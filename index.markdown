@@ -13,6 +13,8 @@ Coffee is on the right desk, that's there, yes, okay. Good Swedish coffee, you w
 
 This is my home in progress: home of a software developer and copyright nerd.
 
+## Short Story
+
 I worked on code, and the most relevant of it is open and free today.
 
 I work on open licensing, copyright advising in creative communities, Free Software, open data, open knowledge, free and open internet.
