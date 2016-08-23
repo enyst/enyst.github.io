@@ -7,11 +7,15 @@ title: Home of a Digital Dweller
 bodyclass: frontpage
 ---
 
+# Welcome
+
 Hi, there. Welcome around, and make yourself comfortable.
 
 Coffee is on the right desk, that's there, yes, okay. Good Swedish coffee, you will see.
 
-This is my home in progress: home of a software developer and copyright nerd.
+This is my home: stripped down home of a software developer and copyright nerd.
+
+(I don't spend much time here, you see.)
 
 ## Short Story
 
