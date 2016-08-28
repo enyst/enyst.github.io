@@ -15,6 +15,7 @@ Just this week, I dropped upon a case, [Wheaton v. Peters](https://www.courtlist
 The court is asked to tell if the author has, in common law, a property-like right to their writings, and if the copyright law as developed next in the country reflects that right. In common law means both common law as in England of the previous century, and its "wisdom of the people here" American counterpart, state law.
 
 The court answers:
+
 > "That an author, at common law, has a property in his manuscript, and may obtain redress against any one who deprives him of it, cannot be doubted; but this is a very different right from that which asserts a perpetual and exclusive property in the future publication of the work, after the author shall have published it to the world."
 
 That is to say, common sense - and common law - tells that no one can and should break into one's house (or computer) and take their unpublished manuscript, copy it, publish it or otherwise use it for their purposes, before the author decides to make it available to the world themselves. However, once published, it's a very different law - and a different meaning of the concept of "property", if we still use it - that we have to recourse to, when we talk of copyright.
