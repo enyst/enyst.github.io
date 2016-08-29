@@ -1,5 +1,6 @@
 ---
 layout: post
+title: Why copyright? Garcia v Google
 category : copyright
 tagline: "Digital Nomad"
 tags : [section 230, copyright preemption, copyright for performance, garcia-v-google, perverse incentives]

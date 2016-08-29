@@ -1,5 +1,6 @@
 ---
 layout: post
+title: EFF is suing over unconstitutionality of DMCA 1201
 category : copyright
 tagline: "Digital Nomad"
 tags : [EFF-v-US, DMCA, freedom of speech]

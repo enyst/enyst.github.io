@@ -1,5 +1,6 @@
 ---
 layout: post
+title: A look at BSD in light of international treaties
 category : copyright
 tagline: "Digital Nomad"
 tags : [bsd, international treaties]
