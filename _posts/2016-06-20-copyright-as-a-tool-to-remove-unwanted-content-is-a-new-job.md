@@ -1,3 +1,11 @@
+---
+layout: post
+category : copyright
+tagline: "Digital Nomad"
+tags : [section 230, copyright misuse]
+---
+{% include JB/setup %}
+
 The trend of using copyright law for things that it wasn't meant for continues. It doesn't only continue, it has become normal, so normal that we have now new job descriptions. Watch this:
 
 > We are looking for an individual or consultant that has made progress in performing DMCA takedowns, Google de-indexing and has a very good understanding of Internet Law and Google's terms and conditions. 

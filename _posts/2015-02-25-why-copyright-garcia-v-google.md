@@ -1,3 +1,11 @@
+---
+layout: post
+category : copyright
+tagline: "Digital Nomad"
+tags : [section 230, copyright preemption, copyright for performance, garcia-v-google]
+---
+{% include JB/setup %}
+
 The first question I had on this case is still the first question that comes to mind, in a week session I did reviewing some of the case: why is this a copyright case?
 
 It could and should be so many others. Fraud, fraudulent inducement or misrepresentations, right of publicity, hate speech related harms, intentional infliction of emotional distress, invasion of privacy, even unfair competition was suggested (cf. International Documentary Ass'n [amicus brief](https://www.eff.org/files/2014/11/26/amicus_brief_of_international_documentary_assoc._film_independent_fredrik_gertten_and_morgan_spurlock_iso_defendants.pdf)). With these or others, Garcia can have relief against who wronged her. It seems just for _them_ to pay. Not [trumpets](http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1474929), as Litman would call Youtube's role here.

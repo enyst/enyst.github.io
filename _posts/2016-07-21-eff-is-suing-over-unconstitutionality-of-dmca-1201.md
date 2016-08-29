@@ -1,3 +1,11 @@
+---
+layout: post
+category : copyright
+tagline: "Digital Nomad"
+tags : [EFF-v-US, DMCA, freedom of speech]
+---
+{% include JB/setup %}
+
 Cory Doctorow blogged about the news that EFF filed a suit against US government for the unconstitutionality of DMCA paragraph 1201.
 
 Finally! I was waiting for this to happen. Cory Doctorow mentioned before in his talks, in the late years, that he went back to work with the EFF on this law. In order for a court to strike it down though, they need a case. A good case, that is, and security research can provide a lot of examples.
