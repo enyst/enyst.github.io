@@ -22,9 +22,9 @@
         <h1 class="header"><a href="{{ HOME_PATH }}">{{ site.title }}</a></h1>
         <p class="header">{{ site.tagline }}</p>
         <ul>
-          {% assign pages_list = site.pages %}
-          {% assign group = 'navigation' %}
-          {% include JB/pages_list %}
+          <li><a href="/open-licensing.html">Open Licensing</a></li>
+          <li><a href="/former-life.html">Former Life</a></li>
+
         </ul>
         {% if site.ads.google %}
         <div class="misc ad">
@@ -38,16 +38,25 @@
           <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js"></script>
         </div>
         {% endif %}
+        <div class="misc vcard">
+          <h4>links</h4>
+          <ul>
+            {% assign pages_list = site.pages %}
+            {% assign group = 'navigation' %}
+            {% include JB/pages_list %}
+          </ul>
+        </div>
         {% if site.author %}
         <div class="misc vcard">
           <h4>about</h4>
           <ul>
+             <li><a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a> <a href="http://github.com/{{ site.author.github }}/" rel="me">enyst</a></li>
             {% if site.author.email %}
             <li class="contact"><address><span class="fn email">{{ site.author.email }}</span></address></li>
             {% endif %}
-            {% if site.author.github %}
+            <!-- {% if site.author.github %}
             <li class="github"><a href="http://github.com/{{ site.author.github }}/" rel="me">github.com/{{ site.author.github }}</a></li>
-            {% endif %}
+            {% endif %} -->
             {% if site.author.twitter %}
             <li class="twitter"><a href="http://twitter.com/{{ site.author.twitter }}/" rel="me">twitter.com/{{ site.author.twitter }}</a></li>
             {% endif %}
@@ -74,7 +83,6 @@
 
       <footer>
       <p><small><a href="https://github.com/sodabrew/theme-dinky">Dinky theme</a> for <a href="http://jekyllbootstrap.com/">Jekyll Bootstrap</a></small></p>
-      <p><small>All material licenseable by me here is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY</a>, unless otherwise noted.</small></p>
       </footer>
     </div>
     <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
