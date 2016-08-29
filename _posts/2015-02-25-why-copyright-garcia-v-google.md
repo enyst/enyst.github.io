@@ -2,7 +2,7 @@
 layout: post
 category : copyright
 tagline: "Digital Nomad"
-tags : [section 230, copyright preemption, copyright for performance, garcia-v-google]
+tags : [section 230, copyright preemption, copyright for performance, garcia-v-google, perverse incentives]
 ---
 {% include JB/setup %}
 

@@ -2,7 +2,7 @@
 layout: post
 category : copyright
 tagline: "Digital Nomad"
-tags : [section 230, copyright misuse]
+tags : [section 230, copyright misuse, perverse incentives]
 ---
 {% include JB/setup %}
 
