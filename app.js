@@ -157,7 +157,7 @@ function lineChart(target, title, months, series) {
 
 function render() {
   document.getElementById('generated').textContent = `Data generated ${DATA.generated_at}.`;
-  document.getElementById('stamps').append(
+  document.getElementById('stamps').replaceChildren(
     el('span', { class: 'pill' }, ['Generated ', DATA.generated_at]),
     el('span', { class: 'pill' }, [`${DATA.methodology.target_repos.length} repositories`]),
     el('span', { class: 'pill' }, ['Self-reviews excluded']),
@@ -177,7 +177,10 @@ function render() {
 
   const reviewerColumns = [
     { label: 'Reviewer', key: 'reviewer', defaultDir: 1, render: (row) => el('span', { class: 'reviewer' }, [row.reviewer]) },
-    { label: 'Role', key: 'role', defaultDir: 1, render: (row) => el('span', { class: `role ${row.role}` }, [row.role]) },
+    { label: 'Role', key: 'role', defaultDir: 1, render: (row) => {
+      const role = row.role || 'community';
+      return el('span', { class: `role ${role}` }, [role]);
+    } },
     { label: 'Total reviews', key: 'total_reviews', num: true },
     { label: 'Community PR reviews', key: 'community_pr_reviews', num: true },
     { label: 'Org PR reviews', key: 'org_pr_reviews', num: true },
@@ -193,7 +196,10 @@ function render() {
   function filterReviewers() {
     const query = document.getElementById('reviewerSearch').value.toLowerCase();
     const role = document.getElementById('roleFilter').value;
-    reviewerTable.setRows(DATA.reviewers.filter((row) => (!role || row.role === role) && (row.reviewer.toLowerCase().includes(query) || row.role.includes(query))));
+    reviewerTable.setRows(DATA.reviewers.filter((row) => {
+      const rowRole = row.role || 'community';
+      return (!role || rowRole === role) && (row.reviewer.toLowerCase().includes(query) || rowRole.includes(query));
+    }));
   }
   document.getElementById('reviewerSearch').oninput = filterReviewers;
   document.getElementById('roleFilter').onchange = filterReviewers;
@@ -220,16 +226,23 @@ function render() {
     { name: 'bot PRs', color: categoryColors.bot, values: DATA.months.map((month) => DATA.by_month[month].bot) }
   ]);
 
-  const topSeries = DATA.reviewers.filter((row) => row.total_reviews > 0).slice(0, 8).map((row, index) => ({
-    name: row.reviewer,
-    color: palette[index % palette.length],
-    values: DATA.months.map((month) => row.by_month[month]?.total || 0)
-  }));
+  const topSeries = [...DATA.reviewers]
+    .sort((a, b) => b.total_reviews - a.total_reviews)
+    .filter((row) => row.total_reviews > 0)
+    .slice(0, 8)
+    .map((row, index) => ({
+      name: row.reviewer,
+      color: palette[index % palette.length],
+      values: DATA.months.map((month) => row.by_month[month]?.total || 0)
+    }));
   lineChart(document.getElementById('topReviewerChart'), 'Top reviewers by monthly review events', DATA.months, topSeries);
 }
 
 fetch('data/review_analysis_data.json')
-  .then((response) => response.json())
+  .then((response) => {
+    if (!response.ok) throw new Error(`HTTP error ${response.status} while loading data`);
+    return response.json();
+  })
   .then((data) => { DATA = data; render(); })
   .catch((error) => {
     document.body.prepend(el('pre', { style: 'white-space:pre-wrap;color:#b4483d;padding:20px' }, [`Failed to load report data: ${error.message}`]));
