@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OpenHands Reviewer Atlas</title>
-  <meta name="description" content="Sortable OpenHands reviewer analysis excluding self-reviews." />
+  <title>OpenHands Review Grove</title>
+  <meta name="description" content="Sortable OpenHands reviewer activity dashboard." />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="shell">
     <header class="hero">
-      <div class="eyebrow">OpenHands reviewer atlas</div>
-      <h1>Review load, without the self-review fog.</h1>
-      <p class="sub">A static, sortable GitHub Pages report for OpenHands PR review activity. Counts exclude review events where the reviewer is also the PR author.</p>
+      <div class="eyebrow">OpenHands review grove</div>
+      <h1>A living map of OpenHands reviews.</h1>
+      <p class="sub">A static, sortable GitHub Pages report for exploring who reviews what across OpenHands repositories, with charts, filters, and quick ways to spot patterns over time.</p>
       <div class="stamp" id="stamps"></div>
     </header>
 
@@ -40,23 +40,32 @@
 
     <section class="grid2">
       <div>
-        <div class="section-head"><div><h2>Month-over-month totals</h2><div class="note">Non-self review events by PR author category.</div></div></div>
+        <div class="section-head"><div><h2>Month-over-month totals</h2><div class="note">Review events by PR author category.</div></div></div>
         <div id="categoryChart"></div>
       </div>
       <div>
-        <div class="section-head"><div><h2>Top reviewers over time</h2><div class="note">Top eight reviewers by total non-self review events.</div></div></div>
+        <div class="section-head"><div><h2>Top reviewers over time</h2><div class="note">Top eight reviewers by total review events.</div></div></div>
         <div id="topReviewerChart"></div>
       </div>
     </section>
 
     <section>
-      <div class="section-head"><div><h2>Reviews by repository</h2><div class="note">Repository totals use the same non-self event set.</div></div></div>
+      <div class="section-head"><div><h2>Reviews by repository</h2><div class="note">Repository totals use the same review-event criteria as the rest of the page.</div></div></div>
       <div class="table-wrap"><table id="repoTable"></table></div>
     </section>
 
     <section>
       <div class="section-head"><div><h2>Monthly data</h2><div class="note">Raw monthly category totals backing the line charts.</div></div></div>
       <div class="table-wrap"><table id="monthTable"></table></div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Methodology notes</h2>
+          <div class="note">Counts include GitHub PR review events with state <code>APPROVED</code>, <code>CHANGES_REQUESTED</code>, or <code>COMMENTED</code>. Self-review events are excluded: if the reviewer is also the PR author, that event is not counted in the tables or charts. PR author buckets follow the latest explicit criteria used in the source JSON.</div>
+        </div>
+      </div>
     </section>
 
     <footer>Created by an AI agent (OpenHands) on behalf of the user. <span id="generated"></span></footer>
