@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands Reviewer Atlas</title>
+  <meta name="description" content="Sortable OpenHands reviewer analysis excluding self-reviews." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="eyebrow">OpenHands reviewer atlas</div>
+      <h1>Review load, without the self-review fog.</h1>
+      <p class="sub">A static, sortable GitHub Pages report for OpenHands PR review activity. Counts exclude review events where the reviewer is also the PR author.</p>
+      <div class="stamp" id="stamps"></div>
+    </header>
+
+    <div class="stats" id="stats"></div>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Reviews by reviewer</h2>
+          <div class="note">Click any column header to sort ascending/descending. Use search to filter reviewers or roles.</div>
+        </div>
+      </div>
+      <div class="controls">
+        <input id="reviewerSearch" type="search" placeholder="Search reviewer or role…" />
+        <select id="roleFilter">
+          <option value="">All roles</option>
+          <option value="maintainer">Maintainers</option>
+          <option value="employee">Employees</option>
+        </select>
+      </div>
+      <div class="table-wrap"><table id="reviewerTable"></table></div>
+    </section>
+
+    <section class="grid2">
+      <div>
+        <div class="section-head"><div><h2>Month-over-month totals</h2><div class="note">Non-self review events by PR author category.</div></div></div>
+        <div id="categoryChart"></div>
+      </div>
+      <div>
+        <div class="section-head"><div><h2>Top reviewers over time</h2><div class="note">Top eight reviewers by total non-self review events.</div></div></div>
+        <div id="topReviewerChart"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><div><h2>Reviews by repository</h2><div class="note">Repository totals use the same non-self event set.</div></div></div>
+      <div class="table-wrap"><table id="repoTable"></table></div>
+    </section>
+
+    <section>
+      <div class="section-head"><div><h2>Monthly data</h2><div class="note">Raw monthly category totals backing the line charts.</div></div></div>
+      <div class="table-wrap"><table id="monthTable"></table></div>
+    </section>
+
+    <footer>Created by an AI agent (OpenHands) on behalf of the user. <span id="generated"></span></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
