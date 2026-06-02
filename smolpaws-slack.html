@@ -47,19 +47,22 @@
     <p>Three approaches exist for connecting an agent to Slack:</p>
 
     <pre class="mermaid">
-flowchart TB
-    subgraph "1. Polling"
+flowchart LR
+    subgraph poll ["1. Polling"]
+        direction TB
         P1["Cron job"] -->|every 60s| P2["conversations.history"]
         P2 --> P3["check triggers"]
         P3 --> P4["start conversation"]
         P4 --> P5["chat.postMessage"]
     end
-    subgraph "2. HTTP Webhooks"
+    subgraph hooks ["2. HTTP Webhooks"]
+        direction TB
         W1["Slack"] -->|POST| W2["Public URL"]
         W2 --> W3["verify + process"]
         W3 --> W4["chat.postMessage"]
     end
-    subgraph "3. Socket Mode ✓"
+    subgraph socket ["3. Socket Mode ✓"]
+        direction TB
         S1["Slack"] <-->|WebSocket| S2["Local process"]
         S2 --> S3["process"]
         S3 --> S4["chat.postMessage"]
