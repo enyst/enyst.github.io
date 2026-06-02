@@ -4,29 +4,98 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Engel Nyst</title>
-  <meta name="description" content="Software developer. Open source. AI agents." />
+  <meta name="description" content="Software developer. Open source. AI agents. Analytical philosophy." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    :root { --ink: #e8e6e3; --muted: #9ca3af; --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #58a6ff; --green: #3fb950; --mono: "SFMono-Regular", "Cascadia Mono", "Liberation Mono", monospace; --sans: "Inter", -apple-system, "Segoe UI", sans-serif; }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.6; min-height: 100vh; }
-    .shell { max-width: 720px; margin: 0 auto; padding: 60px 24px; }
-    h1 { font-size: 2.4em; margin: 0 0 8px; letter-spacing: -0.03em; }
-    .tagline { color: var(--muted); font-size: 1.1em; margin: 0 0 40px; }
-    h2 { font-size: 1.2em; margin: 32px 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--mono); font-size: 0.8em; }
-    .cards { display: grid; gap: 12px; }
-    a.card { display: block; text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: border-color 0.15s, box-shadow 0.15s; }
-    a.card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-    .card-title { font-weight: 700; font-size: 1.05em; margin-bottom: 4px; }
-    .card-desc { color: var(--muted); font-size: 0.9em; }
-    .card-tag { display: inline-block; font-family: var(--mono); font-size: 0.7em; padding: 2px 8px; border-radius: 999px; margin-top: 8px; }
-    .tag-live { background: rgba(63, 185, 80, 0.15); color: var(--green); }
-    .tag-planned { background: rgba(88, 166, 255, 0.15); color: var(--accent); }
-    .tag-data { background: rgba(210, 153, 34, 0.15); color: #d29922; }
-    .links { list-style: none; padding: 0; margin: 0; }
-    .links li { margin: 6px 0; }
-    .links a { color: var(--accent); text-decoration: none; }
-    .links a:hover { text-decoration: underline; }
-    footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8em; }
+    :root {
+      --ink: #e5e0d8; --muted: #8a847a; --bg: #0f0f0e; --card: #1a1a18;
+      --border: #2a2a26; --accent: #c9a84c; --teal: #6bbfab; --green: #7bc47f;
+      --serif: "Instrument Serif", Georgia, serif;
+      --sans: "DM Sans", system-ui, sans-serif;
+      --mono: "JetBrains Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      background: var(--bg); color: var(--ink); font-family: var(--sans);
+      line-height: 1.6; min-height: 100vh;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+    }
+    .shell { max-width: 680px; margin: 0 auto; padding: 100px 28px 80px; }
+
+    h1 {
+      font-family: var(--serif); font-size: clamp(3.2em, 8vw, 5em);
+      font-weight: 400; letter-spacing: -0.04em; line-height: 0.95;
+      margin-bottom: 16px;
+      animation: fadeUp 0.6s ease-out both;
+    }
+    .tagline {
+      color: var(--muted); font-size: 1.05em; margin-bottom: 72px;
+      letter-spacing: 0.01em;
+      animation: fadeUp 0.6s ease-out 0.1s both;
+    }
+
+    h2 {
+      font-family: var(--mono); font-size: 0.72em; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--accent); margin: 56px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cards { display: grid; gap: 14px; }
+    a.card {
+      display: block; text-decoration: none; color: var(--ink);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 22px 24px;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      position: relative; overflow: hidden;
+    }
+    a.card::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--accent); opacity: 0;
+      transition: opacity 0.2s;
+    }
+    a.card:hover {
+      border-color: var(--accent); transform: translateX(4px);
+      box-shadow: -4px 0 0 var(--accent);
+    }
+    a.card:hover::before { opacity: 1; }
+    .card-title { font-weight: 700; font-size: 1em; margin-bottom: 6px; }
+    .card-desc { color: var(--muted); font-size: 0.88em; line-height: 1.5; }
+    .card-tag {
+      display: inline-block; font-family: var(--mono); font-size: 0.65em;
+      font-weight: 600; padding: 3px 10px; border-radius: 3px; margin-top: 10px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .tag-live { background: rgba(123,196,127,0.12); color: var(--green); }
+    .tag-planned { background: rgba(107,191,171,0.12); color: var(--teal); }
+    .tag-data { background: rgba(201,168,76,0.12); color: var(--accent); }
+
+    .links {
+      list-style: none; padding: 0;
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .links a {
+      color: var(--teal); text-decoration: none;
+      font-family: var(--mono); font-size: 0.85em;
+      padding-bottom: 1px; border-bottom: 1px solid transparent;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .links a:hover { border-bottom-color: var(--teal); color: var(--ink); }
+
+    footer {
+      margin-top: 80px; padding-top: 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 0.78em;
+      font-family: var(--mono); letter-spacing: 0.01em;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>

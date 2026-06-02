@@ -5,36 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SmolPaws Discord Entry Point — Engel Nyst</title>
   <meta name="description" content="Architecture of the SmolPaws Discord ingress app." />
-  <style>
-    :root { --ink: #e8e6e3; --muted: #9ca3af; --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #58a6ff; --green: #3fb950; --mono: "SFMono-Regular", "Cascadia Mono", "Liberation Mono", monospace; --sans: "Inter", -apple-system, "Segoe UI", sans-serif; }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.7; min-height: 100vh; }
-    .shell { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
-    .back { color: var(--muted); text-decoration: none; font-size: 0.85em; font-family: var(--mono); }
-    .back:hover { color: var(--accent); }
-    h1 { font-size: 2em; margin: 16px 0 4px; letter-spacing: -0.03em; }
-    .meta { color: var(--muted); font-size: 0.9em; margin-bottom: 32px; }
-    .meta a { color: var(--accent); text-decoration: none; }
-    .meta a:hover { text-decoration: underline; }
-    .tag { display: inline-block; font-family: var(--mono); font-size: 0.7em; padding: 2px 8px; border-radius: 999px; background: rgba(63, 185, 80, 0.15); color: var(--green); vertical-align: middle; margin-left: 8px; }
-    h2 { font-size: 1.3em; margin: 40px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-    h3 { font-size: 1.05em; margin: 24px 0 8px; color: var(--accent); }
-    p { margin: 8px 0 16px; }
-    pre.mermaid { background: transparent; text-align: center; margin: 24px 0; }
-    pre.code { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.85em; line-height: 1.5; color: var(--ink); margin: 16px 0; }
-    table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
-    th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
-    th { background: var(--card); font-family: var(--mono); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
-    code { background: var(--card); padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 0.88em; }
-    ul { padding-left: 20px; }
-    li { margin: 4px 0; }
-    strong { color: #f0f0f0; }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="arch.css" />
 </head>
 <body>
   <div class="shell">
     <a class="back" href="index.html">← Home</a>
-    <h1>SmolPaws Discord Entry Point <span class="tag">live</span></h1>
+    <h1>SmolPaws Discord Entry Point <span class="tag tag-live">live</span></h1>
     <p class="meta">
       How the Discord ingress receives messages and dispatches to the agent server.<br>
       Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/discord">apps/discord/</a>
@@ -187,7 +166,7 @@ flowchart TB
 
     <p>Each ingress is a thin adapter: receive platform events → build conversation ID → dispatch via <code>turnClient</code> → deliver results back. Agent logic, conversation state, and turn management all live in the agent server.</p>
 
-    <p style="margin-top: 40px;"><a class="back" href="index.html">← Home</a></p>
+    <div class="foot-nav"><a href="index.html">← Home</a></div>
   </div>
 
   <script type="module">
