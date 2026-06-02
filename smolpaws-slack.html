@@ -28,14 +28,19 @@ flowchart TB
         direction LR
         P1["Cron job"] -->|every 60s| P2["conversations.history"] --> P3["check triggers"] --> P4["start conversation"] --> P5["chat.postMessage"]
     end
+
     subgraph hooks ["2. HTTP Webhooks"]
         direction LR
         W1["Slack"] -->|POST| W2["Public URL"] --> W3["verify + process"] --> W4["chat.postMessage"]
     end
+
     subgraph socket ["3. Socket Mode ✓"]
         direction LR
         S1["Slack"] <-->|WebSocket| S2["Local process"] --> S3["process"] --> S4["chat.postMessage"]
     end
+
+    poll ~~~ hooks
+    hooks ~~~ socket
     </pre>
 
     <p>SmolPaws uses <strong>Socket Mode</strong> because:</p>
