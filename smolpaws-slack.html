@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmolPaws Slack Entry Point — Engel Nyst</title>
+  <meta name="description" content="Socket Mode architecture for the SmolPaws Slack ingress." />
+  <style>
+    :root { --ink: #e8e6e3; --muted: #9ca3af; --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #58a6ff; --green: #3fb950; --mono: "SFMono-Regular", "Cascadia Mono", "Liberation Mono", monospace; --sans: "Inter", -apple-system, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.7; min-height: 100vh; }
+    .shell { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+    .back { color: var(--muted); text-decoration: none; font-size: 0.85em; font-family: var(--mono); }
+    .back:hover { color: var(--accent); }
+    h1 { font-size: 2em; margin: 16px 0 4px; letter-spacing: -0.03em; }
+    .meta { color: var(--muted); font-size: 0.9em; margin-bottom: 32px; }
+    .meta a { color: var(--accent); text-decoration: none; }
+    .meta a:hover { text-decoration: underline; }
+    .tag { display: inline-block; font-family: var(--mono); font-size: 0.7em; padding: 2px 8px; border-radius: 999px; vertical-align: middle; margin-left: 8px; }
+    .tag-planned { background: rgba(88, 166, 255, 0.15); color: var(--accent); }
+    h2 { font-size: 1.3em; margin: 40px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    h3 { font-size: 1.05em; margin: 24px 0 8px; color: var(--accent); }
+    p { margin: 8px 0 16px; }
+    pre.mermaid { background: transparent; text-align: center; margin: 24px 0; }
+    pre.code { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.85em; line-height: 1.5; color: var(--ink); margin: 16px 0; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
+    th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+    th { background: var(--card); font-family: var(--mono); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    code { background: var(--card); padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 0.88em; }
+    ul { padding-left: 20px; }
+    li { margin: 4px 0; }
+    strong { color: #f0f0f0; }
+    .callout { background: var(--card); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 20px 0; }
+    .callout p { margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="index.html">← Home</a>
+    <h1>SmolPaws Slack Entry Point <span class="tag tag-planned">planned</span></h1>
+    <p class="meta">
+      Socket Mode architecture for the Slack ingress — replacing Chrome browser polling with a real Slack app.<br>
+      Tracking: <a href="https://github.com/smolpaws/smolpaws/issues/105">issue #105</a> · Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/slack">apps/slack/</a> (scaffold only)
+    </p>
+
+    <h2>Why Socket Mode</h2>
+    <p>Three approaches exist for connecting an agent to Slack:</p>
+
+    <pre class="mermaid">
+flowchart TB
+    subgraph "1. Polling"
+        P1["Cron job"] -->|every 60s| P2["conversations.history"]
+        P2 --> P3["check triggers"]
+        P3 --> P4["start conversation"]
+        P4 --> P5["chat.postMessage"]
+    end
+    subgraph "2. HTTP Webhooks"
+        W1["Slack"] -->|POST| W2["Public URL"]
+        W2 --> W3["verify + process"]
+        W3 --> W4["chat.postMessage"]
+    end
+    subgraph "3. Socket Mode ✓"
+        S1["Slack"] <-->|WebSocket| S2["Local process"]
+        S2 --> S3["process"]
+        S3 --> S4["chat.postMessage"]
+    end
+    </pre>
+
+    <p>SmolPaws uses <strong>Socket Mode</strong> because:</p>
+    <ul>
+      <li>No public URL or tunnel required — the bot connects <em>outbound</em> to Slack</li>
+      <li>Event-driven, not poll-driven — no timestamp drift, no missed windows</li>
+      <li>Fits the existing pattern: Discord and WhatsApp are both long-running local processes</li>
+      <li>Fewer API scopes needed — the app reacts to delivered events rather than scraping history</li>
+    </ul>
+
+    <h2>Target Architecture</h2>
+
+    <pre class="mermaid">
+flowchart LR
+    A["Slack\nSocket Mode"] <-->|WebSocket| B["apps/slack\n(@slack/bolt)"]
+    B -->|HTTP POST| C["agent-server\n127.0.0.1:8788"]
+    C -->|runs agent| D["OpenHands\nruntime"]
+    D -->|turn result +\noutbound msgs| C
+    C -->|poll + claim| B
+    B -->|chat.postMessage\nwith thread_ts| A
+    </pre>
+
+    <p>Same thin-ingress pattern as Discord:</p>
+    <ol>
+      <li>Receive Slack event over Socket Mode WebSocket</li>
+      <li>Build a stable conversation ID from Slack identifiers</li>
+      <li>Dispatch to the agent server via the shared <code>turnClient.ts</code></li>
+      <li>Poll for turn completion and claim outbound messages</li>
+      <li>Deliver results back to Slack in the correct thread</li>
+    </ol>
+
+    <h2>Message Flow</h2>
+
+    <pre class="mermaid">
+sequenceDiagram
+    participant U as Slack User
+    participant S as Slack API
+    participant I as apps/slack
+    participant A as agent-server
+    participant R as Agent Runtime
+
+    U->>S: DM or @smolpaws mention
+    S->>I: event via Socket Mode
+    I->>I: isAllowedSlackEvent()
+    I->>I: buildSlackConversationId()
+    I->>I: stripBotMention()
+    I->>A: submitConversationMessage()
+    A->>R: create/resume conversation
+    loop poll until terminal
+        I->>A: getTurnStatus()
+        I->>A: claimTurnOutboundMessages()
+        I-->>S: deliver outbound messages
+    end
+    I->>A: getTurnResult()
+    I->>S: chat.postMessage (thread_ts)
+    S->>U: sees reply in thread
+    </pre>
+
+    <h2>Event Handling</h2>
+    <p>Phase 1 handles two event types:</p>
+
+    <h3>app_mention</h3>
+    <p>Fires when someone types <code>@smolpaws</code> in a channel. The bot replies in a thread under the mentioning message.</p>
+    <pre class="code">app.event("app_mention")
+  → extract text, strip bot mention
+  → build conversation ID from team + channel + thread_ts
+  → dispatch to agent server
+  → reply with thread_ts = event.ts (or event.thread_ts if already threaded)</pre>
+
+    <h3>message.im</h3>
+    <p>Fires on every DM to the bot. No mention required.</p>
+    <pre class="code">app.event("message")  // filter: channel_type === "im"
+  → skip bot messages and subtypes
+  → build conversation ID from team + channel
+  → dispatch to agent server
+  → reply in the DM</pre>
+
+    <h2>Conversation ID Generation</h2>
+    <p>Stable IDs scoped to the Slack workspace:</p>
+
+    <table>
+      <tr><th>Context</th><th>Pattern</th><th>Example</th></tr>
+      <tr><td>DM</td><td><code>slack-im-{team_id}-{channel_id}</code></td><td><code>slack-im-T06P-D08X</code></td></tr>
+      <tr><td>Channel thread</td><td><code>slack-thread-{team_id}-{channel_id}-{thread_ts}</code></td><td><code>slack-thread-T06P-C06P-1717200000.000100</code></td></tr>
+    </table>
+
+    <p>Design decisions:</p>
+    <ul>
+      <li><strong>DMs use channel_id, not user_id</strong> — Slack assigns a unique DM channel per user pair, equivalent but consistent with Slack's model</li>
+      <li><strong>Threads always use thread_ts</strong> — the bot always replies in a thread, using the root message's <code>ts</code> as <code>thread_ts</code></li>
+      <li><strong>team_id included</strong> — supports multi-workspace without collision</li>
+    </ul>
+
+    <h2>Comparison With Hermes</h2>
+    <p>Hermes has a mature Slack adapter (~3000 lines, Python). The two designs target different tradeoffs:</p>
+
+    <pre class="mermaid">
+flowchart TB
+    subgraph "Hermes: monolithic gateway"
+        H1["GatewayRunner"] --> H2["SlackAdapter"]
+        H1 --> H3["TelegramAdapter"]
+        H1 --> H4["DiscordAdapter"]
+        H1 --> H5["WhatsAppAdapter"]
+        H1 --> H6["20+ more..."]
+        H2 --> H7["AIAgent\n(in-process)"]
+    end
+    subgraph "SmolPaws: thin ingresses"
+        S1["apps/slack"] --> S2["turnClient.ts"]
+        S3["apps/discord"] --> S2
+        S4["apps/github"] --> S2
+        S2 --> S5["agent-server\n(separate process)"]
+    end
+    </pre>
+
+    <table>
+      <tr><th>Aspect</th><th>Hermes</th><th>SmolPaws</th></tr>
+      <tr><td>Language</td><td>Python (<code>slack-bolt</code>)</td><td>TypeScript (<code>@slack/bolt</code>)</td></tr>
+      <tr><td>Process model</td><td>All platforms in one gateway</td><td>Separate process per platform</td></tr>
+      <tr><td>Agent coupling</td><td>Agent runs in-process</td><td>Agent in separate server, HTTP API</td></tr>
+      <tr><td>Adapter size</td><td>~3000 lines</td><td>Target: ~200–300 lines</td></tr>
+      <tr><td>Multi-workspace</td><td>Yes (comma tokens + OAuth file)</td><td>Single workspace for MVP</td></tr>
+      <tr><td>Mention gating</td><td>Per-channel config</td><td>DMs: always; channels: require @mention</td></tr>
+      <tr><td>Thread tracking</td><td>Bot-TS memory, mentioned-thread sets</td><td>One conversation per thread_ts</td></tr>
+      <tr><td>Slash commands</td><td>All gateway commands as native slashes</td><td>Not in phase 1</td></tr>
+      <tr><td>Dedup</td><td><code>MessageDeduplicator</code> class</td><td>TBD (in-memory set + TTL)</td></tr>
+      <tr><td>Rich content</td><td>Block Kit, files, audio, approval buttons</td><td>Plain text for MVP</td></tr>
+    </table>
+
+    <div class="callout">
+      <p>SmolPaws' design is intentionally simpler. The complexity lives in the agent server, not the ingress adapter. The Hermes adapter is a useful reference for what SmolPaws might eventually need.</p>
+    </div>
+
+    <h2>Slack Permissions</h2>
+    <p>Minimal scopes for phase 1:</p>
+
+    <h3>Bot token scopes</h3>
+    <table>
+      <tr><th>Scope</th><th>Purpose</th></tr>
+      <tr><td><code>app_mentions:read</code></td><td>Receive @mention events in channels</td></tr>
+      <tr><td><code>chat:write</code></td><td>Post replies</td></tr>
+      <tr><td><code>im:history</code></td><td>Read DM messages</td></tr>
+    </table>
+
+    <h3>Event subscriptions</h3>
+    <table>
+      <tr><th>Event</th><th>Purpose</th></tr>
+      <tr><td><code>app_mention</code></td><td>Channel/thread mentions</td></tr>
+      <tr><td><code>message.im</code></td><td>DM messages</td></tr>
+    </table>
+
+    <p>Broader scopes (<code>channels:history</code>, <code>groups:history</code>, <code>reactions:write</code>) are deferred until code actually needs them.</p>
+
+    <h2>Configuration</h2>
+
+    <table>
+      <tr><th>Variable</th><th>Required</th><th>Default</th><th>Purpose</th></tr>
+      <tr><td><code>SLACK_BOT_TOKEN</code></td><td>yes</td><td>—</td><td>Bot token (<code>xoxb-...</code>)</td></tr>
+      <tr><td><code>SLACK_APP_TOKEN</code></td><td>yes</td><td>—</td><td>App-level token for Socket Mode (<code>xapp-...</code>)</td></tr>
+      <tr><td><code>SMOLPAWS_RUNNER_URL</code></td><td>no</td><td><code>http://127.0.0.1:8788</code></td><td>Agent server base URL</td></tr>
+      <tr><td><code>SMOLPAWS_RUNNER_TOKEN</code></td><td>no</td><td>—</td><td>Auth token for agent server</td></tr>
+      <tr><td><code>SLACK_ALLOWED_TEAM_IDS</code></td><td>no</td><td>—</td><td>Comma-separated workspace IDs</td></tr>
+      <tr><td><code>SLACK_ALLOWED_CHANNEL_IDS</code></td><td>no</td><td>—</td><td>Comma-separated channel IDs</td></tr>
+      <tr><td><code>SLACK_ALLOWED_USER_IDS</code></td><td>no</td><td>—</td><td>Comma-separated user IDs</td></tr>
+    </table>
+
+    <h2>Planned File Layout</h2>
+    <pre class="code">apps/slack/
+├── package.json
+├── tsconfig.json
+├── AGENTS.md
+└── src/
+    ├── index.ts              # Bolt app, event handlers, delivery
+    ├── config.ts             # env parsing, allowlists
+    ├── slackContext.ts        # conversation ID + metadata helpers
+    ├── agentServerClient.ts   # turn API wrapper (like Discord's)
+    └── __tests__/
+        └── slackContext.test.ts</pre>
+
+    <h2>Open Questions</h2>
+    <ol>
+      <li><strong>Channel-thread history</strong> — Should the bot fetch bounded thread context? Adds scopes and complexity. Leaning no for MVP.</li>
+      <li><strong>Slash commands</strong> — Hermes shows the pattern (regex dispatcher, ephemeral ack, response_url replace). Leaning wait.</li>
+      <li><strong>LaunchAgent</strong> — Ship as manual <code>npm run dev</code> first, or include a LaunchAgent from day one? Leaning manual first.</li>
+      <li><strong>Dedup</strong> — Socket Mode can redeliver events on reconnect. Simple in-memory set with TTL should suffice.</li>
+    </ol>
+
+    <p style="margin-top: 40px;"><a class="back" href="index.html">← Home</a></p>
+  </div>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script>
+</body>
+</html>

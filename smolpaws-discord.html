@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmolPaws Discord Entry Point — Engel Nyst</title>
+  <meta name="description" content="Architecture of the SmolPaws Discord ingress app." />
+  <style>
+    :root { --ink: #e8e6e3; --muted: #9ca3af; --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #58a6ff; --green: #3fb950; --mono: "SFMono-Regular", "Cascadia Mono", "Liberation Mono", monospace; --sans: "Inter", -apple-system, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.7; min-height: 100vh; }
+    .shell { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+    .back { color: var(--muted); text-decoration: none; font-size: 0.85em; font-family: var(--mono); }
+    .back:hover { color: var(--accent); }
+    h1 { font-size: 2em; margin: 16px 0 4px; letter-spacing: -0.03em; }
+    .meta { color: var(--muted); font-size: 0.9em; margin-bottom: 32px; }
+    .meta a { color: var(--accent); text-decoration: none; }
+    .meta a:hover { text-decoration: underline; }
+    .tag { display: inline-block; font-family: var(--mono); font-size: 0.7em; padding: 2px 8px; border-radius: 999px; background: rgba(63, 185, 80, 0.15); color: var(--green); vertical-align: middle; margin-left: 8px; }
+    h2 { font-size: 1.3em; margin: 40px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    h3 { font-size: 1.05em; margin: 24px 0 8px; color: var(--accent); }
+    p { margin: 8px 0 16px; }
+    pre.mermaid { background: transparent; text-align: center; margin: 24px 0; }
+    pre.code { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.85em; line-height: 1.5; color: var(--ink); margin: 16px 0; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.9em; }
+    th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+    th { background: var(--card); font-family: var(--mono); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    code { background: var(--card); padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 0.88em; }
+    ul { padding-left: 20px; }
+    li { margin: 4px 0; }
+    strong { color: #f0f0f0; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="index.html">← Home</a>
+    <h1>SmolPaws Discord Entry Point <span class="tag">live</span></h1>
+    <p class="meta">
+      How the Discord ingress receives messages and dispatches to the agent server.<br>
+      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/discord">apps/discord/</a>
+    </p>
+
+    <h2>Overview</h2>
+    <p>The Discord ingress is a long-running local Node.js process. It connects to Discord via the Gateway WebSocket (discord.js), receives messages, and dispatches them to the shared SmolPaws agent server over HTTP.</p>
+
+    <pre class="mermaid">
+flowchart LR
+    A["Discord\nGateway"] -->|WebSocket| B["apps/discord\n(discord.js)"]
+    B -->|HTTP POST| C["agent-server\n127.0.0.1:8788"]
+    C -->|runs agent| D["OpenHands\nruntime"]
+    D -->|turn result +\noutbound msgs| C
+    C -->|poll + claim| B
+    B -->|reply| A
+    </pre>
+
+    <h2>Message Flow</h2>
+
+    <pre class="mermaid">
+sequenceDiagram
+    participant U as Discord User
+    participant D as Discord API
+    participant I as apps/discord
+    participant S as agent-server
+    participant A as Agent Runtime
+
+    U->>D: message or @mention
+    D->>I: MessageCreate (WebSocket)
+    I->>I: shouldRespond() + isAllowed()
+    I->>I: buildConversationId()
+    I->>I: extractPrompt()
+    I->>S: submitConversationMessage()
+    S->>A: create/resume conversation
+    loop poll until terminal
+        I->>S: getTurnStatus()
+        I->>S: claimTurnOutboundMessages()
+        I-->>D: deliver outbound messages
+    end
+    I->>S: getTurnResult()
+    I->>D: reply in thread
+    D->>U: sees reply
+    </pre>
+
+    <h2>Entry Decision Logic</h2>
+    <p>The bot decides whether to respond with two checks:</p>
+
+    <h3>shouldRespond()</h3>
+    <pre class="code">1. Ignore bot messages
+2. Respond if bot is @mentioned
+3. Respond if trigger pattern matches (default: @smolpaws)
+4. Respond to all DMs
+5. Otherwise: ignore</pre>
+
+    <h3>isAllowed()</h3>
+    <pre class="code">1. If ALLOWED_USERS set → user must be in the list
+2. DMs always pass (after user check)
+3. If ALLOWED_GUILDS set → guild must be in the list
+4. If ALLOWED_CHANNELS set → channel must be in the list</pre>
+
+    <h2>Conversation ID Generation</h2>
+    <p>Stable IDs derived from Discord's own identifiers:</p>
+
+    <table>
+      <tr><th>Context</th><th>Pattern</th><th>Example</th></tr>
+      <tr><td>DM</td><td><code>discord-dm-{author_id}</code></td><td><code>discord-dm-123456789</code></td></tr>
+      <tr><td>Thread</td><td><code>discord-thread-{thread_id}</code></td><td><code>discord-thread-987654321</code></td></tr>
+      <tr><td>Channel</td><td><code>discord-channel-{channel_id}</code></td><td><code>discord-channel-111222333</code></td></tr>
+    </table>
+
+    <ul>
+      <li>Each DM user gets one persistent conversation</li>
+      <li>Each Discord thread maps to one agent conversation</li>
+      <li>Non-threaded channel messages share a conversation per channel</li>
+    </ul>
+
+    <h2>Turn API Dispatch</h2>
+    <p>The Discord app uses the shared <code>turnClient.ts</code> — the same client used by the GitHub Cloudflare Worker.</p>
+
+    <pre class="mermaid">
+flowchart TB
+    subgraph "apps/discord"
+        A["agentServerClient.ts"] --> B["dispatchToAgentServer()"]
+    end
+    subgraph "src/shared/turnClient.ts"
+        C1["submitConversationMessage()"]
+        C2["monitorTurn()"]
+        C3["getTurnStatus()"]
+        C4["claimTurnOutboundMessages()"]
+        C5["getTurnResult()"]
+        C2 --> C3 & C4 & C5
+    end
+    B --> C1
+    B --> C2
+    </pre>
+
+    <p>Key details:</p>
+    <ul>
+      <li><strong>deliveryOwnerId</strong> — random UUID per dispatch. First submitter wins delivery ownership. Only the owner polls for and claims outbound messages.</li>
+      <li><strong>idempotencyKey</strong> — set to Discord <code>message.id</code> to prevent double-processing.</li>
+      <li><strong>createConversation</strong> — sent on every submit. Server creates if new, appends if existing.</li>
+      <li><strong>Outbound messages</strong> — claimed during polling and delivered to Discord immediately (not batched).</li>
+    </ul>
+
+    <h2>Configuration</h2>
+    <p>All via environment variables from <code>~/.smolpaws/.env</code>:</p>
+
+    <table>
+      <tr><th>Variable</th><th>Required</th><th>Default</th><th>Purpose</th></tr>
+      <tr><td><code>DISCORD_BOT_TOKEN</code></td><td>yes</td><td>—</td><td>Discord bot token</td></tr>
+      <tr><td><code>SMOLPAWS_RUNNER_URL</code></td><td>no</td><td><code>http://127.0.0.1:8788</code></td><td>Agent server base URL</td></tr>
+      <tr><td><code>SMOLPAWS_RUNNER_TOKEN</code></td><td>no</td><td>—</td><td>Auth token for agent server</td></tr>
+      <tr><td><code>DISCORD_TRIGGER</code></td><td>no</td><td><code>@smolpaws</code></td><td>Text trigger pattern</td></tr>
+      <tr><td><code>DISCORD_ALLOWED_GUILDS</code></td><td>no</td><td>—</td><td>Comma-separated guild IDs</td></tr>
+      <tr><td><code>DISCORD_ALLOWED_CHANNELS</code></td><td>no</td><td>—</td><td>Comma-separated channel IDs</td></tr>
+      <tr><td><code>DISCORD_ALLOWED_USERS</code></td><td>no</td><td>—</td><td>Comma-separated usernames</td></tr>
+    </table>
+
+    <h2>Process Model</h2>
+    <ul>
+      <li>Single Node.js process, ~290 lines total</li>
+      <li>Uses discord.js Gateway WebSocket (not HTTP webhooks)</li>
+      <li>Typing indicator refreshed every 8 seconds while the agent works</li>
+      <li>Graceful shutdown on SIGINT / SIGTERM</li>
+      <li>Messages > 2000 chars split at natural boundaries</li>
+    </ul>
+
+    <h2>Shared Infrastructure</h2>
+    <p>Discord, GitHub, and the planned Slack ingress all share the same turn client:</p>
+
+    <pre class="mermaid">
+flowchart TB
+    subgraph "Ingress Apps"
+        D["Discord\napps/discord"]
+        G["GitHub\napps/github"]
+        S["Slack\napps/slack"]
+    end
+    subgraph "Shared"
+        T["turnClient.ts\nsrc/shared/"]
+    end
+    subgraph "Backend"
+        A["agent-server\napps/agent-server"]
+    end
+    D --> T
+    G --> T
+    S -.->|planned| T
+    T --> A
+    </pre>
+
+    <p>Each ingress is a thin adapter: receive platform events → build conversation ID → dispatch via <code>turnClient</code> → deliver results back. Agent logic, conversation state, and turn management all live in the agent server.</p>
+
+    <p style="margin-top: 40px;"><a class="back" href="index.html">← Home</a></p>
+  </div>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script>
+</body>
+</html>

@@ -3,121 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OpenHands Review Grove</title>
-  <meta name="description" content="Sortable OpenHands reviewer activity dashboard." />
-  <link rel="stylesheet" href="styles.css" />
+  <title>Engel Nyst</title>
+  <meta name="description" content="Software developer. Open source. AI agents." />
+  <style>
+    :root { --ink: #e8e6e3; --muted: #9ca3af; --bg: #0d1117; --card: #161b22; --border: #30363d; --accent: #58a6ff; --green: #3fb950; --mono: "SFMono-Regular", "Cascadia Mono", "Liberation Mono", monospace; --sans: "Inter", -apple-system, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.6; min-height: 100vh; }
+    .shell { max-width: 720px; margin: 0 auto; padding: 60px 24px; }
+    h1 { font-size: 2.4em; margin: 0 0 8px; letter-spacing: -0.03em; }
+    .tagline { color: var(--muted); font-size: 1.1em; margin: 0 0 40px; }
+    h2 { font-size: 1.2em; margin: 32px 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--mono); font-size: 0.8em; }
+    .cards { display: grid; gap: 12px; }
+    a.card { display: block; text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: border-color 0.15s, box-shadow 0.15s; }
+    a.card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .card-title { font-weight: 700; font-size: 1.05em; margin-bottom: 4px; }
+    .card-desc { color: var(--muted); font-size: 0.9em; }
+    .card-tag { display: inline-block; font-family: var(--mono); font-size: 0.7em; padding: 2px 8px; border-radius: 999px; margin-top: 8px; }
+    .tag-live { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+    .tag-planned { background: rgba(88, 166, 255, 0.15); color: var(--accent); }
+    .tag-data { background: rgba(210, 153, 34, 0.15); color: #d29922; }
+    .links { list-style: none; padding: 0; margin: 0; }
+    .links li { margin: 6px 0; }
+    .links a { color: var(--accent); text-decoration: none; }
+    .links a:hover { text-decoration: underline; }
+    footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8em; }
+  </style>
 </head>
 <body>
-  <main class="shell">
-    <header class="hero">
-      <div class="eyebrow">OpenHands review grove</div>
-      <h1>A living map of OpenHands reviews.</h1>
-      <p class="sub">A static, sortable GitHub Pages report for exploring who reviews what across OpenHands repositories, with charts, filters, and quick ways to spot patterns over time.</p>
-      <div class="stamp" id="stamps"></div>
-    </header>
+  <div class="shell">
+    <h1>Engel Nyst</h1>
+    <p class="tagline">Software developer. Open source. AI agents. Runtime surfaces.</p>
 
-    <div class="stats" id="stats"></div>
+    <h2>Architecture</h2>
+    <div class="cards">
+      <a class="card" href="smolpaws-discord.html">
+        <div class="card-title">SmolPaws Discord Entry Point</div>
+        <div class="card-desc">How the Discord ingress receives messages and dispatches to the agent server via the shared turn API.</div>
+        <span class="card-tag tag-live">live</span>
+      </a>
+      <a class="card" href="smolpaws-slack.html">
+        <div class="card-title">SmolPaws Slack Entry Point</div>
+        <div class="card-desc">Socket Mode architecture for the Slack ingress — replacing Chrome polling with a real Slack app.</div>
+        <span class="card-tag tag-planned">planned</span>
+      </a>
+    </div>
 
-    <section>
-      <div class="section-head">
-        <div>
-          <h2>Scope & criteria</h2>
-          <div class="note">What is counted, where it comes from, and how PR authors are bucketed.</div>
-        </div>
-      </div>
-      <div class="prose-grid">
-        <div class="prose-card">
-          <h3>Repositories</h3>
-          <ul id="repoList"></ul>
-        </div>
-        <div class="prose-card">
-          <h3>Review event rule</h3>
-          <p>Counts include GitHub PR review events with state <code>APPROVED</code>, <code>CHANGES_REQUESTED</code>, or <code>COMMENTED</code>. Events where the reviewer is also the PR author are excluded.</p>
-        </div>
-        <div class="prose-card wide">
-          <h3>PR author bucket rule</h3>
-          <p id="criteriaRule"></p>
-        </div>
-      </div>
-    </section>
+    <h2>Data</h2>
+    <div class="cards">
+      <a class="card" href="review-grove/">
+        <div class="card-title">OpenHands Review Grove</div>
+        <div class="card-desc">Sortable reviewer activity dashboard — who reviews what across OpenHands repositories.</div>
+        <span class="card-tag tag-data">data</span>
+      </a>
+    </div>
 
-    <section>
-      <div class="section-head">
-        <div>
-          <h2>Reviews by reviewer</h2>
-          <div class="note">Click any column header to sort ascending/descending. Use search to filter reviewers or roles.</div>
-        </div>
-      </div>
-      <div class="controls">
-        <label class="visually-hidden" for="reviewerSearch">Search reviewers or roles</label>
-        <input id="reviewerSearch" type="search" placeholder="Search reviewer or role…" aria-label="Search reviewers or roles" />
-        <label class="visually-hidden" for="roleFilter">Filter reviewers by role</label>
-        <select id="roleFilter" aria-label="Filter reviewers by role">
-          <option value="">All roles</option>
-          <option value="maintainer">Maintainers</option>
-          <option value="employee">Employees</option>
-        </select>
-      </div>
-      <div class="table-wrap"><table id="reviewerTable"></table></div>
-    </section>
+    <h2>Elsewhere</h2>
+    <ul class="links">
+      <li><a href="https://github.com/enyst">GitHub</a></li>
+      <li><a href="https://github.com/All-Hands-AI/OpenHands">OpenHands</a></li>
+      <li><a href="https://github.com/smolpaws/smolpaws">SmolPaws</a></li>
+    </ul>
 
-    <section class="grid2">
-      <div>
-        <div class="section-head"><div><h2>Month-over-month totals</h2><div class="note">Review events by PR author category.</div></div></div>
-        <div id="categoryChart"></div>
-      </div>
-      <div>
-        <div class="section-head"><div><h2>Top reviewers over time</h2><div class="note">Top eight reviewers by total review events.</div></div></div>
-        <div id="topReviewerChart"></div>
-      </div>
-    </section>
-
-    <section>
-      <div class="section-head"><div><h2>Reviews by repository</h2><div class="note">Repository totals use the same review-event criteria as the rest of the page.</div></div></div>
-      <div class="table-wrap"><table id="repoTable"></table></div>
-    </section>
-
-    <section>
-      <div class="section-head"><div><h2>Monthly data</h2><div class="note">Raw monthly category totals backing the line charts.</div></div></div>
-      <div class="table-wrap"><table id="monthTable"></table></div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <div>
-          <h2>Methodology notes</h2>
-          <div class="note">Reviewer cohort is the union of employees and maintainers from the community PR dashboard criteria plus the explicit overrides in the reproducibility script. The charts and tables are generated from the aggregate JSON file below.</div>
-        </div>
-      </div>
-      <div class="prose-grid">
-        <div class="prose-card">
-          <h3>Employee / maintainer source</h3>
-          <p>Employees are based on visible OpenHands organization membership plus script overrides. Maintainers are based on the dashboard maintainer allowlist. If someone is both, the role label displays <code>maintainer</code>.</p>
-        </div>
-        <div class="prose-card">
-          <h3>Current key override</h3>
-          <p><code>enyst</code> PRs are currently counted as <strong>org PRs</strong>. <code>tobitege</code> and <code>li-boxuan</code> remain community PR author overrides.</p>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <div>
-          <h2>Reproducibility downloads</h2>
-          <div class="note">Raw artifacts used to generate this page. Large files may open slowly in-browser; use “Save link as…” if needed.</div>
-        </div>
-      </div>
-      <div class="download-grid">
-        <a href="data/review_analysis_data.json" download><strong>Aggregate JSON</strong><span>Tables, totals, month buckets, methodology.</span></a>
-        <a href="data/review_events.json" download><strong>Review events JSON</strong><span>All counted non-self review-event rows.</span></a>
-        <a href="openhands_review_analysis.py" download><strong>Analysis script</strong><span>GitHub API fetch + aggregation logic.</span></a>
-        <a href="https://gist.github.com/smolpaws/4d5bede2fccb9d345c3b0174b58267dd"><strong>Original gist</strong><span>Markdown report and generated artifacts.</span></a>
-      </div>
-    </section>
-
-    <footer>Created by an AI agent (OpenHands) on behalf of the user. <span id="generated"></span></footer>
-  </main>
-  <script src="app.js"></script>
+    <footer>Built with static HTML, Mermaid diagrams, and occasionally a cat.</footer>
+  </div>
 </body>
 </html>

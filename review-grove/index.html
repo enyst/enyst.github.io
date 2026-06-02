@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands Review Grove</title>
+  <meta name="description" content="Sortable OpenHands reviewer activity dashboard." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div class="eyebrow">OpenHands review grove</div>
+      <h1>A living map of OpenHands reviews.</h1>
+      <p class="sub">A static, sortable GitHub Pages report for exploring who reviews what across OpenHands repositories, with charts, filters, and quick ways to spot patterns over time.</p>
+      <div class="stamp" id="stamps"></div>
+    </header>
+
+    <div class="stats" id="stats"></div>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Scope & criteria</h2>
+          <div class="note">What is counted, where it comes from, and how PR authors are bucketed.</div>
+        </div>
+      </div>
+      <div class="prose-grid">
+        <div class="prose-card">
+          <h3>Repositories</h3>
+          <ul id="repoList"></ul>
+        </div>
+        <div class="prose-card">
+          <h3>Review event rule</h3>
+          <p>Counts include GitHub PR review events with state <code>APPROVED</code>, <code>CHANGES_REQUESTED</code>, or <code>COMMENTED</code>. Events where the reviewer is also the PR author are excluded.</p>
+        </div>
+        <div class="prose-card wide">
+          <h3>PR author bucket rule</h3>
+          <p id="criteriaRule"></p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Reviews by reviewer</h2>
+          <div class="note">Click any column header to sort ascending/descending. Use search to filter reviewers or roles.</div>
+        </div>
+      </div>
+      <div class="controls">
+        <label class="visually-hidden" for="reviewerSearch">Search reviewers or roles</label>
+        <input id="reviewerSearch" type="search" placeholder="Search reviewer or role…" aria-label="Search reviewers or roles" />
+        <label class="visually-hidden" for="roleFilter">Filter reviewers by role</label>
+        <select id="roleFilter" aria-label="Filter reviewers by role">
+          <option value="">All roles</option>
+          <option value="maintainer">Maintainers</option>
+          <option value="employee">Employees</option>
+        </select>
+      </div>
+      <div class="table-wrap"><table id="reviewerTable"></table></div>
+    </section>
+
+    <section class="grid2">
+      <div>
+        <div class="section-head"><div><h2>Month-over-month totals</h2><div class="note">Review events by PR author category.</div></div></div>
+        <div id="categoryChart"></div>
+      </div>
+      <div>
+        <div class="section-head"><div><h2>Top reviewers over time</h2><div class="note">Top eight reviewers by total review events.</div></div></div>
+        <div id="topReviewerChart"></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head"><div><h2>Reviews by repository</h2><div class="note">Repository totals use the same review-event criteria as the rest of the page.</div></div></div>
+      <div class="table-wrap"><table id="repoTable"></table></div>
+    </section>
+
+    <section>
+      <div class="section-head"><div><h2>Monthly data</h2><div class="note">Raw monthly category totals backing the line charts.</div></div></div>
+      <div class="table-wrap"><table id="monthTable"></table></div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Methodology notes</h2>
+          <div class="note">Reviewer cohort is the union of employees and maintainers from the community PR dashboard criteria plus the explicit overrides in the reproducibility script. The charts and tables are generated from the aggregate JSON file below.</div>
+        </div>
+      </div>
+      <div class="prose-grid">
+        <div class="prose-card">
+          <h3>Employee / maintainer source</h3>
+          <p>Employees are based on visible OpenHands organization membership plus script overrides. Maintainers are based on the dashboard maintainer allowlist. If someone is both, the role label displays <code>maintainer</code>.</p>
+        </div>
+        <div class="prose-card">
+          <h3>Current key override</h3>
+          <p><code>enyst</code> PRs are currently counted as <strong>org PRs</strong>. <code>tobitege</code> and <code>li-boxuan</code> remain community PR author overrides.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Reproducibility downloads</h2>
+          <div class="note">Raw artifacts used to generate this page. Large files may open slowly in-browser; use “Save link as…” if needed.</div>
+        </div>
+      </div>
+      <div class="download-grid">
+        <a href="data/review_analysis_data.json" download><strong>Aggregate JSON</strong><span>Tables, totals, month buckets, methodology.</span></a>
+        <a href="data/review_events.json" download><strong>Review events JSON</strong><span>All counted non-self review-event rows.</span></a>
+        <a href="openhands_review_analysis.py" download><strong>Analysis script</strong><span>GitHub API fetch + aggregation logic.</span></a>
+        <a href="https://gist.github.com/smolpaws/4d5bede2fccb9d345c3b0174b58267dd"><strong>Original gist</strong><span>Markdown report and generated artifacts.</span></a>
+      </div>
+    </section>
+
+    <footer>Created by an AI agent (OpenHands) on behalf of the user. <span id="generated"></span></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
