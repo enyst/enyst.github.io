@@ -160,7 +160,7 @@ function render() {
   document.getElementById('stamps').replaceChildren(
     el('span', { class: 'pill' }, ['Generated ', DATA.generated_at]),
     el('span', { class: 'pill' }, [`${DATA.methodology.target_repos.length} repositories`]),
-    el('span', { class: 'pill' }, ['Self-reviews excluded']),
+    el('span', { class: 'pill' }, ['Sortable tables + charts']),
     el('span', { class: 'pill' }, [`${DATA.reviewer_cohort.target_reviewers.length} reviewer accounts`])
   );
 
