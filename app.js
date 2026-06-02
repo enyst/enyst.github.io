@@ -175,6 +175,11 @@ function render() {
     el('div', { class: 'stat' }, [el('b', {}, [fmt.format(value)]), el('span', {}, [label])])
   ));
 
+  document.getElementById('repoList').replaceChildren(
+    ...DATA.methodology.target_repos.map((repo) => el('li', {}, [repo]))
+  );
+  document.getElementById('criteriaRule').textContent = DATA.methodology.pr_category_rule;
+
   const reviewerColumns = [
     { label: 'Reviewer', key: 'reviewer', defaultDir: 1, render: (row) => el('span', { class: 'reviewer' }, [row.reviewer]) },
     { label: 'Role', key: 'role', defaultDir: 1, render: (row) => {
