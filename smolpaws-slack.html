@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SmolPaws Slack Entry Point — Engel Nyst</title>
-  <meta name="description" content="Socket Mode architecture for the SmolPaws Slack ingress." />
+  <meta name="description" content="Architecture of the SmolPaws Slack ingress app — Socket Mode, thread context, and the turn API." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -13,45 +13,14 @@
 <body>
   <div class="shell">
     <a class="back" href="index.html">← Home</a>
-    <h1>SmolPaws Slack Entry Point <span class="tag tag-planned">planned</span></h1>
+    <h1>SmolPaws Slack Entry Point <span class="tag tag-live">live</span></h1>
     <p class="meta">
-      Socket Mode architecture for the Slack ingress — replacing Chrome browser polling with a real Slack app.<br>
-      Tracking: <a href="https://github.com/smolpaws/smolpaws/issues/105">issue #105</a> · Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/slack">apps/slack/</a> (scaffold only)
+      How the Slack ingress receives messages, fetches thread context, and dispatches to the agent server.<br>
+      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/slack">apps/slack/</a> · PRs: <a href="https://github.com/smolpaws/smolpaws/pull/106">#106</a>–<a href="https://github.com/smolpaws/smolpaws/pull/112">#112</a>
     </p>
 
-    <h2>Why Socket Mode</h2>
-    <p>Three approaches exist for connecting an agent to Slack:</p>
-
-    <pre class="mermaid">
-flowchart TB
-    subgraph poll ["1. Polling"]
-        direction LR
-        P1["Cron job"] -->|every 60s| P2["conversations.history"] --> P3["check triggers"] --> P4["start conversation"] --> P5["chat.postMessage"]
-    end
-
-    subgraph hooks ["2. HTTP Webhooks"]
-        direction LR
-        W1["Slack"] -->|POST| W2["Public URL"] --> W3["verify + process"] --> W4["chat.postMessage"]
-    end
-
-    subgraph socket ["3. Socket Mode ✓"]
-        direction LR
-        S1["Slack"] <-->|WebSocket| S2["Local process"] --> S3["process"] --> S4["chat.postMessage"]
-    end
-
-    poll ~~~ hooks
-    hooks ~~~ socket
-    </pre>
-
-    <p>SmolPaws uses <strong>Socket Mode</strong> because:</p>
-    <ul>
-      <li>No public URL or tunnel required — the bot connects <em>outbound</em> to Slack</li>
-      <li>Event-driven, not poll-driven — no timestamp drift, no missed windows</li>
-      <li>Fits the existing pattern: Discord and WhatsApp are both long-running local processes</li>
-      <li>Fewer API scopes needed — the app reacts to delivered events rather than scraping history</li>
-    </ul>
-
-    <h2>Target Architecture</h2>
+    <h2>Overview</h2>
+    <p>The Slack ingress is a long-running local Node.js process. It connects to Slack via Socket Mode WebSocket (<code>@slack/bolt</code>), receives events, fetches thread context, and dispatches to the shared SmolPaws agent server over HTTP.</p>
 
     <pre class="mermaid">
 flowchart LR
@@ -62,15 +31,6 @@ flowchart LR
     C -->|poll + claim| B
     B -->|chat.postMessage\nwith thread_ts| A
     </pre>
-
-    <p>Same thin-ingress pattern as Discord:</p>
-    <ol>
-      <li>Receive Slack event over Socket Mode WebSocket</li>
-      <li>Build a stable conversation ID from Slack identifiers</li>
-      <li>Dispatch to the agent server via the shared <code>turnClient.ts</code></li>
-      <li>Poll for turn completion and claim outbound messages</li>
-      <li>Deliver results back to Slack in the correct thread</li>
-    </ol>
 
     <h2>Message Flow</h2>
 
@@ -84,9 +44,15 @@ sequenceDiagram
 
     U->>S: DM or @smolpaws mention
     S->>I: event via Socket Mode
-    I->>I: isAllowedSlackEvent()
-    I->>I: buildSlackConversationId()
+    I->>I: dedup + checkAccess()
+    I->>S: reactions.add(eyes)
     I->>I: stripBotMention()
+    alt threaded message
+        I->>S: conversations.replies()
+        S-->>I: thread history
+        I->>I: formatThreadContext()
+    end
+    I->>I: buildConversationId()
     I->>A: submitConversationMessage()
     A->>R: create/resume conversation
     loop poll until terminal
@@ -96,85 +62,133 @@ sequenceDiagram
     end
     I->>A: getTurnResult()
     I->>S: chat.postMessage (thread_ts)
-    S->>U: sees reply in thread
+    S->>U: sees reply
     </pre>
 
-    <h2>Event Handling</h2>
-    <p>Phase 1 handles two event types:</p>
+    <h2>Entry Decision Logic</h2>
+    <p>The bot decides whether to respond through layered checks:</p>
 
-    <h3>app_mention</h3>
-    <p>Fires when someone types <code>@smolpaws</code> in a channel. The bot replies in a thread under the mentioning message.</p>
-    <pre class="code">app.event("app_mention")
-  → extract text, strip bot mention
-  → build conversation ID from team + channel + thread_ts
-  → dispatch to agent server
-  → reply with thread_ts = event.ts (or event.thread_ts if already threaded)</pre>
+    <h3>Event Filtering (index.ts)</h3>
+    <pre class="code">1. Ignore bot messages and self-mentions
+2. app_mention events → always process
+3. message.im events → always process (DMs)
+4. Channel thread replies → only if thread was previously mentioned
+5. Everything else → ignore</pre>
 
-    <h3>message.im</h3>
-    <p>Fires on every DM to the bot. No mention required.</p>
-    <pre class="code">app.event("message")  // filter: channel_type === "im"
-  → skip bot messages and subtypes
-  → build conversation ID from team + channel
-  → dispatch to agent server
-  → reply in the DM</pre>
+    <h3>checkAccess()</h3>
+    <pre class="code">1. Non-DMs: check team and channel allowlists (if configured)
+2. If user is in ALLOWED_USER_IDS → allowed
+3. If no user allowlist configured → allowed (open)
+4. Otherwise → guest (rate-limited to 5 conversations)</pre>
+
+    <h2>Thread Context</h2>
+    <p>When the bot is mentioned in a thread, it fetches prior messages via <code>conversations.replies</code> and prepends them as context to the prompt. This lets the agent understand the conversation that preceded the mention.</p>
+
+    <pre class="code">[Thread context]
+&lt;@U1&gt;: What is OpenHands?
+&lt;@U2&gt;: An AI agent platform for software development
+smolpaws: It's built on top of...
+
+[Current message]
+Can you explain the runtime architecture?</pre>
+
+    <ul>
+      <li>Fetches up to 50 messages per thread</li>
+      <li>Bot's own messages labeled as <code>smolpaws</code>, others as <code>&lt;@UID&gt;</code></li>
+      <li>Current message excluded from context (it's the prompt itself)</li>
+      <li>Graceful degradation — if the fetch fails, dispatches without context</li>
+      <li>Not fetched for non-threaded messages (fresh mentions) or DMs</li>
+    </ul>
 
     <h2>Conversation ID Generation</h2>
-    <p>Stable IDs scoped to the Slack workspace:</p>
+    <p>Stable IDs derived from Slack's own identifiers:</p>
 
     <table>
       <tr><th>Context</th><th>Pattern</th><th>Example</th></tr>
-      <tr><td>DM</td><td><code>slack-im-{team_id}-{channel_id}</code></td><td><code>slack-im-T06P-D08X</code></td></tr>
-      <tr><td>Channel thread</td><td><code>slack-thread-{team_id}-{channel_id}-{thread_ts}</code></td><td><code>slack-thread-T06P-C06P-1717200000.000100</code></td></tr>
+      <tr><td>DM</td><td><code>slack-im-{team}-{channel}</code></td><td><code>slack-im-T06P-D08X</code></td></tr>
+      <tr><td>Thread</td><td><code>slack-thread-{team}-{channel}-{root_ts}</code></td><td><code>slack-thread-T06P-C123-1717200000.000100</code></td></tr>
     </table>
 
-    <p>Design decisions:</p>
     <ul>
-      <li><strong>DMs use channel_id, not user_id</strong> — Slack assigns a unique DM channel per user pair, equivalent but consistent with Slack's model</li>
-      <li><strong>Threads always use thread_ts</strong> — the bot always replies in a thread, using the root message's <code>ts</code> as <code>thread_ts</code></li>
-      <li><strong>team_id included</strong> — supports multi-workspace without collision</li>
+      <li>Each DM channel gets one persistent conversation</li>
+      <li>Each Slack thread maps to one agent conversation (root <code>thread_ts</code>)</li>
+      <li>Top-level channel mentions reply in a new thread using the message's own <code>ts</code> as root</li>
     </ul>
 
-    <h2>Comparison With Hermes</h2>
-    <p>Hermes has a mature Slack adapter (~3000 lines, Python). The two designs target different tradeoffs:</p>
+    <h2>Thread Follow-ups</h2>
+    <p>Once smolpaws has been mentioned in a thread, subsequent replies in that thread are processed <em>without</em> requiring another @mention. The <code>MentionedThreadTracker</code> keeps an in-memory set of tracked threads (capped at 1000, LRU-evicted).</p>
 
     <pre class="mermaid">
 flowchart TB
-    subgraph "Hermes: monolithic gateway"
-        H1["GatewayRunner"] --> H2["SlackAdapter"]
-        H1 --> H3["TelegramAdapter"]
-        H1 --> H4["DiscordAdapter"]
-        H1 --> H5["WhatsAppAdapter"]
-        H1 --> H6["20+ more..."]
-        H2 --> H7["AIAgent\n(in-process)"]
-    end
-    subgraph "SmolPaws: thin ingresses"
-        S1["apps/slack"] --> S2["turnClient.ts"]
-        S3["apps/discord"] --> S2
-        S4["apps/github"] --> S2
-        S2 --> S5["agent-server\n(separate process)"]
-    end
+    A["@smolpaws help me"] -->|app_mention| B["handleSlackEvent"]
+    B --> C["mentionedThreads.track(thread_ts)"]
+    C --> D["dispatch to agent"]
+    E["follow-up reply\n(no @mention)"] -->|message event| F["mentionedThreads.isTracked?"]
+    F -->|yes| B
+    F -->|no| G["ignore"]
     </pre>
 
+    <h2>Turn API Dispatch</h2>
+    <p>The Slack app uses the shared <code>turnClient.ts</code> — the same client used by Discord and the GitHub Cloudflare Worker.</p>
+
+    <pre class="mermaid">
+flowchart TB
+    subgraph "apps/slack"
+        A["slackHandler.ts"] --> B["agentServerClient.ts"]
+    end
+    subgraph "src/shared/turnClient.ts"
+        C1["submitConversationMessage()"]
+        C2["monitorTurn()"]
+        C3["getTurnStatus()"]
+        C4["claimTurnOutboundMessages()"]
+        C5["getTurnResult()"]
+        C2 --> C3 & C4 & C5
+    end
+    B --> C1
+    B --> C2
+    </pre>
+
+    <p>Key details:</p>
+    <ul>
+      <li><strong>deliveryOwnerId</strong> — random UUID per dispatch. First submitter wins delivery ownership.</li>
+      <li><strong>idempotencyKey</strong> — <code>{channel}:{ts}</code> to prevent double-processing.</li>
+      <li><strong>createConversation</strong> — sent on every submit. Server creates if new, appends if existing.</li>
+      <li><strong>Outbound messages</strong> — claimed during polling and delivered to Slack immediately.</li>
+      <li><strong>Guest usage</strong> — recorded only <em>after</em> successful dispatch, not before.</li>
+    </ul>
+
+    <h2>Safety Features</h2>
+
     <table>
-      <tr><th>Aspect</th><th>Hermes</th><th>SmolPaws</th></tr>
+      <tr><th>Feature</th><th>Implementation</th></tr>
+      <tr><td>Deduplication</td><td>In-memory <code>MessageDeduplicator</code> with 60s TTL, auto-prunes at 200 entries</td></tr>
+      <tr><td>Eyes reaction</td><td>👀 added to the triggering message immediately on acceptance (before dispatch)</td></tr>
+      <tr><td>Guest rate limiting</td><td>Non-allowlisted users get 5 conversations total, persisted to disk</td></tr>
+      <tr><td>Bot loop prevention</td><td>Ignores bot messages, self-mentions, and message subtypes</td></tr>
+      <tr><td>Message splitting</td><td>Long replies split at 5900 chars, preferring newlines then spaces</td></tr>
+      <tr><td>Graceful errors</td><td>Dispatch failures post a friendly error message, don't crash the process</td></tr>
+    </table>
+
+    <h2>Hermes Comparison</h2>
+    <p>The <a href="https://github.com/NousResearch/hermes-agent">Hermes agent</a> uses the same Socket Mode approach but at a very different scale:</p>
+
+    <table>
+      <tr><th>Aspect</th><th>Hermes (SlackAdapter)</th><th>SmolPaws (apps/slack)</th></tr>
       <tr><td>Language</td><td>Python (<code>slack-bolt</code>)</td><td>TypeScript (<code>@slack/bolt</code>)</td></tr>
-      <tr><td>Process model</td><td>All platforms in one gateway</td><td>Separate process per platform</td></tr>
-      <tr><td>Agent coupling</td><td>Agent runs in-process</td><td>Agent in separate server, HTTP API</td></tr>
-      <tr><td>Adapter size</td><td>~3000 lines</td><td>Target: ~200–300 lines</td></tr>
-      <tr><td>Multi-workspace</td><td>Yes (comma tokens + OAuth file)</td><td>Single workspace for MVP</td></tr>
-      <tr><td>Mention gating</td><td>Per-channel config</td><td>DMs: always; channels: require @mention</td></tr>
-      <tr><td>Thread tracking</td><td>Bot-TS memory, mentioned-thread sets</td><td>One conversation per thread_ts</td></tr>
-      <tr><td>Slash commands</td><td>All gateway commands as native slashes</td><td>Not in phase 1</td></tr>
-      <tr><td>Dedup</td><td><code>MessageDeduplicator</code> class</td><td>TBD (in-memory set + TTL)</td></tr>
-      <tr><td>Rich content</td><td>Block Kit, files, audio, approval buttons</td><td>Plain text for MVP</td></tr>
+      <tr><td>Scale</td><td>~3000-line adapter, 20+ platforms in one gateway</td><td>~600 lines source, standalone ingress app</td></tr>
+      <tr><td>Routing</td><td>Single <code>GatewayRunner</code> multiplexes all platforms</td><td>HTTP dispatch to shared agent-server</td></tr>
+      <tr><td>Thread context</td><td>Session-presence auto-reply, thread memory</td><td><code>conversations.replies</code> fetch + context formatting</td></tr>
+      <tr><td>Thread follow-ups</td><td>Bot-mentioned-thread tracking</td><td><code>MentionedThreadTracker</code> with LRU eviction</td></tr>
+      <tr><td>Dedup</td><td><code>MessageDeduplicator</code></td><td><code>MessageDeduplicator</code> with TTL + auto-prune</td></tr>
+      <tr><td>Slash commands</td><td>All gateway commands as native slashes</td><td>Not yet</td></tr>
+      <tr><td>Rich content</td><td>Block Kit, files, audio, approval buttons</td><td>Plain text</td></tr>
     </table>
 
     <div class="callout">
-      <p>SmolPaws' design is intentionally simpler. The complexity lives in the agent server, not the ingress adapter. The Hermes adapter is a useful reference for what SmolPaws might eventually need.</p>
+      <p>SmolPaws' design is intentionally simpler. The complexity lives in the agent server, not the ingress adapter. Each ingress is a thin adapter — receive platform events, build a conversation ID, dispatch, deliver results back.</p>
     </div>
 
     <h2>Slack Permissions</h2>
-    <p>Minimal scopes for phase 1:</p>
 
     <h3>Bot token scopes</h3>
     <table>
@@ -182,6 +196,7 @@ flowchart TB
       <tr><td><code>app_mentions:read</code></td><td>Receive @mention events in channels</td></tr>
       <tr><td><code>chat:write</code></td><td>Post replies</td></tr>
       <tr><td><code>im:history</code></td><td>Read DM messages</td></tr>
+      <tr><td><code>reactions:write</code></td><td>Add 👀 acknowledgment reactions</td></tr>
     </table>
 
     <h3>Event subscriptions</h3>
@@ -190,8 +205,6 @@ flowchart TB
       <tr><td><code>app_mention</code></td><td>Channel/thread mentions</td></tr>
       <tr><td><code>message.im</code></td><td>DM messages</td></tr>
     </table>
-
-    <p>Broader scopes (<code>channels:history</code>, <code>groups:history</code>, <code>reactions:write</code>) are deferred until code actually needs them.</p>
 
     <h2>Configuration</h2>
 
@@ -206,26 +219,55 @@ flowchart TB
       <tr><td><code>SLACK_ALLOWED_USER_IDS</code></td><td>no</td><td>—</td><td>Comma-separated user IDs</td></tr>
     </table>
 
-    <h2>Planned File Layout</h2>
+    <h2>File Layout</h2>
     <pre class="code">apps/slack/
 ├── package.json
 ├── tsconfig.json
 ├── AGENTS.md
 └── src/
-    ├── index.ts              # Bolt app, event handlers, delivery
+    ├── index.ts              # Bolt app, Socket Mode, event handlers
     ├── config.ts             # env parsing, allowlists
-    ├── slackContext.ts        # conversation ID + metadata helpers
-    ├── agentServerClient.ts   # turn API wrapper (like Discord's)
+    ├── slackContext.ts        # conversation IDs, access, thread context, dedup
+    ├── slackHandler.ts        # handleSlackEvent() — testable core logic
+    ├── agentServerClient.ts   # turn API wrapper
     └── __tests__/
-        └── slackContext.test.ts</pre>
+        ├── agentServerClient.test.ts
+        ├── slackContext.test.ts
+        └── slackHandler.test.ts</pre>
 
-    <h2>Open Questions</h2>
-    <ol>
-      <li><strong>Channel-thread history</strong> — Should the bot fetch bounded thread context? Adds scopes and complexity. Leaning no for MVP.</li>
-      <li><strong>Slash commands</strong> — Hermes shows the pattern (regex dispatcher, ephemeral ack, response_url replace). Leaning wait.</li>
-      <li><strong>LaunchAgent</strong> — Ship as manual <code>npm run dev</code> first, or include a LaunchAgent from day one? Leaning manual first.</li>
-      <li><strong>Dedup</strong> — Socket Mode can redeliver events on reconnect. Simple in-memory set with TTL should suffice.</li>
-    </ol>
+    <h2>Process Model</h2>
+    <ul>
+      <li>Single Node.js process, ~600 lines of source across 5 files</li>
+      <li>61 tests covering all paths (context, handler, agent client, helpers)</li>
+      <li>Uses <code>@slack/bolt</code> Socket Mode (not HTTP webhooks)</li>
+      <li>Handler extracted into <code>slackHandler.ts</code> with injectable dependencies for testability</li>
+      <li>Graceful shutdown on SIGINT / SIGTERM</li>
+      <li>Messages &gt; 5900 chars split at natural boundaries (newlines, then spaces)</li>
+    </ul>
+
+    <h2>Shared Infrastructure</h2>
+    <p>Slack, Discord, and GitHub all share the same turn client:</p>
+
+    <pre class="mermaid">
+flowchart TB
+    subgraph "Ingress Apps"
+        D["Discord\napps/discord"]
+        G["GitHub\napps/github"]
+        S["Slack\napps/slack"]
+    end
+    subgraph "Shared"
+        T["turnClient.ts\nsrc/shared/"]
+    end
+    subgraph "Backend"
+        A["agent-server\napps/agent-server"]
+    end
+    D --> T
+    G --> T
+    S --> T
+    T --> A
+    </pre>
+
+    <p>Each ingress is a thin adapter: receive platform events → build conversation ID → dispatch via <code>turnClient</code> → deliver results back. Agent logic, conversation state, and turn management all live in the agent server.</p>
 
     <div class="foot-nav"><a href="index.html">← Home</a></div>
   </div>
