@@ -8,100 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --ink: #e5e0d8; --muted: #8a847a; --bg: #0f0f0e; --card: #1a1a18;
-      --border: #2a2a26; --accent: #c9a84c; --teal: #6bbfab; --green: #7bc47f;
-      --serif: "Instrument Serif", Georgia, serif;
-      --sans: "DM Sans", system-ui, sans-serif;
-      --mono: "JetBrains Mono", monospace;
-    }
-    * { box-sizing: border-box; margin: 0; }
-    body {
-      background: var(--bg); color: var(--ink); font-family: var(--sans);
-      line-height: 1.6; min-height: 100vh;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
-    }
-    .shell { max-width: 680px; margin: 0 auto; padding: 100px 28px 80px; }
-
-    h1 {
-      font-family: var(--serif); font-size: clamp(3.2em, 8vw, 5em);
-      font-weight: 400; letter-spacing: -0.04em; line-height: 0.95;
-      margin-bottom: 16px;
-      animation: fadeUp 0.6s ease-out both;
-    }
-    .tagline {
-      color: var(--muted); font-size: 1.05em; margin-bottom: 72px;
-      letter-spacing: 0.01em;
-      animation: fadeUp 0.6s ease-out 0.1s both;
-    }
-
-    h2 {
-      font-family: var(--mono); font-size: 0.72em; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.14em;
-      color: var(--accent); margin: 56px 0 16px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .cards { display: grid; gap: 14px; }
-    a.card {
-      display: block; text-decoration: none; color: var(--ink);
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 6px; padding: 22px 24px;
-      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-      position: relative; overflow: hidden;
-    }
-    a.card::before {
-      content: ""; position: absolute; left: 0; top: 0; bottom: 0;
-      width: 3px; background: var(--accent); opacity: 0;
-      transition: opacity 0.2s;
-    }
-    a.card:hover {
-      border-color: var(--accent); transform: translateX(4px);
-      box-shadow: -4px 0 0 var(--accent);
-    }
-    a.card:hover::before { opacity: 1; }
-    .card-title { font-weight: 700; font-size: 1em; margin-bottom: 6px; }
-    .card-desc { color: var(--muted); font-size: 0.88em; line-height: 1.5; }
-    .card-tag {
-      display: inline-block; font-family: var(--mono); font-size: 0.65em;
-      font-weight: 600; padding: 3px 10px; border-radius: 3px; margin-top: 10px;
-      letter-spacing: 0.06em; text-transform: uppercase;
-    }
-    .tag-live { background: rgba(123,196,127,0.12); color: var(--green); }
-    .tag-planned { background: rgba(107,191,171,0.12); color: var(--teal); }
-    .tag-data { background: rgba(201,168,76,0.12); color: var(--accent); }
-    .tag-report { background: rgba(220,92,58,0.12); color: #dc6b4a; }
-
-    .links {
-      list-style: none; padding: 0;
-      display: flex; gap: 24px; flex-wrap: wrap;
-    }
-    .links a {
-      color: var(--teal); text-decoration: none;
-      font-family: var(--mono); font-size: 0.85em;
-      padding-bottom: 1px; border-bottom: 1px solid transparent;
-      transition: border-color 0.15s, color 0.15s;
-    }
-    .links a:hover { border-bottom-color: var(--teal); color: var(--ink); }
-
-    footer {
-      margin-top: 80px; padding-top: 20px;
-      border-top: 1px solid var(--border);
-      color: var(--muted); font-size: 0.78em;
-      font-family: var(--mono); letter-spacing: 0.01em;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
+  <link rel="stylesheet" href="brand.css" />
 </head>
 <body>
   <div class="shell">
-    <h1>Engel Nyst</h1>
+    <h1 class="hero">Engel Nyst</h1>
     <p class="tagline">Software developer. Open source. AI agents. Analytical philosophy.</p>
 
     <h2>How things work</h2>
