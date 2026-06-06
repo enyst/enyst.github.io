@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hermes Plugin API — Engel Nyst</title>
+  <meta name="description" content="Deep analysis of the Hermes Agent plugin system: how platforms, tools, providers, and hooks are registered without touching core code. Lessons for OpenHands agent-sdk extensibility." />
+  <meta property="og:title" content="Hermes Plugin API" />
+  <meta property="og:description" content="How Hermes lets you add a platform adapter, tool, or provider with zero core code changes — and what OpenHands can learn from it." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/hermes-plugins.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="arch.css" />
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#1a1a18',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="index.html">&larr; Home</a>
+    <h1>Hermes Plugin API <span class="tag">architecture study</span></h1>
+    <p class="meta">
+      How <a href="https://github.com/NousResearch/hermes-agent">Hermes Agent</a> enables adding platforms, tools, and providers without touching core code &mdash; and what this means for <a href="https://github.com/OpenHands/software-agent-sdk">OpenHands agent-sdk</a> extensibility.<br>
+      Companion to <a href="hermes-gateway.html">Hermes Gateway Architecture</a>. Studied from source, June 2026.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2>The Problem</h2>
+    <p>An agent framework that supports 28 messaging platforms faces a constant tension: every new platform means changes to enums, routing tables, config parsers, tool schemas, CLI wizards, cron schedulers, and docs. Hermes&rsquo; built-in path touches <strong>16+ files</strong> across the codebase for each new platform.</p>
+    <p>The plugin system eliminates this. A plugin drops into <code>~/.hermes/plugins/</code>, implements <code>register(ctx)</code>, and the framework handles the rest. Zero core code changes. The same mechanism extends to tools, LLM hooks, TTS/STT providers, image/video generators, browser backends, and context engines.</p>
+
+    <!-- ============================================================ -->
+    <h2>Plugin Discovery</h2>
+    <p>Plugins are discovered from four sources, in order. Later sources override earlier ones on name collision:</p>
+
+    <table>
+      <tr><th>#</th><th>Source</th><th>Path</th><th>Loading</th></tr>
+      <tr><td>1</td><td>Bundled</td><td><code>&lt;repo&gt;/plugins/&lt;name&gt;/</code></td><td>Auto-load for <code>backend</code> and <code>platform</code> kinds</td></tr>
+      <tr><td>2</td><td>User</td><td><code>~/.hermes/plugins/&lt;name&gt;/</code></td><td>Opt-in via <code>plugins.enabled</code> in config.yaml</td></tr>
+      <tr><td>3</td><td>Project</td><td><code>./.hermes/plugins/&lt;name&gt;/</code></td><td>Opt-in via <code>HERMES_ENABLE_PROJECT_PLUGINS</code> env var</td></tr>
+      <tr><td>4</td><td>Pip entry point</td><td><code>hermes_agent.plugins</code> group</td><td>Opt-in via <code>plugins.enabled</code></td></tr>
+    </table>
+
+    <p>Each directory plugin needs a <code>plugin.yaml</code> manifest and an <code>__init__.py</code> with a <code>register(ctx)</code> function. The manifest declares metadata, kind, and environment variable requirements.</p>
+
+    <div class="callout">
+      <p><strong>Design choice:</strong> Bundled platform plugins auto-load (every shipped adapter works out of the box). User-installed plugins require explicit opt-in &mdash; untrusted code doesn&rsquo;t run unless enabled. Project plugins require an additional env var gate.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2>Plugin Kinds</h2>
+    <p>The <code>kind</code> field in <code>plugin.yaml</code> determines loading behavior and integration style:</p>
+
+    <table>
+      <tr><th>Kind</th><th>What it is</th><th>Loading rule</th><th>Example</th></tr>
+      <tr><td><code>standalone</code></td><td>Hooks and tools of its own</td><td>Opt-in via <code>plugins.enabled</code></td><td>disk-cleanup, kanban, observability</td></tr>
+      <tr><td><code>backend</code></td><td>Pluggable backend for existing core tool</td><td>Bundled auto-loads; user opt-in</td><td>image_gen/openai, image_gen/fal</td></tr>
+      <tr><td><code>platform</code></td><td>Gateway messaging adapter</td><td>Bundled auto-loads; user opt-in</td><td>IRC, Discord, LINE, Teams</td></tr>
+      <tr><td><code>exclusive</code></td><td>Category with one active provider</td><td>Selected via <code>&lt;category&gt;.provider</code> config</td><td>memory/holographic</td></tr>
+      <tr><td><code>model-provider</code></td><td>LLM provider profile</td><td>Own discovery via <code>providers/</code></td><td>model-providers/openrouter</td></tr>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2>Minimal Platform Plugin</h2>
+    <p>Three files. No core code changes.</p>
+
+    <h3>Directory layout</h3>
+    <pre class="code">~/.hermes/plugins/my-platform/
+  plugin.yaml       # manifest
+  __init__.py        # re-exports register
+  adapter.py         # adapter class + register() entry point</pre>
+
+    <h3>plugin.yaml</h3>
+    <pre class="code">name: my-platform
+label: My Platform
+kind: platform
+version: 1.0.0
+description: My custom messaging platform adapter
+author: Your Name
+requires_env:
+  - name: MY_PLATFORM_TOKEN
+    description: "Bot API token"
+    prompt: "Bot token"
+    password: true
+  - name: MY_PLATFORM_CHANNEL
+    description: "Channel to join"
+    prompt: "Channel"
+optional_env:
+  - name: MY_PLATFORM_HOME_CHANNEL
+    description: "Default channel for cron delivery"</pre>
+
+    <h3>adapter.py &mdash; register()</h3>
+    <pre class="code">def register(ctx):
+    ctx.register_platform(
+        name="my_platform",
+        label="My Platform",
+        adapter_factory=lambda cfg: MyPlatformAdapter(cfg),
+        check_fn=check_requirements,
+        validate_config=validate_config,
+        env_enablement_fn=_env_enablement,
+        cron_deliver_env_var="MY_PLATFORM_HOME_CHANNEL",
+        standalone_sender_fn=_standalone_send,
+        allowed_users_env="MY_PLATFORM_ALLOWED_USERS",
+        allow_all_env="MY_PLATFORM_ALLOW_ALL_USERS",
+        max_message_length=4000,
+        platform_hint="You are chatting via My Platform.",
+        emoji="💬",
+        setup_fn=interactive_setup,
+    )</pre>
+
+    <h3>adapter.py &mdash; the adapter class</h3>
+    <pre class="code">class MyPlatformAdapter(BasePlatformAdapter):
+    def __init__(self, config):
+        super().__init__(config, Platform("my_platform"))
+        # Read from config.extra or env vars
+
+    async def connect(self) -&gt; bool:
+        # Start listeners, return True on success
+        self._mark_connected()
+        return True
+
+    async def disconnect(self) -&gt; None:
+        self._mark_disconnected()
+
+    async def send(self, chat_id, content,
+                   reply_to=None, metadata=None) -&gt; SendResult:
+        # Send message via platform API
+        return SendResult(success=True, message_id="...")
+
+    async def get_chat_info(self, chat_id) -&gt; dict:
+        return {"name": chat_id, "type": "dm"}</pre>
+
+    <!-- ============================================================ -->
+    <h2>What register_platform() Wires Up</h2>
+    <p>A single <code>ctx.register_platform()</code> call handles approximately <strong>20 integration points</strong> that would otherwise require editing 16+ files:</p>
+
+    <table>
+      <tr><th>Integration Point</th><th>Mechanism</th></tr>
+      <tr><td>Gateway adapter creation</td><td>Registry checked before built-in if/elif chain</td></tr>
+      <tr><td>Platform enum acceptance</td><td><code>Platform._missing_()</code> creates dynamic members for registered plugins</td></tr>
+      <tr><td>Config validation</td><td><code>validate_config()</code> called at startup</td></tr>
+      <tr><td>Connected-platform detection</td><td><code>is_connected()</code> or fallback to <code>validate_config</code></td></tr>
+      <tr><td>User authorization</td><td><code>allowed_users_env</code> / <code>allow_all_env</code> checked by core auth</td></tr>
+      <tr><td>Env-only auto-enable</td><td><code>env_enablement_fn</code> seeds <code>PlatformConfig.extra</code> from env vars</td></tr>
+      <tr><td>YAML config bridge</td><td><code>apply_yaml_config_fn</code> translates config.yaml keys</td></tr>
+      <tr><td>Cron delivery routing</td><td><code>cron_deliver_env_var</code> makes <code>deliver=&lt;name&gt;</code> work</td></tr>
+      <tr><td>Out-of-process sending</td><td><code>standalone_sender_fn</code> for cron when gateway is separate</td></tr>
+      <tr><td>Setup wizard UI</td><td><code>setup_fn</code> + <code>requires_env</code> / <code>optional_env</code> in manifest</td></tr>
+      <tr><td>send_message tool</td><td>Routes through live adapter automatically</td></tr>
+      <tr><td>System prompt hints</td><td><code>platform_hint</code> injected into LLM context</td></tr>
+      <tr><td>Message chunking</td><td><code>max_message_length</code> for smart splitting</td></tr>
+      <tr><td>PII redaction</td><td><code>pii_safe</code> flag</td></tr>
+      <tr><td>Status display</td><td>Shows plugin platforms with <code>(plugin)</code> tag</td></tr>
+      <tr><td>Channel directory</td><td>Plugin platforms included in enumeration</td></tr>
+      <tr><td><code>/update</code> command</td><td><code>allow_update_command</code> flag</td></tr>
+      <tr><td>Token lock (multi-profile)</td><td><code>acquire_scoped_lock()</code> in <code>connect()</code></td></tr>
+      <tr><td>Orphaned config warning</td><td>Descriptive log when config references a missing plugin</td></tr>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2>PlatformEntry: Full Surface</h2>
+    <p>Every field on the <code>PlatformEntry</code> dataclass, grouped by purpose:</p>
+
+    <h3>Core (required)</h3>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>What</th></tr>
+      <tr><td><code>name</code></td><td><code>str</code></td><td>Identifier in config.yaml (e.g. <code>"irc"</code>)</td></tr>
+      <tr><td><code>label</code></td><td><code>str</code></td><td>Human-readable label (e.g. <code>"IRC"</code>)</td></tr>
+      <tr><td><code>adapter_factory</code></td><td><code>(PlatformConfig) &rarr; Adapter</code></td><td>Factory callable &mdash; using a factory instead of a bare class enables custom init, try/except wrapping, extra kwargs</td></tr>
+      <tr><td><code>check_fn</code></td><td><code>() &rarr; bool</code></td><td>Returns True when platform dependencies are available</td></tr>
+    </table>
+
+    <h3>Configuration hooks</h3>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>When called</th></tr>
+      <tr><td><code>validate_config</code></td><td><code>(PlatformConfig) &rarr; bool</code></td><td>At adapter creation &mdash; reject before connect()</td></tr>
+      <tr><td><code>is_connected</code></td><td><code>(PlatformConfig) &rarr; bool</code></td><td>By gateway status and setup UI &mdash; fallback: validate_config</td></tr>
+      <tr><td><code>env_enablement_fn</code></td><td><code>() &rarr; dict?</code></td><td>During config load, before adapter construction &mdash; seeds PlatformConfig.extra from env vars</td></tr>
+      <tr><td><code>apply_yaml_config_fn</code></td><td><code>(yaml, pcfg) &rarr; dict?</code></td><td>During config load, after generic shared-key loop &mdash; bridges platform-specific YAML keys to env/extras</td></tr>
+      <tr><td><code>setup_fn</code></td><td><code>() &rarr; None</code></td><td>Interactive setup wizard &mdash; prompts user, saves env vars</td></tr>
+    </table>
+
+    <h3>Delivery &amp; scheduling</h3>
+    <table>
+      <tr><th>Field</th><th>Type</th><th>Purpose</th></tr>
+      <tr><td><code>cron_deliver_env_var</code></td><td><code>str</code></td><td>Env var name for home channel &mdash; makes <code>deliver=&lt;name&gt;</code> cron jobs work</td></tr>
+      <tr><td><code>standalone_sender_fn</code></td><td><code>async (...) &rarr; dict</code></td><td>Out-of-process message delivery for cron jobs running separately from gateway</td></tr>
+    </table>
+
+    <h3>Auth, UX, display</h3>
+    <table>
+      <tr><th>Field</th><th>Default</th><th>Purpose</th></tr>
+      <tr><td><code>allowed_users_env</code></td><td><code>""</code></td><td>Env var for comma-separated allowed user IDs</td></tr>
+      <tr><td><code>allow_all_env</code></td><td><code>""</code></td><td>Env var to allow all users (dev mode)</td></tr>
+      <tr><td><code>max_message_length</code></td><td><code>0</code></td><td>Message limit for smart chunking (0 = no limit)</td></tr>
+      <tr><td><code>platform_hint</code></td><td><code>""</code></td><td>Injected into system prompt (e.g. &ldquo;no markdown on IRC&rdquo;)</td></tr>
+      <tr><td><code>pii_safe</code></td><td><code>False</code></td><td>Redact PII in session descriptions</td></tr>
+      <tr><td><code>emoji</code></td><td><code>"🔌"</code></td><td>CLI/gateway display</td></tr>
+      <tr><td><code>allow_update_command</code></td><td><code>True</code></td><td>Whether <code>/update</code> is allowed from this platform</td></tr>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2>BasePlatformAdapter Contract</h2>
+
+    <pre class="mermaid">
+classDiagram
+    class BasePlatformAdapter {
+        &lt;&lt;abstract&gt;&gt;
+        +connect() bool
+        +disconnect() void
+        +send(chat_id, content, reply_to?, metadata?) SendResult
+        +get_chat_info(chat_id) dict
+        +handle_message(event) void
+        +format_message(content) str
+        +truncate_message(content, max_length) list
+        +send_typing(chat_id) void
+        +stop_typing(chat_id) void
+        +edit_message(chat_id, msg_id, content) SendResult
+        +create_handoff_thread(parent_id, name) str?
+        #_keep_typing(chat_id) void
+        #_process_message_background(event, key) void
+        #_mark_connected() void
+        #_mark_disconnected() void
+    }
+    class IRCAdapter {
+        +connect() bool
+        +disconnect() void
+        +send(...) SendResult
+        +get_chat_info(...) dict
+    }
+    class LINEAdapter {
+        +connect() bool
+        +send(...) SendResult
+        #_keep_typing(...) void
+        +interrupt_session_activity(...) void
+    }
+    BasePlatformAdapter <|-- IRCAdapter
+    BasePlatformAdapter <|-- LINEAdapter
+    </pre>
+
+    <p><strong>Four abstract methods</strong> that every adapter must implement:</p>
+    <table>
+      <tr><th>Method</th><th>Purpose</th></tr>
+      <tr><td><code>connect() &rarr; bool</code></td><td>Establish connection (WebSocket, long-poll, HTTP server). Return True on success.</td></tr>
+      <tr><td><code>disconnect()</code></td><td>Clean shutdown.</td></tr>
+      <tr><td><code>send(chat_id, content, reply_to?, metadata?) &rarr; SendResult</code></td><td>Send a message. May receive markdown; adapter formats for its platform.</td></tr>
+      <tr><td><code>get_chat_info(chat_id) &rarr; dict</code></td><td>Return <code>{name, type}</code> for a chat. Type is <code>"dm"</code>, <code>"group"</code>, or <code>"channel"</code>.</td></tr>
+    </table>
+
+    <p><strong>Key override points</strong> (optional, with sensible defaults):</p>
+    <ul>
+      <li><code>_keep_typing(chat_id)</code> &mdash; typing indicator heartbeat. Override to layer platform-specific mid-flight UX (e.g. LINE sends a &ldquo;still thinking&rdquo; button at 45s before the reply token expires).</li>
+      <li><code>format_message(content)</code> &mdash; platform-specific formatting (Telegram MarkdownV2, Discord markdown, IRC plain text).</li>
+      <li><code>edit_message(chat_id, msg_id, content)</code> &mdash; update a sent message (streaming edits). Default: no-op.</li>
+      <li><code>create_handoff_thread(parent_id, name)</code> &mdash; create an isolated thread for session handoffs. Default: None.</li>
+      <li><code>REQUIRES_EDIT_FINALIZE</code> &mdash; class attribute. Set True for platforms that need an explicit finalize call to close a message lifecycle (e.g. DingTalk AI Cards).</li>
+    </ul>
+
+    <p><strong>Inbound message flow:</strong> the adapter receives a platform event, constructs a <code>MessageEvent</code>, and calls <code>self.handle_message(event)</code>. The base class routes it to the gateway runner &mdash; the adapter never touches the agent directly.</p>
+
+    <!-- ============================================================ -->
+    <h2>Beyond Platforms: The Full PluginContext</h2>
+    <p><code>PluginContext</code> is the facade handed to every plugin&rsquo;s <code>register(ctx)</code>. Platform registration is one of <strong>14 registration methods</strong>:</p>
+
+    <table>
+      <tr><th>Method</th><th>What it registers</th></tr>
+      <tr><td><code>register_platform()</code></td><td>Gateway messaging adapter (see above)</td></tr>
+      <tr><td><code>register_tool()</code></td><td>Agent tool &mdash; appears in the tool registry alongside built-ins</td></tr>
+      <tr><td><code>register_hook()</code></td><td>Lifecycle hook callback (15+ hook points)</td></tr>
+      <tr><td><code>register_command()</code></td><td>In-session slash command (<code>/lcm</code>, <code>/stats</code>)</td></tr>
+      <tr><td><code>register_cli_command()</code></td><td>CLI subcommand (<code>hermes honcho ...</code>)</td></tr>
+      <tr><td><code>register_context_engine()</code></td><td>Replace built-in ContextCompressor</td></tr>
+      <tr><td><code>register_image_gen_provider()</code></td><td>Image generation backend</td></tr>
+      <tr><td><code>register_video_gen_provider()</code></td><td>Video generation backend</td></tr>
+      <tr><td><code>register_tts_provider()</code></td><td>Text-to-speech backend</td></tr>
+      <tr><td><code>register_transcription_provider()</code></td><td>Speech-to-text backend</td></tr>
+      <tr><td><code>register_browser_provider()</code></td><td>Browser automation backend</td></tr>
+      <tr><td><code>register_web_search_provider()</code></td><td>Web search backend</td></tr>
+      <tr><td><code>register_auxiliary_task()</code></td><td>Plugin-owned LLM auxiliary task (routing config)</td></tr>
+      <tr><td><code>register_skill()</code></td><td>Plugin-provided skill file</td></tr>
+    </table>
+
+    <p>Plus utility methods on <code>ctx</code>:</p>
+    <ul>
+      <li><code>ctx.llm</code> &mdash; host-owned LLM facade for chat/structured completions using the user&rsquo;s model config. No separate API key needed.</li>
+      <li><code>ctx.inject_message(content, role)</code> &mdash; push a message into the active conversation from external sources.</li>
+      <li><code>ctx.dispatch_tool(name, args)</code> &mdash; call any registered tool with proper agent context wiring.</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <h2>Lifecycle Hooks</h2>
+    <p>Plugins register callbacks for named lifecycle points. The framework calls <code>invoke_hook(name, **kwargs)</code> and collects return values.</p>
+
+    <table>
+      <tr><th>Hook</th><th>When it fires</th><th>Can modify?</th></tr>
+      <tr><td><code>pre_tool_call</code></td><td>Before a tool executes</td><td>Yes &mdash; can block</td></tr>
+      <tr><td><code>post_tool_call</code></td><td>After a tool returns</td><td>Observer</td></tr>
+      <tr><td><code>transform_terminal_output</code></td><td>Terminal output post-processing</td><td>Yes &mdash; return replacement</td></tr>
+      <tr><td><code>transform_tool_result</code></td><td>Tool result post-processing</td><td>Yes &mdash; return replacement</td></tr>
+      <tr><td><code>transform_llm_output</code></td><td>LLM response before delivery</td><td>Yes &mdash; first non-None wins</td></tr>
+      <tr><td><code>pre_llm_call</code> / <code>post_llm_call</code></td><td>Around LLM API calls</td><td>Observer</td></tr>
+      <tr><td><code>pre_api_request</code> / <code>post_api_request</code></td><td>Around HTTP API requests</td><td>Observer</td></tr>
+      <tr><td><code>api_request_error</code></td><td>HTTP API request failure</td><td>Observer</td></tr>
+      <tr><td><code>on_session_start</code> / <code>end</code> / <code>finalize</code> / <code>reset</code></td><td>Session lifecycle events</td><td>Observer</td></tr>
+      <tr><td><code>subagent_start</code> / <code>stop</code></td><td>Sub-agent lifecycle</td><td>Observer</td></tr>
+      <tr><td><code>pre_gateway_dispatch</code></td><td>Incoming message before auth/dispatch</td><td>Yes &mdash; skip, rewrite, or allow</td></tr>
+      <tr><td><code>pre_approval_request</code> / <code>post_approval_response</code></td><td>Tool approval lifecycle</td><td>Observer only</td></tr>
+    </table>
+
+    <div class="callout">
+      <p><strong>Hook semantics:</strong> hooks are a fixed whitelist (<code>VALID_HOOKS</code>). Registering an unknown hook name raises an error. This prevents typo-based silent failures while keeping the surface finite and documented.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2>How It All Flows</h2>
+
+    <pre class="mermaid">
+sequenceDiagram
+    participant S as Startup
+    participant PM as PluginManager
+    participant Ctx as PluginContext
+    participant PR as PlatformRegistry
+    participant GW as GatewayRunner
+
+    S->>PM: discover_and_load()
+    PM->>PM: scan bundled/ user/ project/ pip
+    PM->>PM: parse plugin.yaml manifests
+    loop each enabled plugin
+        PM->>PM: import __init__.py
+        PM->>Ctx: create PluginContext(manifest)
+        PM->>PM: call register(ctx)
+        Ctx->>PR: register_platform(PlatformEntry)
+        Ctx->>PM: register_tool / register_hook / ...
+    end
+    Note over PM: Discovery complete
+
+    S->>GW: start gateway
+    GW->>GW: load_gateway_config()
+    GW->>PR: env_enablement_fn → seed PlatformConfig
+    GW->>PR: apply_yaml_config_fn → bridge YAML
+    loop each configured platform
+        GW->>PR: create_adapter(name, config)
+        PR->>PR: check_fn() → validate_config()
+        PR->>GW: return adapter instance
+        GW->>GW: adapter.connect()
+    end
+    </pre>
+
+    <!-- ============================================================ -->
+    <h2>Platform Enum: Dynamic Members</h2>
+    <p>A clever trick: the <code>Platform</code> enum uses <code>_missing_()</code> to accept unknown platform names for registered plugins:</p>
+
+    <pre class="code">class Platform(Enum):
+    TELEGRAM = "telegram"
+    DISCORD = "discord"
+    # ... 20 built-in members
+
+    @classmethod
+    def _missing_(cls, value):
+        # Check bundled plugin dirs
+        if value in cls._scan_bundled_plugin_platforms():
+            pseudo = object.__new__(cls)
+            pseudo._value_ = value
+            pseudo._name_ = value.upper()
+            cls._value2member_map_[value] = pseudo
+            return pseudo
+
+        # Check runtime registry
+        if platform_registry.is_registered(value):
+            # same pattern
+            ...
+
+        return None  # reject unknown strings</pre>
+
+    <p>This means <code>Platform("irc")</code> works without modifying the enum file, and <code>Platform("irc") is Platform("irc")</code> holds (identity-stable via <code>_value2member_map_</code> caching). Arbitrary strings are rejected &mdash; only known plugin platforms create pseudo-members.</p>
+
+    <!-- ============================================================ -->
+    <h2>Real Plugin Examples</h2>
+
+    <h3>IRC &mdash; zero-dep stdlib adapter</h3>
+    <p>The simplest bundled plugin. No external packages. Uses asyncio for the IRC protocol. Key features:</p>
+    <ul>
+      <li>Full <code>register()</code> with all hooks: <code>env_enablement_fn</code>, <code>cron_deliver_env_var</code>, <code>standalone_sender_fn</code>, <code>setup_fn</code></li>
+      <li><code>_env_enablement()</code> reads <code>IRC_SERVER</code>, <code>IRC_CHANNEL</code>, <code>IRC_PORT</code>, etc. and seeds <code>PlatformConfig.extra</code></li>
+      <li><code>standalone_sender_fn</code> opens an ephemeral IRC connection, sends the message, and disconnects &mdash; for cron delivery when gateway is a separate process</li>
+      <li>Interactive <code>setup_fn</code> prompts for server, channel, nick, runs a connectivity test</li>
+    </ul>
+
+    <h3>LINE &mdash; time-window constraint pattern</h3>
+    <p>LINE&rsquo;s reply token expires after ~60 seconds. If the LLM is slow, the free reply token is wasted and the fallback is a metered Push API call. The adapter solves this by overriding <code>_keep_typing()</code>:</p>
+    <ul>
+      <li>Schedules a side task at the configured threshold (default 45s)</li>
+      <li>When fired, sends a Template Buttons postback bubble: &ldquo;Still thinking &mdash; tap to get the answer&rdquo;</li>
+      <li>The postback callback uses a <code>RequestCache</code> state machine to serve the cached response via a fresh reply token (free)</li>
+      <li>Uses <code>interrupt_session_activity</code> override to handle <code>/stop</code> command orphans</li>
+    </ul>
+
+    <h3>Discord &mdash; full-featured external dependency</h3>
+    <p>Uses discord.py. Thread management (auto-archive, handoff threads), slash command registration with Discord&rsquo;s native picker, voice channel support, file attachments with type detection, rate limiting.</p>
+
+    <h3>Teams &mdash; enterprise webhook adapter</h3>
+    <p>Uses microsoft-teams-apps SDK. Adaptive Cards for rich UI, proactive messaging via App.send(), tenant-scoped auth.</p>
+
+    <!-- ============================================================ -->
+    <h2>Built-in vs Plugin Path: The Cost</h2>
+    <p>Adding a platform the built-in way requires touching these files:</p>
+
+    <table>
+      <tr><th>#</th><th>File / Area</th><th>What changes</th></tr>
+      <tr><td>1</td><td><code>gateway/platforms/&lt;name&gt;.py</code></td><td>New adapter file</td></tr>
+      <tr><td>2</td><td><code>gateway/config.py</code></td><td>Platform enum member + config parsing</td></tr>
+      <tr><td>3</td><td><code>gateway/run.py</code></td><td>if/elif in <code>_create_adapter()</code></td></tr>
+      <tr><td>4</td><td><code>gateway/run.py</code></td><td>Authorized user map integration</td></tr>
+      <tr><td>5</td><td><code>toolsets.py</code></td><td>Platform in toolset matrix</td></tr>
+      <tr><td>6</td><td><code>tools/send_message_tool.py</code></td><td>platform_map + routing function</td></tr>
+      <tr><td>7</td><td><code>tools/cronjob_tools.py</code></td><td>deliver parameter description</td></tr>
+      <tr><td>8</td><td><code>cron/scheduler.py</code></td><td>Platform in deliver target map</td></tr>
+      <tr><td>9</td><td><code>gateway/channel_directory.py</code></td><td>Session-based discovery list</td></tr>
+      <tr><td>10</td><td><code>hermes_cli/status.py</code></td><td>Status display entry</td></tr>
+      <tr><td>11</td><td><code>hermes_cli/gateway.py</code></td><td>Setup wizard platform list</td></tr>
+      <tr><td>12</td><td><code>hermes_cli/config.py</code></td><td>Env var definitions</td></tr>
+      <tr><td>13</td><td><code>agent/redact.py</code></td><td>PII redaction patterns</td></tr>
+      <tr><td>14&ndash;16</td><td>README, AGENTS.md, docs/</td><td>Documentation (3+ files)</td></tr>
+    </table>
+
+    <p>The plugin path replaces all of this with <strong>one <code>register()</code> call</strong>. The framework consults the registry at each integration point and discovers plugin platforms dynamically.</p>
+
+    <!-- ============================================================ -->
+    <h2>Design Patterns Worth Stealing</h2>
+
+    <h3>1. Registry-first dispatch</h3>
+    <p><code>_create_adapter()</code> checks the plugin registry <em>first</em>, then falls through to the built-in if/elif chain. This means plugins can override built-in platforms (last writer wins) and the core code doesn&rsquo;t grow per platform.</p>
+
+    <h3>2. Factory over class</h3>
+    <p><code>adapter_factory</code> is a callable, not a class reference. This lets plugins do <code>lambda cfg: IRCAdapter(cfg)</code> with custom error handling, conditional kwargs, or environment-dependent construction &mdash; without expanding the registry API.</p>
+
+    <h3>3. Declarative config hooks</h3>
+    <p><code>env_enablement_fn</code> and <code>apply_yaml_config_fn</code> let a plugin own its configuration schema without touching the core config parser. The gateway calls these hooks during <code>load_gateway_config()</code> and merges the results into <code>PlatformConfig.extra</code>. The plugin controls what env vars mean and how YAML keys map to runtime config.</p>
+
+    <h3>4. Fixed hook whitelist</h3>
+    <p>Unlike open event systems where any string is a valid event name, Hermes uses a fixed <code>VALID_HOOKS</code> set. Registering an unknown hook name raises an error. This catches typos and makes the hook surface discoverable and documentable.</p>
+
+    <h3>5. Standalone sender for out-of-process delivery</h3>
+    <p>When cron runs separately from the gateway, there&rsquo;s no live adapter to send through. <code>standalone_sender_fn</code> is a self-contained async function that opens an ephemeral connection, sends, and disconnects. This pattern decouples the send capability from the persistent adapter lifecycle.</p>
+
+    <h3>6. Dynamic enum extension</h3>
+    <p><code>Platform._missing_()</code> creates pseudo-members for registered plugins. Identity-stable via caching. Rejects arbitrary strings. This means config, routing, and switch/match code work with plugin platforms without enum modification.</p>
+
+    <h3>7. Provider registries with precedence</h3>
+    <p>TTS, STT, image gen, browser, web search &mdash; each has a dedicated registry. Built-in providers always win over plugins. Config-level command-providers win over plugin providers. This gives clear, predictable override semantics.</p>
+
+    <!-- ============================================================ -->
+    <h2>Comparison: Hermes vs SmolPaws vs Agent SDK</h2>
+
+    <table>
+      <tr><th>Aspect</th><th>Hermes</th><th>SmolPaws</th><th>OpenHands agent-sdk</th></tr>
+      <tr><td>Plugin system</td><td>Full framework: manifest, discovery, PluginContext, registry, hooks</td><td>None &mdash; each ingress is custom code</td><td>None &mdash; monolithic</td></tr>
+      <tr><td>Platform adapter base</td><td><code>BasePlatformAdapter</code> (4 abstract methods, ~4700 lines of shared behavior)</td><td>No shared base &mdash; each ingress reimplements connection, auth, delivery</td><td>No concept of platforms/channels</td></tr>
+      <tr><td>Adding a platform</td><td>Plugin: 3 files, 0 core changes</td><td>New app directory + custom code + manual wiring</td><td>N/A</td></tr>
+      <tr><td>Config extensibility</td><td><code>env_enablement_fn</code>, <code>apply_yaml_config_fn</code></td><td>Hard-coded per ingress</td><td>Hard-coded</td></tr>
+      <tr><td>Lifecycle hooks</td><td>15+ named hooks with whitelist validation</td><td>None</td><td>None</td></tr>
+      <tr><td>Tool registration</td><td>Plugin tools in shared registry, per-platform toolset toggle</td><td>System prompt + built-in tools only</td><td>Fixed tool set</td></tr>
+      <tr><td>Provider backends</td><td>Pluggable: TTS, STT, image gen, video gen, browser, web search, context engine</td><td>Fixed (macOS say, local whisper)</td><td>Fixed</td></tr>
+      <tr><td>Host LLM access</td><td><code>ctx.llm</code> &mdash; plugins use host&rsquo;s model config</td><td>N/A</td><td>N/A</td></tr>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2>What Agent SDK Would Need</h2>
+    <p>If we want OpenHands agent-sdk (or SmolPaws&rsquo; agent-sdk fork) to support external platforms without core changes, here&rsquo;s what Hermes teaches us:</p>
+
+    <h3>Minimum viable plugin system</h3>
+    <ol>
+      <li><strong>Channel adapter base class</strong> with <code>connect()</code>, <code>disconnect()</code>, <code>send()</code>, <code>onMessage()</code>. The base class handles message routing to the agent server &mdash; adapters only implement platform I/O.</li>
+      <li><strong>Channel registry</strong> with <code>register()</code> and factory-based instantiation. Check the registry before any hard-coded channel list.</li>
+      <li><strong>Plugin discovery</strong> &mdash; at minimum, scan a directory (<code>~/.openhands/plugins/</code>) for packages that export a <code>register(ctx)</code> function. npm/pip entry points can come later.</li>
+      <li><strong>Manifest file</strong> (<code>plugin.yaml</code> or <code>package.json</code> fields) for metadata, required env vars, and kind.</li>
+    </ol>
+
+    <h3>Stretch goals (worth doing)</h3>
+    <ul>
+      <li><strong>Lifecycle hooks</strong> &mdash; even a small set (pre/post tool call, session start/end, message transform) gives plugins enough surface to be useful without deep integration.</li>
+      <li><strong>Config bridge hooks</strong> &mdash; let plugins own their config schema. <code>env_enablement_fn</code> is the single most impactful hook in Hermes&rsquo; plugin system.</li>
+      <li><strong>Standalone sender</strong> &mdash; decouple &ldquo;can send to platform X&rdquo; from &ldquo;the gateway is currently connected to platform X.&rdquo;</li>
+      <li><strong>Dynamic enum/type extension</strong> &mdash; TypeScript&rsquo;s string literal unions can&rsquo;t do Python&rsquo;s <code>_missing_()</code>, but a registry-first lookup pattern achieves the same result.</li>
+    </ul>
+
+    <h3>What to skip</h3>
+    <ul>
+      <li>Hermes has <strong>14 registration methods</strong> on PluginContext. Most agent-sdk use cases only need platform + tool + hook registration. Start with 3, expand when there&rsquo;s demand.</li>
+      <li>The full provider registry system (TTS, STT, image gen, etc.) is specific to Hermes&rsquo; multi-modal agent. Agent-sdk can add provider extensibility per-domain as needed.</li>
+      <li>CLI command registration is Hermes-specific. Agent-sdk conversations are message-driven, not CLI-driven.</li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <h2>Key Insight</h2>
+    <div class="callout">
+      <p>The gap between &ldquo;built-in platform&rdquo; and &ldquo;plugin platform&rdquo; in Hermes is <strong>16 files vs 3 files</strong>. The entire plugin system exists to collapse that gap. The core abstraction is simple: a registry that the framework checks before its hard-coded paths, plus a context object that lets plugins register capabilities at startup. Everything else &mdash; hooks, config bridges, provider registries &mdash; is refinement on top of that pattern.</p>
+      <p>For agent-sdk, the equivalent gap is between &ldquo;I can add a channel by modifying the SDK source&rdquo; and &ldquo;I can add a channel by dropping a package into a directory.&rdquo; Closing that gap requires the same two things: a registry and a context.</p>
+    </div>
+
+    <div class="foot-nav">
+      <a href="hermes-gateway.html">Hermes Gateway &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="smolpaws-slack.html">SmolPaws Slack &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="smolpaws-discord.html">SmolPaws Discord &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="index.html">&larr; Home</a>
+    </div>
+  </div>
+</body>
+</html>
