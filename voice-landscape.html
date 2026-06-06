@@ -81,7 +81,7 @@ flowchart LR
     <h3>Open models (run locally)</h3>
     <table>
       <tr><th>Model</th><th>Params</th><th>Quality</th><th>Speed</th><th>Notes</th></tr>
-      <tr><td><a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro</a></td><td>82M</td><td>Near-commercial</td><td>Real-time on CPU</td><td>14M downloads. Apache 2.0. Best quality-to-size ratio. Multiple voices. ONNX version available.</td></tr>
+      <tr><td><a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro</a></td><td>82M</td><td>Excellent</td><td>Real-time on CPU</td><td>14M downloads. Apache 2.0. Best quality-to-size ratio. Multiple voices. ONNX version available.</td></tr>
       <tr><td><a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice">Qwen3-TTS</a></td><td>0.6B&ndash;1.7B</td><td>High</td><td>~real-time</td><td>Custom voice cloning. 2M downloads. Multilingual. Apache 2.0.</td></tr>
       <tr><td><a href="https://github.com/SWivid/F5-TTS">F5-TTS</a></td><td>335M</td><td>High</td><td>Near real-time</td><td>Flow-matching. Zero-shot voice cloning from 10s reference. CC-BY-NC.</td></tr>
       <tr><td><a href="https://github.com/rhasspy/piper">Piper</a></td><td>small</td><td>Good</td><td>Very fast</td><td>VITS-based. 44 languages. Runs on Raspberry Pi. Used by Home Assistant. MIT.</td></tr>
@@ -99,7 +99,7 @@ flowchart LR
     </table>
 
     <div class="callout">
-      <p><strong>SmolPaws today:</strong> macOS <code>say -v "Evan (Enhanced)"</code> for local speech + WhatsApp voice notes via the outbox. Upgrade path: Kokoro for local high-quality, ElevenLabs for best-in-class.</p>
+      <p><strong>SmolPaws today:</strong> macOS <code>say -v "Evan (Enhanced)"</code> for local speech + WhatsApp voice notes via the outbox. Upgrade path: Kokoro for excellent local TTS, or ElevenLabs for managed hosting with voice cloning.</p>
     </div>
 
     <h3>Hermes Agent TTS providers</h3>
@@ -228,7 +228,7 @@ flowchart LR
     <h2>Upgrade Paths</h2>
     <ol>
       <li><strong>Better STT</strong> &mdash; replace Whisper <code>base</code> with faster-whisper <code>large-v3-turbo</code> (local, free) or NVIDIA Parakeet (API, free tier). Immediate accuracy improvement.</li>
-      <li><strong>Better TTS</strong> &mdash; <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro 82M</a> runs locally on CPU with near-commercial quality. Or ElevenLabs API for best-in-class.</li>
+      <li><strong>Better TTS</strong> &mdash; <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro 82M</a> runs locally on CPU with excellent quality (14M downloads, Apache 2.0). Or ElevenLabs API for managed hosting.</li>
       <li><strong>Real-time voice via ElevenLabs</strong> &mdash; once the OpenAI-compatible endpoint ships, connect ElevenLabs Conversational AI. Zero voice code needed. Phone calls via Twilio.</li>
       <li><strong>Discord voice channels</strong> &mdash; add <code>@discordjs/voice</code> + Opus bindings. The generic voice pipeline (~400 lines) is well-understood from the Hermes study.</li>
     </ol>
