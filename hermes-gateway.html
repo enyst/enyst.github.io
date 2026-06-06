@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hermes Agent Gateway Architecture — Engel Nyst</title>
+  <meta name="description" content="Architecture study of the Hermes Agent gateway, platform adapters, and OpenAI-compatible API server. Comparison with SmolPaws and OpenClaw." />
+  <meta property="og:title" content="Hermes Agent Gateway Architecture" />
+  <meta property="og:description" content="Gateway, platforms, and the OpenAI-compatible endpoint that turns an agent into an LLM." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/hermes-gateway.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="arch.css" />
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#1a1a18',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="index.html">&larr; Home</a>
+    <h1>Hermes Agent Gateway <span class="tag">architecture study</span></h1>
+    <p class="meta">
+      How <a href="https://github.com/NousResearch/hermes-agent">Hermes Agent</a> (NousResearch, 165K&nbsp;&star;) structures its multi-platform gateway, and what we can learn for <a href="https://github.com/OpenHands/software-agent-sdk">OpenHands</a>.<br>
+      Studied from source, June 2026.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2>Repo Structure</h2>
+    <p>Hermes is a monorepo. The core components, by size:</p>
+
+    <table>
+      <tr><th>Component</th><th>Directory</th><th>Lines</th><th>What it does</th></tr>
+      <tr><td>CLI</td><td><code>hermes_cli/</code></td><td>118K</td><td>Setup, config, commands, proxy server, auth, profiles</td></tr>
+      <tr><td>Tools</td><td><code>tools/</code></td><td>67K</td><td>Browser, code execution, approval, TTS/STT, MCP, security</td></tr>
+      <tr><td>Agent</td><td><code>agent/</code></td><td>61K</td><td>Conversation loop, context compression, LLM adapters, credential pool</td></tr>
+      <tr><td>Gateway platforms</td><td><code>gateway/platforms/</code></td><td>50K</td><td>20 core platform adapters (see below)</td></tr>
+      <tr><td>Gateway core</td><td><code>gateway/</code></td><td>30K</td><td>Runner, sessions, delivery, hooks, config, stream dispatch</td></tr>
+      <tr><td>Plugin platforms</td><td><code>plugins/platforms/</code></td><td>17K</td><td>8 plugin-based adapters (Discord, Teams, IRC, etc.)</td></tr>
+      <tr><td>Skills</td><td><code>skills/</code></td><td>12K</td><td>GitHub, DevOps, creative, media, email</td></tr>
+      <tr><td>Cron</td><td><code>cron/</code></td><td>4K</td><td>Scheduled jobs and automation</td></tr>
+    </table>
+
+    <p>The single largest file in the entire codebase is <code>gateway/run.py</code> at <strong>19,911 lines</strong> &mdash; the GatewayRunner class that orchestrates everything.</p>
+
+    <!-- ============================================================ -->
+    <h2>Gateway Architecture</h2>
+    <p>The gateway is a long-running process that connects to multiple messaging platforms through a unified adapter pattern. Each platform implements a <code>BasePlatformAdapter</code> with <code>connect()</code>, <code>disconnect()</code>, <code>send()</code>, and message handling.</p>
+
+    <pre class="mermaid">
+flowchart TB
+    subgraph Gateway ["GatewayRunner (gateway/run.py)"]
+        direction TB
+        MH["_handle_message()"]
+        SC["Slash command\ndispatch"]
+        AG["AIAgent\ncreation"]
+        SS["SessionStore\n(SQLite)"]
+        DC["Delivery +\nStream dispatch"]
+    end
+
+    subgraph Core ["Core platforms (gateway/platforms/)"]
+        TG["Telegram\n6,081 lines"]
+        SL["Slack\n3,519 lines"]
+        WA["WhatsApp\n1,387 lines"]
+        WH["Webhook\n934 lines"]
+        AS["API Server\n4,257 lines"]
+        EM["Email\n773 lines"]
+        SIG["Signal\n1,543 lines"]
+        MAT["Matrix\n2,983 lines"]
+        MORE["+ 12 more"]
+    end
+
+    subgraph Plugins ["Plugin platforms (plugins/platforms/)"]
+        DIS["Discord"]
+        IRC["IRC"]
+        TMS["Teams"]
+        GC["Google Chat"]
+        LN["LINE"]
+        MM["Mattermost"]
+        NTF["Ntfy"]
+        SIM["SimplEx"]
+    end
+
+    TG & SL & WA & WH & AS & EM & SIG & MAT & MORE --> MH
+    DIS & IRC & TMS & GC & LN & MM --> MH
+    MH --> SC & AG
+    AG --> SS
+    AG --> DC
+    </pre>
+
+    <h3>Two tiers of platforms</h3>
+    <p>Hermes has a split architecture for platform adapters:</p>
+    <ul>
+      <li><strong>Core platforms</strong> (<code>gateway/platforms/</code>) &mdash; built-in, loaded directly by the gateway runner via <code>_create_adapter()</code>. Includes Telegram, Slack, WhatsApp, the API server, webhooks, and 15 others.</li>
+      <li><strong>Plugin platforms</strong> (<code>plugins/platforms/</code>) &mdash; register via <code>PlatformRegistry</code> and are discovered at runtime. Includes Discord, Teams, IRC, Google Chat, LINE, Mattermost, Ntfy, SimplEx.</li>
+    </ul>
+    <p>Both types inherit from <code>BasePlatformAdapter</code> (4,813 lines) which provides the shared interface: connection lifecycle, message guards, typing indicators, delivery helpers, interrupt handling, and text debouncing.</p>
+
+    <h3>Message flow</h3>
+    <pre class="mermaid">
+sequenceDiagram
+    participant P as Platform Adapter
+    participant G as GatewayRunner
+    participant S as SessionStore
+    participant A as AIAgent
+
+    P->>P: receive raw event
+    P->>P: normalize to MessageEvent
+    P->>P: active session guard
+    alt agent running for this session
+        P->>P: queue in _pending_messages
+        P->>P: set interrupt event
+    else
+        P->>G: _handle_message(event)
+        G->>G: resolve session key
+        G->>G: check authorization
+        alt slash command
+            G->>G: dispatch command handler
+        else user message
+            G->>S: load/create session
+            G->>A: create AIAgent + run_conversation
+            A-->>G: final response
+            G->>P: deliver response
+        end
+    end
+    </pre>
+
+    <h3>Session keys</h3>
+    <p>Every conversation is identified by a deterministic session key:</p>
+    <pre class="code">agent:main:{platform}:{chat_type}:{chat_id}</pre>
+    <p>For example: <code>agent:main:telegram:private:123456789</code>. Thread-aware platforms include thread IDs in the chat_id. Keys are always constructed via <code>build_session_key()</code>, never manually.</p>
+
+    <!-- ============================================================ -->
+    <h2>Key Platforms Compared</h2>
+
+    <h3>Slack</h3>
+    <table>
+      <tr><th></th><th>Hermes</th><th>SmolPaws</th></tr>
+      <tr><td>Library</td><td><code>slack-bolt</code> (Python, async)</td><td><code>@slack/bolt</code> (TypeScript)</td></tr>
+      <tr><td>Transport</td><td>Socket Mode</td><td>Socket Mode</td></tr>
+      <tr><td>Lines</td><td>3,519</td><td>686</td></tr>
+      <tr><td>Thread tracking</td><td><code>_mentioned_threads</code> set &mdash; once mentioned, responds to all thread replies</td><td>Same pattern via <code>MentionedThreadTracker</code></td></tr>
+      <tr><td>Auth</td><td>Allowlists, DM pairing, global allow-all</td><td>Allowlist + guest rate limiter</td></tr>
+      <tr><td>Streaming</td><td>Progressive message editing (update sent message in-place)</td><td>Not yet</td></tr>
+    </table>
+    <p>The patterns are strikingly similar. Hermes has ~5x the code due to assistant threads, slash command handling, streaming via message editing, file uploads, and reaction management.</p>
+
+    <h3>GitHub</h3>
+    <table>
+      <tr><th></th><th>Hermes</th><th>SmolPaws</th></tr>
+      <tr><td>Architecture</td><td>Generic <strong>webhook adapter</strong> (934 lines) with configurable routes. No dedicated GitHub adapter.</td><td>Dedicated Cloudflare Worker (<code>apps/github/</code>, 1,718 lines)</td></tr>
+      <tr><td>Trigger</td><td>Webhook POST with HMAC validation per route</td><td>Webhook POST via Cloudflare Worker, @mention or own-thread detection</td></tr>
+      <tr><td>Delivery</td><td>Configurable: <code>github_comment</code>, or forward to another platform</td><td>Direct via <code>gh</code> CLI or API</td></tr>
+      <tr><td>GitHub skills</td><td>Rich skill set: PR workflow, code review, issues, repo management</td><td>Basic: comment on PRs/issues</td></tr>
+    </table>
+    <p>Hermes treats GitHub as a webhook source, not a first-class platform. The webhook adapter is generic &mdash; it handles GitHub, GitLab, JIRA, Stripe, etc. through the same configurable route system. SmolPaws has a dedicated GitHub ingress with its own @mention logic and self-loop guards.</p>
+
+    <h3>Discord</h3>
+    <table>
+      <tr><th></th><th>Hermes</th><th>SmolPaws</th></tr>
+      <tr><td>Architecture</td><td><strong>Plugin</strong> platform (<code>plugins/platforms/discord/</code>), <code>discord.py</code> library</td><td>Ingress app (<code>apps/discord/</code>, 642 lines), <code>discord.js</code></td></tr>
+      <tr><td>Voice</td><td>Voice channel support with mixer</td><td>Not yet</td></tr>
+      <tr><td>Bot commands</td><td>Slash command sync with state tracking</td><td>Basic message handling</td></tr>
+    </table>
+    <p>Discord is notable as a <em>plugin</em> platform in Hermes, not a core one. It uses the plugin registry to self-register, demonstrating the extensibility model.</p>
+
+    <!-- ============================================================ -->
+    <h2>The OpenAI-Compatible API Server</h2>
+
+    <div class="callout">
+      <p><strong>The key insight:</strong> Hermes exposes the agent as an OpenAI-compatible endpoint. Any client that speaks <code>/v1/chat/completions</code> can talk to the full agent runtime &mdash; tools, memory, skills, and all. From the caller's perspective, it looks like a very capable "model."</p>
+    </div>
+
+    <p>Built by <a href="https://github.com/teknium1">Teknium</a> (Nous Research founder) in March 2026. Three PR attempts: <a href="https://github.com/NousResearch/hermes-agent/pull/828">#828</a>, <a href="https://github.com/NousResearch/hermes-agent/pull/956">#956</a>, landed in <a href="https://github.com/NousResearch/hermes-agent/pull/1756">#1756</a>. The motivation was reach &mdash; the PR body listed star counts of OpenAI-compatible frontends that would instantly work:</p>
+
+    <table>
+      <tr><th>Frontend</th><th>Stars</th></tr>
+      <tr><td>Open WebUI</td><td>126K</td></tr>
+      <tr><td>NextChat</td><td>87K</td></tr>
+      <tr><td>LobeChat</td><td>73K</td></tr>
+      <tr><td>AnythingLLM</td><td>56K</td></tr>
+      <tr><td>ChatBox</td><td>39K</td></tr>
+      <tr><td>LibreChat</td><td>34K</td></tr>
+    </table>
+
+    <p>Since landing on March 17, the file grew from its initial implementation to <strong>4,257 lines</strong> in under 3 months &mdash; streaming, Responses API, session management, CORS, security hardening, cron jobs API.</p>
+
+    <h3>Endpoints</h3>
+    <table>
+      <tr><th>Method</th><th>Path</th><th>Purpose</th></tr>
+      <tr><td>POST</td><td><code>/v1/chat/completions</code></td><td>Stateless Chat Completions (opt-in session via header)</td></tr>
+      <tr><td>POST</td><td><code>/v1/responses</code></td><td>Stateful Responses API with <code>previous_response_id</code> chaining</td></tr>
+      <tr><td>GET</td><td><code>/v1/models</code></td><td>Lists the agent as an available model</td></tr>
+      <tr><td>POST</td><td><code>/v1/runs</code></td><td>Async execution with SSE event streaming</td></tr>
+      <tr><td>*</td><td><code>/api/sessions/*</code></td><td>Full session CRUD + chat + fork</td></tr>
+      <tr><td>GET</td><td><code>/health</code></td><td>Health check</td></tr>
+    </table>
+
+    <h3>How chat completions works</h3>
+    <pre class="mermaid">
+sequenceDiagram
+    participant C as OpenAI Client
+    participant AS as API Server Adapter
+    participant A as AIAgent
+
+    C->>AS: POST /v1/chat/completions
+    AS->>AS: parse messages, extract system + user
+    AS->>AS: derive session_id from fingerprint
+    AS->>A: _run_agent(user_message, history, system_prompt)
+    Note over A: full agent loop: tools, memory, skills
+    A-->>AS: result + usage
+    AS->>C: OpenAI-format response
+    </pre>
+
+    <h3>Comparison with OpenHands PR #3545</h3>
+    <table>
+      <tr><th></th><th>Hermes</th><th>OpenHands PR #3545</th></tr>
+      <tr><td>Lines</td><td>4,257</td><td>~530</td></tr>
+      <tr><td>Streaming</td><td>Full SSE with tool progress events</td><td>Not yet (returns 400)</td></tr>
+      <tr><td>Session reuse</td><td><code>X-Hermes-Session-Id</code> header</td><td><code>X-OpenHands-ServerConversation-ID</code> header</td></tr>
+      <tr><td>Responses API</td><td>Yes, with <code>previous_response_id</code></td><td>Not yet (planned)</td></tr>
+      <tr><td>Auth</td><td><code>API_SERVER_KEY</code> bearer token</td><td><code>X-Session-API-Key</code> or <code>Authorization: Bearer</code></td></tr>
+      <tr><td>Models</td><td>Single <code>hermes-agent</code> model</td><td>Profile-backed <code>openhands_{profile}</code> models</td></tr>
+      <tr><td>Token usage</td><td>Real counts via agent metrics</td><td>Real counts via <code>state.stats</code> (PR #3546)</td></tr>
+      <tr><td>Ephemeral cleanup</td><td>No (sessions persist)</td><td>Yes (deletes conversation after response)</td></tr>
+    </table>
+
+    <p>OpenHands PR #3545 is a lean v1 &mdash; non-streaming, stateless by default, with optional conversation reuse. Hermes has 3 months of iteration and 8x more code. The OpenHands PR's profile-backed model system is a nice touch: each LLM profile becomes a distinct "model" on the <code>/v1/models</code> endpoint.</p>
+
+    <p>Issue and scoping: <a href="https://github.com/OpenHands/software-agent-sdk/issues/3540">#3540</a>. PR: <a href="https://github.com/OpenHands/software-agent-sdk/pull/3545">#3545</a>.</p>
+
+    <!-- ============================================================ -->
+    <h2>Other Notable Platforms</h2>
+
+    <table>
+      <tr><th>Platform</th><th>Type</th><th>Lines</th><th>Notes</th></tr>
+      <tr><td>Telegram</td><td>Core</td><td>6,081</td><td>Largest adapter. Bot API, inline queries, forum topics, DM topics, file handling, network retry layer.</td></tr>
+      <tr><td>Feishu / Lark</td><td>Core</td><td>5,163</td><td>Enterprise messaging. Comment threads, meeting invites, separate comment rules engine.</td></tr>
+      <tr><td>Yuanbao</td><td>Core</td><td>4,941</td><td>Tencent's AI assistant platform. Protobuf protocol, sticker/media support.</td></tr>
+      <tr><td>Matrix</td><td>Core</td><td>2,983</td><td>Decentralized protocol. E2E encryption support, room management.</td></tr>
+      <tr><td>Weixin / WeChat</td><td>Core</td><td>2,247</td><td>China's dominant messenger. Official account API.</td></tr>
+      <tr><td>WeCom</td><td>Core</td><td>1,635</td><td>WeChat for enterprise. Callback crypto, webhook integration.</td></tr>
+      <tr><td>Signal</td><td>Core</td><td>1,543</td><td>Privacy-focused. Rate limiting layer for Signal's strict API limits.</td></tr>
+      <tr><td>BlueBubbles</td><td>Core</td><td>1,038</td><td>iMessage bridge. Makes Hermes accessible via iMessage on macOS.</td></tr>
+      <tr><td>Home Assistant</td><td>Core</td><td>449</td><td>Smart home integration. Voice assistant pipeline.</td></tr>
+      <tr><td>SMS</td><td>Core</td><td>379</td><td>Via Twilio or similar. Bare-bones text messaging.</td></tr>
+      <tr><td>Email</td><td>Core</td><td>773</td><td>IMAP/SMTP. Polls inbox, sends replies.</td></tr>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2>Terminology</h2>
+
+    <table>
+      <tr><th>Concept</th><th>Hermes</th><th>OpenClaw</th><th>SmolPaws</th></tr>
+      <tr><td>Messaging service</td><td>Platform</td><td>Channel</td><td>Ingress app</td></tr>
+      <tr><td>Central router</td><td>Gateway</td><td>Gateway</td><td>Agent server (direct)</td></tr>
+      <tr><td>Adapter base</td><td><code>BasePlatformAdapter</code></td><td><code>api.registerChannel()</code></td><td>No shared base</td></tr>
+      <tr><td>Implementation</td><td><code>gateway/platforms/</code> + <code>plugins/platforms/</code></td><td><code>extensions/</code></td><td><code>apps/</code></td></tr>
+      <tr><td>OpenAI endpoint</td><td>Yes (platform adapter)</td><td>No</td><td>Proposed (<a href="https://github.com/OpenHands/software-agent-sdk/issues/3540">#3540</a>)</td></tr>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2>Takeaways</h2>
+    <ul>
+      <li><strong>The gateway pattern works.</strong> Both Hermes and OpenClaw converged on the same architecture: a central gateway process with pluggable platform adapters. The terminology differs but the bones are identical.</li>
+      <li><strong>The OpenAI-compatible endpoint is the most interesting platform.</strong> It dissolves the boundary between "asking a model" and "asking an agent." Expose one endpoint, unlock hundreds of frontends plus voice platforms like ElevenLabs.</li>
+      <li><strong>SmolPaws is architecturally simpler.</strong> No shared gateway, no adapter base class. Each ingress talks to the agent-server directly. This keeps things small but means each ingress reimplements connection management, auth patterns, and delivery logic independently.</li>
+      <li><strong>Hermes is big.</strong> 350K+ lines of Python across the main components. The GatewayRunner alone is 20K lines. This is a mature, feature-rich system &mdash; but also a reminder that complexity accumulates fast once you support 28 platforms.</li>
+    </ul>
+
+    <div class="foot-nav">
+      <a href="smolpaws-slack.html">SmolPaws Slack &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="smolpaws-discord.html">SmolPaws Discord &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="index.html">&larr; Home</a>
+    </div>
+  </div>
+</body>
+</html>
