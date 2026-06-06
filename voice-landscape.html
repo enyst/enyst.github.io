@@ -57,6 +57,7 @@ flowchart LR
       <tr><td><a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a></td><td>same</td><td>same</td><td>99</td><td>CTranslate2 backend. 4x faster than OpenAI Whisper, lower memory. Drop-in replacement.</td></tr>
       <tr><td><a href="https://github.com/argmaxinc/WhisperKit">WhisperKit</a></td><td>same</td><td>same</td><td>99</td><td>CoreML-optimized for Apple Silicon. 10M downloads. Native Swift, runs on iPhone/Mac.</td></tr>
       <tr><td><a href="https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2">Parakeet</a> (NVIDIA)</td><td>600M</td><td>1.69%</td><td>EN (v2), 25 EU (v3)</td><td>FastConformer-TDT. More accurate than Whisper, word timestamps, punctuation. Needs NeMo (CUDA). Free API at <a href="https://build.nvidia.com/nvidia/parakeet-tdt-0_6b-v2">build.nvidia.com</a>.</td></tr>
+      <tr><td><a href="https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b">Nemotron-3.5 ASR</a> (NVIDIA)</td><td>600M</td><td>~4% (streaming)</td><td>36</td><td><strong>New (June 2026).</strong> Streaming ASR &mdash; transcribes in real-time, no silence detection needed. 17x more concurrent streams vs Parakeet RNNT 1.1B. ONNX + CoreML variants available. The real-time voice upgrade path.</td></tr>
       <tr><td><a href="https://github.com/k2-fsa/sherpa-onnx">Sherpa-ONNX</a></td><td>various</td><td>various</td><td>many</td><td>Lightweight ONNX runtime. Good for edge/mobile. No Python dependencies.</td></tr>
     </table>
 
@@ -82,6 +83,8 @@ flowchart LR
     <table>
       <tr><th>Model</th><th>Params</th><th>Quality</th><th>Speed</th><th>Notes</th></tr>
       <tr><td><a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro</a></td><td>82M</td><td>Excellent</td><td>Real-time on CPU</td><td>14M downloads. Apache 2.0. Best quality-to-size ratio. Multiple voices. ONNX version available.</td></tr>
+      <tr><td><a href="https://huggingface.co/bosonai/higgs-audio-v3-tts-4b">Higgs Audio v3</a> (Boson)</td><td>4B</td><td>Excellent</td><td>Sub-second TTFA</td><td><strong>New (June 2026).</strong> 102 languages, 21 emotions, singing/whispering/shouting. Zero-shot voice cloning. Speaks, not just reads. Research/non-commercial license.</td></tr>
+      <tr><td><a href="https://huggingface.co/rednote-hilab/dots.tts-base">dots.tts</a> (RedNote)</td><td>2B</td><td>High</td><td>Near real-time</td><td><strong>New (June 2026).</strong> Fully continuous pipeline &mdash; no discrete codec tokens anywhere. AR + flow-matching over 48kHz AudioVAE. Trained on 1.5M hours. Apache 2.0.</td></tr>
       <tr><td><a href="https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice">Qwen3-TTS</a></td><td>0.6B&ndash;1.7B</td><td>High</td><td>~real-time</td><td>Custom voice cloning. 2M downloads. Multilingual. Apache 2.0.</td></tr>
       <tr><td><a href="https://github.com/SWivid/F5-TTS">F5-TTS</a></td><td>335M</td><td>High</td><td>Near real-time</td><td>Flow-matching. Zero-shot voice cloning from 10s reference. CC-BY-NC.</td></tr>
       <tr><td><a href="https://github.com/rhasspy/piper">Piper</a></td><td>small</td><td>Good</td><td>Very fast</td><td>VITS-based. 44 languages. Runs on Raspberry Pi. Used by Home Assistant. MIT.</td></tr>
@@ -227,8 +230,8 @@ flowchart LR
     <!-- ============================================================ -->
     <h2>Upgrade Paths</h2>
     <ol>
-      <li><strong>Better STT</strong> &mdash; replace Whisper <code>base</code> with faster-whisper <code>large-v3-turbo</code> (local, free) or NVIDIA Parakeet (API, free tier). Immediate accuracy improvement.</li>
-      <li><strong>Better TTS</strong> &mdash; <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro 82M</a> runs locally on CPU with excellent quality (14M downloads, Apache 2.0). Or ElevenLabs API for managed hosting.</li>
+      <li><strong>Better STT</strong> &mdash; replace Whisper <code>base</code> with faster-whisper <code>large-v3-turbo</code> (local, free) or NVIDIA Parakeet (API, free tier). For real-time streaming: <a href="https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b">Nemotron-3.5 ASR</a> (36 languages, ONNX/CoreML available).</li>
+      <li><strong>Better TTS</strong> &mdash; <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro 82M</a> for lightweight local TTS. <a href="https://huggingface.co/bosonai/higgs-audio-v3-tts-4b">Higgs Audio v3</a> for 102 languages + emotions. <a href="https://huggingface.co/rednote-hilab/dots.tts-base">dots.tts</a> for fully continuous pipeline (Apache 2.0).</li>
       <li><strong>Real-time voice via ElevenLabs</strong> &mdash; once the OpenAI-compatible endpoint ships, connect ElevenLabs Conversational AI. Zero voice code needed. Phone calls via Twilio.</li>
       <li><strong>Discord voice channels</strong> &mdash; add <code>@discordjs/voice</code> + Opus bindings. The generic voice pipeline (~400 lines) is well-understood from the Hermes study.</li>
     </ol>
@@ -238,7 +241,10 @@ flowchart LR
     <ul>
       <li><a href="https://github.com/openai/whisper">OpenAI Whisper</a> &mdash; open-source STT</li>
       <li><a href="https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2">NVIDIA Parakeet TDT 0.6B v2</a> &mdash; state-of-the-art English ASR</li>
+      <li><a href="https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b">NVIDIA Nemotron-3.5 ASR</a> &mdash; streaming multilingual ASR (June 2026)</li>
       <li><a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro 82M</a> &mdash; best open TTS model for its size</li>
+      <li><a href="https://huggingface.co/bosonai/higgs-audio-v3-tts-4b">Boson Higgs Audio v3</a> &mdash; 102 languages, emotions, zero-shot cloning (June 2026)</li>
+      <li><a href="https://huggingface.co/rednote-hilab/dots.tts-base">dots.tts</a> &mdash; fully continuous TTS, no codec tokens, Apache 2.0 (June 2026)</li>
       <li><a href="https://elevenlabs.io/docs/eleven-agents/overview">ElevenLabs Conversational AI</a> &mdash; voice-as-a-service platform</li>
       <li><a href="https://platform.openai.com/docs/guides/realtime">OpenAI Realtime API</a> &mdash; native multimodal voice</li>
       <li><a href="hermes-gateway.html">Hermes Gateway Architecture</a> &mdash; our study of the gateway + Discord voice implementation</li>
