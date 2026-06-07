@@ -4,73 +4,113 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SmolPaws Discord Entry Point — Engel Nyst</title>
-  <meta name="description" content="Architecture of the SmolPaws Discord ingress app." />
+  <meta name="description" content="Architecture of the SmolPaws Discord ingress app — now built on the BaseChannelAdapter pattern." />
   <meta property="og:title" content="SmolPaws Discord Entry Point" />
-  <meta property="og:description" content="How the Discord ingress receives messages and dispatches to the agent server via the shared turn API." />
+  <meta property="og:description" content="How the Discord ingress uses the shared channel adapter to dispatch messages to the agent server." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://enyst.github.io/smolpaws-discord.html" />
-  <meta property="og:image" content="https://enyst.github.io/og-discord.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="SmolPaws Discord Entry Point" />
-  <meta name="twitter:description" content="How the Discord ingress receives messages and dispatches to the agent server." />
+  <meta name="twitter:card" content="summary" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="arch.css" />
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#1a1a18',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
 </head>
 <body>
   <div class="shell">
-    <a class="back" href="index.html">← Home</a>
+    <a class="back" href="index.html">&larr; Home</a>
     <h1>SmolPaws Discord Entry Point <span class="tag tag-live">live</span></h1>
     <p class="meta">
-      How the Discord ingress receives messages and dispatches to the agent server.<br>
-      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/discord">apps/discord/</a>
+      How the Discord ingress uses the shared channel adapter to dispatch messages to the agent server.<br>
+      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/discord">apps/discord/</a> &nbsp;&middot;&nbsp;
+      Adapter pattern: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/shared/channelAdapter.ts">channelAdapter.ts</a>
     </p>
 
-    <h2>Overview</h2>
-    <p>The Discord ingress is a long-running local Node.js process. It connects to Discord via the Gateway WebSocket (discord.js), receives messages, and dispatches them to the shared SmolPaws agent server over HTTP.</p>
+    <!-- ============================================================ -->
+    <h2>Architecture</h2>
+    <p>The Discord ingress is built on the <strong>BaseChannelAdapter</strong> pattern &mdash; a shared base class that handles agent-server dispatch, while the <code>DiscordAdapter</code> subclass implements Discord-specific I/O.</p>
 
     <pre class="mermaid">
 flowchart LR
-    A["Discord\nGateway"] -->|WebSocket| B["apps/discord\n(discord.js)"]
-    B -->|HTTP POST| C["agent-server\n127.0.0.1:8788"]
-    C -->|runs agent| D["OpenHands\nruntime"]
-    D -->|turn result +\noutbound msgs| C
-    C -->|poll + claim| B
+    A["Discord\nGateway"] -->|WebSocket| B["DiscordAdapter\n(discord.js)"]
+    B -->|dispatch()| C["BaseChannelAdapter\n(shared)"]
+    C -->|HTTP POST| D["agent-server\n127.0.0.1:8788"]
+    D -->|runs agent| E["OpenHands\nruntime"]
+    E -->|turn result +\noutbound msgs| D
+    D -->|poll + claim| C
+    C -->|sendReply()| B
     B -->|reply| A
     </pre>
 
+    <!-- ============================================================ -->
+    <h2>The Adapter Pattern</h2>
+    <p>Two files, clear separation:</p>
+
+    <table>
+      <tr><th>File</th><th>Lines</th><th>Responsibility</th></tr>
+      <tr><td><code>index.ts</code></td><td>~40</td><td>Entry point &mdash; imports adapter, starts via registry, handles shutdown</td></tr>
+      <tr><td><code>adapter.ts</code></td><td>~300</td><td>DiscordAdapter &mdash; all Discord-specific logic</td></tr>
+      <tr><td><code>channelAdapter.ts</code> (shared)</td><td>~300</td><td>BaseChannelAdapter + ChannelRegistry &mdash; agent-server dispatch loop</td></tr>
+    </table>
+
+    <h3>What the base class handles</h3>
+    <ul>
+      <li>Turn submission via <code>submitConversationMessage()</code></li>
+      <li>Turn monitoring via <code>monitorTurn()</code></li>
+      <li>Typing indicator heartbeat (every 8s)</li>
+      <li>Outbound message delivery</li>
+      <li>Fallback reply when agent returns nothing</li>
+      <li>Lifecycle: <code>start()</code> / <code>stop()</code> with resource cleanup</li>
+    </ul>
+
+    <h3>What the Discord adapter implements</h3>
+    <ul>
+      <li><code>connect()</code> &mdash; create discord.js Client, login, listen for events</li>
+      <li><code>disconnect()</code> &mdash; destroy client</li>
+      <li><code>sendReply(ctx, text)</code> &mdash; split &amp; send via <code>message.reply()</code></li>
+      <li><code>sendTyping(ctx)</code> &mdash; <code>channel.sendTyping()</code></li>
+      <li>Message handling: <code>shouldRespond()</code>, <code>isAllowed()</code>, <code>extractPrompt()</code>, <code>buildConversationId()</code></li>
+    </ul>
+
+    <!-- ============================================================ -->
     <h2>Message Flow</h2>
 
     <pre class="mermaid">
 sequenceDiagram
     participant U as Discord User
     participant D as Discord API
-    participant I as apps/discord
+    participant DA as DiscordAdapter
+    participant BA as BaseChannelAdapter
     participant S as agent-server
-    participant A as Agent Runtime
 
     U->>D: message or @mention
-    D->>I: MessageCreate (WebSocket)
-    I->>I: shouldRespond() + isAllowed()
-    I->>I: buildConversationId()
-    I->>I: extractPrompt()
-    I->>S: submitConversationMessage()
-    S->>A: create/resume conversation
+    D->>DA: MessageCreate (WebSocket)
+    DA->>DA: shouldRespond() + isAllowed()
+    DA->>DA: extractPrompt() + buildConversationId()
+    DA->>BA: dispatch(msg, replyCtx)
+    BA->>BA: sendTyping() + start interval
+    BA->>S: submitConversationMessage()
     loop poll until terminal
-        I->>S: getTurnStatus()
-        I->>S: claimTurnOutboundMessages()
-        I-->>D: deliver outbound messages
+        BA->>S: getTurnStatus()
+        BA->>S: claimOutboundMessages()
+        BA->>DA: sendReply() for each outbound
+        DA->>D: message.reply()
     end
-    I->>S: getTurnResult()
-    I->>D: reply in thread
+    BA->>S: getTurnResult()
+    BA->>DA: sendReply(finalReply)
+    DA->>D: message.reply()
     D->>U: sees reply
     </pre>
 
+    <!-- ============================================================ -->
     <h2>Entry Decision Logic</h2>
-    <p>The bot decides whether to respond with two checks:</p>
 
     <h3>shouldRespond()</h3>
     <pre class="code">1. Ignore bot messages
@@ -80,108 +120,95 @@ sequenceDiagram
 5. Otherwise: ignore</pre>
 
     <h3>isAllowed()</h3>
-    <pre class="code">1. If ALLOWED_USERS set → user must be in the list
+    <pre class="code">1. If ALLOWED_USERS set &rarr; user must be in the list
 2. DMs always pass (after user check)
-3. If ALLOWED_GUILDS set → guild must be in the list
-4. If ALLOWED_CHANNELS set → channel must be in the list</pre>
+3. If ALLOWED_GUILDS set &rarr; guild must be in the list
+4. If ALLOWED_CHANNELS set &rarr; channel must be in the list</pre>
 
+    <!-- ============================================================ -->
     <h2>Conversation ID Generation</h2>
-    <p>Stable IDs derived from Discord's own identifiers:</p>
 
     <table>
-      <tr><th>Context</th><th>Pattern</th><th>Example</th></tr>
-      <tr><td>DM</td><td><code>discord-dm-{author_id}</code></td><td><code>discord-dm-123456789</code></td></tr>
-      <tr><td>Thread</td><td><code>discord-thread-{thread_id}</code></td><td><code>discord-thread-987654321</code></td></tr>
+      <tr><th>Context</th><th>Format</th><th>Example</th></tr>
+      <tr><td>DM</td><td><code>discord-dm-{author_id}</code></td><td><code>discord-dm-456789012</code></td></tr>
+      <tr><td>Thread</td><td><code>discord-thread-{channel_id}</code></td><td><code>discord-thread-987654321</code></td></tr>
       <tr><td>Channel</td><td><code>discord-channel-{channel_id}</code></td><td><code>discord-channel-111222333</code></td></tr>
     </table>
 
+    <!-- ============================================================ -->
+    <h2>Channel Registry</h2>
+    <p>The adapter self-registers with the <code>ChannelRegistry</code> on import. The entry point is minimal:</p>
+
+    <pre class="code">import { channelRegistry } from '../../../src/shared/channelAdapter.js';
+import './adapter.js'; // triggers registration
+
+await channelRegistry.startAdapter('discord', {
+  runnerUrl: RUNNER_URL,
+  runnerToken: RUNNER_TOKEN,
+  logger,
+});</pre>
+
+    <p>The registry provides:</p>
     <ul>
-      <li>Each DM user gets one persistent conversation</li>
-      <li>Each Discord thread maps to one agent conversation</li>
-      <li>Non-threaded channel messages share a conversation per channel</li>
+      <li><code>register(name, factory)</code> &mdash; register an adapter factory</li>
+      <li><code>startAdapter(name, config)</code> &mdash; create, start, and track an instance</li>
+      <li><code>stopAdapter(name)</code> / <code>stopAll()</code> &mdash; graceful shutdown</li>
+      <li>Guards against double-start and concurrent start/stop races</li>
     </ul>
 
-    <h2>Turn API Dispatch</h2>
-    <p>The Discord app uses the shared <code>turnClient.ts</code> — the same client used by the GitHub Cloudflare Worker.</p>
-
-    <pre class="mermaid">
-flowchart TB
-    subgraph "apps/discord"
-        A["agentServerClient.ts"] --> B["dispatchToAgentServer()"]
-    end
-    subgraph "src/shared/turnClient.ts"
-        C1["submitConversationMessage()"]
-        C2["monitorTurn()"]
-        C3["getTurnStatus()"]
-        C4["claimTurnOutboundMessages()"]
-        C5["getTurnResult()"]
-        C2 --> C3 & C4 & C5
-    end
-    B --> C1
-    B --> C2
-    </pre>
-
-    <p>Key details:</p>
-    <ul>
-      <li><strong>deliveryOwnerId</strong> — random UUID per dispatch. First submitter wins delivery ownership. Only the owner polls for and claims outbound messages.</li>
-      <li><strong>idempotencyKey</strong> — set to Discord <code>message.id</code> to prevent double-processing.</li>
-      <li><strong>createConversation</strong> — sent on every submit. Server creates if new, appends if existing.</li>
-      <li><strong>Outbound messages</strong> — claimed during polling and delivered to Discord immediately (not batched).</li>
-    </ul>
-
-    <h2>Configuration</h2>
-    <p>All via environment variables from <code>~/.smolpaws/.env</code>:</p>
-
-    <table>
-      <tr><th>Variable</th><th>Required</th><th>Default</th><th>Purpose</th></tr>
-      <tr><td><code>DISCORD_BOT_TOKEN</code></td><td>yes</td><td>—</td><td>Discord bot token</td></tr>
-      <tr><td><code>SMOLPAWS_RUNNER_URL</code></td><td>no</td><td><code>http://127.0.0.1:8788</code></td><td>Agent server base URL</td></tr>
-      <tr><td><code>SMOLPAWS_RUNNER_TOKEN</code></td><td>no</td><td>—</td><td>Auth token for agent server</td></tr>
-      <tr><td><code>DISCORD_TRIGGER</code></td><td>no</td><td><code>@smolpaws</code></td><td>Text trigger pattern</td></tr>
-      <tr><td><code>DISCORD_ALLOWED_GUILDS</code></td><td>no</td><td>—</td><td>Comma-separated guild IDs</td></tr>
-      <tr><td><code>DISCORD_ALLOWED_CHANNELS</code></td><td>no</td><td>—</td><td>Comma-separated channel IDs</td></tr>
-      <tr><td><code>DISCORD_ALLOWED_USERS</code></td><td>no</td><td>—</td><td>Comma-separated usernames</td></tr>
-    </table>
-
-    <h2>Process Model</h2>
-    <ul>
-      <li>Single Node.js process, ~290 lines total</li>
-      <li>Uses discord.js Gateway WebSocket (not HTTP webhooks)</li>
-      <li>Typing indicator refreshed every 8 seconds while the agent works</li>
-      <li>Graceful shutdown on SIGINT / SIGTERM</li>
-      <li>Messages > 2000 chars split at natural boundaries</li>
-    </ul>
-
+    <!-- ============================================================ -->
     <h2>Shared Infrastructure</h2>
-    <p>Discord, GitHub, and Slack all share the same turn client:</p>
+    <p>All ingress apps share the same adapter base and turn client:</p>
 
     <pre class="mermaid">
 flowchart TB
     subgraph "Ingress Apps"
-        D["Discord\napps/discord"]
-        G["GitHub\napps/github"]
-        S["Slack\napps/slack"]
+        D["Discord\nDiscordAdapter"]
+        S["Slack\n(next)"]
+        G["GitHub\n(next)"]
     end
-    subgraph "Shared"
-        T["turnClient.ts\nsrc/shared/"]
+    subgraph "Shared Layer"
+        BA["BaseChannelAdapter\nchannelAdapter.ts"]
+        T["turnClient.ts"]
+        R["ChannelRegistry"]
     end
     subgraph "Backend"
-        A["agent-server\napps/agent-server"]
+        A["agent-server"]
     end
-    D --> T
-    G --> T
-    S --> T
+    D --> BA
+    S -.-> BA
+    G -.-> BA
+    BA --> T
+    R --> BA
     T --> A
     </pre>
 
-    <p>Each ingress is a thin adapter: receive platform events → build conversation ID → dispatch via <code>turnClient</code> → deliver results back. Agent logic, conversation state, and turn management all live in the agent server.</p>
+    <p>Discord is the first adapter on the pattern. Slack and GitHub will follow the same shape &mdash; subclass <code>BaseChannelAdapter</code>, implement platform I/O, register with the registry.</p>
 
-    <div class="foot-nav"><a href="index.html">← Home</a></div>
+    <!-- ============================================================ -->
+    <h2>Configuration</h2>
+
+    <table>
+      <tr><th>Variable</th><th>Required</th><th>Default</th><th>Purpose</th></tr>
+      <tr><td><code>DISCORD_BOT_TOKEN</code></td><td>yes</td><td>&mdash;</td><td>Discord bot token</td></tr>
+      <tr><td><code>SMOLPAWS_RUNNER_URL</code></td><td>no</td><td><code>http://127.0.0.1:8788</code></td><td>Agent server base URL</td></tr>
+      <tr><td><code>SMOLPAWS_RUNNER_TOKEN</code></td><td>no</td><td>&mdash;</td><td>Auth token for agent server</td></tr>
+      <tr><td><code>DISCORD_TRIGGER</code></td><td>no</td><td><code>@smolpaws</code></td><td>Text trigger pattern</td></tr>
+      <tr><td><code>DISCORD_ALLOWED_GUILDS</code></td><td>no</td><td>&mdash;</td><td>Comma-separated guild IDs</td></tr>
+      <tr><td><code>DISCORD_ALLOWED_CHANNELS</code></td><td>no</td><td>&mdash;</td><td>Comma-separated channel IDs</td></tr>
+      <tr><td><code>DISCORD_ALLOWED_USERS</code></td><td>no</td><td>&mdash;</td><td>Comma-separated usernames</td></tr>
+    </table>
+
+    <!-- ============================================================ -->
+    <h2>Design Context</h2>
+    <p>This adapter pattern is the first step toward a <a href="hermes-plugins.html">plugin system for channel extensibility</a>. The goal: adding a new messaging platform should be &ldquo;subclass BaseChannelAdapter, implement 3 methods, register with the registry&rdquo; &mdash; not &ldquo;copy an existing app and rewire everything.&rdquo;</p>
+    <p>See <a href="https://github.com/smolpaws/smolpaws/issues/115">smolpaws#115</a> for the full extensibility roadmap.</p>
+
+    <div class="foot-nav">
+      <a href="smolpaws-slack.html">SmolPaws Slack &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="hermes-plugins.html">Hermes Plugin API &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="index.html">&larr; Home</a>
+    </div>
   </div>
-
-  <script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
-  </script>
 </body>
 </html>
