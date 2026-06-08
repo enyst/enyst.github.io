@@ -40,12 +40,12 @@
     <pre class="mermaid">
 flowchart LR
     A["Discord\nGateway"] -->|WebSocket| B["DiscordAdapter\n(discord.js)"]
-    B -->|dispatch()| C["BaseChannelAdapter\n(shared)"]
+    B -->|"dispatch()"| C["BaseChannelAdapter\n(shared)"]
     C -->|HTTP POST| D["agent-server\n127.0.0.1:8788"]
     D -->|runs agent| E["OpenHands\nruntime"]
     E -->|turn result +\noutbound msgs| D
     D -->|poll + claim| C
-    C -->|sendReply()| B
+    C -->|"sendReply()"| B
     B -->|reply| A
     </pre>
 
