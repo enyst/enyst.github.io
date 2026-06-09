@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Canvas Tool Visualizers — Engel Nyst</title>
+  <meta name="description" content="Architecture notes for Agent Canvas per-tool visualizers: how events become dedicated React cards and how add-ons could register custom renderers." />
+  <meta property="og:title" content="Agent Canvas Tool Visualizers" />
+  <meta property="og:description" content="How Agent Canvas renders tool events through per-tool React visualizers, with a follow-up addon design for custom renderers." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/agent-canvas-tool-visualizers.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .flow-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 18px 20px; margin: 18px 0; }
+    .flow-card h3 { margin-top: 0; }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 18px 0; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+    .pill { border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-family: var(--mono); font-size: 0.78em; color: var(--muted); background: rgba(255,255,255,0.03); }
+    .decision { border-left: 3px solid #d8a657; }
+    .ok { border-left-color: var(--accent); }
+    .warning { border-left-color: #d86f57; }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#1a1a18',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>Agent Canvas Tool Visualizers <span class="tag">architecture note</span></h1>
+    <p class="meta">
+      How <a href="https://github.com/OpenHands/agent-canvas/pull/1246">OpenHands/agent-canvas PR #1246</a>
+      turns tool events into dedicated React cards, and how the same seam can become an addon extension point.
+      Studied from the PR branch, June 2026.
+    </p>
+
+    <div class="callout ok">
+      <p><strong>Short version:</strong> the PR keeps the existing conversation card chrome and title pipeline, but swaps the expandable <em>details body</em> from markdown text to a React visualizer whenever the event kind is registered. Unknown tools still fall back to the old markdown/JSON rendering.</p>
+    </div>
+
+    <h2>What changed</h2>
+    <p>Before this PR, almost every tool call flowed through two large markdown builders: <code>get-action-content.ts</code> and <code>get-observation-content.ts</code>. That made a bash command, a grep result, a file edit, and an unknown task result look structurally similar, and unsupported observations could degrade into raw JSON.</p>
+    <p>The new system adds a small visualizer registry under <code>src/components/features/chat/tool-visualizers/</code>. Visualizers are ordinary React components, but they are registered by event kind and type-narrowed by <code>defineVisualizer()</code>.</p>
+
+    <div class="pill-row">
+      <span class="pill">ExecuteBashAction</span>
+      <span class="pill">TerminalAction</span>
+      <span class="pill">FileEditorAction</span>
+      <span class="pill">StrReplaceEditorAction</span>
+      <span class="pill">GrepAction</span>
+      <span class="pill">GlobAction</span>
+      <span class="pill">TaskAction</span>
+    </div>
+
+    <table>
+      <tr><th>Part</th><th>Role</th><th>Why it matters</th></tr>
+      <tr><td><code>define.ts</code></td><td>Typed visualizer helper</td><td>Narrows <code>Action</code> and <code>Observation</code> unions by <code>kind</code>, so the component body gets the right fields.</td></tr>
+      <tr><td><code>index.ts</code></td><td>Explicit registry</td><td>Imports built-ins and indexes them by action/observation kind. No magic auto-discovery in core.</td></tr>
+      <tr><td><code>dispatcher.tsx</code></td><td>Runtime resolver</td><td>Looks up the event kind and returns a React node, or <code>null</code> to keep the markdown fallback.</td></tr>
+      <tr><td><code>primitives/*</code></td><td>Shared UI pieces</td><td>Reusable <code>CodeBlock</code>, <code>DiffView</code>, <code>OutputPane</code>, <code>KeyValueGrid</code>, and path chip components.</td></tr>
+    </table>
+
+    <h2>The render path</h2>
+    <p>The key design choice is that the visualizer is not a new card type. It only replaces the card body. Titles, collapse state, success dots, confirmation buttons, grouping, and the ACP path stay where they were.</p>
+
+    <pre class="mermaid">
+flowchart TD
+  A[Agent Server emits event] --> B[REST history / WebSocket stream]
+  B --> C[Conversation event store]
+  C --> D[Messages / EventMessage]
+  D --> E{Event shape?}
+  E -->|message| M[User or assistant message renderer]
+  E -->|action| F[GenericEventMessageWrapper]
+  E -->|observation| G[Find corresponding action by action_id]
+  G --> F
+  F --> H[getEventContent]
+  H --> I[Existing title switch]
+  H --> J[resolveVisualizerBody]
+  J --> K{Registered kind?}
+  K -->|yes| L[Visualizer Body React node]
+  K -->|no| N[Existing markdown fallback]
+  L --> O[GenericEventMessage details]
+  N --> O
+  I --> O
+    </pre>
+
+    <h3>What happens for an action</h3>
+    <p>When an action event arrives first, <code>resolveVisualizerBody(event)</code> checks <code>actionVisualizers.get(event.action.kind)</code>. If present, it renders <code>&lt;Body action={event} /&gt;</code>. This is why an in-flight task can already show the parent agent&rsquo;s query before the subagent result exists.</p>
+
+    <h3>What happens for an observation</h3>
+    <p>When an observation arrives, <code>EventMessage</code> looks back through the visible events for the action whose <code>id</code> matches <code>event.action_id</code>. The dispatcher then renders <code>&lt;Body action={correspondingAction} observation={event} /&gt;</code>. That gives observation cards access to action-side context such as a file editor view range or the original task prompt.</p>
+
+    <pre class="mermaid">
+sequenceDiagram
+  participant AS as Agent Server
+  participant UI as Event store
+  participant EM as EventMessage
+  participant GC as getEventContent
+  participant VR as visualizer registry
+  participant Card as GenericEventMessage
+
+  AS->>UI: ActionEvent(TaskAction)
+  UI->>EM: render action
+  EM->>GC: getEventContent(action)
+  GC->>VR: lookup TaskAction
+  VR-->>GC: taskVisualizer.Body
+  GC-->>Card: title + React details(query)
+
+  AS->>UI: ObservationEvent(TaskObservation, action_id)
+  UI->>EM: render observation
+  EM->>EM: find action by action_id
+  EM->>GC: getEventContent(observation, action)
+  GC->>VR: lookup TaskObservation
+  VR-->>GC: taskVisualizer.Body
+  GC-->>Card: title + React details(query + result)
+    </pre>
+
+    <h2>Per-tool examples</h2>
+    <div class="two-col">
+      <div class="flow-card">
+        <h3>Bash / terminal</h3>
+        <p>Registered for <code>ExecuteBashAction</code>, <code>TerminalAction</code>, <code>ExecuteBashObservation</code>, and <code>TerminalObservation</code>.</p>
+        <ul>
+          <li>Shows the command in a copyable bash code block.</li>
+          <li>Shows medium/high security risk warning on the action card.</li>
+          <li>Shows copyable output plus exit-code status on the observation card.</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <h3>File editor</h3>
+        <p>Registered for both the old and new file-editor action/observation names.</p>
+        <ul>
+          <li>Displays a path chip with optional line range.</li>
+          <li>Uses a code block for <code>view</code> and <code>create</code>.</li>
+          <li>Uses a diff for <code>str_replace</code> and <code>insert</code>.</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <h3>Search</h3>
+        <p>Registered for <code>GrepAction</code>, <code>GlobAction</code>, <code>GrepObservation</code>, and <code>GlobObservation</code>.</p>
+        <ul>
+          <li>Normalizes pattern, path, and include fields into a key/value grid.</li>
+          <li>Shows count, result list, empty state, truncation, or error state.</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <h3>Task / subagent</h3>
+        <p>Registered for <code>TaskAction</code> and <code>TaskObservation</code>.</p>
+        <ul>
+          <li>Shows subagent type and task id.</li>
+          <li>Shows the parent agent&rsquo;s prompt as the task query.</li>
+          <li>Renders the subagent result as markdown with copy affordance.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Why it is incremental</h2>
+    <p>The fallback remains the safety net. A visualizer can be added for one action/observation pair without migrating every tool. That is important for unsupported or newly introduced SDK tools: the UI may be less pretty, but it still renders the event.</p>
+
+    <pre class="mermaid">
+flowchart LR
+  A[OpenHandsEvent] --> B{Known action/observation kind?}
+  B -->|Registered visualizer| C[React visualizer body]
+  B -->|No visualizer| D[Markdown helper]
+  D --> E{Known markdown switch case?}
+  E -->|yes| F[Readable markdown]
+  E -->|no| G[JSON fallback]
+  C --> H[Same collapsible card]
+  F --> H
+  G --> H
+    </pre>
+
+    <div class="callout decision">
+      <p><strong>Important boundary:</strong> <code>InvokeSkillObservation</code> is not a normal visualizer in this PR. It now reuses the existing <code>SkillReadyContentList</code> under an &ldquo;Invoked Skill Knowledge&rdquo; heading, so skill knowledge shares the same expandable list UI as the skill-ready event.</p>
+    </div>
+
+    <h2>How a developer adds one today</h2>
+    <p>Today, defining a different renderer requires editing the Agent Canvas source (or a fork). The in-tree recipe is intentionally small:</p>
+
+    <ol>
+      <li>Create <code>src/components/features/chat/tool-visualizers/&lt;name&gt;/&lt;name&gt;.tsx</code>.</li>
+      <li>Export <code>defineVisualizer({ actionKinds, observationKinds, Body })</code>.</li>
+      <li>Import it in <code>tool-visualizers/index.ts</code> and add it to the <code>ALL</code> array.</li>
+      <li>Add a focused render test and snapshots for action, observation, and error/empty states.</li>
+    </ol>
+
+    <pre class="code">export const myToolVisualizer = defineVisualizer({
+  actionKinds: ["MyToolAction"],
+  observationKinds: ["MyToolObservation"],
+  Body: function MyToolBody({ action, observation }) {
+    return observation
+      ? &lt;MyResult event={observation} sourceAction={action} /&gt;
+      : &lt;MyInFlight event={action} /&gt;;
+  },
+});</pre>
+
+    <div class="callout warning">
+      <p><strong>Current limitation:</strong> this is not yet a user-level extension mechanism. It is a clean internal seam, but a user cannot drop a visualizer into <code>~/.openhands/agent-canvas</code> and have the installed UI pick it up without a follow-up addon architecture.</p>
+    </div>
+
+    <h2>Follow-up: custom visualizers as addons</h2>
+    <p><a href="https://github.com/OpenHands/agent-canvas/issues/481">Issue #481</a> proposes trusted local Agent Canvas UI addons. The visualizer registry from this PR is a good first real use case for route-less JavaScript addons: instead of only adding pages or CSS, an addon could register event renderers for the conversation stream.</p>
+
+    <pre class="mermaid">
+flowchart TD
+  A[~/.openhands/agent-canvas/addons/*] --> B[addon manifest]
+  B --> C[generated addon registry for dev/build]
+  C --> D[Addon register(api)]
+  D --> E[api.registerToolVisualizer]
+  E --> F[Runtime visualizer registry]
+  F --> G{priority}
+  G -->|addon override| H[Addon visualizer]
+  G -->|built-in| I[Core visualizer]
+  G -->|none| J[Markdown fallback]
+    </pre>
+
+    <h3>Minimal API shape</h3>
+    <p>The smallest useful follow-up is an addon API method that composes with the existing registry:</p>
+
+    <pre class="code">export default function register(api: AddonApi) {
+  api.registerToolVisualizer({
+    id: "acme.kubernetes.apply",
+    actionKinds: ["MCPToolAction"],
+    observationKinds: ["MCPToolObservation"],
+    priority: 50,
+    matches({ action, observation }) {
+      return action?.action.kind === "MCPToolAction"
+        &amp;&amp; action.action.tool_name === "kubectl_apply";
+    },
+    Body({ action, observation }) {
+      return &lt;KubernetesApplyCard action={action} observation={observation} /&gt;;
+    },
+  });
+}</pre>
+
+    <table>
+      <tr><th>Design point</th><th>Recommendation</th></tr>
+      <tr><td>Registration</td><td>Add <code>api.registerToolVisualizer()</code> and build the active registry as <code>addon visualizers + built-ins</code>.</td></tr>
+      <tr><td>Overrides</td><td>Support <code>priority</code> and <code>matches()</code>. This lets a custom MCP tool visualizer handle only one tool name while the generic MCP visualizer handles the rest.</td></tr>
+      <tr><td>Packaging</td><td>Start with trusted local source addons compiled by Vite in dev/source mode, matching Devin&rsquo;s proposal. Later add a compiled-runtime path for installed/static packages.</td></tr>
+      <tr><td>Location</td><td>Prefer <code>~/.openhands/agent-canvas/addons/&lt;id&gt;</code> so user customizations do not dirty the Agent Canvas checkout.</td></tr>
+      <tr><td>Safety</td><td>Treat addons as local trusted code, show them in settings, allow disable/remove, wrap each renderer in an error boundary, and fall back to the next renderer or markdown on failure.</td></tr>
+      <tr><td>Stable surface</td><td>Export visualizer types and primitives from a public subpath such as <code>@openhands/agent-canvas/visualizers</code>.</td></tr>
+    </table>
+
+    <h3>Why this fits the addon discussion</h3>
+    <p>Devin&rsquo;s issue asks whether route-less JavaScript should be root-mounted React, compiled runtime scripts, explicit shell slots, or deferred. Custom event rendering is narrower than a root-level addon and more concrete than a generic shell slot. It can be modeled as a named slot:</p>
+
+    <pre class="code">slots: {
+  "conversation.event.visualizers": [myVisualizer]
+}</pre>
+
+    <p>That aligns with the slot proposal in the issue comments while preserving the visualizer PR&rsquo;s fallback behavior. Addons can replace or extend rendering for selected event kinds, but the core conversation renderer still owns ordering, grouping, titles, collapse behavior, and the default safety net.</p>
+
+    <h2>Open questions for the follow-up</h2>
+    <ul>
+      <li><strong>Build story:</strong> is source-based addon compilation dev-only at first, or does Agent Canvas ship a local addon build/cache command?</li>
+      <li><strong>Type story:</strong> should addon visualizers depend on the internal event unions directly, or a versioned public event-rendering SDK?</li>
+      <li><strong>Security story:</strong> local trusted code is acceptable for a first pass, but runtime-loaded compiled scripts need stronger consent and provenance UI.</li>
+      <li><strong>Performance story:</strong> visualizers should not eagerly render huge outputs while collapsed. Heavy visualizers may need lazy mounting and truncation controls.</li>
+      <li><strong>Conflict story:</strong> if two addons claim the same event, priority plus <code>matches()</code> should choose deterministically and make the active renderer inspectable.</li>
+    </ul>
+
+    <div class="callout ok">
+      <p><strong>Proposed next step:</strong> land the in-tree visualizer PR as the core seam, then open a focused addon follow-up that exposes only <code>registerToolVisualizer()</code> or a <code>conversation.event.visualizers</code> slot. This gives users a real customization path without needing the full extension platform to be solved first.</p>
+    </div>
+
+    <div class="foot-nav">
+      <a href="../hermes-plugins.html">Hermes Plugin API &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/OpenHands/agent-canvas/pull/1246">PR #1246 &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/OpenHands/agent-canvas/issues/481">Addon RFC #481 &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="../index.html">&larr; Home</a>
+    </div>
+  </div>
+</body>
+</html>
