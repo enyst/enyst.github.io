@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands OpenAI-Compatible Agent Gateway — Engel Nyst</title>
+  <meta name="description" content="End-goal architecture for exposing OpenHands agent-server as an OpenAI-compatible model endpoint for chat UIs, voice systems, IDEs, and agent-to-agent delegation." />
+  <meta property="og:title" content="OpenHands OpenAI-Compatible Agent Gateway" />
+  <meta property="og:description" content="How OpenHands can expose the full agent runtime through OpenAI-compatible endpoints while keeping the implementation small and usable first." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/openhands-openai-compatible-gateway.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .flow-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 18px 20px; margin: 18px 0; }
+    .flow-card h3 { margin-top: 0; }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 18px 0; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+    .pill { border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-family: var(--mono); font-size: 0.78em; color: var(--muted); background: rgba(255,255,255,0.03); }
+    .ok { border-left-color: var(--accent); }
+    .defer { border-left-color: #8a847a; }
+    .warning { border-left-color: #d86f57; }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#1a1a18',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>OpenHands OpenAI-Compatible Gateway <span class="tag">architecture note</span></h1>
+    <p class="meta">
+      End-goal design for <a href="https://github.com/OpenHands/software-agent-sdk/issues/3540">OpenHands/software-agent-sdk issue #3540</a>
+      and <a href="https://github.com/OpenHands/software-agent-sdk/pull/3545">the first gateway PR</a>: make the full OpenHands agent runtime callable from clients that already speak the OpenAI API.
+      Drafted from the issue discussion, linked PR, and the Hermes gateway precedent, June 2026.
+    </p>
+
+    <div class="callout ok">
+      <p><strong>Short version:</strong> expose OpenHands as a very capable OpenAI-compatible &ldquo;model&rdquo;. The client sends a normal Chat Completions request; the agent-server resolves a profile, runs or resumes an OpenHands conversation, and returns the final assistant text in OpenAI shape. Keep tool calls internal unless a later client really needs them.</p>
+    </div>
+
+    <h2>Why this matters</h2>
+    <p>The OpenAI protocol is the integration surface many products already understand. Chat UIs, voice systems, IDE extensions, evaluation harnesses, and other agents can all point at a base URL and API key. If the OpenHands agent-server exposes that surface, these clients get a software agent rather than a bare model without bespoke adapters.</p>
+
+    <div class="pill-row">
+      <span class="pill">Open WebUI</span>
+      <span class="pill">LibreChat</span>
+      <span class="pill">AnythingLLM</span>
+      <span class="pill">ElevenLabs</span>
+      <span class="pill">IDE extensions</span>
+      <span class="pill">eval harnesses</span>
+      <span class="pill">agent-to-agent</span>
+    </div>
+
+    <h2>End-state shape</h2>
+    <p>The gateway should stay a thin ingress layer over the existing agent-server. It should not become a second runtime, a second settings system, or a copy of the native conversation APIs.</p>
+
+    <pre class="mermaid">
+flowchart LR
+  C[OpenAI-compatible client] -->|Bearer key| R[/v1 gateway router]
+  R --> M[model id to LLM profile]
+  R --> S[session or conversation resolver]
+  M --> A[Agent settings + LLM]
+  S --> V[OpenHands conversation]
+  A --> V
+  V --> T[Agent loop: tools, browser, terminal, files]
+  T --> F[Final assistant response]
+  F --> O[OpenAI response shape]
+    </pre>
+
+    <table>
+      <tr><th>Surface</th><th>End-goal behavior</th><th>Why</th></tr>
+      <tr><td><code>GET /v1/models</code></td><td>List saved profiles as <code>openhands_{profile}</code>.</td><td>OpenAI clients need a model picker, and profiles are already the user-facing LLM configuration unit.</td></tr>
+      <tr><td><code>POST /v1/chat/completions</code></td><td>Default to one-shot agent runs; optionally resume a server conversation through <code>X-OpenHands-ServerConversation-ID</code>.</td><td>Maximizes compatibility while preserving real OpenHands history when a caller opts in.</td></tr>
+      <tr><td><code>POST /v1/responses</code></td><td>Map <code>previous_response_id</code> to an OpenHands conversation when enough clients need it.</td><td>Responses is the more natural stateful OpenAI API, but it is less urgent than Chat Completions compatibility.</td></tr>
+      <tr><td>Streaming</td><td>Stream final assistant text first; internal tool-call streaming is optional and very low priority.</td><td>Voice and chat clients mainly need low perceived latency, not full agent internals.</td></tr>
+      <tr><td>Native APIs</td><td>Keep using existing conversation, event, profile, settings, and auth services underneath.</td><td>One source of truth and less long-term maintenance.</td></tr>
+    </table>
+
+    <h2>Request modes</h2>
+    <div class="two-col">
+      <div class="flow-card">
+        <h3>One-shot compatibility</h3>
+        <p>No OpenHands conversation header. The server creates a short-lived conversation from the latest user message, runs the agent, returns the final text, and cleans up.</p>
+        <p>Best for existing chat widgets, eval jobs, and simple &ldquo;ask the agent&rdquo; integrations.</p>
+      </div>
+      <div class="flow-card">
+        <h3>Server-owned memory</h3>
+        <p>The caller sends <code>X-OpenHands-ServerConversation-ID</code>. The server appends the latest user message to that real conversation and returns the next final response.</p>
+        <p>Best for voice calls, Slack threads, IDE sessions, and any client that can keep a stable thread id.</p>
+      </div>
+    </div>
+
+    <pre class="mermaid">
+sequenceDiagram
+  participant Client as OpenAI client
+  participant Gateway as /v1/chat/completions
+  participant Conv as ConversationService
+  participant Agent as OpenHands agent
+
+  Client->>Gateway: messages + model openhands_work
+  Gateway->>Gateway: resolve work profile
+  alt no conversation header
+    Gateway->>Conv: start ephemeral conversation
+  else X-OpenHands-ServerConversation-ID
+    Gateway->>Conv: load existing conversation
+    Gateway->>Conv: send latest user message
+  end
+  Conv->>Agent: run agent loop
+  Agent-->>Conv: final response + metrics
+  Conv-->>Gateway: state and final text
+  Gateway-->>Client: chat.completion + conversation id header
+    </pre>
+
+    <h2>Data mapping</h2>
+    <table>
+      <tr><th>OpenAI field</th><th>OpenHands mapping</th></tr>
+      <tr><td><code>model</code></td><td><code>openhands_{profile_name}</code> resolves to an <code>LLMProfileStore</code> entry.</td></tr>
+      <tr><td><code>messages[*].role = system</code></td><td>Append as an agent context suffix, preserving the base OpenHands identity and safety prompt.</td></tr>
+      <tr><td>Latest <code>user</code> message</td><td>Becomes the OpenHands user message to run.</td></tr>
+      <tr><td>Prior assistant/user history</td><td>Ignored for one-shot requests; represented by real events when the conversation id header is used.</td></tr>
+      <tr><td><code>choices[0].message.content</code></td><td>The agent final response text.</td></tr>
+      <tr><td><code>usage</code></td><td>Conversation metrics where available; otherwise honest zeroes rather than invented numbers.</td></tr>
+    </table>
+
+    <div class="callout warning">
+      <p><strong>Compatibility boundary:</strong> this is not a promise to emulate every OpenAI edge case. The useful contract is: common OpenAI SDK clients can list a model, send text or image content, receive a normal assistant response, and optionally continue a server-owned conversation.</p>
+    </div>
+
+    <h2>Implementation ladder</h2>
+    <ol>
+      <li><strong>Land the thin Chat Completions router.</strong> Non-streaming, profile-backed models, Bearer session auth, text/image input, final text output, and conversation id reuse.</li>
+      <li><strong>Make it easy to try.</strong> Add docs and examples for OpenAI SDK clients, Open WebUI-style base URL setup, voice webhook usage, and curl smoke tests.</li>
+      <li><strong>Improve operational fit.</strong> Add predictable timeouts, clearer errors, cleanup policies, request tracing, and metrics that help users debug a gateway run.</li>
+      <li><strong>Stream final assistant text.</strong> Start with final-message deltas or coarse progress that ordinary clients can display. Do not expose tool internals until a concrete client needs them.</li>
+      <li><strong>Add Responses API if demand appears.</strong> Map <code>response_id</code> and <code>previous_response_id</code> to OpenHands conversations so stateful OpenAI clients can use their native flow.</li>
+      <li><strong>Only then consider tool-call streaming.</strong> It is useful for specialist UIs, but it adds protocol ambiguity and is not required for the mainstream integrations this unlocks.</li>
+    </ol>
+
+    <h2>What not to copy from Hermes</h2>
+    <p>Hermes proves the pattern, but its gateway adapter grew into a broad platform server with sessions, streaming, cron APIs, platform delivery, and many adapter-specific concerns. OpenHands already has a dedicated agent-server with profile, settings, conversation, event, and workspace services. The OpenAI layer should reuse those seams and stay small.</p>
+
+    <div class="callout defer">
+      <p><strong>Design bias:</strong> optimize for the most common path first: &ldquo;I have an OpenAI-compatible client; give me a base URL, API key, and model id that calls an OpenHands agent.&rdquo; Everything else should be incremental.</p>
+    </div>
+
+    <h2>Open questions</h2>
+    <ul>
+      <li>What should the public docs recommend as the canonical conversation id strategy for Slack threads, voice calls, browser chats, and IDE sessions?</li>
+      <li>Should conversation reuse require an existing conversation id, or should the gateway create deterministic ids from a caller-provided external thread key?</li>
+      <li>Which clients should be certified first: OpenAI Python SDK, curl, Open WebUI, LibreChat, ElevenLabs, and one IDE extension are likely enough.</li>
+      <li>How much native event metadata, if any, should be exposed outside the normal assistant message?</li>
+    </ul>
+
+    <footer>
+      Drafted by an AI agent (OpenHands) on behalf of the user. Source discussion: OpenHands/software-agent-sdk issue #3540 and PR #3545.
+    </footer>
+  </div>
+</body>
+</html>
