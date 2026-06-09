@@ -65,7 +65,7 @@
 
     <pre class="mermaid">
 flowchart LR
-  C[OpenAI-compatible client] -->|Bearer key| R[/v1 gateway router]
+  C[OpenAI-compatible client] -->|Bearer key| R[/v1 gateway router/]
   R --> M[model id to LLM profile]
   R --> S[session or conversation resolver]
   M --> A[Agent settings + LLM]
@@ -102,7 +102,7 @@ flowchart LR
     <pre class="mermaid">
 sequenceDiagram
   participant Client as OpenAI client
-  participant Gateway as /v1/chat/completions
+  participant Gateway as "/v1/chat/completions"
   participant Conv as ConversationService
   participant Agent as OpenHands agent
 
