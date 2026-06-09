@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands Client-Defined Tools — Engel Nyst</title>
+  <meta name="description" content="Architecture notes for OpenHands SDK client-defined tools: JSON tool specs, dynamic action types, WebSocket dispatch, acknowledgement observations, and persistence." />
+  <meta property="og:title" content="OpenHands Client-Defined Tools" />
+  <meta property="og:description" content="How OpenHands SDK lets clients define no-op tools via JSON specs and handle tool execution on the client side." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/openhands-client-defined-tools.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .flow-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 18px 20px; margin: 18px 0; }
+    .flow-card h3 { margin-top: 0; }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 18px 0; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+    .pill { border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-family: var(--mono); font-size: 0.78em; color: var(--muted); background: rgba(255,255,255,0.03); }
+    .decision { border-left: 3px solid #d8a657; }
+    .warning { border-left-color: #d86f57; }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#1a1a18',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>OpenHands Client-Defined Tools <span class="tag">architecture note</span></h1>
+    <p class="meta">
+      Code design for <a href="https://github.com/OpenHands/software-agent-sdk/pull/3306">OpenHands/software-agent-sdk PR #3306</a>,
+      which implements JSON-defined, client-executed tools for the SDK and agent server.
+      Studied from the PR branch, June 2026.
+    </p>
+
+    <div class="callout">
+      <p><strong>Short version:</strong> the client can send a tool name, description, JSON Schema parameters, and optional annotations in <code>client_tools</code>. The SDK turns that spec into a normal tool visible to the LLM, emits an <code>ActionEvent</code> when the tool is called, immediately returns an acknowledgement observation, and leaves the real side effect to the client listening on the event stream.</p>
+    </div>
+
+    <h2>What changed</h2>
+    <p>Before this PR, frontend-owned tools needed Python classes on the server: a module defining <code>Action</code>, <code>Observation</code>, and <code>ToolExecutor</code> had to live next to the JavaScript client code, then be imported by the agent server through <code>tool_module_qualnames</code> or <code>--import-modules</code>. That is a lot of server plumbing for UI commands such as opening a file viewer panel.</p>
+    <p>The new path adds <code>ClientToolSpec</code> and <code>ClientTool</code> in <code>openhands.sdk.tool.client_tool</code>, exposes <code>client_tools</code> on conversation creation, and wires both local and remote conversations so the same JSON spec works whether the SDK runs in-process or through the agent server.</p>
+
+    <div class="pill-row">
+      <span class="pill">ClientToolSpec</span>
+      <span class="pill">ClientTool</span>
+      <span class="pill">ClientToolExecutor</span>
+      <span class="pill">ClientToolObservation</span>
+      <span class="pill">register_client_tools()</span>
+      <span class="pill">ClientAction_*</span>
+    </div>
+
+    <table>
+      <tr><th>Piece</th><th>Role</th><th>Important detail</th></tr>
+      <tr><td><code>ClientToolSpec</code></td><td>Request-time JSON model</td><td>Requires an object JSON Schema in <code>parameters</code>; annotations are optional and are not assumed read-only by default.</td></tr>
+      <tr><td><code>Action.from_mcp_schema()</code></td><td>Dynamic action class builder</td><td>Builds <code>ClientAction_&lt;name&gt;</code> from the JSON Schema so the normal event and LLM-tool paths can be reused.</td></tr>
+      <tr><td><code>ClientTool</code></td><td><code>ToolDefinition</code> implementation</td><td>Has a per-instance <code>name</code>, preserves the original JSON Schema when exporting tool schemas, and uses one shared stateless executor.</td></tr>
+      <tr><td><code>register_client_tools()</code></td><td>Registry bridge</td><td>Registers the <code>ClientTool</code> resolver class globally by tool name, but stores each conversation&rsquo;s full spec in <code>Tool.params["spec"]</code>.</td></tr>
+      <tr><td><code>ClientToolExecutor</code></td><td>No-op server executor</td><td>Returns <code>ClientToolObservation</code> with &ldquo;Tool call dispatched to client.&rdquo; The server never performs the UI action.</td></tr>
+    </table>
+
+    <h2>Registration path</h2>
+    <p>A client-defined tool is not a separate kind of agent capability once registration finishes. It becomes a regular SDK tool spec injected into <code>agent.tools</code>, so agent initialization resolves it using the existing tool registry.</p>
+
+    <pre class="mermaid">
+flowchart TD
+  C["Frontend / Agent Canvas"] -->|"POST /api/conversations with client_tools"| R["StartConversationRequest"]
+  R --> V["ClientToolSpec validation: object JSON Schema"]
+  V --> REG["register_client_tools(specs)"]
+  REG --> CACHE{"Action type cache: name + schema"}
+  CACHE -->|"new stable pair"| ACTION["Action.from_mcp_schema -> ClientAction_name"]
+  CACHE -->|"same name + same schema"| REUSE["Reuse dynamic Action class"]
+  CACHE -->|"same name + different schema"| ERR["ClientToolSchemaConflictError -> HTTP 400"]
+  ACTION --> GREG["Global registry: tool name -> ClientTool class"]
+  REUSE --> GREG
+  GREG --> TS["Tool(name, params.spec): schema stays per conversation"]
+  TS --> AG["Inject into agent.tools"]
+  AG --> INIT["Agent initialization resolves Tool -> ClientTool instance"]
+  INIT --> LLM["LLM sees a normal tool schema"]
+    </pre>
+
+    <div class="callout decision">
+      <p><strong>Key boundary:</strong> the global registry stores only the resolver class for a tool name. The actual client schema stays with the conversation through <code>Tool.params["spec"]</code>, which is why persistence, forks, and resume can recover the exact tool definition.</p>
+    </div>
+
+    <h2>Call path</h2>
+    <p>When the model calls the tool, the SDK emits the same event shape it would emit for any other tool. The only special behavior is execution: the server-side executor is deliberately an acknowledgement, not the real implementation.</p>
+
+    <pre class="mermaid">
+sequenceDiagram
+  participant UI as Client UI
+  participant RC as RemoteConversation
+  participant AS as Agent Server
+  participant LC as LocalConversation
+  participant A as Agent
+  participant L as LLM
+
+  UI->>RC: Conversation(..., client_tools=[spec])
+  RC->>AS: POST /api/conversations
+  AS->>LC: start with registered ClientTool
+  A->>L: completion request with tool schemas
+  L-->>A: tool call open_file_viewer(args)
+  A->>LC: emit ActionEvent(ClientAction_open_file_viewer)
+  LC->>AS: EventService records and broadcasts action
+  AS-->>UI: WebSocket ActionEvent(tool name + args)
+  A->>LC: run ClientToolExecutor
+  LC-->>A: ClientToolObservation acknowledgement
+  LC->>AS: EventService records and broadcasts observation
+  AS-->>UI: WebSocket ObservationEvent(ack)
+  UI->>UI: perform client-side effect
+    </pre>
+
+    <p>The important product behavior follows from that sequence: these tools are <em>fire-and-forget</em>. The agent does not block waiting for the browser to return a result. If a future UI tool needs a real client-provided result, that is a different protocol with pause, timeout, and result-submission semantics.</p>
+
+    <h2>Local, remote, and resume behavior</h2>
+    <div class="two-col">
+      <div class="flow-card">
+        <h3>Local SDK</h3>
+        <p><code>Conversation(..., client_tools=[...])</code> passes specs into <code>LocalConversation</code>. It registers the tools, appends missing <code>Tool(name=...)</code> entries to the immutable agent via <code>model_copy(update=...)</code>, and then initializes normally.</p>
+      </div>
+      <div class="flow-card">
+        <h3>Remote SDK</h3>
+        <p><code>RemoteConversation</code> serializes <code>client_tools</code> into the <code>POST /api/conversations</code> payload. It also registers the dynamic action types locally, so WebSocket and persisted events with <code>ClientAction_*</code> can deserialize on the client side.</p>
+      </div>
+      <div class="flow-card">
+        <h3>Agent server</h3>
+        <p><code>ConversationService</code> calls <code>register_client_tools()</code>, injects returned tool specs into the request agent, and persists the original specs because <code>StoredConversation</code> extends <code>StartConversationRequest</code>.</p>
+      </div>
+      <div class="flow-card">
+        <h3>Forks and restarts</h3>
+        <p>Forking copies stored metadata so a fork keeps its <code>client_tools</code>. On restart, the server reads <code>meta.json</code> and re-registers the specs before event services come back online.</p>
+      </div>
+    </div>
+
+    <pre class="mermaid">
+flowchart LR
+  START["Conversation start"] --> META["meta.json: StoredConversation.client_tools"]
+  START --> BASE["BASE_STATE: agent.tools params.spec"]
+  META --> SERVER["Server restart via ConversationService.__aenter__"]
+  SERVER --> REREG["register_client_tools(stored.client_tools)"]
+  BASE --> LOCAL["Local resume without supplied client_tools"]
+  LOCAL --> RECOVER["extract_client_tool_specs(agent.tools)"]
+  RECOVER --> REREG
+  META --> REMOTE["Remote reattach by conversation_id"]
+  REMOTE --> INFO["GET conversation info returns client_tools"]
+  INFO --> CLIENTREG["ClientTool.from_spec before event sync"]
+  CLIENTREG --> DESER["Persisted ClientAction_* events deserialize"]
+  REREG --> RUN["Conversation resumes with tool available"]
+    </pre>
+
+    <h2>Why the action-type cache matters</h2>
+    <p><code>Action.from_mcp_schema()</code> creates concrete Pydantic action subclasses. Their <code>kind</code> values are process-global because event deserialization uses the action hierarchy to resolve incoming <code>kind</code> strings. Creating two different classes named <code>ClientAction_open_file_viewer</code> would make <code>Action.resolve_kind</code> ambiguous.</p>
+    <p>The PR therefore caches generated action types by tool name and deep-copied schema. Re-registering the same name with the same schema is safe and returns the existing class. Reusing a name for a different schema raises <code>ClientToolSchemaConflictError</code>, which the agent-server router maps to a client error instead of letting it become a confusing internal deserialization failure.</p>
+
+    <h2>Schema and safety semantics</h2>
+    <table>
+      <tr><th>Concern</th><th>Implemented design</th></tr>
+      <tr><td>JSON Schema fidelity</td><td><code>ClientTool._get_tool_schema()</code> starts from the original <code>input_schema</code> so enums, nested objects, numeric bounds, and <code>additionalProperties</code> survive provider export.</td></tr>
+      <tr><td>SDK meta fields</td><td>The tool overlays SDK-added <code>summary</code> and, when required, <code>security_risk</code> fields onto the original schema rather than rebuilding the whole schema from the generated action model.</td></tr>
+      <tr><td>Annotations</td><td>Annotations are optional. If omitted, the SDK does not optimistically mark the tool read-only; clients can explicitly provide MCP-style annotations when appropriate.</td></tr>
+      <tr><td>Server execution</td><td>There is no server-side implementation for the real effect. The executor only acknowledges dispatch, so the frontend owns any UI mutation, navigation, or side effect.</td></tr>
+      <tr><td>Backward compatibility</td><td><code>client_tools</code> defaults to an empty list. Existing Python-backed tools and <code>tool_module_qualnames</code> keep working.</td></tr>
+    </table>
+
+    <h2>Minimal client contract</h2>
+    <p>The frontend needs two pieces: send the spec at conversation creation, then listen for matching action events.</p>
+
+    <pre class="code">{
+  "client_tools": [
+    {
+      "name": "open_file_viewer",
+      "description": "Open the file viewer panel to display a file",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "Path to open"
+          }
+        },
+        "required": ["file_path"]
+      }
+    }
+  ]
+}</pre>
+
+    <pre class="code">if (event.kind === "ActionEvent"
+    &amp;&amp; event.action.kind === "ClientAction_open_file_viewer") {
+  openFileViewer(event.action.file_path);
+}</pre>
+
+    <div class="callout warning">
+      <p><strong>Not in this PR:</strong> client-to-SDK tool result submission, waiting for the client before the agent continues, result timeouts, retries, or a deprecation of Python-backed custom tools. This PR is intentionally the no-op/acknowledgement layer for client-handled actions.</p>
+    </div>
+
+    <h2>How this fits the SDK design</h2>
+    <p>The implementation keeps the SDK&rsquo;s usual boundaries: agents remain immutable Pydantic models, conversation state is the mutable source of truth, and dynamic tool behavior is still described declaratively. The only runtime side effect is registering a resolver so the existing tool system can turn a persisted <code>Tool(name, params)</code> back into a <code>ClientTool</code>.</p>
+    <p>That means Agent Canvas can remove Python-only UI tool modules for fire-and-forget actions, while server-executed tools still use the existing custom tool path. The split is clean: if the browser can handle it from an <code>ActionEvent</code>, use <code>client_tools</code>; if the server must compute a result, ship a real Python tool.</p>
+
+    <div class="foot-nav">
+      <a href="agent-canvas-tool-visualizers.html">Agent Canvas Tool Visualizers &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/OpenHands/software-agent-sdk/pull/3306">PR #3306 &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/OpenHands/software-agent-sdk/issues/3305">Issue #3305 &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="../index.html">&larr; Home</a>
+    </div>
+  </div>
+</body>
+</html>
