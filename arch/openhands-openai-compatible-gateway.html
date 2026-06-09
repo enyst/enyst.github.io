@@ -138,14 +138,14 @@ sequenceDiagram
     <h2>Implementation ladder</h2>
     <ol>
       <li><strong>Land the thin Chat Completions router.</strong> Non-streaming, profile-backed models, Bearer session auth, text/image input, final text output, and conversation id reuse.</li>
-      <li><strong>Make it easy to try.</strong> Add docs and examples for OpenAI SDK clients, Open WebUI-style base URL setup, voice webhook usage, and curl smoke tests.</li>
+      <li><strong>Make it easy to try.</strong> Add docs and examples for OpenAI SDK clients, Open WebUI-style base URL setup, voice webhook usage, and curl smoke tests. Starts with docs PR 554.</li>
       <li><strong>Improve operational fit.</strong> Add predictable timeouts, clearer errors, cleanup policies, request tracing, and metrics that help users debug a gateway run.</li>
       <li><strong>Stream final assistant text.</strong> Start with final-message deltas or coarse progress that ordinary clients can display. Do not expose tool internals until a concrete client needs them.</li>
-      <li><strong>Add Responses API if demand appears.</strong> Map <code>response_id</code> and <code>previous_response_id</code> to OpenHands conversations so stateful OpenAI clients can use their native flow.</li>
+      <li><strong>Add Responses API.</strong> Map <code>response_id</code> and <code>previous_response_id</code> to OpenHands conversations so stateful OpenAI clients can use their native flow.</li>
       <li><strong>Only then consider tool-call streaming.</strong> It is useful for specialist UIs, but it adds protocol ambiguity and is not required for the mainstream integrations this unlocks.</li>
     </ol>
 
-    <h2>What not to copy from Hermes</h2>
+    <h2>Comparison with Hermes</h2>
     <p>Hermes proves the pattern, but its gateway adapter grew into a broad platform server with sessions, streaming, cron APIs, platform delivery, and many adapter-specific concerns. OpenHands already has a dedicated agent-server with profile, settings, conversation, event, and workspace services. The OpenAI layer should reuse those seams and stay small.</p>
 
     <div class="callout defer">
