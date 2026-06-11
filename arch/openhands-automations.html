@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands Automations — Engel Nyst</title>
+  <meta name="description" content="Architecture notes for OpenHands Automations: how definitions, cron and webhook triggers, tarballs, dispatch, sandboxes, callbacks, and watchdog reconciliation fit together." />
+  <meta property="og:title" content="OpenHands Automations" />
+  <meta property="og:description" content="Code design of the OpenHands automation service: database-as-queue, scheduler, dispatcher, execution backends, callbacks, and watchdog fallback." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/openhands-automations.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .flow-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 18px 20px; margin: 18px 0; }
+    .flow-card h3 { margin-top: 0; }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 18px 0; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+    .pill { border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-family: var(--mono); font-size: 0.78em; color: var(--muted); background: rgba(255,255,255,0.03); }
+    .ok { border-left-color: var(--accent); }
+    .warning { border-left-color: #d86f57; }
+    .defer { border-left-color: #8a847a; }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#1a1a18',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>OpenHands Automations <span class="tag">architecture note</span></h1>
+    <p class="meta">
+      Code design for <a href="https://github.com/OpenHands/automation">OpenHands/automation</a>,
+      a standalone FastAPI service that schedules and dispatches OpenHands SDK work into Cloud sandboxes or a local agent server.
+      Reviewed from the repository source, June 2026.
+    </p>
+
+    <div class="callout ok">
+      <p><strong>Short version:</strong> the service uses the database as both catalog and durable queue. Cron polling, webhook ingress, and manual dispatch all create <code>AutomationRun</code> rows in <code>PENDING</code>. A dispatcher claims those rows, starts bash in an execution backend, then returns immediately. Completion is reconciled by an SDK callback, with a watchdog that verifies stale runs if the callback is missed.</p>
+    </div>
+
+    <h2>What this service owns</h2>
+    <p>OpenHands Automations is not the agent runtime. It owns the <em>when</em> and the packaging of <em>what</em> to run. The actual work happens in an agent server: either a new OpenHands Cloud sandbox per run or a configured local/self-hosted agent server.</p>
+
+    <pre class="mermaid">
+flowchart LR
+  User["User / UI / API client"] --> FE["Automations frontend SPA"]
+  User --> API["FastAPI routers under /api/automation/v1"]
+  FE --> API
+
+  subgraph Service["Automation service"]
+    API --> DB[("PostgreSQL or SQLite")]
+    API --> Store["FileStore: GCS, S3, or local"]
+    Scheduler["scheduler_loop"] --> DB
+    Events["event_router"] --> DB
+    Dispatcher["dispatcher_loop"] --> DB
+    Dispatcher --> Exec["execute_in_context"]
+    Watchdog["watchdog_loop"] --> DB
+  end
+
+  Store --> Dispatcher
+  Exec --> Backend{"ExecutionBackend"}
+  Backend --> Cloud["CloudSandboxBackend: create sandbox"]
+  Backend --> Local["LocalAgentServerBackend: reuse agent server"]
+  Cloud --> Agent["OpenHands agent server"]
+  Local --> Agent
+  Agent --> Callback["POST /v1/runs/{run_id}/complete"]
+  Callback --> API
+    </pre>
+
+    <div class="pill-row">
+      <span class="pill">FastAPI</span>
+      <span class="pill">SQLAlchemy async</span>
+      <span class="pill">PostgreSQL / SQLite</span>
+      <span class="pill">FileStore</span>
+      <span class="pill">Cron triggers</span>
+      <span class="pill">HMAC webhooks</span>
+      <span class="pill">Cloud sandboxes</span>
+      <span class="pill">Local agent server</span>
+    </div>
+
+    <h2>Core pieces</h2>
+    <table>
+      <tr><th>Piece</th><th>Files</th><th>Role</th></tr>
+      <tr><td>Application shell</td><td><code>app.py</code>, <code>config.py</code>, <code>db.py</code></td><td>Creates the FastAPI app, shared HTTP client, async database engine/session factory, routers, static frontend hosting, and background tasks.</td></tr>
+      <tr><td>Automation API</td><td><code>router.py</code></td><td>CRUD, manual dispatch, run listing, tarball download, completion callback, and cancellation. All user-facing operations are owner/org scoped.</td></tr>
+      <tr><td>Preset API</td><td><code>preset_router.py</code></td><td>Builds SDK tarballs from prompt or plugin requests, writes them to storage, then creates normal automation records.</td></tr>
+      <tr><td>Uploads</td><td><code>uploads.py</code>, <code>storage/*</code></td><td>Streams user tarballs with a size limit into the configured file store and exposes completed uploads as <code>oh-internal://uploads/{id}</code>.</td></tr>
+      <tr><td>Event ingress</td><td><code>event_router.py</code>, <code>webhook_router.py</code>, <code>utils/webhook.py</code></td><td>Verifies HMAC signatures, parses built-in and custom webhook payloads, matches event trigger patterns and filters, then creates pending runs.</td></tr>
+      <tr><td>Scheduling</td><td><code>scheduler.py</code>, <code>utils/cron.py</code></td><td>Polls enabled cron automations, rotates batches fairly via <code>last_polled_at</code>, and creates pending runs when a schedule is due.</td></tr>
+      <tr><td>Dispatch</td><td><code>dispatcher.py</code>, <code>execution.py</code>, <code>backends/*</code></td><td>Claims pending runs, resolves execution backend, prepares tarball and environment, starts the bash command, and records sandbox/command ids for later verification.</td></tr>
+      <tr><td>Reconciliation</td><td><code>watchdog.py</code>, <code>utils/agent_server.py</code>, <code>utils/sandbox.py</code></td><td>Scans stale running rows, checks the actual bash result in the execution backend, marks missed callbacks terminal, and cleans up resources.</td></tr>
+    </table>
+
+    <h2>The data model is the queue</h2>
+    <p>The important design choice is that no separate queue system is required. The <code>automation_runs</code> table is the durable queue, while <code>automations</code> is the catalog of definitions and <code>tarball_uploads</code> points to executable bytes.</p>
+
+    <pre class="mermaid">
+erDiagram
+  AUTOMATION ||--o{ AUTOMATION_RUN : creates
+  AUTOMATION {
+    uuid id
+    uuid user_id
+    uuid org_id
+    string name
+    json trigger
+    text tarball_path
+    text entrypoint
+    int timeout
+    bool enabled
+    datetime last_polled_at
+    datetime last_triggered_at
+  }
+  AUTOMATION_RUN {
+    uuid id
+    uuid automation_id
+    enum status
+    json event_payload
+    string sandbox_id
+    string bash_command_id
+    string conversation_id
+    datetime timeout_at
+    text error_detail
+  }
+  TARBALL_UPLOAD {
+    uuid id
+    uuid user_id
+    uuid org_id
+    enum status
+    text storage_path
+    bigint size_bytes
+  }
+  CUSTOM_WEBHOOK {
+    uuid id
+    uuid org_id
+    string source
+    string webhook_secret
+    string signature_header
+    string event_key_expr
+    bool enabled
+  }
+    </pre>
+
+    <div class="callout defer">
+      <p><strong>Queue invariant:</strong> once a run row exists in <code>PENDING</code>, it is eligible for the dispatcher. Cron, webhook, and manual entry points deliberately converge on that same state instead of having three execution paths.</p>
+    </div>
+
+    <h2>Creating an automation</h2>
+    <p>There are two creation shapes. Custom automations upload a tarball and create a record pointing at it. Presets generate the tarball for the user: prompt automations include <code>main.py</code>, <code>prompt.txt</code>, <code>setup.sh</code>, and optional repo config; plugin automations add plugin or experiment config.</p>
+
+    <pre class="mermaid">
+sequenceDiagram
+  participant Client
+  participant API as "preset_router / uploads"
+  participant Store as FileStore
+  participant DB as Database
+
+  alt Prompt or plugin preset
+    Client->>API: POST /v1/preset/prompt or /plugin
+    API->>API: generate SDK tarball
+  else Custom tarball
+    Client->>API: POST /v1/uploads raw tar bytes
+  end
+  API->>DB: create TarballUpload(UPLOADING)
+  API->>Store: stream tarball bytes
+  Store-->>API: size_bytes
+  API->>DB: mark upload COMPLETED
+  API->>DB: create Automation(trigger, tarball_path, entrypoint)
+  API-->>Client: AutomationResponse
+    </pre>
+
+    <div class="two-col">
+      <div class="flow-card">
+        <h3>Prompt preset</h3>
+        <p>Generates SDK boilerplate that loads the prompt, optional repo list, LLM settings, secrets, and MCP configuration, then runs a normal OpenHands SDK conversation and posts the completion callback.</p>
+      </div>
+      <div class="flow-card">
+        <h3>Plugin preset</h3>
+        <p>Packages plugin source declarations or A/B experiment variants into JSON config files. The runtime script fetches plugins and invokes the same prompt path with those capabilities loaded.</p>
+      </div>
+      <div class="flow-card">
+        <h3>Custom tarball</h3>
+        <p>Lets a caller provide their own SDK script and entrypoint. The service validates and stores the tarball, but dispatch treats it like any other automation definition.</p>
+      </div>
+      <div class="flow-card">
+        <h3>Prompt edits</h3>
+        <p>For preset prompt automations, changing the prompt regenerates the stored tarball because the runnable prompt is baked into <code>prompt.txt</code>; the database prompt column is metadata.</p>
+      </div>
+    </div>
+
+    <h2>Triggering: cron, events, and manual dispatch</h2>
+    <p>Triggers only decide whether to create a run. They do not execute code directly.</p>
+
+    <pre class="mermaid">
+flowchart TD
+  Cron["scheduler_loop polls enabled cron rows"] --> Due{"is_automation_due?"}
+  Due -->|yes| Pending["create_pending_run"]
+  Due -->|no| Polled["update last_polled_at only"]
+
+  Webhook["POST /v1/events/{org_id}/{source}"] --> Sig{"valid HMAC signature?"}
+  Sig -->|no| Reject["401 / 404"]
+  Sig -->|yes| Parse["parse_event / event_key_expr"]
+  Parse --> Match["matches_trigger: source, on pattern, JMESPath filter"]
+  Match -->|matched| Pending
+  Match -->|not matched| NoRun["received, zero runs"]
+
+  Manual["POST /v1/{automation_id}/dispatch"] --> Pending
+  Pending --> Run[("AutomationRun status=PENDING")]
+    </pre>
+
+    <p>PostgreSQL deployments use <code>FOR UPDATE SKIP LOCKED</code> in the scheduler and dispatcher so multiple service workers can avoid claiming the same rows. SQLite mode skips those locks and assumes a single-process local deployment.</p>
+
+    <h2>Dispatch is fire-and-forget</h2>
+    <p>The dispatcher is intentionally not a blocking job runner. It claims a batch, changes each row to <code>RUNNING</code> with a precomputed <code>timeout_at</code>, and launches an async background task that starts the command in the execution backend.</p>
+
+    <pre class="mermaid">
+sequenceDiagram
+  participant D as Dispatcher
+  participant DB as Database
+  participant B as ExecutionBackend
+  participant S as Storage
+  participant A as Agent server
+  participant Script as Automation code
+  participant API as Completion API
+
+  D->>DB: select oldest PENDING rows
+  D->>DB: mark RUNNING and set timeout_at
+  D->>B: get_execution_context
+  alt Cloud mode
+    B->>B: mint per-user API key
+    B->>B: create sandbox and wait RUNNING
+  else Local mode
+    B->>B: return configured agent server URL and key
+  end
+  D->>S: read internal tarball bytes
+  D->>A: upload tarball or curl external URL
+  D->>A: start bash with exports, extraction, setup, entrypoint
+  A-->>D: bash command id
+  D->>DB: persist sandbox id and bash command id
+  D-->>D: return without waiting for process exit
+  Script->>API: post run completion callback
+  API->>DB: RUNNING to COMPLETED or FAILED
+    </pre>
+
+    <h2>Execution backends</h2>
+    <p><code>ExecutionBackend</code> is the seam that keeps the dispatcher and watchdog mode-agnostic. Both modes expose the same verbs: acquire a context, build environment variables, verify a stale run, and clean up after verification.</p>
+
+    <table>
+      <tr><th>Concern</th><th>Cloud sandbox backend</th><th>Local agent-server backend</th></tr>
+      <tr><td>Context</td><td>Creates a fresh sandbox via OpenHands Cloud, polls until <code>RUNNING</code>, and reads the exposed <code>AGENT_SERVER</code> URL plus session key.</td><td>Returns the configured persistent agent-server URL and API key.</td></tr>
+      <tr><td>Auth</td><td>Mints a per-user API key from the service key and retries once on 401/403 by refreshing it.</td><td>Uses the configured local agent-server API key and optional callback API key.</td></tr>
+      <tr><td>Workspace</td><td>Extracts into <code>/workspace/project</code> in the fresh sandbox.</td><td>Extracts under <code>{workspace_base}/automation-runs/{run_id}</code> for run isolation.</td></tr>
+      <tr><td>Cleanup</td><td>Deletes the sandbox after completion or failed verification unless <code>keep_alive</code> is set.</td><td>No-ops; the agent server is managed externally.</td></tr>
+    </table>
+
+    <h2>The injected contract</h2>
+    <p>The service and user code communicate through environment variables. The dispatcher builds these after acquiring the backend context, then <code>execute_in_context()</code> exports them before <code>setup.sh</code> and the entrypoint.</p>
+
+    <table>
+      <tr><th>Variable</th><th>Meaning</th></tr>
+      <tr><td><code>OPENHANDS_API_KEY</code></td><td>Per-user key for OpenHands Cloud and SDK calls in Cloud mode.</td></tr>
+      <tr><td><code>OPENHANDS_CLOUD_API_URL</code></td><td>Cloud API base URL.</td></tr>
+      <tr><td><code>AGENT_SERVER_URL</code></td><td>Local-mode URL as seen from inside the bash chain.</td></tr>
+      <tr><td><code>SESSION_API_KEY</code></td><td>Agent-server session key for files, bash, settings, and SDK workspace calls.</td></tr>
+      <tr><td><code>SANDBOX_ID</code></td><td>Cloud sandbox id when available.</td></tr>
+      <tr><td><code>AUTOMATION_CALLBACK_URL</code></td><td>Run completion endpoint on the automation service.</td></tr>
+      <tr><td><code>AUTOMATION_RUN_ID</code></td><td>The run id the callback should report.</td></tr>
+      <tr><td><code>AUTOMATION_API_URL</code></td><td>Automation service base URL.</td></tr>
+      <tr><td><code>AUTOMATION_EVENT_PAYLOAD</code></td><td>JSON object with trigger type, full trigger config, automation metadata, event payload when present, and model when configured.</td></tr>
+      <tr><td><code>AUTOMATION_MODEL</code></td><td>Resolved model profile name for the run, when configured.</td></tr>
+    </table>
+
+    <h2>Completion and races</h2>
+    <p>Callbacks, watchdog scans, and cancellation can race. The code resolves that by making terminal updates conditional: update only rows that are still in the expected non-terminal state.</p>
+
+    <pre class="mermaid">
+stateDiagram-v2
+  [*] --> PENDING: cron / event / manual
+  PENDING --> RUNNING: dispatcher claims
+  PENDING --> CANCELLED: user cancels before claim
+  RUNNING --> COMPLETED: SDK callback status COMPLETED
+  RUNNING --> FAILED: SDK callback FAILED or dispatch/runtime error
+  RUNNING --> CANCELLED: user cancels running run
+  RUNNING --> COMPLETED: watchdog verifies exit_code 0
+  RUNNING --> FAILED: watchdog verifies error or timeout
+  PENDING --> SKIPPED: concurrency limit before execution
+  COMPLETED --> [*]
+  FAILED --> [*]
+  CANCELLED --> [*]
+  SKIPPED --> [*]
+    </pre>
+
+    <div class="callout warning">
+      <p><strong>Race boundary:</strong> the completion endpoint and watchdog both use <code>UPDATE ... WHERE status = 'RUNNING'</code> and check <code>rowcount</code>. If another actor has already made the run terminal, the loser gets a conflict or simply skips the row; it does not overwrite the final result.</p>
+    </div>
+
+    <h2>Why the watchdog needs bash command ids</h2>
+    <p>After <code>start_bash_command</code> returns, the dispatcher stores the agent-server <code>bash_command_id</code>. The watchdog passes that id back to the verifier so it reads the output for <em>this</em> automation run, not the latest unrelated bash activity on a shared local agent server or a busy sandbox.</p>
+
+    <pre class="mermaid">
+flowchart LR
+  Run["RUNNING run past timeout_at"] --> Verify["backend.verify_run(run_id)"]
+  Verify --> Cmd["query agent-server bash history by bash_command_id"]
+  Cmd --> Outcome{"verified?"}
+  Outcome -->|exit_code 0| Done["mark COMPLETED: callback missed"]
+  Outcome -->|nonzero| Fail["mark FAILED with stderr/stdout excerpt"]
+  Outcome -->|none or killed| Timeout["mark FAILED: timed out"]
+  Outcome -->|cannot verify| Cleanup["backend cleanup unless keep_alive"]
+  Cleanup --> Fail2["mark FAILED: no callback / verification error"]
+    </pre>
+
+    <h2>Design takeaways</h2>
+    <ul>
+      <li><strong>One queue, many trigger sources.</strong> All triggers converge on <code>AutomationRun(PENDING)</code>, which keeps dispatch logic small.</li>
+      <li><strong>Execution mode is a backend, not a branch everywhere.</strong> Cloud and local behavior stay behind <code>ExecutionBackend</code>.</li>
+      <li><strong>Do not proxy untrusted external tarballs through the service.</strong> Internal tarballs are read from controlled storage; external HTTP URLs are downloaded inside the execution environment with curl limits.</li>
+      <li><strong>Callbacks are the happy path, verification is the safety net.</strong> The dispatcher can stay asynchronous because the watchdog repairs missed callbacks.</li>
+      <li><strong>Optimistic locking is the race-control mechanism.</strong> Terminal transitions are conditional rather than protected by long-running locks.</li>
+      <li><strong>SQLite support shapes migrations and locking.</strong> Models and migrations use generic SQLAlchemy types; row locking is skipped in local SQLite mode.</li>
+    </ul>
+
+    <div class="foot-nav">
+      <a href="openhands-client-defined-tools.html">OpenHands Client-Defined Tools &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="agent-canvas-tool-visualizers.html">Agent Canvas Tool Visualizers &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/OpenHands/automation">OpenHands/automation &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="../index.html">&larr; Home</a>
+    </div>
+  </div>
+</body>
+</html>
