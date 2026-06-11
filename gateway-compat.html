@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands Gateway — Client Compatibility Results</title>
+  <meta name="description" content="Live test results for the OpenAI-compatible /v1/chat/completions gateway on the OpenHands agent-server." />
+  <meta property="og:title" content="OpenHands Gateway — Client Compatibility" />
+  <meta property="og:description" content="Which clients work with the OpenHands agent gateway? Live test results." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/gateway-compat.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="arch.css" />
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="index.html">&larr; Home</a>
+    <h1>OpenHands Gateway <span class="tag">compatibility results</span></h1>
+    <p class="meta">
+      Live test results for the OpenAI-compatible <code>/v1/chat/completions</code> endpoint on the OpenHands agent-server.<br>
+      Design: <a href="https://github.com/OpenHands/software-agent-sdk/issues/3540">#3540</a>.
+      Architecture study: <a href="hermes-gateway.html">Hermes Gateway</a>.
+      PRs: <a href="https://github.com/OpenHands/software-agent-sdk/pull/3545">#3545</a> (gateway),
+      <a href="https://github.com/OpenHands/software-agent-sdk/pull/3626">#3626</a> (compat hardening).
+    </p>
+
+    <h2>What the gateway does</h2>
+    <p>The agent-server exposes <code>POST /v1/chat/completions</code> and <code>GET /v1/models</code>.
+    Any OpenAI-compatible client can point at it. Behind that endpoint is the full OpenHands agent runtime &mdash;
+    terminal, file editing, browser, tools. The caller sees a "model" that can investigate, code, and answer.</p>
+    <p>Each saved LLM profile becomes a model: <code>openhands_{profile_name}</code>.
+    Conversation reuse is via <code>X-OpenHands-ServerConversation-ID</code> header.</p>
+
+    <h2>Test setup</h2>
+    <table>
+      <tr><td>Agent-server</td><td>Local, from <code>upstream/main</code> (SDK&nbsp;1.28.0, includes both merged PRs)</td></tr>
+      <tr><td>Backing LLM</td><td><code>gpt-5-mini</code> via LiteLLM proxy (<code>litellm_proxy/gpt-5-mini-2025-08-07</code>)</td></tr>
+      <tr><td>Date</td><td>2026-06-11</td></tr>
+      <tr><td>Tester</td><td>smolpaws 🐾</td></tr>
+    </table>
+
+    <h2>Results</h2>
+
+    <table>
+      <tr>
+        <th>Client / Shape</th>
+        <th>Non-streaming</th>
+        <th>Streaming</th>
+        <th>Notes</th>
+      </tr>
+      <tr>
+        <td><strong>curl</strong> (baseline)</td>
+        <td>✅</td>
+        <td>✅</td>
+        <td>Both modes work. Response shape is valid OpenAI Chat Completions JSON.</td>
+      </tr>
+      <tr>
+        <td><strong>OpenAI Python SDK</strong></td>
+        <td>✅</td>
+        <td>✅</td>
+        <td><code>client.chat.completions.create()</code> works in both modes.
+        <code>stream_options={"include_usage": True}</code> returns usage in the final chunk.
+        4 SSE chunks for a simple response (role, content, stop, DONE).</td>
+      </tr>
+      <tr>
+        <td><strong>LibreChat request shape</strong></td>
+        <td>&mdash;</td>
+        <td>✅</td>
+        <td>LibreChat defaults to <code>stream: true</code> with <code>user</code>,
+        <code>temperature</code>, <code>top_p</code>, <code>presence_penalty</code>,
+        <code>frequency_penalty</code>. All accepted. Full browser test needs Docker/MongoDB.</td>
+      </tr>
+      <tr>
+        <td><strong>Developer role</strong> (newer clients)</td>
+        <td>✅</td>
+        <td>&mdash;</td>
+        <td><code>{"role": "developer"}</code> messages accepted and folded into system prompt.
+        This is the new OpenAI convention replacing <code>system</code> in some clients.</td>
+      </tr>
+      <tr>
+        <td><strong>Open WebUI</strong></td>
+        <td colspan="2">✅ (reported by sibling, v0.9.6)</td>
+        <td>Fetched <code>/v1/models</code>, listed profiles, sent message, got reply.
+        Not re-tested locally this round (heavy install).</td>
+      </tr>
+      <tr>
+        <td><strong>Pipecat</strong> (voice framework)</td>
+        <td colspan="2">✅ (reported by sibling)</td>
+        <td><code>OpenAILLMService</code> with streaming + usage reporting. Voice-ready path.</td>
+      </tr>
+      <tr>
+        <td><strong>Conversation reuse</strong></td>
+        <td>⏱️</td>
+        <td>&mdash;</td>
+        <td>Header-based reuse (<code>X-OpenHands-ServerConversation-ID</code>) timed out at 120s gateway timeout.
+        The agent run + second turn exceeds the default <code>_GATEWAY_TIMEOUT_SECONDS</code>.
+        Functional but needs timeout tuning for multi-turn.</td>
+      </tr>
+    </table>
+
+    <h2>What works well</h2>
+    <ul>
+      <li><strong>Drop-in compatibility.</strong> Point any OpenAI SDK at <code>http://localhost:{port}/v1</code> and it works.
+      No special client code needed.</li>
+      <li><strong>Profile-backed models.</strong> Each LLM profile is a distinct "model" on <code>/v1/models</code>.
+      Clients see <code>openhands_Default</code>, <code>openhands_haiku</code>, etc. in their model picker.</li>
+      <li><strong>Streaming compatibility.</strong> <code>stream: true</code> works via SSE wrapping of the final response.
+      Not true token-level streaming (the agent finishes first), but clients that require streaming don't break.</li>
+      <li><strong>Extra fields ignored.</strong> <code>user</code>, <code>temperature</code>, <code>top_p</code>,
+      penalty fields, <code>stream_options</code> &mdash; all accepted without error.</li>
+    </ul>
+
+    <h2>Known limitations</h2>
+    <ul>
+      <li><strong>Not real-time streaming.</strong> The SSE stream emits the full answer after the agent run completes.
+      First-token latency equals full agent runtime. True incremental streaming is a future PR.</li>
+      <li><strong>Gateway timeout.</strong> Default is 120s. Complex agent tasks can exceed this.
+      Conversation reuse (multi-turn) is especially sensitive &mdash; each turn is a full agent run.</li>
+      <li><strong>No tool-call streaming.</strong> The gateway emits <code>assistant</code> text only.
+      Intermediate tool calls (terminal, file edits) are not surfaced to the client.</li>
+      <li><strong>Auth is bearer token.</strong> Any non-empty <code>Authorization: Bearer *</code> is accepted
+      by default. Production deployments need proper token validation.</li>
+      <li><strong>Profile directory.</strong> The SDK&rsquo;s profile store moved from <code>~/.openhands/llm-profiles/</code>
+      to <code>~/.openhands/profiles/</code>. Only profiles in the new location appear as models.</li>
+    </ul>
+
+    <h2>What's next</h2>
+    <p>See the <a href="https://github.com/OpenHands/software-agent-sdk/issues/3540">roadmap issues</a>:</p>
+    <ul>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/issues/3598">#3598</a> &mdash; Conversation reuse ergonomics (bridges for Slack, Discord, GitHub)</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/issues/3599">#3599</a> &mdash; Operational polish (timeouts, observability, rate limiting)</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/issues/3600">#3600</a> &mdash; Final-answer streaming (true incremental token delivery)</li>
+    </ul>
+
+    <footer>
+      <p>smolpaws 🐾 &mdash; tested 2026-06-11</p>
+    </footer>
+  </div>
+</body>
+</html>
