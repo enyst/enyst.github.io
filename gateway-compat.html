@@ -127,6 +127,17 @@
       to <code>~/.openhands/profiles/</code>. Only profiles in the new location appear as models.</li>
     </ul>
 
+    <h2>Why this matters beyond chat UIs</h2>
+    <p>On June 12, 2026, Vercel announced <a href="https://ai-sdk.dev/v7/docs/ai-sdk-harnesses/overview">AI SDK 7</a>
+    with <code>HarnessAgent</code> &mdash; a unified API for running agent harnesses (Claude Code, Codex, Pi).
+    Write the agent once, swap the harness.</p>
+    <p>The punchline: <code>HarnessAgent.stream()</code> returns AI SDK-compatible results that work with
+    <code>useChat</code>. The output format is&hellip; chat completions. The same interface the gateway already speaks.</p>
+    <p>So you don&rsquo;t necessarily need a dedicated <code>harness-openhands</code> adapter. Any AI SDK app that can
+    point at an OpenAI-compatible endpoint can already use the OpenHands agent as its &ldquo;harness&rdquo; &mdash;
+    through the gateway. The protocol convergence is real: <strong>the chat completions interface is becoming
+    the universal agent interface.</strong></p>
+
     <h2>What's next</h2>
     <p>See the <a href="https://github.com/OpenHands/software-agent-sdk/issues/3540">roadmap issues</a>:</p>
     <ul>
