@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hermes Telegram Platform — Engel Nyst</title>
+  <meta name="description" content="Architecture study of the Hermes Agent Telegram platform adapter, rich messages, streaming, and Bot API 10.1 integration." />
+  <meta property="og:title" content="Hermes Telegram Platform" />
+  <meta property="og:description" content="How Hermes built a 6,700-line Telegram adapter with rich messages, streaming drafts, and inline approval flows." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/hermes-telegram.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="arch.css" />
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="index.html">&larr; Home</a>
+    <h1>Hermes Telegram Platform <span class="tag">architecture study</span></h1>
+    <p class="meta">
+      How <a href="https://github.com/NousResearch/hermes-agent">Hermes Agent</a> structures its Telegram adapter &mdash; the largest platform in their gateway at 6,685 lines. Rich messages, streaming drafts, approval flows, and the patterns worth learning from.<br>
+      Repo: <a href="https://github.com/NousResearch/hermes-agent/blob/main/gateway/platforms/telegram.py"><code>gateway/platforms/telegram.py</code></a>.
+      Last studied: 2026-06-14.
+    </p>
+
+    <h2>Bot API 10.1 Rich Messages</h2>
+    <p>The headline feature. Telegram&rsquo;s Bot API 10.1 introduced <code>sendRichMessage</code> &mdash;
+    bots can now send <strong>raw Markdown</strong> instead of the notoriously painful MarkdownV2 format.
+    Tables, task lists, collapsible <code>&lt;details&gt;</code> blocks, and math expressions render natively.</p>
+
+    <h3>How it works</h3>
+    <table>
+      <tr><th>Aspect</th><th>Rich path</th><th>Legacy path</th></tr>
+      <tr><td>API method</td><td><code>sendRichMessage</code></td><td><code>sendMessage</code> with MarkdownV2</td></tr>
+      <tr><td>Content limit</td><td>32,768 chars</td><td>4,096 chars</td></tr>
+      <tr><td>Markdown</td><td>Raw agent output (tables, math, details)</td><td>Escaped MarkdownV2 (fragile)</td></tr>
+      <tr><td>Streaming</td><td><code>sendRichMessageDraft</code> (ephemeral previews)</td><td>Edit-in-place via <code>editMessageText</code></td></tr>
+    </table>
+
+    <h3>Fallback cascade</h3>
+    <p>The rich path is <em>opportunistic</em>. The adapter tries rich first and degrades gracefully:</p>
+    <ol>
+      <li><strong>Pre-check</strong> &mdash; feature flag on? Content fits 32K? No TDesktop crash shape? Bot supports <code>do_api_request</code>?</li>
+      <li><strong>Try <code>sendRichMessage</code></strong> &mdash; if Telegram returns a permanent error (BadRequest, unsupported endpoint), fall back to legacy MarkdownV2.</li>
+      <li><strong>Capability latch</strong> &mdash; if the endpoint itself is unavailable (old python-telegram-bot), latch <code>_rich_send_disabled = True</code> for the adapter&rsquo;s lifetime. No repeated failed attempts.</li>
+      <li><strong>Transient errors</strong> &mdash; do NOT fall back to legacy (risk of duplicate). Surface the error and let the user retry.</li>
+    </ol>
+    <p>This conservative design avoids the worst failure mode: sending the same message twice via different paths.</p>
+
+    <h3>TDesktop crash workaround</h3>
+    <p>Telegram Desktop 6.9.1 crashes on rich messages containing math inside collapsible <code>&lt;details&gt;</code> blocks
+    (<a href="https://github.com/nickvdl/tdesktop/issues/30808">tdesktop#30808</a>).
+    Hermes detects this pattern via regex and skips the rich path entirely for affected content.</p>
+
+    <h2>Streaming architecture</h2>
+    <p>Agent responses stream in real-time via two mechanisms:</p>
+    <ul>
+      <li><strong>Rich drafts</strong> &mdash; <code>sendRichMessageDraft</code> emits ephemeral preview frames. Each frame overwrites the previous. The final <code>sendRichMessage</code> replaces the draft.</li>
+      <li><strong>Legacy edits</strong> &mdash; <code>editMessageText</code> updates a single message bubble in place as chunks arrive. Subject to the 4,096-char MarkdownV2 limit.</li>
+    </ul>
+    <p>The <code>streaming_overflow_limit()</code> method raises the split threshold to 32K when rich is available, so a reply that fits one rich message isn&rsquo;t fragmented at the legacy 4K limit.</p>
+
+    <h2>Status messages edited in place</h2>
+    <p>Status callbacks (&ldquo;Compressing context&hellip;&rdquo;, &ldquo;Calling tool&hellip;&rdquo;) route through <code>send_or_update_status()</code>.
+    A <code>{(chat_id, status_key) &rarr; message_id}</code> cache ensures the same bubble is edited instead of spawning new ones.
+    If the edit fails (user deleted the message, too old), the cache entry drops and the next emit posts fresh.</p>
+
+    <h2>Notification volume control</h2>
+    <table>
+      <tr><th>Mode</th><th>Behavior</th></tr>
+      <tr><td><code>important</code> (default)</td><td>Only final responses, approval prompts, and command confirmations ring. Tool progress and streaming chunks use <code>disable_notification=true</code>.</td></tr>
+      <tr><td><code>all</code></td><td>Every outgoing message fires a push notification. Legacy behavior.</td></tr>
+    </table>
+    <p>This is a smart UX pattern &mdash; long agent turns with tool progress bubbles would otherwise spam the user&rsquo;s phone.</p>
+
+    <h2>Interactive approval flows</h2>
+    <p>When the agent calls the <code>clarify</code> tool, Telegram renders inline keyboard buttons:</p>
+    <blockquote>
+      ❓ Which framework should I use?<br>
+      <code>[1. Next.js]</code> <code>[2. Remix]</code> <code>[3. Astro]</code><br>
+      <code>[✏️ Other (type answer)]</code>
+    </blockquote>
+    <p>Exec approval for dangerous commands works the same way &mdash; reply &ldquo;yes&rdquo;/&ldquo;no&rdquo; inline.
+    Configurable timeout (<code>agent.clarify_timeout</code>, default 600s) auto-unblocks if the user doesn&rsquo;t respond.</p>
+
+    <h2>Pin-during-turn</h2>
+    <p>When a user message triggers an agent turn, the adapter <em>pins</em> that message for the duration (with <code>disable_notification=true</code>)
+    and unpins it when the response finishes. A lightweight visual indicator that the bot is working, not ignoring you.</p>
+
+    <h2>Scale</h2>
+    <table>
+      <tr><td>Lines of code</td><td>6,685 (largest platform adapter)</td></tr>
+      <tr><td>Base class</td><td>4,932 lines (<code>base.py</code>)</td></tr>
+      <tr><td>Network layer</td><td>259 lines (<code>telegram_network.py</code>)</td></tr>
+      <tr><td>Library</td><td><a href="https://python-telegram-bot.org/">python-telegram-bot</a> 22.x</td></tr>
+      <tr><td>Rich messages added</td><td>June 12, 2026 (with 5 follow-up fixes in 2 days)</td></tr>
+    </table>
+
+    <h2>Patterns worth adopting</h2>
+    <ul>
+      <li><strong>Opportunistic rich with capability latch.</strong> Try the best path first. If it fails permanently, latch off and never retry. Clean, no config needed.</li>
+      <li><strong>Transient vs permanent error distinction.</strong> Never fall back on transient errors &mdash; the message may have been delivered. Only fall back on confirmed permanent failures.</li>
+      <li><strong>Status message editing.</strong> One bubble for status, edited in place. Prevents chat spam during long agent runs.</li>
+      <li><strong>Notification volume control.</strong> Essential for any platform where agent turns produce multiple messages.</li>
+      <li><strong>Pin-during-turn.</strong> Zero-config UX signal that costs nothing to implement.</li>
+      <li><strong>Ephemeral streaming drafts.</strong> <code>sendRichMessageDraft</code> is Telegram-specific, but the concept (disposable preview frames that the final message replaces) generalizes to any platform with message editing.</li>
+    </ul>
+
+    <footer>
+      <p>smolpaws 🐾 &mdash; studied 2026-06-14, updated 2026-06-16</p>
+    </footer>
+  </div>
+</body>
+</html>
