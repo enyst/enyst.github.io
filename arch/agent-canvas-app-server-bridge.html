@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Canvas + OpenHands app_server bridge — Engel Nyst</title>
+  <meta name="description" content="Study of the minimal OpenHands app_server surface needed for Agent Canvas to use app_server as a sandbox orchestrator and WebSocket gateway for sandbox-hosted agent-servers." />
+  <meta property="og:title" content="Agent Canvas + OpenHands app_server bridge" />
+  <meta property="og:description" content="What parts of OpenHands/OpenHands are actually needed when Agent Canvas talks to app_server, app_server orchestrates sandboxes, and each sandbox hosts an agent-server." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/agent-canvas-app-server-bridge.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    :root { --red: #d86f57; --amber: #d9a441; --blue: #6f9ed8; --green: #6bbfab; }
+    .hero-panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: calc(var(--border-radius) + 10px);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(107,191,171,0.22), transparent 28%),
+        radial-gradient(circle at 88% 6%, rgba(216,111,87,0.16), transparent 24%),
+        linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      padding: 28px 30px;
+      margin: 26px 0 34px;
+    }
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.12;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(to bottom, black, transparent 85%);
+      pointer-events: none;
+    }
+    .hero-panel > * { position: relative; }
+    .lede { max-width: 860px; font-size: 1.05em; color: var(--ink); }
+    .verdict-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 22px 0 4px; }
+    .verdict-card {
+      border: 1px solid var(--border);
+      border-radius: var(--border-radius);
+      background: rgba(0,0,0,0.18);
+      padding: 16px 18px;
+    }
+    .verdict-card strong { display: block; margin-bottom: 6px; }
+    .verdict-card p { margin: 0; color: var(--muted); font-size: 0.9em; }
+    .score { font-family: var(--mono); font-size: 0.78em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .route-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; margin: 18px 0; }
+    .route-card {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--border-radius);
+      background: var(--card);
+      padding: 16px 18px;
+    }
+    .route-card.proxy { border-left-color: var(--green); }
+    .route-card.hybrid { border-left-color: var(--amber); }
+    .route-card.gap { border-left-color: var(--red); }
+    .route-card.optional { border-left-color: #8a847a; }
+    .route-card h3 { margin-top: 0; }
+    .route-card ul { margin-bottom: 0; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+    .chip {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-family: var(--mono);
+      font-size: 0.76em;
+      color: var(--muted);
+      background: rgba(255,255,255,0.035);
+    }
+    .chip.green { color: var(--green); border-color: rgba(107,191,171,0.55); }
+    .chip.amber { color: var(--amber); border-color: rgba(217,164,65,0.55); }
+    .chip.red { color: var(--red); border-color: rgba(216,111,87,0.55); }
+    .matrix td:first-child { font-family: var(--mono); color: var(--ink); }
+    .status-good { color: var(--green); }
+    .status-risk { color: var(--amber); }
+    .status-gap { color: var(--red); }
+    .source-list li { margin-bottom: 9px; }
+    .mini-map {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 22px 0;
+    }
+    .mini-map div {
+      min-height: 86px;
+      border: 1px solid var(--border);
+      border-radius: var(--border-radius);
+      padding: 12px;
+      background: var(--card);
+    }
+    .mini-map b { display: block; color: var(--accent); font-family: var(--mono); font-size: 0.78em; letter-spacing: 0.05em; text-transform: uppercase; }
+    .mini-map span { display: block; color: var(--muted); font-size: 0.88em; margin-top: 8px; }
+    @media (max-width: 760px) { .mini-map { grid-template-columns: 1fr; } }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#151512',
+        tertiaryColor: '#20201c', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>Agent Canvas + OpenHands app_server bridge <span class="tag">study</span></h1>
+    <p class="meta">
+      A gap analysis of <a href="https://github.com/OpenHands/OpenHands/pull/14909">OpenHands/OpenHands#14909</a>
+      and companion <a href="https://github.com/OpenHands/agent-canvas/pull/1435">OpenHands/agent-canvas#1435</a>, with
+      <a href="https://github.com/OpenHands/software-agent-sdk">software-agent-sdk</a> agent-server endpoints as the runtime contract.
+      Reviewed from source in June 2026. Prepared by OpenHands (AI) on behalf of the user.
+    </p>
+
+    <section class="hero-panel">
+      <p class="score">target topology</p>
+      <p class="lede"><strong>Agent Canvas should not need the old OpenHands frontend.</strong> The useful OpenHands piece is a smaller app_server slice: it authenticates the browser, owns user/sandbox/app-conversation metadata, creates or resumes a sandbox, finds the sandbox's exposed agent-server, and relays selected HTTP and WebSocket traffic back to Agent Canvas.</p>
+      <div class="verdict-grid">
+        <div class="verdict-card">
+          <strong>Minimal answer</strong>
+          <p>Keep the app_server orchestration core plus proxy/gateway routers. Drop the local GUI React app for this path.</p>
+        </div>
+        <div class="verdict-card">
+          <strong>Current PR shape</strong>
+          <p>Good first bridge for app-conversation discovery, <code>/ws/events</code>, <code>/ask_agent</code>, and git proxy routes.</p>
+        </div>
+        <div class="verdict-card">
+          <strong>Main risk</strong>
+          <p>Agent Canvas still sends several runtime calls around app_server, so the two PRs are not yet a full gateway topology.</p>
+        </div>
+      </div>
+    </section>
+
+    <h2>The flow we actually want</h2>
+    <p>In this architecture, Agent Canvas treats OpenHands app_server as an app/cloud backend, while each sandbox continues to run a normal software-agent-sdk agent-server. app_server is not the agent runtime; it is the control plane and network gateway.</p>
+
+    <pre class="mermaid">
+sequenceDiagram
+  participant AC as Agent Canvas
+  participant AS as OpenHands app_server
+  participant SB as Sandbox service
+  participant RT as Sandbox-hosted agent-server
+
+  AC->>AS: POST /oauth/device/authorize + /token
+  AC->>AS: POST /api/v1/app-conversations
+  AS->>SB: create or select sandbox
+  SB-->>AS: exposed AGENT_SERVER URL + session key
+  AS->>RT: POST /api/conversations
+  RT-->>AS: ConversationInfo
+  AS-->>AC: AppConversationStartTask
+  AC->>AS: GET /api/v1/app-conversations?ids=...
+  AS-->>AC: conversation_url + session_api_key + websocket_url=/ws/events/{id}
+  AC->>AS: WS /ws/events/{id}
+  AS->>RT: WS /sockets/events/{id}
+  RT-->>AS: SDK events
+  AS-->>AC: same SDK events
+    </pre>
+
+    <div class="callout">
+      <p><strong>Terminology:</strong> in this note, “OpenHands OSS” means the minimal app_server subset necessary for sandbox orchestration with Agent Canvas. It does <em>not</em> mean the old OpenHands local GUI frontend.</p>
+    </div>
+
+    <h2>Minimum viable OpenHands/OpenHands slice</h2>
+    <p>The minimum is not one router. app_server's conversation path is stitched through app-conversation records, sandbox records, sandbox specs, settings/secrets, and the HTTP/WebSocket gateway. The slice below is the part worth preserving if the old UI is replaced by Agent Canvas.</p>
+
+    <div class="route-grid">
+      <div class="route-card hybrid">
+        <h3>1. FastAPI shell and router mount</h3>
+        <p>Keep <code>openhands/app_server/app.py</code> and <code>v1_router.py</code> only as the app_server host: lifespan, middleware, <code>/api/v1</code>, OAuth device routes, and optional <code>/ws</code> mount.</p>
+        <ul>
+          <li><code>ENABLE_WEBSOCKET_GATEWAY=true</code> gates <code>/ws/events/{id}</code>.</li>
+          <li><code>SERVE_FRONTEND</code> and <code>frontend/build</code> are not conceptually required for Agent Canvas.</li>
+        </ul>
+      </div>
+      <div class="route-card hybrid">
+        <h3>2. App-conversation control plane</h3>
+        <p>Keep <code>app_conversation_router.py</code>, models, services, start-task store, and live-status service. This is where app_server turns a UI request into a sandbox + agent-server conversation.</p>
+        <ul>
+          <li><code>POST /api/v1/app-conversations</code></li>
+          <li><code>GET /api/v1/app-conversations/search</code></li>
+          <li><code>GET /api/v1/app-conversations?ids=...</code></li>
+          <li><code>GET /api/v1/app-conversations/start-tasks</code></li>
+        </ul>
+      </div>
+      <div class="route-card hybrid">
+        <h3>3. Sandbox orchestration</h3>
+        <p>Keep sandbox services, routers, and sandbox-spec catalog. app_server must know sandbox status, exposed URLs, and the sandbox session key.</p>
+        <ul>
+          <li><code>/api/v1/sandboxes/*</code> for pause/resume/lifecycle</li>
+          <li><code>/api/v1/sandbox-specs/*</code> for default sandbox shape</li>
+          <li><code>AGENT_SERVER</code> exposed URL lookup</li>
+        </ul>
+      </div>
+      <div class="route-card proxy">
+        <h3>4. Agent-server context resolver</h3>
+        <p>Keep the shared resolver currently living in <code>app_conversation_router._get_agent_server_context</code>. Every proxy route depends on it.</p>
+        <ul>
+          <li>loads app conversation</li>
+          <li>loads sandbox and sandbox spec</li>
+          <li>rejects paused/non-running sandboxes</li>
+          <li>returns internal agent-server URL + session key</li>
+        </ul>
+      </div>
+      <div class="route-card proxy">
+        <h3>5. WebSocket event gateway</h3>
+        <p>Keep <code>websocket_router.py</code> and return <code>AppConversation.websocket_url</code> from live-status responses.</p>
+        <ul>
+          <li>Agent Canvas uses <code>websocket_url</code> as the gateway signal.</li>
+          <li>Relative <code>/ws/events/{id}</code> must resolve against app_server, not the sandbox.</li>
+          <li>Frames can be tunneled without schema awareness.</li>
+        </ul>
+      </div>
+      <div class="route-card proxy">
+        <h3>6. Runtime HTTP proxy routes</h3>
+        <p>Keep thin HTTP routes for the agent-server calls the browser cannot make directly.</p>
+        <ul>
+          <li><code>POST /api/conversations/{id}/ask_agent</code></li>
+          <li><code>GET /api/conversations/{id}/events/count</code></li>
+          <li><code>POST /api/conversations/{id}/pause</code> and <code>/run</code></li>
+          <li><code>GET /api/v1/git/changes|diff?conversation_id=...</code></li>
+        </ul>
+      </div>
+      <div class="route-card hybrid">
+        <h3>7. Event history</h3>
+        <p>Keep <code>event_router.py</code> enough for <code>GET /api/v1/conversation/{id}/events/search</code>. Agent Canvas loads history by REST before opening WebSocket.</p>
+        <ul>
+          <li>app_server event store is fine when callbacks are configured</li>
+          <li>PR #14909's fallback to agent-server is useful when the local store is empty</li>
+        </ul>
+      </div>
+      <div class="route-card hybrid">
+        <h3>8. User settings, secrets, and git providers</h3>
+        <p>Not part of packet forwarding, but needed for a usable hosted/self-hosted app backend: LLM config, API keys, inherited secrets, repository selection, and branch selection.</p>
+        <ul>
+          <li><code>/api/v1/settings</code>, <code>/api/v1/secrets</code></li>
+          <li><code>/api/v1/git/repositories/search</code></li>
+          <li><code>/api/v1/git/branches/search</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>What can be left out for this path</h2>
+    <p>If the deliverable is “Agent Canvas talks to OpenHands app_server”, then several large OpenHands/OpenHands areas are not minimum requirements.</p>
+    <div class="mini-map">
+      <div><b>Old UI</b><span><code>frontend/*</code>, old local GUI routes, old React event renderers, old right panel implementations.</span></div>
+      <div><b>SaaS chrome</b><span>Billing, org switch UX, invitation flows, hosted-only account surfaces.</span></div>
+      <div><b>Most integrations</b><span>Only keep provider integrations required by repository selection and token storage.</span></div>
+      <div><b>Runtime internals</b><span>Do not reimplement agent-server. Proxy it or orchestrate conversation start.</span></div>
+    </div>
+
+    <h2>Endpoint responsibility map</h2>
+    <p>This table merges the PR diff with the endpoint gist. The useful dividing line is: app_server owns app metadata and sandboxes; agent-server owns conversation execution and workspace inspection.</p>
+
+    <table class="matrix">
+      <tr><th>Surface</th><th>Owner</th><th>Keep?</th><th>Why</th></tr>
+      <tr><td>/api/v1/app-conversations</td><td>app_server</td><td class="status-good">yes</td><td>Creates and lists app-level conversations; wraps sandbox creation and <code>POST /api/conversations</code> on the runtime.</td></tr>
+      <tr><td>/api/v1/app-conversations/start-tasks</td><td>app_server</td><td class="status-good">yes</td><td>Agent Canvas already expects asynchronous cloud-style conversation startup.</td></tr>
+      <tr><td>/api/v1/sandboxes</td><td>app_server</td><td class="status-good">yes</td><td>This is the actual sandbox control plane: pause, resume, status, exposed URLs, session keys.</td></tr>
+      <tr><td>/ws/events/{id}</td><td>app_server proxy</td><td class="status-good">yes</td><td>The centerpiece of the PR: browser connects to app_server, app_server tunnels to <code>/sockets/events/{id}</code>.</td></tr>
+      <tr><td>/api/conversations/{id}/ask_agent</td><td>app_server proxy</td><td class="status-good">yes</td><td>Agent Canvas PR #1435 explicitly routes <code>/btw</code> through this when <code>websocket_url</code> exists.</td></tr>
+      <tr><td>/api/v1/conversation/{id}/events/search</td><td>hybrid</td><td class="status-good">yes</td><td>Agent Canvas REST-first history loader uses this before WebSocket. It can read app_server events or fallback to agent-server.</td></tr>
+      <tr><td>/api/v1/git/repositories/search</td><td>app_server</td><td class="status-risk">conditional</td><td>Required only if Agent Canvas should browse app_server-managed git providers and repositories.</td></tr>
+      <tr><td>/api/v1/settings, /api/v1/secrets</td><td>app_server</td><td class="status-risk">conditional</td><td>Required if app_server owns LLM profiles, API keys, git tokens, and inherited sandbox secrets.</td></tr>
+      <tr><td>/api/llm, /api/settings on agent-server</td><td>agent-server</td><td class="status-risk">proxy or avoid</td><td>Not needed if app_server owns profiles/settings; needed if Agent Canvas wants raw agent-server settings UI against this backend.</td></tr>
+      <tr><td>frontend/build</td><td>old UI</td><td class="status-gap">no</td><td>Agent Canvas replaces this UX. Static serving can remain for compatibility, but it is not minimum.</td></tr>
+    </table>
+
+    <h2>Gaps in the two PRs for the exact target topology</h2>
+    <p>The PRs move in the right direction, but “all browser traffic goes through app_server, which reaches private sandbox agent-servers” needs a few more seams closed.</p>
+
+    <div class="route-grid">
+      <div class="route-card gap">
+        <h3>Message send still bypasses app_server</h3>
+        <p>Agent Canvas cloud mode still sends user messages to <code>hostOverride=conversation_url</code> and path <code>/api/conversations/{id}/events</code>. That depends on Agent Canvas' own <code>/api/cloud-proxy</code> reaching the sandbox runtime.</p>
+        <p><strong>Bridge fix:</strong> when <code>websocket_url</code> is present, route sends through app_server, ideally <code>POST /api/v1/app-conversations/{id}/send-message</code> or a new <code>/api/conversations/{id}/events</code> proxy.</p>
+      </div>
+      <div class="route-card gap">
+        <h3>Confirmation responses still bypass app_server</h3>
+        <p><code>respond_to_confirmation</code> remains a direct runtime call in Agent Canvas. app_server PR #14909 does not add a matching gateway route.</p>
+        <p><strong>Bridge fix:</strong> add and use <code>POST /api/conversations/{id}/events/respond_to_confirmation</code> on app_server.</p>
+      </div>
+      <div class="route-card gap">
+        <h3>Git path mismatch</h3>
+        <p>OpenHands PR #14909 adds <code>/api/v1/git/changes?conversation_id=...</code> and <code>/api/v1/git/diff?conversation_id=...</code>. Current Agent Canvas cloud git service calls <code>/api/v1/app-conversations/{id}/git/changes</code> and <code>/diff</code>.</p>
+        <p><strong>Bridge fix:</strong> either add compatibility routes in app_server or update Agent Canvas to use the new <code>/api/v1/git/*?conversation_id=</code> contract.</p>
+      </div>
+      <div class="route-card gap">
+        <h3>WebSocket replay params are downgraded</h3>
+        <p>Agent Canvas opens the main socket with <code>resend_mode=since&amp;after_timestamp=...</code> after REST history loads. The new app_server gateway only accepts <code>resend_all</code> and forwards <code>resend_all</code> to the runtime.</p>
+        <p><strong>Bridge fix:</strong> pass through <code>resend_mode</code> and <code>after_timestamp</code> so reconnect and REST-then-WS semantics match agent-server.</p>
+      </div>
+      <div class="route-card gap">
+        <h3>Bash WebSocket is not gatewayed</h3>
+        <p>Agent Canvas still derives <code>/sockets/bash-events</code> from <code>conversation_url</code>. If the sandbox agent-server is private, terminal-tab command execution needs a gateway too.</p>
+        <p><strong>Bridge fix:</strong> add <code>/ws/bash-events/{conversation_id}</code> or an equivalent conversation-scoped terminal proxy.</p>
+      </div>
+      <div class="route-card gap">
+        <h3>Auth story is not yet real OAuth</h3>
+        <p>The PR adds in-memory device flow and returns a bearer-looking token, while app_server route dependencies still primarily understand <code>SESSION_API_KEY</code> / <code>X-Session-API-Key</code> or SaaS access-token dependencies.</p>
+        <p><strong>Bridge fix:</strong> decide whether self-hosted app_server uses bearer API keys, <code>X-Access-Token</code>, or session API keys, then make Agent Canvas and app_server dependencies agree.</p>
+      </div>
+    </div>
+
+    <h2>Minimal route contract for Agent Canvas</h2>
+    <p>If we write the contract down from Agent Canvas' point of view, it looks like this:</p>
+
+    <table>
+      <tr><th>Need</th><th>Route</th><th>Mode</th></tr>
+      <tr><td>Add backend</td><td><code>POST /oauth/device/authorize</code>, <code>POST /oauth/device/token</code></td><td>app_server auth</td></tr>
+      <tr><td>Start conversation</td><td><code>POST /api/v1/app-conversations</code>, <code>GET /api/v1/app-conversations/start-tasks</code></td><td>app_server orchestration</td></tr>
+      <tr><td>Load conversation metadata</td><td><code>GET /api/v1/app-conversations/search</code>, <code>GET /api/v1/app-conversations?ids=...</code></td><td>app_server + live status</td></tr>
+      <tr><td>Stream events</td><td><code>WS /ws/events/{id}</code> → <code>WS /sockets/events/{id}</code></td><td>gateway tunnel</td></tr>
+      <tr><td>Send user messages</td><td><code>POST /api/v1/app-conversations/{id}/send-message</code> or <code>POST /api/conversations/{id}/events</code></td><td>gateway/orchestration</td></tr>
+      <tr><td>History pagination</td><td><code>GET /api/v1/conversation/{id}/events/search</code></td><td>app_server history or fallback proxy</td></tr>
+      <tr><td>Side questions</td><td><code>POST /api/conversations/{id}/ask_agent</code></td><td>gateway proxy</td></tr>
+      <tr><td>Confirm actions</td><td><code>POST /api/conversations/{id}/events/respond_to_confirmation</code></td><td>gateway proxy</td></tr>
+      <tr><td>Git diff panel</td><td><code>GET /api/v1/git/changes?conversation_id=...</code>, <code>GET /api/v1/git/diff?conversation_id=...</code></td><td>gateway proxy</td></tr>
+      <tr><td>Pause/resume sandbox</td><td><code>POST /api/v1/sandboxes/{sandbox_id}/pause</code>, <code>/resume</code></td><td>app_server sandbox control</td></tr>
+    </table>
+
+    <h2>Source notes</h2>
+    <ul class="source-list">
+      <li><a href="https://github.com/OpenHands/OpenHands/pull/14909">OpenHands/OpenHands#14909</a> — introduces V1 routing support, app-server proxy endpoints, <code>websocket_url</code>, OAuth device-flow stub, and the optional WebSocket gateway.</li>
+      <li><a href="https://github.com/OpenHands/agent-canvas/pull/1435">OpenHands/agent-canvas#1435</a> — treats entered OpenHands OSS hosts as cloud-style backends, accepts HTTP device verification URLs, resolves relative <code>websocket_url</code> against backend host, and routes <code>ask_agent</code> through the gateway signal.</li>
+      <li><a href="https://gist.github.com/smolpaws/30207dbb8f14eef9327686cb6058c4c3">Endpoint split gist</a> — classifies app_server endpoints as agent-server-backed, hybrid, or app_server-owned.</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/tree/main/openhands-agent-server/openhands/agent_server">software-agent-sdk agent-server</a> — the runtime API contract for <code>/api/conversations</code>, events, git, settings, and <code>/sockets/*</code>.</li>
+    </ul>
+
+    <div class="callout">
+      <p><strong>Working conclusion:</strong> the old local GUI can be removed from the critical path. The irreducible OpenHands/OpenHands value for this scenario is app_server as a stateful sandbox control plane plus a narrow gateway to each sandbox-hosted agent-server. The two PRs establish the pattern, but the next step should be making every Agent Canvas runtime call choose the app_server gateway whenever <code>websocket_url</code> is present.</p>
+    </div>
+
+    <div class="foot-nav"><a href="../index.html">&larr; Back to studies</a></div>
+  </div>
+</body>
+</html>
