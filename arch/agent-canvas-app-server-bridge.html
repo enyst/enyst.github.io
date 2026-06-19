@@ -123,7 +123,7 @@
 
     <section class="hero-panel">
       <p class="score">target topology</p>
-      <p class="lede"><strong>Agent Canvas should not need the old OpenHands frontend.</strong> The useful OpenHands piece is a smaller app_server slice: it authenticates the browser, owns user/sandbox/app-conversation metadata, creates or resumes a sandbox, finds the sandbox's exposed agent-server, and relays selected HTTP and WebSocket traffic back to Agent Canvas.</p>
+      <p class="lede"><strong>Agent Canvas should not need the old OpenHands frontend.</strong> The useful OpenHands piece is a smaller app_server slice: it owns sandbox and app-conversation metadata, creates or resumes a sandbox, finds the sandbox's exposed agent-server, and relays selected HTTP and WebSocket traffic back to Agent Canvas.</p>
       <div class="verdict-grid">
         <div class="verdict-card">
           <strong>Minimal answer</strong>
@@ -169,13 +169,30 @@ sequenceDiagram
       <p><strong>Terminology:</strong> in this note, “OpenHands OSS” means the minimal app_server subset necessary for sandbox orchestration with Agent Canvas. It does <em>not</em> mean the old OpenHands local GUI frontend.</p>
     </div>
 
+    <h2>Kripper's device OAuth flow</h2>
+    <p>PR #14909 adds a new base-app <code>openhands/app_server/oauth/device_flow.py</code>. This is not the existing Enterprise/SaaS device flow from <code>enterprise/server/routes/oauth_device.py</code>; it is a lightweight compatibility surface for Agent Canvas.</p>
+
+    <table>
+      <tr><th>Aspect</th><th>PR #14909 app_server flow</th><th>Standard / production expectation</th></tr>
+      <tr><td>Storage</td><td>In-memory <code>DEVICE_STORE</code> and <code>USER_CODE_INDEX</code>.</td><td>Durable store with expiry, cleanup, restart tolerance, and multi-worker safety.</td></tr>
+      <tr><td>User authentication</td><td><code>verify-authenticated</code> accepts a <code>user_code</code> form post; no dependency on an authenticated user.</td><td>The verifier must prove the browser user is logged in and authorize the device for that user.</td></tr>
+      <tr><td>Token issuance</td><td>Generates <code>sk-...</code> with <code>secrets.token_urlsafe</code> and returns it as <code>access_token</code>.</td><td>Mint or return a real app_server API key that the rest of app_server recognizes.</td></tr>
+      <tr><td>Route auth alignment</td><td>Returns <code>token_type: Bearer</code>, while base app_server dependencies primarily check <code>SESSION_API_KEY</code> / <code>X-Session-API-Key</code>; Enterprise uses API keys/bearer via its own stack.</td><td>One agreed auth contract for Agent Canvas calls: bearer, <code>X-Access-Token</code>, or <code>X-Session-API-Key</code>.</td></tr>
+      <tr><td>RFC behavior</td><td>Has basic <code>authorization_pending</code>, <code>access_denied</code>, and expiry responses.</td><td>Also needs polling rate-limit / <code>slow_down</code>, denial UI, CSRF protection, auditability, and revocation.</td></tr>
+    </table>
+
+    <div class="callout">
+      <p><strong>Completeness read:</strong> useful as a demo handshake, but not complete from a standard OAuth/device-auth or production-use point of view. For the minimal self-hosted bridge, the better question is whether we need OAuth device flow at all. If Agent Canvas can store a user-provided app_server API key/session key, app_server can avoid this auth surface entirely. If we do keep device auth, it should either reuse the Enterprise/SaaS implementation or become a real base app_server auth service, not an in-memory token generator.</p>
+    </div>
+
+
     <h2>Minimum viable OpenHands/OpenHands slice</h2>
-    <p>The minimum is not one router. app_server's conversation path is stitched through app-conversation records, sandbox records, sandbox specs, settings/secrets, and the HTTP/WebSocket gateway. The slice below is the part worth preserving if the old UI is replaced by Agent Canvas.</p>
+    <p>The minimum is not one router. app_server's conversation path is stitched through app-conversation records, sandbox records, sandbox specs, and the HTTP/WebSocket gateway. User settings, secrets, LLM profiles, and local git-provider tokens should stay in Agent Canvas + agent-server unless app_server is deliberately acting as a hosted SaaS identity layer.</p>
 
     <div class="route-grid">
       <div class="route-card hybrid">
         <h3>1. FastAPI shell and router mount</h3>
-        <p>Keep <code>openhands/app_server/app.py</code> and <code>v1_router.py</code> only as the app_server host: lifespan, middleware, <code>/api/v1</code>, OAuth device routes, and optional <code>/ws</code> mount.</p>
+        <p>Keep <code>openhands/app_server/app.py</code> and <code>v1_router.py</code> only as the app_server host: lifespan, middleware, <code>/api/v1</code>, and optional <code>/ws</code> mount. OAuth device routes are optional unless this bridge needs browser-mediated pairing instead of a pasted/preconfigured key.</p>
         <ul>
           <li><code>ENABLE_WEBSOCKET_GATEWAY=true</code> gates <code>/ws/events/{id}</code>.</li>
           <li><code>SERVE_FRONTEND</code> and <code>frontend/build</code> are not conceptually required for Agent Canvas.</li>
@@ -237,13 +254,13 @@ sequenceDiagram
           <li>PR #14909's fallback to agent-server is useful when the local store is empty</li>
         </ul>
       </div>
-      <div class="route-card hybrid">
-        <h3>8. User settings, secrets, and git providers</h3>
-        <p>Not part of packet forwarding, but needed for a usable hosted/self-hosted app backend: LLM config, API keys, inherited secrets, repository selection, and branch selection.</p>
+      <div class="route-card optional">
+        <h3>8. Do not pull settings into app_server</h3>
+        <p>For the minimal bridge, user settings, secrets, LLM profiles, and local git-provider tokens should remain owned by Agent Canvas + the sandbox agent-server. app_server should only pass conversation-start inputs through or inject narrowly-scoped sandbox facts.</p>
         <ul>
-          <li><code>/api/v1/settings</code>, <code>/api/v1/secrets</code></li>
-          <li><code>/api/v1/git/repositories/search</code></li>
-          <li><code>/api/v1/git/branches/search</code></li>
+          <li>Use agent-server <code>/api/settings</code>, <code>/api/settings/secrets</code>, and profile APIs for runtime configuration.</li>
+          <li>Use Agent Canvas' existing local/self-hosted settings UI instead of re-creating <code>/api/v1/settings</code>.</li>
+          <li>Keep app_server git-provider search only as an optional SaaS/repository-browser feature, not part of the minimal sandbox gateway.</li>
         </ul>
       </div>
     </div>
@@ -253,7 +270,7 @@ sequenceDiagram
     <div class="mini-map">
       <div><b>Old UI</b><span><code>frontend/*</code>, old local GUI routes, old React event renderers, old right panel implementations.</span></div>
       <div><b>SaaS chrome</b><span>Billing, org switch UX, invitation flows, hosted-only account surfaces.</span></div>
-      <div><b>Most integrations</b><span>Only keep provider integrations required by repository selection and token storage.</span></div>
+      <div><b>Most integrations</b><span>Keep SaaS repository/provider integrations out of the minimum. Agent Canvas + agent-server already own local settings, secrets, and profile configuration.</span></div>
       <div><b>Runtime internals</b><span>Do not reimplement agent-server. Proxy it or orchestrate conversation start.</span></div>
     </div>
 
@@ -268,9 +285,9 @@ sequenceDiagram
       <tr><td>/ws/events/{id}</td><td>app_server proxy</td><td class="status-good">yes</td><td>The centerpiece of the PR: browser connects to app_server, app_server tunnels to <code>/sockets/events/{id}</code>.</td></tr>
       <tr><td>/api/conversations/{id}/ask_agent</td><td>app_server proxy</td><td class="status-good">yes</td><td>Agent Canvas PR #1435 explicitly routes <code>/btw</code> through this when <code>websocket_url</code> exists.</td></tr>
       <tr><td>/api/v1/conversation/{id}/events/search</td><td>hybrid</td><td class="status-good">yes</td><td>Agent Canvas REST-first history loader uses this before WebSocket. It can read app_server events or fallback to agent-server.</td></tr>
-      <tr><td>/api/v1/git/repositories/search</td><td>app_server</td><td class="status-risk">conditional</td><td>Required only if Agent Canvas should browse app_server-managed git providers and repositories.</td></tr>
-      <tr><td>/api/v1/settings, /api/v1/secrets</td><td>app_server</td><td class="status-risk">conditional</td><td>Required if app_server owns LLM profiles, API keys, git tokens, and inherited sandbox secrets.</td></tr>
-      <tr><td>/api/llm, /api/settings on agent-server</td><td>agent-server</td><td class="status-risk">proxy or avoid</td><td>Not needed if app_server owns profiles/settings; needed if Agent Canvas wants raw agent-server settings UI against this backend.</td></tr>
+      <tr><td>/api/v1/git/repositories/search</td><td>app_server</td><td class="status-risk">optional</td><td>Only for hosted/SaaS repository browsing. Not required when Agent Canvas attaches a local workspace or sends repo information directly at conversation start.</td></tr>
+      <tr><td>/api/v1/settings, /api/v1/secrets</td><td>app_server</td><td class="status-gap">no for minimal</td><td>Do not duplicate Agent Canvas + agent-server settings/secrets. app_server should not become a second settings source unless this is explicitly a SaaS identity backend.</td></tr>
+      <tr><td>/api/llm, /api/settings on agent-server</td><td>agent-server</td><td class="status-good">yes</td><td>This is the existing implementation Agent Canvas should use for LLM profiles, secrets, and runtime-owned configuration.</td></tr>
       <tr><td>frontend/build</td><td>old UI</td><td class="status-gap">no</td><td>Agent Canvas replaces this UX. Static serving can remain for compatibility, but it is not minimum.</td></tr>
     </table>
 
@@ -315,7 +332,7 @@ sequenceDiagram
 
     <table>
       <tr><th>Need</th><th>Route</th><th>Mode</th></tr>
-      <tr><td>Add backend</td><td><code>POST /oauth/device/authorize</code>, <code>POST /oauth/device/token</code></td><td>app_server auth</td></tr>
+      <tr><td>Add backend</td><td>Prefer pasted/preconfigured app_server key; optionally <code>POST /oauth/device/authorize</code>, <code>POST /oauth/device/token</code> if real device auth exists</td><td>app_server auth</td></tr>
       <tr><td>Start conversation</td><td><code>POST /api/v1/app-conversations</code>, <code>GET /api/v1/app-conversations/start-tasks</code></td><td>app_server orchestration</td></tr>
       <tr><td>Load conversation metadata</td><td><code>GET /api/v1/app-conversations/search</code>, <code>GET /api/v1/app-conversations?ids=...</code></td><td>app_server + live status</td></tr>
       <tr><td>Stream events</td><td><code>WS /ws/events/{id}</code> → <code>WS /sockets/events/{id}</code></td><td>gateway tunnel</td></tr>
@@ -336,7 +353,7 @@ sequenceDiagram
     </ul>
 
     <div class="callout">
-      <p><strong>Working conclusion:</strong> the old local GUI can be removed from the critical path. The irreducible OpenHands/OpenHands value for this scenario is app_server as a stateful sandbox control plane plus a narrow gateway to each sandbox-hosted agent-server. The two PRs establish the pattern, but the next step should be making every Agent Canvas runtime call choose the app_server gateway whenever <code>websocket_url</code> is present.</p>
+      <p><strong>Working conclusion:</strong> the old local GUI can be removed from the critical path. The irreducible OpenHands/OpenHands value for this scenario is app_server as a stateful sandbox control plane plus a narrow gateway to each sandbox-hosted agent-server. The two PRs establish the pattern, but the next step should be making every Agent Canvas runtime call choose the app_server gateway whenever <code>websocket_url</code> is present, while keeping settings/secrets/profile ownership in Agent Canvas + agent-server instead of recreating it in app_server.</p>
     </div>
 
     <div class="foot-nav"><a href="../index.html">&larr; Back to studies</a></div>
