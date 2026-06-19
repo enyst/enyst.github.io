@@ -265,6 +265,24 @@ sequenceDiagram
       </div>
     </div>
 
+    <h2>Settings scope for an app_server backend</h2>
+    <p>This is the part that must be explicit. There are three different scopes, and only one is desirable for the minimal bridge.</p>
+
+    <table>
+      <tr><th>Scope</th><th>Where stored</th><th>What it means</th><th>Use for minimal bridge?</th></tr>
+      <tr><td>Current local Agent Canvas backend</td><td>Stable agent-server <code>/api/settings</code>, backed by agent-server persistence: <code>OH_PERSISTENCE_DIR/settings.json</code> or default <code>workspace/.openhands/settings.json</code>.</td><td>Effectively per registered agent-server backend / installation. One settings set is reused across conversations started through that backend.</td><td class="status-good">Yes, this is the model to preserve.</td></tr>
+      <tr><td>Recommended minimal app_server backend</td><td>Agent Canvas-side profile/settings store keyed by backend id, using the existing agent-server settings/profile schema and APIs when there is a stable Agent Canvas-owned agent-server available. If Agent Canvas is only a static browser client, this durable store is missing product work and should be added on the Agent Canvas side, not app_server.</td><td>Per app_server backend registration, reused for all sandboxes created through that backend. At conversation start, Agent Canvas resolves the selected profile and sends the resulting runtime settings/secrets to app_server for one-time forwarding.</td><td class="status-good">Yes. This answers “one set for the app_server backend, not per sandbox.”</td></tr>
+      <tr><td>Current cloud/app_server path</td><td>app_server <code>/api/v1/settings</code> and app_server user/secret stores.</td><td>Per app_server user/org, shared across all sandboxes created by that app_server. This is how OpenHands Cloud works today: app_server builds the full runtime <code>StartConversationRequest</code> from <code>user.agent_settings</code>, <code>user.conversation_settings</code>, and app_server secrets.</td><td class="status-gap">No for minimal. This recreates settings ownership in app_server.</td></tr>
+      <tr><td>Sandbox agent-server</td><td>The sandbox's own agent-server <code>/api/settings</code> store inside that sandbox filesystem.</td><td>Per sandbox / per agent-server process. Good for inspecting or changing one already-running runtime, but not durable across new sandboxes unless the sandbox filesystem is deliberately persisted/shared.</td><td class="status-risk">Only for runtime-local overrides, not canonical user settings.</td></tr>
+    </table>
+
+    <div class="callout">
+      <p><strong>Recommendation:</strong> for an OpenHands app_server backend, the canonical settings should be <em>per Agent Canvas backend registration</em>, not per sandbox. A new sandbox should receive a complete conversation-start payload derived from that backend's selected Agent Canvas profile. app_server should orchestrate and forward that payload to the sandbox agent-server; it should not own the user's LLM profiles, saved secrets, MCP config, or app preferences.</p>
+    </div>
+
+    <p>That means the current PR shape is not yet cleanly minimal: because Agent Canvas marks the OpenHands OSS backend as <code>kind="cloud"</code>, today's settings code would naturally call app_server <code>/api/v1/settings</code>. To make “Agent Canvas + agent-server own settings” real, Agent Canvas needs to separate <em>control-plane backend</em> from <em>settings/profile owner</em>, then send the resolved <code>agent_settings</code>, <code>conversation_settings</code>, and conversation secrets in <code>POST /api/v1/app-conversations</code> or an equivalent start route. app_server can validate, add sandbox facts, and forward to the sandbox-hosted agent-server, but it should not persist those settings as its own user model.</p>
+
+
     <h2>What can be left out for this path</h2>
     <p>If the deliverable is “Agent Canvas talks to OpenHands app_server”, then several large OpenHands/OpenHands areas are not minimum requirements.</p>
     <div class="mini-map">
@@ -333,7 +351,7 @@ sequenceDiagram
     <table>
       <tr><th>Need</th><th>Route</th><th>Mode</th></tr>
       <tr><td>Add backend</td><td>Prefer pasted/preconfigured app_server key; optionally <code>POST /oauth/device/authorize</code>, <code>POST /oauth/device/token</code> if real device auth exists</td><td>app_server auth</td></tr>
-      <tr><td>Start conversation</td><td><code>POST /api/v1/app-conversations</code>, <code>GET /api/v1/app-conversations/start-tasks</code></td><td>app_server orchestration</td></tr>
+      <tr><td>Start conversation</td><td><code>POST /api/v1/app-conversations</code> carrying resolved <code>agent_settings</code>, <code>conversation_settings</code>, and one-time secret references/values; <code>GET /api/v1/app-conversations/start-tasks</code></td><td>app_server orchestration, not settings storage</td></tr>
       <tr><td>Load conversation metadata</td><td><code>GET /api/v1/app-conversations/search</code>, <code>GET /api/v1/app-conversations?ids=...</code></td><td>app_server + live status</td></tr>
       <tr><td>Stream events</td><td><code>WS /ws/events/{id}</code> → <code>WS /sockets/events/{id}</code></td><td>gateway tunnel</td></tr>
       <tr><td>Send user messages</td><td><code>POST /api/v1/app-conversations/{id}/send-message</code> or <code>POST /api/conversations/{id}/events</code></td><td>gateway/orchestration</td></tr>
