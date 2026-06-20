@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Minimal OpenHands app_server — Engel Nyst</title>
+  <meta name="description" content="Architecture of the minimal app_server bridge between Agent Canvas and sandbox-hosted OpenHands agent-server runtimes." />
+  <meta property="og:title" content="Minimal OpenHands app_server" />
+  <meta property="og:description" content="How the new minimal app_server talks to Agent Canvas on one side and sandbox-hosted agent-server runtimes on the other." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/minimal-openhands-app-server.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin: 18px 0; }
+    .box { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 16px 18px; }
+    .box h3 { margin-top: 0; }
+    .good { border-left: 3px solid var(--accent); }
+    .temp { border-left: 3px solid #d9a441; }
+    .no { border-left: 3px solid #d86f57; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .chip { font-family: var(--mono); font-size: 0.76em; border: 1px solid var(--border); border-radius: 999px; padding: 4px 9px; color: var(--muted); background: rgba(255,255,255,0.03); }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8', primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#151512', tertiaryColor: '#20201c', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>Minimal OpenHands app_server <span class="tag">architecture</span></h1>
+    <p class="meta">Implementation notes for <a href="https://github.com/enyst/app-server">enyst/app-server</a>, the extracted control-plane bridge for Agent Canvas and sandbox-hosted agent-server runtimes. Prepared by OpenHands (AI) on behalf of the user, June 2026.</p>
+
+    <div class="callout">
+      <p><strong>Short version:</strong> the minimal app_server is a session-key-protected FastAPI control plane. It stores sandbox and app-conversation metadata, starts conversations on a sandbox-hosted agent-server, then exposes HTTP and WebSocket gateway routes so Agent Canvas does not need direct browser access to the sandbox.</p>
+    </div>
+
+    <h2>Shape</h2>
+    <pre class="mermaid">
+flowchart LR
+  AC["Agent Canvas"] -->|X-Session-API-Key| AS["minimal app_server"]
+  AS --> Store[("app_server state: sandboxes, conversations, start tasks")]
+  AS -->|X-Session-API-Key: runtime key| RT["sandbox-hosted agent-server"]
+  RT --> WS["/sockets/events + /sockets/bash-events"]
+  AS -->|/ws/events + /ws/bash-events| AC
+  AS -->|temporary only| Temp["settings/secrets compatibility store"]
+    </pre>
+
+    <div class="chips">
+      <span class="chip">FastAPI</span>
+      <span class="chip">session-key auth</span>
+      <span class="chip">HTTP proxy</span>
+      <span class="chip">WebSocket tunnel</span>
+      <span class="chip">agent-server runtime</span>
+      <span class="chip">temporary settings bridge</span>
+    </div>
+
+    <h2>Responsibilities</h2>
+    <div class="grid">
+      <div class="box good"><h3>Owns</h3><p>App-conversation records, start-task records, sandbox records, sandbox status, runtime URL/session-key discovery, and gateway routing.</p></div>
+      <div class="box good"><h3>Proxies</h3><p>Runtime conversation events, confirmations, ask-agent calls, pause/run calls, git changes/diff, event history, and event/bash WebSockets.</p></div>
+      <div class="box temp"><h3>Temporary</h3><p><code>/api/v1/settings</code> and <code>/api/v1/secrets</code> exist only for current Agent Canvas cloud-style compatibility. MCP config is stored as opaque <code>agent_settings.mcp_config</code> data here.</p></div>
+      <div class="box no"><h3>Does not own</h3><p>Agent execution, LLM profile semantics, canonical MCP/server settings, long-term saved secrets, billing, org management, old OpenHands frontend routes, or SaaS account chrome.</p></div>
+    </div>
+
+    <h2>Conversation start</h2>
+    <pre class="mermaid">
+sequenceDiagram
+  participant C as Agent Canvas
+  participant A as app_server
+  participant R as agent-server
+
+  C->>A: POST /api/v1/app-conversations<br/>resolved runtime settings + initial message
+  A->>A: create sandbox/app-conversation records
+  A->>R: POST /api/conversations<br/>same payload + runtime session key
+  R-->>A: ConversationInfo
+  A-->>C: AppConversationStartTask READY
+  C->>A: GET /api/v1/app-conversations?ids=...
+  A-->>C: conversation_url, sandbox_status, websocket_url
+  C->>A: WS /ws/events/{id}
+  A->>R: WS /sockets/events/{id}
+  R-->>C: SDK events via tunnel
+    </pre>
+
+    <h2>API surface</h2>
+    <table>
+      <tr><th>Need</th><th>Route</th><th>Notes</th></tr>
+      <tr><td>Conversation start/list</td><td><code>/api/v1/app-conversations*</code></td><td>Creates metadata and forwards start payload to agent-server.</td></tr>
+      <tr><td>Sandbox state</td><td><code>POST /api/v1/sandboxes/{id}/pause|resume</code></td><td>Minimal state transition hooks for Agent Canvas.</td></tr>
+      <tr><td>Runtime HTTP</td><td><code>/api/conversations/{id}/...</code>, <code>/api/v1/git/...</code></td><td>Thin pass-through using sandbox runtime session key.</td></tr>
+      <tr><td>Runtime WebSocket</td><td><code>/ws/events/{id}</code>, <code>/ws/bash-events/{id}</code></td><td>Tunnels frames to runtime agent-server sockets.</td></tr>
+      <tr><td>Compatibility settings</td><td><code>/api/v1/settings</code>, <code>/api/v1/secrets</code></td><td>Marked temporary in source; not the long-term owner.</td></tr>
+    </table>
+
+    <h2>Testing policy</h2>
+    <p>The port was written test-first. The repo includes a fake agent-server runtime and tests covering session-key auth, conversation start and metadata, HTTP proxies, sandbox pause/resume, event and bash WebSocket gateways, and temporary settings/secrets including MCP config round-trip.</p>
+
+    <pre class="code">python -m ruff check .
+python -m pytest</pre>
+
+    <div class="foot-nav"><a href="../index.html">&larr; Back to studies</a></div>
+  </div>
+</body>
+</html>
