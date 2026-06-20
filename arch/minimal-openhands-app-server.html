@@ -46,7 +46,9 @@
 flowchart LR
   AC["Agent Canvas"] -->|X-Session-API-Key| AS["minimal app_server"]
   AS --> Store[("app_server state: sandboxes, conversations, start tasks")]
-  AS -->|X-Session-API-Key: runtime key| RT["sandbox-hosted agent-server"]
+  AS -->|Docker provider creates / pauses / resumes / deletes| D["Docker container"]
+  D --> RT["sandbox-hosted agent-server"]
+  AS -->|X-Session-API-Key: runtime key| RT
   RT --> WS["/sockets/events + /sockets/bash-events"]
   AS -->|/ws/events + /ws/bash-events| AC
   AS -->|temporary only| Temp["settings/secrets compatibility store"]
@@ -58,12 +60,13 @@ flowchart LR
       <span class="chip">HTTP proxy</span>
       <span class="chip">WebSocket tunnel</span>
       <span class="chip">agent-server runtime</span>
+      <span class="chip">Docker sandbox lifecycle</span>
       <span class="chip">temporary settings bridge</span>
     </div>
 
     <h2>Responsibilities</h2>
     <div class="grid">
-      <div class="box good"><h3>Owns</h3><p>App-conversation records, start-task records, sandbox records, sandbox status, runtime URL/session-key discovery, and gateway routing.</p></div>
+      <div class="box good"><h3>Owns</h3><p>App-conversation records, start-task records, Docker sandbox lifecycle, sandbox status, runtime URL/session-key discovery, and gateway routing.</p></div>
       <div class="box good"><h3>Proxies</h3><p>Runtime conversation events, confirmations, ask-agent calls, pause/run calls, git changes/diff, event history, and event/bash WebSockets.</p></div>
       <div class="box temp"><h3>Temporary</h3><p><code>/api/v1/settings</code> and <code>/api/v1/secrets</code> exist only for current Agent Canvas cloud-style compatibility. MCP config is stored as opaque <code>agent_settings.mcp_config</code> data here.</p></div>
       <div class="box no"><h3>Does not own</h3><p>Agent execution, LLM profile semantics, canonical MCP/server settings, long-term saved secrets, billing, org management, old OpenHands frontend routes, or SaaS account chrome.</p></div>
@@ -77,7 +80,8 @@ sequenceDiagram
   participant R as agent-server
 
   C->>A: POST /api/v1/app-conversations<br/>resolved runtime settings + initial message
-  A->>A: create sandbox/app-conversation records
+  A->>A: create app-conversation/start-task records
+  A->>A: DockerSandboxService.start_sandbox<br/>run agent-server container + inject OH_SESSION_API_KEYS_0
   A->>R: POST /api/conversations<br/>same payload + runtime session key
   R-->>A: ConversationInfo
   A-->>C: AppConversationStartTask READY
@@ -92,14 +96,14 @@ sequenceDiagram
     <table>
       <tr><th>Need</th><th>Route</th><th>Notes</th></tr>
       <tr><td>Conversation start/list</td><td><code>/api/v1/app-conversations*</code></td><td>Creates metadata and forwards start payload to agent-server.</td></tr>
-      <tr><td>Sandbox state</td><td><code>POST /api/v1/sandboxes/{id}/pause|resume</code></td><td>Minimal state transition hooks for Agent Canvas.</td></tr>
+      <tr><td>Sandbox state</td><td><code>POST /api/v1/sandboxes/{id}/pause|resume</code></td><td>Calls the sandbox provider. Docker mode maps these to container pause/unpause or restart.</td></tr>
       <tr><td>Runtime HTTP</td><td><code>/api/conversations/{id}/...</code>, <code>/api/v1/git/...</code></td><td>Thin pass-through using sandbox runtime session key.</td></tr>
       <tr><td>Runtime WebSocket</td><td><code>/ws/events/{id}</code>, <code>/ws/bash-events/{id}</code></td><td>Tunnels frames to runtime agent-server sockets.</td></tr>
       <tr><td>Compatibility settings</td><td><code>/api/v1/settings</code>, <code>/api/v1/secrets</code></td><td>Marked temporary in source; not the long-term owner.</td></tr>
     </table>
 
     <h2>Testing policy</h2>
-    <p>The port was written test-first. The repo includes a fake agent-server runtime and tests covering session-key auth, conversation start and metadata, HTTP proxies, sandbox pause/resume, event and bash WebSocket gateways, and temporary settings/secrets including MCP config round-trip.</p>
+    <p>The port was written test-first. The repo includes a fake agent-server runtime and tests covering session-key auth, conversation start and metadata, HTTP proxies, sandbox pause/resume, event and bash WebSocket gateways, and temporary settings/secrets including MCP config round-trip. It also ports/adapts OpenHands/OpenHands non-enterprise Docker sandbox lifecycle tests for container metadata translation, session-key injection, port mapping, search/pagination, get-by-session-key, pause/resume, and delete.</p>
 
     <pre class="code">python -m ruff check .
 python -m pytest</pre>
