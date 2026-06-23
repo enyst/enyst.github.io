@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands Deferred Init Runtime Boundary — Engel Nyst</title>
+  <meta name="description" content="Architecture note comparing the current OpenHands agent-server deferred-init flow with a factory/runtime-context design inspired by PR 400." />
+  <meta property="og:title" content="OpenHands Deferred Init Runtime Boundary" />
+  <meta property="og:description" content="The current warm-pool deferred-init flow, its risks, and a less error-prone runtime-context pattern for agent-server initialization." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/openhands-deferred-init-runtime-boundary.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .lead-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 16px; margin: 22px 0; }
+    @media (max-width: 760px) { .lead-grid { grid-template-columns: 1fr; } }
+    .panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 18px 20px; }
+    .panel h3 { margin-top: 0; }
+    .panel p:last-child, .panel ul:last-child { margin-bottom: 0; }
+    .stamp { display: inline-block; font-family: var(--mono); font-size: 0.72em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; margin-bottom: 10px; }
+    .risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 18px 0; }
+    .risk { position: relative; background: linear-gradient(145deg, rgba(216,111,87,0.08), rgba(26,26,24,0.96)); border: 1px solid var(--border); border-left: 3px solid #d86f57; border-radius: var(--border-radius); padding: 14px 16px; }
+    .risk strong { display: block; margin-bottom: 6px; }
+    .ok { border-left-color: var(--teal); background: linear-gradient(145deg, rgba(107,191,171,0.08), rgba(26,26,24,0.96)); }
+    .pattern { border-left-color: var(--accent); background: linear-gradient(145deg, rgba(201,168,76,0.10), rgba(26,26,24,0.96)); }
+    .compare td:first-child { color: var(--accent); font-family: var(--mono); font-size: 0.82em; }
+    .mini-map { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0; }
+    @media (max-width: 720px) { .mini-map { grid-template-columns: 1fr; } }
+    .step { border: 1px solid var(--border); border-radius: var(--border-radius); padding: 14px; background: rgba(255,255,255,0.025); }
+    .step b { color: var(--accent); font-family: var(--mono); font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.06em; }
+    .step p { margin: 8px 0 0; }
+    .verdict { font-size: 1.04em; border-left: 4px solid var(--teal); }
+  </style>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true, theme: "dark",
+      themeVariables: { primaryColor: "#1a1a18", primaryTextColor: "#e5e0d8",
+        primaryBorderColor: "#2a2a26", lineColor: "#c9a84c", secondaryColor: "#151513",
+        tertiaryColor: "#1f1f1b", noteBkgColor: "#1f1f1b", noteTextColor: "#e5e0d8",
+        actorBkg: "#1a1a18", actorBorder: "#2a2a26", actorTextColor: "#e5e0d8",
+        signalColor: "#6bbfab", signalTextColor: "#e5e0d8", fontSize: "14px" }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>OpenHands Deferred Init Runtime Boundary <span class="tag">architecture note</span></h1>
+    <p class="meta">
+      Notes from <a href="https://github.com/OpenHands/software-agent-sdk/pull/3844">PR #3844</a>,
+      <a href="https://github.com/OpenHands/software-agent-sdk/pull/400">PR #400</a>, and
+      <a href="https://github.com/OpenHands/software-agent-sdk/pull/3287">PR #3287</a>, which introduced deferred init.
+      The question: how should warm-pool agent-servers accept per-user runtime config without scattering mutable state across closures, globals, middleware, and service singletons?
+    </p>
+
+    <div class="callout verdict">
+      <p><strong>Short answer:</strong> deferred init wants a standardized runtime boundary. Register routes once, but make every request and WebSocket resolve a typed <code>AgentServerRuntime</code> from <code>app.state</code>. Build the ready runtime off to the side, enter its services, then atomically swap it in. Avoid per-route config closures, module-level services, and conditional auth registration.</p>
+    </div>
+
+    <div class="lead-grid">
+      <div class="panel">
+        <span class="stamp">current merged path</span>
+        <p>PR #3287 added a dormant warm-pool mode. The server boots, starts stateless side services, mounts all routers, and waits for <code>POST /api/init</code>. That init call merges a narrow runtime payload into the dormant <code>Config</code>, starts <code>ConversationService</code>, stores the new config and service on <code>app.state</code>, then flips <code>InitService.state</code> to <code>ready</code>.</p>
+      </div>
+      <div class="panel">
+        <span class="stamp">PR #3844 lesson</span>
+        <p>Auth was the first concrete failure. Dependencies captured startup config, so a key delivered by <code>/api/init</code> was not honored. Also, if there were no session keys at startup, the auth dependency was never registered. PR #3844 fixed this by making auth dependencies read <code>request.app.state.config</code> on each request and by registering them unconditionally.</p>
+      </div>
+    </div>
+
+    <h2>1. Current flow</h2>
+    <p>The current design separates <em>route shape</em> from <em>runtime readiness</em>. Routes exist immediately, but most <code>/api/*</code> routes include <code>require_initialized</code>, which returns 503 while the init service is dormant or initializing. The init endpoint uses <code>X-Init-API-Key</code> and the dormant server's bootstrap <code>secret_key</code>; the session key delivered later becomes the normal API credential.</p>
+
+    <pre class="mermaid">
+sequenceDiagram
+  participant Pod as Warm pod process
+  participant App as FastAPI app
+  participant Init as InitService
+  participant Orchestrator
+  participant Runtime as ConversationService
+  participant Client
+
+  Pod->>App: create_app(dormant Config)
+  App->>App: mount routers and middleware
+  App->>Init: attach only when deferred_init=True
+  App-->>Orchestrator: /ready is ready, /api/* mostly 503
+  Orchestrator->>Init: POST /api/init + X-Init-API-Key
+  Init->>Init: merge InitRequest into base Config
+  Init->>Runtime: build and enter ConversationService(new_config)
+  Init->>App: app.state.config = new_config
+  Init->>App: app.state.conversation_service = service
+  Init-->>Orchestrator: state=ready
+  Client->>App: /api/* + X-Session-API-Key
+  App->>App: auth reads app.state.config at request time
+  App->>Runtime: handle conversation/tool/workspace request
+    </pre>
+
+    <div class="mini-map">
+      <div class="step"><b>Boot</b><p>One FastAPI app is created from a dormant config. Its root path, static files, middleware, route dependencies, and some module globals are established at import/startup time.</p></div>
+      <div class="step"><b>Init</b><p><code>InitService</code> merges the runtime payload, mutates process env, starts the conversation service, updates <code>app.state</code>, and marks the server ready.</p></div>
+      <div class="step"><b>Serve</b><p>HTTP auth now checks the latest config. Handlers use a mixture of <code>app.state</code>, default singleton accessors, and module-level service references.</p></div>
+    </div>
+
+    <h2>Current risks</h2>
+    <p>PR #3844 fixed the known session-key bug, but the shape that produced it is still easy to repeat. The risks are less about one bad dependency and more about the lack of one canonical place where request-time runtime state is resolved.</p>
+
+    <div class="risk-grid">
+      <div class="risk"><strong>Captured startup config</strong><p>Any dependency factory or closure that receives <code>Config</code> during route registration can silently ignore the runtime config delivered by <code>/api/init</code>.</p></div>
+      <div class="risk"><strong>Conditional registration</strong><p>If routes decide at startup whether auth or guards are needed, a dormant server that starts without keys may never protect the routes after keys arrive.</p></div>
+      <div class="risk"><strong>Multiple sources of truth</strong><p>The effective runtime can live in <code>base_config</code>, <code>app.state.config</code>, conversation-service singletons, route-module globals, and middleware copies.</p></div>
+      <div class="risk"><strong>WebSocket parity drift</strong><p>HTTP dependencies can be corrected while WebSocket modules still use import-time service objects or default config helpers unless they share the same resolver.</p></div>
+      <div class="risk"><strong>Startup-only app shape</strong><p>Values like <code>root_path</code>, static file mounts, and CORS middleware are established when the app is created. If they are allowed in <code>InitRequest</code>, they need dynamic handling or they are only partially effective.</p></div>
+      <div class="risk"><strong>Process-wide env mutation</strong><p><code>InitRequest.env</code> updates <code>os.environ</code>. That is acceptable for one runtime per process, but it is not scoped, reversible, or naturally test-isolated.</p></div>
+    </div>
+
+    <h2>2. PR #400-style flow</h2>
+    <p>PR #400 was not the deferred-init PR. Its goal was to move agent-server toward a FastAPI factory pattern: create the app from an explicit <code>Config</code>, store config and services on <code>app.state</code>, and make routers/dependencies resolve services from that app state instead of relying on imported globals. That is the right direction for deferred init because it makes the app instance the ownership boundary.</p>
+
+    <pre class="mermaid">
+flowchart TD
+  subgraph Factory[App factory]
+    C[Config input] --> A[create_app(config)]
+    A --> R[register routers once]
+    A --> S[app.state.runtime = DormantRuntime]
+  end
+
+  subgraph Provider[Request-time provider]
+    G[get_runtime(request or websocket)]
+    G --> Auth[auth policy]
+    G --> Ready[require_ready_runtime]
+    G --> Services[conversation, bash, workspace services]
+  end
+
+  subgraph Init[Deferred initialization]
+    I[POST /api/init] --> B[build ReadyRuntime off to the side]
+    B --> E[enter services]
+    E --> Swap[atomic app.state.runtime swap]
+  end
+
+  R --> G
+  S --> G
+  Swap --> G
+    </pre>
+
+    <p>A deferred-init version of that pattern should go one step further than PR #400's original sketch: the thing stored on <code>app.state</code> should not be just <code>config</code> plus several independent service attributes. It should be a typed runtime object with a single state transition.</p>
+
+    <pre class="code">@dataclass(frozen=True)
+class DormantRuntime:
+    bootstrap_config: Config
+    state: Literal[&quot;dormant&quot;, &quot;initializing&quot;]
+
+@dataclass(frozen=True)
+class ReadyRuntime:
+    config: Config
+    conversation_service: ConversationService
+    bash_event_service: BashEventService
+    state: Literal[&quot;ready&quot;] = &quot;ready&quot;
+
+AgentServerRuntime = DormantRuntime | ReadyRuntime</pre>
+
+    <div class="panel pattern">
+      <h3>Standardized pattern</h3>
+      <p><strong>App shape is static; runtime is explicit.</strong> The factory owns route registration and static server-shape decisions. A runtime provider owns all request-time config, auth, and services. Deferred init replaces the runtime object only after the new runtime is fully built and entered.</p>
+    </div>
+
+    <h2>Current vs. runtime-context design</h2>
+    <table class="compare">
+      <tr><th>Concern</th><th>Current merged flow</th><th>Runtime-context flow</th></tr>
+      <tr><td>Route registration</td><td>Routes are registered once. PR #3844 removed session-key conditionals for HTTP auth.</td><td>Routes are registered once, always with the same typed dependencies. No route decides auth based on startup keys.</td></tr>
+      <tr><td>Config lookup</td><td>Some auth paths read <code>app.state.config</code>; other code may still use default accessors or import-time objects.</td><td>Every route, WebSocket, and service dependency uses <code>get_runtime(...)</code>. Fallbacks to process defaults are not part of request handling.</td></tr>
+      <tr><td>Readiness</td><td><code>InitService.state</code> gates most <code>/api/*</code> routes. Other surfaces need to remember to participate.</td><td><code>require_ready_runtime</code> returns a <code>ReadyRuntime</code> or 503. Any handler needing services must request this dependency.</td></tr>
+      <tr><td>Initialization</td><td>Init mutates env, resets a singleton, enters service, then updates multiple <code>app.state</code> fields.</td><td>Init constructs and enters a complete ready runtime locally, then swaps one pointer. Failure cleans up the local candidate and leaves the old runtime intact.</td></tr>
+      <tr><td>Testing</td><td>Tests can miss stale closures unless they mutate <code>app.state.config</code> after route registration.</td><td>Unit tests target the provider: dormant returns 503, ready returns typed services, swap changes auth and services for HTTP and WebSocket together.</td></tr>
+      <tr><td>Design pressure</td><td>Each new router must remember which global helpers are unsafe in deferred mode.</td><td>The safe path is the default. A router cannot get runtime services without going through the provider.</td></tr>
+    </table>
+
+    <h2>Recommended boundary split</h2>
+    <p>The deepest simplification is to stop treating all config fields as equally mutable. Some fields define the ASGI app's shape; others define the user runtime. Mixing them is how partial application bugs appear.</p>
+
+    <pre class="mermaid">
+flowchart LR
+  Static[Server-shape config<br/>root_path, static files, middleware strategy, enabled routers] --> Factory[create_app]
+  Runtime[Runtime config<br/>session keys, secret, persistence paths, webhooks, user env] --> Init[POST /api/init]
+  Factory --> App[FastAPI app]
+  Init --> Context[AgentServerRuntime]
+  Context --> Req[HTTP + WebSocket dependencies]
+  App --> Req
+    </pre>
+
+    <div class="risk-grid">
+      <div class="risk ok"><strong>Static app config</strong><p>If changing a value would require rebuilding middleware, remounting routes, or changing root path behavior, prefer setting it before <code>create_app</code>. If it must vary per user, implement it as dynamic middleware that reads the runtime provider.</p></div>
+      <div class="risk ok"><strong>Runtime config</strong><p>If a value affects auth, storage locations, user webhooks, secret encryption, or tools used after init, it belongs in the ready runtime and should be visible through one provider.</p></div>
+      <div class="risk ok"><strong>State transition</strong><p>Use a candidate runtime: build, enter, validate, then swap. Do not publish partially initialized pieces across several <code>app.state</code> attributes.</p></div>
+    </div>
+
+    <h2>What I would do next</h2>
+    <ol>
+      <li><strong>Introduce a typed runtime provider.</strong> Keep it small: <code>get_runtime</code>, <code>get_ready_runtime</code>, HTTP auth, WebSocket auth, and service accessors. Make it the only approved request-time path to config-backed services.</li>
+      <li><strong>Move WebSockets onto the same provider.</strong> This closes the most obvious parity gap left by fixing HTTP auth: auth and event/bash services should come from the same ready runtime as REST handlers.</li>
+      <li><strong>Classify init fields.</strong> Decide which <code>InitRequest</code> fields are truly runtime mutable. For <code>web_url</code> and CORS, either make the middleware/root-path behavior dynamic or remove them from deferred-init payload expectations.</li>
+      <li><strong>Retire default singleton use inside request handlers.</strong> Default factories can remain for the normal app bootstrap path, but routers should not call them after the app exists.</li>
+      <li><strong>Add mutation tests around the boundary.</strong> Tests should update or swap the runtime after route registration and assert old keys/services stop working and new keys/services work across REST, workspace cookie auth, OpenAI routes, and WebSockets.</li>
+    </ol>
+
+    <div class="callout">
+      <p><strong>Design bias:</strong> make deferred init boring. The warm-pool controller should deliver one payload; the server should either remain dormant or publish one ready runtime. Every handler should ask the same question: &ldquo;what runtime owns this request?&rdquo; If the answer is standardized, stale closures and missing guards become much harder to write.</p>
+    </div>
+
+    <h2>Source trail</h2>
+    <ul>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/3287">PR #3287</a> introduced <code>Config.deferred_init</code>, <code>InitService</code>, <code>/api/init</code>, and the dormant-to-ready transition.</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/3844">PR #3844</a> fixed stale HTTP auth dependencies by reading <code>app.state.config</code> at request time and registering auth dependencies unconditionally.</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/400">PR #400</a> explored the app-factory/app-state dependency-injection direction that would make runtime ownership more explicit.</li>
+    </ul>
+
+    <footer>
+      Drafted by an AI agent (OpenHands) on behalf of the user. This is an architecture study, not a merged SDK contract.
+    </footer>
+  </div>
+</body>
+</html>
