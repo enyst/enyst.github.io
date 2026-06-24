@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmolPaws WhatsApp Entry Point — Engel Nyst</title>
+  <meta name="description" content="Architecture of the SmolPaws WhatsApp ingress — Baileys multi-device, a SQLite-backed poll loop, scopes, and media handling." />
+  <meta property="og:title" content="SmolPaws WhatsApp Entry Point" />
+  <meta property="og:description" content="The primary channel — Baileys multi-device, SQLite poll loop, scopes, images, voice notes." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/smolpaws-whatsapp.html" />
+  <meta property="og:image" content="https://enyst.github.io/og-index.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SmolPaws WhatsApp Entry Point" />
+  <meta name="twitter:description" content="The primary channel — Baileys multi-device, SQLite poll loop, scopes, images, voice notes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="arch.css" />
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="index.html">← Home</a>
+    <h1>SmolPaws WhatsApp Entry Point <span class="tag tag-live">live</span></h1>
+    <p class="meta">
+      How the WhatsApp ingress — SmolPaws' primary channel — receives messages over Baileys and dispatches to the agent server.<br>
+      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/src">src/</a> &nbsp;&middot;&nbsp;
+      Entry: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/index.ts">src/index.ts</a>
+    </p>
+
+    <h2>Overview</h2>
+    <p>WhatsApp is where SmolPaws started, and it is still the primary channel. Unlike the Slack and Discord <a href="smolpaws-slack.html">bridges</a> (which live under <code>apps/</code> and self-register with the bridge loader), WhatsApp is the <strong>root process</strong> in <code>src/</code>: it owns the WhatsApp connection, the message store, the scheduler, and the dispatch loop.</p>
+
+    <p>It connects to WhatsApp via <a href="https://github.com/WhiskeySockets/Baileys">Baileys</a> (<code>@whiskeysockets/baileys</code>), the multi-device Web protocol — no Business API, no phone number rental. Authentication is a one-time QR pairing; the session persists to disk. Rather than reacting to a push stream, the process <strong>persists every message to SQLite and polls</strong> for new ones every 2 seconds, which makes restarts and missed-message recovery trivial.</p>
+
+    <pre class="mermaid">
+flowchart LR
+    A["WhatsApp\n(multi-device)"] <-->|Baileys WS| B["src/index.ts\n(makeWASocket)"]
+    B -->|"messages.upsert"| DB["SQLite\nstore (db.ts)"]
+    B -.->|"poll every 2s"| DB
+    B -->|"runAgentRuntime()"| C["local-agent-server\n127.0.0.1:8788"]
+    C -->|runs agent| D["OpenHands\nruntime"]
+    D -->|turn result +\noutbound msgs| C
+    C --> B
+    B -->|"sock.sendMessage"| A
+    </pre>
+
+    <h2>Why a Poll Loop?</h2>
+    <p>Baileys delivers messages via a <code>messages.upsert</code> event, but SmolPaws does not dispatch straight off that event. Instead it writes incoming messages into SQLite, then a separate loop reads new rows on a fixed interval.</p>
+    <ul>
+      <li><strong>Durability</strong> — messages survive a crash or restart; nothing is lost between the socket and the agent.</li>
+      <li><strong>Context batching</strong> — when the agent is triggered, the loop pulls <em>all</em> messages since the last interaction (<code>getMessagesSince</code>), so the prompt carries the full recent conversation, not just the triggering line.</li>
+      <li><strong>Collapse to latest per chat</strong> — rapid bursts across chats collapse to the latest pending item per chat, avoiding redundant runs.</li>
+      <li><strong>Idempotency</strong> — the WhatsApp message id is the dispatch idempotency key.</li>
+    </ul>
+    <pre class="code">POLL_INTERVAL = 2000ms          // src/config.ts
+loop:
+  messages = getNewMessages(jids, lastTimestamp, ASSISTANT_NAME)
+  for each chat with new messages:
+    processMessage(latest)        // pulls full context since last run</pre>
+
+    <h2>Message Flow</h2>
+    <pre class="mermaid">
+sequenceDiagram
+    participant U as WhatsApp User
+    participant W as Baileys Socket
+    participant L as Poll Loop (index.ts)
+    participant DB as SQLite
+    participant A as local-agent-server
+    participant R as Agent Runtime
+
+    U->>W: message (text / image / audio / doc)
+    W->>L: messages.upsert
+    L->>DB: storeMessage() (+ download media)
+    loop every 2s
+        L->>DB: getNewMessages()
+        DB-->>L: pending rows
+    end
+    L->>L: trigger? (control scope / triggerFree / @smolpaws)
+    L->>DB: getMessagesSince() — full context
+    L->>W: setTyping(true)
+    L->>A: runAgentRuntime(scope, prompt, images)
+    A->>R: create/resume conversation
+    R-->>A: result + outbound messages
+    A-->>L: AgentRuntimeOutput
+    L->>W: setTyping(false)
+    L->>W: sock.sendMessage(reply)
+    W->>U: sees reply
+    </pre>
+
+    <h2>Trigger Logic</h2>
+    <p>Whether a message wakes the agent depends on the <strong>scope</strong> of the chat:</p>
+    <pre class="code">shouldRespondWithoutTrigger(folder, triggerFree)
+  = isControlScope(folder) || triggerFree === true
+
+// otherwise require an @mention:
+TRIGGER_PATTERN = /(^|\W)@smolpaws\b/i</pre>
+    <ul>
+      <li><strong>Control scope</strong> (the <code>main</code> group) — responds to every message, no mention needed. This is Engel's private line to the cat.</li>
+      <li><strong>Trigger-free groups</strong> — opt-in per group (<code>triggerFree: true</code>), also respond to all messages. Used for the Hunting group.</li>
+      <li><strong>Everything else</strong> — requires an explicit <code>@smolpaws</code> mention (matched in text or image caption).</li>
+    </ul>
+
+    <h2>Scopes</h2>
+    <p>Each registered chat maps to a <strong>scope</strong> — an isolation boundary for conversation state, working directory, and permissions. The control scope (<code>main</code>) is privileged; other scopes are sandboxed to themselves.</p>
+    <table>
+      <tr><th>Capability</th><th>Control scope (<code>main</code>)</th><th>Other scopes</th></tr>
+      <tr><td>Respond without @mention</td><td>yes</td><td>only if <code>triggerFree</code></td></tr>
+      <tr><td>Send to other chats</td><td>any chat</td><td>own chat only</td></tr>
+      <tr><td>Register / refresh groups</td><td>yes</td><td>no</td></tr>
+      <tr><td>See scheduled tasks</td><td>all</td><td>own scope only</td></tr>
+      <tr><td>List available groups</td><td>yes</td><td>no</td></tr>
+    </table>
+    <p>Conversation continuity is per-scope: <code>sessions.json</code> maps each scope to its agent-server conversation id, so a chat resumes its own conversation across turns.</p>
+
+    <h2>Media</h2>
+    <p>The ingress downloads attached media to <code>~/.smolpaws/whatsapp/media/</code> and passes it to the agent in the form the model can use:</p>
+    <table>
+      <tr><th>Type</th><th>Handling</th></tr>
+      <tr><td>Images</td><td>Read back as a base64 data URL and sent inline to the LLM (cap 10&nbsp;MB)</td></tr>
+      <tr><td>Audio / voice notes</td><td>Saved to disk; path passed as <code>has_audio</code> + <code>audio_path</code> for local transcription (Whisper)</td></tr>
+      <tr><td>Documents</td><td>Text extracted and embedded as an <code>&lt;attachment&gt;</code> block (truncated if large)</td></tr>
+    </table>
+
+    <h2>Sending Replies</h2>
+    <p>Text replies go out directly via <code>sock.sendMessage</code>, prefixed with the assistant name. Two extra paths exist:</p>
+    <ul>
+      <li><strong>Outbound messages</strong> — the agent's <code>send_message</code> tool produces <code>current_thread_message</code> items, delivered to the chat in order before the final reply.</li>
+      <li><strong>Voice notes</strong> — the agent writes <code>{jid, oggPath}</code> lines to a <code>voice-outbox.jsonl</code>; the loop drains it each cycle (atomic rename → send as <code>ptt: true</code> Opus → requeue on failure). This is how the cat speaks in Engel's voice (TTS → OGG/Opus).</li>
+    </ul>
+
+    <h2>Connection Resilience</h2>
+    <ul>
+      <li>One-time QR pairing via <code>useMultiFileAuthState</code>; credentials persist under <code>~/.smolpaws/whatsapp/</code>.</li>
+      <li>Auto-reconnect on disconnect unless logged out (Baileys <code>DisconnectReason</code>).</li>
+      <li><code>ConnectionGuards</code> debounce reconnect storms and surface a clean "I'm up" ping on the main scope after a healthy reconnect.</li>
+      <li>Group metadata synced once per 24h so chat names stay current.</li>
+    </ul>
+
+    <h2>Configuration</h2>
+    <table>
+      <tr><th>Variable</th><th>Default</th><th>Purpose</th></tr>
+      <tr><td><code>ASSISTANT_NAME</code></td><td><code>smolpaws</code></td><td>Reply prefix and <code>@mention</code> trigger word</td></tr>
+      <tr><td><code>SMOLPAWS_HOME</code> / <code>WHATSAPP_DIR</code></td><td><code>~/.smolpaws/…</code></td><td>Auth state, media, voice outbox, SQLite db</td></tr>
+      <tr><td><code>TZ</code></td><td>system</td><td>Timezone for the scheduler</td></tr>
+    </table>
+    <p>Registered chats and their scopes live in <code>data/registered_groups.json</code> (folder, name, <code>triggerFree</code>).</p>
+
+    <h2>File Layout</h2>
+    <pre class="code">src/
+├── index.ts               # WhatsApp socket, poll loop, dispatch, voice outbox
+├── config.ts              # constants (poll interval, trigger, paths)
+├── db.ts                  # SQLite store — messages, chat metadata, sync state
+├── scope.ts               # ExecutionScope from a registered group
+├── control-scope.ts        # control / trigger-free / permission rules
+├── message-loop.ts         # collapse messages to latest per chat
+├── connection-guards.ts    # reconnect debounce + health ping
+├── whatsapp-jid.ts         # outbound JID resolution (lid ↔ chat)
+├── document-text.ts        # document text extraction
+├── outbound-reply-policy.ts # when to send the final reply after outbound msgs
+├── task-scheduler.ts       # cron / interval / once scheduled tasks
+└── agent-runtime/
+    ├── index.ts            # runAgentRuntime() → local-agent-server
+    └── local-agent-server.ts # turn submission + monitoring</pre>
+
+    <h2>Relationship to the Bridges</h2>
+    <p>WhatsApp predates the bridge abstraction, so it does not extend <code>BaseBridgeAdapter</code> or register with the bridge loader. But it terminates at the <strong>same backend</strong>: <code>runAgentRuntime()</code> submits to the local agent-server on <code>127.0.0.1:8788</code> — the very server that hosts the Slack and Discord bridges. One agent, one runtime, many front doors.</p>
+
+    <pre class="mermaid">
+flowchart TB
+    subgraph "Front doors"
+        WA["WhatsApp\nsrc/ (root process)"]
+        SL["Slack\napps/slack (bridge)"]
+        DC["Discord\napps/discord (bridge)"]
+        GH["GitHub\napps/github"]
+    end
+    subgraph "Backend"
+        A["agent-server\n127.0.0.1:8788"]
+        R["OpenHands runtime"]
+    end
+    WA --> A
+    SL --> A
+    DC --> A
+    GH --> A
+    A --> R
+    </pre>
+
+    <div class="callout">
+      <p><strong>Why not make WhatsApp a bridge too?</strong> It could be, but it carries concerns the bridges don't: the SQLite store, the scope/permission model, the scheduler, and media pipelines. Those are first-class to the primary channel. The bridges are deliberately thinner — they lean on the shared turn client and let the agent-server own state.</p>
+    </div>
+
+    <div class="foot-nav"><a href="index.html">← Home</a></div>
+  </div>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script>
+</body>
+</html>

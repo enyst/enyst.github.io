@@ -26,21 +26,37 @@
     <h1>SmolPaws Slack Entry Point <span class="tag tag-live">live</span></h1>
     <p class="meta">
       How the Slack ingress receives messages, fetches thread context, and dispatches to the agent server.<br>
-      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/slack">apps/slack/</a> · PRs: <a href="https://github.com/smolpaws/smolpaws/pull/106">#106</a>–<a href="https://github.com/smolpaws/smolpaws/pull/112">#112</a>
+      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/slack">apps/slack/</a> &nbsp;&middot;&nbsp;
+      Bridge pattern: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/shared/bridgeAdapter.ts">bridgeAdapter.ts</a> &nbsp;&middot;&nbsp;
+      PRs: <a href="https://github.com/smolpaws/smolpaws/pull/106">#106</a>–<a href="https://github.com/smolpaws/smolpaws/pull/112">#112</a>, <a href="https://github.com/smolpaws/smolpaws/pull/118">#118</a>
     </p>
 
     <h2>Overview</h2>
-    <p>The Slack ingress is a long-running local Node.js process. It connects to Slack via Socket Mode WebSocket (<code>@slack/bolt</code>), receives events, fetches thread context, and dispatches to the shared SmolPaws agent server over HTTP.</p>
+    <p>The Slack ingress connects to Slack via Socket Mode WebSocket (<code>@slack/bolt</code>), receives events, fetches thread context, and dispatches to the shared SmolPaws agent server over HTTP.</p>
+
+    <p>As of <a href="https://github.com/smolpaws/smolpaws/pull/118">#118</a> it is a <strong>bridge</strong>: a <code>SlackAdapter extends BaseBridgeAdapter</code> that self-registers with the <code>bridgeRegistry</code> and is discovered by the bridge loader via <code>plugin.json</code>. When <code>SLACK_BOT_TOKEN</code> and <code>SLACK_APP_TOKEN</code> are present, the agent-server starts it automatically at boot &mdash; the same pattern Discord uses. The thin <code>index.ts</code> also runs it standalone.</p>
 
     <pre class="mermaid">
 flowchart LR
-    A["Slack\nSocket Mode"] <-->|WebSocket| B["apps/slack\n(@slack/bolt)"]
-    B -->|HTTP POST| C["agent-server\n127.0.0.1:8788"]
+    A["Slack\nSocket Mode"] <-->|WebSocket| B["SlackAdapter\n(@slack/bolt)"]
+    B -->|"dispatch()"| BA["BaseBridgeAdapter\n(shared)"]
+    BA -->|HTTP POST| C["agent-server\n127.0.0.1:8788"]
     C -->|runs agent| D["OpenHands\nruntime"]
     D -->|turn result +\noutbound msgs| C
-    C -->|poll + claim| B
+    C -->|poll + claim| BA
     B -->|chat.postMessage\nwith thread_ts| A
     </pre>
+
+    <h2>Bridge Pattern</h2>
+    <p>The Slack app keeps its richer ingress logic (thread context, dedup, guest rate limiting, reactions) in <code>slackHandler.ts</code>, injected via <code>SlackDeps</code>. The adapter owns the platform connection lifecycle:</p>
+    <table>
+      <tr><th>File</th><th>Responsibility</th></tr>
+      <tr><td><code>plugin.json</code></td><td>Bridge manifest &mdash; <code>kind: "bridge"</code>, <code>requiredEnv</code>; discovered by the loader</td></tr>
+      <tr><td><code>index.ts</code></td><td>Thin entry point &mdash; <code>bridgeRegistry.startAdapter('slack', …)</code>, shutdown</td></tr>
+      <tr><td><code>adapter.ts</code></td><td><code>SlackAdapter</code> &mdash; Bolt connection lifecycle (<code>connect</code>/<code>disconnect</code>), event wiring, registry registration</td></tr>
+      <tr><td><code>slackHandler.ts</code></td><td><code>handleSlackEvent()</code> &mdash; testable ingress core, dependency-injected</td></tr>
+      <tr><td><code>bridgeAdapter.ts</code> (shared)</td><td><code>BaseBridgeAdapter</code> + <code>bridgeRegistry</code> &mdash; agent-server dispatch loop</td></tr>
+    </table>
 
     <h2>Message Flow</h2>
 
@@ -78,7 +94,7 @@ sequenceDiagram
     <h2>Entry Decision Logic</h2>
     <p>The bot decides whether to respond through layered checks:</p>
 
-    <h3>Event Filtering (index.ts)</h3>
+    <h3>Event Filtering (adapter.ts)</h3>
     <pre class="code">1. Ignore bot messages and self-mentions
 2. app_mention events → always process
 3. message.im events → always process (DMs)
@@ -231,11 +247,13 @@ flowchart TB
 
     <h2>File Layout</h2>
     <pre class="code">apps/slack/
+├── plugin.json               # bridge manifest (kind: "bridge", requiredEnv)
 ├── package.json
 ├── tsconfig.json
 ├── AGENTS.md
 └── src/
-    ├── index.ts              # Bolt app, Socket Mode, event handlers
+    ├── index.ts              # thin entry — bridgeRegistry.startAdapter('slack')
+    ├── adapter.ts            # SlackAdapter — Bolt lifecycle, event wiring, registration
     ├── config.ts             # env parsing, allowlists
     ├── slackContext.ts        # conversation IDs, access, thread context, dedup
     ├── slackHandler.ts        # handleSlackEvent() — testable core logic
@@ -247,11 +265,11 @@ flowchart TB
 
     <h2>Process Model</h2>
     <ul>
-      <li>Single Node.js process, ~600 lines of source across 5 files</li>
-      <li>61 tests covering all paths (context, handler, agent client, helpers)</li>
+      <li>Runs as a bridge under the agent-server (auto-started when tokens are present), or standalone via <code>index.ts</code></li>
+      <li>68 tests covering all paths (context, handler, agent client, helpers)</li>
       <li>Uses <code>@slack/bolt</code> Socket Mode (not HTTP webhooks)</li>
-      <li>Handler extracted into <code>slackHandler.ts</code> with injectable dependencies for testability</li>
-      <li>Graceful shutdown on SIGINT / SIGTERM</li>
+      <li>Ingress core extracted into <code>slackHandler.ts</code> with injectable dependencies for testability</li>
+      <li>Connection lifecycle (<code>connect</code>/<code>disconnect</code>) managed by <code>BaseBridgeAdapter</code>; graceful shutdown on SIGINT / SIGTERM</li>
       <li>Messages &gt; 5900 chars split at natural boundaries (newlines, then spaces)</li>
     </ul>
 

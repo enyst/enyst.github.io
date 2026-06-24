@@ -4,9 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SmolPaws Discord Entry Point — Engel Nyst</title>
-  <meta name="description" content="Architecture of the SmolPaws Discord ingress app — now built on the BaseChannelAdapter pattern." />
+  <meta name="description" content="Architecture of the SmolPaws Discord ingress app — now built on the BaseBridgeAdapter pattern." />
   <meta property="og:title" content="SmolPaws Discord Entry Point" />
-  <meta property="og:description" content="How the Discord ingress uses the shared channel adapter to dispatch messages to the agent server." />
+  <meta property="og:description" content="How the Discord ingress uses the shared bridge adapter to dispatch messages to the agent server." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://enyst.github.io/smolpaws-discord.html" />
   <meta name="twitter:card" content="summary" />
@@ -28,19 +28,19 @@
     <a class="back" href="index.html">&larr; Home</a>
     <h1>SmolPaws Discord Entry Point <span class="tag tag-live">live</span></h1>
     <p class="meta">
-      How the Discord ingress uses the shared channel adapter to dispatch messages to the agent server.<br>
+      How the Discord ingress uses the shared bridge adapter to dispatch messages to the agent server.<br>
       Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/discord">apps/discord/</a> &nbsp;&middot;&nbsp;
-      Adapter pattern: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/shared/channelAdapter.ts">channelAdapter.ts</a>
+      Adapter pattern: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/shared/bridgeAdapter.ts">bridgeAdapter.ts</a>
     </p>
 
     <!-- ============================================================ -->
     <h2>Architecture</h2>
-    <p>The Discord ingress is built on the <strong>BaseChannelAdapter</strong> pattern &mdash; a shared base class that handles agent-server dispatch, while the <code>DiscordAdapter</code> subclass implements Discord-specific I/O.</p>
+    <p>The Discord ingress is built on the <strong>BaseBridgeAdapter</strong> pattern &mdash; a shared base class that handles agent-server dispatch, while the <code>DiscordAdapter</code> subclass implements Discord-specific I/O.</p>
 
     <pre class="mermaid">
 flowchart LR
     A["Discord\nGateway"] -->|WebSocket| B["DiscordAdapter\n(discord.js)"]
-    B -->|"dispatch()"| C["BaseChannelAdapter\n(shared)"]
+    B -->|"dispatch()"| C["BaseBridgeAdapter\n(shared)"]
     C -->|HTTP POST| D["agent-server\n127.0.0.1:8788"]
     D -->|runs agent| E["OpenHands\nruntime"]
     E -->|turn result +\noutbound msgs| D
@@ -57,7 +57,7 @@ flowchart LR
       <tr><th>File</th><th>Lines</th><th>Responsibility</th></tr>
       <tr><td><code>index.ts</code></td><td>~40</td><td>Entry point &mdash; imports adapter, starts via registry, handles shutdown</td></tr>
       <tr><td><code>adapter.ts</code></td><td>~300</td><td>DiscordAdapter &mdash; all Discord-specific logic</td></tr>
-      <tr><td><code>channelAdapter.ts</code> (shared)</td><td>~300</td><td>BaseChannelAdapter + ChannelRegistry &mdash; agent-server dispatch loop</td></tr>
+      <tr><td><code>bridgeAdapter.ts</code> (shared)</td><td>~300</td><td>BaseBridgeAdapter + BridgeRegistry &mdash; agent-server dispatch loop</td></tr>
     </table>
 
     <h3>What the base class handles</h3>
@@ -87,7 +87,7 @@ sequenceDiagram
     participant U as Discord User
     participant D as Discord API
     participant DA as DiscordAdapter
-    participant BA as BaseChannelAdapter
+    participant BA as BaseBridgeAdapter
     participant S as agent-server
 
     U->>D: message or @mention
@@ -136,13 +136,13 @@ sequenceDiagram
     </table>
 
     <!-- ============================================================ -->
-    <h2>Channel Registry</h2>
-    <p>The adapter self-registers with the <code>ChannelRegistry</code> on import. The entry point is minimal:</p>
+    <h2>Bridge Registry</h2>
+    <p>The adapter self-registers with the <code>BridgeRegistry</code> on import. The entry point is minimal:</p>
 
-    <pre class="code">import { channelRegistry } from '../../../src/shared/channelAdapter.js';
+    <pre class="code">import { bridgeRegistry } from '../../../src/shared/bridgeAdapter.js';
 import './adapter.js'; // triggers registration
 
-await channelRegistry.startAdapter('discord', {
+await bridgeRegistry.startAdapter('discord', {
   runnerUrl: RUNNER_URL,
   runnerToken: RUNNER_TOKEN,
   logger,
@@ -162,28 +162,28 @@ await channelRegistry.startAdapter('discord', {
 
     <pre class="mermaid">
 flowchart TB
-    subgraph "Ingress Apps"
+    subgraph "Bridges"
         D["Discord\nDiscordAdapter"]
-        S["Slack\n(next)"]
-        G["GitHub\n(next)"]
+        S["Slack\nSlackAdapter"]
     end
     subgraph "Shared Layer"
-        BA["BaseChannelAdapter\nchannelAdapter.ts"]
+        BA["BaseBridgeAdapter\nbridgeAdapter.ts"]
         T["turnClient.ts"]
-        R["ChannelRegistry"]
+        R["BridgeRegistry"]
+        L["bridgeLoader\n(scans plugin.json)"]
     end
     subgraph "Backend"
         A["agent-server"]
     end
     D --> BA
-    S -.-> BA
-    G -.-> BA
+    S --> BA
     BA --> T
     R --> BA
+    L --> R
     T --> A
     </pre>
 
-    <p>Discord is the first adapter on the pattern. Slack and GitHub will follow the same shape &mdash; subclass <code>BaseChannelAdapter</code>, implement platform I/O, register with the registry.</p>
+    <p>Discord was the first bridge on the pattern; <a href="smolpaws-slack.html">Slack</a> now follows the same shape (<a href="https://github.com/smolpaws/smolpaws/pull/118">#118</a>) &mdash; subclass <code>BaseBridgeAdapter</code>, implement platform I/O, register with the registry, declare a <code>plugin.json</code> so the loader discovers it.</p>
 
     <!-- ============================================================ -->
     <h2>Configuration</h2>
@@ -201,7 +201,7 @@ flowchart TB
 
     <!-- ============================================================ -->
     <h2>Design Context</h2>
-    <p>This adapter pattern is the first step toward a <a href="hermes-plugins.html">plugin system for channel extensibility</a>. The goal: adding a new messaging platform should be &ldquo;subclass BaseChannelAdapter, implement 3 methods, register with the registry&rdquo; &mdash; not &ldquo;copy an existing app and rewire everything.&rdquo;</p>
+    <p>This adapter pattern is the first step toward a <a href="hermes-plugins.html">plugin system for channel extensibility</a>. The goal: adding a new messaging platform should be &ldquo;subclass BaseBridgeAdapter, implement 3 methods, register with the registry&rdquo; &mdash; not &ldquo;copy an existing app and rewire everything.&rdquo;</p>
     <p>See <a href="https://github.com/smolpaws/smolpaws/issues/115">smolpaws#115</a> for the full extensibility roadmap.</p>
 
     <div class="foot-nav">
