@@ -46,7 +46,7 @@
     </p>
 
     <div class="callout ok">
-      <p><strong>Short version:</strong> a scenario drives the product through surfaces (browser, terminal/TUI). Each surface captures its own native artifact, a Playwright video for the browser, an asciicast for the terminal, and stamps a shared <code>timeline.json</code> as a side effect of acting. Recordings are off-by-default cost: assertions are vitest's job, not the film's. When <code>E2E_FILM=1</code>, the surfaces slow down and "beat" so the result is followable. A post-step <code>film.ts</code> cuts each native recording on the focus timeline and concatenates them onto one canvas, so a multi-window run plays back as one screen recording of a developer tabbing between apps.</p>
+      <p><strong>Short version:</strong> a scenario drives the product through surfaces (browser, terminal/TUI). Each surface captures its own native artifact (a Playwright video for the browser, an asciicast for the terminal) and stamps a shared <code>timeline.json</code> as a side effect of acting. Recordings are an off-by-default cost: assertions are vitest's job, not the film's. When <code>E2E_FILM=1</code>, the surfaces slow down and "beat" so the result is followable. A post-step <code>film.ts</code> then cuts each native recording on the focus timeline and concatenates them onto one canvas, so a multi-window run plays back as a single screen recording of a developer tabbing between apps.</p>
     </div>
 
     <h2>The shape of a recorded run</h2>
@@ -110,7 +110,7 @@ ffmpeg -y -i &lt;recorded.webm&gt; \
     </p>
 
     <div class="callout">
-      <p><strong>This is the path our sibling's PR used.</strong> The OpenHands agent's <code>policies-duplicate</code> scenario yields only <code>Browser</code> and <code>Api</code>, so it produced exactly this: <code>session.mp4</code> + <code>trace.zip</code> + step screenshots, recorded with <code>E2E_FILM=1</code> for the watchable pace. No terminal track, so no splice, the browser video <em>is</em> the film.</p>
+      <p><strong>This is the path our sibling's PR used.</strong> The OpenHands agent's <code>policies-duplicate</code> scenario yields only <code>Browser</code> and <code>Api</code>, so it produced exactly this: <code>session.mp4</code> + <code>trace.zip</code> + step screenshots, recorded with <code>E2E_FILM=1</code> for the watchable pace. No terminal track means no splice: the browser video <em>is</em> the film.</p>
     </div>
 
     <h2>Terminal capture: a real PTY to asciicast</h2>
@@ -131,7 +131,7 @@ ffmpeg -y -i &lt;recorded.webm&gt; \
   realMcpCall,   // the spinner lasts exactly as long as this Effect runs
 )</pre>
     <p>
-      No inference, no third-party agent binary, the chat is a renderer painting genuine calls, so the
+      No inference and no third-party agent binary: the chat is a renderer painting genuine calls, so the
       recording reads like an agent session while staying fully deterministic. The renderer runs inside the
       recorded PTY and the theater feeds it events as base64 lines, producing the <code>terminal.cast</code>.
     </p>
@@ -189,8 +189,8 @@ sequenceDiagram
     </div>
     <p>
       The design rule stated in the source is worth repeating: a scenario should never hand-code a sleep to
-      make a film readable, that is the recording's concern. Pacing is a property of the focus transition,
-      owned by the framework, so the test stays a clean spec.
+      make a film readable, because that is the recording's concern. Pacing is a property of the focus
+      transition, owned by the framework, so the test stays a clean spec.
     </p>
 
     <h2>The splice: one film from many cameras</h2>
@@ -212,7 +212,7 @@ sequenceDiagram
 //       pad=1280:800:(ow-iw)/2:(oh-ih)/2:color=0x0b0b10,
 //       setsar=1,fps=24,format=yuv420p</pre>
     <p>
-      The only editorial act is the cut, both segments are the genuine recordings, so the film is honest:
+      The only editorial act is the cut; both segments are the genuine recordings, so the film is honest:
       it plays like a screen recording of someone tabbing between a full-screen terminal and a full-screen
       browser. film.mp4 is registered back into <code>result.json</code>'s artifact list so the viewer prefers
       it over the bare parts.
@@ -233,7 +233,7 @@ ffmpeg -f x11grab -framerate 24 -video_size 1440x900 -i :99 \
       chat theater renders into a visible <code>xterm</code> (events over a FIFO instead of a recorded PTY). One
       <code>x11grab</code> films both windows on the same screen as the developer "tabs" between them; the
       resulting <code>desk.mp4</code> replaces <code>session.mp4</code> in the run dir. Same scenario file, no
-      changes, the surfaces just switch transports on the env var. The splice is the cheap default; the desk is
+      changes: the surfaces just switch transports on the env var. The splice is the cheap default; the desk is
       the cinematic one.
     </p>
 
@@ -262,10 +262,10 @@ ffmpeg -f x11grab -framerate 24 -video_size 1440x900 -i :99 \
 
     <h2>Design takeaways</h2>
     <ul>
-      <li><strong>Recording is a side effect, not a layer.</strong> Each surface captures its own native artifact; there is no central recorder coupling them. Correctness lives in vitest assertions, the film is debugging and demo evidence.</li>
+      <li><strong>Recording is a side effect, not a layer.</strong> Each surface captures its own native artifact; there is no central recorder coupling them. Correctness lives in vitest assertions; the film is debugging and demo evidence.</li>
       <li><strong>The cut list is derived from operations.</strong> Focus is stamped when a surface is acted on, so the film cuts itself for any number of window hops, with no scenario annotation.</li>
       <li><strong>Pacing belongs to the framework.</strong> <code>slowMo</code> and <code>beat()</code> live in the surfaces and only fire when filming, so CI stays fast and tests stay free of presentation sleeps.</li>
-      <li><strong>Capture survives failure.</strong> <code>acquireUseRelease</code> guarantees the browser flushes its video and the PTY writes its cast even on timeout, exactly the runs whose footage you need.</li>
+      <li><strong>Capture survives failure.</strong> <code>acquireUseRelease</code> guarantees the browser flushes its video and the PTY writes its cast even on timeout: exactly the runs whose footage you need.</li>
       <li><strong>Portability is deliberate.</strong> webm &rarr; mp4 with <code>+faststart</code> for inline playback, and a gif fallback for GitHub, are chosen for where the evidence will be watched.</li>
       <li><strong>One play with two stages.</strong> The same scenario yields a fast cut via <code>film.ts</code> or a true single-screen take via the desk, by switching transports on an env var, not by forking the test.</li>
     </ul>
