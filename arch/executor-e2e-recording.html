@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Executor E2E Recording — Engel Nyst</title>
+  <meta name="description" content="How RhysSullivan/executor's e2e harness records its tests: Playwright video, asciicast terminal capture, a derived focus timeline, and an ffmpeg splice into one watchable film." />
+  <meta property="og:title" content="Executor E2E Recording" />
+  <meta property="og:description" content="The recording pipeline behind executor's e2e suite: per-surface capture, a focus timeline derived from normal operations, watchable slow-mo, and a single spliced film." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/executor-e2e-recording.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .flow-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 18px 20px; margin: 18px 0; }
+    .flow-card h3 { margin-top: 0; }
+    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 18px 0; }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+    .pill { border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-family: var(--mono); font-size: 0.78em; color: var(--muted); background: rgba(255,255,255,0.03); }
+    .ok { border-left-color: var(--accent); }
+    .warning { border-left-color: #d86f57; }
+    .defer { border-left-color: #8a847a; }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#1a1a18',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>Executor E2E Recording <span class="tag">study</span></h1>
+    <p class="meta">
+      How the e2e harness in <a href="https://github.com/RhysSullivan/executor">RhysSullivan/executor</a>
+      turns a black-box test run into a watchable recording: per-surface capture, a focus timeline
+      derived from normal operations, optional slow-mo for the camera, and an ffmpeg splice into a
+      single film. Read from the repository source (<code>e2e/src</code>, <code>e2e/scripts</code>,
+      <code>e2e/desk</code>), June 2026.
+    </p>
+
+    <div class="callout ok">
+      <p><strong>Short version:</strong> a scenario drives the product through surfaces (browser, terminal/TUI). Each surface captures its own native artifact, a Playwright video for the browser, an asciicast for the terminal, and stamps a shared <code>timeline.json</code> as a side effect of acting. Recordings are off-by-default cost: assertions are vitest's job, not the film's. When <code>E2E_FILM=1</code>, the surfaces slow down and "beat" so the result is followable. A post-step <code>film.ts</code> cuts each native recording on the focus timeline and concatenates them onto one canvas, so a multi-window run plays back as one screen recording of a developer tabbing between apps.</p>
+    </div>
+
+    <h2>The shape of a recorded run</h2>
+    <p>
+      The entry point is <code>scenario(name, options, body)</code> in <code>e2e/src/scenario.ts</code>.
+      It computes a per-run directory (<code>runs/&lt;target&gt;/&lt;slug&gt;</code>), builds an Effect
+      <em>context</em> of only the surfaces this target can provide, runs the body, and writes a small
+      <code>result.json</code> plus whatever artifacts the surfaces dropped into the run dir. There is no
+      central recorder: each surface owns its own capture, and the scenario file itself is shipped as
+      <code>test.ts</code> because "the test source is the review artifact."
+    </p>
+
+    <pre class="mermaid">
+flowchart TB
+  Scenario["scenario(name, options, body)"] --> Ctx["contextFor(target, dir):<br/>add only the surfaces<br/>the target's capabilities allow"]
+  Ctx --> Body["run body Effect"]
+  Body --> Browser["Browser surface<br/>(Playwright)"]
+  Body --> Cli["Cli / chat-theater<br/>(PTY)"]
+  Browser --> RunDir[("runs/&lt;target&gt;/&lt;slug&gt;/")]
+  Cli --> RunDir
+  Browser -. side effect .-> TL["timeline.json"]
+  Cli -. side effect .-> TL
+  RunDir --> Result["result.json + test.ts"]
+  Result --> Film{"both<br/>terminal.cast +<br/>session.mp4?"}
+  Film -->|yes| FilmTs["scripts/film.ts<br/>cut + concat → film.mp4"]
+  Film -->|no| Done["parts stay as artifacts"]
+    </pre>
+
+    <p>
+      Both capturing surfaces wrap their resource in Effect's <code>acquireUseRelease</code>. That matters
+      for evidence: a vitest timeout interrupts the fiber, and the <em>release</em> step still runs, so the
+      browser closes and flushes its video, or the PTY recording is written, even on a failing or hung run.
+      A bare promise would leak Chromium and lose the footage you most want.
+    </p>
+
+    <h2>Browser capture: Playwright video, trace, screenshots</h2>
+    <p>
+      <code>e2e/src/surfaces/browser.ts</code> launches Chromium and opens a context with three capture
+      mechanisms turned on at once:
+    </p>
+    <ul>
+      <li><strong>Video</strong> via Playwright's native <code>recordVideo: { dir, size: 1280&times;800 }</code>. Playwright writes a <code>.webm</code> as the page runs.</li>
+      <li><strong>Trace</strong> via <code>context.tracing.start({ screenshots, snapshots, sources })</code>, the time-travel DOM + network + console bundle you drag into <code>trace.playwright.dev</code>.</li>
+      <li><strong>Per-step screenshots</strong>: the <code>step(label, fn)</code> helper opens a tracing group, runs the action, then saves a numbered PNG named from the step label.</li>
+    </ul>
+    <p>
+      The context is dark-mode and seeded with the identity's cookies, so the recording is of a real logged-in
+      session against the target's actual web UI, never a stub. On release the surface stops tracing
+      (<code>trace.zip</code>), closes the context to flush the video, then transcodes:
+    </p>
+    <pre class="code">// webm plays nowhere reliable; mp4 plays everywhere (Safari/iOS don't do webm)
+ffmpeg -y -i &lt;recorded.webm&gt; \
+  -c:v libx264 -preset veryfast -crf 26 \
+  -pix_fmt yuv420p -movflags +faststart \
+  &lt;run&gt;/session.mp4
+// if ffmpeg is missing, fall back to copying the raw .webm</pre>
+    <p>
+      That transcode is the entire reason the artifact is a portable <code>session.mp4</code>. The
+      <code>+faststart</code> flag moves the MP4 index to the front so it streams inline in a browser or a
+      GitHub PR without downloading the whole file first.
+    </p>
+
+    <div class="callout">
+      <p><strong>This is the path our sibling's PR used.</strong> The OpenHands agent's <code>policies-duplicate</code> scenario yields only <code>Browser</code> and <code>Api</code>, so it produced exactly this: <code>session.mp4</code> + <code>trace.zip</code> + step screenshots, recorded with <code>E2E_FILM=1</code> for the watchable pace. No terminal track, so no splice, the browser video <em>is</em> the film.</p>
+    </div>
+
+    <h2>Terminal capture: a real PTY to asciicast</h2>
+    <p>
+      The CLI surface (<code>e2e/src/surfaces/cli.ts</code>) drives a real pseudo-terminal through
+      <code>@kitlangton/terminal-control</code>. A scenario can type, press keys, wait for rendered text, and
+      assert on the screen. With <code>record</code> set, the session's internal JSONL recording is converted
+      to <strong>asciicast v2</strong> (<code>terminal.cast</code>), the same format asciinema plays, using a
+      single streaming UTF-8 decoder so multi-byte characters split across PTY chunks survive.
+    </p>
+    <p>
+      On top of the raw CLI surface sits <strong>chat theater</strong> (<code>e2e/src/clients/chat-theater.ts</code>),
+      which is the clever bit for product demos. It renders a fake "developer chatting with an agent" TUI, but
+      every tool spinner brackets a <em>real</em> MCP call:
+    </p>
+    <pre class="code">theater.tool(
+  { name: "execute", input: code, result: (v) =&gt; ... },
+  realMcpCall,   // the spinner lasts exactly as long as this Effect runs
+)</pre>
+    <p>
+      No inference, no third-party agent binary, the chat is a renderer painting genuine calls, so the
+      recording reads like an agent session while staying fully deterministic. The renderer runs inside the
+      recorded PTY and the theater feeds it events as base64 lines, producing the <code>terminal.cast</code>.
+    </p>
+
+    <h2>The focus timeline: derived, never declared</h2>
+    <p>
+      The keystone idea is in <code>e2e/src/timeline.ts</code>. The film needs to know <em>which window the
+      developer was looking at, and when</em>, so it can cut between the terminal and the browser at the right
+      moments. Rather than make scenarios annotate that, the surfaces stamp it as a side effect of normal work:
+    </p>
+    <ul>
+      <li>Driving a Playwright step calls <code>enterFocus(dir, "browser")</code>.</li>
+      <li>Pushing a chat event calls <code>markFocus(dir, "terminal")</code>.</li>
+      <li>Each recording's start wall-clock is stamped with <code>markRecordingStart</code>, the <em>anchor</em> that maps wall time to that recording's own clock.</li>
+      <li>Main-frame navigations are recorded too, feeding the viewer's synthetic URL bar (the video itself is chromeless).</li>
+    </ul>
+    <p>
+      So <code>timeline.json</code> ends up with <code>anchors</code> (when each camera started),
+      <code>focus</code> (the ordered window transitions), and <code>nav</code> (URLs). Any scenario gets a
+      faithful focus track "for free," and the cut list is decided by the operations themselves, for any number
+      of hops, not by hand-authored markers.
+    </p>
+
+    <pre class="mermaid">
+sequenceDiagram
+  participant S as Scenario body
+  participant T as terminal (cast)
+  participant B as browser (mp4)
+  participant TL as timeline.json
+  S->>T: chat: "add a rule"
+  T->>TL: markFocus(terminal) @ t0
+  Note over T: anchor.terminal = t0
+  S->>B: step: open /policies
+  B->>TL: enterFocus(browser) @ t1
+  Note over B: anchor.browser = t1
+  S->>T: chat: "done"
+  T->>TL: markFocus(terminal) @ t2
+  Note over TL: focus = [terminal@t0, browser@t1, terminal@t2]
+    </pre>
+
+    <h2>Watchable mode: slow-mo and beats</h2>
+    <p>
+      A recording at machine speed flickers through states too fast to read. Two off-by-default knobs fix that,
+      gated on <code>E2E_FILM=1</code> (or <code>E2E_DESK=1</code>):
+    </p>
+    <div class="two-col">
+      <div class="flow-card">
+        <h3>slowMo</h3>
+        <p>The browser surface passes Playwright <code>slowMo: 400</code>, so each action takes 400&nbsp;ms. That is the "17-second" pace you see in the demo videos. Normal CI runs pass <code>undefined</code> and stay fast.</p>
+      </div>
+      <div class="flow-card">
+        <h3>beats</h3>
+        <p>A "beat" is a deliberate dwell, framework-owned, not hand-coded <code>waitForTimeout</code>. The surfaces beat at the end of a visible step and when focus changes ("look before you tab away"). <code>beat()</code> is a no-op unless filming, so nobody pays for pacing in CI.</p>
+      </div>
+    </div>
+    <p>
+      The design rule stated in the source is worth repeating: a scenario should never hand-code a sleep to
+      make a film readable, that is the recording's concern. Pacing is a property of the focus transition,
+      owned by the framework, so the test stays a clean spec.
+    </p>
+
+    <h2>The splice: one film from many cameras</h2>
+    <p>
+      After a successful run that has <em>both</em> a <code>terminal.cast</code> and a <code>session.mp4</code>,
+      <code>scenario.ts</code> shells out to <code>e2e/scripts/film.ts</code> (best-effort: a failure here never
+      fails the run; the parts simply remain). film.ts builds a cut list and concatenates:
+    </p>
+    <ol>
+      <li><strong>Cut list from the timeline.</strong> Each contiguous focus run becomes an act <code>{ source, from, to }</code> in that recording's own clock, computed from the wall-clock focus transitions minus the recording's anchor. A run without a usable timeline falls back to a heuristic (locate the browser hop by a narrator line, or the largest idle gap in the cast).</li>
+      <li><strong>Render the terminal.</strong> <code>agg</code> turns <code>terminal.cast</code> into a gif with idle compression disabled (so cast time equals video time), then ffmpeg makes it an even-dimensioned mp4.</li>
+      <li><strong>Trim and concat.</strong> One ffmpeg <code>filter_complex</code> trims each act out of its source, fits every act onto an identical 1280&times;800 letterboxed canvas (<code>scale</code> + <code>pad</code> + <code>fps</code> + <code>format</code>), and <code>concat</code>s them in order into <code>film.mp4</code>.</li>
+    </ol>
+    <pre class="code">// per act: trim the source window, normalize onto one canvas
+[0:v]trim=from:to,setpts=PTS-STARTPTS,&lt;FIT&gt;[act0]   // terminal
+[1:v]trim=from:to,setpts=PTS-STARTPTS,&lt;FIT&gt;[act1]   // browser
+[act0][act1]concat=n=2:v=1:a=0[out]
+// FIT = scale=1280:800:force_original_aspect_ratio=decrease,
+//       pad=1280:800:(ow-iw)/2:(oh-ih)/2:color=0x0b0b10,
+//       setsar=1,fps=24,format=yuv420p</pre>
+    <p>
+      The only editorial act is the cut, both segments are the genuine recordings, so the film is honest:
+      it plays like a screen recording of someone tabbing between a full-screen terminal and a full-screen
+      browser. film.mp4 is registered back into <code>result.json</code>'s artifact list so the viewer prefers
+      it over the bare parts.
+    </p>
+
+    <h2>The desk: one real screen instead of a splice</h2>
+    <p>
+      There is a heavier alternative for when you want a true single-camera take. <code>e2e/desk/</code> runs the
+      scenario inside a Docker image with a virtual X display and films it with one screen grab:
+    </p>
+    <pre class="code">Xvfb :99 -screen 0 1440x900x24 &amp;        # virtual display
+openbox &amp; xsetroot -solid "#0b0b10"     # a window manager + backdrop
+ffmpeg -f x11grab -framerate 24 -video_size 1440x900 -i :99 \
+       -c:v libx264 -preset veryfast -crf 24 -pix_fmt yuv420p desk.mp4 &amp;
+(cd e2e &amp;&amp; E2E_DESK=1 vitest run --project cloud "$SCENARIO")</pre>
+    <p>
+      Under <code>E2E_DESK=1</code> the browser launches <strong>headed</strong> at a fixed window position, and
+      chat theater renders into a visible <code>xterm</code> (events over a FIFO instead of a recorded PTY). One
+      <code>x11grab</code> films both windows on the same screen as the developer "tabs" between them; the
+      resulting <code>desk.mp4</code> replaces <code>session.mp4</code> in the run dir. Same scenario file, no
+      changes, the surfaces just switch transports on the env var. The splice is the cheap default; the desk is
+      the cinematic one.
+    </p>
+
+    <h2>Sharing: run dir to a PR</h2>
+    <p>
+      <code>e2e/scripts/pr-media.ts</code> closes the loop to GitHub. Given a run dir it picks the best recording
+      (<code>film.mp4</code> &gt; <code>session.mp4</code> &gt; <code>terminal.cast</code>), converts it to a gif
+      (ffmpeg two-pass palette for the browser mp4, <code>agg</code> for a cast), commits the gif to an orphan
+      <code>e2e-media</code> branch through the git database API (never touching the worktree), and prints
+      ready-to-paste markdown. The gif route exists because GitHub renders gifs inline from a raw repo URL and
+      has no API for the drag-and-drop asset upload.
+    </p>
+
+    <h2>Artifacts a run leaves behind</h2>
+    <table>
+      <tr><th>Artifact</th><th>Producer</th><th>What it is</th></tr>
+      <tr><td><code>session.mp4</code></td><td>browser surface + ffmpeg</td><td>The browser video, transcoded webm &rarr; mp4 for portability.</td></tr>
+      <tr><td><code>trace.zip</code></td><td>Playwright tracing</td><td>Time-travel DOM, network, console; opens in trace.playwright.dev.</td></tr>
+      <tr><td><code>NN-&lt;step&gt;.png</code></td><td><code>step()</code></td><td>One screenshot per named step; <code>failure.png</code> on error.</td></tr>
+      <tr><td><code>terminal.cast</code></td><td>CLI surface</td><td>asciicast v2 of the PTY/TUI session.</td></tr>
+      <tr><td><code>timeline.json</code></td><td>all surfaces</td><td>Recording anchors, focus transitions, navigations.</td></tr>
+      <tr><td><code>traces.json</code></td><td>browser + MCP</td><td>Per-request distributed-trace ledger for the run.</td></tr>
+      <tr><td><code>film.mp4</code></td><td><code>scripts/film.ts</code></td><td>The spliced single-camera cut, when both tracks exist.</td></tr>
+      <tr><td><code>result.json</code></td><td>scenario.ts</td><td>Pass/fail, timing, and the artifact inventory for the viewer.</td></tr>
+    </table>
+
+    <h2>Design takeaways</h2>
+    <ul>
+      <li><strong>Recording is a side effect, not a layer.</strong> Each surface captures its own native artifact; there is no central recorder coupling them. Correctness lives in vitest assertions, the film is debugging and demo evidence.</li>
+      <li><strong>The cut list is derived from operations.</strong> Focus is stamped when a surface is acted on, so the film cuts itself for any number of window hops, with no scenario annotation.</li>
+      <li><strong>Pacing belongs to the framework.</strong> <code>slowMo</code> and <code>beat()</code> live in the surfaces and only fire when filming, so CI stays fast and tests stay free of presentation sleeps.</li>
+      <li><strong>Capture survives failure.</strong> <code>acquireUseRelease</code> guarantees the browser flushes its video and the PTY writes its cast even on timeout, exactly the runs whose footage you need.</li>
+      <li><strong>Portability is deliberate.</strong> webm &rarr; mp4 with <code>+faststart</code> for inline playback, and a gif fallback for GitHub, are chosen for where the evidence will be watched.</li>
+      <li><strong>One play with two stages.</strong> The same scenario yields a fast cut via <code>film.ts</code> or a true single-screen take via the desk, by switching transports on an env var, not by forking the test.</li>
+    </ul>
+
+    <div class="foot-nav">
+      <a href="openhands-automations.html">OpenHands Automations &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="openhands-client-defined-tools.html">OpenHands Client-Defined Tools &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/RhysSullivan/executor">RhysSullivan/executor &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="../index.html">&larr; Home</a>
+    </div>
+  </div>
+</body>
+</html>
