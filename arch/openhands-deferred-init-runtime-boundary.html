@@ -122,22 +122,22 @@ sequenceDiagram
     <pre class="mermaid">
 flowchart TD
   subgraph Factory[App factory]
-    C[Config input] --> A[create_app(config)]
-    A --> R[register routers once]
-    A --> S[app.state.runtime = DormantRuntime]
+    C["Config input"] --> A["create_app(config)"]
+    A --> R["register routers once"]
+    A --> S["app.state.runtime = DormantRuntime"]
   end
 
   subgraph Provider[Request-time provider]
-    G[get_runtime(request or websocket)]
-    G --> Auth[auth policy]
-    G --> Ready[require_ready_runtime]
-    G --> Services[conversation, bash, workspace services]
+    G["get_runtime(request or websocket)"]
+    G --> Auth["auth policy"]
+    G --> Ready["require_ready_runtime"]
+    G --> Services["conversation, bash, workspace services"]
   end
 
   subgraph Init[Deferred initialization]
-    I[POST /api/init] --> B[build ReadyRuntime off to the side]
-    B --> E[enter services]
-    E --> Swap[atomic app.state.runtime swap]
+    I["POST /api/init"] --> B["build ReadyRuntime off to the side"]
+    B --> E["enter services"]
+    E --> Swap["atomic app.state.runtime swap"]
   end
 
   R --> G
