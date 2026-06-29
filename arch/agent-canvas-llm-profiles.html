@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Canvas LLM Profiles — Engel Nyst</title>
+  <meta name="description" content="Concise design notes on how Agent Canvas handles LLM profiles across local agent-server, remote agent-server, and OpenHands Cloud backends." />
+  <meta property="og:title" content="Agent Canvas LLM Profiles" />
+  <meta property="og:description" content="Where the LLM profile model is unified today, where Cloud still differs, and the clean seam for future convergence." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/agent-canvas-llm-profiles.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin: 18px 0; }
+    .box { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 16px 18px; }
+    .box h3 { margin-top: 0; }
+    .ok { border-left: 3px solid var(--accent); }
+    .gap { border-left: 3px solid #d9a441; }
+    .risk { border-left: 3px solid #d86f57; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .chip { font-family: var(--mono); font-size: 0.76em; border: 1px solid var(--border); border-radius: 999px; padding: 4px 9px; color: var(--muted); background: rgba(255,255,255,0.03); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>Agent Canvas LLM Profiles <span class="tag">design note</span></h1>
+    <p class="meta">Notes for <a href="https://github.com/OpenHands/agent-canvas/issues/533">OpenHands/agent-canvas#533</a>. Prepared by OpenHands (AI) on behalf of the user, June 2026.</p>
+
+    <div class="callout">
+      <p><strong>Short version:</strong> local and remote agent-server backends already share one LLM profile model. OpenHands Cloud still exposes raw LLM settings, so the product model is not fully unified yet.</p>
+    </div>
+
+    <div class="chips">
+      <span class="chip">Agent Canvas</span>
+      <span class="chip">LLM profiles</span>
+      <span class="chip">agent-server</span>
+      <span class="chip">Cloud settings</span>
+      <span class="chip">/model</span>
+    </div>
+
+    <h2>Current shape</h2>
+    <div class="grid">
+      <div class="box ok"><h3>Local agent-server</h3><p>Uses saved profiles through the SDK <code>ProfilesClient</code>. The settings page is profile-oriented and conversation start consumes the active profile after the server materializes it into <code>agent_settings.llm</code>.</p></div>
+      <div class="box ok"><h3>Remote agent-server</h3><p>Same as local. In Agent Canvas, a remote agent-server is still a <code>kind: &quot;local&quot;</code> backend because it speaks the same agent-server protocol.</p></div>
+      <div class="box gap"><h3>OpenHands Cloud</h3><p>Still uses raw Cloud settings from <code>/api/v1/settings</code>. The frontend derives <code>agent_settings.llm</code> only so the existing raw LLM form can render.</p></div>
+      <div class="box risk"><h3>Remaining split</h3><p>Routes, navigation copy, chat labels, <code>/model</code>, and switch behavior still branch on <code>backend.kind</code>.</p></div>
+    </div>
+
+    <h2>The useful seam</h2>
+    <p>The clean boundary is the effective LLM config, not the profile name. A profile, raw Cloud setting, or future Cloud profile should all resolve to the same runtime shape before conversation start or model switch:</p>
+
+    <pre class="code">agent_settings: {
+  llm: {
+    model: "openhands/minimax-m2.7",
+    api_key: "...encrypted or server-held...",
+    base_url: "...optional...",
+    stream: true
+  }
+}</pre>
+
+    <p>That lets conversation runtime code stay mostly backend-agnostic. The backend-specific work should remain at the storage and materialization boundary.</p>
+
+    <h2>Code shape today</h2>
+    <table>
+      <tr><th>Area</th><th>Current design</th></tr>
+      <tr><td>Profile lifecycle</td><td><code>ProfilesService</code> wraps SDK <code>ProfilesClient</code> calls for list/get/save/activate on agent-server backends.</td></tr>
+      <tr><td>Conversation start</td><td>Agent-server start fetches encrypted settings, then builds the runtime payload from <code>agent_settings.llm</code>.</td></tr>
+      <tr><td>Cloud settings</td><td>Cloud response stays mostly flat, then derives <code>agent_settings.llm</code> for the raw settings form.</td></tr>
+      <tr><td>Switching</td><td>Agent-server profile switch fetches encrypted profile config and calls <code>ConversationClient.switchLLM</code>. Cloud profile switching is not implemented.</td></tr>
+      <tr><td>UI copy</td><td>Local says “LLM Profiles”; Cloud still says “LLM Settings”.</td></tr>
+    </table>
+
+    <h2>What I would clean up next</h2>
+    <ol>
+      <li>Centralize the capability check as something like <code>supportsLlmProfiles(backend)</code> instead of repeating <code>backend.kind</code> checks.</li>
+      <li>Choose the Cloud profile storage owner before changing the UX: app/backend-owned storage is safer than browser localStorage for anything secret-bearing.</li>
+      <li>Define switch semantics once: local has “activate for future conversations” on home and “switch current conversation” in chat.</li>
+      <li>Keep <code>agent_settings.llm</code> as the common materialization seam so SaaS/local branches do not leak into runtime code.</li>
+    </ol>
+
+    <div class="callout">
+      <p><strong>Tiny cleanup already made in Agent Canvas:</strong> <code>useLlmProfiles()</code> now disables itself by default while Cloud is active, avoiding a local-only profile request in Cloud mode.</p>
+    </div>
+
+    <div class="foot-nav"><a href="../index.html">&larr; Back to studies</a></div>
+  </div>
+</body>
+</html>
