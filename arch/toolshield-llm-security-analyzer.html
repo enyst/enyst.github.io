@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ToolShield LLM Security Analyzer — Engel Nyst</title>
+  <meta name="description" content="Higher-level map of OpenHands software-agent-sdk PR #2911: separate guardrail LLM, ToolShield safety experiences, data flow, captured risk patterns, and review notes." />
+  <meta property="og:title" content="ToolShield LLM Security Analyzer" />
+  <meta property="og:description" content="How OpenHands PR #2911 separates actor and judge for action-risk analysis, and what ToolShield contributes." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/toolshield-llm-security-analyzer.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .signal-board {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 18px;
+      align-items: stretch;
+      margin: 30px 0;
+    }
+    .signal-card {
+      background:
+        radial-gradient(circle at 20% 0%, rgba(201,168,76,0.13), transparent 34%),
+        linear-gradient(135deg, rgba(107,191,171,0.08), transparent 52%),
+        var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--border-radius);
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    .signal-card::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(201,168,76,0.07);
+      pointer-events: none;
+    }
+    .signal-card h2 { margin-top: 0; }
+    .metric-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+    .metric {
+      border: 1px solid var(--border);
+      background: rgba(15,15,14,0.48);
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .metric .num { display: block; font-family: var(--serif); font-size: 2.1em; line-height: 0.9; color: var(--accent); }
+    .metric .label { display: block; margin-top: 8px; color: var(--muted); font-size: 0.78em; }
+    .rung {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 14px;
+      margin: 16px 0;
+      align-items: start;
+    }
+    .rung-index {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 0.78em;
+    }
+    .rung strong { display: block; margin-bottom: 3px; }
+    .rung p { margin: 0; color: var(--muted); }
+    .grid-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 18px 0; }
+    .tile {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--border-radius);
+      padding: 18px 20px;
+    }
+    .tile h3 { margin-top: 0; }
+    .tiny-label {
+      font-family: var(--mono);
+      font-size: 0.72em;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .verdict-low { color: #7bc47f; }
+    .verdict-med { color: #d8a657; }
+    .verdict-high { color: #d86f57; }
+    .verdict-unknown { color: #b9b1a4; }
+    .review-note { border-left: 3px solid #6bbfab; }
+    .review-note.warning { border-left-color: #d86f57; }
+    @media (max-width: 760px) {
+      .signal-board { grid-template-columns: 1fr; }
+      .metric-row { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#141411',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>ToolShield LLM Security Analyzer <span class="tag tag-report">PR map</span></h1>
+    <p class="meta">
+      Higher-level notes for <a href="https://github.com/OpenHands/software-agent-sdk/pull/2911">OpenHands/software-agent-sdk PR #2911</a>,
+      which adds <code>ToolShieldLLMSecurityAnalyzer</code> as an opt-in security analyzer for OpenHands SDK.
+      Studied from the PR branch and the <a href="https://github.com/CHATS-Lab/ToolShield">CHATS-Lab/ToolShield</a> package, July 2026.
+    </p>
+
+    <div class="signal-board">
+      <section class="signal-card">
+        <h2>Short version</h2>
+        <p>The PR splits the agent into two roles: an <strong>actor</strong> LLM proposes a tool call, and a separate <strong>guardrail</strong> LLM classifies the action before execution. The guardrail sees the current action, recent action history, and optional ToolShield safety experiences.</p>
+        <p>Nothing becomes the default automatically. Existing agents keep using the current analyzer unless callers opt into this one and wire it to a confirmation policy such as <code>ConfirmRisky</code>.</p>
+        <div class="metric-row">
+          <div class="metric"><span class="num">1</span><span class="label">new analyzer class</span></div>
+          <div class="metric"><span class="num">3</span><span class="label">experience-loading helpers</span></div>
+          <div class="metric"><span class="num">0</span><span class="label">default behavior changes</span></div>
+        </div>
+      </section>
+      <section class="signal-card">
+        <h2>Why it exists</h2>
+        <div class="rung">
+          <div class="rung-index">01</div>
+          <div><strong>Self-policing is biased</strong><p>The current <code>LLMSecurityAnalyzer</code> trusts the same model that wants to run the tool call to self-label its risk.</p></div>
+        </div>
+        <div class="rung">
+          <div class="rung-index">02</div>
+          <div><strong>Multi-turn attacks hide intent</strong><p>Reconnaissance, staging, and final execution can each look harmless in isolation.</p></div>
+        </div>
+        <div class="rung">
+          <div class="rung-index">03</div>
+          <div><strong>Tool-specific memory helps</strong><p>ToolShield supplies distilled safety experiences from sandbox red-teaming so the guardrail can recognize known bad tool patterns.</p></div>
+        </div>
+      </section>
+    </div>
+
+    <h2>Data flow</h2>
+    <p>The analyzer sits between proposed action and execution. It assigns a risk level; the existing confirmation policy still decides whether to pause.</p>
+
+    <pre class="mermaid">
+flowchart TD
+  User["User task"] --> Actor["Actor LLM proposes tool call"]
+  Actor --> Event["ActionEvent: tool, summary, thought, arguments"]
+  Event --> Render["Render current action + recent history"]
+  Experiences["Optional safety_experiences"] --> Render
+  Render --> Guard["Separate guardrail LLM"]
+  Guard --> Risk{"SecurityRisk"}
+  Risk -->|LOW / MEDIUM| Allow["Default ConfirmRisky allows"]
+  Risk -->|HIGH| Pause["Pause for confirmation"]
+  Risk -->|UNKNOWN| Unknown["ConfirmRisky(confirm_unknown=True) pauses"]
+  Allow --> Tool["Tool executor"]
+    </pre>
+
+    <h2>What ToolShield contributes</h2>
+    <p>ToolShield is not embedded into the SDK as a hard dependency. The SDK accepts <code>safety_experiences</code> as a plain string. If the optional extra is installed, helper functions load and format ToolShield's bundled JSON guidelines.</p>
+
+    <div class="grid-two">
+      <div class="tile">
+        <span class="tiny-label">bare guardrail</span>
+        <h3><code>safety_experiences=""</code></h3>
+        <p>The default for the new analyzer. It still separates actor and judge, but no tool-specific experience text is injected.</p>
+      </div>
+      <div class="tile">
+        <span class="tiny-label">default seed</span>
+        <h3><code>default_safety_experiences()</code></h3>
+        <p>Loads terminal and filesystem experiences from the optional package. This is explicit opt-in, not construction-time magic.</p>
+      </div>
+      <div class="tile">
+        <span class="tiny-label">explicit list</span>
+        <h3><code>load_safety_experiences([...])</code></h3>
+        <p>Callers choose the tool experience names, such as <code>postgres-mcp</code>, <code>playwright-mcp</code>, or <code>notion-mcp</code>.</p>
+      </div>
+      <div class="tile">
+        <span class="tiny-label">local discovery</span>
+        <h3><code>auto_detect_safety_experiences()</code></h3>
+        <p>Uses ToolShield's MCP scanner to inspect localhost ports and load matching bundled experiences for discovered MCP servers.</p>
+      </div>
+    </div>
+
+    <h2>Risk classification contract</h2>
+    <table>
+      <tr><th>Guardrail result</th><th>SDK result</th><th>Why it matters</th></tr>
+      <tr><td><code>RISK: LOW</code></td><td class="verdict-low"><code>SecurityRisk.LOW</code></td><td>Normal safe path; no confirmation under default <code>ConfirmRisky</code>.</td></tr>
+      <tr><td><code>RISK: MEDIUM</code></td><td class="verdict-med"><code>SecurityRisk.MEDIUM</code></td><td>Allows callers to configure a stricter threshold without forcing all users to pause.</td></tr>
+      <tr><td><code>RISK: HIGH</code></td><td class="verdict-high"><code>SecurityRisk.HIGH</code></td><td>Default <code>ConfirmRisky</code> pauses before execution.</td></tr>
+      <tr><td>No parseable label, conflicting labels, or LLM infrastructure error</td><td class="verdict-unknown"><code>SecurityRisk.UNKNOWN</code></td><td>Lets <code>ConfirmRisky(confirm_unknown=True)</code> pause without making UNKNOWN dominate ensemble max-risk fusion.</td></tr>
+    </table>
+
+    <h2>Issues this catches better than self-assessment</h2>
+    <div class="grid-two">
+      <div class="tile">
+        <h3>Distributed harmful goal</h3>
+        <p>A sequence such as inspect permissions, stage a helper, then delete protected data may not look like one obvious bad action until the history is evaluated together.</p>
+      </div>
+      <div class="tile">
+        <h3>Tool-specific footguns</h3>
+        <p>Filesystem, terminal, database, browser, and Notion tools fail differently. ToolShield experiences give the guardrail a compact memory of those failure modes.</p>
+      </div>
+      <div class="tile">
+        <h3>Actor prompt injection into risk output</h3>
+        <p>The implementation wraps summary, thought, and arguments in structural tags, HTML-escapes field content, and strips untrusted spans before parsing labels.</p>
+      </div>
+      <div class="tile">
+        <h3>Ambiguous guardrail responses</h3>
+        <p>If the guardrail says both <code>RISK: LOW</code> and <code>RISK: HIGH</code> on standalone lines, the parser returns UNKNOWN instead of letting the last label win.</p>
+      </div>
+    </div>
+
+    <h2>Implementation map</h2>
+    <pre class="mermaid">
+flowchart LR
+  subgraph SDK[software-agent-sdk]
+    A[toolshield_llm_analyzer.py]
+    H[toolshield_helpers.py]
+    I[security/__init__.py exports]
+    P[pyproject optional extra]
+    T[test_toolshield_llm_analyzer.py]
+  end
+
+  subgraph Package[toolshield optional package]
+    E[ExperienceStore]
+    J[experience JSON files]
+    S[mcp_scan.py]
+  end
+
+  H -->|lazy import| E
+  H -->|loads| J
+  H -->|auto-detect| S
+  H -->|returns prompt string| A
+  A -->|returns| R[SecurityRisk]
+  I --> A
+  I --> H
+  P --> Package
+  T --> A
+  T --> H
+    </pre>
+
+    <h2>Review notes</h2>
+    <div class="callout review-note">
+      <p><strong>Package provenance:</strong> Earlier review found ToolShield wheels did not reproduce from source and <code>toolshield auto</code> was broken in PyPI 0.1.2. The PR now pins <code>toolshield&gt;=0.1.3,&lt;0.2</code>. The `.pr/` evidence bundle records PyPI metadata, wheel contents, source-to-package hash matches, and a fresh-venv smoke test.</p>
+    </div>
+    <div class="callout review-note">
+      <p><strong>Prompt/output hardening:</strong> The branch went through multiple review rounds: parse failures now return UNKNOWN, untrusted fields are tagged, summary is stripped like thought and arguments, closing-tag injection is neutralized with HTML escaping, and conflicting labels become UNKNOWN.</p>
+    </div>
+    <div class="callout review-note warning">
+      <p><strong>Edges to watch:</strong> The helper that auto-detects MCP tools probes localhost and currently depends on ToolShield's scanner behavior. Reviewers should verify the no-extra fallback contract, stdout/logging behavior, and whether a server process should ever run broad local probing implicitly.</p>
+    </div>
+
+    <h2>What this is not</h2>
+    <ul>
+      <li>Not a replacement for sandboxing, permissions, or human confirmation.</li>
+      <li>Not enabled by default in the SDK.</li>
+      <li>Not a guarantee that every harmful multi-turn sequence is caught.</li>
+      <li>Not a reason to send sensitive tool arguments to an untrusted guardrail provider without thinking about data handling.</li>
+      <li>Not frontend UI work; surfacing it in settings is expected in a separate OpenHands app PR.</li>
+    </ul>
+
+    <h2>Useful links</h2>
+    <ul>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/2911">OpenHands/software-agent-sdk PR #2911</a></li>
+      <li><a href="https://github.com/OpenHands/OpenHands/issues/14040">Feature issue OpenHands#14040</a></li>
+      <li><a href="https://github.com/CHATS-Lab/ToolShield">ToolShield package repository</a></li>
+      <li><a href="https://github.com/CHATS-Lab/ToolShield/issues/4">ToolShield package provenance issue #4</a></li>
+      <li><a href="https://arxiv.org/abs/2602.13379">Unsafer in Many Turns paper</a></li>
+    </ul>
+
+    <div class="foot-nav">
+      <a href="openhands-client-defined-tools.html">OpenHands Client-Defined Tools &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/OpenHands/software-agent-sdk/pull/2911">PR #2911 &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="../index.html">&larr; Home</a>
+    </div>
+  </div>
+</body>
+</html>
