@@ -1,0 +1,267 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>teach-me: triggerFree groups in smolpaws — Engel Nyst</title>
+<meta name="description" content="An interactive walkthrough of the triggerFree change in smolpaws: how a group can respond without an @mention, why it works, and a quiz to check you understood.">
+<meta property="og:title" content="teach-me: triggerFree groups in smolpaws">
+<meta property="og:description" content="Background → Intuition → Code → Quiz. Learn how smolpaws lets a group skip the @mention, and test yourself.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://enyst.github.io/arch/teach-triggerfree-groups.html">
+<meta name="twitter:card" content="summary">
+<style>
+  :root{
+    --fg:#1a1a1a;--muted:#5a5a5a;--subtle:#8a8a82;
+    --bg:#fdfdfb;--card:#ffffff;--elevated:#f7f6f1;
+    --accent:#2b4eaa;--accent-soft:#e6ecfa;
+    --rule:#e2e2dc;--rule-strong:#bdbcb4;
+    --code-bg:#f3f1ec;--warn:#b25b0e;--ok:#2f7a3a;--crit:#a02020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.65;font-size:16px}
+  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:4px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none}nav.toc a:hover{color:var(--accent)}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:20px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:33px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted);max-width:780px}
+  h2{font-size:23px;margin:46px 0 10px}h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:15px;margin:22px 0 6px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  p{max-width:760px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:13px;line-height:1.5;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule);white-space:pre}
+  pre code{background:transparent;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}.add{color:var(--ok)}.del{color:var(--crit)}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:16px 0;border-radius:0 4px 4px 0;font-size:14.5px;max-width:760px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6}.callout.note{border-color:var(--muted);background:#f3f1ec}
+  .skip{font-size:13px;color:var(--muted);font-style:italic;margin:6px 0 14px}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  /* reusable diagram family: message → gate → outcome */
+  .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:16px 0;max-width:760px}
+  .node{border:1px solid var(--rule-strong);background:var(--card);border-radius:8px;padding:10px 12px;font-size:13px;min-width:120px}
+  .node .n-t{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
+  .node .n-d{font-family:var(--mono);font-size:12px}
+  .gate{border-color:var(--accent);background:var(--accent-soft)}
+  .arrow{display:flex;align-items:center;color:var(--rule-strong);font-size:20px}
+  .yes{border-color:var(--ok);background:#eaf4ec}.no{border-color:var(--crit);background:#f7ecec}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;background:var(--code-bg);color:var(--muted);margin-left:6px}
+  /* quiz */
+  .q{border:1px solid var(--rule);border-radius:8px;padding:16px 18px;margin:16px 0;max-width:760px;background:var(--card)}
+  .q .qn{font-weight:600;margin-bottom:10px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--rule-strong);background:var(--card);border-radius:6px;padding:9px 12px;margin:7px 0;font:inherit;font-size:14px;cursor:pointer;transition:background .12s,border-color .12s}
+  .opt:hover{background:var(--elevated)}
+  .opt.correct{border-color:var(--ok);background:#eaf4ec}
+  .opt.wrong{border-color:var(--crit);background:#f7ecec}
+  .opt.disabled{cursor:default;opacity:.75}
+  .fb{font-size:13.5px;margin-top:8px;padding:8px 12px;border-radius:6px;display:none}
+  .fb.show{display:block}
+  .fb.good{background:#eaf4ec;color:var(--ok)}.fb.bad{background:#f7ecec;color:var(--crit)}
+  .score{font-weight:600;margin-top:8px}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr;gap:16px}nav.toc{position:static}}
+</style></head>
+<body><div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+  <li><a href="#bg">Background</a></li>
+  <li><a href="#in">Intuition</a></li>
+  <li><a href="#code">The code</a></li>
+  <li><a href="#quiz">Quiz</a></li>
+</ol></nav>
+<main>
+<header class="title">
+  <div class="eyebrow">teach-me · smolpaws · commit 68de7f6</div>
+  <h1>Letting a group talk to the cat without an @mention</h1>
+  <p class="sub">A four-line feature with an outsized effect on how a room feels. We'll build up the background, get the intuition with a worked example, walk the actual diff, and then you'll quiz yourself.</p>
+</header>
+
+<section id="bg"><h2><span class="num">1</span>Background</h2>
+
+<h3>Deep background — how smolpaws decides to answer</h3>
+<p class="skip">Skip this if you already know how the WhatsApp message gate works.</p>
+<p>smolpaws lives in group chats. A naive bot would reply to <em>every</em> message, which is intolerable in a busy room — imagine a cat that meows at every word you say. So smolpaws stays quiet unless a message is clearly meant for it. The usual signal is an <strong>@mention</strong>: you write <code>@smolpaws</code> and it wakes up.</p>
+<p>Concretely, every incoming message runs through a single gate in <code>processMessage</code>. Two facts decide whether the cat bothers to think:</p>
+<ul>
+  <li>Is this a room where the cat is allowed to respond to <em>anything</em> (no mention needed)?</li>
+  <li>Or, failing that, does the message text actually contain the trigger <code>@smolpaws</code>?</li>
+</ul>
+<p>The trigger itself is a regex, <code>TRIGGER_PATTERN</code>, built from the assistant's name (<a class="src" href="https://github.com/smolpaws/smolpaws/blob/68de7f653f888df3fe99f638354e5cfdde7df86f/src/config.ts#L28">config.ts:28</a>). If neither fact is true, the function simply returns and the message is ignored.</p>
+
+<h3>Narrow background — the "control scope"</h3>
+<p>Before this change, exactly one kind of room was allowed to skip the mention: the <strong>control scope</strong> — the "main" channel, smolpaws' private command room. The helper <code>shouldRespondWithoutTrigger</code> was a thin wrapper that answered a single question: <em>is this the main channel?</em></p>
+<pre><code><span class="com">// src/control-scope.ts — before</span>
+<span class="kw">export function</span> shouldRespondWithoutTrigger(scopeFolder: string): boolean {
+  <span class="kw">return</span> isControlScope(scopeFolder);
+}</code></pre>
+<div class="callout note">ⓘ A <strong>scope</strong> is smolpaws' word for an isolated room + its state. The <strong>control scope</strong> (folder <code>main</code>) is the privileged one. Every other group is a normal scope that, until now, always needed an @mention.</div>
+</section>
+
+<section id="in"><h2><span class="num">2</span>Intuition</h2>
+<p>The feature request is simple to state: <em>let some trusted rooms treat the cat as a full participant</em> — no @mention, just talk — exactly the way the main channel already works. The Hunting group (where Engel and the cat hunt bugs together) should feel like a conversation, not a command line.</p>
+<p>The insight is that "responds without a trigger" was never really about being the <em>control</em> scope. That was just the only reason we had so far. Being trigger-free is a <strong>property a room can have</strong>, and the control scope is one thing that happens to have it. So instead of asking only "are you main?", the gate should ask "are you main, <em>or</em> have you been marked trigger-free?"</p>
+
+<p>Here's the same message flowing through the gate, before and after, with real example data:</p>
+
+<h3>Before — a plain message in the Hunting group</h3>
+<div class="flow">
+  <div class="node"><div class="n-t">message</div><div class="n-d">"is the build green?"</div><span class="pill">group: hunting</span></div>
+  <div class="arrow">→</div>
+  <div class="node gate"><div class="n-t">gate</div><div class="n-d">main? <b>no</b><br>@smolpaws? <b>no</b></div></div>
+  <div class="arrow">→</div>
+  <div class="node no"><div class="n-t">outcome</div><div class="n-d">ignored 😾</div></div>
+</div>
+
+<h3>After — same message, group marked <code>triggerFree</code></h3>
+<div class="flow">
+  <div class="node"><div class="n-t">message</div><div class="n-d">"is the build green?"</div><span class="pill">group: hunting</span></div>
+  <div class="arrow">→</div>
+  <div class="node gate"><div class="n-t">gate</div><div class="n-d">main? no<br>triggerFree? <b>yes</b></div></div>
+  <div class="arrow">→</div>
+  <div class="node yes"><div class="n-t">outcome</div><div class="n-d">cat responds 🐾</div></div>
+</div>
+
+<div class="callout">★ The change doesn't add a new gate. It widens the <em>one condition</em> that already let the main channel skip the trigger, so any room can opt into the same behaviour.</div>
+</section>
+
+<section id="code"><h2><span class="num">3</span>The code</h2>
+<p>Four files change, but they tell one story: <em>add a flag, thread it into the one decision that reads it.</em> Follow the flag from where it's stored to where it's used.</p>
+
+<h3>a. The flag exists — <code>RegisteredGroup</code> gains a field</h3>
+<p>A group's config gets an optional boolean. Optional means every existing group keeps working untouched — absent is the same as <code>false</code>. <a class="src" href="https://github.com/smolpaws/smolpaws/blob/68de7f653f888df3fe99f638354e5cfdde7df86f/src/types.ts#L41">types.ts:41</a></p>
+<pre><code>export interface RegisteredGroup {
+  folder: string;
+  trigger: string;
+  added_at: string;
+<span class="add">+ triggerFree?: boolean;</span>
+  containerConfig?: ContainerConfig;
+}</code></pre>
+
+<h3>b. The decision widens — <code>shouldRespondWithoutTrigger</code></h3>
+<p>The helper now takes the flag and ORs it in. This is the heart of the change. <a class="src" href="https://github.com/smolpaws/smolpaws/blob/68de7f653f888df3fe99f638354e5cfdde7df86f/src/control-scope.ts#L8">control-scope.ts:8</a></p>
+<pre><code><span class="del">- export function shouldRespondWithoutTrigger(scopeFolder: string): boolean {</span>
+<span class="del">-   return isControlScope(scopeFolder);</span>
+<span class="add">+ export function shouldRespondWithoutTrigger(scopeFolder: string, triggerFree?: boolean): boolean {</span>
+<span class="add">+   return isControlScope(scopeFolder) || triggerFree === true;</span>
+}</code></pre>
+<div class="callout note">ⓘ Note the explicit <code>=== true</code>. Since <code>triggerFree</code> is <code>boolean | undefined</code>, this coerces "not set" cleanly to "not trigger-free" rather than leaking <code>undefined</code> into the boolean result.</div>
+
+<h3>c. The caller passes the flag — the gate in <code>processMessage</code></h3>
+<p>The one call site now forwards the group's flag. The <code>TRIGGER_PATTERN</code> half is unchanged. <a class="src" href="https://github.com/smolpaws/smolpaws/blob/68de7f653f888df3fe99f638354e5cfdde7df86f/src/index.ts#L225">index.ts:225</a></p>
+<pre><code>  <span class="com">// control scope AND trigger-free groups respond to ambient messages;</span>
+  <span class="com">// all others require an @mention.</span>
+<span class="del">- if (!shouldRespondWithoutTrigger(group.folder) &amp;&amp; !TRIGGER_PATTERN.test(content)) return;</span>
+<span class="add">+ if (!shouldRespondWithoutTrigger(group.folder, group.triggerFree) &amp;&amp; !TRIGGER_PATTERN.test(content)) return;</span></code></pre>
+
+<h3>d. Someone opts in — <code>registered_groups.json</code></h3>
+<p>Finally, the Hunting group's config sets <code>"triggerFree": true</code>. This is the only place the feature is actually switched on; every other group's behaviour is byte-for-byte identical to before.</p>
+
+<div class="callout">★ Read top to bottom, the change is a clean data-flow: <b>store</b> the flag (types + json) → <b>read</b> it in the decision (control-scope) → <b>thread</b> it from the caller (index). No new control flow, no new gate.</div>
+</section>
+
+<section id="quiz"><h2><span class="num">4</span>Quiz</h2>
+<p>Five questions to check you actually understood the change — not trivia. Click an answer to see whether it's right and why.</p>
+<div id="quiz"></div>
+<div class="score" id="score"></div>
+</section>
+</main>
+</div>
+
+<script>
+const QUIZ = [
+  {
+    q: "Before this change, which rooms could respond to a message that had no @smolpaws mention?",
+    opts: [
+      {t: "Any group, as long as the message wasn't empty", ok:false, why:"No — non-control groups required the trigger. That's exactly what this change relaxes."},
+      {t: "Only the control scope (the main channel)", ok:true, why:"Right. shouldRespondWithoutTrigger returned isControlScope(scopeFolder) and nothing else."},
+      {t: "Only groups with triggerFree set to true", ok:false, why:"triggerFree didn't exist yet — this change introduces it."},
+      {t: "No rooms — every message needed a mention", ok:false, why:"The main channel already skipped the mention before this change."}
+    ]
+  },
+  {
+    q: "Why is triggerFree declared as 'triggerFree?: boolean' (optional) rather than a required boolean?",
+    opts: [
+      {t: "So existing groups without the field keep working unchanged — absent behaves like false", ok:true, why:"Correct. Optional means every already-registered group needs no edit and defaults to the old behaviour."},
+      {t: "Because TypeScript forbids booleans in interfaces", ok:false, why:"It doesn't; booleans are fine in interfaces."},
+      {t: "So the value can be a string like 'yes' or 'no'", ok:false, why:"It's still a boolean; optional only makes it possibly undefined."},
+      {t: "To let the runtime change it at execution time", ok:false, why:"Optionality is a type-level concern, not a mutability one."}
+    ]
+  },
+  {
+    q: "In the new condition 'isControlScope(scopeFolder) || triggerFree === true', why the explicit '=== true'?",
+    opts: [
+      {t: "To compare object identity instead of value", ok:false, why:"For a boolean/undefined there's no object identity concern here."},
+      {t: "Because || only accepts booleans on its right side", ok:false, why:"|| happily takes any value; that's not the reason."},
+      {t: "To coerce undefined (flag not set) cleanly to false, so the result is always a real boolean", ok:true, why:"Right. triggerFree is boolean|undefined; '=== true' maps undefined to false and keeps the return type a clean boolean."},
+      {t: "It's required or the code won't compile", ok:false, why:"It would compile without it; the explicit check is about clean semantics, not compilation."}
+    ]
+  },
+  {
+    q: "A message with no @mention arrives in a group where triggerFree is true. What happens at the gate?",
+    opts: [
+      {t: "It's ignored, because there's no trigger in the text", ok:false, why:"No — trigger-free means the mention isn't required for that room."},
+      {t: "shouldRespondWithoutTrigger returns true, so the guard doesn't return early and the cat processes it", ok:true, why:"Correct. The left side of the AND is false (!true), so the 'return' is skipped and processing continues."},
+      {t: "It depends on whether TRIGGER_PATTERN matches", ok:false, why:"Once shouldRespondWithoutTrigger is true, the TRIGGER_PATTERN half is short-circuited — it isn't consulted."},
+      {t: "It errors because triggerFree isn't a real scope", ok:false, why:"triggerFree is just a flag on the group; it doesn't create or require a scope."}
+    ]
+  },
+  {
+    q: "Which statement best captures the *design* of this change?",
+    opts: [
+      {t: "It adds a second, separate gate specifically for trigger-free rooms", ok:false, why:"No new gate — it widens the single existing condition."},
+      {t: "It generalizes 'responds without a trigger' from a hardcoded property of the control scope into a flag any room can set", ok:true, why:"Exactly. Being trigger-free becomes a room property; the control scope is just one thing that has it."},
+      {t: "It removes the @mention requirement for all groups", ok:false, why:"Only groups that opt in via triggerFree change; every other group is unchanged."},
+      {t: "It replaces TRIGGER_PATTERN with the triggerFree flag", ok:false, why:"TRIGGER_PATTERN is untouched; it's still the fallback for non-trigger-free rooms."}
+    ]
+  }
+];
+
+let answered = 0, correct = 0;
+const root = document.getElementById('quiz');
+QUIZ.forEach((item, i) => {
+  const box = document.createElement('div');
+  box.className = 'q';
+  const qn = document.createElement('div');
+  qn.className = 'qn';
+  qn.textContent = (i+1) + '. ' + item.q;
+  box.appendChild(qn);
+  const fb = document.createElement('div');
+  fb.className = 'fb';
+  item.opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = o.t;
+    btn.addEventListener('click', () => {
+      if (box.dataset.done) return;
+      box.dataset.done = '1';
+      answered++;
+      if (o.ok) correct++;
+      Array.from(box.querySelectorAll('.opt')).forEach(b => {
+        b.classList.add('disabled');
+        b.disabled = true;
+      });
+      btn.classList.add(o.ok ? 'correct' : 'wrong');
+      if (!o.ok) {
+        const right = Array.from(box.querySelectorAll('.opt'))
+          .find((b, idx) => item.opts[idx].ok);
+        if (right) right.classList.add('correct');
+      }
+      fb.textContent = (o.ok ? '✅ ' : '❌ ') + o.why;
+      fb.className = 'fb show ' + (o.ok ? 'good' : 'bad');
+      updateScore();
+    });
+    box.appendChild(btn);
+  });
+  box.appendChild(fb);
+  root.appendChild(box);
+});
+
+function updateScore(){
+  const s = document.getElementById('score');
+  s.textContent = 'Score: ' + correct + ' / ' + QUIZ.length +
+    (answered === QUIZ.length ? (correct === QUIZ.length ? ' — perfect, you understood the change 🐾' : ' — reread the section behind any you missed.') : '');
+}
+</script>
+</body></html>
