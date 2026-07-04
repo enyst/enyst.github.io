@@ -1,0 +1,178 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDK swap surface — what smolpaws uses, and where it lives in the new package</title>
+<style>
+  :root{
+    --fg:#1a1a1a; --muted:#5a5a5a; --subtle:#8a8a82;
+    --bg:#fdfdfb; --card:#ffffff; --elevated:#f7f6f1;
+    --accent:#2b4eaa; --accent-soft:#e6ecfa;
+    --rule:#e2e2dc; --rule-strong:#bdbcb4;
+    --code-bg:#f3f1ec; --warn:#b25b0e; --ok:#2f7a3a; --crit:#a02020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.6;font-size:16px}
+  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:4px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none} nav.toc a:hover{color:var(--accent)}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:28px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:32px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted);max-width:780px}
+  h2{font-size:22px;margin:44px 0 10px} h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:16px;margin:22px 0 8px}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule)}
+  pre code{background:transparent;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg)}
+  td.sym code{background:transparent;padding:0;color:var(--accent);font-weight:600}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:14px 0;border-radius:0 4px 4px 0;font-size:14.5px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6} .callout.note{border-color:var(--muted);background:#f3f1ec}
+  .callout.ok{border-color:var(--ok);background:#eef6ef}
+  .fig{margin:18px 0 22px}
+  .fig svg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--rule);border-radius:6px}
+  .fig figcaption{font-size:13px;color:var(--muted);margin-top:6px;text-align:center}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid var(--rule-strong);color:var(--muted);white-space:nowrap}
+  .pill.ok{color:var(--ok);border-color:var(--ok);background:#eef6ef}
+  .pill.rename{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+  .pill.gap{color:var(--warn);border-color:var(--warn);background:#fbf1e6}
+  .pill.dev{color:var(--crit);border-color:var(--crit);background:#faeeee}
+  .mono{font-family:var(--mono)}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr}}
+</style></head><body>
+<div class="wrap">
+  <nav class="toc"><h2>Contents</h2><ol>
+    <li><a href="#big">The surface at a glance</a></li>
+    <li><a href="#clean">Clean map (13)</a></li>
+    <li><a href="#rename">Renamed / reshaped (4)</a></li>
+    <li><a href="#gap">Must port (3)</a></li>
+    <li><a href="#dev">Intentional deviations (3)</a></li>
+    <li><a href="#hotspot">The hotspot file</a></li>
+    <li><a href="#plan">Migration order</a></li>
+  </ol></nav>
+  <main>
+    <header class="title">
+      <div class="eyebrow">SDK migration map · smolpaws</div>
+      <h1>Swapping the SDK: what smolpaws uses &amp; where it lands</h1>
+      <p class="sub">smolpaws imports <strong>22 distinct symbols</strong> from <code>@smolpaws/agent-sdk@0.10</code> across ~21 files. To hook it up to the fresh transpile <code>@smolpaws/openhands-agent@0.1</code>, every one needs a home. This is the wire-by-wire map: <span class="pill ok">13 map cleanly</span> <span class="pill rename">4 renamed</span> <span class="pill gap">3 to port</span> <span class="pill dev">3 deviations to decide</span>.</p>
+    </header>
+
+    <section id="big"><h2><span class="num">1</span>The surface at a glance</h2>
+      <p>Every symbol smolpaws pulls from the SDK, bucketed by how much work the swap needs. Green is a drop-in; the rest is the actual migration work.</p>
+      <div class="fig"><svg viewBox="0 0 900 150" role="img" aria-label="22 symbols by migration difficulty">
+        <rect x="20"  y="30" width="360" height="90" rx="8" fill="#eef6ef" stroke="#2f7a3a"/>
+        <text x="30" y="52" font-size="13" font-weight="700" fill="#2f7a3a">13 · drop-in</text>
+        <text x="30" y="72" font-size="11" fill="#1a1a1a">AgentContext · Event · MessageEvent · TextContent</text>
+        <text x="30" y="88" font-size="11" fill="#1a1a1a">Message · ToolDefinition · Skill · loadSkillsFromDir</text>
+        <text x="30" y="104" font-size="11" fill="#1a1a1a">BrowserTool · FileStore · LocalConversation …</text>
+        <rect x="392" y="30" width="228" height="90" rx="8" fill="#e6ecfa" stroke="#2b4eaa"/>
+        <text x="402" y="52" font-size="13" font-weight="700" fill="#2b4eaa">4 · renamed</text>
+        <text x="402" y="72" font-size="11" fill="#1a1a1a">Workspace →</text>
+        <text x="402" y="88" font-size="11" fill="#1a1a1a">OpenHandsSettings →</text>
+        <text x="402" y="104" font-size="11" fill="#1a1a1a">AgentServerWorkspace …</text>
+        <rect x="632" y="30" width="120" height="90" rx="8" fill="#fbf1e6" stroke="#b25b0e"/>
+        <text x="642" y="52" font-size="13" font-weight="700" fill="#b25b0e">3 · port</text>
+        <text x="642" y="72" font-size="11" fill="#1a1a1a">event guards</text>
+        <text x="642" y="88" font-size="11" fill="#1a1a1a">reduceText-</text>
+        <text x="642" y="104" font-size="11" fill="#1a1a1a">Content</text>
+        <rect x="764" y="30" width="116" height="90" rx="8" fill="#faeeee" stroke="#a02020"/>
+        <text x="774" y="52" font-size="13" font-weight="700" fill="#a02020">3 · decide</text>
+        <text x="774" y="72" font-size="11" fill="#1a1a1a">security</text>
+        <text x="774" y="88" font-size="11" fill="#1a1a1a">confirm policy</text>
+        <text x="774" y="104" font-size="11" fill="#1a1a1a">SecretRegistry</text>
+      </svg><figcaption>The swap is mostly green. The real work is the 6 amber/red symbols — and 4 of those live in one file.</figcaption></div>
+    </section>
+
+    <section id="clean"><h2><span class="num">2</span>Clean map — drop-in <span class="pill ok">13</span></h2>
+      <p>Same name, same shape, exported from the new package barrel. Change the import path, done.</p>
+      <table>
+        <tr><th>Symbol</th><th>New package location</th><th>smolpaws files</th></tr>
+        <tr><td class="sym"><code>AgentContext</code></td><td class="mono">context/agent-context.ts:22</td><td>conversationRuntime</td></tr>
+        <tr><td class="sym"><code>BrowserTool</code></td><td class="mono">tools/index.ts:217</td><td>conversationRuntime</td></tr>
+        <tr><td class="sym"><code>Event</code> <span class="pill">type</span></td><td class="mono">event/index.ts:248</td><td>eventRouter, sockets, eventService</td></tr>
+        <tr><td class="sym"><code>FileStore</code></td><td class="mono">io/index.ts:8</td><td>conversationService</td></tr>
+        <tr><td class="sym"><code>LocalConversation</code></td><td class="mono">conversation/local-conversation.ts:14</td><td>conversationRuntime</td></tr>
+        <tr><td class="sym"><code>Skill</code></td><td class="mono">skills/index.ts:38</td><td>projectSkills</td></tr>
+        <tr><td class="sym"><code>TextContent</code></td><td class="mono">llm/index.ts:146</td><td>conversationRouter, eventRouter, sockets, turnState</td></tr>
+        <tr><td class="sym"><code>Message</code> <span class="pill">type</span></td><td class="mono">llm/index.ts:150</td><td>(type re-export)</td></tr>
+        <tr><td class="sym"><code>ToolDefinition</code></td><td class="mono">tool/index.ts:58</td><td>outboundMessaging, taskCommands</td></tr>
+        <tr><td class="sym"><code>MessageEvent</code> <span class="pill">type</span></td><td class="mono">event/index.ts:257</td><td>(type re-export)</td></tr>
+        <tr><td class="sym"><code>loadSkillsFromDir</code></td><td class="mono">skills/index.ts:117</td><td>projectSkills</td></tr>
+      </table>
+      <p class="mono" style="font-size:12px;color:var(--muted)">(13 counts the type/value pairs — <code>Event</code>, <code>TextContent</code>, <code>MessageEvent</code>, <code>Message</code> appear as both.)</p>
+    </section>
+
+    <section id="rename"><h2><span class="num">3</span>Renamed / reshaped <span class="pill rename">4</span></h2>
+      <p>The concept exists but under a different name or shape. Each needs a small adapter or a rename at the call site.</p>
+      <table>
+        <tr><th>Old (0.10)</th><th>New (0.1)</th><th>Note</th><th>smolpaws files</th></tr>
+        <tr><td class="sym"><code>Workspace</code></td><td class="mono">BaseWorkspace / LocalWorkspace <a class="src" href="https://github.com/enyst/openhands-agent/blob/main/src/workspace/index.ts#L32">workspace:32,48</a></td><td>base is now an interface; pick <code>LocalWorkspace</code> or <code>RemoteWorkspace</code></td><td>conversationRuntime, shared-runner</td></tr>
+        <tr><td class="sym"><code>AgentServerWorkspace</code></td><td class="mono">RemoteWorkspace <a class="src" href="https://github.com/enyst/openhands-agent/blob/main/src/workspace/index.ts#L125">workspace:125</a></td><td>the agent-server-backed workspace, renamed</td><td>(type)</td></tr>
+        <tr><td class="sym"><code>isAgentServerWorkspace</code></td><td class="mono">— (use <code>instanceof RemoteWorkspace</code>)</td><td>guard not exported; trivially replaced</td><td>shared-runner</td></tr>
+        <tr><td class="sym"><code>OpenHandsSettings</code></td><td class="mono">OpenHandsAgentSettings <a class="src" href="https://github.com/enyst/openhands-agent/blob/main/src/settings/index.ts#L64">settings:64</a></td><td>+ <code>openHandsAgentSettingsSchema</code> (zod). Confirm field parity.</td><td>(type)</td></tr>
+      </table>
+    </section>
+
+    <section id="gap"><h2><span class="num">4</span>Must port <span class="pill gap">3</span></h2>
+      <p>Genuinely absent from the new package. Small, pure helpers — port them, or add them upstream to the transpile.</p>
+      <table>
+        <tr><th>Symbol</th><th>What it does</th><th>smolpaws files</th></tr>
+        <tr><td class="sym"><code>isMessageEvent</code></td><td>event type guard — the new pkg has <code>isAcpPatchEdit</code> but not this family</td><td>activityRouter, conversationState</td></tr>
+        <tr><td class="sym"><code>isConversationStateUpdateEvent</code></td><td>event type guard</td><td>conversationState</td></tr>
+        <tr><td class="sym"><code>reduceTextContent</code></td><td>collapses <code>TextContent[]</code> → string; used all over the read path</td><td>activityRouter, conversationState, messageText</td></tr>
+      </table>
+      <div class="callout note">All three are tiny, dependency-free functions. Cheapest path: port them into the new package's <code>event/</code> and <code>llm/</code> modules and export them — they belong there, and it keeps smolpaws import-clean. (Good first upstream PRs to the transpile.)</div>
+    </section>
+
+    <section id="dev"><h2><span class="num">5</span>Intentional deviations — decide <span class="pill dev">3</span></h2>
+      <p>The transpile's README lists these as deliberately dropped: "no security analyzers, risk scoring, confirmation gates … Python secret-storage split." smolpaws imports all three. So this isn't "port it" — it's "do we still want it?"</p>
+      <table>
+        <tr><th>Symbol</th><th>Was</th><th>Decision</th><th>smolpaws files</th></tr>
+        <tr><td class="sym"><code>LLMSecurityAnalyzer</code></td><td>guardrail LLM / risk scoring</td><td>Dropped by design. Do we rely on it? If yes → keep as a smolpaws-side wrapper; if no → delete the wiring.</td><td>conversationRuntime</td></tr>
+        <tr><td class="sym"><code>createConfirmationPolicyFromSettings</code></td><td>confirmation gate before risky actions</td><td>Dropped by design. This is the "don't do irreversible things unsupervised" lever — decide consciously (see caution).</td><td>conversationRuntime</td></tr>
+        <tr><td class="sym"><code>SecretRegistry</code></td><td>Python secret-split registry</td><td>Replaced by the new <code>SecretStore</code> / keyring model (see the <a class="src" href="secrets-keyring-vs-cipher.html">secrets page</a>). Re-wire, don't port.</td><td>conversationRuntime</td></tr>
+        <tr><td class="sym"><code>clearRawLlmFieldsWhenProfileSelected</code></td><td>settings hygiene helper</td><td>Not in new pkg. Small — port it, or fold into the profile-selection path.</td><td>conversationRuntime</td></tr>
+      </table>
+      <div class="callout warn"><strong>Caution — the confirmation/security pair.</strong> These are exactly the kind of thing you don't miss until an agent does something irreversible unsupervised. Dropping them is defensible for a trusted local cat, but it should be a <em>chosen</em> tradeoff, not a silent consequence of the swap. Confirm smolpaws doesn't lean on them before deleting the wiring.</div>
+    </section>
+
+    <section id="hotspot"><h2><span class="num">6</span>The hotspot: <code>conversationRuntime.ts</code></h2>
+      <p>Eight of the 22 symbols — and <em>every one</em> of the hard ones (security, confirmation, SecretRegistry, Workspace, clearRawLlm) — land in a single file. The other ~20 files each touch one or two easy symbols.</p>
+      <div class="fig"><svg viewBox="0 0 900 130" role="img" aria-label="import concentration">
+        <rect x="20" y="30" width="300" height="70" rx="8" fill="#faeeee" stroke="#a02020"/>
+        <text x="30" y="54" font-size="13" font-weight="700" fill="#a02020">conversationRuntime.ts</text>
+        <text x="30" y="74" font-size="11" fill="#1a1a1a">8 symbols · all 3 deviations + 2 renames</text>
+        <text x="30" y="90" font-size="11" fill="#5a5a5a">→ the file to migrate first &amp; carefully</text>
+        <rect x="345" y="30" width="200" height="70" rx="8" fill="#fbf1e6" stroke="#b25b0e"/>
+        <text x="355" y="54" font-size="13" font-weight="700" fill="#b25b0e">read-path trio</text>
+        <text x="355" y="74" font-size="11" fill="#1a1a1a">conversationState · activityRouter</text>
+        <text x="355" y="90" font-size="11" fill="#5a5a5a">event guards + reduceTextContent</text>
+        <rect x="570" y="30" width="310" height="70" rx="8" fill="#eef6ef" stroke="#2f7a3a"/>
+        <text x="580" y="54" font-size="13" font-weight="700" fill="#2f7a3a">the long tail (~17 files)</text>
+        <text x="580" y="74" font-size="11" fill="#1a1a1a">TextContent, Event, ToolDefinition, Skill…</text>
+        <text x="580" y="90" font-size="11" fill="#5a5a5a">→ path-only import changes</text>
+      </svg><figcaption>Migration difficulty is not spread evenly — it's concentrated. Fix one file well and most of the risk is gone.</figcaption></div>
+    </section>
+
+    <section id="plan"><h2><span class="num">7</span>Suggested migration order</h2>
+      <ol>
+        <li><strong>Port the 3 pure helpers</strong> (<code>isMessageEvent</code>, <code>isConversationStateUpdateEvent</code>, <code>reduceTextContent</code>) into the new package &amp; export them. Unblocks the read-path trio with zero smolpaws logic change.</li>
+        <li><strong>Rename the 4 reshaped ones</strong> at call sites (<code>Workspace</code>→<code>LocalWorkspace</code>/<code>RemoteWorkspace</code>, <code>OpenHandsSettings</code>→<code>OpenHandsAgentSettings</code>, swap the workspace guard for <code>instanceof</code>). Confirm settings field parity.</li>
+        <li><strong>Decide the 3 deviations</strong> in <code>conversationRuntime.ts</code>: re-wire <code>SecretRegistry</code>→<code>SecretStore</code>; consciously keep-or-drop security + confirmation; port <code>clearRawLlmFieldsWhenProfileSelected</code>.</li>
+        <li><strong>Flip the ~13 clean imports</strong> — path change only, mechanical.</li>
+        <li><strong>Shadow-run</strong> before cutover: pin both, run one real day (a heartbeat, a WhatsApp media message, a GitHub webhook, one long tool-using session) and diff behavior against 0.10.</li>
+      </ol>
+      <div class="callout ok"><strong>Bottom line:</strong> the swap is real but bounded. 13 are free, 4 are renames, 3 are tiny ports, and 3 are decisions — and the decisions all live in one file. This is a hookup, not a rewrite.</div>
+      <div class="callout note">Grounded to: smolpaws <code>src/</code> + <code>apps/</code> imports of <code>@smolpaws/agent-sdk</code> (22 symbols, ~21 files) · new package <code>@smolpaws/openhands-agent@0.1.0</code> <code>src/</code> exports (170-test transpile). Companion: <a class="src" href="secrets-keyring-vs-cipher.html">secrets: keyring vs cipher</a> · <a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/3988">agent-sdk#3988</a>.</div>
+    </section>
+  </main>
+</div></body></html>
