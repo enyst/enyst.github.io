@@ -1,0 +1,156 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Canvas: local vs cloud backends — Engel Nyst</title>
+<meta name="description" content="How Agent Canvas routes conversation calls to a local agent-server vs the cloud API — the getActiveBackend().kind fork, ConversationClient vs callCloudProxy, and why pause differs from interrupt.">
+<meta property="og:title" content="Agent Canvas: local vs cloud backends">
+<meta property="og:description" content="The kind==='cloud' fork, ConversationClient vs callCloudProxy, sandbox proxying, and pause-vs-interrupt — grounded to code.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://enyst.github.io/arch/agent-canvas-local-vs-cloud-backends.html">
+<meta name="twitter:card" content="summary">
+<style>
+  :root{--fg:#1a1a1a;--muted:#5a5a5a;--subtle:#8a8a82;--bg:#fdfdfb;--card:#ffffff;--elevated:#f7f6f1;--accent:#2b4eaa;--accent-soft:#e6ecfa;--rule:#e2e2dc;--rule-strong:#bdbcb4;--code-bg:#f3f1ec;--warn:#b25b0e;--ok:#2f7a3a;--crit:#a02020;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;}
+  *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.65;font-size:16px}
+  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:4px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none}nav.toc a:hover{color:var(--accent)}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:20px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:32px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted);max-width:780px}
+  h2{font-size:22px;margin:44px 0 10px}h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:14px;margin:20px 0 6px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  p{max-width:770px}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:12.5px;line-height:1.5;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule);white-space:pre}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0;max-width:770px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg)}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:16px 0;border-radius:0 4px 4px 0;font-size:14.5px;max-width:770px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6}.callout.note{border-color:var(--muted);background:#f3f1ec}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  .fig{margin:18px 0 22px}
+  .fig svg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--rule);border-radius:6px}
+  .fig figcaption{font-size:13px;color:var(--muted);margin-top:6px;text-align:center}
+  svg .lbl{font:600 13px var(--sans);fill:var(--fg)}svg .lblw{font:600 13px var(--sans);fill:#fff}
+  svg .sub{font:11px var(--mono);fill:var(--muted)}svg .subw{font:11px var(--mono);fill:#cbd5e1}
+  svg .eL{stroke:var(--ok);stroke-width:1.6;fill:none}svg .eC{stroke:var(--accent);stroke-width:1.6;fill:none}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr;gap:16px}nav.toc{position:static}}
+</style></head>
+<body><div class="wrap">
+<nav class="toc"><h2>Contents</h2><ol>
+  <li><a href="#s1">The fork</a></li>
+  <li><a href="#s2">Two paths</a></li>
+  <li><a href="#s3">Cloud: direct vs proxied</a></li>
+  <li><a href="#s4">Pause vs interrupt</a></li>
+  <li><a href="#s5">Where it hurts</a></li>
+</ol></nav>
+<main>
+<header class="title">
+  <div class="eyebrow">show-me · agent-canvas · @ 1499376c</div>
+  <h1>Local vs cloud backends: how a call is routed</h1>
+  <p class="sub">Agent Canvas talks to two kinds of backend. Almost every conversation call forks on one boolean — <code>getActiveBackend().backend.kind === "cloud"</code> — into a local <code>ConversationClient</code> or a <code>callCloudProxy</code>. This traces the split end to end, and explains why pause behaves differently on each.</p>
+</header>
+
+<div class="callout">★ One flag, forked everywhere: <code>kind === "cloud"</code> is branched at ~15 sites in the conversation service alone. Local → <code>new ConversationClient(...)</code> straight to the agent-server. Cloud → <code>callCloudProxy(...)</code>, which itself splits into a <em>direct</em> app-host call and a <em>proxied</em> sandbox call. The pause button's local-vs-cloud difference is one instance of this pattern.</div>
+
+<section id="s1"><h2><span class="num">1</span>The fork: one backend kind</h2>
+<p>A backend is just a small record — an id, a host, an api key, and a <code>kind</code>. <a class="src" href="https://github.com/OpenHands/agent-canvas/blob/1499376c7c670c92bae485d6e01626ee7d1ce889/src/api/backend-registry/types.ts#L1">backend-registry/types.ts:1</a></p>
+<pre><code><span class="kw">export type</span> BackendKind = <span class="str">"local"</span> | <span class="str">"cloud"</span>;
+<span class="kw">export interface</span> Backend { id; name; host; apiKey; kind: BackendKind; }</code></pre>
+<p><code>getActiveBackend()</code> returns the currently selected one, and the conversation service reads <code>.backend.kind</code> before nearly every call to decide how to reach it.</p>
+</section>
+
+<section id="s2"><h2><span class="num">2</span>Two paths out of the app</h2>
+<div class="fig">
+<svg viewBox="0 0 960 250" role="img" aria-labelledby="ft fd">
+ <title id="ft">local vs cloud request routing</title>
+ <desc id="fd">A conversation call branches on kind: local goes direct to the agent-server via ConversationClient; cloud goes through callCloudProxy, which either calls the cloud app host directly or proxies sandbox hosts through /api/cloud-proxy.</desc>
+ <rect x="30" y="100" width="150" height="52" rx="6" fill="var(--elevated)" stroke="var(--rule-strong)"/>
+ <text x="105" y="122" text-anchor="middle" class="lbl">Canvas UI</text>
+ <text x="105" y="138" text-anchor="middle" class="sub">conversation-service</text>
+ <rect x="250" y="100" width="120" height="52" rx="6" fill="var(--accent-soft)" stroke="var(--accent)"/>
+ <text x="310" y="122" text-anchor="middle" class="lbl">kind?</text>
+ <text x="310" y="138" text-anchor="middle" class="sub">getActiveBackend</text>
+ <line x1="180" y1="126" x2="250" y2="126" class="eC" marker-end="url(#a)"/>
+ <!-- local -->
+ <line x1="370" y1="115" x2="470" y2="60" class="eL" marker-end="url(#al)"/>
+ <text x="415" y="80" class="sub" style="fill:var(--ok)">local</text>
+ <rect x="470" y="34" width="200" height="52" rx="6" fill="#fff" stroke="var(--ok)"/>
+ <text x="570" y="56" text-anchor="middle" class="lbl">ConversationClient</text>
+ <text x="570" y="72" text-anchor="middle" class="sub">→ local agent-server host</text>
+ <!-- cloud -->
+ <line x1="370" y1="138" x2="470" y2="175" class="eC" marker-end="url(#a)"/>
+ <text x="415" y="176" class="sub" style="fill:var(--accent)">cloud</text>
+ <rect x="470" y="150" width="200" height="80" rx="6" fill="#fff" stroke="var(--accent)"/>
+ <text x="570" y="170" text-anchor="middle" class="lbl">callCloudProxy</text>
+ <text x="570" y="188" text-anchor="middle" class="sub">app host → direct</text>
+ <text x="570" y="204" text-anchor="middle" class="sub">sandbox host → /api/cloud-proxy</text>
+ <rect x="720" y="34" width="200" height="52" rx="6" fill="#0f172a"/>
+ <text x="820" y="56" text-anchor="middle" class="lblw">local agent-server</text>
+ <text x="820" y="72" text-anchor="middle" class="subw">127.0.0.1 / configured host</text>
+ <line x1="670" y1="60" x2="720" y2="60" class="eL" marker-end="url(#al)"/>
+ <rect x="720" y="150" width="200" height="80" rx="6" fill="#0f172a"/>
+ <text x="820" y="178" text-anchor="middle" class="lblw">cloud API + sandboxes</text>
+ <text x="820" y="196" text-anchor="middle" class="subw">app origin + per-conv runtime</text>
+ <line x1="670" y1="190" x2="720" y2="190" class="eC" marker-end="url(#a)"/>
+ <defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/></marker>
+  <marker id="al" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="var(--ok)"/></marker>
+ </defs>
+</svg>
+<figcaption>Green = local path, blue = cloud path. Both end at an agent-server; the difference is how you reach it.</figcaption>
+</div>
+<p>The shape repeats in method after method. <a class="src" href="https://github.com/OpenHands/agent-canvas/blob/1499376c7c670c92bae485d6e01626ee7d1ce889/src/api/conversation-service/agent-server-conversation-service.api.ts#L299">agent-server-conversation-service.api.ts</a>:</p>
+<pre><code><span class="kw">if</span> (getActiveBackend().backend.kind === <span class="str">"cloud"</span>) {
+  <span class="kw">await</span> callCloudProxy({ backend, method, path, authMode, sessionApiKey });
+  <span class="kw">return</span>;
+}
+<span class="kw">await new</span> ConversationClient(getAgentServerClientOptions()).sendEvent(...);</code></pre>
+</section>
+
+<section id="s3"><h2><span class="num">3</span>Cloud isn't one path — it's two</h2>
+<p><code>callCloudProxy</code> makes a second decision based on <code>hostOverride</code>. <a class="src" href="https://github.com/OpenHands/agent-canvas/blob/1499376c7c670c92bae485d6e01626ee7d1ce889/src/api/cloud/proxy.ts#L66">cloud/proxy.ts:66</a></p>
+<table>
+<tr><th>Call</th><th>Target</th><th>How</th></tr>
+<tr><td>App-host (metadata, search, org)</td><td><code>backend.host</code> (cloud app origin)</td><td>Direct <code>axios</code> call with bearer auth</td></tr>
+<tr><td>Runtime / sandbox (events, files, runtime)</td><td>per-conversation sandbox host via <code>hostOverride</code></td><td>Through <code>/api/cloud-proxy</code> with <code>X-Session-API-Key</code></td></tr>
+</table>
+<p><span class="callout note" style="display:inline-block">ⓘ Why the sandbox detour: per-conversation runtime hosts aren't the configured cloud origin, so they can't be called directly from the browser — they're tunneled through the bundled proxy, which attaches session auth server-side and enforces a host allowlist.</span></p>
+<p>Local, by contrast, has no proxy step. <code>getAgentServerClientOptions</code> resolves one host (the effective local backend or an override) and the client hits it directly. <a class="src" href="https://github.com/OpenHands/agent-canvas/blob/1499376c7c670c92bae485d6e01626ee7d1ce889/src/api/agent-server-client-options.ts#L52">agent-server-client-options.ts:52</a></p>
+</section>
+
+<section id="s4"><h2><span class="num">4</span>The pause button: pause vs interrupt</h2>
+<p>This is the thread's question, and it's a clean example of the fork having <em>semantic</em> consequences, not just transport ones. <a class="src" href="https://github.com/OpenHands/agent-canvas/blob/1499376c7c670c92bae485d6e01626ee7d1ce889/src/hooks/mutation/conversation-mutation-utils.ts#L41">conversation-mutation-utils.ts:41</a></p>
+<pre><code><span class="kw">export const</span> pauseConversation = <span class="kw">async</span> (conversationId) => {
+  <span class="kw">const</span> { conversationUrl, sessionApiKey, sandboxId } = <span class="kw">await</span> fetchConversationData(conversationId);
+
+  <span class="kw">if</span> (getActiveBackend().backend.kind === <span class="str">"cloud"</span>) {
+    <span class="kw">await</span> pauseCloudSandbox(sandboxId);   <span class="com">// POST /api/v1/sandboxes/{id}/pause</span>
+    <span class="kw">return</span> { success: <span class="kw">true</span> };
+  }
+  <span class="com">// local: interrupt so the in-flight LLM call is cancelled immediately,</span>
+  <span class="com">// instead of waiting for the current call to finish</span>
+  <span class="kw">return new</span> ConversationClient(...).interruptConversation(conversationId);
+};</code></pre>
+<table>
+<tr><th></th><th>Cloud</th><th>Local</th></tr>
+<tr><td>Endpoint</td><td><code>/api/v1/sandboxes/{id}/pause</code></td><td>conversation <code>interrupt</code></td></tr>
+<tr><td>Effect</td><td>pauses the sandbox; current LLM call finishes first</td><td>cancels in-flight LLM request immediately</td></tr>
+<tr><td>Needs</td><td>a <code>sandbox_id</code> (throws if missing)</td><td>conversation url + session key</td></tr>
+</table>
+<div class="callout warn">⚠ So the thread's observation is real and intentional: cloud "pause" is graceful (sandbox-level, waits), local "pause" is really an <em>interrupt</em> (immediate). The button is one UI affordance mapped onto two different backend verbs.</div>
+</section>
+
+<section id="s5"><h2><span class="num">5</span>Where this hurts (and the direction floated)</h2>
+<p>The cost isn't any single branch — it's that the <code>kind === "cloud"</code> decision is re-made in ~15 conversation methods plus file upload, secrets, bash, plugins. Local flows go through <code>typescript-client</code>'s <code>ConversationClient</code>; cloud flows go through bespoke proxy code. Two transports, two auth models (bearer vs session-api-key), forked per method.</p>
+<div class="callout">★ The direction raised in the thread — "move cloud support into <code>typescript-client</code>" — is exactly the deepening this suggests: put the local-vs-cloud transport behind one client interface so callers stop re-deciding <code>kind</code> at every site. That's a seam decision: one adapter per backend, chosen once, instead of a boolean threaded through every method.</div>
+<p style="color:var(--subtle);font-size:12px;margin-top:24px">Made by smolpaws · /show-me · grounded to OpenHands/agent-canvas @ 1499376c · 🐾</p>
+</section>
+</main>
+</div></body></html>
