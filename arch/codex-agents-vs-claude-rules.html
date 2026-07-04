@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Codex AGENTS.md vs Claude Code rules</title>
+<style>
+  :root{
+    --fg:#1f2328; --muted:#59636e; --subtle:#8c959f;
+    --bg:#fdfcf8; --card:#ffffff; --elevated:#f6f3ea;
+    --accent:#3157b7; --accent-soft:#e9eefc; --codex:#2f7a3a; --codex-soft:#e8f5ea;
+    --claude:#b25b0e; --claude-soft:#fbf0e5; --warn:#a02020; --warn-soft:#faeaea;
+    --rule:#dedbd2; --rule-strong:#b9b4a8; --code-bg:#f1eee6;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.58;font-size:16px}
+  .wrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:46px;max-width:1200px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;margin:0;padding:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:7px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none} nav.toc a:hover{color:var(--accent)}
+  main{max-width:860px}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:28px}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{font-size:35px;line-height:1.1;margin:6px 0 7px;letter-spacing:-.02em}
+  .sub{color:var(--muted);max-width:790px;font-size:17px}
+  h2{font-size:23px;margin:44px 0 12px} h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:17px;margin:24px 0 8px}
+  p{margin:10px 0}
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 15px;margin:16px 0;border-radius:0 6px 6px 0;font-size:15px}
+  .callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+  .callout.note{border-color:var(--muted);background:var(--elevated)}
+  .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:15px}
+  .card h3{margin:0 0 8px;font-size:15px}.card p{margin:0;color:var(--muted);font-size:14px}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:14px 0;background:var(--card);border:1px solid var(--rule)}
+  th,td{text-align:left;padding:10px 11px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:700;background:var(--code-bg)} tr:last-child td{border-bottom:0}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  .pill{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px;font-weight:700;margin-right:4px}
+  .pill.codex{background:var(--codex-soft);color:var(--codex)} .pill.claude{background:var(--claude-soft);color:var(--claude)}
+  .fig{margin:20px 0 24px}.fig svg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--rule);border-radius:8px}.fig figcaption{font-size:13px;color:var(--muted);text-align:center;margin-top:7px}
+  details{border:1px solid var(--rule);border-radius:8px;background:var(--card);margin:12px 0} summary{cursor:pointer;padding:9px 12px;color:var(--muted);font-size:13px} details div{padding:0 12px 12px}
+  ul{padding-left:21px}
+  @media (max-width:820px){.wrap{display:block;padding:24px 18px 72px}nav.toc{position:static;margin-bottom:24px}.cards{grid-template-columns:1fr}h1{font-size:29px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#answer">Answer</a></li>
+    <li><a href="#mechanism">Mechanism</a></li>
+    <li><a href="#compare">Comparison</a></li>
+    <li><a href="#gotchas">Gotchas</a></li>
+    <li><a href="#sources">Source map</a></li>
+  </ol>
+</nav>
+<main>
+<header class="title">
+  <div class="eyebrow">show-me · issue 3984</div>
+  <h1>Codex AGENTS.md is directory-scoped context, not Claude-style file-touch rules</h1>
+  <p class="sub">Codex CLI and Claude Code both try to make repository instructions harder to miss. They choose different trigger seams: Codex starts from the active working directory; Claude rules, as described in the issue, start from the path of each touched file.</p>
+</header>
+
+<section id="answer">
+  <h2><span class="num">1.</span>One-sentence answer</h2>
+  <div class="callout">
+    <strong>Codex CLI deterministically loads the <code>AGENTS.md</code> chain from project root to the active CWD, then relies on the model prompt to check deeper or outside-CWD <code>AGENTS.md</code> files; Claude Code rules are glob-based and fire on matching file operations.</strong>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <h3><span class="pill codex">Codex</span> Directory boundary</h3>
+      <p><code>AGENTS.md</code> can appear in any directory. The scoped unit is that directory's subtree, with deeper files taking precedence by instruction.</p>
+    </div>
+    <div class="card">
+      <h3><span class="pill claude">Claude</span> File path boundary</h3>
+      <p>The issue describes <code>.claude/rules/*.md</code> files whose <code>paths:</code> globs are injected when matching files are read or edited.</p>
+    </div>
+  </div>
+</section>
+
+<section id="mechanism">
+  <h2><span class="num">2.</span>The two trigger seams</h2>
+  <figure class="fig">
+  <svg viewBox="0 0 820 380" role="img" aria-labelledby="fig-title fig-desc">
+    <title id="fig-title">Codex AGENTS.md versus Claude rules trigger diagram</title>
+    <desc id="fig-desc">Codex scans from project root to current working directory. Claude rules match file paths during tool operations.</desc>
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+      <marker id="arrC" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--codex)"/></marker>
+      <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--claude)"/></marker>
+      <style>
+        .box{fill:var(--card);stroke:var(--rule-strong);stroke-width:1.2}.cod{fill:var(--codex-soft);stroke:var(--codex)}.cla{fill:var(--claude-soft);stroke:var(--claude)}
+        .title{font:700 14px var(--sans);fill:var(--fg)}.detail{font:12px var(--sans);fill:var(--muted)}.path{font:11px var(--mono);fill:var(--subtle)}
+        .edge{stroke:var(--muted);stroke-width:1.4;fill:none;marker-end:url(#arr)}.edgeC{stroke:var(--codex);stroke-width:1.8;fill:none;marker-end:url(#arrC)}.edgeR{stroke:var(--claude);stroke-width:1.8;fill:none;marker-end:url(#arrR)}.dash{stroke-dasharray:5 4}
+      </style>
+    </defs>
+    <text x="40" y="34" class="title">Codex: active directory → instruction chain</text>
+    <rect x="40" y="56" width="140" height="58" rx="7" class="box"/><text x="110" y="81" text-anchor="middle" class="title">repo root</text><text x="110" y="99" text-anchor="middle" class="path">AGENTS.md</text>
+    <path class="edgeC" d="M180,85 H245"/>
+    <rect x="245" y="56" width="150" height="58" rx="7" class="box"/><text x="320" y="81" text-anchor="middle" class="title">subdir</text><text x="320" y="99" text-anchor="middle" class="path">AGENTS.md</text>
+    <path class="edgeC" d="M395,85 H460"/>
+    <rect x="460" y="56" width="150" height="58" rx="7" class="cod"/><text x="535" y="81" text-anchor="middle" class="title">active CWD</text><text x="535" y="99" text-anchor="middle" class="path">turn env cwd</text>
+    <path class="edgeC" d="M535,114 V158"/>
+    <rect x="388" y="158" width="294" height="68" rx="8" class="cod"/><text x="535" y="184" text-anchor="middle" class="title">model-visible AGENTS.md instructions</text><text x="535" y="203" text-anchor="middle" class="detail">root → CWD, byte-limited, source-tracked</text>
+    <path class="edge dash" d="M610,85 H700 V158"/>
+    <text x="704" y="100" class="detail">deeper paths:</text><text x="704" y="116" class="detail">model is told</text><text x="704" y="132" class="detail">to check</text>
+
+    <text x="40" y="272" class="title">Claude rules in the issue: touched file → glob rules</text>
+    <rect x="40" y="294" width="150" height="58" rx="7" class="box"/><text x="115" y="319" text-anchor="middle" class="title">Read/Edit tool</text><text x="115" y="337" text-anchor="middle" class="path">src/api/foo.ts</text>
+    <path class="edgeR" d="M190,323 H270"/>
+    <rect x="270" y="294" width="180" height="58" rx="7" class="cla"/><text x="360" y="319" text-anchor="middle" class="title">paths: glob match</text><text x="360" y="337" text-anchor="middle" class="path">src/api/**/*.ts</text>
+    <path class="edgeR" d="M450,323 H530"/>
+    <rect x="530" y="294" width="230" height="58" rx="7" class="cla"/><text x="645" y="319" text-anchor="middle" class="title">matching rule injected</text><text x="645" y="337" text-anchor="middle" class="detail">operation-scoped context</text>
+  </svg>
+  <figcaption>Fig 1 · Codex binds instructions to the active directory chain; Claude-style rules bind them to file-operation path matches.</figcaption>
+  </figure>
+
+  <h3>Codex algorithm in plain English</h3>
+  <ol>
+    <li>For each selected turn environment, Codex asks the environment filesystem for its CWD and calls <code>read_agents_md</code>. <a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/src/agents_md.rs#L45-L74">agents_md.rs:45-74</a></li>
+    <li>It finds the project root by walking upward until a configured marker is found; default markers include <code>.git</code>. It does not walk past that root. <a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/src/agents_md.rs#L1-L16">agents_md.rs:1-16</a> <a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/src/agents_md.rs#L147-L199">147-199</a></li>
+    <li>It searches directories from root to CWD and picks one candidate instruction file per directory. <code>AGENTS.override.md</code> wins over <code>AGENTS.md</code>, then configured fallbacks follow. <a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/src/agents_md.rs#L201-L235">agents_md.rs:201-235</a></li>
+    <li>It reads non-empty files into ordered, model-visible instruction entries, truncating to <code>project_doc_max_bytes</code>. <a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/src/agents_md.rs#L83-L145">agents_md.rs:83-145</a></li>
+    <li>The base prompt also tells the model that <code>AGENTS.md</code> files can appear anywhere, apply to their containing subtree, and must be checked when working below or outside the CWD. <a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/protocol/src/prompts/base_instructions/default.md#L17-L27">default.md:17-27</a></li>
+  </ol>
+</section>
+
+<section id="compare">
+  <h2><span class="num">3.</span>Comparison table</h2>
+  <table>
+    <thead><tr><th>Dimension</th><th>Codex CLI <code>AGENTS.md</code></th><th>Claude Code rules, as described in issue #3984</th></tr></thead>
+    <tbody>
+      <tr><td>Authoring shape</td><td>Plain <code>AGENTS.md</code> in any directory; current Codex also has <code>AGENTS.override.md</code> and configured fallback filenames.</td><td>Markdown files under <code>.claude/rules/</code> or <code>~/.claude/rules/</code>, with optional YAML <code>paths:</code>.</td></tr>
+      <tr><td>Scope model</td><td>Directory subtree rooted where the file lives; deeper <code>AGENTS.md</code> wins on conflicts by prompt contract.</td><td>Glob match against touched file paths; rules without <code>paths</code> act like always-on context.</td></tr>
+      <tr><td>Automatic trigger</td><td>Deterministic for the active root→CWD chain that Codex discovers and injects.</td><td>Deterministic for matching Read/Edit file operations, per the issue body.</td></tr>
+      <tr><td>Model-dependent part</td><td>When working in a subdirectory below CWD or outside CWD, the prompt tells the model to check for applicable <code>AGENTS.md</code>; that is instruction-following, not a file-operation hook.</td><td>No model decision for path-scoped rules once the tool path matches the glob.</td></tr>
+      <tr><td>Granularity</td><td>Good for nested directory ownership boundaries; less direct for “all tests everywhere” unless files share directories or the model checks broader docs.</td><td>Good for cross-cutting patterns like <code>**/*.test.ts</code> that span many directories.</td></tr>
+      <tr><td>Token behavior</td><td>Only the root→CWD chain is injected automatically, and Codex enforces a byte budget.</td><td>Path-scoped rules stay out of baseline context until a matching file operation; overly broad globs become effectively always-on in file-heavy work.</td></tr>
+      <tr><td>Source visibility</td><td>Codex tracks and exposes instruction source paths through <code>instruction_sources</code>.</td><td>The issue does not describe a comparable source reporting surface.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="gotchas">
+  <h2><span class="num">4.</span>Gotchas that matter for SDK design</h2>
+  <div class="callout warn">
+    <strong>Codex is not a drop-in precedent for Claude rules.</strong> It proves directory-scoped instruction discovery is useful, but it does not implement a glob-based “inject when this file is read/edited/created” trigger.
+  </div>
+  <ul>
+    <li><strong>Dynamic CWD refresh is nuanced.</strong> A Codex suite test has a TODO to diff <code>user_instructions</code> when <code>AGENTS.md</code> changes after CWD changes; the current snapshot asserts no refreshed AGENTS content in that case. <a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/tests/suite/model_visible_layout.rs#L203-L206">model_visible_layout.rs:203-206</a> <a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/tests/suite/model_visible_layout.rs#L310-L325">310-325</a></li>
+    <li><strong>Remote/deferred environments still get deterministic project-doc loading once available.</strong> The remote environment test observes AGENTS content in later requests and records the loaded source. <a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/tests/suite/remote_env.rs#L722-L728">remote_env.rs:722-728</a></li>
+    <li><strong>The SDK design implication is a hybrid.</strong> Codex-style directory memory maps naturally to repository context and plugin/package ownership; Claude-style path rules require a tool-use seam that evaluates paths on Read/Edit/Write and injects matched content deterministically.</li>
+  </ul>
+</section>
+
+<section id="sources">
+  <h2><span class="num">5.</span>Source map and validation</h2>
+  <table>
+    <thead><tr><th>Claim</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td>Codex scans from project root to CWD and stops at project root.</td><td><a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/src/agents_md.rs#L1-L16">agents_md.rs:1-16</a></td></tr>
+      <tr><td>Codex loads project instructions for each turn environment.</td><td><a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/src/agents_md.rs#L45-L74">agents_md.rs:45-74</a></td></tr>
+      <tr><td>Codex candidate names include override, default, and fallbacks.</td><td><a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/core/src/agents_md.rs#L222-L235">agents_md.rs:222-235</a></td></tr>
+      <tr><td>Codex prompt assigns subtree scope, nested precedence, and self-checking below/outside CWD.</td><td><a class="src" href="https://github.com/openai/codex/blob/98d28aab54ed86714901b6619400598598876dd0/codex-rs/protocol/src/prompts/base_instructions/default.md#L17-L27">default.md:17-27</a></td></tr>
+      <tr><td>This page follows SmolPaws show-me conventions: self-contained HTML, big-picture first, code-grounded claims.</td><td><a class="src" href="https://github.com/smolpaws/smolpaws/blob/b15dc60f72b9b926cd9931efed1e081190969679/.agents/skills/show-me/SKILL.md#L1-L65">show-me/SKILL.md:1-65</a> <a class="src" href="https://github.com/smolpaws/smolpaws/blob/b15dc60f72b9b926cd9931efed1e081190969679/AGENTS.md#L55-L59">SmolPaws AGENTS.md:55-59</a></td></tr>
+      <tr><td>Claude rules behavior summarized here is the issue's stated behavior, not independently reverse-engineered Claude Code source.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/3984">OpenHands/software-agent-sdk#3984</a></td></tr>
+    </tbody>
+  </table>
+  <details>
+    <summary>Validation note</summary>
+    <div><p>This is a source-inspection report. I cloned <code>openai/codex</code> at <code>98d28aab54ed86714901b6619400598598876dd0</code> and <code>smolpaws/smolpaws</code> at <code>b15dc60f72b9b926cd9931efed1e081190969679</code>. I did not run Codex's Rust test suite because the task was investigative documentation, not a code change.</p></div>
+  </details>
+  <p class="callout note">Created by an AI agent (OpenHands) on behalf of the issue request.</p>
+</section>
+</main>
+</div>
+</body>
+</html>
