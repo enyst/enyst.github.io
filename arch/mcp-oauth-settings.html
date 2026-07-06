@@ -1,0 +1,252 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCP OAuth &amp; settings-backed auth — SDK #3964 + Canvas #1583</title>
+<style>
+  :root{
+    --fg:#1a1a1a; --muted:#5a5a5a; --subtle:#8a8a82;
+    --bg:#fdfdfb; --card:#ffffff; --elevated:#f7f6f1;
+    --accent:#2b4eaa; --accent-soft:#e6ecfa;
+    --rule:#e2e2dc; --rule-strong:#bdbcb4;
+    --code-bg:#f3f1ec; --warn:#b25b0e; --ok:#2f7a3a; --crit:#a02020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.6;font-size:16px}
+  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:4px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none} nav.toc a:hover{color:var(--accent)}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:28px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:32px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted);max-width:760px}
+  h2{font-size:22px;margin:44px 0 10px} h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:16px;margin:22px 0 8px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule)}
+  pre code{background:transparent;padding:0}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg)}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:14px 0;border-radius:0 4px 4px 0;font-size:14.5px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6} .callout.note{border-color:var(--muted);background:#f3f1ec}
+  .fig{margin:18px 0 22px}
+  .fig svg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--rule);border-radius:6px}
+  .fig figcaption{font-size:13px;color:var(--muted);margin-top:6px;text-align:center}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--rule-strong);color:var(--muted)}
+  .pill.sdk{color:#2b4eaa;border-color:#9db0e0;background:#eef2fc}
+  .pill.canvas{color:#7a4a1e;border-color:#d8b48a;background:#f8efe2}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr}.ba{grid-template-columns:1fr}}
+</style></head><body>
+<div class="wrap">
+  <nav class="toc"><h2>Contents</h2><ol>
+    <li><a href="#big">The big picture</a></li>
+    <li><a href="#model">The shared model</a></li>
+    <li><a href="#sdk">SDK #3964 — before / after</a></li>
+    <li><a href="#canvas">Canvas #1583 — before / after</a></li>
+    <li><a href="#flow">The OAuth install flow</a></li>
+    <li><a href="#usecases">Use cases at a glance</a></li>
+  </ol></nav>
+  <main>
+    <header class="title">
+      <div class="eyebrow">Change explainer · two PRs, one story</div>
+      <h1>MCP OAuth &amp; settings-backed auth</h1>
+      <p class="sub">Some MCP servers (e.g. Superhuman Mail) authenticate with <strong>OAuth</strong>,
+      not a static API key. These two PRs give the whole stack <em>one</em> typed way to
+      capture, encrypt, persist and reuse MCP credentials — so an OAuth server is installed
+      once and just works on the next conversation, local or cloud.
+      <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/3964">sdk#3964</a>
+      defines the model + runtime;
+      <a class="src" href="https://github.com/OpenHands/agent-canvas/pull/1583">canvas#1583</a>
+      builds the install UI on top of it.</p>
+    </header>
+
+    <section id="big"><h2><span class="num">1</span>The big picture</h2>
+      <p>Read it as a <strong>contract and its consumer</strong>. The SDK PR is the contract:
+      it defines a tagged-union credential type, stores secrets encrypted through normal
+      settings serialization, and adds the agent-server OAuth endpoints. The Canvas PR is the
+      consumer: it adds the install/edit UI that speaks that exact shape, drives the browser
+      OAuth dance, and writes the result back through settings. Neither is useful alone; the
+      value is that <em>both sides now agree on one model.</em></p>
+      <div class="fig"><svg viewBox="0 0 820 250" role="img" aria-label="High-level: SDK defines the model and endpoints, Canvas consumes them, settings persist credentials">
+        <rect x="24" y="30" width="330" height="190" rx="8" fill="#eef2fc" stroke="#9db0e0"/>
+        <text x="40" y="54" font-family="var(--mono)" font-size="12" fill="#2b4eaa">sdk #3964 — the contract</text>
+        <rect x="44" y="70" width="290" height="34" rx="5" fill="#fff" stroke="#9db0e0"/>
+        <text x="58" y="91" font-family="var(--sans)" font-size="13" fill="#1a1a1a">MCPServer + MCPAuthCredential (tagged union)</text>
+        <rect x="44" y="112" width="290" height="34" rx="5" fill="#fff" stroke="#9db0e0"/>
+        <text x="58" y="133" font-family="var(--sans)" font-size="13" fill="#1a1a1a">SecretStr encrypt / redact in settings</text>
+        <rect x="44" y="154" width="290" height="34" rx="5" fill="#fff" stroke="#9db0e0"/>
+        <text x="58" y="175" font-family="var(--sans)" font-size="13" fill="#1a1a1a">/api/mcp/oauth/start · status · callback</text>
+        <rect x="466" y="30" width="330" height="190" rx="8" fill="#f8efe2" stroke="#d8b48a"/>
+        <text x="482" y="54" font-family="var(--mono)" font-size="12" fill="#7a4a1e">canvas #1583 — the consumer</text>
+        <rect x="486" y="70" width="290" height="34" rx="5" fill="#fff" stroke="#d8b48a"/>
+        <text x="500" y="91" font-family="var(--sans)" font-size="13" fill="#1a1a1a">Install / edit modal (OAuth, header, api_key)</text>
+        <rect x="486" y="112" width="290" height="34" rx="5" fill="#fff" stroke="#d8b48a"/>
+        <text x="500" y="133" font-family="var(--sans)" font-size="13" fill="#1a1a1a">Browser OAuth popup → callback</text>
+        <rect x="486" y="154" width="290" height="34" rx="5" fill="#fff" stroke="#d8b48a"/>
+        <text x="500" y="175" font-family="var(--sans)" font-size="13" fill="#1a1a1a">Write agent_settings.mcp_config</text>
+        <line x1="354" y1="125" x2="466" y2="125" stroke="#5a5a5a" stroke-width="1.5" marker-end="url(#ar)"/>
+        <text x="360" y="118" font-family="var(--mono)" font-size="11" fill="#5a5a5a">same shape</text>
+        <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9z" fill="#5a5a5a"/></marker></defs>
+      </svg><figcaption>Two repos, one credential model. The SDK owns it; Canvas speaks it.</figcaption></div>
+    </section>
+
+    <section id="model"><h2><span class="num">2</span>The shared model — a tagged union of credentials</h2>
+      <p>The heart of both PRs is one idea: <strong>every MCP credential is a variant tagged by a
+      <code>strategy</code> field.</strong> Add OAuth as just another variant and the rest of the
+      stack — serialization, redaction, UI — handles it uniformly. The SDK and Canvas define the
+      <em>same</em> set of strategies, in Python and TypeScript.</p>
+      <div class="ba">
+        <div>
+          <span class="pill sdk">Python · SDK</span>
+          <pre><code>MCPNoneAuthCredential   strategy="none"
+MCPApiKeyAuthCredential strategy="api_key"
+MCPBearerAuthCredential strategy="bearer"
+MCPBasicAuthCredential  strategy="basic"
+MCPHeaderAuthCredential strategy="header"
+MCPOAuthAuthCredential  strategy="oauth2"
+
+class MCPServer(_MCPBaseModel):
+    auth: MCPAuthCredential | None = None</code></pre>
+          <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/3964/files">openhands-sdk/openhands/sdk/mcp/config.py</a>
+        </div>
+        <div>
+          <span class="pill canvas">TypeScript · Canvas</span>
+          <pre><code>type MCPAuthCredential =
+  | { strategy: "none" }
+  | { strategy: "api_key"; value; header_name? }
+  | { strategy: "bearer"; value }
+  | { strategy: "basic"; username; password }
+  | { strategy: "header"; headers }
+  | { strategy: "oauth2"; /* + state */ };</code></pre>
+          <a class="src" href="https://github.com/OpenHands/agent-canvas/pull/1583/files">src/types/mcp-auth.ts</a>
+        </div>
+      </div>
+      <div class="callout note">Secrets (<code>value</code>, <code>password</code>, OAuth tokens) are
+      <code>SecretStr</code> leaves. They serialize encrypted, and redact to a placeholder when the
+      settings are read back for display — so an edit never has to round-trip the real secret.</div>
+    </section>
+
+    <section id="sdk"><h2><span class="num">3</span>SDK #3964 — before / after</h2>
+      <p><strong>What changed:</strong> MCP settings were loosely typed and OAuth wasn't first-class;
+      legacy shapes were handled by ad-hoc runtime normalization. After, <code>mcp_config</code> is a
+      typed <code>dict[str, MCPServer]</code>, OAuth credentials live under
+      <code>mcp_config.&lt;server&gt;.auth.state</code>, and the map is normalized to FastMCP/ACP
+      only at the protocol boundary.</p>
+      <div class="ba">
+        <div>
+          <h3>Before</h3>
+          <pre><code>mcp_config: dict[str, MCPServer]
+# additionalProperties: true  (untyped)
+# OAuth: not first-class
+# legacy shapes normalized at runtime
+# secrets: partial handling</code></pre>
+        </div>
+        <div>
+          <h3>After</h3>
+          <pre><code>mcp_config: dict[str, MCPServer]
+#   MCPServer.auth: MCPAuthCredential
+# OAuth token/client state under auth.state
+# legacy shapes handled by settings
+#   migrations only (no runtime legacy)
+# secrets encrypt/redact via settings</code></pre>
+        </div>
+      </div>
+      <p>New agent-server endpoints drive the OAuth probe and hand the acquired state back to the
+      client to persist:</p>
+      <table>
+        <tr><th>Endpoint</th><th>Purpose</th></tr>
+        <tr><td><code>POST /api/mcp/oauth/start</code></td><td>Begin an OAuth probe for a server; returns a job id.</td></tr>
+        <tr><td><code>GET /api/mcp/oauth/status/{job_id}</code></td><td>Poll the probe; returns acquired <code>oauth_state</code> when done.</td></tr>
+        <tr><td><code>POST /api/mcp/oauth/callback/{job_id}</code></td><td>Deliver the browser redirect result back to the probe.</td></tr>
+      </table>
+      <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/3964">software-agent-sdk#3964 · +5078 / −2036</a>
+    </section>
+
+    <section id="canvas"><h2><span class="num">4</span>Canvas #1583 — before / after</h2>
+      <p><strong>What changed:</strong> the install flow assumed API-key-shaped servers. After, it
+      installs OAuth-only and header-based servers as first-class, reads/writes through the SDK's
+      <code>agent_settings.mcp_config</code>, and normalizes server names to SDK-safe underscore
+      names. It also folds in two earlier follow-ups (#1569 name normalization + redacted-secret
+      preservation, #1503 custom headers + editable remote URLs).</p>
+      <div class="ba">
+        <div>
+          <h3>Before</h3>
+          <pre><code>Install modal ≈ "paste an API key"
+OAuth-only servers: awkward / faked
+Custom headers: not supported
+Names: not SDK-safe
+Edits could drop redacted secrets</code></pre>
+        </div>
+        <div>
+          <h3>After</h3>
+          <pre><code>Install modal: OAuth · header · api_key
+OAuth popup → callback → auth.state
+Custom request headers supported
+Names normalized to underscore form
+Edits preserve encrypted/redacted creds</code></pre>
+        </div>
+      </div>
+      <a class="src" href="https://github.com/OpenHands/agent-canvas/pull/1583">agent-canvas#1583 · +5303 / −787</a>
+    </section>
+
+    <section id="flow"><h2><span class="num">5</span>The OAuth install flow (dynamic registration)</h2>
+      <p>The interesting path is a <strong>dynamic OAuth</strong> server: the user has no client id/secret,
+      so the server registers one on the fly (PKCE). Canvas opens a popup, the agent-server runs the
+      probe, and the acquired state is written back into settings so the <em>next</em> conversation
+      reuses it with no re-auth.</p>
+      <div class="fig"><svg viewBox="0 0 860 300" role="img" aria-label="OAuth install sequence across Canvas, agent-server, and the MCP provider">
+        <text x="70"  y="24" font-family="var(--mono)" font-size="12" fill="#7a4a1e" text-anchor="middle">Canvas UI</text>
+        <text x="330" y="24" font-family="var(--mono)" font-size="12" fill="#2b4eaa" text-anchor="middle">agent-server</text>
+        <text x="600" y="24" font-family="var(--mono)" font-size="12" fill="#5a5a5a" text-anchor="middle">MCP + IdP</text>
+        <text x="800" y="24" font-family="var(--mono)" font-size="12" fill="#2f7a3a" text-anchor="middle">settings</text>
+        <line x1="70"  y1="32" x2="70"  y2="288" stroke="#d8b48a" stroke-width="1"/>
+        <line x1="330" y1="32" x2="330" y2="288" stroke="#9db0e0" stroke-width="1"/>
+        <line x1="600" y1="32" x2="600" y2="288" stroke="#bdbcb4" stroke-width="1"/>
+        <line x1="800" y1="32" x2="800" y2="288" stroke="#a9cbb0" stroke-width="1"/>
+        <g font-family="var(--sans)" font-size="12" fill="#1a1a1a">
+          <line x1="70" y1="60" x2="330" y2="60" stroke="#5a5a5a" marker-end="url(#a2)"/>
+          <text x="76" y="54">POST /api/mcp/oauth/start</text>
+          <line x1="330" y1="96" x2="600" y2="96" stroke="#5a5a5a" marker-end="url(#a2)"/>
+          <text x="336" y="90">dynamic client register + PKCE</text>
+          <line x1="600" y1="132" x2="70" y2="132" stroke="#5a5a5a" stroke-dasharray="4 3" marker-end="url(#a2)"/>
+          <text x="120" y="126">authorize URL → browser popup</text>
+          <line x1="70" y1="168" x2="330" y2="168" stroke="#5a5a5a" marker-end="url(#a2)"/>
+          <text x="76" y="162">POST /oauth/callback/{job_id}  (redirect result)</text>
+          <line x1="330" y1="204" x2="600" y2="204" stroke="#5a5a5a" marker-end="url(#a2)"/>
+          <text x="336" y="198">exchange code → tokens</text>
+          <line x1="70" y1="240" x2="330" y2="240" stroke="#5a5a5a" marker-end="url(#a2)"/>
+          <text x="76" y="234">GET /oauth/status → oauth_state</text>
+          <line x1="70" y1="276" x2="800" y2="276" stroke="#2f7a3a" marker-end="url(#a3)"/>
+          <text x="76" y="270">write mcp_config.&lt;server&gt;.auth.state (encrypted)</text>
+        </g>
+        <defs>
+          <marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9z" fill="#5a5a5a"/></marker>
+          <marker id="a3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9z" fill="#2f7a3a"/></marker>
+        </defs>
+      </svg><figcaption>Install once. The acquired OAuth state persists in settings; the next conversation reuses it with no re-authentication.</figcaption></div>
+      <div class="callout">The SDK PR proves this end to end with a headless integration test: a real
+      FastMCP OAuth-protected server, dynamic client registration, PKCE/token exchange, settings
+      serialization, and a <em>second</em> connection that reuses the persisted credentials.</div>
+    </section>
+
+    <section id="usecases"><h2><span class="num">6</span>Use cases at a glance</h2>
+      <table>
+        <tr><th>Server kind</th><th>Strategy</th><th>What the user does</th></tr>
+        <tr><td>Public / no auth</td><td><code>none</code></td><td>Install, done.</td></tr>
+        <tr><td>Static-key remote (most marketplace)</td><td><code>api_key</code> / <code>bearer</code> / <code>header</code></td><td>Paste key / headers once.</td></tr>
+        <tr><td>Basic-auth remote</td><td><code>basic</code></td><td>Username + password once.</td></tr>
+        <tr><td>OAuth with client id/secret</td><td><code>oauth2</code></td><td>Enter client id/secret + scopes; popup consent.</td></tr>
+        <tr><td><strong>Dynamic OAuth</strong> (e.g. Superhuman)</td><td><code>oauth2</code></td><td>Just consent in the popup; client is registered on the fly.</td></tr>
+      </table>
+      <p class="sub" style="margin-top:22px">Grounded to the two PRs above. Both were human-tested by
+      the author against the Superhuman Mail MCP running in the real stack.</p>
+    </section>
+  </main>
+</div></body></html>
