@@ -64,6 +64,7 @@
     <li><a href="#bg">Background</a></li>
     <li><a href="#intuition">The intuition</a></li>
     <li><a href="#uses">Who actually uses it</a></li>
+    <li><a href="#sibling">Its Python sibling: openhands-workspace</a></li>
     <li><a href="#move">The proposed move</a></li>
     <li><a href="#quiz">Quiz</a></li>
   </ol></nav>
@@ -73,8 +74,9 @@
       <h1>The <code>typescript-client</code> repo, and the proposal to fold it into the SDK</h1>
       <p class="sub">Someone proposed moving <code>OpenHands/typescript-client</code> into
       <code>OpenHands/software-agent-sdk</code> to ease releases. To have an opinion, you need to know
-      what the client is, who depends on it, and what "the release process" actually is. This page
-      teaches all three, then quizzes you.</p>
+      what the client is, how it stays in sync with the Python SDK, who depends on it, how it relates to the
+      existing <code>openhands-workspace</code> member, and what "the release process" actually is. This page
+      teaches that, then quizzes you.</p>
     </header>
 
     <div class="callout"><strong>★ The one thing to remember:</strong>
@@ -211,8 +213,44 @@
       pinned registry version vs a git URL), so both mechanisms have to keep working.</div>
     </section>
 
+    <section id="sibling">
+      <h2><span class="num">4</span>Its Python sibling: <code>openhands-workspace</code> is already this pattern</h2>
+      <p>The best analogy isn't external — it's already a member of the SDK repo.
+      <code>openhands-workspace</code> ("Docker and container-based workspace implementations") is, in part,
+      <strong>a client to the agent-server too</strong>. Its <code>RemoteWorkspace</code> /
+      <code>APIRemoteWorkspace</code> / <code>CloudWorkspace</code> classes use <code>httpx</code> to reach a
+      remote agent-server and drive it. (The base <code>RemoteWorkspace</code> / <code>RemoteWorkspaceMixin</code>
+      actually live in <code>openhands-sdk</code>
+      <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/main/openhands-sdk/openhands/sdk/workspace/remote/remote_workspace_mixin.py">openhands-sdk/…/workspace/remote/remote_workspace_mixin.py</a>;
+      <code>openhands-workspace</code> adds the concrete backends.)</p>
+
+      <p>So <code>typescript-client</code> is best understood as <strong>a sibling of the remote/client side of
+      <code>openhands-workspace</code> — same job, different language, browser-safe.</strong> Both speak the
+      agent-server's HTTP/WS contract. One caveat keeps the analogy honest:</p>
+
+      <table>
+        <thead><tr><th></th><th><code>openhands-workspace</code> (Python)</th><th><code>typescript-client</code> (TS)</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Provision</strong> a runtime (Docker / apptainer / cloud, sysbox, images, ports)</td>
+            <td><span style="color:var(--ok)">Yes</span> — inherently server-side Python</td>
+            <td><span style="color:var(--crit)">No</span> — a browser can't spin up containers</td></tr>
+          <tr><td><strong>Talk to</strong> an already-running agent-server (REST + WS)</td>
+            <td><span style="color:var(--ok)">Yes</span></td>
+            <td><span style="color:var(--ok)">Yes</span> — this is all it does</td></tr>
+          <tr><td>Runs in the browser</td>
+            <td><span style="color:var(--crit)">No</span></td>
+            <td><span style="color:var(--ok)">Yes</span> — the reason it exists</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">★ So the SDK repo <em>already</em> ships an agent-server client as a workspace member
+      (<code>openhands-workspace</code>). <code>typescript-client</code> is the same species — the
+      remote-conversation client slice, ported to TS for the browser. That's the real case for the move: it's a
+      sibling client that happens to be in a different language, so it belongs next to the others.</div>
+    </section>
+
     <section id="move">
-      <h2><span class="num">4</span>The proposed move — and the one thing that can break</h2>
+      <h2><span class="num">5</span>The proposed move — and the one thing that can break</h2>
       <p>Today <code>typescript-client</code> releases on its own: pushing a <code>v*</code> tag runs
       <code>release.yml</code>, which builds and publishes to GitHub Packages.
       <a class="src" href="https://github.com/OpenHands/typescript-client/blob/main/.github/workflows/release.yml">release.yml</a>
@@ -238,8 +276,8 @@
     </section>
 
     <section id="quiz">
-      <h2><span class="num">5</span>Quiz</h2>
-      <p>Five questions. Click an answer to see whether you got it and why.</p>
+      <h2><span class="num">6</span>Quiz</h2>
+      <p>Six questions. Click an answer to see whether you got it and why.</p>
       <div id="quizroot"></div>
       <div class="score" id="score"></div>
     </section>
@@ -294,6 +332,22 @@ const QUIZ = [
       "Right. It's a hand-ported mirror (module-for-module, client/*-client.ts per resource). Nothing mechanical enforces agreement — which is exactly why drift is the risk.",
       "No — they're independent implementations of the same wire contract, not a runtime dependency.",
       "No — there's no such divergence check; drift surfaces at runtime in canvas, not in CI."
+    ]
+  },
+  {
+    q: "Which existing SDK-repo member is typescript-client most like?",
+    opts: [
+      "openhands-tools — the agent's tool implementations",
+      "openhands-workspace — whose Remote/API/Cloud workspaces are themselves httpx clients to the agent-server (TS client ≈ its remote/client side, browser-safe)",
+      "openhands-agent-server — the server it talks to",
+      "None; it has no analogue in the repo"
+    ],
+    correct: 1,
+    fb: [
+      "No — openhands-tools is about the tools the agent runs, not talking to the server.",
+      "Right. openhands-workspace already ships an agent-server client (RemoteWorkspace/APIRemoteWorkspace/CloudWorkspace over httpx). typescript-client is the same species — the remote-conversation client slice, ported to TS for the browser. It just can't provision runtimes (a browser can't).",
+      "No — that's the server; the TS client is a client of it.",
+      "No — openhands-workspace is a close sibling: also an agent-server client."
     ]
   },
   {
