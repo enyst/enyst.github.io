@@ -269,14 +269,18 @@
       They share the adapter shape, so each is a repeat of a known move rather than new invention.</p>
     </li>
     <li>
-      <span class="ms-t">Slack will probably just work <span class="pill maybe">verify, don’t assume</span></span>
-      <p class="ms-d">Slack rides the same adapter base, so it likely comes along for free — but
-      “probably” is a hypothesis to confirm, not a step to skip.</p>
+      <span class="ms-t">Slack-via-Chrome should keep working untouched <span class="pill maybe">verify, don’t assume</span></span>
+      <p class="ms-d">The Slack SmolPaws reads today (the OpenHands workspace, during heartbeats) goes
+      through a browser — the Chrome tab and Slack’s web API — <strong>not</strong> through the agent-server
+      at all. So the SDK swap shouldn’t touch it: it likely just keeps working. “Probably” is still a
+      hypothesis to confirm once the new stack is live, not a step to skip.</p>
     </li>
     <li>
-      <span class="ms-t">Retest, adapt, redeploy <code>paws</code> — the real Slack app</span>
-      <p class="ms-d">Finally, the thin standalone Slack presence (<code>paws</code>) gets re-tested against
-      the new stack, adapted at its seams, and redeployed. This is the outward-facing cat, so it goes
+      <span class="ms-t">Retest, adapt, redeploy <code>paws</code> — the standalone Slack app</span>
+      <p class="ms-d"><code>paws</code> is the separate Slack bot app (<code>apps/slack</code>) — SmolPaws’
+      own thinner Slack surface. It isn’t in active use yet, <strong>but it will be</strong>, and it does
+      ride the agent-server through the bridge adapter. So once the new stack is proven, <code>paws</code>
+      gets re-tested against it, adapted at its seams, and redeployed. Outward-facing cat, so it goes
       last and carefully.</p>
     </li>
   </ol>
@@ -312,9 +316,9 @@
   <p>
     Not starting from zero. The new SDK’s provider routing is done and verified live (OpenAI, Anthropic,
     Gemini all dispatch to the right client). Its conversation loop, tools, workspace and skills are
-    ported and tested. The bridges already share one adapter base, which is why steps 5–6 are repeats
-    rather than reinvention. The work ahead is real, but it’s re-flooring a house that stands — not
-    building a new one.
+    ported and tested. The bridges already share one adapter base, which is why step 5 (Discord, GitHub,
+    Email) is a repeat of a known move rather than reinvention. The work ahead is real, but it’s
+    re-flooring a house that stands — not building a new one.
   </p>
 
   <nav class="foot-nav">
