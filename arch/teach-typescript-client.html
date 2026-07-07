@@ -126,43 +126,63 @@
     </section>
 
     <section id="intuition">
-      <h2><span class="num">2</span>The intuition: two SDKs for one server, kept in sync by hand</h2>
-      <p>Picture the agent-server as a socket in the wall. The Python SDK is one plug; the TypeScript client
-      is a second plug shaped for a different device (the browser). Both plugs have to match the socket. When
-      the socket's shape changes — a new field on an event, a renamed endpoint — <em>both</em> plugs need
-      re-cutting, or the mismatched one stops fitting.</p>
+      <h2><span class="num">2</span>The intuition: a hand-written mirror of the SDK, and no schema forcing them to agree</h2>
+      <p>The important detail — the one the socket metaphor would hide — is <strong>how</strong> the TS client
+      tracks the Python SDK. It is not generated. There is no OpenAPI spec, no codegen step, no
+      <code>@generated</code> banner anywhere in <code>src/</code>. It is a <strong>hand-written
+      re-implementation</strong> that mirrors the Python package module-for-module.</p>
 
-      <div class="fig"><svg viewBox="0 0 720 260" role="img" aria-label="Two SDK clients talking to one agent-server">
-        <rect x="288" y="96" width="150" height="66" rx="8" fill="#e6ecfa" stroke="#2b4eaa"/>
-        <text x="363" y="126" text-anchor="middle" font-family="var(--sans)" font-size="14" font-weight="700" fill="#1a1a1a">agent-server</text>
-        <text x="363" y="145" text-anchor="middle" font-family="var(--mono)" font-size="11" fill="#5a5a5a">HTTP + WebSocket API</text>
+      <p>Lay the two side by side and it's a near one-to-one port. The Python SDK's modules —
+      <code>agent</code>, <code>conversation</code>, <code>events</code>, <code>llm</code>,
+      <code>security</code>, <code>workspace</code> — each have a TS twin, and every server resource gets a
+      typed client under <code>src/client/*</code> (<code>conversation-client.ts</code>,
+      <code>bash-client.ts</code>, <code>file-client.ts</code>, <code>settings-client.ts</code>, …). Transport
+      is a plain <code>http-client.ts</code> for REST plus a <code>websocket-client.ts</code> for the event
+      stream — the browser-safe equivalents of what the Python SDK does over its own HTTP/WS.</p>
 
-        <rect x="40" y="30" width="180" height="60" rx="8" fill="#fff" stroke="#bdbcb4"/>
-        <text x="130" y="55" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">Python SDK</text>
-        <text x="130" y="73" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#5a5a5a">software-agent-sdk</text>
-
-        <rect x="40" y="168" width="180" height="66" rx="8" fill="#fff" stroke="#2b4eaa"/>
-        <text x="130" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">typescript-client</text>
-        <text x="130" y="210" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#5a5a5a">browser-compatible</text>
-        <text x="130" y="226" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#5a5a5a">remote only</text>
-
-        <line x1="220" y1="60" x2="300" y2="112" stroke="#bdbcb4" stroke-width="2" marker-end="url(#a)"/>
-        <line x1="220" y1="200" x2="300" y2="146" stroke="#2b4eaa" stroke-width="2" marker-end="url(#a)"/>
-
-        <rect x="520" y="168" width="170" height="66" rx="8" fill="#f7f6f1" stroke="#bdbcb4"/>
-        <text x="605" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#1a1a1a">agent-canvas</text>
-        <text x="605" y="210" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#5a5a5a">browser UI · React</text>
-        <text x="605" y="226" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#5a5a5a">imports the client</text>
-        <line x1="520" y1="201" x2="222" y2="201" stroke="#2b4eaa" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#a)"/>
-        <text x="370" y="248" text-anchor="middle" font-size="11" fill="#8a8a82">agent-canvas → import → typescript-client → API → agent-server</text>
+      <div class="fig"><svg viewBox="0 0 720 300" role="img" aria-label="Python SDK modules mirrored one-to-one by TypeScript client modules, both over the same wire protocol">
+        <text x="150" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#5a5a5a">software-agent-sdk (Python)</text>
+        <text x="440" y="22" text-anchor="middle" font-size="12" font-weight="700" fill="#2b4eaa">typescript-client (hand-ported)</text>
+        <g font-family="var(--mono)" font-size="11.5">
+          <rect x="40" y="36" width="220" height="24" rx="4" fill="#fff" stroke="#bdbcb4"/><text x="52" y="52" fill="#1a1a1a">conversation/  RemoteConversation</text>
+          <rect x="330" y="36" width="240" height="24" rx="4" fill="#e6ecfa" stroke="#2b4eaa"/><text x="342" y="52" fill="#1a1a1a">conversation/remote-conversation.ts</text>
+          <rect x="40" y="66" width="220" height="24" rx="4" fill="#fff" stroke="#bdbcb4"/><text x="52" y="82" fill="#1a1a1a">events/  event stream</text>
+          <rect x="330" y="66" width="240" height="24" rx="4" fill="#e6ecfa" stroke="#2b4eaa"/><text x="342" y="82" fill="#1a1a1a">events/websocket-client.ts</text>
+          <rect x="40" y="96" width="220" height="24" rx="4" fill="#fff" stroke="#bdbcb4"/><text x="52" y="112" fill="#1a1a1a">agent / llm / security / workspace</text>
+          <rect x="330" y="96" width="240" height="24" rx="4" fill="#e6ecfa" stroke="#2b4eaa"/><text x="342" y="112" fill="#1a1a1a">agent/ llm/ security/ workspace/</text>
+          <rect x="40" y="126" width="220" height="24" rx="4" fill="#fff" stroke="#bdbcb4"/><text x="52" y="142" fill="#1a1a1a">per-resource server calls</text>
+          <rect x="330" y="126" width="240" height="24" rx="4" fill="#e6ecfa" stroke="#2b4eaa"/><text x="342" y="142" fill="#1a1a1a">client/*-client.ts (bash, file, …)</text>
+        </g>
+        <line x1="262" y1="48" x2="328" y2="48" stroke="#8a8a82" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <line x1="262" y1="78" x2="328" y2="78" stroke="#8a8a82" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <line x1="262" y1="108" x2="328" y2="108" stroke="#8a8a82" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <line x1="262" y1="138" x2="328" y2="138" stroke="#8a8a82" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <text x="295" y="172" text-anchor="middle" font-size="10.5" fill="#8a8a82">hand-kept parallel — no codegen</text>
+        <rect x="230" y="196" width="260" height="40" rx="8" fill="#f7f6f1" stroke="#bdbcb4"/>
+        <text x="360" y="214" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1a1a1a">agent-server</text>
+        <text x="360" y="230" text-anchor="middle" font-family="var(--mono)" font-size="10.5" fill="#5a5a5a">same REST + WebSocket contract</text>
+        <line x1="150" y1="150" x2="300" y2="196" stroke="#bdbcb4" stroke-width="1.5" marker-end="url(#a)"/>
+        <line x1="450" y1="150" x2="420" y2="196" stroke="#2b4eaa" stroke-width="1.5" marker-end="url(#a)"/>
+        <rect x="250" y="258" width="220" height="30" rx="6" fill="#fff" stroke="#2b4eaa"/>
+        <text x="360" y="277" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1a1a1a">agent-canvas (browser, imports TS)</text>
+        <line x1="360" y1="258" x2="360" y2="238" stroke="#2b4eaa" stroke-width="1.5" marker-end="url(#a)"/>
         <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#5a5a5a"/></marker></defs>
-      </svg><figcaption>One server, two client plugs. agent-canvas (browser) can only use the TS plug — it
-      can't import Python. Both plugs track the same API, so they drift if released separately.</figcaption></div>
+      </svg><figcaption>Two hand-maintained parallels over one wire contract. Nothing mechanical keeps the
+      dashed lines aligned — a human does, on every API change.</figcaption></div>
 
-      <p>Right now those two plugs live in <em>two different repos with two different release buttons</em>.
-      Every time the API moves, someone bumps and releases the Python SDK, then separately tags and releases
-      the TS client. Two-repo lockstep done by hand is exactly the kind of coordination that quietly rots —
-      you ship the server change, forget the client tag, and canvas is suddenly a version behind.</p>
+      <p>That's the actual problem the move addresses. Two implementations of one contract, maintained by
+      hand, in <strong>separate repos with separate release triggers</strong>. When the agent-server API gains
+      a field or renames an event, someone edits the Python side, ships it, and must <em>remember</em> to make
+      the matching TS edit and cut a second release. Nothing in CI fails when they forget — the drift only
+      surfaces at runtime, in canvas, as a deserialization error or a missing field. That is the classic cost
+      of a hand-synced mirror split across repo boundaries: the invariant ("these two agree") is real but
+      unenforced.</p>
+
+      <div class="callout note">ⓘ Same-repo doesn't magically generate the client — it stays hand-written. But
+      it collapses the coordination: the diff that changes the Python contract and the diff that updates the TS
+      mirror land in one PR, reviewed together, released together. The invariant moves from "someone remembers"
+      to "it's in the same changeset." (The deeper fix — generating the TS client from a shared schema — is a
+      separate question this proposal doesn't settle.)</div>
     </section>
 
     <section id="uses">
@@ -261,19 +281,19 @@ const QUIZ = [
     ]
   },
   {
-    q: "Why does a separate TypeScript client exist at all, instead of everyone using the Python SDK?",
+    q: "How does the TS client stay in sync with the Python SDK's API today?",
     opts: [
-      "Python is deprecated in OpenHands",
-      "A browser (e.g. agent-canvas' React app) can't import Python, but it can import a browser-safe TS package to call the server",
-      "The TS client is faster than the Python SDK",
-      "Licensing reasons"
+      "It's generated from a shared OpenAPI/schema at build time",
+      "It's a hand-written re-implementation that mirrors the Python modules — no codegen — so a human must make matching edits",
+      "The Python SDK imports it at runtime",
+      "A CI job diffs the two and fails the build on any divergence"
     ],
     correct: 1,
     fb: [
-      "No — the Python SDK is very much the primary SDK; the TS client mirrors it.",
-      "Right. The browser-compatibility (Blob/File/FormData, no fs) is the whole point — it lets front-end code talk to the agent-server directly.",
-      "No — speed isn't the motivation; reach into the browser is.",
-      "No — it's about runtime environment (browser vs Python), not licensing."
+      "No — there's no OpenAPI spec or codegen step anywhere in src/; that would be a different (arguably better) design.",
+      "Right. It's a hand-ported mirror (module-for-module, client/*-client.ts per resource). Nothing mechanical enforces agreement — which is exactly why drift is the risk.",
+      "No — they're independent implementations of the same wire contract, not a runtime dependency.",
+      "No — there's no such divergence check; drift surfaces at runtime in canvas, not in CI."
     ]
   },
   {
@@ -287,7 +307,7 @@ const QUIZ = [
     correct: 1,
     fb: [
       "No — the move keeps the client; it changes where it's released from.",
-      "Right. Two plugs for one socket, released separately, drift. Same-repo release makes the mirroring an invariant.",
+      "Right. Two hand-maintained implementations of one API contract, released from separate repos, drift when someone forgets the second edit. Same-repo lands both changes in one reviewed changeset.",
       "No — browser-compat is the client's reason to exist; the move doesn't touch that.",
       "No — it's about release coordination, not concealment."
     ]
