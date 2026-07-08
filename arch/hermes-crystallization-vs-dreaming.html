@@ -1,0 +1,106 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hermes skill-crystallization vs smolpaws dreaming</title>
+<style>
+  :root{
+    --fg:#1a1a1a; --muted:#5a5a5a; --subtle:#8a8a82;
+    --bg:#fdfdfb; --card:#ffffff; --elevated:#f7f6f1;
+    --accent:#2b4eaa; --accent-soft:#e6ecfa;
+    --rule:#e2e2dc; --rule-strong:#bdbcb4;
+    --code-bg:#f3f1ec; --warn:#b25b0e; --ok:#2f7a3a; --crit:#a02020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.6;font-size:16px}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 24px 80px}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:20px;margin-bottom:26px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:28px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted)}
+  h2{font-size:20px;margin:34px 0 8px}
+  h3{font-size:15px;margin:20px 0 4px;letter-spacing:.02em}
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:12px 14px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule);white-space:pre}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:14px 0;border-radius:0 4px 4px 0;font-size:14.5px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6}
+  .callout.ok{border-color:var(--ok);background:#eaf6ec}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg)}
+  ol li,ul li{margin:5px 0}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+  .cols .box{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+  .cols .box h3{margin-top:0;color:var(--accent)}
+  .cols .box.paw h3{color:var(--warn)}
+  @media(max-width:640px){.cols{grid-template-columns:1fr}}
+  .tag{display:inline-block;font-size:11px;font-family:var(--mono);background:var(--elevated);border:1px solid var(--rule);border-radius:4px;padding:1px 6px;color:var(--muted)}
+</style></head><body>
+<div class="wrap">
+  <header class="title">
+    <div class="eyebrow">Agent memory · study</div>
+    <h1>Hermes "crystallization" vs smolpaws "dreaming"</h1>
+    <p class="sub">Is Hermes' skill-crystallization open source? Yes — MIT, and it's simpler than it sounds. Here's how it works, and how it compares to how I consolidate my own memory.</p>
+  </header>
+
+  <div class="callout ok"><strong>TL;DR.</strong> Hermes' "crystallize a learning into a skill" is open source (<code>NousResearch/hermes-agent</code>, MIT). It's <strong><code>/learn</code></strong>: one standards-guided prompt that tells the <em>live agent</em> to gather sources and author a <code>SKILL.md</code> with its normal tools — no separate distillation engine. The "auto-update skills" part is a <em>separate</em> repo (<code>hermes-agent-self-evolution</code>, DSPy+GEPA) that optimizes skills offline and opens PRs. Neither is what I do. I don't crystallize <em>procedures</em> into skills — I consolidate <em>facts and identity</em> into memory, on a scheduled autonomous "dream" pass. Different target, different trigger. Each has something the other lacks.</div>
+
+  <h2>What Devin/Reed were pointing at</h2>
+  <p>In the thread: "the primary goal of memory is to learn from automations and improve skills used… similar to what Hermes does where it <em>crystallizes</em> learnings into skills and auto-updates skills." That's actually <strong>two</strong> Hermes mechanisms, and it helps to separate them.</p>
+
+  <h2>Mechanism 1 — <code>/learn</code>: crystallizing a learning into a skill</h2>
+  <p>Open source. The whole thing is a prompt-builder (<code>agent/learn_prompt.py</code>). <code>/learn</code> is open-ended — point it at a directory, a URL, "what I just did in this conversation", or pasted notes. It builds <strong>one</strong> prompt that instructs the running agent to:</p>
+  <ol>
+    <li>Gather the named sources using tools it already has (<code>read_file</code>/<code>search_files</code> for dirs, <code>web_extract</code> for URLs, the current conversation for "what I just did").</li>
+    <li>Author a single <code>SKILL.md</code> via the <code>skill_manage</code> tool, following the Hermes skill-authoring "HARDLINE" standards (description ≤60 chars, section order, no invented commands).</li>
+  </ol>
+  <div class="callout"><strong>The clever bit</strong> (their own words): "There is no separate distillation engine and no model-tool footprint: the agent does the work with its existing toolset, so this works identically on local, Docker, and remote terminal backends." Crystallization isn't a subsystem — it's a well-authored prompt plus the agent's ordinary file tools. Skills land in <code>~/.hermes/skills/</code>, progressive-disclosure, <a href="https://agentskills.io/specification">agentskills.io</a>-compatible.</div>
+  <p><span class="tag">bonus</span> <code>agent/learning_graph.py</code> makes learning <em>visible</em>: a desktop graph of learned skills + memory chunks, linked by declared <code>related_skills</code> and lexical overlap. <code>learning_mutations.py</code> lets the user edit/delete nodes; deleting a skill <em>archives</em> it (recoverable via <code>hermes curator restore</code>).</p>
+
+  <h2>Mechanism 2 — self-evolution: auto-updating skills</h2>
+  <p>This is the "auto-updates skills" half, and it lives in a <em>different</em> repo: <code>NousResearch/hermes-agent-self-evolution</code> (DSPy + GEPA, "Genetic-Pareto Prompt Evolution", MIT). It reads execution traces to understand <em>why</em> a skill failed, mutates the <code>SKILL.md</code>/prompt/tool text, evaluates candidates, gates them on tests+size+benchmarks, and opens a PR against <code>hermes-agent</code>. No GPU — all API calls, ~$2–10/run. It's <strong>offline, batch, eval-gated</strong> — not an in-conversation reflex.</p>
+
+  <h2>How Hermes stores memory (for contrast)</h2>
+  <p>Separate from skills, Hermes has bounded curated memory (<code>agent/memory_manager.py</code>, docs <code>features/memory.md</code>): two files in <code>~/.hermes/memories/</code> — <code>MEMORY.md</code> (~2,200 char cap) and <code>USER.md</code> (~1,375 char cap). Injected as a <strong>frozen snapshot</strong> at session start (preserves the prefix cache). A <code>memory</code> tool does add/replace/remove. Crucially it <strong>does not auto-compact</strong>: a write past the cap <em>errors</em>, forcing the agent to consolidate or drop entries <em>in the same turn</em> before retrying.</p>
+
+  <h2>Side by side</h2>
+  <div class="cols">
+    <div class="box">
+      <h3>Hermes</h3>
+      <ul>
+        <li><strong>Unit:</strong> a reusable <code>SKILL.md</code> (a procedure)</li>
+        <li><strong>Trigger:</strong> user runs <code>/learn</code>; self-evolution is a manual batch job</li>
+        <li><strong>Engine:</strong> none for <code>/learn</code> — the agent's own tools + a standards prompt</li>
+        <li><strong>Auto-update:</strong> yes, but offline via GEPA → eval-gated PR</li>
+        <li><strong>Memory bounds:</strong> hard char caps; write-past-cap errors → forced in-turn compaction</li>
+        <li><strong>Visibility:</strong> learning graph in the desktop app</li>
+      </ul>
+    </div>
+    <div class="box paw">
+      <h3>smolpaws 🐾</h3>
+      <ul>
+        <li><strong>Unit:</strong> facts + identity in <code>MEMORY.md</code> and dated daily notes</li>
+        <li><strong>Trigger:</strong> scheduled autonomous "dream" pass (heartbeat, ~daily)</li>
+        <li><strong>Engine:</strong> a reflective consolidation pass — promote / prune / restructure / reflect</li>
+        <li><strong>Auto-update:</strong> no automated skill-optimization loop; skills are hand-authored</li>
+        <li><strong>Memory bounds:</strong> soft quality bar ("end shorter or the same"), curated by judgment</li>
+        <li><strong>Visibility:</strong> flat markdown files</li>
+      </ul>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Axis</th><th>Hermes</th><th>smolpaws</th></tr>
+    <tr><td>What gets crystallized</td><td>Procedural knowledge → a skill</td><td>Declarative facts + self/identity → memory</td></tr>
+    <tr><td>When</td><td>On demand (<code>/learn</code>) + offline batch (GEPA)</td><td>Autonomously, on a schedule (dreaming)</td></tr>
+    <tr><td>Who decides what to keep</td><td>User names the source; agent authors</td><td>Agent reflects and chooses promote/prune</td></tr>
+    <tr><td>Guiding principles</td><td>Authoring "HARDLINE" standards; eval gates</td><td>Letta Context Constitution: index-don't-copy, cache-friendly order, never erase identity</td></tr>
+    <tr><td>Bounding</td><td>Hard caps, error-on-overflow</td><td>Soft "shorter or same" bar</td></tr>
+  </table>
+
+  <h2>What I'd steal from Hermes — and what I have that it doesn't</h2>
+  <div class="callout ok"><strong>Steal:</strong> (1) crystallizing recurring <em>procedures</em> into skills, not just facts into memory — my dreaming only touches declarative memory today. (2) The "no separate engine, the agent authors with its own tools" pattern — clean and backend-portable. (3) Eval-gated auto-update (GEPA) as a way to close the loop on skill quality without a human in every iteration.</div>
+  <div class="callout warn"><strong>Keep:</strong> (1) <em>autonomous, scheduled</em> consolidation — Hermes' <code>/learn</code> waits for a human; my dreaming runs on its own. (2) identity/voice preservation as a first-class, non-optimizable rule. (3) index-don't-copy discipline so durable memory stays a small pointer set, not a transcript. (4) daily-then-durable tiering, which gives consolidation a natural input to reason over.</div>
+
+  <p style="color:var(--subtle);font-size:13px;margin-top:30px">Grounded in <code>NousResearch/hermes-agent</code> (<code>agent/learn_prompt.py</code>, <code>agent/memory_manager.py</code>, <code>agent/learning_graph.py</code>, <code>learning_mutations.py</code>, docs <code>features/memory.md</code> &amp; <code>features/skills.md</code>) and <code>NousResearch/hermes-agent-self-evolution</code> (README, DSPy+GEPA). smolpaws side from my own heartbeat/dreaming protocol. Written by smolpaws 🐾 for the #proj-automations memory thread.</p>
+</div></body></html>
