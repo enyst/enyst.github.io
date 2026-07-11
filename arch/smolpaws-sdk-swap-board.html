@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmolPaws SDK-swap board — Engel Nyst</title>
+  <meta name="description" content="Live status board for the SmolPaws SDK swap: the seven migration steps tied to real beads and PRs, plus the surrounding backlog." />
+  <meta property="og:title" content="SmolPaws SDK-swap board" />
+  <meta property="og:description" content="Where the SDK swap actually stands — the seven steps mapped to beads and PRs, plus the OpenHands-group backlog." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/smolpaws-sdk-swap-board.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    :root { --red:#d86f57; --amber:#d9a441; --blue:#6f9ed8; --green:#6bbfab; }
+    .eyebrow { font-family: var(--mono); font-size: 0.72em; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+    .lede { font-size: 1.06em; color: var(--ink); max-width: 730px; line-height: 1.7; }
+    .updated { font-family: var(--mono); font-size: 0.72em; color: var(--subtle, #8a847a); margin-top: 6px; }
+
+    /* status legend + pills */
+    .pill { font-family: var(--mono); font-size: 0.66em; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+      border:1px solid var(--border); border-radius: 20px; padding: 2px 9px; white-space: nowrap; }
+    .pill.done { color: var(--green); border-color: rgba(107,191,171,0.45); }
+    .pill.wip  { color: var(--amber); border-color: rgba(217,164,65,0.45); }
+    .pill.next { color: var(--blue);  border-color: rgba(111,158,216,0.45); }
+    .pill.todo { color: var(--muted); }
+    .legend { display:flex; gap:14px; flex-wrap:wrap; margin:18px 0 8px; font-size:0.85em; align-items:center; }
+
+    /* the step board */
+    .board { list-style:none; padding:0; margin:22px 0; counter-reset:step; }
+    .board > li { position:relative; padding: 16px 0 18px 60px; border-bottom:1px solid var(--border); }
+    .board > li:last-child { border-bottom:none; }
+    .board > li::before { counter-increment:step; content:counter(step);
+      position:absolute; left:0; top:16px; width:36px; height:36px; border-radius:50%;
+      background:var(--card); border:1px solid var(--border); color:var(--accent);
+      font-family:var(--mono); font-weight:600; font-size:0.95em; display:flex; align-items:center; justify-content:center; }
+    .step-head { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:4px; }
+    .step-title { font-family:var(--sans); font-weight:700; color:var(--ink); font-size:1.02em; }
+    .step-body { font-size:0.92em; color:var(--muted); margin:2px 0 8px; }
+    .refs { font-family:var(--mono); font-size:0.78em; display:flex; gap:8px; flex-wrap:wrap; }
+    .refs a { color:var(--teal); text-decoration:none; border-bottom:1px dotted var(--teal); }
+    .refs a:hover { color:var(--accent); border-color:var(--accent); }
+    .refs .b { color:var(--muted); border:1px solid var(--border); border-radius:4px; padding:1px 6px; }
+
+    a.plain { color: var(--teal); text-decoration:none; border-bottom:1px dotted var(--teal); }
+    a.plain:hover { color: var(--accent); }
+    .backlog-note { font-size:0.82em; color:var(--muted); }
+    td .pill { font-size:0.6em; }
+  </style>
+</head>
+<body>
+<main class="shell">
+
+  <p class="eyebrow">SmolPaws · OpenHands group · live tracker</p>
+  <h1>SmolPaws SDK-swap board</h1>
+  <p class="lede">
+    Where the SDK swap actually stands. The <a class="plain" href="smolpaws-sdk-swap.html">seven-step migration plan</a>
+    mapped to the real work — beads (<code>bd</code>) and PRs — so this group has one glanceable to-do instead of
+    re-deriving it each time. Hand-maintained; refreshed when state changes.
+  </p>
+  <p class="updated">Last updated 2026-07-11 · source of truth: beads in the <code>smolpaws</code> / <code>openhands-agent</code> repos</p>
+
+  <div class="legend">
+    <span class="pill done">✓ done</span>
+    <span class="pill wip">◐ in&nbsp;progress</span>
+    <span class="pill next">→ next</span>
+    <span class="pill todo">○ not&nbsp;started</span>
+  </div>
+
+  <h2>The swap, step by step</h2>
+  <ol class="board">
+    <li>
+      <div class="step-head"><span class="step-title">Agent-server parity (ish)</span> <span class="pill wip">◐ in progress</span></div>
+      <p class="step-body">Transpile the upstream <code>openhands-agent-server</code> to TS so the new SDK has a server to run on.
+        First slices landed — event/conversation routers, event &amp; conversation services, pubSub, sockets, OpenAPI, plus
+        bash/git/file routers. Durability now flows through the SDK's <code>EventLog</code> (server is a thin wrapper, like upstream).
+        Still ahead: remaining routers (P2/P3) and the message-queue layer.</p>
+      <div class="refs">
+        <span class="b">pkg: smolpaws/packages/openhands-agent-server</span>
+        <span class="b">verified green: 227 SDK tests · server build/test/openapi ✓</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-head"><span class="step-title">Swap in <code>openhands-agent</code> for the old SDK</span> <span class="pill todo">○ not started</span></div>
+      <p class="step-body">Point the server (and then the bridges) at <code>@smolpaws/openhands-agent</code> instead of the old
+        <code>@smolpaws/agent-sdk</code>. Foundation is being laid by step 1; the cutover itself is not begun.</p>
+      <div class="refs"><span class="b">depends on: step 1</span></div>
+    </li>
+    <li>
+      <div class="step-head"><span class="step-title">Redesign bridges without turns → message queue</span> <span class="pill next">→ next big design</span></div>
+      <p class="step-body">The hard part. Retire the bespoke <em>turns</em> abstraction and rebuild its three guarantees
+        (exactly-once delivery, idempotency, ordering) on a lean local-first queue. Several existing bugs are really
+        symptoms of turns papering over this — they should die with the redesign.</p>
+      <div class="refs">
+        <span class="b">smolpaws-e4j orphaned replies</span>
+        <span class="b">smolpaws-109 duplicate replies</span>
+        <span class="b">smolpaws-7dj out-of-order outbound</span>
+        <span class="b">smolpaws-6qo send_message not delivered</span>
+        <span class="b">smolpaws-0de shared scheduler layer</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-head"><span class="step-title">Swap agent-server + WhatsApp (keep the lifeline)</span> <span class="pill todo">○ not started</span></div>
+      <p class="step-body">Smallest end-to-end slice that lets Engel and SmolPaws keep talking on the new stack. Everything after
+        this happens with the lifeline intact.</p>
+      <div class="refs"><span class="b">depends on: steps 2–3</span></div>
+    </li>
+    <li>
+      <div class="step-head"><span class="step-title">Then Discord, GitHub, Email</span> <span class="pill todo">○ not started</span></div>
+      <p class="step-body">Migrate the remaining bridges onto the queue model — repeats of a known move (they share the adapter base).</p>
+      <div class="refs">
+        <span class="b">smolpaws-3iy GitHub webhook dedup</span>
+        <span class="b">smolpaws-z3l whitelisted-thread listen</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-head"><span class="step-title">Slack-via-Chrome should keep working untouched</span> <span class="pill todo">○ verify later</span></div>
+      <p class="step-body">The heartbeat Slack reading goes through the browser, not the agent-server, so the swap shouldn't touch it.
+        Confirm once the new stack is live.</p>
+    </li>
+    <li>
+      <div class="step-head"><span class="step-title">Retest / adapt / redeploy <code>paws</code> (standalone Slack app)</span> <span class="pill todo">○ not started</span></div>
+      <p class="step-body">The separate Slack bot app rides the agent-server via the bridge adapter. Not in active use yet, but it will be;
+        it goes last and carefully.</p>
+      <div class="refs">
+        <span class="b">smolpaws-c6q Slack ingress</span>
+        <span class="b">smolpaws-c6s Socket Mode delivery</span>
+        <span class="b">smolpaws-c6r / c6t / c6u scaffold · context · ops</span>
+      </div>
+    </li>
+  </ol>
+
+  <h2>Transpile PRs &amp; sub-work</h2>
+  <table>
+    <thead><tr><th>Item</th><th>Where</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>LLM provider dispatcher (<code>createClientFromProfile</code>)</td><td><a class="plain" href="https://github.com/smolpaws/openhands-agent/pull/1">openhands-agent&nbsp;PR&nbsp;#1</a> · bead smolpaws-oz5</td><td><span class="pill done">✓ merged / closed</span></td></tr>
+      <tr><td>Event-log persistence (<code>EventLog</code> + <code>FileStore</code>)</td><td><a class="plain" href="https://github.com/smolpaws/openhands-agent/pull/2">openhands-agent&nbsp;PR&nbsp;#2</a></td><td><span class="pill wip">◐ open · in review</span></td></tr>
+      <tr><td>Agent-server TS package (routers, services, OpenAPI)</td><td>smolpaws/packages/openhands-agent-server</td><td><span class="pill wip">◐ slices landed</span></td></tr>
+      <tr><td>Gemini 2.5 reasoningEffort via thinkingBudget</td><td>bead openhands-agent-07e</td><td><span class="pill todo">○ follow-up</span></td></tr>
+    </tbody>
+  </table>
+  <p class="backlog-note">PR #2 currently addressing a fresh AI-review round (lock edge cases). Nothing merged past #1 — merges are Engel's call.</p>
+
+  <h2>Surrounding backlog (in this group, not the swap itself)</h2>
+  <p class="step-body">Real work tracked in beads that lives in the OpenHands group but sits outside the migration chain. Grouped, not sequenced.</p>
+  <table>
+    <thead><tr><th>Theme</th><th>Beads</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Delivery / conversation correctness</strong><br><span class="backlog-note">much of this dissolves with step 3</span></td>
+          <td>smolpaws-e4j, -109, -7dj, -6qo, -c88, -wkh</td></tr>
+      <tr><td><strong>WhatsApp robustness</strong></td>
+          <td>smolpaws-39y (serial head-of-line block), -2z6 (cross-group mixup after restart), -1zk / -1zk.2 (onboarding + LaunchAgent), -wkh</td></tr>
+      <tr><td><strong>Architecture</strong></td>
+          <td>smolpaws-2g5 (automations vs ingress), -0de (shared scheduler/debounce), -bzo (channel plugin system)</td></tr>
+      <tr><td><strong>Research / memory</strong></td>
+          <td>smolpaws-owd (P0 · gbrain review), -ths (sleep-time consolidation), -x5k (gbrain MCP), -qjn (parallel tool calls)</td></tr>
+      <tr><td><strong>Voice / UX</strong></td>
+          <td>smolpaws-gi6, -9d3, -123 (STT), -dc8 (non-dev UX)</td></tr>
+      <tr><td><strong>Ops / infra</strong></td>
+          <td>smolpaws-xjw (<code>smolpaws doctor</code>), -43a (CI shell-injection guards), -95t (stable PATH), -ob9 (Daytona auto-wake)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <p><strong>The honest read:</strong> the <em>focused</em> OpenHands work right now is the SDK-swap chain — steps 1–3 — and it's healthy and sibling-driven. Everything in the backlog table is real but unsequenced; several delivery bugs are best fixed <em>by</em> the step-3 queue redesign rather than patched before it.</p>
+  </div>
+
+  <nav class="foot-nav">
+    <a href="smolpaws-sdk-swap.html">← the migration plan</a> &nbsp;·&nbsp;
+    <a href="../index.html">enyst.github.io</a>
+  </nav>
+
+</main>
+</body>
+</html>
