@@ -1,0 +1,182 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programmatic Tool Calling on the OpenHands SDK — Engel Nyst</title>
+<meta name="description" content="How GPT-5.6's Programmatic Tool Calling works, what the OpenHands agent-sdk sends and parses today, and exactly why the loop can't complete yet.">
+<meta property="og:title" content="Programmatic Tool Calling on the OpenHands SDK">
+<meta property="og:description" content="How GPT-5.6's Programmatic Tool Calling works, what the OpenHands agent-sdk sends and parses today, and exactly why the loop can't complete yet.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://enyst.github.io/arch/gpt56-programmatic-tool-calling.html">
+<meta name="twitter:card" content="summary">
+<style>
+  :root{
+    --fg:#1a1a1a;--muted:#5a5a5a;--subtle:#8a8a82;
+    --bg:#fdfdfb;--card:#ffffff;--elevated:#f7f6f1;
+    --accent:#2b4eaa;--accent-soft:#e6ecfa;
+    --rule:#e2e2dc;--rule-strong:#bdbcb4;
+    --code-bg:#f3f1ec;--warn:#b25b0e;--ok:#2f7a3a;--crit:#a02020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.65;font-size:16px}
+  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:4px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none}nav.toc a:hover{color:var(--accent)}
+  nav.toc .back{display:block;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  nav.toc .back:hover{color:var(--accent)}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:20px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:33px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted);max-width:780px}
+  h2{font-size:23px;margin:46px 0 10px}h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:15px;margin:22px 0 6px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  p{max-width:760px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:13px;line-height:1.5;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule);white-space:pre}
+  pre code{background:transparent;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}.add{color:var(--ok)}.del{color:var(--crit)}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:16px 0;border-radius:0 4px 4px 0;font-size:14.5px;max-width:760px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6}.callout.note{border-color:var(--muted);background:#f3f1ec}
+  .skip{font-size:13px;color:var(--muted);font-style:italic;margin:6px 0 14px}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  a.ext{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0;max-width:760px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg)}
+  .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:16px 0;max-width:760px}
+  .node{border:1px solid var(--rule-strong);background:var(--card);border-radius:8px;padding:10px 12px;font-size:13px;min-width:120px}
+  .node .n-t{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
+  .node .n-d{font-family:var(--mono);font-size:12px}
+  .gate{border-color:var(--accent);background:var(--accent-soft)}
+  .arrow{display:flex;align-items:center;color:var(--rule-strong);font-size:20px}
+  .yes{border-color:var(--ok);background:#eaf4ec}.no{border-color:var(--crit);background:#f7ecec}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;background:var(--code-bg);color:var(--muted);margin-left:6px}
+  .pill.gap{background:#f7e2e2;color:var(--crit)}.pill.partial{background:#fbf1e6;color:var(--warn)}
+  .q{border:1px solid var(--rule);border-radius:8px;padding:16px 18px;margin:16px 0;max-width:760px;background:var(--card)}
+  .q .qn{font-weight:600;margin-bottom:10px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--rule-strong);background:var(--card);border-radius:6px;padding:9px 12px;margin:7px 0;font:inherit;font-size:14px;cursor:pointer;transition:background .12s,border-color .12s}
+  .opt:hover{background:var(--elevated)}
+  .opt.correct{border-color:var(--ok);background:#eaf4ec}
+  .opt.wrong{border-color:var(--crit);background:#f7ecec}
+  .opt.disabled{cursor:default;opacity:.75}
+  .fb{font-size:13.5px;margin-top:8px;padding:8px 12px;border-radius:6px;display:none}
+  .fb.show{display:block}
+  .fb.good{background:#eaf4ec;color:var(--ok)}.fb.bad{background:#f7ecec;color:var(--crit)}
+  .score{font-weight:600;margin-top:8px}
+  .foot-nav{margin-top:52px;border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono);font-size:13px}
+  .foot-nav a{color:var(--muted);text-decoration:none}.foot-nav a:hover{color:var(--accent)}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr;gap:16px}nav.toc{position:static}}
+</style>
+</head>
+<body><div class="wrap">
+<nav class="toc"><a class="back" href="../index.html">← Home</a><h2>Contents</h2><ol><li><a href="#what">What the feature is</a></li><li><a href="#need">What OpenAI needs</a></li><li><a href="#today">What the SDK does today</a></li><li><a href="#gap">The two-sided gap</a></li></ol></nav>
+<main>
+<header class="title">
+  <div class="eyebrow">show-me + teach-me · GPT-5.6 Responses · SDK issue #4082</div>
+  <h1>Programmatic Tool Calling &mdash; and the item the parser drops</h1>
+  <p class="sub">GPT-5.6 can write JavaScript that runs in a hosted sandbox and orchestrates tool calls before returning one compact result. This page shows what the feature needs, what the OpenHands agent-sdk does today, and the precise two-sided gap that stops it working.</p>
+</header>
+
+<section id="what"><h2><span class="num">1</span>What the feature is</h2>
+<p>In ordinary tool calling, every tool result flows back through the model: fetch ten things, and the model reads ten results. <strong>Programmatic Tool Calling (PTC)</strong> flips that. The model writes a small JavaScript program that runs in a hosted, isolated V8 runtime; the program calls tools (in parallel, in loops), reduces the intermediate data, and returns a single small result. Good for &ldquo;fetch many, keep the two that matter.&rdquo;</p>
+<p class="skip">The runtime has top-level <code>await</code> but no Node, no network, no filesystem, no persistent state &mdash; it only reaches the outside world through the tools you enabled, and emits output via <code>text(...)</code> / <code>image(...)</code>.</p>
+<div class="callout">★ The essential trade: PTC moves the &ldquo;glue&rdquo; between tool calls from model tokens into sandboxed code. Fewer round-trips, less intermediate context, but you give up per-result model judgement.</div>
+</section>
+
+<section id="need"><h2><span class="num">2</span>What OpenAI needs in the request</h2>
+<p>Three additions to a normal Responses request:</p>
+<pre><code>tools = [
+  {"type":"function","name":"get_inventory",
+   <span class="kw">"output_schema"</span>: {...},              <span class="com"># so generated JS can trust the shape</span>
+   <span class="kw">"allowed_callers"</span>: ["programmatic"]},  <span class="com"># direct | programmatic | both</span>
+  {"type": <span class="str">"programmatic_tool_calling"</span>}         <span class="com"># the hosted tool</span>
+]</code></pre>
+<p>And three <em>new output item types</em> come back in <code>response.output</code>:</p>
+<table>
+<tr><th>Item</th><th>Meaning</th></tr>
+<tr><td><code>program</code></td><td>The generated JS + a <code>call_id</code> + an opaque <code>fingerprint</code> used to resume.</td></tr>
+<tr><td><code>function_call</code> with <code>caller.caller_id</code></td><td>A tool call <em>made by the program</em>; <code>caller_id</code> points at the program's <code>call_id</code>.</td></tr>
+<tr><td><code>program_output</code></td><td>The program's final result + status.</td></tr>
+</table>
+<div class="callout note">ⓘ The continuation contract: you run each client-owned <code>function_call</code>, then return a <code>function_call_output</code> that <strong>echoes the original <code>caller</code> unchanged</strong>. That's how the hosted runtime resumes the right program.</div>
+</section>
+
+<section id="today"><h2><span class="num">3</span>What the SDK does today</h2>
+<p>The OpenHands Responses path is a straight pipe bracketed by two methods. Here's the outbound one:</p>
+<pre><code><span class="com"># tool.py:497 — to_responses_tool()</span>
+return {
+  "type": "function",
+  "name": self.name,
+  "description": self.description,
+  "parameters": self._get_tool_schema(...),
+  "strict": False,
+}</code></pre>
+<p>No <code>output_schema</code>, no <code>allowed_callers</code>, and nothing injects the <code>programmatic_tool_calling</code> hosted tool. Notably, we <em>already</em> compute <code>output_schema</code> for <code>to_mcp_tool()</code> a few lines up (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/main/openhands-sdk/openhands/sdk/tool/tool.py#L407">tool.py:407</a>) &mdash; the data exists, it just isn't threaded to the Responses serializer.</p>
+<p>The inbound method only understands three nouns:</p>
+<pre><code><span class="com"># message.py:541 — from_llm_responses_output()</span>
+for item in output:
+    t = _get(item, "type")
+    if   t == "message":        ...   <span class="com"># collect text</span>
+    elif t == "function_call":  ...   <span class="com"># → MessageToolCall (caller NOT captured)</span>
+    elif t == "reasoning":      ...   <span class="com"># → ReasoningItemModel</span>
+    <span class="com"># no else — unknown items vanish</span></code></pre>
+</section>
+
+<section id="gap"><h2><span class="num">4</span>The two-sided gap</h2>
+<p>Here's the same PTC response flowing through today's parser, with real item types:</p>
+<div class="flow">
+  <div class="node"><div class="n-t">output item</div><div class="n-d">program</div></div>
+  <div class="arrow">→</div>
+  <div class="node gate"><div class="n-t">parser</div><div class="n-d">knows 3 types</div></div>
+  <div class="arrow">→</div>
+  <div class="node no"><div class="n-t">result</div><div class="n-d">dropped 😾</div></div>
+</div>
+<div class="flow">
+  <div class="node"><div class="n-t">output item</div><div class="n-d">function_call<br>{caller:{caller_id}}</div></div>
+  <div class="arrow">→</div>
+  <div class="node gate"><div class="n-t">parser</div><div class="n-d">keeps call_id,<br>drops caller</div></div>
+  <div class="arrow">→</div>
+  <div class="node no"><div class="n-t">result</div><div class="n-d">can't echo caller</div></div>
+</div>
+<div class="callout warn">⚠ This is the load-bearing point. Even if you hand-inject the hosted tool via raw kwargs and the request is <em>accepted</em>, the parser silently drops <code>program</code>/<code>program_output</code> and never captures <code>caller</code>. Without echoing <code>caller</code> back on <code>function_call_output</code>, the hosted runtime can't resume the program &mdash; so a PTC loop can look half-working while being fundamentally unable to finish.</div>
+<p>The fix is therefore two-sided: thread <code>output_schema</code>/<code>allowed_callers</code> out and inject the hosted tool (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/main/openhands-sdk/openhands/sdk/llm/options/responses_options.py">responses_options.py</a>), <em>and</em> teach the parser to preserve <code>program</code>, <code>program_output</code>, and <code>caller</code> end-to-end. Tracked in <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4082">#4082</a>.</p>
+</section>
+
+<section id="quiz"><h2><span class="num">4</span>Quiz</h2>
+<p>Five questions to check you actually understood it — not trivia. Click an answer to see whether it's right and why.</p>
+<div id="quiz"></div>
+<div class="score" id="score"></div>
+</section>
+<div class="foot-nav">Companion pages: <a class="ext" href="gpt56-tool-search.html">Tool search</a> · <a class="ext" href="gpt56-websocket-mode.html">WebSocket mode</a> · <a class="ext" href="gpt56-multi-agent.html">Multi-agent</a> &nbsp;|&nbsp; SDK issue <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4082">#4082</a> &nbsp;|&nbsp; <a href="../index.html">← Home</a></div>
+</main>
+</div>
+<script>const QUIZ=[{"q": "You inject the programmatic_tool_calling hosted tool via raw kwargs and the request is accepted. Why does the loop still fail to finish?", "opts": [{"t": "The Responses API rejects it unless store=true", "ok": false, "why": "No \u2014 store mode isn't the blocker; the request was accepted."}, {"t": "from_llm_responses_output() drops program/program_output and never captures caller, so the SDK can't echo caller back to resume the program", "ok": true, "why": "Right. Unknown items vanish and the lost caller means the program can never resume."}, {"t": "LiteLLM can't reach the Responses API at all", "ok": false, "why": "No \u2014 LiteLLM is exactly how the SDK reaches Responses today."}, {"t": "The V8 sandbox needs network access OpenHands blocks", "ok": false, "why": "The sandbox has no network by design, but that isn't why our loop fails."}]}, {"q": "Where does the SDK already compute the output_schema that PTC needs?", "opts": [{"t": "In to_responses_tool()", "ok": false, "why": "No \u2014 that method omits output_schema; that's the gap."}, {"t": "In to_mcp_tool() (tool.py:407) \u2014 the data exists, it just isn't threaded to the Responses serializer", "ok": true, "why": "Correct. output_schema is built for MCP; PTC just needs it wired into the Responses path."}, {"t": "Nowhere \u2014 it must be written from scratch", "ok": false, "why": "It exists for MCP already."}, {"t": "In the condenser", "ok": false, "why": "Unrelated \u2014 the condenser is about context compaction."}]}, {"q": "What does allowed_callers control?", "opts": [{"t": "Which users may call the API", "ok": false, "why": "No \u2014 it's about call origin, not users."}, {"t": "Whether a tool can be called directly by the model, only from a program, or either way", "ok": true, "why": "Correct: [\"direct\"], [\"programmatic\"], or both."}, {"t": "The maximum number of parallel calls", "ok": false, "why": "No \u2014 that's not what the field means."}, {"t": "Whether the tool requires approval", "ok": false, "why": "Approval is a separate MCP require_approval concern."}]}, {"q": "On continuation, what must the SDK send back for a program-initiated function_call?", "opts": [{"t": "A function_call_output that echoes the original caller unchanged", "ok": true, "why": "Right \u2014 the runtime uses caller to resume the correct program."}, {"t": "A brand-new program item", "ok": false, "why": "No \u2014 the client doesn't author program items."}, {"t": "Nothing; the runtime handles it", "ok": false, "why": "No \u2014 client-owned calls are executed and returned by the app."}, {"t": "The full transcript re-encrypted", "ok": false, "why": "Not required by the contract."}]}, {"q": "What's the best one-line summary of the PTC gap in the SDK?", "opts": [{"t": "It's purely an outbound serialization change", "ok": false, "why": "No \u2014 parsing is broken too."}, {"t": "It's purely an inbound parsing change", "ok": false, "why": "No \u2014 the outbound tool fields are missing too."}, {"t": "It's two-sided: send new tool fields + the hosted tool, and preserve program/program_output/caller inbound", "ok": true, "why": "Correct \u2014 both ends of the pipe need work."}, {"t": "It's a LiteLLM bug", "ok": false, "why": "The gap is in the SDK's own serialize/parse methods."}]}];</script>
+<script>
+let answered=0,correct=0;const root=document.getElementById('quiz');
+QUIZ.forEach((item,i)=>{
+  const box=document.createElement('div');box.className='q';
+  const qn=document.createElement('div');qn.className='qn';qn.textContent=(i+1)+'. '+item.q;box.appendChild(qn);
+  const fb=document.createElement('div');fb.className='fb';
+  item.opts.forEach(o=>{
+    const btn=document.createElement('button');btn.className='opt';btn.textContent=o.t;
+    btn.addEventListener('click',()=>{
+      if(box.dataset.done)return;box.dataset.done='1';answered++;if(o.ok)correct++;
+      Array.from(box.querySelectorAll('.opt')).forEach(b=>{b.classList.add('disabled');b.disabled=true;});
+      btn.classList.add(o.ok?'correct':'wrong');
+      fb.textContent=(o.ok?'\u2705 ':'\u274c ')+o.why;fb.className='fb show '+(o.ok?'good':'bad');
+      updateScore();
+    });
+    box.appendChild(btn);
+  });
+  box.appendChild(fb);root.appendChild(box);
+});
+function updateScore(){
+  const s=document.getElementById('score');
+  s.textContent='Score: '+correct+' / '+QUIZ.length+(answered===QUIZ.length?(correct===QUIZ.length?' \u2014 perfect, you understood it \ud83d\udc3e':' \u2014 reread the section behind any you missed.'):'');
+}
+</script>
+</body></html>

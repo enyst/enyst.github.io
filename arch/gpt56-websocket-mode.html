@@ -1,0 +1,153 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WebSocket mode + previous_response_id on the OpenHands SDK — Engel Nyst</title>
+<meta name="description" content="How GPT-5.6 WebSocket mode cuts per-turn overhead with incremental inputs and previous_response_id, and the cheap HTTP Phase 0 the OpenHands agent-sdk can adopt first.">
+<meta property="og:title" content="WebSocket mode + previous_response_id on the OpenHands SDK">
+<meta property="og:description" content="How GPT-5.6 WebSocket mode cuts per-turn overhead with incremental inputs and previous_response_id, and the cheap HTTP Phase 0 the OpenHands agent-sdk can adopt first.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://enyst.github.io/arch/gpt56-websocket-mode.html">
+<meta name="twitter:card" content="summary">
+<style>
+  :root{
+    --fg:#1a1a1a;--muted:#5a5a5a;--subtle:#8a8a82;
+    --bg:#fdfdfb;--card:#ffffff;--elevated:#f7f6f1;
+    --accent:#2b4eaa;--accent-soft:#e6ecfa;
+    --rule:#e2e2dc;--rule-strong:#bdbcb4;
+    --code-bg:#f3f1ec;--warn:#b25b0e;--ok:#2f7a3a;--crit:#a02020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.65;font-size:16px}
+  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:4px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none}nav.toc a:hover{color:var(--accent)}
+  nav.toc .back{display:block;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  nav.toc .back:hover{color:var(--accent)}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:20px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:33px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted);max-width:780px}
+  h2{font-size:23px;margin:46px 0 10px}h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:15px;margin:22px 0 6px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  p{max-width:760px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:13px;line-height:1.5;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule);white-space:pre}
+  pre code{background:transparent;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}.add{color:var(--ok)}.del{color:var(--crit)}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:16px 0;border-radius:0 4px 4px 0;font-size:14.5px;max-width:760px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6}.callout.note{border-color:var(--muted);background:#f3f1ec}
+  .skip{font-size:13px;color:var(--muted);font-style:italic;margin:6px 0 14px}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  a.ext{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0;max-width:760px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg)}
+  .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:16px 0;max-width:760px}
+  .node{border:1px solid var(--rule-strong);background:var(--card);border-radius:8px;padding:10px 12px;font-size:13px;min-width:120px}
+  .node .n-t{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
+  .node .n-d{font-family:var(--mono);font-size:12px}
+  .gate{border-color:var(--accent);background:var(--accent-soft)}
+  .arrow{display:flex;align-items:center;color:var(--rule-strong);font-size:20px}
+  .yes{border-color:var(--ok);background:#eaf4ec}.no{border-color:var(--crit);background:#f7ecec}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;background:var(--code-bg);color:var(--muted);margin-left:6px}
+  .pill.gap{background:#f7e2e2;color:var(--crit)}.pill.partial{background:#fbf1e6;color:var(--warn)}
+  .q{border:1px solid var(--rule);border-radius:8px;padding:16px 18px;margin:16px 0;max-width:760px;background:var(--card)}
+  .q .qn{font-weight:600;margin-bottom:10px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--rule-strong);background:var(--card);border-radius:6px;padding:9px 12px;margin:7px 0;font:inherit;font-size:14px;cursor:pointer;transition:background .12s,border-color .12s}
+  .opt:hover{background:var(--elevated)}
+  .opt.correct{border-color:var(--ok);background:#eaf4ec}
+  .opt.wrong{border-color:var(--crit);background:#f7ecec}
+  .opt.disabled{cursor:default;opacity:.75}
+  .fb{font-size:13.5px;margin-top:8px;padding:8px 12px;border-radius:6px;display:none}
+  .fb.show{display:block}
+  .fb.good{background:#eaf4ec;color:var(--ok)}.fb.bad{background:#f7ecec;color:var(--crit)}
+  .score{font-weight:600;margin-top:8px}
+  .foot-nav{margin-top:52px;border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono);font-size:13px}
+  .foot-nav a{color:var(--muted);text-decoration:none}.foot-nav a:hover{color:var(--accent)}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr;gap:16px}nav.toc{position:static}}
+</style>
+</head>
+<body><div class="wrap">
+<nav class="toc"><a class="back" href="../index.html">← Home</a><h2>Contents</h2><ol><li><a href="#what">What the feature is</a></li><li><a href="#today">What the SDK does today</a></li><li><a href="#phase0">The cheap Phase 0</a></li><li><a href="#gap">The full gap & dependency</a></li></ol></nav>
+<main>
+<header class="title">
+  <div class="eyebrow">show-me + teach-me · GPT-5.6 Responses · SDK issue #4084</div>
+  <h1>WebSocket mode &mdash; and the cheap win hiding inside it</h1>
+  <p class="sub">A persistent socket plus incremental inputs speeds long tool-heavy rollouts by up to ~40%. But there's a transport-independent Phase 0 the SDK can adopt today, because it currently replays the whole transcript every turn.</p>
+</header>
+
+<section id="what"><h2><span class="num">1</span>What the feature is</h2>
+<p><strong>WebSocket mode</strong> keeps a persistent connection to <code>/v1/responses</code>. Each turn is a <code>response.create</code> event that carries only the new input items plus <code>previous_response_id</code> &mdash; not the whole transcript. For rollouts with 20+ tool calls, OpenAI reports up to ~40% faster end-to-end execution. There's also a <code>generate:false</code> warmup, a 60-minute connection cap, and defined reconnect/recovery behaviour.</p>
+<div class="callout">★ Two ideas are bundled here: a <em>transport</em> (websocket) and a <em>continuation model</em> (<code>previous_response_id</code> + incremental input). The second is useful even without the first.</div>
+</section>
+
+<section id="today"><h2><span class="num">2</span>What the SDK does today</h2>
+<p>The Responses path calls <code>litellm_responses</code> / <code>litellm_aresponses</code> over HTTP, defaults to <code>store=false</code>, and replays the full input every turn. Grep the whole <code>llm.py</code> and you won't find <code>previous_response_id</code> — it's never used (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/main/openhands-sdk/openhands/sdk/llm/llm.py#L1555">llm.py:1555</a>).</p>
+<div class="flow">
+  <div class="node"><div class="n-t">turn N</div><div class="n-d">send FULL transcript</div></div>
+  <div class="arrow">→</div>
+  <div class="node gate"><div class="n-t">litellm_responses</div><div class="n-d">HTTP · store=false</div></div>
+  <div class="arrow">→</div>
+  <div class="node"><div class="n-t">turn N+1</div><div class="n-d">send FULL transcript<br><b>again</b></div></div>
+</div>
+</section>
+
+<section id="phase0"><h2><span class="num">3</span>The cheap Phase 0</h2>
+<p>You don't need a websocket to stop re-uploading the growing transcript. For stored responses, adopting <code>previous_response_id</code> continuation on the <em>existing HTTP path</em> already sends only new items each turn. That's a transport-independent win and the natural first step.</p>
+<div class="flow">
+  <div class="node yes"><div class="n-t">turn N</div><div class="n-d">resp_123</div></div>
+  <div class="arrow">→</div>
+  <div class="node yes"><div class="n-t">turn N+1</div><div class="n-d">previous_response_id=<br>resp_123<br>+ only new items</div></div>
+</div>
+</section>
+
+<section id="gap"><h2><span class="num">4</span>The full gap &amp; its dependency</h2>
+<p>The websocket transport itself is the heavier lift and the lowest-confidence part:</p>
+<table>
+<tr><th>Piece</th><th>Status / note</th></tr>
+<tr><td>Phase 0: <code>previous_response_id</code> on HTTP</td><td>doable now; measure token/latency impact</td></tr>
+<tr><td>WebSocket transport</td><td>blocked on LiteLLM exposing a websocket Responses transport (or a direct-client path)</td></tr>
+<tr><td>Warmup, reconnect, 60-min, <code>previous_response_not_found</code></td><td>Phase 2, after transport lands</td></tr>
+</table>
+<div class="callout warn">⚠ Biggest dependency: does LiteLLM support (or plan) a websocket transport for the Responses API? If not, this needs a direct-client path or an upstream LiteLLM contribution. Flag it low-confidence for near-term. Also: continuation must play nice with our condenser/compaction and reasoning-item replay for stateless requests. Tracked in <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4084">#4084</a>.</div>
+</section>
+
+<section id="quiz"><h2><span class="num">4</span>Quiz</h2>
+<p>Five questions to check you actually understood it — not trivia. Click an answer to see whether it's right and why.</p>
+<div id="quiz"></div>
+<div class="score" id="score"></div>
+</section>
+<div class="foot-nav">Companion pages: <a class="ext" href="gpt56-programmatic-tool-calling.html">Programmatic Tool Calling</a> · <a class="ext" href="gpt56-tool-search.html">Tool search</a> · <a class="ext" href="gpt56-multi-agent.html">Multi-agent</a> &nbsp;|&nbsp; SDK issue <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4084">#4084</a> &nbsp;|&nbsp; <a href="../index.html">← Home</a></div>
+</main>
+</div>
+<script>const QUIZ=[{"q": "What's the transport-independent Phase 0 for this issue?", "opts": [{"t": "Adopt previous_response_id continuation on the existing HTTP path so the SDK stops re-uploading the whole transcript", "ok": true, "why": "Correct \u2014 a real win without any websocket."}, {"t": "Rewrite the LLM layer to be async-first", "ok": false, "why": "Separate concern."}, {"t": "Switch every model to store=true", "ok": false, "why": "Has privacy/ZDR implications and isn't the point."}, {"t": "Drop LiteLLM immediately", "ok": false, "why": "Heavy last resort, not Phase 0."}]}, {"q": "Why does the SDK not benefit from incremental continuation today?", "opts": [{"t": "It uses Chat Completions, not Responses", "ok": false, "why": "It does use the Responses path."}, {"t": "It defaults to store=false and replays the full input every turn; previous_response_id is never used", "ok": true, "why": "Correct \u2014 no continuation id is threaded."}, {"t": "LiteLLM strips the transcript", "ok": false, "why": "Not the reason."}, {"t": "The condenser deletes it", "ok": false, "why": "Unrelated."}]}, {"q": "What is the biggest dependency for the full websocket transport?", "opts": [{"t": "Whether LiteLLM supports (or will support) a websocket Responses transport", "ok": true, "why": "Right \u2014 that gates the transport work; otherwise a direct-client path is needed."}, {"t": "Whether GPT-5.6 exists", "ok": false, "why": "It does."}, {"t": "Whether the model supports images", "ok": false, "why": "Irrelevant here."}, {"t": "Whether store=false is allowed", "ok": false, "why": "Websocket works with both store modes."}]}, {"q": "On a store=false / ZDR connection, what happens if the previous_response_id is uncached?", "opts": [{"t": "It silently succeeds", "ok": false, "why": "No \u2014 there's no persisted fallback."}, {"t": "It returns previous_response_not_found; you must start a new chain with the full context", "ok": true, "why": "Correct \u2014 no persisted fallback for store=false/ZDR."}, {"t": "It falls back to Chat Completions", "ok": false, "why": "No such fallback."}, {"t": "The connection closes permanently", "ok": false, "why": "You just start a fresh response."}]}, {"q": "What performance shape does WebSocket mode target?", "opts": [{"t": "Single-shot prompts with no tools", "ok": false, "why": "Those gain little."}, {"t": "Long, tool-heavy agent loops with many model\u2194tool round trips", "ok": true, "why": "Correct \u2014 exactly the agent-loop shape; ~40% faster on 20+ tool calls."}, {"t": "Image generation", "ok": false, "why": "Not the target."}, {"t": "Batch embedding jobs", "ok": false, "why": "Not the target."}]}];</script>
+<script>
+let answered=0,correct=0;const root=document.getElementById('quiz');
+QUIZ.forEach((item,i)=>{
+  const box=document.createElement('div');box.className='q';
+  const qn=document.createElement('div');qn.className='qn';qn.textContent=(i+1)+'. '+item.q;box.appendChild(qn);
+  const fb=document.createElement('div');fb.className='fb';
+  item.opts.forEach(o=>{
+    const btn=document.createElement('button');btn.className='opt';btn.textContent=o.t;
+    btn.addEventListener('click',()=>{
+      if(box.dataset.done)return;box.dataset.done='1';answered++;if(o.ok)correct++;
+      Array.from(box.querySelectorAll('.opt')).forEach(b=>{b.classList.add('disabled');b.disabled=true;});
+      btn.classList.add(o.ok?'correct':'wrong');
+      fb.textContent=(o.ok?'\u2705 ':'\u274c ')+o.why;fb.className='fb show '+(o.ok?'good':'bad');
+      updateScore();
+    });
+    box.appendChild(btn);
+  });
+  box.appendChild(fb);root.appendChild(box);
+});
+function updateScore(){
+  const s=document.getElementById('score');
+  s.textContent='Score: '+correct+' / '+QUIZ.length+(answered===QUIZ.length?(correct===QUIZ.length?' \u2014 perfect, you understood it \ud83d\udc3e':' \u2014 reread the section behind any you missed.'):'');
+}
+</script>
+</body></html>

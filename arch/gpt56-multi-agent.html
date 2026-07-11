@@ -1,0 +1,153 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hosted Multi-agent vs the OpenHands SDK's client-side subagents — Engel Nyst</title>
+<meta name="description" content="GPT-5.6's Multi-agent beta lets the model spawn subagents server-side. The OpenHands agent-sdk already has a client-side subagent system — so this is a design decision, not just a gap.">
+<meta property="og:title" content="Hosted Multi-agent vs the OpenHands SDK's client-side subagents">
+<meta property="og:description" content="GPT-5.6's Multi-agent beta lets the model spawn subagents server-side. The OpenHands agent-sdk already has a client-side subagent system — so this is a design decision, not just a gap.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://enyst.github.io/arch/gpt56-multi-agent.html">
+<meta name="twitter:card" content="summary">
+<style>
+  :root{
+    --fg:#1a1a1a;--muted:#5a5a5a;--subtle:#8a8a82;
+    --bg:#fdfdfb;--card:#ffffff;--elevated:#f7f6f1;
+    --accent:#2b4eaa;--accent-soft:#e6ecfa;
+    --rule:#e2e2dc;--rule-strong:#bdbcb4;
+    --code-bg:#f3f1ec;--warn:#b25b0e;--ok:#2f7a3a;--crit:#a02020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.65;font-size:16px}
+  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:4px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none}nav.toc a:hover{color:var(--accent)}
+  nav.toc .back{display:block;margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  nav.toc .back:hover{color:var(--accent)}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:20px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:33px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted);max-width:780px}
+  h2{font-size:23px;margin:46px 0 10px}h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:15px;margin:22px 0 6px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  p{max-width:760px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:13px;line-height:1.5;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule);white-space:pre}
+  pre code{background:transparent;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}.add{color:var(--ok)}.del{color:var(--crit)}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:16px 0;border-radius:0 4px 4px 0;font-size:14.5px;max-width:760px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6}.callout.note{border-color:var(--muted);background:#f3f1ec}
+  .skip{font-size:13px;color:var(--muted);font-style:italic;margin:6px 0 14px}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  a.ext{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:12px 0;max-width:760px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg)}
+  .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:16px 0;max-width:760px}
+  .node{border:1px solid var(--rule-strong);background:var(--card);border-radius:8px;padding:10px 12px;font-size:13px;min-width:120px}
+  .node .n-t{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:4px}
+  .node .n-d{font-family:var(--mono);font-size:12px}
+  .gate{border-color:var(--accent);background:var(--accent-soft)}
+  .arrow{display:flex;align-items:center;color:var(--rule-strong);font-size:20px}
+  .yes{border-color:var(--ok);background:#eaf4ec}.no{border-color:var(--crit);background:#f7ecec}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;background:var(--code-bg);color:var(--muted);margin-left:6px}
+  .pill.gap{background:#f7e2e2;color:var(--crit)}.pill.partial{background:#fbf1e6;color:var(--warn)}
+  .q{border:1px solid var(--rule);border-radius:8px;padding:16px 18px;margin:16px 0;max-width:760px;background:var(--card)}
+  .q .qn{font-weight:600;margin-bottom:10px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid var(--rule-strong);background:var(--card);border-radius:6px;padding:9px 12px;margin:7px 0;font:inherit;font-size:14px;cursor:pointer;transition:background .12s,border-color .12s}
+  .opt:hover{background:var(--elevated)}
+  .opt.correct{border-color:var(--ok);background:#eaf4ec}
+  .opt.wrong{border-color:var(--crit);background:#f7ecec}
+  .opt.disabled{cursor:default;opacity:.75}
+  .fb{font-size:13.5px;margin-top:8px;padding:8px 12px;border-radius:6px;display:none}
+  .fb.show{display:block}
+  .fb.good{background:#eaf4ec;color:var(--ok)}.fb.bad{background:#f7ecec;color:var(--crit)}
+  .score{font-weight:600;margin-top:8px}
+  .foot-nav{margin-top:52px;border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono);font-size:13px}
+  .foot-nav a{color:var(--muted);text-decoration:none}.foot-nav a:hover{color:var(--accent)}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr;gap:16px}nav.toc{position:static}}
+</style>
+</head>
+<body><div class="wrap">
+<nav class="toc"><a class="back" href="../index.html">← Home</a><h2>Contents</h2><ol><li><a href="#what">What the feature is</a></li><li><a href="#rival">The rival we already ship</a></li><li><a href="#delta">Hosted vs client-side</a></li><li><a href="#gap">If we wanted hosted mode</a></li></ol></nav>
+<main>
+<header class="title">
+  <div class="eyebrow">show-me + teach-me · GPT-5.6 Responses · SDK issue #4085</div>
+  <h1>Multi-agent &mdash; the &ldquo;subagents&rdquo; we already have, differently</h1>
+  <p class="sub">This is the &ldquo;GPT-5.6 likes subagents&rdquo; bit: multi_agent.enabled lets the model spawn a tree of subagents that OpenAI orchestrates server-side. But the SDK already ships a portable client-side subagent system — so the real question is who orchestrates.</p>
+</header>
+
+<section id="what"><h2><span class="num">1</span>What the feature is</h2>
+<p><strong>Multi-agent</strong> (beta, GPT-5.6) lets the model spin up and coordinate subagents in parallel inside a single Responses request — the mechanism behind GPT-5.6's <code>ultra</code> mode. Enable it with <code>multi_agent.enabled: true</code> and the beta header <code>OpenAI-Beta: responses_multi_agent=v1</code>. A root agent (<code>/root</code>) spawns a tree (<code>/root/researcher</code>, …); OpenAI hosts the orchestration via six actions (<code>spawn_agent</code>, <code>followup_task</code>, <code>send_message</code>, <code>wait_agent</code>, <code>interrupt_agent</code>, <code>list_agents</code>) surfaced as <code>multi_agent_call</code> items. The root synthesizes the final answer.</p>
+<div class="callout note">ⓘ Your app does <em>not</em> execute <code>multi_agent_call</code> items — OpenAI runs them and returns <code>multi_agent_call_output</code>. Ordinary client-owned <code>function_call</code>s still work exactly as before: any agent can emit one, you run it, you return <code>function_call_output</code>.</div>
+</section>
+
+<section id="rival"><h2><span class="num">2</span>The rival we already ship</h2>
+<p>Unlike the other three GPT-5.6 features, this isn't a missing capability &mdash; the SDK already has a subagent story, but <em>client-side</em>:</p>
+<ul>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/tree/main/openhands-sdk/openhands/sdk/subagent">subagent/</a> &mdash; markdown agent definitions + registry</li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/tree/main/openhands-tools/openhands/tools/delegate">delegate/</a> &mdash; a <code>spawn</code>/<code>delegate</code> tool</li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/tree/main/openhands-tools/openhands/tools/task">task/</a> &mdash; <code>TaskTool</code> / <code>TaskToolSet</code> backed by a <code>TaskManager</code></li>
+</ul>
+<p>Our system spawns and drives full sub-conversations. Same goal as OpenAI's multi-agent; opposite philosophy on who holds the reins.</p>
+</section>
+
+<section id="delta"><h2><span class="num">3</span>Hosted vs client-side</h2>
+<table>
+<tr><th>Axis</th><th>OpenAI hosted multi-agent</th><th>SDK client-side subagents</th></tr>
+<tr><td>Orchestrator</td><td>OpenAI servers (opaque)</td><td>Our code — full sub-conversations</td></tr>
+<tr><td>Portability</td><td>GPT-5.6 only, beta</td><td>Any model</td></tr>
+<tr><td>Observability</td><td>Encrypted <code>agent_message</code>s</td><td>Full event stream, ours</td></tr>
+<tr><td>Code to maintain</td><td>Little (offloaded)</td><td>More (we own it)</td></tr>
+</table>
+<div class="callout">★ The real question isn't &ldquo;can we parse the new items&rdquo; — it's &ldquo;who orchestrates.&rdquo; That's a design decision, not a bug to fix.</div>
+</section>
+
+<section id="gap"><h2><span class="num">4</span>If we wanted hosted mode</h2>
+<p>Supporting it would need modest plumbing plus new parsing:</p>
+<table>
+<tr><th>Needed</th><th>SDK today</th></tr>
+<tr><td><code>multi_agent</code> param + beta header</td><td>none (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/main/openhands-sdk/openhands/sdk/llm/options/responses_options.py">responses_options.py</a>, <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/main/openhands-sdk/openhands/sdk/llm/llm.py#L916">llm.py:916</a>)</td></tr>
+<tr><td>parse <code>multi_agent_call</code>/<code>_output</code>/<code>agent_message</code> with <code>agent</code>/<code>phase</code></td><td>none (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/main/openhands-sdk/openhands/sdk/llm/message.py#L541">message.py:541</a>)</td></tr>
+</table>
+<div class="callout warn">⚠ Beta, GPT-5.6-only, schemas may change; encrypted inter-agent messages limit observability vs our client-side delegation. Also incompatible with <code>/responses/compact</code>, <code>reasoning.summary</code>, and <code>max_tool_calls</code>. Recommendation in <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4085">#4085</a>: keep the portable client-side system as default; treat hosted multi-agent as an optional, model-specific accelerator only if a maintainer decides it's worth the beta surface.</div>
+</section>
+
+<section id="quiz"><h2><span class="num">4</span>Quiz</h2>
+<p>Five questions to check you actually understood it — not trivia. Click an answer to see whether it's right and why.</p>
+<div id="quiz"></div>
+<div class="score" id="score"></div>
+</section>
+<div class="foot-nav">Companion pages: <a class="ext" href="gpt56-programmatic-tool-calling.html">Programmatic Tool Calling</a> · <a class="ext" href="gpt56-tool-search.html">Tool search</a> · <a class="ext" href="gpt56-websocket-mode.html">WebSocket mode</a> &nbsp;|&nbsp; SDK issue <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4085">#4085</a> &nbsp;|&nbsp; <a href="../index.html">← Home</a></div>
+</main>
+</div>
+<script>const QUIZ=[{"q": "Why is hosted Multi-agent framed as a decision rather than a gap to fill?", "opts": [{"t": "Because it's impossible to parse the new item types", "ok": false, "why": "They're parseable; that's not the issue."}, {"t": "Because GPT-5.6 doesn't actually support it", "ok": false, "why": "It does (beta)."}, {"t": "Because the SDK already has a portable, observable client-side subagent system, so adopting OpenAI's opaque hosted one is a trade-off", "ok": true, "why": "Correct \u2014 it's a philosophy choice, not a missing feature."}, {"t": "Because it requires abandoning the Responses API", "ok": false, "why": "It lives inside Responses."}]}, {"q": "What must your app do with a multi_agent_call item?", "opts": [{"t": "Execute it and return a result, like a function_call", "ok": false, "why": "No \u2014 OpenAI runs hosted actions and returns multi_agent_call_output."}, {"t": "Nothing \u2014 the hosted runtime executes it; you just preserve it if you need replay/tracing", "ok": true, "why": "Correct."}, {"t": "Convert it to a delegate tool call", "ok": false, "why": "Not required."}, {"t": "Reject it", "ok": false, "why": "No."}]}, {"q": "Which of these still works normally when Multi-agent is enabled?", "opts": [{"t": "Ordinary client-owned function_call \u2192 you execute it, return function_call_output", "ok": true, "why": "Correct \u2014 any agent may emit one and the usual contract holds."}, {"t": "/responses/compact", "ok": false, "why": "Not supported when multi-agent is on."}, {"t": "reasoning.summary", "ok": false, "why": "Not supported when multi-agent is on."}, {"t": "max_tool_calls", "ok": false, "why": "Not supported when multi-agent is on."}]}, {"q": "What's a concrete downside of the hosted approach vs the SDK's client-side one?", "opts": [{"t": "It only runs on CPUs", "ok": false, "why": "Irrelevant."}, {"t": "Inter-agent messages are encrypted, limiting observability, and it's GPT-5.6-only + beta", "ok": true, "why": "Correct \u2014 less transparency and no portability."}, {"t": "It can't call tools", "ok": false, "why": "All agents share the request's tools."}, {"t": "It needs a websocket always", "ok": false, "why": "WebSocket is recommended, not required."}]}, {"q": "What's the recommended default in issue #4085?", "opts": [{"t": "Replace the client-side system with hosted multi-agent", "ok": false, "why": "No \u2014 the opposite."}, {"t": "Keep the portable client-side subagents as default; treat hosted multi-agent as an optional accelerator", "ok": true, "why": "Correct."}, {"t": "Drop subagents entirely", "ok": false, "why": "No."}, {"t": "Only use hosted multi-agent", "ok": false, "why": "No."}]}];</script>
+<script>
+let answered=0,correct=0;const root=document.getElementById('quiz');
+QUIZ.forEach((item,i)=>{
+  const box=document.createElement('div');box.className='q';
+  const qn=document.createElement('div');qn.className='qn';qn.textContent=(i+1)+'. '+item.q;box.appendChild(qn);
+  const fb=document.createElement('div');fb.className='fb';
+  item.opts.forEach(o=>{
+    const btn=document.createElement('button');btn.className='opt';btn.textContent=o.t;
+    btn.addEventListener('click',()=>{
+      if(box.dataset.done)return;box.dataset.done='1';answered++;if(o.ok)correct++;
+      Array.from(box.querySelectorAll('.opt')).forEach(b=>{b.classList.add('disabled');b.disabled=true;});
+      btn.classList.add(o.ok?'correct':'wrong');
+      fb.textContent=(o.ok?'\u2705 ':'\u274c ')+o.why;fb.className='fb show '+(o.ok?'good':'bad');
+      updateScore();
+    });
+    box.appendChild(btn);
+  });
+  box.appendChild(fb);root.appendChild(box);
+});
+function updateScore(){
+  const s=document.getElementById('score');
+  s.textContent='Score: '+correct+' / '+QUIZ.length+(answered===QUIZ.length?(correct===QUIZ.length?' \u2014 perfect, you understood it \ud83d\udc3e':' \u2014 reread the section behind any you missed.'):'');
+}
+</script>
+</body></html>
