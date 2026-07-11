@@ -239,16 +239,17 @@
 
   <ol class="plan">
     <li>
-      <span class="ms-t">Parity on the agent-server too (ish)</span>
-      <p class="ms-d">Bring the new SDK’s world close enough to how our agent-server behaves that
-      the two can meet. “Ish” is honest: not every upstream surface, just enough to build on —
-      and this is where the sibling will need to take on the agent-server layer it deliberately
-      skipped so far.</p>
-    </li>
-    <li>
       <span class="ms-t">Swap <code>openhands-agent</code> in for the old <code>agent-sdk</code> first</span>
       <p class="ms-d">Change what the server imports: the new SDK becomes the engine. Before touching
-      any bridge behaviour, get the core running on the new library.</p>
+      any bridge behaviour, get the core running on the new library. Doing this first surfaces exactly
+      what the server actually needs from the SDK, which tells us how far the next step has to go.</p>
+    </li>
+    <li>
+      <span class="ms-t">Agent-server parity (ish)</span>
+      <p class="ms-d">Bring the new SDK’s world close enough to how our agent-server behaves that
+      the two can meet. “Ish” is honest: not every upstream surface, just enough to build on —
+      and this is where the sibling takes on the agent-server layer the SDK transpile deliberately
+      skipped. Scope is driven by what step 1 revealed the server truly relies on.</p>
     </li>
     <li>
       <span class="ms-t">Redesign the bridges to work without turns <span class="pill hard">the hard part</span></span>

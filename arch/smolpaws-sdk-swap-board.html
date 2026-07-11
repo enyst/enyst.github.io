@@ -73,24 +73,26 @@
   <h2>The swap, step by step</h2>
   <ol class="board">
     <li>
+      <div class="step-head"><span class="step-title">Swap in <code>openhands-agent</code> for the old SDK</span> <span class="pill next">→ next</span></div>
+      <p class="step-body">Point the server at <code>@smolpaws/openhands-agent</code> instead of the old
+        <code>@smolpaws/agent-sdk</code> — the new SDK becomes the engine. Doing this first surfaces exactly what the
+        server actually relies on, which then scopes step 2. Not begun; the SDK it depends on is landing (dispatcher merged,
+        persistence in review).</p>
+      <div class="refs"><span class="b">unblocks: scope of step 2</span></div>
+    </li>
+    <li>
       <div class="step-head"><span class="step-title">Agent-server parity (ish)</span> <span class="pill wip">◐ in progress</span></div>
       <p class="step-body">Transpile the upstream <code>openhands-agent-server</code> to TS so the new SDK has a server to run on.
         First slices landed — event/conversation routers, event &amp; conversation services, pubSub, sockets, OpenAPI, plus
         bash/git/file routers. Durability now flows through the SDK's <code>EventLog</code> (server is a thin wrapper, like upstream).
-        Still ahead: remaining routers (P2/P3) and the message-queue layer.</p>
+        Still ahead: remaining routers (P2/P3) and the message-queue layer. Final scope follows what step 1's cutover reveals.</p>
       <div class="refs">
         <span class="b">pkg: smolpaws/packages/openhands-agent-server</span>
         <span class="b">verified green: 227 SDK tests · server build/test/openapi ✓</span>
       </div>
     </li>
     <li>
-      <div class="step-head"><span class="step-title">Swap in <code>openhands-agent</code> for the old SDK</span> <span class="pill todo">○ not started</span></div>
-      <p class="step-body">Point the server (and then the bridges) at <code>@smolpaws/openhands-agent</code> instead of the old
-        <code>@smolpaws/agent-sdk</code>. Foundation is being laid by step 1; the cutover itself is not begun.</p>
-      <div class="refs"><span class="b">depends on: step 1</span></div>
-    </li>
-    <li>
-      <div class="step-head"><span class="step-title">Redesign bridges without turns → message queue</span> <span class="pill next">→ next big design</span></div>
+      <div class="step-head"><span class="step-title">Redesign bridges without turns → message queue</span> <span class="pill todo">○ the hard design</span></div>
       <p class="step-body">The hard part. Retire the bespoke <em>turns</em> abstraction and rebuild its three guarantees
         (exactly-once delivery, idempotency, ordering) on a lean local-first queue. Several existing bugs are really
         symptoms of turns papering over this — they should die with the redesign.</p>
