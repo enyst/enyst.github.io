@@ -33,7 +33,7 @@
     .trace{counter-reset:trace;display:grid;gap:9px;margin:15px 0}.trace-row{counter-increment:trace;display:grid;grid-template-columns:34px 165px minmax(0,1fr);gap:10px;align-items:start;border-bottom:1px solid var(--rule);padding:9px 0}.trace-row:before{content:counter(trace);width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font:12px var(--mono)}.trace-row strong{font-size:14px}.trace-row span{font-size:14px;color:var(--muted)}
     details{border:1px solid var(--rule);border-radius:6px;margin:12px 0;background:var(--card)}details>summary{cursor:pointer;padding:9px 12px;color:var(--muted)}details>div{padding:0 12px 12px}
     .options{display:grid;gap:8px}.option{display:grid;grid-template-columns:140px 88px minmax(0,1fr);gap:12px;border-bottom:1px solid var(--rule);padding:10px 0}.verdict{font:11px var(--mono);text-transform:uppercase}.chosen{color:var(--ok)}.rejected{color:var(--crit)}.borrow{color:var(--violet)}
-    .state{font:11px var(--mono);padding:2px 6px;border-radius:999px;border:1px solid var(--rule-strong);white-space:nowrap}.ready{color:var(--accent);background:var(--accent-soft)}.done{color:var(--ok);background:var(--ok-soft)}.uncertain{color:var(--warn);background:var(--warn-soft)}
+    .state{font:11px var(--mono);padding:2px 6px;border-radius:999px;border:1px solid var(--rule-strong);white-space:nowrap}.ready{color:var(--accent);background:var(--accent-soft)}.done{color:var(--ok);background:var(--ok-soft)}.delivery_unknown{color:var(--warn);background:var(--warn-soft)}
     footer{margin-top:55px;padding-top:18px;border-top:1px solid var(--rule);color:var(--muted);font-size:13px}.small{font-size:13px;color:var(--muted)}
     @media(max-width:850px){.wrap{display:block;padding:24px 18px 72px}nav.toc{position:static;border-bottom:1px solid var(--rule);padding-bottom:16px;margin-bottom:24px}.grid{grid-template-columns:1fr}.trace-row{grid-template-columns:30px 1fr}.trace-row span{grid-column:2}.option{grid-template-columns:1fr}.option .verdict{grid-row:1}table{display:block;overflow-x:auto;white-space:normal}a.src{white-space:normal;overflow-wrap:anywhere}code{overflow-wrap:anywhere}h1{font-size:31px}}
   </style>
@@ -78,7 +78,7 @@
         Channel adapters durably accept input through it and deliver output through it. The coordinator appends messages to agent-server, requests execution, projects deliverable agent events into delivery work, and owns claims, retries, ordering, reconciliation and audit history.
       </div>
       <p>Agent-server remains the source of truth for conversations: durable events, execution, state and event streaming. The coordinator remains the source of truth for external work: whether a platform message has been integrated and whether an agent event has been delivered.</p>
-      <div class="callout warn"><strong>Honest guarantee:</strong> intake can become effectively-once after agent-server accepts a deterministic event identity. External delivery is effectively-once only when the platform supports idempotency or reconciliation; an ambiguous send must become <code>uncertain</code>, never a blind retry.</div>
+      <div class="callout warn"><strong>Honest guarantee:</strong> intake can become effectively-once after agent-server accepts a deterministic event identity. External delivery is effectively-once only when the platform supports idempotency or reconciliation; an ambiguous send must become <code>delivery_unknown</code>, never a blind retry.</div>
 
       <figure class="fig">
         <svg viewBox="0 0 940 390" role="img" aria-labelledby="arch-title arch-desc">
@@ -153,9 +153,9 @@
         <article class="card">
           <div class="tag">source of lane policy</div>
           <h3>Hermes gateway</h3>
-          <p>Builds a deterministic session key, permits one active handler per key, queues or merges follow-ups, and drains them without parallel execution.</p>
-          <p><strong>Keep:</strong> deterministic lanes, no overlap, bounded text coalescing, direct control handling.</p>
-          <p><strong>Reject as storage:</strong> its active and pending maps are in memory and pending input can disappear on restart.</p>
+          <p>Builds a deterministic session key, permits one active handler per key, and carefully hands pending input to the next handler without parallel execution.</p>
+          <p><strong>Keep:</strong> deterministic lanes, one active owner, stale-owner recovery, ordered handoff and explicit control handling.</p>
+          <p><strong>Reject:</strong> in-memory pending storage and message merging. Agent-server already accepts each message asynchronously and preserves its event boundary.</p>
         </article>
       </div>
 
@@ -169,6 +169,21 @@
           <tr><td>What is missing?</td><td>External dedup/delivery knowledge</td><td>Attempts, retry backoff, platform ordering</td><td>Crash-safe pending work</td><td>The coordinator fills exactly these gaps.</td></tr>
         </tbody>
       </table>
+
+      <h3>What the Hermes lessons mean here</h3>
+      <table>
+        <thead><tr><th>Hermes mechanism</th><th>What it actually protects</th><th>Our landing</th></tr></thead>
+        <tbody>
+          <tr><td>Deterministic session key</td><td>Every message for the same chat or thread reaches the same concurrency domain.</td><td>Use a canonical <code>lane_key</code>; normalize aliases such as WhatsApp JID/LID before constructing it.</td></tr>
+          <tr><td>One active handler per key</td><td>Two agent executions cannot mutate one conversation concurrently.</td><td>One claimed intake item per lane; agent-server remains the authority on whether conversation execution is active.</td></tr>
+          <tr><td>Owner-task identity</td><td>An older task’s cleanup cannot clear a newer task’s guard.</td><td>Fence every claim with a generation; stale workers cannot settle a claim that has been reassigned.</td></tr>
+          <tr><td>Stale-guard self-heal</td><td>If the guard says “busy” but its task is gone, the next message repairs the split state.</td><td>Expired claims are reconciled back to <code>ready</code> or <code>delivery_unknown</code>, depending on whether an external effect may have occurred.</td></tr>
+          <tr><td>Ordered handoff</td><td>The active handler keeps ownership until cleanup finishes, then starts the next pending message.</td><td>Only the unresolved lane head is claimable; later messages wait, but each remains a separate durable agent event.</td></tr>
+          <tr><td>Direct control handling</td><td>Stop/reset/approval-like input can reach a blocked execution instead of waiting behind ordinary work.</td><td>Control operations use agent-server’s explicit pause/interrupt/control interfaces; they are not hidden inside ordinary intake ordering.</td></tr>
+          <tr><td>In-memory pending merge</td><td>Hermes compresses bursts while one handler is active because its adapter owns scheduling.</td><td><strong>Do not borrow.</strong> REST and WebSocket already append asynchronous messages separately and request a rerun; preserving IDs, media, senders and reply anchors is more valuable.</td></tr>
+        </tbody>
+      </table>
+      <div class="callout ok"><strong>Agent-server already schedules the conversation:</strong> each REST or WebSocket message is appended immediately. If execution is active, agent-server records a rerun request and processes the newly appended events afterward; the coordinator only guarantees durable acceptance and lane order.</div>
       <div class="callout"><strong>Correction from the first sketch:</strong> Automation supplies lifecycle, atomic claim and watchdog patterns. Attempt counts, <code>available_at</code> backoff and claim expiry are requirements for the local coordinator, not features already present in Automation.</div>
     </section>
 
@@ -179,7 +194,7 @@
       <figure class="fig">
         <svg viewBox="0 0 940 360" role="img" aria-labelledby="state-title state-desc">
           <title id="state-title">Intake and delivery state machines</title>
-          <desc id="state-desc">Both work kinds move from ready to claimed and then done. Failed claims can wait for retry. Delivery alone can enter uncertain when an external send may have succeeded.</desc>
+          <desc id="state-desc">Both work kinds move from ready to claimed and then done. Failed claims can wait for retry. Delivery alone can enter delivery_unknown when an external send may have succeeded.</desc>
           <defs><marker id="sarr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="var(--accent)"/></marker><style>.n{fill:#fff;stroke:var(--rule-strong);stroke-width:1.2}.nready{fill:var(--accent-soft);stroke:var(--accent)}.ndone{fill:var(--ok-soft);stroke:var(--ok)}.nwarn{fill:var(--warn-soft);stroke:var(--warn)}.nfail{fill:var(--crit-soft);stroke:var(--crit)}.t{font:600 13px var(--sans);fill:var(--fg)}.d{font:11px var(--sans);fill:var(--muted)}.e{stroke:var(--accent);stroke-width:1.7;fill:none;marker-end:url(#sarr)}.ed{stroke:var(--subtle);stroke-width:1.4;stroke-dasharray:5 4;fill:none;marker-end:url(#sarr)}.lbl{font:10px var(--mono);fill:var(--muted)}</style></defs>
           <text x="24" y="38" class="t">Intake work</text><text x="24" y="57" class="d">Done means the deterministic user event exists and execution was requested.</text>
           <rect x="42" y="90" width="120" height="54" rx="7" class="nready"/><text x="102" y="121" text-anchor="middle" class="t">ready</text>
@@ -189,11 +204,11 @@
           <rect x="438" y="180" width="120" height="54" rx="7" class="nfail"/><text x="498" y="211" text-anchor="middle" class="t">failed</text>
           <path d="M162 117H238" class="e"/><text x="177" y="106" class="lbl">claim</text><path d="M358 117H438" class="e"/><text x="372" y="106" class="lbl">checkpoint</text><path d="M298 144V180" class="ed"/><text x="305" y="166" class="lbl">retryable</text><path d="M358 207H438" class="ed"/><text x="371" y="196" class="lbl">exhausted</text><path d="M238 207C177 207 176 145 102 145V90" class="ed"/>
 
-          <text x="625" y="38" class="t">Delivery work</text><text x="625" y="57" class="d">Ambiguous external effects stop in uncertain; they do not auto-retry.</text>
+          <text x="625" y="38" class="t">Delivery work</text><text x="625" y="57" class="d">Ambiguous external effects stop in delivery_unknown; they do not auto-retry.</text>
           <rect x="625" y="90" width="120" height="54" rx="7" class="nready"/><text x="685" y="121" text-anchor="middle" class="t">ready</text>
           <rect x="792" y="90" width="120" height="54" rx="7" class="n"/><text x="852" y="121" text-anchor="middle" class="t">claimed</text>
           <rect x="792" y="180" width="120" height="54" rx="7" class="ndone"/><text x="852" y="211" text-anchor="middle" class="t">done</text>
-          <rect x="625" y="180" width="120" height="54" rx="7" class="nwarn"/><text x="685" y="211" text-anchor="middle" class="t">uncertain</text>
+          <rect x="625" y="180" width="120" height="54" rx="7" class="nwarn"/><text x="685" y="211" text-anchor="middle" class="t">delivery_unknown</text>
           <rect x="625" y="276" width="120" height="54" rx="7" class="nfail"/><text x="685" y="307" text-anchor="middle" class="t">failed</text>
           <path d="M745 117H792" class="e"/><path d="M852 144V180" class="e"/><text x="859" y="165" class="lbl">ack</text><path d="M792 117C758 117 758 207 745 207" class="ed"/><text x="746" y="165" class="lbl">unknown</text><path d="M685 234V276" class="ed"/><text x="693" y="259" class="lbl">resolve</text>
           <text x="470" y="337" text-anchor="middle" class="d">A claim deadline returns abandoned claimed work to ready; later work in the same lane waits behind unresolved earlier work.</text>
@@ -226,7 +241,7 @@
       <pre><code>acceptIntake(input)               → existing-or-new work
 projectDeliveries(conversation)   → number created
 claimReady(worker, now)           → claimed work | null
-settle(claim, outcome)            → done | retry_wait | uncertain | failed
+settle(claim, outcome)            → done | retry_wait | delivery_unknown | failed
 reconcile(now)                    → expired/reconciled count</code></pre>
       <p>The storage adapter hides SQLite transactions, lane-head selection, backoff and stale-claim fencing. Channel adapters only normalize, deliver and optionally reconcile external effects.</p>
     </section>
@@ -239,7 +254,7 @@ reconcile(now)                    → expired/reconciled count</code></pre>
         <div class="trace-row"><strong>Accept B + C</strong><span>Two more messages enter as sequence 42 and 43 while agent-server is active. Both are durable immediately; B is lane head, so C cannot overtake it.</span></div>
         <div class="trace-row"><strong>Integrate B, then C</strong><span>The coordinator appends in lane order. Agent-server’s active execution path records a rerun request rather than starting parallel work.</span></div>
         <div class="trace-row"><strong>Project output</strong><span>The event projector catches up from its durable cursor, maps each deliverable agent event to one delivery row, then subscribes for live events. A unique event/destination source key makes replay harmless.</span></div>
-        <div class="trace-row"><strong>Deliver</strong><span>The channel adapter claims delivery work in lane order. A confirmed platform message ID completes it; an ambiguous effect becomes <span class="state uncertain">uncertain</span> and blocks later delivery until reconciled or explicitly resolved.</span></div>
+        <div class="trace-row"><strong>Deliver</strong><span>The channel adapter claims delivery work in lane order. A confirmed platform message ID completes it; an ambiguous effect becomes <span class="state delivery_unknown">delivery_unknown</span> and blocks later delivery until reconciled or explicitly resolved.</span></div>
       </div>
       <div class="callout ok"><strong>What this permits:</strong> incoming messages can be durably accepted while agent-server is busy. Ordering is established before any HTTP call, while agent-server remains responsible for how those messages affect the next execution.</div>
       <div class="callout crit"><strong>What this forbids:</strong> holding accepted messages only in adapter memory, deriving delivery from “latest response” after a restart, or retrying an external send whose outcome is unknown.</div>
@@ -262,7 +277,7 @@ reconcile(now)                    → expired/reconciled count</code></pre>
           <tr><td>Delivery worker dies before send</td><td>Claimed row, no external ID</td><td>Claim expires and retries.</td><td class="safe">No external effect yet.</td></tr>
           <tr><td>Platform rejects before accepting</td><td>Retryable error</td><td>Backoff through <code>retry_wait</code>; preserve lane order.</td><td class="safe">Bounded retry.</td></tr>
           <tr><td>Platform accepts; acknowledgment persists</td><td><code>external_message_id</code></td><td>Set done; replay sees completion.</td><td class="safe">Effectively-once.</td></tr>
-          <tr><td>Platform may accept; response lost</td><td>No proof either way</td><td>Mark <code>uncertain</code>; adapter reconciles when possible, otherwise operator chooses confirm/retry/skip.</td><td class="gap">Exactly-once is impossible without platform support.</td></tr>
+          <tr><td>Platform may accept; response lost</td><td>No proof either way</td><td>Mark <code>delivery_unknown</code>; adapter reconciles when possible, otherwise operator chooses confirm/retry/skip.</td><td class="gap">Exactly-once is impossible without platform support.</td></tr>
           <tr><td>Repeated poison delivery</td><td>Attempts + errors</td><td>Move to failed after policy limit; lane remains blocked until explicit skip or repair.</td><td class="safe">No silent overtaking.</td></tr>
           <tr><td>Two coordinator processes claim together</td><td>SQLite row state + generation</td><td><code>BEGIN IMMEDIATE</code> / compare-and-set update allows one winner.</td><td class="safe">One active claim.</td></tr>
           <tr><td>Machine restarts with queued Hermes-style follow-up</td><td>Coordinator row, not an in-memory pending map</td><td>Claim after restart.</td><td class="safe">Hermes UX, durable implementation.</td></tr>
@@ -313,13 +328,13 @@ reconcile(now)                    → expired/reconciled count</code></pre>
     <section id="sequence">
       <h2><span class="num">9</span>Implementation order</h2>
       <ol>
-        <li><strong>Specify the store through tests.</strong> Duplicate accept, per-lane order, claim fencing, expiry, backoff, projector replay and uncertain delivery all get deterministic SQLite tests.</li>
+        <li><strong>Specify the store through tests.</strong> Duplicate accept, per-lane order, claim fencing, expiry, backoff, projector replay and delivery_unknown outcomes all get deterministic SQLite tests.</li>
         <li><strong>Add idempotent event append to agent-server.</strong> Prove append-response loss by retrying the same event identity across restart.</li>
         <li><strong>Implement intake only.</strong> Run a shadow path that accepts and appends one non-critical channel while current delivery remains unchanged.</li>
         <li><strong>Add event projection and delivery work.</strong> Start with terminal agent responses and a recording adapter; prove projector crash cases before real sends.</li>
         <li><strong>Canary WhatsApp.</strong> It exercises media, aliases, restart recovery and the most visible duplicate/loss cases. Preserve a rollback switch.</li>
         <li><strong>Migrate Discord, Slack, GitHub and email.</strong> They become platform adapters around the same coordinator interface rather than new orchestration implementations.</li>
-        <li><strong>Remove superseded orchestration paths.</strong> Only after a soak period shows no unresolved uncertainty, ordering violations or duplicate intake.</li>
+        <li><strong>Remove superseded orchestration paths.</strong> Only after a soak period shows no unresolved delivery_unknown states, ordering violations or duplicate intake.</li>
       </ol>
       <p>No estimates are attached. Each step stops on an executable invariant, not on elapsed time.</p>
     </section>
@@ -338,13 +353,13 @@ reconcile(now)                    → expired/reconciled count</code></pre>
           <tr><td>Automation claims oldest pending rows, uses DB locking where available and launches asynchronously.</td><td><a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/dispatcher.py#L94-L122">dispatcher.py:94–122</a> · <a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/dispatcher.py#L347-L400">dispatcher.py:347–400</a></td></tr>
           <tr><td>Automation completion races settle through a guarded state update.</td><td><a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/router.py#L325-L390">router.py:325–390</a> · <a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/watchdog.py#L225-L275">watchdog.py:225–275</a></td></tr>
           <tr><td>Hermes holds one active task and one pending map entry per deterministic session key.</td><td><a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/platforms/base.py#L1843-L1867">base.py:1843–1867</a> · <a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/session.py#L617-L698">session.py:617–698</a></td></tr>
-          <tr><td>Hermes queues/merges follow-ups while a lane is active and drains them without overlap.</td><td><a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/platforms/base.py#L3919-L4110">base.py:3919–4110</a> · <a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/platforms/base.py#L4490-L4532">base.py:4490–4532</a></td></tr>
+          <tr><td>Hermes queues/merges follow-ups while a lane is active and drains them without overlap; the merge is documented for comparison and explicitly not adopted.</td><td><a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/platforms/base.py#L3919-L4110">base.py:3919–4110</a> · <a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/platforms/base.py#L4490-L4532">base.py:4490–4532</a></td></tr>
         </tbody>
       </table>
       <div class="callout ok"><strong>Validation performed:</strong> code paths and focused tests were read at the pinned commits above. The new design is an ADR, so its crash guarantees remain proposed until the SQLite store and idempotent append tests execute them.</div>
       <details><summary>Vocabulary used by this ADR</summary><div>
         <p><strong>Agent event:</strong> a durable event in a conversation’s EventLog. <strong>Intake work:</strong> one external input waiting to be integrated into agent-server. <strong>Delivery work:</strong> one immutable intent to deliver an agent event to one external destination.</p>
-        <p><strong>Lane:</strong> the ordering domain for a chat or thread. <strong>Claim:</strong> short, fenced ownership of one work attempt. <strong>Uncertain:</strong> an external effect may have happened but cannot yet be proved.</p>
+        <p><strong>Lane:</strong> the ordering domain for a chat or thread. <strong>Claim:</strong> short, fenced ownership of one work attempt. <strong>Delivery outcome unknown:</strong> an external effect may have happened but cannot yet be proved.</p>
       </div></details>
     </section>
 
