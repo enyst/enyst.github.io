@@ -124,10 +124,12 @@
           <tr><td>Conversation messages and agent actions</td><td><strong>agent-server EventLog</strong></td><td>They are conversation history and already survive restart through the SDK’s durable <code>EventLog</code>.</td></tr>
           <tr><td>Whether a conversation is executing</td><td><strong>agent-server</strong></td><td>The coordinator must observe execution state; it must not copy or invent another execution state machine.</td></tr>
           <tr><td>External source deduplication</td><td><strong>Message Work Coordinator</strong></td><td>Only the channel side knows the stable platform message identity.</td></tr>
-          <tr><td>Per-chat/thread ordering</td><td><strong>Message Work Coordinator</strong></td><td>Ordering is a channel delivery concern expressed by a deterministic <code>lane_key</code>.</td></tr>
+          <tr><td>Canonical chat/thread lane computation</td><td><strong>Channel adapter</strong></td><td>The adapter knows platform identity rules, thread semantics and aliases such as WhatsApp JID/LID.</td></tr>
+          <tr><td>Lane-to-conversation correspondence</td><td><strong>Message Work Coordinator</strong></td><td>The persisted mapping makes routing idempotent and leaves a queryable debugging trail from platform address to agent-server conversation.</td></tr>
+          <tr><td>Per-chat/thread ordering</td><td><strong>Message Work Coordinator</strong></td><td>Ordering is a channel delivery concern expressed by the persisted <code>lane_key</code>.</td></tr>
           <tr><td>Retry timing and claim recovery</td><td><strong>Message Work Coordinator</strong></td><td>These are durable-work mechanics borrowed from Automation, independent of agent execution.</td></tr>
           <tr><td>Whether one agent event reached one destination</td><td><strong>Message Work Coordinator</strong></td><td>Agent-server cannot know whether Slack, Discord or WhatsApp accepted a send.</td></tr>
-          <tr><td>Platform connection, formatting and reconciliation</td><td><strong>Channel adapter</strong></td><td>The adapter knows platform capabilities; it does not own durable scheduling.</td></tr>
+          <tr><td>Platform connection, formatting and reconciliation</td><td><strong>Channel adapter</strong></td><td>The adapter knows platform capabilities; it does not own durable scheduling or the lane directory.</td></tr>
         </tbody>
       </table>
       <p class="small">The deletion test is useful here: deleting the coordinator would force deduplication, claims, retries, crash recovery and ordering back into every adapter. That is enough complexity behind one small interface to earn a module.</p>
@@ -174,7 +176,7 @@
       <table>
         <thead><tr><th>Hermes mechanism</th><th>What it actually protects</th><th>Our landing</th></tr></thead>
         <tbody>
-          <tr><td>Deterministic session key</td><td>Every message for the same chat or thread reaches the same concurrency domain.</td><td>Use a canonical <code>lane_key</code>; normalize aliases such as WhatsApp JID/LID before constructing it.</td></tr>
+          <tr><td>Deterministic session key</td><td>Every message for the same chat or thread reaches the same concurrency domain.</td><td>The channel adapter computes a canonical <code>lane_key</code>, including platform-specific alias normalization. The coordinator persists its correspondence with <code>conversation_id</code>.</td></tr>
           <tr><td>One active handler per key</td><td>Two agent executions cannot mutate one conversation concurrently.</td><td>One claimed intake item per lane; agent-server remains the authority on whether conversation execution is active.</td></tr>
           <tr><td>Owner-task identity</td><td>An older task’s cleanup cannot clear a newer task’s guard.</td><td>Fence every claim with a generation; stale workers cannot settle a claim that has been reassigned.</td></tr>
           <tr><td>Stale-guard self-heal</td><td>If the guard says “busy” but its task is gone, the next message repairs the split state.</td><td>Expired claims are reconciled back to <code>ready</code> or <code>delivery_unknown</code>, depending on whether an external effect may have occurred.</td></tr>
@@ -232,24 +234,43 @@
         </tbody>
       </table>
 
-      <h3>Lane key</h3>
-      <p>Borrow Hermes’s deterministic session-key idea, but define the key from our channel routing policy:</p>
-      <pre><code>channel:{platform}:{account}:{chat}:{thread-or-root}</code></pre>
-      <p>DMs isolate by stable chat identity; threads share one lane unless explicitly configured otherwise. Platform aliases—especially WhatsApp JID/LID forms—must be canonicalized before key construction.</p>
+      <h3>Adapter-computed lane key</h3>
+      <p>Borrow Hermes’s deterministic session-key idea, but let each channel adapter compute the canonical key because it owns that platform’s chat, thread and alias semantics:</p>
+      <pre><code>channel:{platform}:{account}:{chat}:{thread-or-root}
+
+WhatsApp → channel:whatsapp:smolpaws:120363426327189600@g.us:root
+Slack    → channel:slack:T06P212QSEA:C06P5NCGSFP:1783869407.798</code></pre>
+      <p>DMs isolate by stable chat identity; a Slack or Discord thread gets its own lane. Platform aliases—especially WhatsApp JID/LID forms—are canonicalized by the adapter before it returns the key.</p>
+
+      <h3>Persisted lane directory</h3>
+      <p>The coordinator resolves the adapter’s key to an agent-server conversation and saves the correspondence even though the key is deterministic. That row is both routing state and debugging evidence:</p>
+      <pre><code>lane_key         TEXT PRIMARY KEY
+conversation_id  TEXT NOT NULL
+platform         TEXT NOT NULL
+account_id       TEXT
+chat_id          TEXT NOT NULL
+thread_id        TEXT
+display_name     TEXT
+created_at       TEXT NOT NULL
+last_seen_at     TEXT NOT NULL</code></pre>
+      <p>Repeated resolution of the same lane returns the same <code>conversation_id</code>. Operators can query either side to explain which platform chat created a conversation, why messages split, or whether alias normalization produced an unexpected lane; no version field is introduced yet.</p>
 
       <h3>Small coordinator interface</h3>
-      <pre><code>acceptIntake(input)               → existing-or-new work
+      <pre><code>adapter.computeLane(input)        → lane descriptor
+resolveLane(lane)                 → lane binding + conversation_id
+acceptIntake(binding, input)      → existing-or-new work
 projectDeliveries(conversation)   → number created
 claimReady(worker, now)           → claimed work | null
 settle(claim, outcome)            → done | retry_wait | delivery_unknown | failed
 reconcile(now)                    → expired/reconciled count</code></pre>
-      <p>The storage adapter hides SQLite transactions, lane-head selection, backoff and stale-claim fencing. Channel adapters only normalize, deliver and optionally reconcile external effects.</p>
+      <p>The storage adapter hides the lane directory, SQLite transactions, lane-head selection, backoff and stale-claim fencing. Channel adapters compute canonical lane identity, normalize input, deliver output and optionally reconcile external effects; they do not persist the mapping themselves.</p>
     </section>
 
     <section id="trace">
       <h2><span class="num">5</span>Worked trace: two messages arrive during execution</h2>
       <div class="trace">
-        <div class="trace-row"><strong>Accept A</strong><span>WhatsApp message <code>A</code> becomes intake sequence 41 in lane <code>channel:whatsapp:…:chat-7:root</code>. The unique source key makes a webhook/poll replay a no-op.</span></div>
+        <div class="trace-row"><strong>Resolve lane</strong><span>The WhatsApp adapter canonicalizes the chat address and computes <code>channel:whatsapp:…:chat-7:root</code>. The coordinator finds or creates its persisted <code>conversation_id</code> correspondence and updates <code>last_seen_at</code>.</span></div>
+        <div class="trace-row"><strong>Accept A</strong><span>Message <code>A</code> becomes intake sequence 41 in that lane. The unique source key makes a webhook/poll replay a no-op.</span></div>
         <div class="trace-row"><strong>Integrate A</strong><span>The worker appends deterministic agent event <code>uuid5(A)</code> with <code>run=true</code>. Agent-server persists it, starts execution asynchronously, and intake A becomes <span class="state done">done</span>.</span></div>
         <div class="trace-row"><strong>Accept B + C</strong><span>Two more messages enter as sequence 42 and 43 while agent-server is active. Both are durable immediately; B is lane head, so C cannot overtake it.</span></div>
         <div class="trace-row"><strong>Integrate B, then C</strong><span>The coordinator appends in lane order. Agent-server’s active execution path records a rerun request rather than starting parallel work.</span></div>
@@ -266,6 +287,8 @@ reconcile(now)                    → expired/reconciled count</code></pre>
         <thead><tr><th>Crash or race</th><th>Durable fact before crash</th><th>Recovery</th><th>Result</th></tr></thead>
         <tbody>
           <tr><td>Duplicate platform input</td><td>Existing <code>source_key</code></td><td><code>acceptIntake</code> returns the same row.</td><td class="safe">No duplicate intake.</td></tr>
+          <tr><td>Two first messages resolve one new lane</td><td>Unique <code>lane_key</code></td><td>One lane-directory insert wins; both callers use the persisted <code>conversation_id</code>.</td><td class="safe">One routing correspondence.</td></tr>
+          <tr><td>Crash after lane mapping, before conversation creation</td><td>Lane row with reserved <code>conversation_id</code></td><td>Next resolution ensures that exact conversation exists before accepting intake.</td><td class="safe">Mapping remains repairable.</td></tr>
           <tr><td>After accept, before claim</td><td><span class="state ready">ready</span> row</td><td>Next worker claims it.</td><td class="safe">No loss.</td></tr>
           <tr><td>After claim, before agent-server call</td><td>Claim deadline + generation</td><td>Expiry returns work to ready; stale worker is fenced.</td><td class="safe">Safe retry.</td></tr>
           <tr><td>Agent event appended; HTTP response lost</td><td>Deterministic <code>agent_event_id</code></td><td>Retry same append; agent-server returns existing event.</td><td class="gap">Requires idempotent append extension.</td></tr>
@@ -328,7 +351,7 @@ reconcile(now)                    → expired/reconciled count</code></pre>
     <section id="sequence">
       <h2><span class="num">9</span>Implementation order</h2>
       <ol>
-        <li><strong>Specify the store through tests.</strong> Duplicate accept, per-lane order, claim fencing, expiry, backoff, projector replay and delivery_unknown outcomes all get deterministic SQLite tests.</li>
+        <li><strong>Specify the store through tests.</strong> Concurrent lane resolution, persisted lane-to-conversation lookup, duplicate accept, per-lane order, claim fencing, expiry, backoff, projector replay and delivery_unknown outcomes all get deterministic SQLite tests.</li>
         <li><strong>Add idempotent event append to agent-server.</strong> Prove append-response loss by retrying the same event identity across restart.</li>
         <li><strong>Implement intake only.</strong> Run a shadow path that accepts and appends one non-critical channel while current delivery remains unchanged.</li>
         <li><strong>Add event projection and delivery work.</strong> Start with terminal agent responses and a recording adapter; prove projector crash cases before real sends.</li>
