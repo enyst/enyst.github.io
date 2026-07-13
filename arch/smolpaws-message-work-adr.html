@@ -114,6 +114,20 @@
         </svg>
         <figcaption>Fig 1 · Conversation truth stays in agent-server; external-work truth stays in the coordinator.</figcaption>
       </figure>
+
+      <h3 id="edge-spool">Edge availability: Cloudflare Queue is a spool, not the coordinator</h3>
+      <div class="decision">
+        <strong>Use Cloudflare Queue in front of the local coordinator for HTTP-reachable ingress.</strong>
+        The public Worker verifies the webhook and enqueues a normalized envelope. A local HTTP-pull adapter consumes it and calls the coordinator; no inbound tunnel is required. GitHub, email and future webhook bridges use this path. Socket-only clients still need a connected adapter somewhere and are not made durable merely by creating a queue.
+      </div>
+      <ol>
+        <li>The Worker authenticates the platform request and writes one envelope with a stable platform source identity.</li>
+        <li>The local pull adapter computes the canonical lane and calls <code>resolveLane</code> plus <code>acceptIntake</code>.</li>
+        <li>Only after the SQLite intake transaction commits does the adapter acknowledge the Cloudflare message. If acknowledgment is lost, redelivery hits the coordinator’s unique source key and returns the existing work row.</li>
+        <li>The coordinator—not Cloudflare Queue—owns lane order, claims, retries after local acceptance, projection, delivery outcomes and audit history.</li>
+      </ol>
+      <div class="callout ok"><strong>Operational consequence:</strong> retire the Quick Tunnel from webhook delivery. A named tunnel may still serve interactive access, but durable ingress no longer depends on <code>cloudflared</code> staying connected. Cloudflare’s published Workers Free allowance is “10,000 operations/day included” with 24-hour retention; paid retention is configurable up to 14 days. See <a class="src" href="https://developers.cloudflare.com/queues/platform/pricing/">Cloudflare Queues pricing</a> and <a class="src" href="https://developers.cloudflare.com/queues/configuration/pull-consumers/">HTTP pull consumers</a>.</div>
+      <p>This is intentionally two durable layers with different facts: Cloudflare Queue records that an edge message has not yet reached the host; the SQLite coordinator records that accepted external work has or has not been integrated and delivered. Neither store impersonates the other.</p>
     </section>
 
     <section id="ownership">
@@ -377,6 +391,8 @@ reconcile(now)                    → expired/reconciled count</code></pre>
           <tr><td>Automation completion races settle through a guarded state update.</td><td><a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/router.py#L325-L390">router.py:325–390</a> · <a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/watchdog.py#L225-L275">watchdog.py:225–275</a></td></tr>
           <tr><td>Hermes holds one active task and one pending map entry per deterministic session key.</td><td><a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/platforms/base.py#L1843-L1867">base.py:1843–1867</a> · <a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/session.py#L617-L698">session.py:617–698</a></td></tr>
           <tr><td>Hermes queues/merges follow-ups while a lane is active and drains them without overlap; the merge is documented for comparison and explicitly not adopted.</td><td><a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/platforms/base.py#L3919-L4110">base.py:3919–4110</a> · <a class="src" href="https://github.com/NousResearch/hermes-agent/blob/4e6d05c6a51e4461af0d0d51e79e3c6afe3f7b9a/gateway/platforms/base.py#L4490-L4532">base.py:4490–4532</a></td></tr>
+          <tr><td>Cloudflare Queue can spool edge input on Workers Free: 10,000 operations/day included, 24-hour retention.</td><td><a class="src" href="https://developers.cloudflare.com/queues/platform/pricing/">Queues pricing</a></td></tr>
+          <tr><td>A pull consumer explicitly pulls and acknowledges messages from infrastructure outside Workers.</td><td><a class="src" href="https://developers.cloudflare.com/queues/configuration/pull-consumers/">HTTP pull consumers</a></td></tr>
         </tbody>
       </table>
       <div class="callout ok"><strong>Validation performed:</strong> code paths and focused tests were read at the pinned commits above. The new design is an ADR, so its crash guarantees remain proposed until the SQLite store and idempotent append tests execute them.</div>

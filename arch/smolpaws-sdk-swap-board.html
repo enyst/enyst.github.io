@@ -61,7 +61,7 @@
     mapped to the real work — beads (<code>bd</code>) and PRs — so this group has one glanceable to-do instead of
     re-deriving it each time. Hand-maintained; refreshed when state changes.
   </p>
-  <p class="updated">Last updated 2026-07-11 · source of truth: beads in the <code>smolpaws</code> / <code>openhands-agent</code> repos</p>
+  <p class="updated">Last updated 2026-07-13 · source of truth: beads in the <code>smolpaws</code> / <code>openhands-agent</code> repos + the <a class="plain" href="smolpaws-message-work-adr.html">message-work ADR</a></p>
 
   <div class="legend">
     <span class="pill done">✓ done</span>
@@ -85,34 +85,35 @@
       <p class="step-body">Transpile the upstream <code>openhands-agent-server</code> to TS so the new SDK has a server to run on.
         First slices landed — event/conversation routers, event &amp; conversation services, pubSub, sockets, OpenAPI, plus
         bash/git/file routers. Durability now flows through the SDK's <code>EventLog</code> (server is a thin wrapper, like upstream).
-        Still ahead: remaining routers (P2/P3) and the message-queue layer. Final scope follows what step 1's cutover reveals.</p>
+        Still ahead: remaining routers (P2/P3) and one narrow deterministic-append extension; external queue state stays out of this package.</p>
       <div class="refs">
         <span class="b">pkg: smolpaws/packages/openhands-agent-server</span>
         <span class="b">verified green: 227 SDK tests · server build/test/openapi ✓</span>
       </div>
     </li>
     <li>
-      <div class="step-head"><span class="step-title">Redesign bridges without turns → message queue</span> <span class="pill todo">○ the hard design</span></div>
-      <p class="step-body">The hard part. Retire the bespoke <em>turns</em> abstraction and rebuild its three guarantees
-        (exactly-once delivery, idempotency, ordering) on a lean local-first queue. Several existing bugs are really
-        symptoms of turns papering over this — they should die with the redesign.</p>
+      <div class="step-head"><span class="step-title">Build durable message work around agent-server</span> <span class="pill wip">◐ ADR proposed</span></div>
+      <p class="step-body">The seam is chosen: one shared SQLite-backed Message Work Coordinator in the bridge runtime,
+        outside agent-server. Adapters compute lanes and accept/deliver through it. For webhook ingress, Cloudflare Queue
+        is an edge spool; a local HTTP-pull adapter acknowledges only after SQLite acceptance. No webhook tunnel is required.</p>
       <div class="refs">
-        <span class="b">smolpaws-e4j orphaned replies</span>
-        <span class="b">smolpaws-109 duplicate replies</span>
-        <span class="b">smolpaws-7dj out-of-order outbound</span>
-        <span class="b">smolpaws-6qo send_message not delivered</span>
-        <span class="b">smolpaws-0de shared scheduler layer</span>
+        <a href="smolpaws-message-work-adr.html">message-work ADR + crash matrix</a>
+        <span class="b">coordinator/store implementation: not started</span>
+        <span class="b">existing BaseBridgeAdapter: transport seam, not coordinator</span>
+        <span class="b">smolpaws-e4j · -109 · -7dj · -6qo</span>
       </div>
     </li>
     <li>
       <div class="step-head"><span class="step-title">Swap agent-server + WhatsApp (keep the lifeline)</span> <span class="pill todo">○ not started</span></div>
-      <p class="step-body">Smallest end-to-end slice that lets Engel and SmolPaws keep talking on the new stack. Everything after
-        this happens with the lifeline intact.</p>
+      <p class="step-body">Smallest end-to-end slice: migrate the legacy WhatsApp SQLite/poll monolith into a platform adapter
+        around the coordinator, preserving individual message boundaries. Everything after this happens with the lifeline intact.</p>
       <div class="refs"><span class="b">depends on: steps 2–3</span></div>
     </li>
     <li>
       <div class="step-head"><span class="step-title">Then Discord, GitHub, Email</span> <span class="pill todo">○ not started</span></div>
-      <p class="step-body">Migrate the remaining bridges onto the queue model — repeats of a known move (they share the adapter base).</p>
+      <p class="step-body">Migrate each transport onto the same coordinator seam. Discord already uses the base adapter;
+        Slack is half-migrated; GitHub already has a CF Queue but its Worker consumer still calls the runner; email dispatches directly.
+        GitHub/email become Worker → Queue → local pull adapters, while connected transports stay local.</p>
       <div class="refs">
         <span class="b">smolpaws-3iy GitHub webhook dedup</span>
         <span class="b">smolpaws-z3l whitelisted-thread listen</span>
@@ -168,7 +169,7 @@
   </table>
 
   <div class="callout">
-    <p><strong>The honest read:</strong> the <em>focused</em> OpenHands work right now is the SDK-swap chain — steps 1–3 — and it's healthy and sibling-driven. Everything in the backlog table is real but unsequenced; several delivery bugs are best fixed <em>by</em> the step-3 queue redesign rather than patched before it.</p>
+    <p><strong>The honest read:</strong> the focused OpenHands work is the SDK-swap chain — steps 1–3. Step 3 now has a proposed ADR but no coordinator/store implementation. Several delivery bugs should be fixed by that shared module rather than patched per adapter. The unmerged burst-coalescing work under <code>smolpaws-0de</code> needs redesign: accepted messages stay separate durable events.</p>
   </div>
 
   <nav class="foot-nav">

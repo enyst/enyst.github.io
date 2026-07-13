@@ -252,22 +252,25 @@
       skipped. Scope is driven by what step 1 revealed the server truly relies on.</p>
     </li>
     <li>
-      <span class="ms-t">Redesign the bridges to work without turns <span class="pill hard">the hard part</span></span>
-      <p class="ms-d">This is where the pain starts. Turns gave us ordering, idempotency and
-      single-delivery for free. Without them we need a carefully built <strong>message queue</strong>
-      so replies still arrive once, in order, even across restarts. Get this wrong and SmolPaws
-      double-texts or goes silent. Get it right and the rest is downhill.</p>
+      <span class="ms-t">Build durable message work around agent-server <span class="pill hard">ADR proposed</span></span>
+      <p class="ms-d">The design is now explicit: one shared SQLite-backed Message Work Coordinator
+      lives in the SmolPaws bridge runtime, outside the upstream-shaped agent-server. Platform adapters
+      compute canonical lanes and accept/deliver through it; they do not own retry loops. For webhook
+      ingress, a Cloudflare Queue is an optional edge spool — the local pull adapter acknowledges it only
+      after the coordinator commits intake. It replaces the fragile Quick Tunnel, but does not replace the
+      coordinator. <a href="smolpaws-message-work-adr.html">Read the message-work ADR →</a></p>
     </li>
     <li>
       <span class="ms-t">Swap agent-server + WhatsApp <span class="pill talk">lifeline restored</span></span>
       <p class="ms-d">Do the smallest end-to-end slice that lets us keep talking: the new server plus
-      the WhatsApp bridge. Once this works, SmolPaws and Engel can continue working together on the
-      new stack — everything after this happens with the lifeline intact.</p>
+      the WhatsApp adapter through the coordinator. Once this works, SmolPaws and Engel can continue working
+      together on the new stack — everything after this happens with the lifeline intact.</p>
     </li>
     <li>
       <span class="ms-t">Then Discord, GitHub, Email</span>
-      <p class="ms-d">Migrate the remaining bridges onto the new message-queue model, one at a time.
-      They share the adapter shape, so each is a repeat of a known move rather than new invention.</p>
+      <p class="ms-d">Migrate the remaining platform adapters onto the same coordinator interface, one at
+      a time. GitHub and email can use Worker → Cloudflare Queue → local HTTP pull; Discord remains a connected
+      adapter. The transport differs, but durable acceptance begins at the same coordinator seam.</p>
     </li>
     <li>
       <span class="ms-t">Slack-via-Chrome should keep working untouched <span class="pill maybe">verify, don’t assume</span></span>
@@ -289,37 +292,40 @@
   <h2>5 · Why step 3 is the one to respect</h2>
   <p>
     Everything hinges on replacing what “turns” quietly did for us. It wasn’t just bookkeeping —
-    it was three guarantees bundled into one object:
+    it bundled source deduplication, execution ownership and reply delivery into one object. The replacement
+    must separate those facts instead of recreating a shadow turn:
   </p>
   <ul>
-    <li><strong>Exactly-once delivery.</strong> The <em>delivery owner</em> on a turn made sure one — and only
-      one — bridge sent the reply, even if two workers raced or the process restarted mid-flight.</li>
-    <li><strong>Idempotency.</strong> The same inbound message couldn’t spawn two runs; the idempotency key
-      collapsed retries into one turn.</li>
-    <li><strong>Ordering.</strong> Turns are numbered in sequence, so replies never overtook each other.</li>
+    <li><strong>Conversation truth stays in agent-server.</strong> Events, execution and state already belong to its durable <code>EventLog</code>.</li>
+    <li><strong>External-work truth belongs to one local coordinator.</strong> SQLite stores lane correspondence, intake/delivery work, claims, retries, ordering and audit history.</li>
+    <li><strong>Platform knowledge stays in adapters.</strong> They compute canonical lane identity, normalize input, deliver output and reconcile ambiguous external effects.</li>
+    <li><strong>Cloudflare Queue is only an edge spool.</strong> It keeps HTTP webhook input safe while the Mac is offline; the local pull adapter acknowledges it after SQLite acceptance.</li>
   </ul>
   <p>
-    A message queue has to give all three back, deliberately — not as a side effect of an object we’re
-    deleting. That’s the careful work. It’s also why the WhatsApp slice (step 4) is the right first
-    proof: it’s the bridge where a dropped or doubled message is most obvious, so it’s the honest test
-    of whether the queue really works.
+    The guarantee is deliberately honest: intake becomes effectively-once once deterministic append exists.
+    External delivery is effectively-once only when the platform supports idempotency or reconciliation;
+    an ambiguous send becomes <code>delivery_unknown</code>, never a blind retry. WhatsApp is still the right
+    first proof because a dropped, doubled or reordered message is immediately visible.
   </p>
 
   <div class="callout warn">
     <span class="lbl">⚠ The trap to avoid</span>
-    <p>Don’t try to make the new SDK speak <code>/turns</code>, and don’t try to keep turns alive on the
-    side. Both leave us maintaining the drift forever. The point of the swap is to <em>retire</em> the
-    turn abstraction and rebuild its guarantees on a clean queue — so the server and SDK finally speak
-    the same language.</p>
+    <p>Don’t make the new SDK speak <code>/turns</code>, put platform queue state inside agent-server, or
+    mistake Cloudflare Queue for the coordinator. The point is to retire the turn abstraction while preserving
+    each fact at its natural seam. The full contract and crash matrix live in the
+    <a href="smolpaws-message-work-adr.html">durable message-work ADR</a>.</p>
   </div>
 
   <h2>6 · What’s already true today</h2>
   <p>
     Not starting from zero. The new SDK’s provider routing is done and verified live (OpenAI, Anthropic,
     Gemini all dispatch to the right client). Its conversation loop, tools, workspace and skills are
-    ported and tested. The bridges already share one adapter base, which is why step 5 (Discord, GitHub,
-    Email) is a repeat of a known move rather than reinvention. The work ahead is real, but it’s
-    re-flooring a house that stands — not building a new one.
+    ported and tested. The shared bridge loader, registry, base adapter and turn client exist; Discord uses
+    the shared dispatch path, while Slack only shares lifecycle/output and still has its own client. WhatsApp
+    remains the legacy SQLite/poll monolith; GitHub already has a Cloudflare Queue but its Worker consumer
+    still calls the runner directly; email also dispatches directly. The coordinator interface and SQLite
+    work store are designed, not implemented. The old unmerged burst-coalescing branch must be reconsidered:
+    the ADR preserves each asynchronous message boundary instead of merging messages in adapter memory.
   </p>
 
   <nav class="foot-nav">
