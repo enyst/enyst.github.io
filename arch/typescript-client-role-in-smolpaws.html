@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Do we need typescript-client? A responsibility map for SmolPaws</title>
+  <meta name="description" content="A code-grounded report on what OpenHands/typescript-client owns today, what SmolPaws actually uses, why Agent Canvas still depends on it, and which responsibilities should survive the SDK migration.">
+  <style>
+    :root{--fg:#191919;--muted:#5d5d58;--subtle:#898982;--bg:#fdfdfb;--card:#fff;--elev:#f6f4ee;--accent:#2d4fa3;--accent-soft:#e9eefb;--rule:#e1e0da;--rule-strong:#b9b8b0;--code:#f2f0ea;--warn:#a7580b;--warn-soft:#fff3e5;--ok:#2f7139;--ok-soft:#edf7ed;--crit:#9d2a2a;--crit-soft:#faecea;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.62 var(--sans)}
+    .wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px;max-width:1200px;margin:0 auto;padding:34px 28px 100px}nav{position:sticky;top:24px;align-self:start;font-size:13px}nav h2{margin:0 0 10px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}nav li{counter-increment:toc;margin:5px 0}nav li:before{content:counter(toc) ". ";color:var(--subtle)}nav a{color:var(--fg);text-decoration:none}nav a:hover{color:var(--accent)}nav .back{display:block;margin-top:18px;color:var(--accent)}
+    main{min-width:0}header{border-bottom:1px solid var(--rule);padding-bottom:24px;margin-bottom:26px}.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:750}h1{font-size:37px;line-height:1.14;letter-spacing:-.025em;margin:7px 0 10px}.sub{color:var(--muted);max-width:850px;font-size:17px}.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.pill{display:inline-block;padding:3px 8px;border:1px solid var(--rule-strong);border-radius:999px;font:12px var(--mono);background:var(--card)}
+    h2{font-size:23px;line-height:1.25;margin:48px 0 12px;scroll-margin-top:24px}h2 .num{color:var(--subtle);font-weight:500;margin-right:8px}h3{font-size:17px;margin:25px 0 8px}p{margin:8px 0 14px}code{font:.88em var(--mono);background:var(--code);padding:1px 5px;border-radius:3px}pre{font:13px/1.55 var(--mono);background:var(--code);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;overflow:auto}a{color:var(--accent)}a.src{font:12px var(--mono);text-decoration:none;border-bottom:1px dotted var(--accent)}
+    .decision{border-left:4px solid var(--accent);background:var(--accent-soft);padding:16px 18px;margin:18px 0;border-radius:0 6px 6px 0;font-size:17px}.decision strong{display:block;margin-bottom:5px}.callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:11px 14px;margin:14px 0;border-radius:0 5px 5px 0;font-size:14.5px}.callout.warn{border-color:var(--warn);background:var(--warn-soft)}.callout.ok{border-color:var(--ok);background:var(--ok-soft)}.callout.crit{border-color:var(--crit);background:var(--crit-soft)}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}.card{background:var(--card);border:1px solid var(--rule);border-radius:7px;padding:15px}.card h3{margin:0 0 7px}.card p{font-size:14px;margin:5px 0}.card .tag{font:11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}th,td{text-align:left;vertical-align:top;padding:8px 9px;border-bottom:1px solid var(--rule)}th{background:var(--code);font-weight:650}.yes{color:var(--ok);font-weight:650}.no{color:var(--crit);font-weight:650}.partial{color:var(--warn);font-weight:650}
+    .flow{display:grid;grid-template-columns:1fr 48px 1fr 48px 1fr;gap:10px;align-items:center;margin:20px 0}.box{background:var(--card);border:1px solid var(--rule);border-radius:7px;padding:13px;min-height:112px}.box strong{display:block;margin-bottom:5px}.box small{color:var(--muted)}.arrow{text-align:center;color:var(--accent);font:700 23px var(--mono)}footer{border-top:1px solid var(--rule);margin-top:48px;padding-top:18px;color:var(--muted);font-size:14px}
+    @media(max-width:850px){.wrap{display:block;padding:24px 18px 72px}nav{position:static;border-bottom:1px solid var(--rule);padding-bottom:16px;margin-bottom:24px}.grid{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}table{display:block;overflow-x:auto}h1{font-size:31px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <nav aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#verdict">Verdict</a></li>
+      <li><a href="#responsibilities">Current responsibilities</a></li>
+      <li><a href="#usage">Actual consumers</a></li>
+      <li><a href="#migration">SmolPaws migration</a></li>
+      <li><a href="#repo">Do we need the repo?</a></li>
+      <li><a href="#target">Target ownership</a></li>
+      <li><a href="#recommendation">Recommendation</a></li>
+      <li><a href="#sources">Source map</a></li>
+    </ol>
+    <a class="back" href="../index.html">← enyst.github.io</a>
+  </nav>
+
+  <main>
+    <header>
+      <div class="eyebrow">SmolPaws · architecture report · client ownership</div>
+      <h1>Do we need <code>typescript-client</code>?</h1>
+      <div class="sub">What <code>OpenHands/typescript-client</code> owns today, what SmolPaws actually consumes, why Agent Canvas still depends on it, and which responsibilities should survive the transpiled SDK/server migration.</div>
+      <div class="meta"><span class="pill">2026-07-13</span><span class="pill">typescript-client 9eac1c3</span><span class="pill">openhands-agent 14887f2</span><span class="pill">agent-canvas 010d23e</span><span class="pill">smolpaws dcd1bed</span></div>
+    </header>
+
+    <section id="verdict">
+      <h2><span class="num">1</span>Verdict</h2>
+      <div class="decision"><strong>SmolPaws core does not need the package today. Agent Canvas does.</strong> SmolPaws may need one responsibility from it—a browser-safe, typed agent-server wire client—but it should not absorb the package’s duplicate SDK/domain behavior.</div>
+      <table>
+        <thead><tr><th>Question</th><th>Answer</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>Does the SmolPaws process import it?</td><td class="no">No</td><td>No package or source import exists in SmolPaws.</td></tr>
+          <tr><td>Does the bridge/coordinator design require it?</td><td class="no">No</td><td>The coordinator needs a narrow append/run/events port, not a broad UI client.</td></tr>
+          <tr><td>Does Agent Canvas require it now?</td><td class="yes">Yes</td><td>Canvas imports it across 46 production source files (53 including tests/mocks) for HTTP, WebSocket, workspace and control-plane access.</td></tr>
+          <tr><td>Do we need its durable responsibility?</td><td class="yes">Yes</td><td>A browser-safe, typed client for the agent-server contract remains useful and currently has no complete replacement.</td></tr>
+          <tr><td>Should all current responsibilities survive?</td><td class="no">No</td><td>Agent, local conversation, LLM, prompts, security, hooks and stuck detection overlap the transpiled SDK.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="responsibilities">
+      <h2><span class="num">2</span>What the repository owns today</h2>
+      <div class="grid">
+        <div class="card"><div class="tag">keep</div><h3>Typed agent-server clients</h3><p>Conversation, bash, files, settings, profiles, skills, security, API keys, sessions, shared conversations, server health, desktop and VS Code endpoints. The released package used by Canvas also covers agent profiles, MCP, plugins, hooks, sub-agents and workspace management.</p></div>
+        <div class="card"><div class="tag">keep</div><h3>Browser-safe transport</h3><p><code>fetch</code>, browser <code>WebSocket</code>, API-key/cookie auth, <code>Blob</code>, <code>File</code> and <code>FormData</code>, with an explicit ban on Node built-ins. This is the clearest non-duplicated responsibility.</p></div>
+        <div class="card"><div class="tag">keep, then narrow</div><h3>Remote ergonomics</h3><p><code>RemoteConversation</code>, <code>RemoteWorkspace</code>, <code>RemoteState</code>, <code>RemoteEventsList</code>, WebSocket callbacks and conversation management. They make the wire contract usable from applications rather than exposing only generated calls.</p></div>
+        <div class="card"><div class="tag">overlap</div><h3>SDK/domain behavior</h3><p>Agent, local conversation, OpenRouter LLM, confirmation policy, security analyzer, hooks, prompts, secret registry and stuck detector. These independently reproduce concepts now owned by <code>@smolpaws/openhands-agent</code>.</p></div>
+      </div>
+      <div class="callout warn"><strong>The repository has two identities.</strong> It is both an agent-server browser client and a partial TypeScript SDK. The first identity is durable. The second became architectural debt once the upstream Python SDK was transpiled properly.</div>
+    </section>
+
+    <section id="usage">
+      <h2><span class="num">3</span>Who actually uses it?</h2>
+      <h3>SmolPaws core: effectively nobody</h3>
+      <ul>
+        <li>No direct <code>@openhands/typescript-client</code> dependency or import exists in the SmolPaws package manifests or source.</li>
+        <li>Bridge ingress uses the hand-written shared <code>turnClient.ts</code> today.</li>
+        <li>The transpiled server’s compatibility tests and manual smoke use <code>RemoteConversation</code>/<code>RemoteWorkspace</code> from <code>@smolpaws/openhands-agent</code>.</li>
+      </ul>
+      <h3>Agent Canvas: a primary consumer</h3>
+      <ul>
+        <li>Canvas pins <code>@openhands/typescript-client@1.32.1</code> and imports it in 46 production source files (53 including tests/mocks).</li>
+        <li>It uses endpoint clients for conversations, files, bash, settings, profiles, skills, plugins, MCP, shared conversations, workspaces and backend compatibility.</li>
+        <li>Canvas has an architectural test that forbids ad-hoc agent-server calls and instructs contributors to add missing endpoints to <code>typescript-client</code> first.</li>
+        <li>The client repo itself recently added 789 lines under the explicit commit title “Add agent canvas API client coverage.”</li>
+      </ul>
+      <div class="callout ok"><strong>Deletion test:</strong> deleting the package changes nothing in the SmolPaws daemon, but forces browser transport, wire types and dozens of endpoint calls back into Agent Canvas. The module earns its place there.</div>
+    </section>
+
+    <section id="migration">
+      <h2><span class="num">4</span>Do we need it for the SmolPaws migration?</h2>
+      <p><strong>Not as a runtime dependency.</strong> The intended architecture already has distinct owners:</p>
+      <div class="flow">
+        <div class="box"><strong><code>@smolpaws/openhands-agent</code></strong><small>Engine/domain SDK: agent loop, events, tools, workspaces, LLMs, persistence.</small></div>
+        <div class="arrow">→</div>
+        <div class="box"><strong><code>@smolpaws/openhands-agent-server</code></strong><small>Upstream-shaped REST/WebSocket server around the SDK.</small></div>
+        <div class="arrow">→</div>
+        <div class="box"><strong>Browser client / Agent Canvas</strong><small>Typed remote control plane; currently <code>typescript-client</code>.</small></div>
+      </div>
+      <p>Adding the full package to SmolPaws would create a second set of conversation, workspace, event, LLM, security and hook types beside the transpiled SDK—the drift the migration is meant to remove.</p>
+      <div class="callout"><strong>Coordinator rule:</strong> the Message Work Coordinator should depend on its own narrow <code>AgentServerWorkPort</code>—deterministic append, run, catch-up and subscribe. A low-level generated client may implement that port later; the coordinator should not learn the whole Canvas client surface.</div>
+    </section>
+
+    <section id="repo">
+      <h2><span class="num">5</span>Do we need the repository?</h2>
+      <h3>If Agent Canvas remains maintained: yes, today</h3>
+      <p>Retiring the repo now would leave Canvas on an abandoned package or require replacing 46 production importing files plus its compatibility conventions. There is no complete browser-safe substitute in <code>@smolpaws/openhands-agent</code>.</p>
+      <h3>Why the transpiled SDK is not a drop-in browser replacement</h3>
+      <p>The transpiled SDK does include a narrow <code>RemoteConversation</code> and <code>RemoteWorkspace</code>, but its workspace module imports <code>node:child_process</code>, <code>node:fs/promises</code>, <code>node:path</code> and <code>node:util</code>. It is an engine package with remote affordances, not a browser control-plane package.</p>
+      <h3>What can disappear over time</h3>
+      <p>The repo can shrink as domain concepts move to their canonical owner. Its eventual name could honestly be “agent-server-client”: wire types, transports and remote ergonomics, without pretending to be another full agent SDK.</p>
+    </section>
+
+    <section id="target">
+      <h2><span class="num">6</span>Target responsibility map</h2>
+      <table>
+        <thead><tr><th>Responsibility</th><th>Target owner</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td>Agent loop, events, tools, LLMs, local workspaces, hooks/security behavior</td><td><code>@smolpaws/openhands-agent</code></td><td>Keep canonical; remove independent client implementations.</td></tr>
+          <tr><td>Agent-server REST/WebSocket implementation and OpenAPI</td><td><code>@smolpaws/openhands-agent-server</code></td><td>Keep upstream-shaped; publish canonical contract.</td></tr>
+          <tr><td>Browser-safe HTTP/WebSocket/auth transport</td><td><code>@openhands/typescript-client</code></td><td>Keep.</td></tr>
+          <tr><td>Generated wire schemas/types and endpoint clients</td><td><code>@openhands/typescript-client</code></td><td>Generate from canonical OpenAPI; stop manual drift.</td></tr>
+          <tr><td>Remote application ergonomics</td><td><code>@openhands/typescript-client</code></td><td>Keep a thin layer over generated clients.</td></tr>
+          <tr><td>Canvas services and UI policy</td><td>Agent Canvas</td><td>Keep outside the generic client.</td></tr>
+          <tr><td>Durable platform intake/delivery</td><td>SmolPaws Message Work Coordinator</td><td>Use a narrow work port, not the broad browser client.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="recommendation">
+      <h2><span class="num">7</span>Recommendation</h2>
+      <ol>
+        <li><strong>Do not add <code>@openhands/typescript-client</code> to SmolPaws core.</strong></li>
+        <li><strong>Keep it for Agent Canvas</strong> until a real browser-safe replacement exists.</li>
+        <li><strong>Write down the narrow charter:</strong> browser-safe agent-server transport, generated wire types, endpoint clients and remote ergonomics.</li>
+        <li><strong>Deprecate duplicated SDK behavior</strong> as <code>@smolpaws/openhands-agent</code> reaches parity.</li>
+        <li><strong>Use its integration suite as an external conformance gate</strong> against both the official Python server and the transpiled TypeScript server.</li>
+        <li><strong>Keep the Work Coordinator behind its own port.</strong> Reuse a low-level client only as an implementation detail.</li>
+      </ol>
+      <div class="decision"><strong>Landing</strong> We need the responsibility mostly for Canvas, not the package in SmolPaws’ bridge runtime. Keep the repository now; narrow it toward a browser-safe agent-server client; let the transpiled SDK reclaim duplicated domain behavior.</div>
+    </section>
+
+    <section id="sources">
+      <h2><span class="num">8</span>Source map</h2>
+      <table>
+        <thead><tr><th>Claim</th><th>Grounding</th></tr></thead>
+        <tbody>
+          <tr><td>The repo’s declared purpose and browser-only constraint</td><td><a class="src" href="https://github.com/OpenHands/typescript-client/blob/9eac1c341ad90790bb1628fee84593e16e1ea220/AGENTS.md">typescript-client AGENTS.md</a></td></tr>
+          <tr><td>Endpoint-oriented client exports</td><td><a class="src" href="https://github.com/OpenHands/typescript-client/blob/9eac1c341ad90790bb1628fee84593e16e1ea220/src/clients.ts">src/clients.ts</a></td></tr>
+          <tr><td>Agent Canvas client-first access rule</td><td><a class="src" href="https://github.com/OpenHands/agent-canvas/blob/010d23ee209448b89ed23640637d2147cae26da7/src/api/README.md">agent-canvas src/api/README.md</a></td></tr>
+          <tr><td>Canvas package dependency</td><td><a class="src" href="https://github.com/OpenHands/agent-canvas/blob/010d23ee209448b89ed23640637d2147cae26da7/package.json">agent-canvas package.json</a></td></tr>
+          <tr><td>Transpiled SDK RemoteConversation</td><td><a class="src" href="https://github.com/smolpaws/openhands-agent/blob/14887f2e1dc1cb20983905f2b4f6ef6afbea10ad/src/conversation/remote-conversation.ts">openhands-agent remote-conversation.ts</a></td></tr>
+          <tr><td>Transpiled SDK workspace’s Node coupling</td><td><a class="src" href="https://github.com/smolpaws/openhands-agent/blob/14887f2e1dc1cb20983905f2b4f6ef6afbea10ad/src/workspace/index.ts">openhands-agent workspace/index.ts</a></td></tr>
+          <tr><td>SmolPaws’ current bridge turn client</td><td><a class="src" href="https://github.com/smolpaws/smolpaws/blob/dcd1bedfeca978bc34d9b8e8861cf02455c3c977/src/shared/turnClient.ts">smolpaws turnClient.ts</a></td></tr>
+          <tr><td>Target coordinator port and ownership</td><td><a class="src" href="smolpaws-message-work-adr.html">message-work ADR</a></td></tr>
+        </tbody>
+      </table>
+      <div class="callout ok"><strong>Validation performed:</strong> repository manifests, exports, current source imports and pinned implementation files were read locally. Canvas has 46 production importers and 53 when tests/mocks are included; generated build output is excluded.</div>
+    </section>
+
+    <footer><p><a href="smolpaws-sdk-swap.html">SDK migration plan</a> · <a href="openhands-agent-server-parity.html">agent-server parity</a> · <a href="smolpaws-message-work-adr.html">message-work ADR</a> · <a href="../index.html">enyst.github.io</a></p></footer>
+  </main>
+</div>
+</body>
+</html>
