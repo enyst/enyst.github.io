@@ -37,14 +37,14 @@
     <header class="title">
       <div class="eyebrow">Product decision · Agent Canvas composer</div>
       <h1>One LLM picker. Three layers of state.</h1>
-      <p class="dek">For OpenHands, the conversation composer should stay an LLM Profile picker before conversation start and during the conversation. Agent Profiles remain the agent configuration behind the scene and in Settings. Every successful selection should persist the same per-user preferred LLM. Before conversation start it determines that conversation’s LLM; during a conversation it also switches the running conversation. A truly single-user installation may additionally mirror that choice into only its hidden well-known default Agent Profile.</p>
+      <p class="dek">For OpenHands, the conversation composer should stay an LLM Profile picker before conversation start and during the conversation. Agent Profiles remain the agent configuration behind the scene and in Settings. Selecting an LLM Profile should always make it the LLM for the conversation currently shown in Canvas and save it as the user’s preference for future conversations. A truly single-user installation may additionally mirror that choice into only its hidden well-known default Agent Profile.</p>
       <div class="jump"><a href="llm-profiles-before-agent-profiles.html">← Read the former behavior</a><a href="#options">Compare options</a></div>
       <p class="meta">Current source snapshots: OpenHands/agent-canvas @ bc77e113 · OpenHands/OpenHands @ 1747b395 · decision record, June 2026</p>
     </header>
     <section id="recommendation">
       <h2><span class="num">1</span>Recommendation in one screen</h2>
-      <div class="callout ok"><strong>Choose Refined Option C—with Option 1B as the canonical model.</strong> OpenHands always shows an LLM Profile picker. Every successful selection persists a per-user preferred LLM. Before conversation start it determines the new conversation’s LLM; during a conversation the same action also switches the running conversation. Explicitly single-user backends may also update only the hidden well-known <code>default</code> Agent Profile. Named Agent Profiles never change from a composer click. ACP keeps its provider model picker.</div>
-      <div class="callout"><strong>Same action invariant.</strong> Selecting Claude from the composer always makes Claude the saved preference for future conversations. If a conversation is already running, that same action additionally switches the current conversation to Claude. Pressing Enter on the first prompt must not change what the picker means.</div>
+      <div class="callout ok"><strong>Choose Refined Option C—with Option 1B as the canonical model.</strong> OpenHands always shows an LLM Profile picker. Selecting an LLM Profile always makes it the LLM for the conversation currently shown in Canvas and saves it as the user’s preference for future conversations. Explicitly single-user backends may also update only the hidden well-known <code>default</code> Agent Profile. Named Agent Profiles never change from a composer click. ACP keeps its provider model picker.</div>
+      <div class="callout"><strong>Same action invariant.</strong> Selecting Claude always means “use Claude for this conversation and remember Claude for future conversations.” If the conversation has not started, Canvas uses Claude when the first prompt starts it. If it is running, Canvas applies Claude immediately. Those are two execution paths for one behavior—not two picker meanings.</div>
       <div class="cards">
         <div class="card"><b>Visible control</b><span class="big">LLM</span><p>Stable before conversation start and during the conversation.</p></div>
         <div class="card"><b>Agent configuration</b><span class="big">profile</span><p>Selected behind the scene; edited in Settings → Agent.</p></div>
@@ -114,7 +114,7 @@
         <article class="option recommended">
           <span class="verdict">Option 1B · canonical multi-user model</span>
           <h3>One persistent selection, in both phases</h3>
-          <p><strong>Behavior.</strong> Every successful composer selection becomes that user’s preferred LLM for future Canvas conversations. Before conversation start, the selection also determines the conversation being started. During a conversation, the same selection also switches that running conversation.</p>
+          <p><strong>Behavior.</strong> Every successful composer selection makes that LLM effective for the conversation currently shown in Canvas and saves it as the user’s preferred LLM for future conversations. A not-yet-started conversation uses it on the first prompt; a running conversation applies it immediately.</p>
           <p><strong>Changes.</strong> Persist <code>preferred_llm_profile</code> per user/member, show it before conversation start, send it when an interactive conversation starts, and update it after every successful in-conversation switch.</p>
           <p><strong>Good.</strong> Restores last-used behavior without modifying Agent Profiles. Teammates can share one agent profile and prefer different LLMs.</p>
           <p><strong>Cost.</strong> Adds one explicit state layer and makes the Agent Profile LLM a fallback rather than the final interactive choice.</p>
