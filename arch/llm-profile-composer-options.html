@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One LLM picker, three layers of state</title>
+  <meta name="description" content="Options and recommendation for making the Agent Canvas composer a stable LLM Profile picker without destabilizing Agent Profiles or multi-user Cloud state.">
+  <meta property="og:title" content="One LLM picker, three layers of state">
+  <meta property="og:description" content="Current behavior, four options, tenancy tradeoffs, and a refined recommendation for single-user and Cloud backends.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/llm-profile-composer-options.html">
+  <meta name="twitter:card" content="summary">
+  <style>
+    :root{--ink:#e5e0d8;--muted:#9a9388;--dim:#6f6a62;--bg:#0f0f0e;--card:#1a1a18;--lift:#20201d;--line:#32312b;--gold:#c9a84c;--teal:#6bbfab;--green:#7bc47f;--orange:#dc6b4a;--blue:#7e9ed9;--mono:"JetBrains Mono",monospace;--sans:"DM Sans",system-ui,sans-serif;--serif:"Instrument Serif",Georgia,serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.68 var(--sans);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E")}
+    a{color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(107,191,171,.35)}a:hover{border-color:var(--teal)}code{font:13px/1.5 var(--mono);background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 5px;overflow-wrap:anywhere;word-break:break-word}.wrap{display:grid;grid-template-columns:236px minmax(0,1fr);gap:48px;max-width:1180px;margin:auto;padding:36px 28px 100px}.toc{position:sticky;top:24px;align-self:start}.toc .home{display:inline-block;margin-bottom:28px;font:12px var(--mono);color:var(--muted);border:0}.toc h2{font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0 0 12px}.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}.toc li{counter-increment:toc;margin:6px 0;font-size:13px}.toc li::before{content:counter(toc) ". ";color:var(--dim);font-family:var(--mono)}.toc a{color:var(--muted);border:0}.toc a:hover{color:var(--ink)}main{min-width:0;max-width:850px}.title{padding:30px 0 28px;border-bottom:1px solid var(--line);margin-bottom:24px}.eyebrow{font:600 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}h1{font:400 clamp(38px,6vw,62px)/.98 var(--serif);letter-spacing:-.035em;margin:9px 0 16px;max-width:780px}.dek{font-size:18px;line-height:1.55;color:var(--muted);max-width:760px}.meta{font:11px/1.6 var(--mono);color:var(--dim);margin-top:16px}.jump{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.jump a{font:12px var(--mono);padding:7px 10px;background:rgba(107,191,171,.08);border:1px solid rgba(107,191,171,.35);border-radius:5px}section{margin-top:52px}section>h2{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);padding-bottom:10px;border-bottom:1px solid var(--line);margin:0 0 18px}.num{color:var(--dim);margin-right:9px}h3{font-size:17px;line-height:1.3;margin:26px 0 8px}p{max-width:780px;margin:10px 0 16px}.lead{font-size:18px;line-height:1.55}.source{font:11px/1.55 var(--mono);color:var(--dim);margin-top:6px}.source a{color:var(--teal)}.callout{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 7px 7px 0;padding:16px 18px;margin:18px 0;max-width:800px}.callout strong{color:var(--gold)}.callout.warn{border-left-color:var(--orange)}.callout.warn strong{color:var(--orange)}.callout.ok{border-left-color:var(--green)}.callout.ok strong{color:var(--green)}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.card{background:var(--card);border:1px solid var(--line);border-radius:7px;padding:15px;min-height:145px}.card b{display:block;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:9px}.card p{font-size:13px;line-height:1.5;margin:0;color:var(--muted)}.card .big{display:block;font:400 29px/1 var(--serif);color:var(--ink);margin-bottom:8px}.figure{margin:22px 0}.figure svg{width:100%;height:auto;display:block;background:#151513;border:1px solid var(--line);border-radius:8px}.figure figcaption{font-size:12.5px;color:var(--muted);text-align:center;margin-top:8px}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:7px;margin:18px 0}table{border-collapse:collapse;width:100%;min-width:680px;font-size:13.5px}th,td{text-align:left;vertical-align:top;padding:11px 12px;border-bottom:1px solid var(--line)}tr:last-child td{border-bottom:0}th{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);background:var(--card)}td{color:var(--muted)}td strong{color:var(--ink)}.pill{display:inline-block;font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border:1px solid var(--line);border-radius:999px;color:var(--muted);white-space:nowrap}.pill.user{color:var(--blue);border-color:rgba(126,158,217,.55)}.pill.org{color:var(--orange);border-color:rgba(220,107,74,.55)}.pill.conv{color:var(--green);border-color:rgba(123,196,127,.55)}.trace{display:grid;grid-template-columns:34px 1fr;gap:10px 13px;margin:20px 0}.trace .n{display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--gold);border-radius:50%;font:12px var(--mono);color:var(--gold)}.trace .step{padding:3px 0 16px;border-bottom:1px solid var(--line)}.trace .step:last-child{border:0}.trace .step b{display:block;margin-bottom:3px}.trace .step span{font-size:13px;color:var(--muted)}.timeline{display:grid;grid-template-columns:130px 1fr;gap:10px 20px;margin:20px 0}.timeline time{font:12px var(--mono);color:var(--gold)}.timeline div{padding-bottom:16px;border-bottom:1px solid var(--line);color:var(--muted)}.options{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}.option{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px}.option h3{margin:0 0 8px}.option p,.option li{font-size:13.5px}.option.recommended{border-color:var(--green);box-shadow:inset 0 3px 0 rgba(123,196,127,.8)}.option.risky{border-color:rgba(220,107,74,.65)}.verdict{display:block;font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:8px}.precedence{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;counter-reset:priority;margin:18px 0}.precedence div{counter-increment:priority;background:var(--card);border:1px solid var(--line);padding:14px;border-radius:7px;font-size:13px;color:var(--muted)}.precedence div::before{content:counter(priority);display:block;color:var(--gold);font:26px var(--serif);margin-bottom:5px}.cross{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.cross a{display:block;background:var(--card);border:1px solid var(--line);border-radius:7px;padding:16px 18px;color:var(--ink)}.cross a:hover{border-color:var(--gold)}.cross small{display:block;color:var(--gold);font:10px var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}.foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);font:11px/1.7 var(--mono);color:var(--dim)}
+    @media(max-width:900px){.wrap{grid-template-columns:1fr;gap:18px;padding-top:24px}.toc{position:static}.toc ol{display:flex;gap:8px 14px;flex-wrap:wrap}.toc li::before{display:none}.toc .home{margin-bottom:16px}.cards,.precedence{grid-template-columns:1fr 1fr}.options{grid-template-columns:1fr}}
+    @media(max-width:620px){.wrap{padding:20px 18px 72px}.title{padding-top:18px}.cards,.cross,.precedence{grid-template-columns:1fr}.timeline{grid-template-columns:1fr;gap:4px}.timeline div{margin-bottom:12px}.figure{margin-left:-8px;margin-right:-8px}.dek,.lead{font-size:16px}.toc{display:none}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="toc" aria-label="Page contents">
+    <a class="home" href="../index.html">← enyst.github.io</a>
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#recommendation">Recommendation</a></li>
+      <li><a href="#current">Current UX</a></li>
+      <li><a href="#concepts">Three state layers</a></li>
+      <li><a href="#options">Four options</a></li>
+      <li><a href="#tenancy">Tenancy matrix</a></li>
+      <li><a href="#ownership">Target ownership</a></li>
+      <li><a href="#unresolved">Unresolved decisions</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="title">
+      <div class="eyebrow">Product decision · Agent Canvas composer</div>
+      <h1>One LLM picker. Three layers of state.</h1>
+      <p class="dek">For OpenHands, the composer should stay an LLM Profile picker before and after launch. Agent Profiles remain the agent configuration behind the scene and in Settings. Multi-user Cloud should store a per-user preferred LLM and apply it as a launch override. A truly single-user installation may additionally mirror that choice into only its hidden well-known default Agent Profile.</p>
+      <div class="jump"><a href="llm-profiles-before-agent-profiles.html">← Read the former behavior</a><a href="#options">Compare options</a></div>
+      <p class="meta">Current source snapshots: OpenHands/agent-canvas @ bc77e113 · OpenHands/OpenHands @ e39d94e5 · decision record, June 2026</p>
+    </header>
+    <section id="recommendation">
+      <h2><span class="num">1</span>Recommendation in one screen</h2>
+      <div class="callout ok"><strong>Choose Refined Option C—with Option 1B as the canonical model.</strong> OpenHands always shows an LLM Profile picker. Multi-user backends persist a per-user preferred LLM and send it as a launch override. Explicitly single-user backends may also update only the hidden well-known <code>default</code> Agent Profile. Named Agent Profiles never change from a composer click. ACP keeps its provider model picker.</div>
+      <div class="cards">
+        <div class="card"><b>Visible control</b><span class="big">LLM</span><p>Stable before and after launch for OpenHands.</p></div>
+        <div class="card"><b>Agent configuration</b><span class="big">profile</span><p>Selected behind the scene; edited in Settings → Agent.</p></div>
+        <div class="card"><b>Future choice</b><span class="big">user</span><p>Preferred LLM belongs to a person, not a shared org profile.</p></div>
+        <div class="card"><b>Local refinement</b><span class="big">default</span><p>Only the hidden default may mirror the choice on single-user servers.</p></div>
+      </div>
+      <p class="source">Constraints behind the recommendation: current launch sends <code>agent_profile_id</code> and resolves its saved LLM reference <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/api/conversation-service/agent-server-conversation-service.api.ts#L368-L410">agent-server-conversation-service.api.ts:368–410</a>; current Cloud Agent Profiles are organization-owned while activation writes only the calling member’s pointer <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/server/routes/agent_profiles.py#L1-L24">agent_profiles.py:1–24</a> and <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/server/routes/agent_profiles.py#L386-L427">:386–427</a>.</p>
+      <h3>Explicit precedence</h3>
+      <div class="precedence" aria-label="LLM selection precedence from highest to lowest">
+        <div><strong>Explicit conversation choice</strong><br>The selection the person just made for this launch or running conversation.</div>
+        <div><strong>Per-user preferred LLM</strong><br>The last interactive choice saved for future Canvas conversations.</div>
+        <div><strong>Active Agent Profile fallback</strong><br>The profile’s stable <code>llm_profile_ref</code>, used when no user preference applies.</div>
+        <div><strong>System default</strong><br>The final seed/fallback when neither user nor Agent Profile provides a resolvable LLM.</div>
+      </div>
+      <p class="source">The existing Cloud resolver already demonstrates the lower-level fallback pattern for Agent Profiles: explicit launch profile → member active profile → org default → composed settings <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/storage/saas_settings_store.py#L190-L235">saas_settings_store.py:190–235</a>. The proposed LLM preference layer would sit above the resolved Agent Profile’s LLM for interactive Canvas launches.</p>
+    </section>
+
+    <section id="current">
+      <h2><span class="num">2</span>Current UX: the control changes identity</h2>
+      <p class="lead">Today the picker is selected by conversation phase. Before launch—or while a blank conversation has not substantively started—Canvas prefers Agent Profiles. After an OpenHands conversation starts, it uses LLM Profiles. ACP uses the model picker.</p>
+      <p class="source">Verified in the pure picker matrix: <code>!hasConversation || !hasStartedConversation</code> returns <code>agent-profile</code> when profiles exist; a started conversation returns <code>model</code> for ACP and <code>llm-profile</code> otherwise <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/components/features/chat/components/resolve-picker-kind.ts#L27-L46">resolve-picker-kind.ts:27–46</a>. The renderer maps those three values to three controls <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/components/features/chat/components/chat-input-actions.tsx#L411-L468">chat-input-actions.tsx:411–468</a>.</p>
+      <figure class="figure">
+        <svg viewBox="0 0 920 400" role="img" aria-labelledby="ux-title ux-desc">
+          <title id="ux-title">Current composer picker compared with proposed stable picker</title>
+          <desc id="ux-desc">The top lane shows Agent Profile before launch changing to LLM Profile after launch. The bottom lane shows the proposed design with an LLM Profile in both phases while the Agent Profile remains a hidden launch input.</desc>
+          <defs><marker id="ux-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#c9a84c"/></marker><marker id="ux-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#7bc47f"/></marker></defs>
+          <text x="24" y="30" fill="#dc6b4a" font-family="var(--mono)" font-size="12" font-weight="600">CURRENT — VISIBLE CONCEPT CHANGES</text>
+          <rect x="28" y="54" width="260" height="105" rx="10" fill="#20201d" stroke="#32312b"/><text x="48" y="80" fill="#9a9388" font-family="var(--mono)" font-size="11">blank composer</text><rect x="48" y="96" width="215" height="42" rx="21" fill="#1a1a18" stroke="#dc6b4a"/><text x="155" y="122" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Agent Profile · Default</text>
+          <line x1="288" y1="106" x2="390" y2="106" stroke="#c9a84c" stroke-width="2" marker-end="url(#ux-a)"/><text x="339" y="94" text-anchor="middle" fill="#c9a84c" font-family="var(--mono)" font-size="10">send</text>
+          <rect x="392" y="54" width="188" height="105" rx="10" fill="#20201d" stroke="#32312b"/><text x="486" y="88" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Resolve profile</text><text x="486" y="111" text-anchor="middle" fill="#9a9388" font-family="var(--mono)" font-size="11">llm_profile_ref = GPT</text><text x="486" y="133" text-anchor="middle" fill="#9a9388" font-family="var(--mono)" font-size="11">launch conversation</text>
+          <line x1="580" y1="106" x2="632" y2="106" stroke="#c9a84c" stroke-width="2" marker-end="url(#ux-a)"/>
+          <rect x="634" y="54" width="258" height="105" rx="10" fill="#20201d" stroke="#32312b"/><text x="654" y="80" fill="#9a9388" font-family="var(--mono)" font-size="11">running conversation</text><rect x="654" y="96" width="215" height="42" rx="21" fill="#1a1a18" stroke="#7bc47f"/><text x="761" y="122" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">LLM Profile · GPT</text>
+
+          <line x1="24" y1="200" x2="896" y2="200" stroke="#32312b"/>
+          <text x="24" y="236" fill="#7bc47f" font-family="var(--mono)" font-size="12" font-weight="600">PROPOSED — VISIBLE CONCEPT STAYS PUT</text>
+          <rect x="28" y="260" width="260" height="105" rx="10" fill="#20201d" stroke="#7bc47f"/><text x="48" y="286" fill="#9a9388" font-family="var(--mono)" font-size="11">blank composer</text><rect x="48" y="302" width="215" height="42" rx="21" fill="#1a1a18" stroke="#7bc47f"/><text x="155" y="328" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">LLM Profile · Claude</text>
+          <line x1="288" y1="312" x2="390" y2="312" stroke="#7bc47f" stroke-width="2" marker-end="url(#ux-g)"/><text x="339" y="300" text-anchor="middle" fill="#7bc47f" font-family="var(--mono)" font-size="10">send</text>
+          <rect x="392" y="250" width="188" height="125" rx="10" fill="#20201d" stroke="#c9a84c"/><text x="486" y="277" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Compose launch</text><text x="486" y="300" text-anchor="middle" fill="#9a9388" font-family="var(--mono)" font-size="11">Agent Profile · Default</text><text x="486" y="321" text-anchor="middle" fill="#7bc47f" font-family="var(--mono)" font-size="11">+ LLM override · Claude</text><text x="486" y="349" text-anchor="middle" fill="#c9a84c" font-family="var(--mono)" font-size="10">Agent Profile stays in Settings</text>
+          <line x1="580" y1="312" x2="632" y2="312" stroke="#7bc47f" stroke-width="2" marker-end="url(#ux-g)"/>
+          <rect x="634" y="260" width="258" height="105" rx="10" fill="#20201d" stroke="#7bc47f"/><text x="654" y="286" fill="#9a9388" font-family="var(--mono)" font-size="11">running conversation</text><rect x="654" y="302" width="215" height="42" rx="21" fill="#1a1a18" stroke="#7bc47f"/><text x="761" y="328" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">LLM Profile · Claude</text>
+        </svg>
+        <figcaption>The UX delta is deliberately small: keep the visible LLM choice stable; compose it with the Agent Profile at launch.</figcaption>
+      </figure>
+      <p class="source">Current launch contract: Canvas sends only <code>agent_profile_id</code> on Cloud <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/api/conversation-service/agent-server-conversation-service.api.ts#L378-L410">agent-server-conversation-service.api.ts:378–410</a>. Current Cloud resolution replaces composed settings with the Agent Profile’s resolved settings at conversation start <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/storage/saas_settings_store.py#L470-L500">saas_settings_store.py:470–500</a>. The LLM launch override shown below is a proposal, not current behavior.</p>
+    </section>
+
+    <section id="concepts">
+      <h2><span class="num">3</span>Three concepts, three owners</h2>
+      <div class="options">
+        <div class="option"><span class="verdict" style="color:var(--gold)">Agent configuration</span><h3>Agent Profile</h3><p>A reusable agent definition: kind, tools/skills/MCP choices, limits, and an OpenHands <code>llm_profile_ref</code> fallback. Named profiles should be stable because other launches and automations can refer to them.</p><p class="source">Current Cloud summaries expose <code>agent_kind</code>, revision, <code>llm_profile_ref</code>, and MCP refs <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/server/routes/agent_profiles.py#L75-L99">agent_profiles.py:75–99</a>.</p></div>
+        <div class="option recommended"><span class="verdict">Personal future default · proposed</span><h3>Preferred LLM Profile</h3><p>The last interactive LLM choice for one user. It predicts the blank composer and overrides the Agent Profile fallback only for interactive launches.</p><p class="source">This layer does not exist cleanly today. Historically, the equivalent behavior came from materialized member settings, but the visible active marker was org-owned; see <a href="llm-profiles-before-agent-profiles.html#cloud">the former Cloud flow</a>.</p></div>
+        <div class="option"><span class="verdict" style="color:var(--green)">Runtime state</span><h3>Conversation LLM Profile</h3><p>The profile used by one running conversation. Switching it should remain immediate and conversation-scoped.</p><p class="source">Current Canvas passes the conversation id into <code>switchProfile</code>, updates conversation queries/metadata, and does not save an Agent Profile <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/hooks/mutation/use-switch-llm-profile.ts#L51-L103">use-switch-llm-profile.ts:51–103</a>.</p></div>
+        <div class="option"><span class="verdict" style="color:var(--blue)">Separate agent family</span><h3>ACP model</h3><p>ACP does not use OpenHands LLM Profiles. Its provider/session model selector remains the composer control in ACP contexts.</p><p class="source">Current picker resolution returns <code>model</code> for a started ACP conversation <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/components/features/chat/components/resolve-picker-kind.ts#L41-L46">resolve-picker-kind.ts:41–46</a>; ACP context is derived from the active Agent Profile or conversation kind <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/hooks/use-acp-model-context.ts#L34-L59">use-acp-model-context.ts:34–59</a>.</p></div>
+      </div>
+    </section>
+    <section id="options">
+      <h2><span class="num">4</span>Four options side by side</h2>
+      <div class="options">
+        <article class="option">
+          <span class="verdict" style="color:var(--muted)">Option 1 · UX-only persistence model</span>
+          <h3>Launch override, conversation only</h3>
+          <p><strong>Behavior.</strong> The composer always shows LLM Profiles. The selected LLM overrides the Agent Profile for this launch; later in-chat changes switch only that conversation. The next blank composer falls back to the Agent Profile again.</p>
+          <p><strong>Changes.</strong> Add an optional LLM profile name to the start contract; resolve the Agent Profile, replace only its LLM in memory, never save it.</p>
+          <p><strong>Good.</strong> Stable named profiles, no hidden writes, safe for shared Cloud profiles and automations.</p>
+          <p><strong>Cost.</strong> It fixes the visual switch but not “last selected starts next conversation.” The visible picker can surprise the user on the next visit.</p>
+        </article>
+        <article class="option recommended">
+          <span class="verdict">Option 1B · canonical multi-user model</span>
+          <h3>Launch override + per-user preference</h3>
+          <p><strong>Behavior.</strong> The same launch override, plus every successful interactive LLM choice becomes that user’s preferred profile for future Canvas conversations.</p>
+          <p><strong>Changes.</strong> Persist <code>preferred_llm_profile</code> per user/member, show it before launch, send it on interactive starts, and update it after a successful in-conversation switch.</p>
+          <p><strong>Good.</strong> Restores last-used behavior without modifying Agent Profiles. Teammates can share one agent profile and prefer different LLMs.</p>
+          <p><strong>Cost.</strong> Adds one explicit state layer and makes the Agent Profile LLM a fallback rather than the final interactive choice.</p>
+        </article>
+        <article class="option risky">
+          <span class="verdict" style="color:var(--orange)">Option 2 · not recommended generally</span>
+          <h3>Mutate the active Agent Profile</h3>
+          <p><strong>Behavior.</strong> Every composer LLM selection rewrites the active Agent Profile’s <code>llm_profile_ref</code>; future launches naturally inherit it.</p>
+          <p><strong>Changes.</strong> Prefer a narrow revision-aware patch. A whole-profile save must fetch and preserve every field, then coordinate profile persistence with the live runtime switch.</p>
+          <p><strong>Good.</strong> One saved object appears to contain the effective configuration.</p>
+          <p><strong>Cost.</strong> A chat control silently edits Settings. Named/shared profiles drift, revisions churn, automations can change behavior, and runtime-switch/profile-save partial failures become visible.</p>
+        </article>
+        <article class="option recommended">
+          <span class="verdict">Refined Option C · recommended rollout</span>
+          <h3>Option 1B everywhere; local default mirroring when safe</h3>
+          <p><strong>Multi-user.</strong> Use Option 1B; never mutate a shared Agent Profile.</p>
+          <p><strong>Single-user.</strong> Use the same preference/override behavior, and optionally mirror the selection into only the hidden well-known <code>default</code> Agent Profile.</p>
+          <p><strong>Named profiles.</strong> Stay stable on every backend. A temporary model experiment must not rewrite “Deep review” or affect an automation.</p>
+          <p><strong>Boundary.</strong> Branch on an explicit tenancy/capability contract—not Docker, hostname, localhost, or remote-vs-local guesses.</p>
+        </article>
+      </div>
+      <p class="source">Current constraints: in-conversation OpenHands switching is conversation-scoped <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/hooks/use-chat-input-llm-profile-state.ts#L11-L24">use-chat-input-llm-profile-state.ts:11–24</a> and <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/hooks/use-chat-input-llm-profile-state.ts#L75-L90">:75–90</a>; Cloud Agent Profile activation is pointer-only, not a settings write <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/server/routes/agent_profiles.py#L386-L427">agent_profiles.py:386–427</a>; Cloud resolves profile references only at conversation start <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/storage/saas_settings_store.py#L473-L500">saas_settings_store.py:473–500</a>.</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Criterion</th><th>Option 1</th><th>Option 1B</th><th>Option 2</th><th>Refined C</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Stable visible picker</strong></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td><strong>Last-used starts next chat</strong></td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td><strong>Named Agent Profiles stay stable</strong></td><td>Yes</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+          <tr><td><strong>Safe for shared Cloud profiles</strong></td><td>Yes</td><td>Yes</td><td>No without private/copy-on-write profiles</td><td>Yes</td></tr>
+          <tr><td><strong>One persistence model</strong></td><td>Yes, no preference</td><td>Yes</td><td>Yes, but destructive</td><td>No: optional local compatibility mirror</td></tr>
+          <tr><td><strong>Long-term migration path</strong></td><td>Weak UX</td><td><span class="pill conv">clean</span></td><td>Requires undoing shared mutation</td><td><span class="pill conv">clean</span> local mirror can disappear later</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="tenancy">
+      <h2><span class="num">5</span>Single-user vs multi-user: branch on ownership, not packaging</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Deployment shape</th><th>Declared scope</th><th>Future LLM persistence</th><th>May mirror hidden <code>default</code>?</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Standalone SDK embedded in a personal app</strong></td><td><span class="pill">installation</span> only if the embedding app declares it</td><td>App-owned preference or direct agent configuration.</td><td>Yes, if it also adopts the well-known default Agent Profile convention.</td></tr>
+          <tr><td><strong>Canvas + local agent-server</strong></td><td><span class="pill">installation</span></td><td>Installation/user preference; same user in current product shape.</td><td><span class="pill conv">yes</span> only for seeded hidden <code>default</code>.</td></tr>
+          <tr><td><strong>Canvas + all-in-one Docker</strong></td><td>Server must declare <span class="pill">installation</span> or <span class="pill org">multi-user</span></td><td>Follow declared scope.</td><td>Only when the server explicitly declares single-user ownership.</td></tr>
+          <tr><td><strong>Canvas + remote VM agent-server</strong></td><td>Server must declare scope; hostname is irrelevant.</td><td>Follow declared scope.</td><td>Only when explicitly single-user.</td></tr>
+          <tr><td><strong>OpenHands Cloud / Canvas Cloud backend</strong></td><td><span class="pill org">organization</span> profiles + <span class="pill user">member</span> preference</td><td>Per-member preferred LLM + launch override.</td><td><span class="pill org">no</span> shared profile state stays stable.</td></tr>
+          <tr><td><strong>Automation or API launch by Agent Profile id</strong></td><td>Caller-selected reusable profile</td><td>Ignore interactive preference unless the API explicitly supplies an LLM override.</td><td>No implicit mutation from an interactive user’s preference.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="source">Current Canvas exposes only the coarse transport kinds <code>local | cloud</code> <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/api/backend-registry/types.ts#L1-L13">backend-registry/types.ts:1–13</a>. Current local Agent Profiles lazily seed a well-known default profile and active pointer <a href="https://github.com/OpenHands/software-agent-sdk/blob/56ac31719f91059dc9b319dbc6bb79f17ef60cd7/openhands-agent-server/openhands/agent_server/agent_profiles_router.py#L219-L259">agent_profiles_router.py:219–259</a>. Current Cloud stores the collection with the organization and activation with the member <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/server/routes/agent_profiles.py#L1-L24">agent_profiles.py:1–24</a>. The proposed capability should describe ownership explicitly, for example <code>profile_scope: "installation" | "organization"</code>.</p>
+      <div class="callout warn"><strong>Why “Docker” is not a capability.</strong> A container can serve one human or an office. A VM can be personal or shared. <code>localhost</code> can front a multi-user reverse proxy. The mutation rule must follow declared ownership semantics, not deployment folklore.</div>
+    </section>
+
+    <section id="ownership">
+      <h2><span class="num">6</span>Target state ownership and mutation rules</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>State</th><th>Owner</th><th>Written by</th><th>Consumed by</th><th>Must not be changed by</th></tr></thead>
+        <tbody>
+          <tr><td><strong>LLM Profile definitions</strong></td><td>Installation or organization</td><td>LLM Profile Settings</td><td>Launch resolver and conversation switch</td><td>A normal composer selection</td></tr>
+          <tr><td><strong>Agent Profile definition</strong></td><td>Installation or organization</td><td>Settings → Agent; explicit profile APIs</td><td>Interactive, automation, and API launches</td><td>Composer selection—except optional hidden-default mirror on declared single-user servers</td></tr>
+          <tr><td><strong>Active Agent Profile pointer</strong></td><td>Installation or member</td><td>Settings → Agent activation</td><td>Conversation launch fallback</td><td>LLM picker</td></tr>
+          <tr><td><strong>Preferred LLM Profile</strong> <span class="pill user">proposed</span></td><td>User/member; installation when no identity exists</td><td>Successful interactive picker selection</td><td>Blank composer + interactive launch override</td><td>Automation or another teammate</td></tr>
+          <tr><td><strong>Conversation LLM Profile</strong></td><td>Conversation</td><td>Launch resolution or live switch</td><td>Running runtime and visible picker</td><td>Another conversation</td></tr>
+          <tr><td><strong>ACP model</strong></td><td>ACP Agent Profile fallback + ACP session</td><td>ACP settings/model picker</td><td>ACP subprocess</td><td>OpenHands LLM Profile picker</td></tr>
+        </tbody>
+      </table></div>
+      <p class="source">Current state boundaries support this separation: Cloud Agent Profile activation writes a member pointer only <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/server/routes/agent_profiles.py#L386-L427">agent_profiles.py:386–427</a>; an explicit start request may already override the Agent Profile id without changing that pointer <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/openhands/app_server/app_conversation/app_conversation_models.py#L221-L238">app_conversation_models.py:221–238</a>; running OpenHands LLM switching targets the current conversation <a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/api/conversation-service/agent-server-conversation-service.api.ts#L781-L829">agent-server-conversation-service.api.ts:781–829</a>.</p>
+
+      <h3>Recommended implementation boundary</h3>
+      <div class="trace">
+        <div class="n">1</div><div class="step"><b>Canvas owns one intent: <code>selectComposerLlmProfile(name)</code>.</b><span>The component never decides Cloud vs local persistence.</span></div>
+        <div class="n">2</div><div class="step"><b>Switch the running conversation when one exists.</b><span>Keep the current runtime endpoint and conversation metadata behavior.</span><p class="source"><a href="https://github.com/OpenHands/agent-canvas/blob/bc77e113d5f626eb769e426f767f9295ac4b2421/src/hooks/mutation/use-switch-llm-profile.ts#L55-L103">use-switch-llm-profile.ts:55–103</a></p></div>
+        <div class="n">3</div><div class="step"><b>Persist the future interactive choice according to advertised scope.</b><span>Canonical path: preferred LLM. Optional compatibility path: narrow, revision-aware patch of only the hidden local default Agent Profile.</span></div>
+        <div class="n">4</div><div class="step"><b>Pass the selected LLM on every interactive launch.</b><span>Resolve Agent Profile normally, then replace only its LLM in memory. Preserve profile id/revision provenance.</span><p class="source">Current start already carries one-off Agent Profile provenance through resolution <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/openhands/app_server/app_conversation/live_status_app_conversation_service.py#L530-L548">live_status_app_conversation_service.py:530–548</a>; the LLM override is the proposed adjacent contract.</p></div>
+        <div class="n">5</div><div class="step"><b>Serialize selection and Send.</b><span>Disable or queue Send while future-state persistence is pending so a quick choose-then-send cannot launch the old LLM. Surface split failures instead of pretending runtime and preference are identical.</span></div>
+      </div>
+      <div class="callout"><strong>Migration posture.</strong> Build Option 1B first as the durable model. Add local default-profile mirroring behind the explicit installation-scope capability. If local backends gain real identities later, remove the mirror without changing the composer UX or launch contract.</div>
+    </section>
+
+    <section id="unresolved">
+      <h2><span class="num">7</span>Unresolved decisions before implementation</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Decision</th><th>Recommended default</th><th>Why it remains explicit</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Capability name and source</strong></td><td>Server-advertised ownership, such as <code>profile_scope</code>.</td><td>Current <code>backend.kind</code> describes transport, not who owns mutable state.</td></tr>
+          <tr><td><strong>Preferred LLM storage</strong></td><td>Backend-owned per-member field on Cloud; persisted app preference on identity-less installations.</td><td>It must roam correctly for Cloud users without becoming organization state.</td></tr>
+          <tr><td><strong>Explicit named Agent Profile launch</strong></td><td>Interactive Canvas preference overrides only the LLM; automation/API profile launches ignore it unless an override is explicitly supplied.</td><td>Keeps named profiles deterministic outside interactive UX.</td></tr>
+          <tr><td><strong>Deleted or renamed preferred LLM</strong></td><td>Clear stale preference, fall back to Agent Profile, and make the fallback visible.</td><td>A silent stale name would make the picker lie again.</td></tr>
+          <tr><td><strong>Switch succeeds, preference save fails</strong></td><td>Keep the runtime switch; report that the next-conversation preference did not persist and allow retry.</td><td>Rolling back a live model switch is more disruptive than acknowledging split state.</td></tr>
+          <tr><td><strong>Local mirror lifetime</strong></td><td>Compatibility optimization, not a second canonical architecture.</td><td>Prevents single-user convenience from hardening into a multi-user mutation rule.</td></tr>
+          <tr><td><strong>Settings copy</strong></td><td>Label Agent Profile’s field “Default LLM Profile” or “Fallback LLM Profile.”</td><td>The per-user interactive preference has higher precedence.</td></tr>
+        </tbody>
+      </table></div>
+      <p class="source">The need for explicit stale-reference and fallback handling is grounded in current Cloud resolution, which falls back rather than bricking launch when an active profile id is missing <a href="https://github.com/OpenHands/OpenHands/blob/e39d94e5db769ab2209f91f22c02cc115a429627/enterprise/storage/saas_settings_store.py#L213-L239">saas_settings_store.py:213–239</a>. The rest of this section records product decisions, not existing behavior.</p>
+      <div class="callout ok"><strong>Decision summary.</strong> Preserve the user’s visible mental model—“I choose an LLM here”—while keeping the system’s richer agent configuration stable and reusable. One UI, explicit ownership underneath.</div>
+      <div class="cross">
+        <a href="llm-profiles-before-agent-profiles.html"><small>Evidence · former behavior</small>How “last selected starts next conversation” actually worked →</a>
+        <a href="agent-canvas-llm-profiles.html"><small>Earlier design note</small>The profile abstraction before Agent Profiles landed →</a>
+      </div>
+    </section>
+
+    <div class="foot">Prepared by OpenHands (AI) on behalf of Engel Nyst. Verified behavior is source-linked; recommendations and unresolved choices are explicitly labeled.</div>
+  </main>
+</div>
+</body>
+</html>
