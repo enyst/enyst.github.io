@@ -6,7 +6,7 @@
   <title>Before Agent Profiles: how LLM Profiles behaved</title>
   <meta name="description" content="A source-grounded reconstruction of OpenHands LLM Profile behavior before Agent Profiles, across local agent-server and multi-user Cloud backends.">
   <meta property="og:title" content="Before Agent Profiles: how LLM Profiles behaved">
-  <meta property="og:description" content="Definitions, ownership, activation, launch, and in-conversation switching across single-user and Cloud deployments.">
+  <meta property="og:description" content="Definitions, ownership, activation, conversation start, and in-conversation switching across single-user and Cloud deployments.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://enyst.github.io/arch/llm-profiles-before-agent-profiles.html">
   <meta name="twitter:card" content="summary">
@@ -37,7 +37,7 @@
     <header class="title">
       <div class="eyebrow">Historical reconstruction · OpenHands profiles</div>
       <h1>Before Agent Profiles, the picker meant “use this LLM next”</h1>
-      <p class="dek">The visible control was an LLM Profile picker. Before launch it materialized a durable default; after launch the same control switched only the running conversation. Single-user agent-servers owned one installation-wide settings namespace. Cloud split ownership across the organization and the calling member—with a permission flaw for ordinary teammates.</p>
+      <p class="dek">The visible control was an LLM Profile picker. Before conversation start it materialized a durable default; during a conversation the same control switched only that conversation. Single-user agent-servers owned one installation-wide settings namespace. Cloud split ownership across the organization and the calling member—with a permission flaw for ordinary teammates.</p>
       <div class="jump"><a href="llm-profile-composer-options.html">Read the current decision →</a><a href="agent-canvas-llm-profiles.html">Earlier profile design note</a></div>
       <p class="meta">Source snapshots: OpenHands/agent-canvas @ 0c979071 · OpenHands/OpenHands @ b8d0c618 · OpenHands/software-agent-sdk @ ff03816d · verified June 2026</p>
     </header>
@@ -46,8 +46,8 @@
       <div class="callout ok"><strong>Verified conclusion.</strong> On the blank composer, choosing an LLM Profile changed what the next conversation would use. Once a conversation existed, choosing another profile changed only that conversation. The visible name “active profile” hid different storage owners on local and Cloud backends.</div>
       <div class="cards" aria-label="Historical state summary">
         <div class="card"><b>Profile catalog</b><span class="big">saved</span><p>Installation-owned on an agent-server; organization-owned on Cloud.</p></div>
-        <div class="card"><b>Before launch</b><span class="big">durable</span><p>Activation copied the selected LLM into effective agent settings.</p></div>
-        <div class="card"><b>After launch</b><span class="big">scoped</span><p>The live runtime changed; the future-conversation default did not.</p></div>
+        <div class="card"><b>Before conversation start</b><span class="big">durable</span><p>Activation copied the selected LLM into effective agent settings.</p></div>
+        <div class="card"><b>During conversation</b><span class="big">scoped</span><p>The live runtime changed; the future-conversation default did not.</p></div>
         <div class="card"><b>Cloud caveat</b><span class="big">hybrid</span><p>Org marker, member settings, and admin permission did not line up cleanly.</p></div>
       </div>
       <p class="source">Evidence: the historical Canvas mutation explicitly distinguishes global activation from conversation switching <a href="https://github.com/OpenHands/agent-canvas/blob/0c9790710f174e84236156e069f576608a55c06c/src/hooks/mutation/use-switch-llm-profile.ts#L10-L48">use-switch-llm-profile.ts:10–48</a>; the composer rendered <code>SwitchProfileButton</code> for OpenHands and the ACP model control otherwise <a href="https://github.com/OpenHands/agent-canvas/blob/0c9790710f174e84236156e069f576608a55c06c/src/components/features/chat/components/chat-input-actions.tsx#L398-L414">chat-input-actions.tsx:398–414</a>.</p>
@@ -55,44 +55,44 @@
       <figure class="figure">
         <svg viewBox="0 0 920 370" role="img" aria-labelledby="old-flow-title old-flow-desc">
           <title id="old-flow-title">Historical LLM Profile behavior before Agent Profiles</title>
-          <desc id="old-flow-desc">Two lanes show single-user and Cloud activation before launch. Both materialize LLM settings used by the next conversation. A separate bottom lane shows that switching after launch changes only the running conversation.</desc>
+          <desc id="old-flow-desc">Two lanes show single-user and Cloud activation before conversation start. Both materialize LLM settings used by the next conversation. A separate bottom lane shows that selecting during a conversation changes only that conversation.</desc>
           <defs><marker id="arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#c9a84c"/></marker><marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#7bc47f"/></marker></defs>
-          <text x="22" y="30" fill="#c9a84c" font-family="var(--mono)" font-size="12" font-weight="600">BEFORE LAUNCH — THE CHOICE PERSISTS</text>
+          <text x="22" y="30" fill="#c9a84c" font-family="var(--mono)" font-size="12" font-weight="600">BEFORE CONVERSATION START — THE CHOICE PERSISTS</text>
           <text x="22" y="72" fill="#9a9388" font-family="var(--mono)" font-size="11">single-user</text>
           <rect x="112" y="48" width="162" height="60" rx="7" fill="#20201d" stroke="#32312b"/><text x="193" y="73" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Choose “Claude”</text><text x="193" y="92" text-anchor="middle" fill="#9a9388" font-family="var(--mono)" font-size="11">composer picker</text>
           <line x1="274" y1="78" x2="338" y2="78" stroke="#c9a84c" stroke-width="2" marker-end="url(#arrow-gold)"/>
           <rect x="340" y="48" width="220" height="60" rx="7" fill="#20201d" stroke="#c9a84c"/><text x="450" y="72" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Persist installation settings</text><text x="450" y="92" text-anchor="middle" fill="#c9a84c" font-family="var(--mono)" font-size="11">agent_settings.llm + active_profile</text>
           <line x1="560" y1="78" x2="624" y2="78" stroke="#c9a84c" stroke-width="2" marker-end="url(#arrow-gold)"/>
-          <rect x="626" y="48" width="264" height="60" rx="7" fill="#20201d" stroke="#7bc47f"/><text x="758" y="72" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Next conversation uses Claude</text><text x="758" y="92" text-anchor="middle" fill="#7bc47f" font-family="var(--mono)" font-size="11">settings copied into launch payload</text>
+          <rect x="626" y="48" width="264" height="60" rx="7" fill="#20201d" stroke="#7bc47f"/><text x="758" y="72" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Next conversation uses Claude</text><text x="758" y="92" text-anchor="middle" fill="#7bc47f" font-family="var(--mono)" font-size="11">settings copied into start request</text>
 
           <text x="22" y="162" fill="#9a9388" font-family="var(--mono)" font-size="11">Cloud</text>
           <rect x="112" y="138" width="162" height="60" rx="7" fill="#20201d" stroke="#32312b"/><text x="193" y="163" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Choose “Claude”</text><text x="193" y="182" text-anchor="middle" fill="#9a9388" font-family="var(--mono)" font-size="11">org profile picker</text>
           <line x1="274" y1="168" x2="338" y2="168" stroke="#c9a84c" stroke-width="2" marker-end="url(#arrow-gold)"/>
           <rect x="340" y="128" width="220" height="80" rx="7" fill="#20201d" stroke="#dc6b4a"/><text x="450" y="153" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Two writes, one transaction</text><text x="450" y="174" text-anchor="middle" fill="#dc6b4a" font-family="var(--mono)" font-size="11">org profiles.active = “Claude”</text><text x="450" y="192" text-anchor="middle" fill="#7e9ed9" font-family="var(--mono)" font-size="11">caller member.agent_settings_diff.llm</text>
           <line x1="560" y1="168" x2="624" y2="168" stroke="#c9a84c" stroke-width="2" marker-end="url(#arrow-gold)"/>
-          <rect x="626" y="138" width="264" height="60" rx="7" fill="#20201d" stroke="#7bc47f"/><text x="758" y="162" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Next conversation uses Claude</text><text x="758" y="182" text-anchor="middle" fill="#7bc47f" font-family="var(--mono)" font-size="11">member-effective settings at launch</text>
+          <rect x="626" y="138" width="264" height="60" rx="7" fill="#20201d" stroke="#7bc47f"/><text x="758" y="162" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Next conversation uses Claude</text><text x="758" y="182" text-anchor="middle" fill="#7bc47f" font-family="var(--mono)" font-size="11">member-effective settings at conversation start</text>
 
           <line x1="22" y1="242" x2="898" y2="242" stroke="#32312b"/>
-          <text x="22" y="276" fill="#7bc47f" font-family="var(--mono)" font-size="12" font-weight="600">AFTER LAUNCH — THE CHOICE STAYS WITH THIS CONVERSATION</text>
+          <text x="22" y="276" fill="#7bc47f" font-family="var(--mono)" font-size="12" font-weight="600">DURING CONVERSATION — THE CHOICE STAYS HERE ONLY</text>
           <rect x="112" y="296" width="182" height="54" rx="7" fill="#20201d" stroke="#32312b"/><text x="203" y="319" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Running on GPT</text><text x="203" y="337" text-anchor="middle" fill="#9a9388" font-family="var(--mono)" font-size="11">conversation A</text>
           <line x1="294" y1="323" x2="374" y2="323" stroke="#7bc47f" stroke-width="2" marker-end="url(#arrow-green)"/><text x="334" y="311" text-anchor="middle" fill="#7bc47f" font-family="var(--mono)" font-size="10">choose Claude</text>
           <rect x="376" y="296" width="224" height="54" rx="7" fill="#20201d" stroke="#7bc47f"/><text x="488" y="319" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Runtime switches to Claude</text><text x="488" y="337" text-anchor="middle" fill="#7bc47f" font-family="var(--mono)" font-size="11">/switch_profile or switchLLM</text>
           <path d="M600 323H692" stroke="#7bc47f" stroke-width="2" marker-end="url(#arrow-green)"/><rect x="694" y="296" width="196" height="54" rx="7" fill="#20201d" stroke="#32312b"/><text x="792" y="319" text-anchor="middle" fill="#e5e0d8" font-family="var(--sans)" font-size="13" font-weight="700">Future default unchanged</text><text x="792" y="337" text-anchor="middle" fill="#9a9388" font-family="var(--mono)" font-size="11">conversation B may differ</text>
         </svg>
-        <figcaption>One control, two temporal meanings: durable before launch; conversation-scoped after launch.</figcaption>
+        <figcaption>One control, two temporal meanings: durable before conversation start; conversation-scoped during a conversation.</figcaption>
       </figure>
       <p class="source">Flow sources: single-user activation writes both settings fields <a href="https://github.com/OpenHands/software-agent-sdk/blob/ff03816d4bc184b9a7ebdf9449e1df2daf3a645e/openhands-agent-server/openhands/agent_server/profiles_router.py#L290-L350">profiles_router.py:290–350</a>; Cloud activation performs the org and member writes atomically <a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/enterprise/server/routes/org_profiles.py#L265-L351">org_profiles.py:265–351</a>; running-conversation switching is routed separately <a href="https://github.com/OpenHands/agent-canvas/blob/0c9790710f174e84236156e069f576608a55c06c/src/api/conversation-service/agent-server-conversation-service.api.ts#L679-L743">agent-server-conversation-service.api.ts:679–743</a>.</p>
     </section>
 
     <section id="model">
       <h2><span class="num">2</span>The old mental model: catalog, pointer, materialized settings, conversation</h2>
-      <p class="lead">“LLM Profile” was not one state. It was a named catalog entry plus an active name, a flattened LLM configuration used for launch, and—after launch—a runtime choice.</p>
+      <p class="lead">“LLM Profile” was not one state. It was a named catalog entry plus an active name, a flattened LLM configuration used at conversation start, and—during a conversation—a runtime choice.</p>
       <div class="table-wrap"><table>
         <thead><tr><th>State</th><th>Single-user agent-server</th><th>Cloud before Agent Profiles</th><th>What it controlled</th></tr></thead>
         <tbody>
           <tr><td><strong>Profile definitions</strong></td><td><span class="pill">installation</span> <code>LLMProfileStore</code></td><td><span class="pill org">organization</span> <code>org.llm_profiles</code></td><td>Reusable model, endpoint, parameters, and credential material.</td></tr>
           <tr><td><strong>Active profile name</strong></td><td><span class="pill">installation</span> persisted settings</td><td><span class="pill org">organization</span> <code>profiles.active</code></td><td>What the UI called active; not itself the runtime configuration.</td></tr>
-          <tr><td><strong>Effective LLM settings</strong></td><td><span class="pill">installation</span> <code>agent_settings.llm</code></td><td><span class="pill user">member</span> <code>agent_settings_diff.llm</code> merged over org settings</td><td>The LLM configuration materialized into the next launch.</td></tr>
+          <tr><td><strong>Effective LLM settings</strong></td><td><span class="pill">installation</span> <code>agent_settings.llm</code></td><td><span class="pill user">member</span> <code>agent_settings_diff.llm</code> merged over org settings</td><td>The LLM configuration materialized when the next conversation started.</td></tr>
           <tr><td><strong>Running LLM</strong></td><td><span class="pill conv">conversation</span></td><td><span class="pill conv">conversation</span></td><td>The model used by one existing conversation after a live switch.</td></tr>
         </tbody>
       </table></div>
@@ -107,19 +107,19 @@
         <div class="n">1</div><div class="step"><b>Canvas calls profile activation.</b><span>With no conversation id, the service posts to the agent-server’s <code>/{name}/activate</code> endpoint.</span><p class="source"><a href="https://github.com/OpenHands/agent-canvas/blob/0c9790710f174e84236156e069f576608a55c06c/src/api/conversation-service/agent-server-conversation-service.api.ts#L718-L723">agent-server-conversation-service.api.ts:718–723</a></p></div>
         <div class="n">2</div><div class="step"><b>The server loads the named profile.</b><span>Its complete LLM configuration comes from <code>LLMProfileStore</code>.</span><p class="source"><a href="https://github.com/OpenHands/software-agent-sdk/blob/ff03816d4bc184b9a7ebdf9449e1df2daf3a645e/openhands-agent-server/openhands/agent_server/profiles_router.py#L306-L318">profiles_router.py:306–318</a></p></div>
         <div class="n">3</div><div class="step"><b>Activation materializes two fields.</b><span>The profile’s LLM becomes <code>agent_settings.llm</code>; its name becomes <code>active_profile</code>.</span><p class="source"><a href="https://github.com/OpenHands/software-agent-sdk/blob/ff03816d4bc184b9a7ebdf9449e1df2daf3a645e/openhands-agent-server/openhands/agent_server/profiles_router.py#L320-L335">profiles_router.py:320–335</a></p></div>
-        <div class="n">4</div><div class="step"><b>The next launch reads those settings.</b><span>Canvas fetches settings, encrypts the start payload, and creates the conversation with that materialized LLM.</span><p class="source"><a href="https://github.com/OpenHands/agent-canvas/blob/0c9790710f174e84236156e069f576608a55c06c/src/api/conversation-service/agent-server-conversation-service.api.ts#L381-L408">agent-server-conversation-service.api.ts:381–408</a></p></div>
+        <div class="n">4</div><div class="step"><b>The next conversation start reads those settings.</b><span>Canvas fetches settings, encrypts the start payload, and creates the conversation with that materialized LLM.</span><p class="source"><a href="https://github.com/OpenHands/agent-canvas/blob/0c9790710f174e84236156e069f576608a55c06c/src/api/conversation-service/agent-server-conversation-service.api.ts#L381-L408">agent-server-conversation-service.api.ts:381–408</a></p></div>
       </div>
       <div class="callout"><strong>Practical result.</strong> On a personal installation, “last selected starts next conversation” emerged naturally because the selected profile overwrote the single effective <code>agent_settings.llm</code>. Docker and remote-VM deployments behaved the same when they exposed that same single-user agent-server API.</div>
     </section>
 
     <section id="cloud">
-      <h2><span class="num">4</span>Cloud: org-owned definitions, member-effective launches</h2>
+      <h2><span class="num">4</span>Cloud: org-owned definitions, member-effective conversation starts</h2>
       <p class="lead">Cloud deliberately reused the product behavior, but not the same ownership model. The organization stored profile definitions and the visible active name. Activation then copied the chosen LLM into only the calling member’s effective settings and encrypted key fields.</p>
       <div class="trace">
         <div class="n">1</div><div class="step"><b>Canvas calls the organization endpoint.</b><span><code>POST /api/organizations/{orgId}/profiles/{name}/activate</code>.</span><p class="source"><a href="https://github.com/OpenHands/agent-canvas/blob/0c9790710f174e84236156e069f576608a55c06c/src/api/cloud/profiles-service.api.ts#L116-L139">profiles-service.api.ts:116–139</a></p></div>
         <div class="n">2</div><div class="step"><b>The org marker advances.</b><span><code>profiles.active = name</code> changes the organization-owned collection.</span><p class="source"><a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/enterprise/server/routes/org_profiles.py#L285-L297">org_profiles.py:285–297</a></p></div>
         <div class="n">3</div><div class="step"><b>The calling member gets the effective LLM.</b><span>The backend masks the key in JSON, stores the effective key in member-encrypted columns, and writes <code>member.agent_settings_diff["llm"]</code>.</span><p class="source"><a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/enterprise/server/routes/org_profiles.py#L298-L346">org_profiles.py:298–346</a></p></div>
-        <div class="n">4</div><div class="step"><b>Launch uses member-effective settings.</b><span>The settings store overlays the member diff on org settings and resolves the effective API key; conversation construction then starts from <code>user.agent_settings.llm</code>.</span><p class="source"><a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/enterprise/storage/saas_settings_store.py#L164-L214">saas_settings_store.py:164–214</a> · <a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/openhands/app_server/app_conversation/live_status_app_conversation_service.py#L1171-L1208">live_status_app_conversation_service.py:1171–1208</a></p></div>
+        <div class="n">4</div><div class="step"><b>Conversation start uses member-effective settings.</b><span>The settings store overlays the member diff on org settings and resolves the effective API key; conversation construction then starts from <code>user.agent_settings.llm</code>.</span><p class="source"><a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/enterprise/storage/saas_settings_store.py#L164-L214">saas_settings_store.py:164–214</a> · <a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/openhands/app_server/app_conversation/live_status_app_conversation_service.py#L1171-L1208">live_status_app_conversation_service.py:1171–1208</a></p></div>
       </div>
 
       <div class="callout warn"><strong>The team-org flaw.</strong> Activation required <code>EDIT_ORG_SETTINGS</code> because it changed org state. Personal-org owners and team admins could persist a choice. Ordinary members could list profiles but their blank-composer activation failed authorization—even though they could still switch an already-running conversation.</div>
@@ -130,7 +130,7 @@
     </section>
     <section id="running">
       <h2><span class="num">5</span>Inside a running conversation, persistence stopped</h2>
-      <p class="lead">After launch, the dropdown stopped meaning “future default.” Canvas passed a conversation id, and each backend switched that runtime directly.</p>
+      <p class="lead">During a conversation, the dropdown stopped meaning “future default.” Canvas passed a conversation id, and each backend switched that runtime directly.</p>
       <div class="table-wrap"><table>
         <thead><tr><th>Backend</th><th>Switch mechanism</th><th>State changed</th><th>State not changed</th></tr></thead>
         <tbody>
@@ -139,7 +139,7 @@
         </tbody>
       </table></div>
       <p class="source">Agent-server switch: <a href="https://github.com/OpenHands/agent-canvas/blob/0c9790710f174e84236156e069f576608a55c06c/src/api/conversation-service/agent-server-conversation-service.api.ts#L725-L743">agent-server-conversation-service.api.ts:725–743</a>. Cloud switch resolution and sandbox call: <a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/openhands/app_server/app_conversation/app_conversation_router.py#L620-L670">app_conversation_router.py:620–670</a> and <a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/openhands/app_server/app_conversation/app_conversation_router.py#L689-L734">:689–734</a>. Cloud persists only the conversation model after a successful switch at <a href="https://github.com/OpenHands/OpenHands/blob/b8d0c618e3681e5379b784b3983964b59a2f8e66/openhands/app_server/app_conversation/app_conversation_router.py#L600-L617">:600–617</a>.</p>
-      <div class="callout"><strong>The historical product contract.</strong> “Choose on home” meant activate for later conversations. “Choose in chat” meant switch this chat. The clean behavior existed, but Cloud’s org/member ownership made the first half inconsistent for teams.</div>
+      <div class="callout"><strong>The historical product contract.</strong> “Choose on home” meant activate for later conversations. “Choose in chat” meant switch this chat. That temporal inconsistency was already poor UX; Cloud’s org/member ownership made it worse for teams.</div>
     </section>
 
     <section id="matrix">
@@ -163,12 +163,12 @@
     <section id="transition">
       <h2><span class="num">7</span>The transition: a brief Cloud LLM era, then Agent Profiles</h2>
       <div class="timeline">
-        <time>agent-canvas #1532</time><div><strong>Cloud LLM Profiles land.</strong> Canvas gains the Cloud profile catalog, activation request, and the durable-before-launch / scoped-after-launch behavior reconstructed above. <span class="source"><a href="https://github.com/OpenHands/agent-canvas/pull/1532">PR #1532</a> · <a href="https://github.com/OpenHands/agent-canvas/commit/0c06e23a8c20aa7022e98e81309a9ff1dd14dace">merge commit 0c06e23a</a></span></div>
-        <time>agent-canvas #1571</time><div><strong>Agent Profiles become the composer’s launch abstraction.</strong> The UI introduces an Agent Profile picker and launches a conversation from its stored <code>llm_profile_ref</code>. <span class="source"><a href="https://github.com/OpenHands/agent-canvas/pull/1571">PR #1571</a> · <a href="https://github.com/OpenHands/agent-canvas/commit/96b65f893ad36643944acc4351a989105a9df1ea">merge commit 96b65f89</a></span></div>
-        <time>OpenHands #15060</time><div><strong>Cloud gains organization-owned Agent Profiles with a per-member active pointer.</strong> Activation becomes pointer-only; launch resolves the profile and its LLM reference. <span class="source"><a href="https://github.com/OpenHands/OpenHands/pull/15060">PR #15060</a> · <a href="https://github.com/OpenHands/OpenHands/commit/c0c64bbb">commit c0c64bbb</a></span></div>
+        <time>agent-canvas #1532</time><div><strong>Cloud LLM Profiles land.</strong> Canvas gains the Cloud profile catalog, activation request, and the durable-before-conversation-start / scoped-during-conversation behavior reconstructed above. <span class="source"><a href="https://github.com/OpenHands/agent-canvas/pull/1532">PR #1532</a> · <a href="https://github.com/OpenHands/agent-canvas/commit/0c06e23a8c20aa7022e98e81309a9ff1dd14dace">merge commit 0c06e23a</a></span></div>
+        <time>agent-canvas #1571</time><div><strong>Agent Profiles become the composer’s conversation-start abstraction.</strong> The UI introduces an Agent Profile picker and starts a conversation from its stored <code>llm_profile_ref</code>. <span class="source"><a href="https://github.com/OpenHands/agent-canvas/pull/1571">PR #1571</a> · <a href="https://github.com/OpenHands/agent-canvas/commit/96b65f893ad36643944acc4351a989105a9df1ea">merge commit 96b65f89</a></span></div>
+        <time>OpenHands #15060</time><div><strong>Cloud gains organization-owned Agent Profiles with a per-member active pointer.</strong> Activation becomes pointer-only; conversation start resolves the profile and its LLM reference. <span class="source"><a href="https://github.com/OpenHands/OpenHands/pull/15060">PR #15060</a> · <a href="https://github.com/OpenHands/OpenHands/commit/c0c64bbb">commit c0c64bbb</a></span></div>
         <time>agent-canvas #1629</time><div><strong>Blank conversations are aligned with the Agent Profile picker.</strong> Current picker resolution returns Agent Profile before a conversation has substantively started, then LLM Profile for a running OpenHands conversation. <span class="source"><a href="https://github.com/OpenHands/agent-canvas/pull/1629">PR #1629</a> · <a href="https://github.com/OpenHands/agent-canvas/commit/a411c18d2f1a3102039511053b80978a28aa6823">merge commit a411c18d</a></span></div>
       </div>
-      <div class="callout warn"><strong>What got lost.</strong> Agent Profiles made launch configuration richer and safer to reuse, but the visible composer stopped being a stable LLM choice. The next page evaluates how to recover that UX without restoring Cloud’s old hybrid ownership bug.</div>
+      <div class="callout warn"><strong>What got lost.</strong> Agent Profiles made conversation-start configuration richer and safer to reuse, but the visible composer stopped being a stable LLM choice. The next page evaluates how to recover that UX without restoring Cloud’s old hybrid ownership bug.</div>
       <div class="cross">
         <a href="llm-profile-composer-options.html"><small>Next · current decision</small>Keep one LLM picker without destabilizing Agent Profiles →</a>
         <a href="agent-canvas-llm-profiles.html"><small>Earlier design note</small>Why LLM Profiles became the shared Canvas contract →</a>
