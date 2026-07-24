@@ -438,20 +438,27 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
 
 <h3>Role 2 — Launch spec (how to (re)start the conversation)</h3>
 <p>These configure <em>how the server boots the conversation</em>; they are not the agent and not the message history. They belong in meta (or a dedicated <code>launch.json</code>, per #15298) because the server needs them at start time, before/around loading state.</p>
+<div class="callout warn"><p><strong>Reality check (measured, not eyeballed):</strong> comparing the two Pydantic models directly, <strong>nine</strong> fields are in <em>both</em> <code>StoredConversation</code> and <code>ConversationState</code> today — not just <code>agent</code>. The full overlap is: <code>agent</code>, <code>workspace</code>, <code>max_iterations</code>, <code>stuck_detection</code>, <code>confirmation_policy</code>, <code>security_analyzer</code>, <code>hook_config</code>, <code>tags</code>, <code>id</code>. So the duplication is broader than "the agent"; every one of these is a latent divergence point, and each needs a single owner. The table's "Also in base_state today?" column makes that explicit.</p></div>
 <table>
-  <tr><th>Field</th><th>Meaning</th></tr>
-  <tr><td><code>workspace</code></td><td>Working directory. Needed to build paths before state loads. (Also in base_state — a genuine overlap to reconcile: pick one owner.)</td></tr>
-  <tr><td><code>worktree</code></td><td>Whether to create a dedicated git worktree for this conversation.</td></tr>
-  <tr><td><code>max_iterations</code>, <code>stuck_detection</code></td><td>Run limits / loop guards.</td></tr>
-  <tr><td><code>confirmation_policy</code>, <code>security_analyzer</code></td><td>Run-time policy applied to the agent's actions.</td></tr>
-  <tr><td><code>secrets</code>, <code>secrets_encrypted</code></td><td>Conversation secret <em>sources</em> and whether they arrive encrypted. (The endgame, #15298, replaces values with references.)</td></tr>
-  <tr><td><code>plugins</code>, <code>hook_config</code></td><td>What to fetch/merge into the agent at start (skills, MCP, lifecycle hooks).</td></tr>
-  <tr><td><code>agent_definitions</code>, <code>tool_module_qualnames</code>, <code>client_tools</code></td><td>Client/registry wiring: subagents to register, tool modules to import, client-executed tool specs.</td></tr>
-  <tr><td><code>agent_launch_additions</code></td><td>Deployment context layered on after profile resolution.</td></tr>
-  <tr><td><code>required_runtime_credential_bindings</code></td><td>Credential bindings (e.g. Codex) that must be resolved before the runtime can start.</td></tr>
-  <tr><td><code>autotitle</code>, <code>title_llm_profile</code></td><td>Titling behavior and the (fast/cheap) LLM profile to title with.</td></tr>
-  <tr><td><code>observability_metadata</code> / <code>_tags</code> / <code>_span_name</code></td><td>Tracing metadata attached to the conversation's spans.</td></tr>
+  <tr><th>Field</th><th>Meaning</th><th>Also in base_state today?</th></tr>
+  <tr><td><code>workspace</code></td><td>Working directory; server needs it to build paths before state loads.</td><td><strong>Yes</strong> — duplicated</td></tr>
+  <tr><td><code>max_iterations</code></td><td>Run cap / loop guard.</td><td><strong>Yes</strong> — duplicated</td></tr>
+  <tr><td><code>stuck_detection</code></td><td>Loop guard toggle.</td><td><strong>Yes</strong> — duplicated</td></tr>
+  <tr><td><code>confirmation_policy</code></td><td>When to pause for user confirmation before acting.</td><td><strong>Yes</strong> — duplicated</td></tr>
+  <tr><td><code>security_analyzer</code></td><td>Action-risk analyzer.</td><td><strong>Yes</strong> — duplicated</td></tr>
+  <tr><td><code>hook_config</code></td><td>Lifecycle hook scripts.</td><td><strong>Yes</strong> — duplicated</td></tr>
+  <tr><td><code>tags</code></td><td>Key-value labels (also an index field).</td><td><strong>Yes</strong> — duplicated</td></tr>
+  <tr><td><code>secrets</code>, <code>secrets_encrypted</code></td><td>Conversation secret <em>sources</em> + whether they arrive encrypted. Related but <em>not identical</em> to base_state's <code>secret_registry</code> (resolved sources). Reconcile the two secret representations.</td><td>Related (<code>secret_registry</code>)</td></tr>
+  <tr><td><code>plugins</code></td><td>Plugins to fetch/merge at start.</td><td>meta only</td></tr>
+  <tr><td><code>worktree</code></td><td>Create a dedicated git worktree for this conversation.</td><td>meta only</td></tr>
+  <tr><td><code>agent_definitions</code>, <code>tool_module_qualnames</code>, <code>client_tools</code></td><td>Client/registry wiring: subagents to register, tool modules to import, client-executed tool specs.</td><td>meta only</td></tr>
+  <tr><td><code>agent_launch_additions</code></td><td>Deployment context layered on after profile resolution.</td><td>meta only</td></tr>
+  <tr><td><code>required_runtime_credential_bindings</code></td><td>Credential bindings (e.g. Codex) resolved before the runtime starts.</td><td>meta only</td></tr>
+  <tr><td><code>autotitle</code>, <code>title_llm_profile</code></td><td>Titling behavior and the (fast/cheap) LLM profile to title with.</td><td>meta only</td></tr>
+  <tr><td><code>observability_metadata</code> / <code>_tags</code> / <code>_span_name</code></td><td>Tracing metadata attached to the conversation's spans.</td><td>meta only</td></tr>
+  <tr><td><code>parent_conversation_id</code></td><td>Owning conversation, if any.</td><td>meta only</td></tr>
 </table>
+<p>Which file should own the <em>duplicated</em> run-config fields (workspace, limits, policies, hooks, tags)? They are read at boot by the server but also legitimately part of conversation state. The tie-breaker: these rarely change after creation, and when the server does mutate one (e.g. <code>set_confirmation_policy</code>) it already writes <code>meta.json</code> via <code>save_meta</code>. Pick <strong>one</strong> owner per field and have the other read it — the same discipline the agent needs, applied to the long tail. The point of the inventory is that "make base_state own the agent" is necessary but <em>not sufficient</em>: eight more fields are duplicated behind it.</p>
 
 <h3>Role 3 — Discriminator (cold agent-kind checks without the full agent)</h3>
 <p>This is the one piece of "agent" info the server legitimately needs <em>cold</em> — today it reaches for the whole <code>stored.agent</code> to do it (e.g. <code>_is_codex_agent</code>). Replace that with a tiny, stable discriminator so the full agent can live only in <code>base_state.json</code>:</p>
@@ -489,12 +496,13 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
   <text class="s" x="468" y="170">rewritten on every live mutation (switch_llm, ACP</text>
   <text class="s" x="468" y="186">switch, plugin merge) — no mirror to keep in sync</text>
 </svg>
-<figcaption>Target ownership. meta.json answers "what exists / how to launch / what kind"; base_state.json owns the agent and history. No field appears in both except the one genuine overlap to resolve — <code>workspace</code>.</figcaption>
+<figcaption>Target ownership. meta.json answers "what exists / how to launch / what kind"; base_state.json owns the agent and history. Getting here means resolving the nine fields that are duplicated <em>today</em> (agent + workspace + the run-config tail) down to one owner each.</figcaption>
 </figure>
 
-<h3>The two loose ends to resolve</h3>
+<h3>The loose ends to resolve</h3>
 <ol class="steps">
-  <li><strong>The <code>workspace</code> overlap</strong><span>It's in both files today. Pick one owner. Meta is the natural home (the server needs it before state loads to build paths); base_state can drop it or treat meta's as authoritative.</span></li>
+  <li><strong>The nine duplicated fields</strong><span>agent, workspace, max_iterations, stuck_detection, confirmation_policy, security_analyzer, hook_config, tags, id — each needs one owner. Agent → base_state. id is a harmless shared key. The run-config tail (workspace/limits/policies/hooks/tags) is read at boot, so meta is the natural owner; base_state should stop persisting them (or treat meta as authoritative).</span></li>
+  <li><strong>The two secret representations</strong><span>meta has <code>secrets</code> (sources) and base_state has <code>secret_registry</code> (resolved). They're related, not identical. Reconcile so a credential is described in exactly one place — this is also what #15298 pushes toward.</span></li>
   <li><strong>Listing cost if you go single-file (Option B)</strong><span>If meta is folded into base_state entirely, the list view must not open every large state file. Keep a small, <em>rebuildable</em> index (the Role-1 fields) — derived cache, not a second source of truth.</span></li>
 </ol>
 <p>With that split in place, both bandaids become unnecessary: there is nothing to mirror and no per-kind resume rule, because the agent has exactly one home. That is also the shape #15298 wants — small metadata separate from the rest — so this is the step that lines the agent-server up with the reference-only credentials direction.</p>
