@@ -85,6 +85,8 @@
     <li><a href="#leak">The secret-leak link</a></li>
     <li><a href="#fix">Two ways to fix it</a></li>
     <li><a href="#single">The single-file idea</a></li>
+    <li><a href="#bandaids">The two bandaids shipped</a></li>
+    <li><a href="#right">Doing it right: what meta should hold</a></li>
     <li><a href="#risks">What to watch</a></li>
     <li><a href="#sources">Sources</a></li>
   </ol>
@@ -400,26 +402,126 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
 <div class="callout ok"><p><strong>Recommendation.</strong> The two designs are not really rivals — they're the same idea at different depths. Option A is the safe first move: it kills the duplicate today with almost no new machinery, and it leaves <code>meta.json</code> as an honest little index. Option B is the tidier end state <em>if</em> we also treat listing as a rebuildable index rather than a source of truth. A good path is A now, and keep B open as the direction — especially alongside <a class="src" href="https://github.com/OpenHands/OpenHands/issues/15298">#15298</a>, which already wants a clean split between “small metadata” and “the rest.”</p></div>
 </section>
 
-<section id="risks">
-<h2><span class="num">9</span>What to watch</h2>
-<div class="verdict">
-  <article><span class="pill warn">who wins at load</span><strong>Cold read vs. hydration</strong><p>A cold read is served from <code>base_state.json</code>; first use rebuilds the agent from <code>meta.json</code> and overwrites it. Fixing this means the rebuild must stop preferring <code>meta.json</code> — read the agent from state instead.</p></article>
-  <article><span class="pill warn">ACP &amp; fork paths</span><strong>Other readers of <code>stored.agent</code></strong><p>ACP model switch (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L1636">event_service.py:1636</a>) and fork mutate <code>stored.agent</code>. Each must be moved onto the single owner or kept as a thin projection.</p></article>
-  <article><span class="pill info">the deeper fix</span><strong>References, not values</strong><p>Even one copy of the agent still embeds credentials. #15298's reference-only persistence is the endgame; slimming <code>meta.json</code> is the necessary first move that removes the duplicate, not the whole problem.</p></article>
+<section id="bandaids">
+<h2><span class="num">9</span>The two bandaids shipped</h2>
+<p>Two PRs now fix the <em>symptom</em> (#4032). Neither removes the duplication — both keep the agent in both files and just fight the divergence. Worth being honest about that, and about a consistency cost one of them introduces.</p>
+<table>
+  <tr><th></th><th>#4028 (mirror on write)</th><th>#4219 (read from base_state)</th></tr>
+  <tr><td>Approach</td><td>When the live LLM/condenser changes, copy it <em>into</em> <code>meta.json</code> (a new listener on the agent-change event).</td><td>On resume, read the LLM/condenser <em>from</em> <code>base_state.json</code> instead of the <code>meta.json</code> snapshot.</td></tr>
+  <tr><td>Fixes the timeout revert?</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Removes the duplication?</td><td>No — agent still in both files</td><td>No — agent still in both files</td></tr>
+  <tr><td>Mirrors needed</td><td>Adds a second write mirror (alongside the ACP one)</td><td>None on write</td></tr>
+  <tr><td>Consistency across agent kinds</td><td>Uniform: <code>meta.json</code> stays authoritative for both regular <em>and</em> ACP agents (mirror-on-change for each).</td><td><strong>Split brain:</strong> regular agents become base_state-authoritative for llm/condenser, but ACP still resumes from <code>meta.json</code> and mirrors <code>acp_model</code> on write. Two philosophies in one file pair.</td></tr>
+</table>
+<div class="callout warn">
+  <p><strong>The honest critique of my own PR (#4219):</strong> it fixes the regular-agent bug with no write mirror, but it makes the resume path <em>inconsistent</em> — regular agents read llm/condenser from <code>base_state.json</code> while ACP agents keep reading from <code>meta.json</code>. #4028 at least keeps a single rule for both (meta authoritative, mirror on change). So #4028 is the more <em>internally consistent</em> bandaid; #4219 is the one that leans toward the real fix but only for half the agent kinds. Neither is the destination.</p>
 </div>
-<p>The compact test for the change: <strong>after an LLM switch, a cold resume must observe the switched config</strong> — with the reproduction script from PR #4028 asserting it, both with and without a switch.</p>
+<p>Both are fine as stop-the-bleeding patches. But every mirror or per-kind special case is a tax the duplication keeps charging. The real fix deletes the tax.</p>
+</section>
+
+<section id="right">
+<h2><span class="num">10</span>Doing it right: what <code>meta.json</code> should actually hold</h2>
+<p>The destination is unambiguous: <strong><code>base_state.json</code> owns the agent (it is conversation state), and <code>meta.json</code> holds no agent at all.</strong> The reason a slim <code>meta.json</code> still needs to exist is a real one — the server must answer "what conversations exist, and how do I (re)start one?" without deserializing full state for every conversation in a list. So the honest question is not "delete meta" but "what exactly does meta legitimately own?"</p>
+<p>Below is the full field inventory, split into the three roles it actually plays. Every field is one the server reads <em>before or independently of</em> loading conversation state.</p>
+
+<h3>Role 1 — Index (cheap list/catalog reads)</h3>
+<table>
+  <tr><th>Field</th><th>Meaning / why meta owns it</th></tr>
+  <tr><td><code>id</code></td><td>Conversation UUID — the key.</td></tr>
+  <tr><td><code>title</code></td><td>User-facing name shown in the list.</td></tr>
+  <tr><td><code>created_at</code> / <code>updated_at</code></td><td>Lifecycle timestamps for sorting/display.</td></tr>
+  <tr><td><code>metrics</code></td><td>A <code>MetricsSnapshot</code> (cost/token totals) for the list view without loading stats from state.</td></tr>
+  <tr><td><code>forked_from_conversation_id</code> / <code>forked_from_event_id</code></td><td>Provenance: which conversation/branch-point this was forked from.</td></tr>
+  <tr><td><code>launched_agent_profile</code></td><td>Snapshot of the agent profile (id + revision) that launched it — provenance, not live config.</td></tr>
+  <tr><td><code>tags</code>, <code>user_id</code></td><td>Filtering/correlation metadata (e.g. <code>origin: slack</code>, hosting-deployment identity).</td></tr>
+</table>
+
+<h3>Role 2 — Launch spec (how to (re)start the conversation)</h3>
+<p>These configure <em>how the server boots the conversation</em>; they are not the agent and not the message history. They belong in meta (or a dedicated <code>launch.json</code>, per #15298) because the server needs them at start time, before/around loading state.</p>
+<table>
+  <tr><th>Field</th><th>Meaning</th></tr>
+  <tr><td><code>workspace</code></td><td>Working directory. Needed to build paths before state loads. (Also in base_state — a genuine overlap to reconcile: pick one owner.)</td></tr>
+  <tr><td><code>worktree</code></td><td>Whether to create a dedicated git worktree for this conversation.</td></tr>
+  <tr><td><code>max_iterations</code>, <code>stuck_detection</code></td><td>Run limits / loop guards.</td></tr>
+  <tr><td><code>confirmation_policy</code>, <code>security_analyzer</code></td><td>Run-time policy applied to the agent's actions.</td></tr>
+  <tr><td><code>secrets</code>, <code>secrets_encrypted</code></td><td>Conversation secret <em>sources</em> and whether they arrive encrypted. (The endgame, #15298, replaces values with references.)</td></tr>
+  <tr><td><code>plugins</code>, <code>hook_config</code></td><td>What to fetch/merge into the agent at start (skills, MCP, lifecycle hooks).</td></tr>
+  <tr><td><code>agent_definitions</code>, <code>tool_module_qualnames</code>, <code>client_tools</code></td><td>Client/registry wiring: subagents to register, tool modules to import, client-executed tool specs.</td></tr>
+  <tr><td><code>agent_launch_additions</code></td><td>Deployment context layered on after profile resolution.</td></tr>
+  <tr><td><code>required_runtime_credential_bindings</code></td><td>Credential bindings (e.g. Codex) that must be resolved before the runtime can start.</td></tr>
+  <tr><td><code>autotitle</code>, <code>title_llm_profile</code></td><td>Titling behavior and the (fast/cheap) LLM profile to title with.</td></tr>
+  <tr><td><code>observability_metadata</code> / <code>_tags</code> / <code>_span_name</code></td><td>Tracing metadata attached to the conversation's spans.</td></tr>
+</table>
+
+<h3>Role 3 — Discriminator (cold agent-kind checks without the full agent)</h3>
+<p>This is the one piece of "agent" info the server legitimately needs <em>cold</em> — today it reaches for the whole <code>stored.agent</code> to do it (e.g. <code>_is_codex_agent</code>). Replace that with a tiny, stable discriminator so the full agent can live only in <code>base_state.json</code>:</p>
+<table>
+  <tr><th>Field</th><th>Meaning</th></tr>
+  <tr><td><code>agent_kind</code></td><td><code>"Agent"</code> | <code>"ACPAgent"</code> — enough for cold routing decisions.</td></tr>
+  <tr><td><code>acp_server</code> (when ACP)</td><td>e.g. <code>"codex"</code> — enough for <code>_is_codex_agent</code>-style checks without loading the agent.</td></tr>
+</table>
+
+<h3>What is NOT in meta</h3>
+<div class="callout ok">
+  <p><strong>The agent and everything it contains</strong> — <code>llm</code>, <code>condenser</code>, <code>tools</code>, <code>agent_context</code>, <code>mcp_config</code>, <code>acp_model</code> — is conversation <em>state</em>. It lives only in <code>base_state.json</code>, which the SDK already owns and rewrites on every mutation. No snapshot, no mirror, no per-kind resume rule. ACP's <code>acp_model</code> switch and the LLM switch then both just write state, like everything else.</p>
+</div>
+
+<figure>
+<svg viewBox="0 0 860 250" role="img" aria-label="Target ownership: meta = index + launch + discriminator; base_state = the agent and history">
+  <style>
+    .b{fill:var(--card);stroke:var(--rule-strong);stroke-width:1.5}
+    .l{font:600 13px var(--sans);fill:var(--fg)} .s{font:11px var(--mono);fill:var(--muted)}
+    .m{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.3}
+    .st{fill:var(--teal-soft);stroke:var(--teal);stroke-width:1.3}
+    .t{font:700 11px var(--mono);fill:var(--accent)} .tt{font:700 11px var(--mono);fill:var(--teal)}
+  </style>
+  <rect class="b" x="20" y="24" width="390" height="200" rx="8"/>
+  <text class="l" x="38" y="48">meta.json — server-owned, no agent</text>
+  <rect class="m" x="38" y="62" width="354" height="30" rx="5"/><text class="t" x="50" y="81">index: id · title · timestamps · metrics · fork · profile · tags</text>
+  <rect class="m" x="38" y="98" width="354" height="46" rx="5"/><text class="t" x="50" y="117">launch: workspace · policies · secrets · plugins ·</text><text class="t" x="50" y="133">hooks · client tools · titling · observability</text>
+  <rect class="m" x="38" y="150" width="354" height="30" rx="5"/><text class="t" x="50" y="169">discriminator: agent_kind · acp_server</text>
+  <text class="s" x="38" y="205">cheap to read for the whole list; never needs state</text>
+
+  <rect class="b" x="450" y="24" width="390" height="200" rx="8"/>
+  <text class="l" x="468" y="48">base_state.json — the single source of truth</text>
+  <rect class="st" x="468" y="62" width="354" height="46" rx="5"/><text class="tt" x="480" y="81">agent: llm · condenser · tools ·</text><text class="tt" x="480" y="97">agent_context · mcp_config · acp_model</text>
+  <rect class="st" x="468" y="114" width="354" height="30" rx="5"/><text class="tt" x="480" y="133">events HEAD · stats · secret registry</text>
+  <text class="s" x="468" y="170">rewritten on every live mutation (switch_llm, ACP</text>
+  <text class="s" x="468" y="186">switch, plugin merge) — no mirror to keep in sync</text>
+</svg>
+<figcaption>Target ownership. meta.json answers "what exists / how to launch / what kind"; base_state.json owns the agent and history. No field appears in both except the one genuine overlap to resolve — <code>workspace</code>.</figcaption>
+</figure>
+
+<h3>The two loose ends to resolve</h3>
+<ol class="steps">
+  <li><strong>The <code>workspace</code> overlap</strong><span>It's in both files today. Pick one owner. Meta is the natural home (the server needs it before state loads to build paths); base_state can drop it or treat meta's as authoritative.</span></li>
+  <li><strong>Listing cost if you go single-file (Option B)</strong><span>If meta is folded into base_state entirely, the list view must not open every large state file. Keep a small, <em>rebuildable</em> index (the Role-1 fields) — derived cache, not a second source of truth.</span></li>
+</ol>
+<p>With that split in place, both bandaids become unnecessary: there is nothing to mirror and no per-kind resume rule, because the agent has exactly one home. That is also the shape #15298 wants — small metadata separate from the rest — so this is the step that lines the agent-server up with the reference-only credentials direction.</p>
+</section>
+
+<section id="risks">
+<h2><span class="num">11</span>What to watch</h2>
+<div class="verdict">
+  <article><span class="pill warn">who wins at load</span><strong>Cold read vs. hydration</strong><p>A cold read is served from <code>base_state.json</code>; first use rebuilds the agent and overwrites it. The real fix makes base_state authoritative for <em>all</em> agent kinds, not just regular ones.</p></article>
+  <article><span class="pill warn">ACP &amp; fork paths</span><strong>Every reader of <code>stored.agent</code></strong><p>ACP model switch (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L1636">event_service.py:1636</a>), fork, and codex-detection read the meta agent. All must move onto the discriminator + base_state, or the split is only half done.</p></article>
+  <article><span class="pill info">the deeper fix</span><strong>References, not values</strong><p>Even one copy of the agent still embeds credentials. #15298's reference-only persistence is the endgame; making base_state the sole owner is the step that gets there.</p></article>
+</div>
+<p>The compact test for any real fix: <strong>after an LLM switch <em>and</em> after an ACP model switch, a cold resume must observe the switched config</strong> — with no field living authoritatively in two files.</p>
 </section>
 
 <section id="sources">
-<h2><span class="num">10</span>Sources</h2>
+<h2><span class="num">12</span>Sources</h2>
 <ul class="sources">
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-sdk/openhands/sdk/conversation/state.py#L421">state.py:421 — <code>_save_base_state</code></a><small>base_state.json is the SDK's single source of truth; persists <code>ConversationState.agent</code>.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L169">event_service.py:169 — <code>save_meta</code></a><small>Writes the full <code>StoredConversation</code> (incl. agent) into meta.json.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/models.py#L78">models.py:78 — <code>StoredConversation</code></a><small>Extends <code>StartConversationRequest</code>; inherits <code>agent: AgentBase</code> (L324).</small></li>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L974">event_service.py:974 — agent rebuilt from <code>stored.agent</code></a><small>Start path reconstructs the runtime agent from the meta copy.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py#L1522">local_conversation.py:1522 — <code>switch_llm</code></a><small>Mutates SDK agent → base_state.json only; does not save_meta.</small></li>
-  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4028">PR #4028</a><small>The timeout-restore report and reproduction discussion.</small></li>
-  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4217">PR #4217</a> / <a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/4216">issue #4216</a><small>Trajectory secret-leak fix (export-boundary redaction) — the bandaid.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/4032">issue #4032</a><small>The bug report: LLM profile timeout reset after agent-server restart.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4028">PR #4028</a><small>Bandaid 1 — mirror the switched llm/condenser into meta.json on change.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4219">PR #4219</a><small>Bandaid 2 — read llm/condenser from base_state.json on resume (regular agents only).</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4217">PR #4217</a> / <a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/4216">issue #4216</a><small>Trajectory secret-leak fix (export-boundary redaction) — a related bandaid.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/OpenHands/issues/15298">OpenHands #15298</a><small>Reference-only credentials — the endgame that makes even one copy safe.</small></li>
 </ul>
 </section>
