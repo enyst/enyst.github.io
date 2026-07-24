@@ -211,18 +211,23 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
 
 <section id="bug">
 <h2><span class="num">4</span>How it broke</h2>
-<p>This is the <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4028">PR #4028</a> report, reduced to the mechanism. A user set an LLM profile <code>timeout=600</code>, used the conversation, restored it later, and found the timeout reverted. It only reproduced <em>when an LLM switch was involved</em> — which is the tell.</p>
+<p>This is the <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4028">PR #4028</a> / <a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/4032">issue #4032</a> report, reduced to the mechanism. A user set an LLM profile <code>timeout</code>, and after an agent-server restart the conversation ran with a different timeout — one that wasn't in any profile.</p>
 <ol class="steps">
-  <li><strong>Start with a profile</strong><span>Agent's LLM has <code>timeout=600</code>. Both <code>base_state.json</code> and <code>meta.json</code> agree: <code>timeout=600</code>.</span></li>
-  <li class="bad"><strong>Switch the LLM at runtime</strong><span><code>switch_llm</code> installs a new/derived LLM and writes it to <code>base_state.json</code>. <code>meta.json</code>'s agent is <em>not</em> rewritten in the same step → the two files now disagree.</span></li>
-  <li class="bad"><strong>Cold resume reads the wrong owner</strong><span>On restart the server reconstructs the agent from <code>self.stored.agent</code> (the <code>meta.json</code> copy), which may carry a stale or default-derived <code>timeout</code>, then hands it to the SDK — overwriting what <code>base_state.json</code> had.</span></li>
-  <li class="bad"><strong>Observed: timeout reverted</strong><span>The restored conversation runs with a <code>timeout</code> the user never chose. No error, no log — just a silently wrong config, because two files claimed authority over one field.</span></li>
+  <li><strong>Start with a profile</strong><span>The agent's LLM has <code>timeout=600</code>. Both files agree.</span></li>
+  <li class="bad"><strong>Switch the LLM while the conversation is running</strong><span><code>switch_llm</code> installs a new LLM and saves it to <code>base_state.json</code>. It does <em>not</em> re-save <code>meta.json</code>. Now the two files disagree — <code>base_state.json</code> has the new timeout, <code>meta.json</code> still has the old one.</span></li>
+  <li class="bad"><strong>Restart, then <em>touch</em> the conversation</strong><span>Here's the subtle part. Right after a restart, reading the conversation is answered from <code>base_state.json</code> — the <em>correct</em> value, so it looks fine. But the first time anything actually uses the conversation, the server rebuilds the agent from <code>meta.json</code> (the stale copy) and overwrites <code>base_state.json</code> with it.</span></li>
+  <li class="bad"><strong>The timeout reverts</strong><span>The agent now runs with a timeout the user never chose — silently, because the stale copy won at the moment of use.</span></li>
 </ol>
 <div class="callout crit">
-  <p>Vasco confirmed in-thread: <em>“We can reproduce the issue just if we switch the LLM somewhere. It is impossible to reproduce without the switch.”</em> And Engel's read: <em>“this very bug is due to the duplicate source of truth.”</em> The switch is not the cause — it's what makes the two copies diverge enough to notice.</p>
+  <p><strong>Why the read “lies.”</strong> A cold read right after restart shows the right value (from <code>base_state.json</code>); the revert only happens on first use, when the agent is rebuilt from <code>meta.json</code>. So checking by hand looks like a pass unless you use the conversation first. That cold-vs-warm split is exactly why the bug was so slippery to pin down. <span class="meta">(See PR #4028 §4.)</span></p>
 </div>
-<h3>The non-example</h3>
-<p>A conversation that <em>never switches its LLM</em> does not show the bug, even though the duplication is still there. Both files stay byte-equivalent for the agent, so it doesn't matter which one resume reads. That's exactly why the report looked like an “LLM-switch bug” rather than what it is: a latent dual-source-of-truth that only a divergence event exposes.</p>
+<h3>The report that looked contradictory</h3>
+<p>The reporter said the timeout is lost on plain restart, with <em>no</em> switch — while the maintainer could only reproduce it <em>with</em> a switch. Both are right, and here's the reconciliation:</p>
+<ul>
+  <li><strong>Editing a profile does not reach a running conversation.</strong> The LLM config is frozen into the agent when the conversation is created. So to push a new timeout into an existing conversation, the reporter toggled profiles A→B→A — which he thought of as “fixing the setting,” but mechanically <em>that toggle is the switch</em>.</li>
+  <li>That switch plants the <code>base_state.json</code> ⁄ <code>meta.json</code> divergence, and the restart then reverts it. Same bug, described from two ends.</li>
+</ul>
+<div class="callout"><p>A conversation that is <em>never</em> switched keeps its timeout across restarts — the two files stay identical, so it doesn't matter which one wins. There's also a separate, deeper question hiding here: <em>should restoring a conversation re-read its active profile at all?</em> Today it never does; the config is frozen at creation. That's a design choice worth its own discussion, independent of the duplication.</p></div>
 </section>
 
 <section id="history">
@@ -398,7 +403,7 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
 <section id="risks">
 <h2><span class="num">9</span>What to watch</h2>
 <div class="verdict">
-  <article><span class="pill warn">resume ordering</span><strong>Who is authoritative at cold start?</strong><p>Today the server hydrates the agent from <code>meta.json</code> before the SDK loads <code>base_state.json</code>. Flipping ownership means the server must defer to state, or read agent config out of <code>base_state.json</code> itself.</p></article>
+  <article><span class="pill warn">who wins at load</span><strong>Cold read vs. hydration</strong><p>A cold read is served from <code>base_state.json</code>; first use rebuilds the agent from <code>meta.json</code> and overwrites it. Fixing this means the rebuild must stop preferring <code>meta.json</code> — read the agent from state instead.</p></article>
   <article><span class="pill warn">ACP &amp; fork paths</span><strong>Other readers of <code>stored.agent</code></strong><p>ACP model switch (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L1636">event_service.py:1636</a>) and fork mutate <code>stored.agent</code>. Each must be moved onto the single owner or kept as a thin projection.</p></article>
   <article><span class="pill info">the deeper fix</span><strong>References, not values</strong><p>Even one copy of the agent still embeds credentials. #15298's reference-only persistence is the endgame; slimming <code>meta.json</code> is the necessary first move that removes the duplicate, not the whole problem.</p></article>
 </div>
