@@ -88,6 +88,7 @@
     <li><a href="#bandaids">The two bandaids shipped</a></li>
     <li><a href="#right">Doing it right: what meta should hold</a></li>
     <li><a href="#risks">What to watch</a></li>
+    <li><a href="#plan">The build plan</a></li>
     <li><a href="#sources">Sources</a></li>
   </ol>
 </nav>
@@ -96,7 +97,7 @@
   <div class="eyebrow">OpenHands agent-server · architecture study</div>
   <h1>Two files, one truth.</h1>
   <p class="sub">When you run a conversation through the agent-server, the whole agent — its LLM, its condenser, its tools — gets written to disk <strong>twice</strong>: once in <code>base_state.json</code> and again in <code>meta.json</code>. Two copies of the same thing eventually disagree. That disagreement already quietly reset a saved conversation's settings, and it made the trajectory key-leak twice as bad. Here's exactly where the copy is made, and two ways to end up with a single source of truth.</p>
-  <p class="meta">Grounded to software-agent-sdk @ 01813312 · agent-canvas thread on PR #4028 · by smolpaws 🐾</p>
+  <p class="meta">Grounded to software-agent-sdk @ 01813312 · agent-canvas thread on PR #4028 · §12 build plan cross-checked against #4201/#4100/#4202 and the ACP field durability in <code>switch_acp_model</code> · by smolpaws 🐾</p>
 </header>
 
 <section id="verdict">
@@ -400,6 +401,7 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
   <tr><td>Effort / risk</td><td>Low</td><td>Medium</td></tr>
 </table>
 <div class="callout ok"><p><strong>Recommendation.</strong> The two designs are not really rivals — they're the same idea at different depths. Option A is the safe first move: it kills the duplicate today with almost no new machinery, and it leaves <code>meta.json</code> as an honest little index. Option B is the tidier end state <em>if</em> we also treat listing as a rebuildable index rather than a source of truth. A good path is A now, and keep B open as the direction — especially alongside <a class="src" href="https://github.com/OpenHands/OpenHands/issues/15298">#15298</a>, which already wants a clean split between “small metadata” and “the rest.”</p></div>
+<div class="callout warn"><p><strong>Update — the cost of Option B is now concrete, not hypothetical.</strong> <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4201">#4201</a> (perf: <em>index conversation execution status for search/count</em>, landed 2026-07-23) deliberately <em>replaced</em> a full-<code>ConversationState</code> load per conversation with a signature-gated raw read of a single enum — its docstring names the exact price: <em>"validating the full ConversationState costs an agent, LLM config, workspace, secret registry and stats blob to reach one enum field."</em> With <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4100">#4100</a> (lazy hydration) and <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4202">#4202</a> (idle eviction) alongside it, the codebase is actively investing in <em>less</em> state loading, not more. So the "cheap listing" property is not vestigial — it is defended. That settles it: <strong>Option A is the destination, not just the first step</strong>; a literal single file is off the table, and any future consolidation must keep listing answerable from a small in-memory index without hydrating state.</p></div>
 </section>
 
 <section id="bandaids">
@@ -506,7 +508,8 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
   <li><strong>Reconcile the two secret shapes</strong><span>meta's <code>secrets</code> (sources) vs base_state's <code>secret_registry</code> (resolved). Describe a credential in exactly one place — the direction #15298 wants anyway.</span></li>
   <li><strong>Keep listing cheap</strong><span>The list view reads bucket 3 (+ maybe bucket 2) from the small meta. If you ever fold meta into base_state (the single-file option), keep a <em>rebuildable</em> index instead — a derived cache, not a second source of truth.</span></li>
 </ol>
-<div class="callout ok"><p>With bucket 1 gone, both bandaids evaporate: nothing to mirror, no per-kind resume rule, because the agent (and the rest of the Conversation) has exactly one home. The rule to hold the line: <strong>if a field is on <code>ConversationState</code>, it must not also be persisted in <code>meta.json</code>.</strong></p></div>
+<div class="callout ok"><p>With bucket 1 gone, both bandaids evaporate: nothing to mirror, no per-kind resume rule, because the agent (and the rest of the Conversation) has exactly one home. The rule to hold the line, in full: <strong>if a field is on <code>ConversationState</code>, it must not be <em>authoritative</em> in <code>meta.json</code>. If the list view needs it cold, it may exist there only as a <em>signature-gated derived copy</em> — one-way, rebuildable, memory-wins-when-live, never read back into the conversation.</strong></p>
+<p style="margin-top:8px">That second clause isn't a loophole — it's the shape that already exists and works. <code>execution_status</code> is a <code>ConversationState</code>-only field the server caches in <code>_ConversationRecord</code> and refreshes through <code>_refresh_execution_statuses()</code>: gated on an <code>os.stat</code> signature, invalidated to <code>None</code> the instant the conversation goes live (<em>"went live while we were reading disk; memory wins"</em>). Any derived index copy must have that shape — and it must live on <code>_ConversationRecord</code>, <strong>not</strong> on <code>StoredConversation</code>, so the structural guard (below) still fires on real duplication.</p></div>
 </section>
 
 <section id="risks">
@@ -517,10 +520,42 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
   <article><span class="pill info">the deeper fix</span><strong>References, not values</strong><p>Even one copy of the agent still embeds credentials. #15298's reference-only persistence is the endgame; making base_state the sole owner is the step that gets there.</p></article>
 </div>
 <p>The compact test for any real fix: <strong>after an LLM switch <em>and</em> after an ACP model switch, a cold resume must observe the switched config</strong> — with no field living authoritatively in two files.</p>
+
+<h3>Two open questions, now resolved</h3>
+<div class="callout ok"><p><strong>Q1 — Is ACP durable in <code>base_state</code>? Yes, fully.</strong> <code>acp_model</code> and <code>acp_server</code> are regular <code>Field</code>s on <code>ACPAgent</code> (not <code>PrivateAttr</code>), so they already ride inside <code>state.agent</code> → <code>base_state.json</code>. And <code>switch_acp_model</code> already does the whole job on the SDK side: it sets <code>self._state.agent = new_agent</code> (via <code>model_copy</code>, precisely so the autosave fires) and updates <code>agent_state["acp_current_model_id"]</code> — both persisted. So the agent-server's ACP mirror (<code>event_service.py:1636</code>) is <em>pure redundancy</em>: it exists only because <code>start()</code> rebuilds the agent from <code>stored.agent</code>. Kill the rebuild and the mirror has no reason to exist — <strong>it can be deleted in the same step, no one-release grace period</strong>. ACP comes under the read-side rule immediately.</p></div>
+<div class="callout"><p><strong>Q2 — Should resume re-read the active profile? No — keep config frozen at creation, but answer the intent explicitly.</strong> The reporter's mental model was <em>"edit profile → my conversation picks it up."</em> Re-reading the active profile on every restart would be a behaviour change that also reintroduces a second source of truth. Instead, keep <code>launched_agent_profile</code> (bucket 3) as provenance the client can diff against the current profile, and let the UI offer <em>"this conversation's profile changed since launch → re-apply"</em> — which calls the existing switch endpoint. Implicit-on-restart becomes explicit-on-click. Decide it <em>in writing</em>, and ship it as a separate PR from the duplication fix — don't let it be an emergent property of which file wins.</p></div>
+</section>
+
+<section id="plan">
+<h2><span class="num">12</span>The build plan: burn the overlap down under a guard test</h2>
+<p>Turning "one source of truth" from a claim in a PR description into a property CI enforces. The order matters: land the scoreboard first, then let each phase shrink it.</p>
+
+<h3>The test that defines "done"</h3>
+<p>Two tests. The first proves the behaviour; the second holds the line so no future PR can quietly re-add a duplicate.</p>
+<p><strong>(a) Round-trip, parametrized over every mutable field</strong> — create a conversation, mutate the field at runtime through its real endpoint, tear the service down, start a fresh one over the same directory, hydrate through the real resume path, and assert the live conversation observes the mutated value.</p>
+<p><strong>(b) The structural guard</strong> — the rule as an assertion over the type system's own metadata, so it needs no bug report to fire:</p>
+<pre><code><span class="com"># fails the moment anyone re-adds a duplicated field</span>
+stored_persisted = StoredConversation.model_fields.keys() - EXCLUDED
+overlap = stored_persisted &amp; ConversationState.model_fields.keys()
+assert overlap == {<span class="str">"id"</span>}, f<span class="str">"meta.json re-persists ConversationState fields: {overlap - {'id'}}"</span></code></pre>
+<p>Land (b) <strong>first</strong>, xfail-ed with the current 9-field overlap listed, and let each phase shrink the expected set. Note <code>EXCLUDED</code> must subtract <code>exclude=True</code> fields — <code>exclude=True</code> suppresses <em>serialization</em>, not validation, so an excluded field is still readable in memory during the migration window and would otherwise let the guard pass while the field is still live.</p>
+
+<h3>Sequencing</h3>
+<table>
+  <tr><th>Phase</th><th>What</th><th>Blocks</th></tr>
+  <tr><td>5b</td><td>Structural guard test, xfail-ed at 9. <em>Land first — it scores the rest.</em></td><td>nothing</td></tr>
+  <tr><td>0</td><td>Read-side authority, extended to ACP; delete the ACP mirror (Q1 unblocks this). <em>Supersedes #4028 and #4219 — they should not merge alongside it.</em></td><td>nothing</td></tr>
+  <tr><td>1</td><td><code>agent</code> out of <code>meta.json</code> (bucket 1: 1 of 9). Needs the <code>ConversationState.create(agent=None)</code> resume-path change.</td><td>needs 0</td></tr>
+  <tr><td>2</td><td>Rest of bucket 1 (8 of 9) — same <code>create()</code> generalisation makes it mechanical.</td><td>needs 1</td></tr>
+  <tr><td>2b</td><td>Reconcile <code>secrets</code> vs <code>secret_registry</code> (gated on the credential model, #15298).</td><td>needs 1</td></tr>
+  <tr><td style="text-decoration:line-through">4</td><td style="text-decoration:line-through">Index relabel / Option B</td><td><strong>cut</strong> — #4201 already built the index</td></tr>
+</table>
+<div class="callout warn"><p><strong>The Phase 1 traps</strong> (both easy to miss, both pass on old fixtures and break later): (1) <code>StoredConversation.agent</code> is typed <code>AgentBase</code> but defaults to <code>None</code> — a new-style <code>meta.json</code> validates fine and every remaining unguarded <code>type(stored.agent)</code> then fails with a confusing <code>NoneType</code> error, so branch explicitly on the resume path rather than leaning on the default. (2) The one real SDK change is making <code>ConversationState.create()</code> take <code>agent: AgentBase | None</code> (<code>None</code> on resume → keep the persisted agent, skip the overwrite and <code>verify</code>) — this is the <em>same</em> change bucket-1's <code>workspace</code>/<code>max_iterations</code> need, so do it once, generalised.</p></div>
+<div class="callout"><p><strong>Guardrail for every phase:</strong> do not regress #4201 / #4100 / #4202 — sort, filter, count and paginate must stay answerable from the in-memory catalog without loading <code>ConversationState</code>. And <strong>agent-canvas needs no changes</strong>: the HTTP API already builds its conversation response from <code>ConversationState</code>, not from the meta snapshot, so removing <code>agent</code> from <code>meta.json</code> changes zero bytes of any API response. Both are worth an explicit line in each PR description, because "will this break the client / the list view?" is the question that otherwise stalls review.</p></div>
 </section>
 
 <section id="sources">
-<h2><span class="num">12</span>Sources</h2>
+<h2><span class="num">13</span>Sources</h2>
 <ul class="sources">
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-sdk/openhands/sdk/conversation/state.py#L421">state.py:421 — <code>_save_base_state</code></a><small>base_state.json is the SDK's single source of truth; persists <code>ConversationState.agent</code>.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L169">event_service.py:169 — <code>save_meta</code></a><small>Writes the full <code>StoredConversation</code> (incl. agent) into meta.json.</small></li>
@@ -530,6 +565,8 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/4032">issue #4032</a><small>The bug report: LLM profile timeout reset after agent-server restart.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4028">PR #4028</a><small>Bandaid 1 — mirror the switched llm/condenser into meta.json on change.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4219">PR #4219</a><small>Bandaid 2 — read llm/condenser from base_state.json on resume (regular agents only).</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4201">PR #4201</a><small>perf — index conversation execution status for search/count; replaces a full-state load with a signature-gated raw enum read. The concrete cost of loading state for listing.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4100">PR #4100</a> / <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4202">PR #4202</a><small>Lazy hydration + idle eviction — the codebase actively investing in <em>less</em> state loading, which is why Option B's index cost is real.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4217">PR #4217</a> / <a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/4216">issue #4216</a><small>Trajectory secret-leak fix (export-boundary redaction) — a related bandaid.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/OpenHands/issues/15298">OpenHands #15298</a><small>Reference-only credentials — the endgame that makes even one copy safe.</small></li>
 </ul>
