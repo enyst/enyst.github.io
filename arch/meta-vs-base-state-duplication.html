@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Why the OpenHands agent-server persists the full agent config twice — in base_state.json and meta.json — how that duplicate source of truth produced a timeout-restore bug, and how to slim meta.json back to server-owned fields.">
+<link rel="icon" href="data:,">
+<title>Two files, one truth: meta.json vs base_state.json in the OpenHands agent-server</title>
+<style>
+  :root{
+    --fg:#1b1d1f; --muted:#5e646b; --subtle:#858b91;
+    --bg:#fbfbf8; --card:#ffffff; --raised:#f5f4ef;
+    --accent:#2b4eaa; --accent-soft:#e9eefb; --teal:#26736b; --teal-soft:#e5f3f0;
+    --warn:#a9570b; --warn-soft:#fbf0e3; --crit:#9b2929; --crit-soft:#faeaea;
+    --ok:#34753c; --ok-soft:#eaf4eb; --rule:#dfdfd8; --rule-strong:#babbb5;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.62 var(--sans)}
+  a{color:var(--accent)}
+  .wrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;width:100%;max-width:1200px;margin:0 auto;padding:34px 28px 100px}
+  nav,main{min-width:0}
+  nav{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav .home{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}
+  nav h2{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+  nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav li{counter-increment:toc;margin:5px 0}
+  nav li::before{content:counter(toc) ". ";color:var(--subtle)}
+  nav a{color:var(--fg);text-decoration:none} nav a:hover{color:var(--accent)}
+  header{padding:2px 0 26px;border-bottom:1px solid var(--rule);margin-bottom:30px}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{max-width:860px;margin:7px 0 8px;font-size:clamp(32px,5vw,54px);line-height:1.05;letter-spacing:-.04em}
+  header .sub{max-width:820px;margin:0;color:var(--muted);font-size:18px}
+  .meta{margin-top:16px;color:var(--subtle);font:12px/1.5 var(--mono)}
+  h2{font-size:24px;margin:52px 0 12px;letter-spacing:-.02em} h2 .num{margin-right:8px;color:var(--subtle);font-weight:500}
+  h3{font-size:17px;margin:24px 0 8px}
+  p{max-width:820px}
+  code{font:13px var(--mono);background:var(--raised);padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+  pre{max-width:820px;background:var(--raised);border:1px solid var(--rule);border-radius:7px;padding:14px 16px;overflow-x:auto;font:12.5px/1.5 var(--mono)}
+  pre code{background:none;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}
+  .verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+  .verdict article,.card{border:1px solid var(--rule);border-radius:8px;background:var(--card);padding:18px}
+  .verdict strong{display:block;margin:8px 0 4px;font-size:16px}
+  .verdict p{margin:0;color:var(--muted);font-size:14px}
+  .pill{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:2px 8px;font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+  .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.crit{color:var(--crit)} .pill.info{color:var(--accent)}
+  .callout{margin:16px 0;padding:13px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 5px 5px 0}
+  .callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+  .callout.crit{border-color:var(--crit);background:var(--crit-soft)}
+  .callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .callout p{margin:0}
+  figure{margin:22px 0 26px} figure svg{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:8px;background:#fff}
+  figcaption{margin-top:7px;text-align:center;color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--rule)}
+  th{background:var(--raised);font-weight:700}
+  .src{font:12px var(--mono);text-decoration:none;border-bottom:1px dotted currentColor;overflow-wrap:anywhere}
+  .steps{counter-reset:steps;display:grid;gap:9px;padding:0;list-style:none}
+  .steps li{counter-increment:steps;position:relative;padding:13px 14px 13px 52px;border:1px solid var(--rule);border-radius:7px;background:var(--card)}
+  .steps li::before{content:counter(steps);position:absolute;left:14px;top:12px;width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:#fff;font:700 12px var(--mono)}
+  .steps strong{display:block}.steps span{color:var(--muted);font-size:14px}
+  .steps li.bad::before{background:var(--crit)}
+  details{margin:12px 0;border:1px solid var(--rule);border-radius:7px;background:var(--card)}
+  summary{cursor:pointer;padding:10px 13px;color:var(--muted);font-size:13px;font-weight:700}
+  details>div{padding:0 14px 14px}
+  .sources li{margin:8px 0}.sources small{display:block;color:var(--muted)}
+  footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--rule);color:var(--muted);font:12px/1.6 var(--mono)}
+  @media(max-width:800px){.wrap{grid-template-columns:minmax(0,1fr);gap:20px;padding:24px 18px 72px}.wrap nav{position:static}.verdict{grid-template-columns:minmax(0,1fr)}table{display:block;overflow-x:auto}h1{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="home" href="../">← enyst.github.io</a>
+  <h2>On this page</h2>
+  <ol>
+    <li><a href="#verdict">Verdict</a></li>
+    <li><a href="#files">The two files</a></li>
+    <li><a href="#duplication">Where the copy happens</a></li>
+    <li><a href="#bug">How it broke: a worked trace</a></li>
+    <li><a href="#history">Why it's like this</a></li>
+    <li><a href="#leak">The secret-leak connection</a></li>
+    <li><a href="#fix">Proposed slim-down</a></li>
+    <li><a href="#risks">Risks &amp; open questions</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ol>
+</nav>
+<main>
+<header>
+  <div class="eyebrow">OpenHands agent-server · architecture study</div>
+  <h1>Two files, one truth.</h1>
+  <p class="sub">The agent-server persists the <em>entire</em> agent — LLM, condenser, tools, context — into <strong>both</strong> <code>base_state.json</code> and <code>meta.json</code>. Two owners of the same fact drift apart, and the drift is a bug surface: it already reverted a restored conversation's LLM config, and it doubled the blast radius of the trajectory secret leak. This page traces exactly where the copy is made and argues for one owner.</p>
+  <p class="meta">Grounded to software-agent-sdk @ 01813312 · agent-canvas thread on PR #4028 · by smolpaws 🐾</p>
+</header>
+
+<section id="verdict">
+<h2><span class="num">1</span>Verdict</h2>
+<div class="verdict">
+  <article>
+    <span class="pill crit">the defect</span>
+    <strong>Duplicate source of truth</strong>
+    <p>The agent config lives in <code>base_state.json</code> (SDK-owned conversation state) <em>and</em> in <code>meta.json</code> (server-owned <code>StoredConversation</code>). Nothing keeps them in sync.</p>
+  </article>
+  <article>
+    <span class="pill warn">the symptom</span>
+    <strong>Config reverts on resume</strong>
+    <p>A restored conversation read agent config from one copy while a runtime LLM switch had only updated the other — so e.g. a profile <code>timeout=600</code> silently reverted.</p>
+  </article>
+  <article>
+    <span class="pill info">the fix</span>
+    <strong>One owner</strong>
+    <p><code>base_state.json</code> owns conversation state (agent included). <code>meta.json</code> shrinks to server-only fields: id, title, timestamps, fork provenance, launch profile.</p>
+  </article>
+</div>
+<div class="callout note">
+  <p>This is not a proposal to invent a new format. Both files already exist and both already contain the agent. The proposal is <em>subtractive</em>: stop writing the agent into <code>meta.json</code>, and read it from the one place that has owned it since the SDK's first persistence commit.</p>
+</div>
+</section>
+
+<section id="files">
+<h2><span class="num">2</span>The two files, and who writes them</h2>
+<p>Every persisted conversation directory contains both files. They are written by different layers, on different schedules, with different serializers.</p>
+<table>
+  <tr><th>File</th><th>Owner / layer</th><th>Written by</th><th>Carries the agent?</th></tr>
+  <tr>
+    <td><code>base_state.json</code></td>
+    <td>SDK — <code>ConversationState</code></td>
+    <td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-sdk/openhands/sdk/conversation/state.py#L421">state.py:421 <code>_save_base_state</code></a> → <code>model_dump_json</code> at <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-sdk/openhands/sdk/conversation/state.py#L437">L437</a></td>
+    <td><strong>Yes</strong> — <code>ConversationState.agent: AgentBase</code>, plus events HEAD, stats, tags.</td>
+  </tr>
+  <tr>
+    <td><code>meta.json</code></td>
+    <td>agent-server — <code>StoredConversation</code></td>
+    <td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L169">event_service.py:169 <code>save_meta</code></a> → <code>self.stored.model_dump_json</code> at <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L173">L173</a></td>
+    <td><strong>Yes</strong> — <code>StoredConversation.agent: AgentBase</code> (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/models.py#L324">models.py:324</a>), <em>plus</em> genuinely server-owned fields.</td>
+  </tr>
+</table>
+<p>The problem is the overlap. <code>meta.json</code> has a legitimate job — id, title, <code>created_at</code>/<code>updated_at</code>, fork provenance, the launched agent-profile snapshot (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/models.py#L78">models.py:78, <code>StoredConversation</code></a>). But it inherits <code>agent: AgentBase</code> from its base class <code>StartConversationRequest</code>, so the full agent blob rides along and becomes a second, independently-written copy of what <code>base_state.json</code> already owns.</p>
+
+<figure>
+<svg viewBox="0 0 860 340" role="img" aria-label="Two writers, two files, one conversation dir">
+  <style>
+    .box{fill:var(--card);stroke:var(--rule-strong);stroke-width:1.5}
+    .lbl{font:600 13px var(--sans);fill:var(--fg)}
+    .sub{font:11px var(--mono);fill:var(--muted)}
+    .flow{stroke:var(--accent);stroke-width:2;fill:none;marker-end:url(#a)}
+    .dup{fill:var(--crit-soft);stroke:var(--crit);stroke-width:1.5}
+    .duptxt{font:700 11px var(--mono);fill:var(--crit)}
+  </style>
+  <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="var(--accent)"/></marker></defs>
+
+  <rect class="box" x="20" y="40" width="200" height="70" rx="8"/>
+  <text class="lbl" x="36" y="68">SDK layer</text>
+  <text class="sub" x="36" y="88">ConversationState</text>
+  <text class="sub" x="36" y="102">._save_base_state()</text>
+
+  <rect class="box" x="20" y="230" width="200" height="70" rx="8"/>
+  <text class="lbl" x="36" y="258">agent-server layer</text>
+  <text class="sub" x="36" y="278">EventService.save_meta()</text>
+  <text class="sub" x="36" y="292">on StoredConversation</text>
+
+  <rect class="box" x="500" y="40" width="330" height="90" rx="8"/>
+  <text class="lbl" x="520" y="66">base_state.json</text>
+  <text class="sub" x="520" y="86">events HEAD · stats · tags</text>
+  <rect class="dup" x="520" y="96" width="150" height="22" rx="5"/>
+  <text class="duptxt" x="530" y="111">agent (full)</text>
+
+  <rect class="box" x="500" y="210" width="330" height="90" rx="8"/>
+  <text class="lbl" x="520" y="236">meta.json</text>
+  <text class="sub" x="520" y="256">id · title · timestamps · fork · profile</text>
+  <rect class="dup" x="520" y="266" width="150" height="22" rx="5"/>
+  <text class="duptxt" x="530" y="281">agent (full)</text>
+
+  <path class="flow" d="M220,75 C360,75 360,85 500,85"/>
+  <path class="flow" d="M220,265 C360,265 360,255 500,255"/>
+
+  <text class="duptxt" x="590" y="165" text-anchor="middle">▲ same fact, two writers ▼</text>
+  <path d="M595,130 L595,205" stroke="var(--crit)" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>
+</svg>
+<figcaption>Two layers persist into the same conversation directory. The red blocks are the same <code>agent: AgentBase</code> serialized twice, with no synchronization between the writers.</figcaption>
+</figure>
+</section>
+
+<section id="duplication">
+<h2><span class="num">3</span>Where the copy is actually made</h2>
+<p>The <code>meta.json</code> agent originates from the request that started the conversation and is then re-serialized on every <code>save_meta()</code>. On start, the server even rebuilds the live agent <em>from</em> the stored copy:</p>
+<pre><code><span class="com"># event_service.py — reconstruct the runtime agent from the STORED (meta) copy</span>
+agent_cls = <span class="kw">type</span>(self.stored.agent)
+agent = agent_cls.model_validate(
+    self.stored.agent.model_dump(context={<span class="str">"expose_secrets"</span>: <span class="kw">True</span>}),
+)
+<span class="com"># … then hand that agent to the SDK, which ALSO persists it into base_state.json</span>
+conversation = LocalConversation(agent=agent, …)</code></pre>
+<p class="meta"><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L974">event_service.py:974–976</a> · <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L1037">L1037 <code>LocalConversation(...)</code></a></p>
+
+<p>Now watch the two writers diverge. A runtime <strong>LLM switch</strong> mutates the SDK-side agent — which auto-persists to <code>base_state.json</code> — but the server-side <code>StoredConversation.agent</code> in <code>meta.json</code> is only re-written on its own <code>save_meta()</code> triggers:</p>
+<pre><code><span class="com"># local_conversation.py — switch_llm mutates the SDK agent (→ base_state.json)</span>
+<span class="kw">def</span> <span class="lbl">switch_llm</span>(self, llm: LLM) -&gt; <span class="kw">None</span>:
+    …
+    self.agent = self.agent.model_copy(update=update)  <span class="com"># new llm + condenser</span>
+    self._state.agent = self.agent                     <span class="com"># autosave → base_state.json</span></code></pre>
+<p class="meta"><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py#L1522">local_conversation.py:1522 <code>switch_llm</code></a> · endpoint <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/conversation_router.py#L492">conversation_router.py:492</a></p>
+<div class="callout warn">
+  <p><strong>The asymmetry is the bug.</strong> <code>switch_llm</code> updates the SDK agent and <code>base_state.json</code>. It does not call <code>save_meta()</code>. So after a switch, <code>base_state.json</code> and <code>meta.json</code> hold <em>different</em> agent configs — and which one wins depends entirely on which file the next cold start reads.</p>
+</div>
+</section>
+
+<section id="bug">
+<h2><span class="num">4</span>How it broke: a worked trace</h2>
+<p>This is the <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4028">PR #4028</a> report, reduced to the mechanism. A user set an LLM profile <code>timeout=600</code>, used the conversation, restored it later, and found the timeout reverted. It only reproduced <em>when an LLM switch was involved</em> — which is the tell.</p>
+<ol class="steps">
+  <li><strong>Start with a profile</strong><span>Agent's LLM has <code>timeout=600</code>. Both <code>base_state.json</code> and <code>meta.json</code> agree: <code>timeout=600</code>.</span></li>
+  <li class="bad"><strong>Switch the LLM at runtime</strong><span><code>switch_llm</code> installs a new/derived LLM and writes it to <code>base_state.json</code>. <code>meta.json</code>'s agent is <em>not</em> rewritten in the same step → the two files now disagree.</span></li>
+  <li class="bad"><strong>Cold resume reads the wrong owner</strong><span>On restart the server reconstructs the agent from <code>self.stored.agent</code> (the <code>meta.json</code> copy), which may carry a stale or default-derived <code>timeout</code>, then hands it to the SDK — overwriting what <code>base_state.json</code> had.</span></li>
+  <li class="bad"><strong>Observed: timeout reverted</strong><span>The restored conversation runs with a <code>timeout</code> the user never chose. No error, no log — just a silently wrong config, because two files claimed authority over one field.</span></li>
+</ol>
+<div class="callout crit">
+  <p>Vasco confirmed in-thread: <em>“We can reproduce the issue just if we switch the LLM somewhere. It is impossible to reproduce without the switch.”</em> And Engel's read: <em>“this very bug is due to the duplicate source of truth.”</em> The switch is not the cause — it's what makes the two copies diverge enough to notice.</p>
+</div>
+<h3>The non-example</h3>
+<p>A conversation that <em>never switches its LLM</em> does not show the bug, even though the duplication is still there. Both files stay byte-equivalent for the agent, so it doesn't matter which one resume reads. That's exactly why the report looked like an “LLM-switch bug” rather than what it is: a latent dual-source-of-truth that only a divergence event exposes.</p>
+</section>
+
+<section id="history">
+<h2><span class="num">5</span>Why it's like this (verified from git)</h2>
+<p>Engel's instinct in-thread — <em>“I don't know why we are doing that or since when”</em> — is right to be surprised, because it was never a deliberate decision <em>in this repo</em>.</p>
+<table>
+  <tr><th>When</th><th>What</th><th>Effect on the two files</th></tr>
+  <tr><td>PR #41 (2025-09-10)</td><td>“Serialization of Conversation to FileStore”</td><td>Introduced <code>base_state.json</code>; <code>ConversationState.agent</code> persisted there from day one. This is the legitimate single source of truth.</td></tr>
+  <tr><td>PR #317 (2025-09-17)</td><td>“Ported over agent server code”</td><td>First appearance of the agent-server here. Its first <code>save_meta()</code> already dumped the whole <code>StoredConversation</code>, and <code>StoredConversation</code> extended a request type carrying the full agent — so <code>meta.json</code> was heavy from its first commit in this repo.</td></tr>
+  <tr><td>PR #356 (2025-09-22)</td><td>“Unify tool initialization”</td><td>Changed the embedded field to a full <code>agent: AgentBase</code>, making <code>meta.json</code>'s agent structurally identical to <code>base_state.json</code>'s — the exact duplication.</td></tr>
+</table>
+<div class="callout note">
+  <p><strong>Caveat, stated honestly:</strong> the agent-server was <em>ported in</em> at #317. The decision that first made <code>meta.json</code> heavyweight lived in the pre-port agent-server codebase, which is not in this repo's history. So there is no single “this PR did it” commit here — the duplication was inherited, then cemented by #356. The lightweight, list-view-only <code>meta.json</code> some remember belonged to the <em>original</em> server and did not survive the port.</p>
+</div>
+</section>
+
+<section id="leak">
+<h2><span class="num">6</span>The secret-leak connection</h2>
+<p>The same duplication doubled the blast radius of a separate security bug. The <code>GET /api/file/download-trajectory/{id}</code> endpoint zips the raw conversation directory. Because the full agent — including the condenser's own LLM — is serialized into <em>both</em> <code>base_state.json</code> and <code>meta.json</code>, a downloaded trajectory carried the LLM API key <strong>and</strong> the condenser LLM API key, in two files, as plaintext (no <code>OH_SECRET_KEY</code>) or recoverable Fernet ciphertext (with one).</p>
+<p>That was fixed at the export boundary in <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4217">software-agent-sdk #4217</a> (redact secrets while building the zip) — but that is a bandaid over the duplication. If the agent config lived in one place and, better still, held credential <em>references</em> only (<a class="src" href="https://github.com/OpenHands/OpenHands/issues/15298">OpenHands #15298</a>), there would be nothing to redact and nothing to keep in sync.</p>
+<div class="callout"><p>Two bugs, one root cause. Reliability (config reverts) and confidentiality (key leak) are both downstream of “the agent is written twice.”</p></div>
+</section>
+
+<section id="fix">
+<h2><span class="num">7</span>Proposed slim-down</h2>
+<p>Make <code>base_state.json</code> the sole owner of conversation state (agent included), and reduce <code>meta.json</code> to fields the server genuinely owns and needs for cheap list/index reads without deserializing state.</p>
+<div class="ba" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  <div class="card">
+    <span class="pill crit">before</span>
+    <h3 style="margin-top:10px">meta.json today</h3>
+    <pre style="max-width:none"><code>{
+  "id": "…", "title": "…",
+  "created_at": "…","updated_at":"…",
+  "forked_from_…": "…",
+  "launched_agent_profile": {…},
+  <span class="com">// everything below duplicates</span>
+  <span class="com">// base_state.json:</span>
+  "agent": {
+    "llm": { "model":"…",
+             "api_key":"…", … },
+    "condenser": { "llm": {
+             "api_key":"…", … } },
+    "tools": [ … ],
+    "agent_context": { … }
+  }
+}</code></pre>
+  </div>
+  <div class="card">
+    <span class="pill ok">after</span>
+    <h3 style="margin-top:10px">meta.json, server-owned only</h3>
+    <pre style="max-width:none"><code>{
+  "id": "…", "title": "…",
+  "created_at": "…","updated_at":"…",
+  "forked_from_conversation_id": "…",
+  "forked_from_event_id": "…",
+  "launched_agent_profile": {…},
+  "metrics": {…}
+  <span class="com">// agent lives ONLY in</span>
+  <span class="com">// base_state.json now.</span>
+  <span class="com">// list views read these</span>
+  <span class="com">// few fields cheaply.</span>
+}</code></pre>
+  </div>
+</div>
+<p>Mechanically, the moves are:</p>
+<ol class="steps">
+  <li><strong>Stop serializing <code>agent</code> into <code>meta.json</code></strong><span>Exclude the agent (and any other state-owned fields) from the <code>StoredConversation</code> persistence dump, the way <code>agent_profile_id</code> is already <code>exclude=True</code> at <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/models.py#L85">models.py:85</a>.</span></li>
+  <li><strong>Reconstruct the start-agent from <code>base_state.json</code></strong><span>On resume, read the agent from conversation state (already the SDK's owner) instead of <code>self.stored.agent</code>. Fresh-start still takes the agent from the create request; it's only persisted to one file.</span></li>
+  <li><strong>Keep list/index reads cheap</strong><span>The conversation list view needs id/title/timestamps/metrics — all retained in <code>meta.json</code>. It never needed the agent blob.</span></li>
+  <li><strong>Migration: tolerate legacy heavy meta</strong><span>Existing <code>meta.json</code> files still carry an agent; readers should ignore it in favor of <code>base_state.json</code>, and a cold-resume rewrite drops it. Never dual-write going forward.</span></li>
+</ol>
+<div class="callout warn"><p>Vasco's caution — <em>“it seems very risky… but should be possible”</em> — is the right posture. The risk is in resume/fork/ACP paths that currently trust <code>self.stored.agent</code>. Those call sites must be enumerated and repointed before the field is dropped; a compatibility phase that reads both and writes one de-risks it.</p></div>
+</section>
+
+<section id="risks">
+<h2><span class="num">8</span>Risks &amp; open questions</h2>
+<div class="verdict">
+  <article><span class="pill warn">resume ordering</span><strong>Who is authoritative at cold start?</strong><p>Today the server hydrates the agent from <code>meta.json</code> before the SDK loads <code>base_state.json</code>. Flipping ownership means the server must defer to state, or read agent config out of <code>base_state.json</code> itself.</p></article>
+  <article><span class="pill warn">ACP &amp; fork paths</span><strong>Other readers of <code>stored.agent</code></strong><p>ACP model switch (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L1636">event_service.py:1636</a>) and fork mutate <code>stored.agent</code>. Each must be moved onto the single owner or kept as a thin projection.</p></article>
+  <article><span class="pill info">the deeper fix</span><strong>References, not values</strong><p>Even one copy of the agent still embeds credentials. #15298's reference-only persistence is the endgame; slimming <code>meta.json</code> is the necessary first move that removes the duplicate, not the whole problem.</p></article>
+</div>
+<p>The compact test for the change: <strong>after an LLM switch, a cold resume must observe the switched config</strong> — with the reproduction script from PR #4028 asserting it, both with and without a switch.</p>
+</section>
+
+<section id="sources">
+<h2><span class="num">9</span>Sources</h2>
+<ul class="sources">
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-sdk/openhands/sdk/conversation/state.py#L421">state.py:421 — <code>_save_base_state</code></a><small>base_state.json is the SDK's single source of truth; persists <code>ConversationState.agent</code>.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L169">event_service.py:169 — <code>save_meta</code></a><small>Writes the full <code>StoredConversation</code> (incl. agent) into meta.json.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/models.py#L78">models.py:78 — <code>StoredConversation</code></a><small>Extends <code>StartConversationRequest</code>; inherits <code>agent: AgentBase</code> (L324).</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L974">event_service.py:974 — agent rebuilt from <code>stored.agent</code></a><small>Start path reconstructs the runtime agent from the meta copy.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py#L1522">local_conversation.py:1522 — <code>switch_llm</code></a><small>Mutates SDK agent → base_state.json only; does not save_meta.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4028">PR #4028</a><small>The timeout-restore report and reproduction discussion.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4217">PR #4217</a> / <a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/4216">issue #4216</a><small>Trajectory secret-leak fix (export-boundary redaction) — the bandaid.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/OpenHands/issues/15298">OpenHands #15298</a><small>Reference-only credentials — the endgame that makes even one copy safe.</small></li>
+</ul>
+</section>
+
+<footer>Self-contained technical explainer. No secret value or ciphertext appears on this page. Line numbers pinned to software-agent-sdk @ 01813312; history claims verified from git log as summarized in the PR #4028 thread. Architecture opinion grounded in the linked code — not a claim that the slim-down already exists. 🐾</footer>
+</main>
+</div>
+</body>
+</html>
