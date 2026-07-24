@@ -420,61 +420,63 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
 </section>
 
 <section id="right">
-<h2><span class="num">10</span>Doing it right: what <code>meta.json</code> should actually hold</h2>
-<p>The destination is unambiguous: <strong><code>base_state.json</code> owns the agent (it is conversation state), and <code>meta.json</code> holds no agent at all.</strong> The reason a slim <code>meta.json</code> still needs to exist is a real one — the server must answer "what conversations exist, and how do I (re)start one?" without deserializing full state for every conversation in a list. So the honest question is not "delete meta" but "what exactly does meta legitimately own?"</p>
-<p>Below is the full field inventory, split into the three roles it actually plays. Every field is one the server reads <em>before or independently of</em> loading conversation state.</p>
+<h2><span class="num">10</span>Doing it right: two objects, not two files' worth of overlap</h2>
+<p>Step back from the field lists and there are really only <strong>two things worth persisting</strong>, plus a little server bookkeeping:</p>
+<div class="verdict">
+  <article><span class="pill info">object 1</span><strong>The Agent</strong><p>llm, condenser, tools, agent_context, mcp_config (or acp_model). It's a field <em>of</em> the Conversation.</p></article>
+  <article><span class="pill info">object 2</span><strong>The Conversation</strong><p><code>ConversationState</code>: the agent + events HEAD + stats + secret registry + run config. The SDK owns it and writes it to <code>base_state.json</code>.</p></article>
+  <article><span class="pill ok">plus</span><strong>Server bookkeeping</strong><p>A handful of fields the agent-server adds for its list/lifecycle: timestamps, title, metrics, fork lineage, launched profile.</p></article>
+</div>
+<p>So the target is simple to state: <strong><code>base_state.json</code> is the one persisted Conversation (Agent included). <code>meta.json</code> holds only what the server genuinely adds, plus whatever create-time inputs the SDK consumes at construction but does not round-trip into state.</strong></p>
 
-<h3>Role 1 — Index (cheap list/catalog reads)</h3>
+<h3>What <code>meta.json</code> is today (measured, not eyeballed)</h3>
+<p><code>StoredConversation</code> is literally <em>the server's create-request re-persisted</em>: it subclasses <code>StartConversationRequest</code> and adds a few fields. Comparing the classes directly gives an exact partition — no hand-labeling.</p>
+<div class="callout warn"><p><strong>Two clarifications worth stating plainly</strong>, because they're easy to get wrong: (1) <code>StartConversationRequest</code> is effectively a <em>server/API contract</em>, not something the pure SDK consumes — the SDK's <code>Conversation</code>/<code>LocalConversation</code> constructors take plain args (<code>agent=</code>, <code>workspace=</code>…), never a request object; it only lives in the SDK package so client and server share one schema. (2) <code>ConversationState</code> is the real SDK persistence object. So "meta = persisted request" and "base_state = persisted Conversation".</p></div>
+
+<h4>Bucket 1 — Duplicates the Conversation (the bug surface): 8 fields</h4>
+<p>In <em>both</em> <code>StoredConversation</code> and <code>ConversationState</code> today. <code>base_state.json</code> already owns these; meta re-storing them is the duplication.</p>
 <table>
-  <tr><th>Field</th><th>Meaning / why meta owns it</th></tr>
-  <tr><td><code>id</code></td><td>Conversation UUID — the key.</td></tr>
-  <tr><td><code>title</code></td><td>User-facing name shown in the list.</td></tr>
-  <tr><td><code>created_at</code> / <code>updated_at</code></td><td>Lifecycle timestamps for sorting/display.</td></tr>
-  <tr><td><code>metrics</code></td><td>A <code>MetricsSnapshot</code> (cost/token totals) for the list view without loading stats from state.</td></tr>
-  <tr><td><code>forked_from_conversation_id</code> / <code>forked_from_event_id</code></td><td>Provenance: which conversation/branch-point this was forked from.</td></tr>
-  <tr><td><code>launched_agent_profile</code></td><td>Snapshot of the agent profile (id + revision) that launched it — provenance, not live config.</td></tr>
-  <tr><td><code>tags</code>, <code>user_id</code></td><td>Filtering/correlation metadata (e.g. <code>origin: slack</code>, hosting-deployment identity).</td></tr>
+  <tr><th>Field</th><th>Note</th></tr>
+  <tr><td><code>agent</code></td><td>The whole agent. The headline case (#4032).</td></tr>
+  <tr><td><code>workspace</code></td><td>Working directory.</td></tr>
+  <tr><td><code>max_iterations</code>, <code>stuck_detection</code></td><td>Run caps / loop guard.</td></tr>
+  <tr><td><code>confirmation_policy</code>, <code>security_analyzer</code></td><td>Run-time action policy.</td></tr>
+  <tr><td><code>hook_config</code></td><td>Lifecycle hook scripts.</td></tr>
+  <tr><td><code>tags</code></td><td>Labels (also an index field).</td></tr>
+  <tr><td><code>id</code></td><td>Shared key — harmless, but technically in both.</td></tr>
 </table>
 
-<h3>Role 2 — Launch spec (how to (re)start the conversation)</h3>
-<p>These configure <em>how the server boots the conversation</em>; they are not the agent and not the message history. They belong in meta (or a dedicated <code>launch.json</code>, per #15298) because the server needs them at start time, before/around loading state.</p>
-<div class="callout warn"><p><strong>Reality check (measured, not eyeballed):</strong> comparing the two Pydantic models directly, <strong>nine</strong> fields are in <em>both</em> <code>StoredConversation</code> and <code>ConversationState</code> today — not just <code>agent</code>. The full overlap is: <code>agent</code>, <code>workspace</code>, <code>max_iterations</code>, <code>stuck_detection</code>, <code>confirmation_policy</code>, <code>security_analyzer</code>, <code>hook_config</code>, <code>tags</code>, <code>id</code>. So the duplication is broader than "the agent"; every one of these is a latent divergence point, and each needs a single owner. The table's "Also in base_state today?" column makes that explicit.</p></div>
-<table>
-  <tr><th>Field</th><th>Meaning</th><th>Also in base_state today?</th></tr>
-  <tr><td><code>workspace</code></td><td>Working directory; server needs it to build paths before state loads.</td><td><strong>Yes</strong> — duplicated</td></tr>
-  <tr><td><code>max_iterations</code></td><td>Run cap / loop guard.</td><td><strong>Yes</strong> — duplicated</td></tr>
-  <tr><td><code>stuck_detection</code></td><td>Loop guard toggle.</td><td><strong>Yes</strong> — duplicated</td></tr>
-  <tr><td><code>confirmation_policy</code></td><td>When to pause for user confirmation before acting.</td><td><strong>Yes</strong> — duplicated</td></tr>
-  <tr><td><code>security_analyzer</code></td><td>Action-risk analyzer.</td><td><strong>Yes</strong> — duplicated</td></tr>
-  <tr><td><code>hook_config</code></td><td>Lifecycle hook scripts.</td><td><strong>Yes</strong> — duplicated</td></tr>
-  <tr><td><code>tags</code></td><td>Key-value labels (also an index field).</td><td><strong>Yes</strong> — duplicated</td></tr>
-  <tr><td><code>secrets</code>, <code>secrets_encrypted</code></td><td>Conversation secret <em>sources</em> + whether they arrive encrypted. Related but <em>not identical</em> to base_state's <code>secret_registry</code> (resolved sources). Reconcile the two secret representations.</td><td>Related (<code>secret_registry</code>)</td></tr>
-  <tr><td><code>plugins</code></td><td>Plugins to fetch/merge at start.</td><td>meta only</td></tr>
-  <tr><td><code>worktree</code></td><td>Create a dedicated git worktree for this conversation.</td><td>meta only</td></tr>
-  <tr><td><code>agent_definitions</code>, <code>tool_module_qualnames</code>, <code>client_tools</code></td><td>Client/registry wiring: subagents to register, tool modules to import, client-executed tool specs.</td><td>meta only</td></tr>
-  <tr><td><code>agent_launch_additions</code></td><td>Deployment context layered on after profile resolution.</td><td>meta only</td></tr>
-  <tr><td><code>required_runtime_credential_bindings</code></td><td>Credential bindings (e.g. Codex) resolved before the runtime starts.</td><td>meta only</td></tr>
-  <tr><td><code>autotitle</code>, <code>title_llm_profile</code></td><td>Titling behavior and the (fast/cheap) LLM profile to title with.</td><td>meta only</td></tr>
-  <tr><td><code>observability_metadata</code> / <code>_tags</code> / <code>_span_name</code></td><td>Tracing metadata attached to the conversation's spans.</td><td>meta only</td></tr>
-  <tr><td><code>parent_conversation_id</code></td><td>Owning conversation, if any.</td><td>meta only</td></tr>
-</table>
-<p>Which file should own the <em>duplicated</em> run-config fields (workspace, limits, policies, hooks, tags)? They are read at boot by the server but also legitimately part of conversation state. The tie-breaker: these rarely change after creation, and when the server does mutate one (e.g. <code>set_confirmation_policy</code>) it already writes <code>meta.json</code> via <code>save_meta</code>. Pick <strong>one</strong> owner per field and have the other read it — the same discipline the agent needs, applied to the long tail. The point of the inventory is that "make base_state own the agent" is necessary but <em>not sufficient</em>: eight more fields are duplicated behind it.</p>
-
-<h3>Role 3 — Discriminator (cold agent-kind checks without the full agent)</h3>
-<p>This is the one piece of "agent" info the server legitimately needs <em>cold</em> — today it reaches for the whole <code>stored.agent</code> to do it (e.g. <code>_is_codex_agent</code>). Replace that with a tiny, stable discriminator so the full agent can live only in <code>base_state.json</code>:</p>
+<h4>Bucket 2 — Create-request inputs the SDK consumes but doesn't round-trip into state</h4>
+<p>These are inherited from <code>StartConversationRequest</code> and are <em>not</em> <code>ConversationState</code> fields. The SDK transforms them at construction (plugins → merged into the agent; <code>secrets</code> → <code>secret_registry</code>; observability → telemetry) and doesn't keep the raw input in state. So the server legitimately keeps them to reconstruct the conversation on restart.</p>
 <table>
   <tr><th>Field</th><th>Meaning</th></tr>
-  <tr><td><code>agent_kind</code></td><td><code>"Agent"</code> | <code>"ACPAgent"</code> — enough for cold routing decisions.</td></tr>
-  <tr><td><code>acp_server</code> (when ACP)</td><td>e.g. <code>"codex"</code> — enough for <code>_is_codex_agent</code>-style checks without loading the agent.</td></tr>
+  <tr><td><code>plugins</code></td><td>Plugins to fetch/merge into the agent at start.</td></tr>
+  <tr><td><code>secrets</code>, <code>secrets_encrypted</code></td><td>Secret <em>sources</em> (+ encrypted-input flag). Become <code>secret_registry</code> in state — related, not identical; one representation to reconcile.</td></tr>
+  <tr><td><code>client_tools</code>, <code>tool_module_qualnames</code>, <code>agent_definitions</code></td><td>Client/registry wiring: client-executed tool specs, tool modules to import, subagents to register.</td></tr>
+  <tr><td><code>agent_settings</code>, <code>agent_profile_id</code></td><td>SDK alternatives to a concrete <code>agent</code> at create time (validated / resolved into one). SDK concepts, not server-only.</td></tr>
+  <tr><td><code>agent_launch_additions</code></td><td>Deployment context layered on after profile resolution.</td></tr>
+  <tr><td><code>parent_conversation_id</code></td><td>Owning conversation (SDK request field).</td></tr>
+  <tr><td><code>worktree</code></td><td>Create a dedicated git worktree.</td></tr>
+  <tr><td><code>autotitle</code>, <code>title_llm_profile</code></td><td>Titling behavior + the profile to title with.</td></tr>
+  <tr><td><code>observability_metadata</code> / <code>_tags</code> / <code>_span_name</code>, <code>user_id</code></td><td>Tracing/correlation metadata.</td></tr>
+  <tr><td><code>initial_message</code>, <code>conversation_id</code></td><td>The opening message; the requested id.</td></tr>
 </table>
 
-<h3>What is NOT in meta</h3>
-<div class="callout ok">
-  <p><strong>The agent and everything it contains</strong> — <code>llm</code>, <code>condenser</code>, <code>tools</code>, <code>agent_context</code>, <code>mcp_config</code>, <code>acp_model</code> — is conversation <em>state</em>. It lives only in <code>base_state.json</code>, which the SDK already owns and rewrites on every mutation. No snapshot, no mirror, no per-kind resume rule. ACP's <code>acp_model</code> switch and the LLM switch then both just write state, like everything else.</p>
-</div>
+<h4>Bucket 3 — Genuinely added by the agent-server: 9 fields</h4>
+<p>These are exactly <code>StoredConversation − StartConversationRequest</code> — the only fields the server truly owns.</p>
+<table>
+  <tr><th>Field</th><th>Meaning</th></tr>
+  <tr><td><code>id</code></td><td>Conversation id (server-assigned form; also the shared key above).</td></tr>
+  <tr><td><code>title</code></td><td>User-facing name for the list.</td></tr>
+  <tr><td><code>created_at</code>, <code>updated_at</code></td><td>Lifecycle timestamps.</td></tr>
+  <tr><td><code>metrics</code></td><td>A <code>MetricsSnapshot</code> for the list without loading stats.</td></tr>
+  <tr><td><code>forked_from_conversation_id</code>, <code>forked_from_event_id</code></td><td>Fork lineage. Note: fork is an SDK <em>operation</em> (<code>LocalConversation.fork</code>), but the SDK doesn't record "who I came from" — the server does.</td></tr>
+  <tr><td><code>launched_agent_profile</code></td><td>Provenance snapshot of the profile that launched it.</td></tr>
+  <tr><td><code>required_runtime_credential_bindings</code></td><td>Credential bindings (e.g. Codex) to resolve before the runtime starts.</td></tr>
+</table>
 
 <figure>
-<svg viewBox="0 0 860 250" role="img" aria-label="Target ownership: meta = index + launch + discriminator; base_state = the agent and history">
+<svg viewBox="0 0 860 250" role="img" aria-label="Target ownership: base_state = the Conversation (agent included); meta = server bookkeeping + un-round-tripped create inputs">
   <style>
     .b{fill:var(--card);stroke:var(--rule-strong);stroke-width:1.5}
     .l{font:600 13px var(--sans);fill:var(--fg)} .s{font:11px var(--mono);fill:var(--muted)}
@@ -483,29 +485,28 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
     .t{font:700 11px var(--mono);fill:var(--accent)} .tt{font:700 11px var(--mono);fill:var(--teal)}
   </style>
   <rect class="b" x="20" y="24" width="390" height="200" rx="8"/>
-  <text class="l" x="38" y="48">meta.json — server-owned, no agent</text>
-  <rect class="m" x="38" y="62" width="354" height="30" rx="5"/><text class="t" x="50" y="81">index: id · title · timestamps · metrics · fork · profile · tags</text>
-  <rect class="m" x="38" y="98" width="354" height="46" rx="5"/><text class="t" x="50" y="117">launch: workspace · policies · secrets · plugins ·</text><text class="t" x="50" y="133">hooks · client tools · titling · observability</text>
-  <rect class="m" x="38" y="150" width="354" height="30" rx="5"/><text class="t" x="50" y="169">discriminator: agent_kind · acp_server</text>
-  <text class="s" x="38" y="205">cheap to read for the whole list; never needs state</text>
+  <text class="l" x="38" y="48">meta.json — server bookkeeping + create inputs</text>
+  <rect class="m" x="38" y="62" width="354" height="46" rx="5"/><text class="t" x="50" y="81">bucket 3 (server): id · title · timestamps ·</text><text class="t" x="50" y="97">metrics · fork lineage · launched profile · bindings</text>
+  <rect class="m" x="38" y="114" width="354" height="46" rx="5"/><text class="t" x="50" y="133">bucket 2 (create inputs SDK drops): plugins ·</text><text class="t" x="50" y="149">secrets · client tools · agent_settings · titling · obs</text>
+  <text class="s" x="38" y="188">cheap to read for the whole list; no agent, no state</text>
 
   <rect class="b" x="450" y="24" width="390" height="200" rx="8"/>
-  <text class="l" x="468" y="48">base_state.json — the single source of truth</text>
+  <text class="l" x="468" y="48">base_state.json — the Conversation (SDK)</text>
   <rect class="st" x="468" y="62" width="354" height="46" rx="5"/><text class="tt" x="480" y="81">agent: llm · condenser · tools ·</text><text class="tt" x="480" y="97">agent_context · mcp_config · acp_model</text>
-  <rect class="st" x="468" y="114" width="354" height="30" rx="5"/><text class="tt" x="480" y="133">events HEAD · stats · secret registry</text>
-  <text class="s" x="468" y="170">rewritten on every live mutation (switch_llm, ACP</text>
-  <text class="s" x="468" y="186">switch, plugin merge) — no mirror to keep in sync</text>
+  <rect class="st" x="468" y="114" width="354" height="46" rx="5"/><text class="tt" x="480" y="133">run config: workspace · limits · policies · hooks ·</text><text class="tt" x="480" y="149">tags · events HEAD · stats · secret_registry</text>
+  <text class="s" x="468" y="188">rewritten on every mutation — one writer, one truth</text>
 </svg>
-<figcaption>Target ownership. meta.json answers "what exists / how to launch / what kind"; base_state.json owns the agent and history. Getting here means resolving the nine fields that are duplicated <em>today</em> (agent + workspace + the run-config tail) down to one owner each.</figcaption>
+<figcaption>Target ownership. base_state.json is the persisted Conversation (agent + run config + history). meta.json keeps only bucket 3 (server bookkeeping) and bucket 2 (create inputs the SDK consumes but doesn't round-trip). Bucket 1 — the 8 fields meta duplicates from ConversationState — is deleted from meta.</figcaption>
 </figure>
 
-<h3>The loose ends to resolve</h3>
+<h3>The concrete moves</h3>
 <ol class="steps">
-  <li><strong>The nine duplicated fields</strong><span>agent, workspace, max_iterations, stuck_detection, confirmation_policy, security_analyzer, hook_config, tags, id — each needs one owner. Agent → base_state. id is a harmless shared key. The run-config tail (workspace/limits/policies/hooks/tags) is read at boot, so meta is the natural owner; base_state should stop persisting them (or treat meta as authoritative).</span></li>
-  <li><strong>The two secret representations</strong><span>meta has <code>secrets</code> (sources) and base_state has <code>secret_registry</code> (resolved). They're related, not identical. Reconcile so a credential is described in exactly one place — this is also what #15298 pushes toward.</span></li>
-  <li><strong>Listing cost if you go single-file (Option B)</strong><span>If meta is folded into base_state entirely, the list view must not open every large state file. Keep a small, <em>rebuildable</em> index (the Role-1 fields) — derived cache, not a second source of truth.</span></li>
+  <li><strong>Delete bucket 1 from <code>meta.json</code></strong><span>Stop persisting agent, workspace, max_iterations, stuck_detection, confirmation_policy, security_analyzer, hook_config, tags into meta. <code>base_state.json</code> already owns them; on resume, read them from there.</span></li>
+  <li><strong>Add a tiny agent discriminator to meta</strong><span>The one thing the server needs <em>cold</em> (before loading state) is the agent kind — today it reaches for the whole <code>stored.agent</code> (e.g. <code>_is_codex_agent</code>). Replace with <code>agent_kind</code> (<code>"Agent"</code>|<code>"ACPAgent"</code>) and, for ACP, <code>acp_server</code>. Small, stable, not the agent.</span></li>
+  <li><strong>Reconcile the two secret shapes</strong><span>meta's <code>secrets</code> (sources) vs base_state's <code>secret_registry</code> (resolved). Describe a credential in exactly one place — the direction #15298 wants anyway.</span></li>
+  <li><strong>Keep listing cheap</strong><span>The list view reads bucket 3 (+ maybe bucket 2) from the small meta. If you ever fold meta into base_state (the single-file option), keep a <em>rebuildable</em> index instead — a derived cache, not a second source of truth.</span></li>
 </ol>
-<p>With that split in place, both bandaids become unnecessary: there is nothing to mirror and no per-kind resume rule, because the agent has exactly one home. That is also the shape #15298 wants — small metadata separate from the rest — so this is the step that lines the agent-server up with the reference-only credentials direction.</p>
+<div class="callout ok"><p>With bucket 1 gone, both bandaids evaporate: nothing to mirror, no per-kind resume rule, because the agent (and the rest of the Conversation) has exactly one home. The rule to hold the line: <strong>if a field is on <code>ConversationState</code>, it must not also be persisted in <code>meta.json</code>.</strong></p></div>
 </section>
 
 <section id="risks">
