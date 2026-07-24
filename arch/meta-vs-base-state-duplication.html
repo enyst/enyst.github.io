@@ -77,14 +77,15 @@
   <a class="home" href="../">← enyst.github.io</a>
   <h2>On this page</h2>
   <ol>
-    <li><a href="#verdict">Verdict</a></li>
+    <li><a href="#verdict">The short version</a></li>
     <li><a href="#files">The two files</a></li>
     <li><a href="#duplication">Where the copy happens</a></li>
-    <li><a href="#bug">How it broke: a worked trace</a></li>
+    <li><a href="#bug">How it broke</a></li>
     <li><a href="#history">Why it's like this</a></li>
-    <li><a href="#leak">The secret-leak connection</a></li>
-    <li><a href="#fix">Proposed slim-down</a></li>
-    <li><a href="#risks">Risks &amp; open questions</a></li>
+    <li><a href="#leak">The secret-leak link</a></li>
+    <li><a href="#fix">Two ways to fix it</a></li>
+    <li><a href="#single">The single-file idea</a></li>
+    <li><a href="#risks">What to watch</a></li>
     <li><a href="#sources">Sources</a></li>
   </ol>
 </nav>
@@ -92,31 +93,31 @@
 <header>
   <div class="eyebrow">OpenHands agent-server · architecture study</div>
   <h1>Two files, one truth.</h1>
-  <p class="sub">The agent-server persists the <em>entire</em> agent — LLM, condenser, tools, context — into <strong>both</strong> <code>base_state.json</code> and <code>meta.json</code>. Two owners of the same fact drift apart, and the drift is a bug surface: it already reverted a restored conversation's LLM config, and it doubled the blast radius of the trajectory secret leak. This page traces exactly where the copy is made and argues for one owner.</p>
+  <p class="sub">When you run a conversation through the agent-server, the whole agent — its LLM, its condenser, its tools — gets written to disk <strong>twice</strong>: once in <code>base_state.json</code> and again in <code>meta.json</code>. Two copies of the same thing eventually disagree. That disagreement already quietly reset a saved conversation's settings, and it made the trajectory key-leak twice as bad. Here's exactly where the copy is made, and two ways to end up with a single source of truth.</p>
   <p class="meta">Grounded to software-agent-sdk @ 01813312 · agent-canvas thread on PR #4028 · by smolpaws 🐾</p>
 </header>
 
 <section id="verdict">
-<h2><span class="num">1</span>Verdict</h2>
+<h2><span class="num">1</span>The short version</h2>
 <div class="verdict">
   <article>
-    <span class="pill crit">the defect</span>
-    <strong>Duplicate source of truth</strong>
-    <p>The agent config lives in <code>base_state.json</code> (SDK-owned conversation state) <em>and</em> in <code>meta.json</code> (server-owned <code>StoredConversation</code>). Nothing keeps them in sync.</p>
+    <span class="pill crit">the problem</span>
+    <strong>The agent is saved twice</strong>
+    <p>The same agent config sits in two files: <code>base_state.json</code> (written by the SDK) and <code>meta.json</code> (written by the agent-server). Nothing keeps the two copies in step.</p>
   </article>
   <article>
-    <span class="pill warn">the symptom</span>
-    <strong>Config reverts on resume</strong>
-    <p>A restored conversation read agent config from one copy while a runtime LLM switch had only updated the other — so e.g. a profile <code>timeout=600</code> silently reverted.</p>
+    <span class="pill warn">what went wrong</span>
+    <strong>Settings snapped back</strong>
+    <p>Change the LLM mid-conversation and only one copy gets updated. Reopen the conversation later and it can read the <em>stale</em> copy — so a setting like <code>timeout=600</code> quietly reverted.</p>
   </article>
   <article>
-    <span class="pill info">the fix</span>
-    <strong>One owner</strong>
-    <p><code>base_state.json</code> owns conversation state (agent included). <code>meta.json</code> shrinks to server-only fields: id, title, timestamps, fork provenance, launch profile.</p>
+    <span class="pill info">the goal</span>
+    <strong>One place to look</strong>
+    <p>Make one file the truth. Either shrink <code>meta.json</code> so only the SDK file holds the agent, or merge into a single file the SDK owns and the server extends.</p>
   </article>
 </div>
 <div class="callout note">
-  <p>This is not a proposal to invent a new format. Both files already exist and both already contain the agent. The proposal is <em>subtractive</em>: stop writing the agent into <code>meta.json</code>, and read it from the one place that has owned it since the SDK's first persistence commit.</p>
+  <p>Nothing here needs a brand-new format. Both files already exist and both already hold the agent. The fix is to <em>stop storing it in two places</em>. Below: where the second copy is made, how it bit us, and the two clean ways out — with the trade-offs of each stated plainly.</p>
 </div>
 </section>
 
@@ -209,7 +210,7 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
 </section>
 
 <section id="bug">
-<h2><span class="num">4</span>How it broke: a worked trace</h2>
+<h2><span class="num">4</span>How it broke</h2>
 <p>This is the <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4028">PR #4028</a> report, reduced to the mechanism. A user set an LLM profile <code>timeout=600</code>, used the conversation, restored it later, and found the timeout reverted. It only reproduced <em>when an LLM switch was involved</em> — which is the tell.</p>
 <ol class="steps">
   <li><strong>Start with a profile</strong><span>Agent's LLM has <code>timeout=600</code>. Both <code>base_state.json</code> and <code>meta.json</code> agree: <code>timeout=600</code>.</span></li>
@@ -246,8 +247,28 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
 </section>
 
 <section id="fix">
-<h2><span class="num">7</span>Proposed slim-down</h2>
-<p>Make <code>base_state.json</code> the sole owner of conversation state (agent included), and reduce <code>meta.json</code> to fields the server genuinely owns and needs for cheap list/index reads without deserializing state.</p>
+<h2><span class="num">7</span>Two ways to fix it</h2>
+<p>Both fixes reach the same goal — one place that owns the agent — and both keep the SDK working the same way when you run it on its own, without the agent-server. They differ in <em>how many files</em> end up on disk.</p>
+<div class="verdict">
+  <article>
+    <span class="pill info">Option A</span>
+    <strong>Keep two files, remove the overlap</strong>
+    <p>Stop writing the agent into <code>meta.json</code>. <code>base_state.json</code> becomes the only home for the agent; <code>meta.json</code> keeps just the handful of things the server owns.</p>
+  </article>
+  <article>
+    <span class="pill info">Option B</span>
+    <strong>Use one file, extended</strong>
+    <p>Keep only <code>base_state.json</code>. The agent-server tucks its extra fields into one clearly-labelled corner of that same file. Discussed in the next section.</p>
+  </article>
+  <article>
+    <span class="pill ok">either way</span>
+    <strong>The agent is written once</strong>
+    <p>After the switch, reopening the conversation reads the config the user actually chose. No second copy to fall out of step.</p>
+  </article>
+</div>
+
+<h3>Option A — slim down <code>meta.json</code></h3>
+<p>Make <code>base_state.json</code> the only owner of the agent, and cut <code>meta.json</code> down to the few things the server genuinely needs to answer “what conversations exist?” without opening the big state file.</p>
 <div class="ba" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
   <div class="card">
     <span class="pill crit">before</span>
@@ -257,8 +278,8 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
   "created_at": "…","updated_at":"…",
   "forked_from_…": "…",
   "launched_agent_profile": {…},
-  <span class="com">// everything below duplicates</span>
-  <span class="com">// base_state.json:</span>
+  <span class="com">// everything below is a</span>
+  <span class="com">// copy of base_state.json:</span>
   "agent": {
     "llm": { "model":"…",
              "api_key":"…", … },
@@ -271,7 +292,7 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
   </div>
   <div class="card">
     <span class="pill ok">after</span>
-    <h3 style="margin-top:10px">meta.json, server-owned only</h3>
+    <h3 style="margin-top:10px">meta.json, server fields only</h3>
     <pre style="max-width:none"><code>{
   "id": "…", "title": "…",
   "created_at": "…","updated_at":"…",
@@ -279,25 +300,103 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
   "forked_from_event_id": "…",
   "launched_agent_profile": {…},
   "metrics": {…}
-  <span class="com">// agent lives ONLY in</span>
-  <span class="com">// base_state.json now.</span>
-  <span class="com">// list views read these</span>
-  <span class="com">// few fields cheaply.</span>
+  <span class="com">// the agent now lives only</span>
+  <span class="com">// in base_state.json.</span>
+  <span class="com">// the conversation list</span>
+  <span class="com">// reads these few fields.</span>
 }</code></pre>
   </div>
 </div>
-<p>Mechanically, the moves are:</p>
+<p>The steps:</p>
 <ol class="steps">
-  <li><strong>Stop serializing <code>agent</code> into <code>meta.json</code></strong><span>Exclude the agent (and any other state-owned fields) from the <code>StoredConversation</code> persistence dump, the way <code>agent_profile_id</code> is already <code>exclude=True</code> at <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/models.py#L85">models.py:85</a>.</span></li>
-  <li><strong>Reconstruct the start-agent from <code>base_state.json</code></strong><span>On resume, read the agent from conversation state (already the SDK's owner) instead of <code>self.stored.agent</code>. Fresh-start still takes the agent from the create request; it's only persisted to one file.</span></li>
-  <li><strong>Keep list/index reads cheap</strong><span>The conversation list view needs id/title/timestamps/metrics — all retained in <code>meta.json</code>. It never needed the agent blob.</span></li>
-  <li><strong>Migration: tolerate legacy heavy meta</strong><span>Existing <code>meta.json</code> files still carry an agent; readers should ignore it in favor of <code>base_state.json</code>, and a cold-resume rewrite drops it. Never dual-write going forward.</span></li>
+  <li><strong>Don't write the agent into <code>meta.json</code></strong><span>Leave it out of the saved <code>StoredConversation</code>, the same way <code>agent_profile_id</code> is already marked <code>exclude=True</code> at <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/models.py#L85">models.py:85</a>.</span></li>
+  <li><strong>On reopen, read the agent from <code>base_state.json</code></strong><span>Use the SDK's copy instead of <code>self.stored.agent</code>. A brand-new conversation still gets its agent from the start request — it's just saved to one file, not two.</span></li>
+  <li><strong>Keep the list view fast</strong><span>Listing conversations needs id, title, timestamps, metrics — all still in <code>meta.json</code>. It never needed the agent.</span></li>
+  <li><strong>Be kind to old files</strong><span>Existing <code>meta.json</code> files still carry an agent; readers should just ignore it and trust <code>base_state.json</code>. Rewrite drops it on the next reopen. Never write it to both again.</span></li>
 </ol>
-<div class="callout warn"><p>Vasco's caution — <em>“it seems very risky… but should be possible”</em> — is the right posture. The risk is in resume/fork/ACP paths that currently trust <code>self.stored.agent</code>. Those call sites must be enumerated and repointed before the field is dropped; a compatibility phase that reads both and writes one de-risks it.</p></div>
+<div class="callout ok"><p><strong>Why A is the low-risk choice:</strong> it changes almost nothing about how files are read for the conversation list, and it matches how the SDK has always worked on its own. It's a subtraction, not a redesign.</p></div>
+</section>
+
+<section id="single">
+<h2><span class="num">8</span>The single-file idea</h2>
+<p>Engel's question: could we drop <code>meta.json</code> entirely and keep <strong>one</strong> file — where the SDK writes the normal conversation state, and the agent-server just adds a few of its own fields on top? So running through the SDK alone gives you the common file, and running through the agent-server gives you the same file plus a small server section.</p>
+<p><strong>Short answer: yes, it can work — and it's a nice mental model — but only if you get one detail right (who is allowed to write the file) and accept one trade-off (you may still want a tiny separate index for speed).</strong> Here's the reasoning, plainly.</p>
+
+<h3>The shape that works</h3>
+<p>Give the agent-server its own clearly-labelled corner of the SDK file — not fields sprinkled next to the SDK's own. Something like:</p>
+<pre><code>{
+  <span class="com">// ── common: written by the SDK, same as running standalone ──</span>
+  "agent": { "llm": {…}, "condenser": {…}, "tools": [ … ] },
+  "events HEAD": "…", "stats": {…}, "tags": {…},
+
+  <span class="com">// ── one labelled corner the SDK carries but never reads ──</span>
+  "agent_server": {
+    "title": "…",
+    "created_at": "…", "updated_at": "…",
+    "forked_from_conversation_id": "…",
+    "launched_agent_profile": {…}
+  }
+}</code></pre>
+<p>Why a single labelled corner, and not loose fields? Because the SDK validates this file when it loads. Pydantic (what the SDK uses) <em>ignores</em> keys it doesn't know when reading — so extra server fields won't crash a standalone SDK load. Good. But it <em>drops</em> those unknown keys when it writes the file back. So if the SDK is the writer and doesn't know about the server's fields, it will quietly erase them on the next save. That's the whole trick, and it points to one firm rule:</p>
+
+<figure>
+<svg viewBox="0 0 860 250" role="img" aria-label="One writer owns the file; the server block is carried through untouched">
+  <style>
+    .b{fill:var(--card);stroke:var(--rule-strong);stroke-width:1.5}
+    .l{font:600 13px var(--sans);fill:var(--fg)}
+    .s{font:11px var(--mono);fill:var(--muted)}
+    .f{stroke:var(--accent);stroke-width:2;fill:none;marker-end:url(#b)}
+    .blk{fill:var(--teal-soft);stroke:var(--teal);stroke-width:1.4}
+    .blktxt{font:700 11px var(--mono);fill:var(--teal)}
+    .warn{fill:var(--warn-soft);stroke:var(--warn);stroke-width:1.4}
+  </style>
+  <defs><marker id="b" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="var(--accent)"/></marker></defs>
+  <rect class="b" x="20" y="30" width="180" height="60" rx="8"/>
+  <text class="l" x="36" y="56">agent-server</text>
+  <text class="s" x="36" y="74">hands its block to the SDK</text>
+  <rect class="b" x="20" y="150" width="180" height="60" rx="8"/>
+  <text class="l" x="36" y="176">SDK state writer</text>
+  <text class="s" x="36" y="194">the ONE writer of the file</text>
+  <path class="f" d="M200,60 C300,60 300,165 340,172"/>
+  <rect class="b" x="360" y="70" width="470" height="110" rx="8"/>
+  <text class="l" x="380" y="98">base_state.json  (single file)</text>
+  <rect class="blk" x="380" y="112" width="200" height="26" rx="5"/>
+  <text class="blktxt" x="392" y="129">agent + state (SDK owns)</text>
+  <rect class="blk" x="380" y="144" width="200" height="26" rx="5"/>
+  <text class="blktxt" x="392" y="161">"agent_server": {…} carried</text>
+  <text class="s" x="600" y="128">SDK writes both blocks;</text>
+  <text class="s" x="600" y="146">treats the server block</text>
+  <text class="s" x="600" y="164">as opaque pass-through.</text>
+</svg>
+<figcaption>The working shape: exactly one writer (the SDK's state save). The server's fields ride along in a labelled block the SDK preserves but never interprets.</figcaption>
+</figure>
+
+<div class="callout"><p><strong>The one rule:</strong> a single file needs a single writer. Today two layers write on their own schedules — the SDK saves on almost every state change, the server saves on its own events. If both wrote the same file independently, whoever saved last would erase the other's part. So the SDK must own the write and treat the server's block as a sealed envelope it carries but never opens.</p></div>
+
+<h3>Why this doesn't fall out for free today</h3>
+<ol class="steps">
+  <li><strong>The SDK would need a “carry this, don't touch it” slot</strong><span>Right now the SDK's state model has no place to stash foreign fields across a save. It would need one explicit opaque field (e.g. <code>extensions</code>) that survives read → write untouched. Without it, Pydantic drops unknown keys and the server's data vanishes on the next save.</span></li>
+  <li><strong>The server writes its fields through the SDK, not around it</strong><span>Updating the title or <code>updated_at</code> would have to go through the SDK's save path (hand the SDK the new block), instead of the server writing its own file. That's a real change to <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L169">save_meta</a>.</span></li>
+  <li><strong>The fast conversation list gets more expensive</strong><span>This is the real trade-off. Today the list reader opens the small <code>meta.json</code> to get id/title/time (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/conversation_service.py#L589">conversation_service.py:589</a>). With one file, listing 500 conversations means opening 500 <em>large</em> state files (they can be hundreds of KB) just to read a title. You'd want a small separate index or a DB row — which is, quietly, a second file again.</span></li>
+</ol>
+
+<div class="callout warn"><p><strong>The honest tension.</strong> “One file” is clean for correctness — one writer, one truth, nothing to keep in sync. But the reason a separate <code>meta.json</code> exists at all is cheap listing. Fold everything into one file and you either accept slow listing, or you re-introduce a small index and you're back to two things on disk — just with the index now clearly a <em>derived cache</em> you can rebuild, not a second source of truth.</p></div>
+
+<h3>So which is it?</h3>
+<table>
+  <tr><th></th><th>Option A — slim two files</th><th>Option B — one file + block</th></tr>
+  <tr><td>One source of truth?</td><td>Yes (agent in base_state only)</td><td>Yes (everything in base_state)</td></tr>
+  <tr><td>Fixes the revert bug?</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Fast conversation list?</td><td>Yes — meta stays small</td><td>Needs a separate rebuildable index</td></tr>
+  <tr><td>Standalone SDK unchanged?</td><td>Yes</td><td>Yes — server block simply absent</td></tr>
+  <tr><td>New SDK machinery?</td><td>None</td><td>An opaque “carry-through” slot + single-writer rule</td></tr>
+  <tr><td>Effort / risk</td><td>Low</td><td>Medium</td></tr>
+</table>
+<div class="callout ok"><p><strong>Recommendation.</strong> The two designs are not really rivals — they're the same idea at different depths. Option A is the safe first move: it kills the duplicate today with almost no new machinery, and it leaves <code>meta.json</code> as an honest little index. Option B is the tidier end state <em>if</em> we also treat listing as a rebuildable index rather than a source of truth. A good path is A now, and keep B open as the direction — especially alongside <a class="src" href="https://github.com/OpenHands/OpenHands/issues/15298">#15298</a>, which already wants a clean split between “small metadata” and “the rest.”</p></div>
 </section>
 
 <section id="risks">
-<h2><span class="num">8</span>Risks &amp; open questions</h2>
+<h2><span class="num">9</span>What to watch</h2>
 <div class="verdict">
   <article><span class="pill warn">resume ordering</span><strong>Who is authoritative at cold start?</strong><p>Today the server hydrates the agent from <code>meta.json</code> before the SDK loads <code>base_state.json</code>. Flipping ownership means the server must defer to state, or read agent config out of <code>base_state.json</code> itself.</p></article>
   <article><span class="pill warn">ACP &amp; fork paths</span><strong>Other readers of <code>stored.agent</code></strong><p>ACP model switch (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L1636">event_service.py:1636</a>) and fork mutate <code>stored.agent</code>. Each must be moved onto the single owner or kept as a thin projection.</p></article>
@@ -307,7 +406,7 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
 </section>
 
 <section id="sources">
-<h2><span class="num">9</span>Sources</h2>
+<h2><span class="num">10</span>Sources</h2>
 <ul class="sources">
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-sdk/openhands/sdk/conversation/state.py#L421">state.py:421 — <code>_save_base_state</code></a><small>base_state.json is the SDK's single source of truth; persists <code>ConversationState.agent</code>.</small></li>
   <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/01813312e2365a1c89553bae294b2e5e96df03ba/openhands-agent-server/openhands/agent_server/event_service.py#L169">event_service.py:169 — <code>save_meta</code></a><small>Writes the full <code>StoredConversation</code> (incl. agent) into meta.json.</small></li>
