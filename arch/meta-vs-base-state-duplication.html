@@ -531,6 +531,7 @@ conversation = LocalConversation(agent=agent, …)</code></pre>
 <section id="plan">
 <h2><span class="num">12</span>The build plan: burn the overlap down under a guard test</h2>
 <p>Turning "one source of truth" from a claim in a PR description into a property CI enforces. The order matters: land the scoreboard first, then let each phase shrink it.</p>
+<div class="callout"><p><strong>Deeper companion:</strong> <a href="meta-vs-base-state-single-source.html">One source of truth — the plan</a> derives the field partition below from set arithmetic over the Pydantic models, traces the two Phase-1 traps to the line, and works through the one <code>ConversationState.create()</code> change everything else rides on.</p></div>
 
 <h3>The test that defines "done"</h3>
 <p>Two tests. The first proves the behaviour; the second holds the line so no future PR can quietly re-add a duplicate.</p>

@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The build plan to give the OpenHands agent-server one source of truth: a re-derived 3-bucket field partition, the rule that keeps it enforced by a CI guard test, and the phased path to delete meta.json's duplicated agent — with the two Phase-1 traps traced.">
+<link rel="icon" href="data:,">
+<title>One source of truth: the plan to end the meta.json / base_state.json split</title>
+<style>
+  :root{
+    --fg:#1b1d1f; --muted:#5e646b; --subtle:#858b91;
+    --bg:#fbfbf8; --card:#ffffff; --raised:#f5f4ef;
+    --accent:#2b4eaa; --accent-soft:#e9eefb; --teal:#26736b; --teal-soft:#e5f3f0;
+    --warn:#a9570b; --warn-soft:#fbf0e3; --crit:#9b2929; --crit-soft:#faeaea;
+    --ok:#34753c; --ok-soft:#eaf4eb; --rule:#dfdfd8; --rule-strong:#babbb5;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.62 var(--sans)}
+  a{color:var(--accent)}
+  .wrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;width:100%;max-width:1200px;margin:0 auto;padding:34px 28px 100px}
+  nav,main{min-width:0}
+  nav{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav .home{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}
+  nav h2{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+  nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav li{counter-increment:toc;margin:5px 0}
+  nav li::before{content:counter(toc) ". ";color:var(--subtle)}
+  nav a{color:var(--fg);text-decoration:none} nav a:hover{color:var(--accent)}
+  header{padding:2px 0 26px;border-bottom:1px solid var(--rule);margin-bottom:30px}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{max-width:860px;margin:7px 0 8px;font-size:clamp(32px,5vw,54px);line-height:1.05;letter-spacing:-.04em}
+  header .sub{max-width:820px;margin:0;color:var(--muted);font-size:18px}
+  .meta{margin-top:16px;color:var(--subtle);font:12px/1.5 var(--mono)}
+  h2{font-size:24px;margin:52px 0 12px;letter-spacing:-.02em} h2 .num{margin-right:8px;color:var(--subtle);font-weight:500}
+  h3{font-size:17px;margin:24px 0 8px}
+  p{max-width:820px}
+  code{font:13px var(--mono);background:var(--raised);padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+  pre{max-width:820px;background:var(--raised);border:1px solid var(--rule);border-radius:7px;padding:14px 16px;overflow-x:auto;font:12.5px/1.5 var(--mono)}
+  pre code{background:none;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}
+  .verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+  .verdict article,.card{border:1px solid var(--rule);border-radius:8px;background:var(--card);padding:18px}
+  .verdict strong{display:block;margin:8px 0 4px;font-size:16px}
+  .verdict p{margin:0;color:var(--muted);font-size:14px}
+  .pill{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:2px 8px;font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+  .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.crit{color:var(--crit)} .pill.info{color:var(--accent)}
+  .callout{margin:16px 0;padding:13px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 5px 5px 0}
+  .callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+  .callout.crit{border-color:var(--crit);background:var(--crit-soft)}
+  .callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .callout p{margin:0}
+  figure{margin:22px 0 26px} figure svg{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:8px;background:#fff}
+  figcaption{margin-top:7px;text-align:center;color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--rule)}
+  th{background:var(--raised);font-weight:700}
+  .src{font:12px var(--mono);text-decoration:none;border-bottom:1px dotted currentColor;overflow-wrap:anywhere}
+  .steps{counter-reset:steps;display:grid;gap:9px;padding:0;list-style:none}
+  .steps li{counter-increment:steps;position:relative;padding:13px 14px 13px 52px;border:1px solid var(--rule);border-radius:7px;background:var(--card)}
+  .steps li::before{content:counter(steps);position:absolute;left:14px;top:12px;width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:var(--accent);color:#fff;font:700 12px var(--mono)}
+  .steps strong{display:block}.steps span{color:var(--muted);font-size:14px}
+  .steps li.bad::before{background:var(--crit)}
+  details{margin:12px 0;border:1px solid var(--rule);border-radius:7px;background:var(--card)}
+  summary{cursor:pointer;padding:10px 13px;color:var(--muted);font-size:13px;font-weight:700}
+  details>div{padding:0 14px 14px}
+  .sources li{margin:8px 0}.sources small{display:block;color:var(--muted)}
+  footer{margin-top:60px;padding-top:18px;border-top:1px solid var(--rule);color:var(--muted);font:12px/1.6 var(--mono)}
+  @media(max-width:800px){.wrap{grid-template-columns:minmax(0,1fr);gap:20px;padding:24px 18px 72px}.wrap nav{position:static}.verdict{grid-template-columns:minmax(0,1fr)}table{display:block;overflow-x:auto}h1{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="home" href="../">← enyst.github.io</a>
+  <h2>On this page</h2>
+  <ol>
+    <li><a href="#verdict">The short version</a></li>
+    <li><a href="#findings">Four things that move the difficulty</a></li>
+    <li><a href="#rootcause">Three rules, none written down</a></li>
+    <li><a href="#partition">The measured partition</a></li>
+    <li><a href="#rule">The rule, and its one exception</a></li>
+    <li><a href="#phases">The phases</a></li>
+    <li><a href="#tests">The test that defines "done"</a></li>
+    <li><a href="#resolved">Open questions, resolved</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ol>
+</nav>
+<main>
+<header>
+  <div class="eyebrow">OpenHands agent-server · architecture plan</div>
+  <h1>One source of truth.</h1>
+  <p class="sub">The companion study showed the agent-server writes the whole agent to disk <strong>twice</strong> and that the two copies drift. This is the plan to end that — derived, not asserted: a field-by-field partition of what each file should own, the one rule that keeps it enforced by a CI guard test, and a phased path that deletes the duplication without breaking the client or the (recently hard-won) cheap conversation list.</p>
+  <p class="meta">Grounded to software-agent-sdk @ upstream/main 99342c4f9 (v1.37.1) · partition re-derived by set arithmetic over the Pydantic models · companion to <a href="meta-vs-base-state-duplication.html">the duplication study</a> · 🐾</p>
+</header>
+
+<div class="callout"><p><strong>Read the study first.</strong> This page assumes <a href="meta-vs-base-state-duplication.html">Two files, one truth</a> — where the copy is made, how it produced the <code>timeout</code>-revert bug (#4032), and the destination. That page states the goal and carries the compact build plan in its §12; <em>this</em> page is the deep version: the partition re-derivation, the two Phase-1 traps traced to the line, and the one SDK change everything else rides on.</p></div>
+
+<section id="verdict">
+<h2><span class="num">1</span>The short version</h2>
+<div class="verdict">
+  <article>
+    <span class="pill info">the reframe</span>
+    <strong>Two objects, not two files</strong>
+    <p>There are only two things worth persisting: the <strong>Agent</strong> (a field of the Conversation) and the <strong>Conversation</strong> (<code>ConversationState</code> → <code>base_state.json</code>), plus a little server bookkeeping. <code>meta.json</code> is literally the create-request re-persisted.</p>
+  </article>
+  <article>
+    <span class="pill ok">the rule</span>
+    <strong>One field, one home — checkable</strong>
+    <p>If a field is on <code>ConversationState</code>, it must not be <em>authoritative</em> in <code>meta.json</code>. That is enforceable by a five-line assertion over the models' own metadata — no judgement, no repro needed.</p>
+  </article>
+  <article>
+    <span class="pill warn">the method</span>
+    <strong>Land the scoreboard first</strong>
+    <p>Ship the guard test <em>xfail</em>-ed at today's 9-field overlap, then let each phase shrink it. "Once and for all" becomes a property CI defends, not a claim in a PR description.</p>
+  </article>
+</div>
+<p>The study proved the mechanism. What was missing was the part that makes a fix <em>stick</em>: an exact account of which file should own each field, a rule that a reviewer can't accidentally violate, and a sequence that never regresses the three perf PRs (#4201/#4100/#4202) the codebase just landed to make listing cheap. That's this page.</p>
+</section>
+
+<section id="findings">
+<h2><span class="num">2</span>Four things that move the difficulty</h2>
+<p>Re-reading <code>upstream/main</code> surfaced four facts the study's framing didn't yet carry. Two make the fix <em>easier</em> than it looks; two make it <em>harder</em>. All four change where the real work is.</p>
+
+<h3>2.1 The HTTP API is already <code>base_state</code>-authoritative — easier</h3>
+<p><code>_compose_conversation_info()</code> builds every conversation response from <strong><code>ConversationState</code></strong>, not from the meta snapshot:</p>
+<pre><code>return ConversationInfo(
+    **state.model_dump(mode=<span class="str">"json"</span>),   <span class="com"># &lt;- agent comes from base_state.json</span>
+    title=stored.title, metrics=stored.metrics, created_at=stored.created_at, ...
+)</code></pre>
+<p>So <code>ConversationInfo.agent</code> is fed by <code>base_state.json</code>. <strong>Removing <code>agent</code> from <code>meta.json</code> changes zero bytes of any API response.</strong> agent-canvas reads <code>info.agent.kind</code> / <code>.acp_server</code> / <code>.acp_model</code> / <code>.llm.model</code> (<code>agent-server-adapter.ts:305,314,340-343</code>) — all still served, unchanged. This kills the biggest perceived blocker: the client contract is not in the way.</p>
+
+<h3>2.2 The cheap-listing argument is alive — and was just reinforced</h3>
+<div class="callout warn"><p><strong>A correction I owe the record.</strong> My first draft claimed "meta exists to keep listing cheap" was <em>already false</em>. Engel pushed back and the code sided with him. Fixing it in place, because the wrong version pointed the plan at the wrong end state.</p></div>
+<p><strong>#4201</strong> landed 2025-07-23 — days before the study's rewrite — and it is a deliberate investment in exactly the direction I'd called dead: it <em>replaced</em> a per-conversation full <code>ConversationState</code> load with a signature-gated raw read of one enum. Its docstring names the cost I was waving away:</p>
+<div class="callout"><p><em>"Validating the full <code>ConversationState</code> costs an agent, LLM config, workspace, secret registry and stats blob to reach one enum field."</em></p></div>
+<p>With #4100 (lazy hydration) and #4202 (idle eviction) beside it, the trajectory is unambiguous: <strong>less</strong> state loading, not more. What actually survives of my point, stated narrowly:</p>
+<table>
+  <tr><th>Path</th><th>Loads <code>base_state</code>?</th><th>Bearing on the plan</th></tr>
+  <tr><td>sort / filter / count / paginate</td><td><strong>No</strong> — from the in-memory catalog; status is a gated one-enum read, skipped when the <code>stat()</code> signature is unchanged</td><td>meta's index role is real. <strong>Don't break it.</strong></td></tr>
+  <tr><td>composing the ≤<code>limit</code> page items</td><td><strong>Yes</strong> — full <code>model_validate_json</code> per item; #4201 did not touch this</td><td>the only claim Phase 1 needs: reading the agent from <code>base_state</code> for the page adds <em>zero</em> new reads</td></tr>
+</table>
+<p>So Phase 1 is free on listing performance <em>and</em> the catalog must stay answerable without loading state. Compatible. The error was generalising the second row into a verdict on the first — and it flips Option B from "tidier end state" to <strong>actively regressive</strong>: folding meta into base_state would delete the index #4201 just built.</p>
+
+<h3>2.3 The two <code>agent</code> blobs are not copies — they're two things wearing one type</h3>
+<p>This is the finding that reframes the whole problem.</p>
+<ul>
+  <li><code>meta.json</code>'s agent is the <strong>declarative launch spec</strong>: what the caller asked for, pre-merge.</li>
+  <li><code>base_state.json</code>'s agent is the <strong>resolved runtime agent</strong>: post-merge. <code>_ensure_plugins_loaded()</code> merges plugin skills, expands MCP config, and writes the <em>merged</em> agent into state (which autosaves).</li>
+</ul>
+<p>They were never two copies of one value that drifted — they are two different values that were never given different names. That is exactly why <strong>neither shipped bandaid can be right</strong>: #4028 copies resolved → declarative, #4219 reads declarative ← resolved, and <em>both</em> had to hand-scope to <code>llm</code>+<code>condenser</code> so they wouldn't move the merged form. That coincidence <em>is</em> the type confusion showing through. Every future field would need the same manual adjudication.</p>
+
+<h3>2.4 The resolved agent has secret <em>values</em> baked in — harder</h3>
+<p><code>_ensure_plugins_loaded</code> calls <code>expand_mcp_variables(..., expand_defaults=True)</code> and persists the result. <code>mcp_config</code> is a plain dict — no <code>SecretStr</code>, so no redaction on dump. So <code>base_state.json</code>'s agent carries <strong>resolved secret values</strong> that <code>meta.json</code>'s does not. Two consequences, both real:</p>
+<ul>
+  <li><code>base_state.json</code> is the <em>more</em> dangerous file for the trajectory-export leak (#4216/#4217), not the safer one.</li>
+  <li>A naive "resume entirely from base_state" would <strong>freeze rotated secrets forever</strong> — the baked-in values have no <code>${...}</code> left to re-expand.</li>
+</ul>
+<p>This is the code-level reason the declarative copy has value, and the concrete link to <strong>#15298</strong>. The endgame isn't "one agent blob" — it's one <em>resolved</em> agent that is safe to persist because it holds references, plus one <em>declarative</em> launch spec that is the only thing ever re-resolved.</p>
+</section>
+
+<section id="rootcause">
+<h2><span class="num">3</span>Three rules, none written down</h2>
+<p>Restated: the system has two files and <strong>at least three different, undocumented, per-field rules</strong> about which one wins on resume. <code>agent</code> is just the instance that got reported. Verified on <code>upstream/main</code>:</p>
+<table>
+  <tr><th>Field</th><th>Who wins on resume</th><th>Mechanism</th><th>Runtime mutator that writes only <code>base_state</code></th></tr>
+  <tr><td><code>agent</code></td><td><strong>meta</strong></td><td><code>ConversationState.create()</code> overwrites <code>state.agent = agent</code> (<code>state.py:545</code>), rebuilt from <code>stored.agent</code> (<code>event_service.py:974-976</code>)</td><td><code>switch_llm</code> → <strong>#4032</strong></td></tr>
+  <tr><td><code>workspace</code>, <code>max_iterations</code></td><td><strong>meta</strong></td><td><code>state.py:546-547</code></td><td>—</td></tr>
+  <tr><td><code>confirmation_policy</code></td><td><strong>meta</strong></td><td>server re-asserts after create (<code>event_service.py:1059</code>)</td><td><code>POST .../confirmation_policy</code> → <strong>latent #4032</strong></td></tr>
+  <tr><td><code>security_analyzer</code></td><td><strong>meta</strong></td><td>server re-asserts after create (<code>event_service.py:1060</code>)</td><td><code>POST .../security_analyzer</code> → <strong>latent #4032</strong></td></tr>
+  <tr><td><code>stuck_detection</code>, <code>hook_config</code>, <code>tags</code></td><td><strong>meta</strong></td><td>passed into the <code>LocalConversation(...)</code> ctor on resume</td><td>—</td></tr>
+  <tr><td><code>acp_model</code></td><td><strong>meta</strong></td><td>rebuilt from <code>stored.agent</code>, kept in step by a <strong>hand-rolled mirror</strong> (<code>event_service.py:1636-1639</code>)</td><td><code>switch_acp_model</code></td></tr>
+  <tr><td><code>stats</code>, <code>execution_status</code>, <code>agent_state</code>, …</td><td><strong>base_state</strong></td><td>loaded and never overwritten</td><td>—</td></tr>
+</table>
+<div class="callout crit"><p><strong>#4032 already exists twice more, unreported.</strong> <code>set_confirmation_policy</code> and <code>set_security_analyzer</code> mutate live state but never call <code>save_meta()</code>, and both are re-asserted from meta on resume. Change either mid-conversation, restart, and it silently reverts to the creation-time value. Fixing <code>agent</code> alone leaves two live instances and an unbounded supply of future ones — <em>because nothing in the code states the rule.</em></p></div>
+</section>
+
+<section id="partition">
+<h2><span class="num">4</span>The measured partition</h2>
+<p>The destination comes from set arithmetic over three Pydantic models, not hand-labeling. <code>meta.json</code> is <code>StoredConversation(StartConversationRequest)</code> — the server's create-request re-persisted. (<code>StartConversationRequest</code> lives in the <em>SDK</em> only so client and server share one schema; the SDK's own constructors take plain args and never consume a request object.) So: <strong>meta = persisted request, base_state = persisted Conversation.</strong> Diffing the classes gives an exact three-way split — which I re-derived independently of the study, and which reproduces it exactly:</p>
+<table>
+  <tr><th>Bucket</th><th>Definition</th><th>n</th><th>Fields</th></tr>
+  <tr><td><strong>1 — the bug surface</strong></td><td>persisted in meta <strong>∧</strong> on <code>ConversationState</code></td><td><strong>9</strong></td><td><code>agent</code>, <code>workspace</code>, <code>max_iterations</code>, <code>stuck_detection</code>, <code>confirmation_policy</code>, <code>security_analyzer</code>, <code>hook_config</code>, <code>tags</code>, <code>id</code></td></tr>
+  <tr><td><strong>2 — create inputs the SDK consumes but doesn't round-trip</strong></td><td>persisted in meta, <strong>∉</strong> <code>ConversationState</code>, <strong>∉</strong> bucket 3</td><td><strong>18</strong></td><td><code>plugins</code>, <code>secrets</code>, <code>secrets_encrypted</code>, <code>client_tools</code>, <code>tool_module_qualnames</code>, <code>agent_definitions</code>, <code>agent_settings</code>, <code>agent_launch_additions</code>, <code>parent_conversation_id</code>, <code>conversation_id</code>, <code>initial_message</code>, <code>worktree</code>, <code>autotitle</code>, <code>title_llm_profile</code>, <code>observability_*</code> (×3), <code>user_id</code></td></tr>
+  <tr><td><strong>3 — genuinely server-added</strong></td><td><code>StoredConversation − StartConversationRequest</code></td><td><strong>9</strong></td><td><code>id</code>, <code>title</code>, <code>created_at</code>, <code>updated_at</code>, <code>metrics</code>, <code>forked_from_conversation_id</code>, <code>forked_from_event_id</code>, <code>launched_agent_profile</code>, <code>required_runtime_credential_bindings</code></td></tr>
+</table>
+<p>Two details the arithmetic settles cleanly: <code>agent_profile_id</code> is the <strong>only</strong> <code>exclude=True</code> field in the whole pair — so <code>agent_settings</code> is genuinely persisted (bucket 2), and the study was right to correct <code>agent_settings</code>/<code>parent_conversation_id</code> from "server-only" to SDK request fields. And bucket 1 is 9 <em>including</em> <code>id</code>; the eight that actually matter are the rest.</p>
+<div class="callout ok"><p><strong>Keep bucket 2, delete bucket 1.</strong> Bucket 2 is the <em>declarative</em> side of §2.3 — the SDK transforms these at construction (plugins → merged into the agent; secrets → <code>secret_registry</code>) and doesn't keep the raw input in state, so the server legitimately holds them to reconstruct the conversation. Bucket 1 is pure duplication: <code>base_state.json</code> already owns every field, and meta re-storing it is the bug.</p></div>
+</section>
+
+<section id="rule">
+<h2><span class="num">5</span>The rule, and its one exception</h2>
+<p>Stated once, mechanically checkable — with the exception named so it stays honest:</p>
+<div class="callout"><p>If a field is on <code>ConversationState</code>, it must not be <strong>authoritative</strong> in <code>meta.json</code>.<br>If the catalog needs it cold, it may exist there only as a <strong>signature-gated derived copy</strong>: one-way, rebuildable, memory-wins-when-live, never read back into the conversation.</p></div>
+<p>The second clause is why §2.2 matters: the catalog genuinely must answer sort/filter/count without loading state. And the exception is <strong>not a loophole I'm inventing to dodge the hard cases — it already exists and is already implemented correctly.</strong> <code>execution_status</code> is a <code>ConversationState</code>-only field the server caches in <code>_ConversationRecord</code> and refreshes through <code>_refresh_execution_statuses()</code>: gated on an <code>os.stat</code> signature, invalidated to <code>None</code> the moment the conversation goes live (<em>"Autosave will invalidate any signature we hold"</em>), and explicitly memory-wins on the race (<em>"Went live while we were reading disk; memory wins"</em>).</p>
+<p>That is the shape any derived index copy must take — and the reason the rule stays enforceable. A derived copy lives in <code>_ConversationRecord</code>, <strong>not</strong> in <code>StoredConversation</code>, so the guard test (§7), which checks <code>StoredConversation</code> against <code>ConversationState</code>, still fires on any <em>real</em> duplication.</p>
+
+<h3>The two cold-read wrinkles, re-judged</h3>
+<ul>
+  <li><strong><code>tags</code> — clean, delete it.</strong> I'd assumed the catalog filters on tags; it doesn't. <code>_search_conversations</code> takes only <code>page_id</code>, <code>limit</code>, <code>execution_status</code>, <code>sort_order</code> — there is no tag filter in the router today. So <code>tags</code> leaves <code>meta.json</code> with no index consequence at all. If a filter is ever added, it takes the <code>execution_status</code> treatment, not a resurrected authoritative copy.</li>
+  <li><strong><code>workspace</code> — genuine, and my first answer was wrong.</strong> The server needs it <em>before</em> <code>LocalConversation</code> exists: <code>start()</code> reads <code>stored.workspace</code>, <code>mkdir</code>s the working dir and calls <code>_ensure_workspace_is_git_repo()</code>. I first wrote "the resume path can read <code>base_state.json</code> first" — which is precisely the reasoning #4201 spent a PR removing. Better: leave <code>workspace</code> in meta as <strong>launch-spec input</strong> and delete it from <code>ConversationState</code> instead. <code>create()</code> already overwrites it from the caller every time, so base_state's copy has <em>never once</em> been authoritative. It is the one bucket-1 field where meta is the more defensible owner. Decide it explicitly in Phase 2.</li>
+</ul>
+</section>
+
+<section id="phases">
+<h2><span class="num">6</span>The phases</h2>
+<p>Each phase is independently shippable and revertable. The full sequencing table and the compact guard live in the study's §12; below is what a phase actually touches.</p>
+
+<h3>Phase 0 — Unblock #4032 now</h3>
+<p>kripper is blocked and has confirmed #4028 fixes it in his environment. Ship this week; don't hold the bug hostage to the redesign. <strong>Recommendation: land #4219's read-side approach, extended to ACP</strong> — take <code>llm</code>+<code>condenser</code> from <code>base_state</code> on resume, and <em>delete</em> the ACP mirror rather than adding a sibling to it (Q1 in §8 shows that's safe). #4028 adds a second hand-rolled mirror that Phase 1 then removes; #4219 leans toward the real fix. Either is acceptable — but <strong>do not merge both.</strong> Two overlapping fixes in one file pair is how the next inconsistency is born.</p>
+
+<h3>Phase 1 — <code>agent</code> out of <code>meta.json</code></h3>
+<p>The whole point, and the blast radius is small: only <strong>six</strong> production sites read <code>stored.agent</code>, and §2.1 means the API layer isn't one of them.</p>
+<ol class="steps">
+  <li><strong>Add a discriminator to <code>StoredConversation</code></strong><span><code>agent_kind: str</code> + <code>acp_server: str | None</code>, populated at creation — the one thing the server needs to know about the agent <em>before</em> state loads.</span></li>
+  <li><strong>Replace the cold codex checks</strong><span><code>_is_codex_agent(stored.agent)</code> at three sites → read the discriminator.</span></li>
+  <li><strong>Resume reads the agent from <code>base_state.json</code></strong><span>Drop the <code>type(stored.agent)</code> / <code>model_validate</code> rebuild at <code>event_service.py:974-976</code>. A brand-new conversation still gets its agent from the start request — written once, to one file.</span></li>
+  <li><strong>Fork</strong><span>Already copies <code>fork_conv.agent</code> (the live agent, in base_state); just drop <code>"agent"</code> from <code>fork_overrides</code>.</span></li>
+  <li><strong>Stop persisting it</strong><span>Mark <code>agent</code> <code>exclude=True</code> on <code>StoredConversation</code>, mirroring the <code>agent_profile_id</code> precedent. Old files keep an <code>agent</code>; readers ignore it, the next <code>save_meta()</code> drops it. Never write it again.</span></li>
+</ol>
+<div class="callout warn"><p><strong>The two Phase-1 traps</strong> — both pass on old fixtures and break later, so name them in the PR:</p>
+<p style="margin-top:8px">(1) <strong>The one real SDK change</strong> is making <code>ConversationState.create()</code> take <code>agent: AgentBase | None</code> — <code>None</code> on resume means "keep the persisted agent, skip the overwrite and <code>verify</code>." This is the <em>same</em> change bucket-1's <code>workspace</code>/<code>max_iterations</code> need, so do it once, generalised, and Phase 2 becomes mechanical.</p>
+<p style="margin-top:8px">(2) <code>StoredConversation.agent</code> is typed <code>AgentBase</code> but <strong>defaults to <code>None</code></strong> (<code>Field(default=cast(AgentBase, None))</code>). A new-style <code>meta.json</code> validates fine, and every remaining unguarded <code>type(stored.agent)</code> then fails later with a confusing <code>NoneType</code> error instead of a clear one. Branch explicitly on the resume path; don't lean on the default.</p></div>
+
+<h3>Phase 2 — the rest of bucket 1 (8 of 9)</h3>
+<p>Where the arithmetic changed the shape of the work — no longer a tidy-up, the actual fix.</p>
+<ul>
+  <li><strong><code>confirmation_policy</code> + <code>security_analyzer</code> — two live bugs, not hygiene.</strong> Remove the re-assertion at <code>event_service.py:1059-1060</code> on the <em>resume</em> path (keep it for fresh creation). These are §3's unreported #4032 instances; ship them with a regression test each and say they were reproducible before the change. That turns "refactor" into "bug fix" for a reviewer.</li>
+  <li><strong><code>max_iterations</code>, <code>workspace</code></strong> — via the generalised <code>create(agent=None, ...)</code> change; <code>workspace</code> carries the §5 wrinkle.</li>
+  <li><strong><code>stuck_detection</code>, <code>hook_config</code>, <code>tags</code></strong> — stop passing them from <code>stored</code> into the resume-path ctor; let loaded state supply them.</li>
+  <li><strong><code>id</code></strong> stays in both — shared key, not a duplicated value. The guard test whitelists exactly this one field and no more.</li>
+  <li>Write the §5 rule into a docstring on <code>StoredConversation</code> <strong>and</strong> <code>ConversationState</code>. The rule never being written down is why this recurred.</li>
+</ul>
+
+<h3>Phase 2b — reconcile the two secret shapes</h3>
+<p>meta's <code>secrets</code>/<code>secrets_encrypted</code> (sources, bucket 2) vs base_state's <code>secret_registry</code> (resolved). <em>Related, not identical</em>, so the arithmetic doesn't flag them — but they are two descriptions of one credential, the same disease in a different shape. Keep it separate from Phase 2 so the mechanical deletions land without waiting on the credential-model decision (#15298).</p>
+
+<h3>Phase 3 — make the single copy <em>safe</em></h3>
+<p>Phase 1 makes <code>base_state.json</code> the sole home of the agent; §2.4 says that file bakes resolved secret values into <code>mcp_config</code>. Persist <code>mcp_config</code> in its <strong>unexpanded</strong> form (<code>${...}</code> intact) and expand at use time only. Then a rotated secret is picked up on the next resume instead of frozen, and the trajectory export has nothing to redact — the #4217 bandaid becomes unnecessary rather than load-bearing. This is #15298's invariant applied to one concrete field, and the step that earns "once and for all": Phases 1–2 make the config <em>correct</em>; Phase 3 makes the single copy <em>defensible</em>.</p>
+
+<h3 style="text-decoration:line-through">Phase 4 — Option B / single file</h3>
+<p><strong>Cut.</strong> #4201 already built the derived, signature-gated, rebuildable index that Option B would need — and better than a relabel would have. A literal single file is off the table per §5. The only survivor worth keeping is a docstring on <code>_ConversationRecord</code>: <em>this is a derived cache, never a source of truth</em> — folded into Phase 2.</p>
+
+<div class="callout"><p><strong>Guardrail for every phase:</strong> do not regress #4201 / #4100 / #4202 — sort, filter, count, paginate must stay answerable from the in-memory catalog without loading <code>ConversationState</code>. And <strong>agent-canvas needs no changes</strong> (§2.1). Both are worth an explicit line in each PR description, because "will this break the client / the list view?" is the question that otherwise stalls review.</p></div>
+</section>
+
+<section id="tests">
+<h2><span class="num">7</span>The test that defines "done"</h2>
+<p>Two tests. The first proves the behaviour; the second holds the line so no future PR can quietly re-add a duplicate.</p>
+<p><strong>(a) Round-trip, parametrized over every mutable field</strong> — create a conversation, mutate the field at runtime through its real endpoint, tear the service down, start a fresh one over the same directory, hydrate through the real resume path (<code>get_event_service()</code>, not the <code>_event_services</code> dict — #4100's lazy hydration means the direct read skips the resume path; this is the trap #4028 hit on rebase), and assert the live conversation observes the mutated value.</p>
+<p><strong>(b) The structural guard</strong> — the §5 rule as an assertion over the type system's own metadata, so it needs no repro to fire:</p>
+<pre><code><span class="com"># fails the moment anyone re-adds a duplicated field</span>
+stored_persisted = StoredConversation.model_fields.keys() - EXCLUDED
+overlap = stored_persisted &amp; ConversationState.model_fields.keys()
+assert overlap == {<span class="str">"id"</span>}, f<span class="str">"meta.json re-persists ConversationState fields: {overlap - {'id'}}"</span></code></pre>
+<p>Land (b) <strong>first</strong>, xfail-ed with today's 9-field overlap listed, and let each phase shrink the expected set. Note <code>EXCLUDED</code> must subtract <code>exclude=True</code> fields — <code>exclude=True</code> suppresses <em>serialization</em>, not validation, so an excluded field is still readable in memory during the migration window and would otherwise let the guard pass while the field is still live. This is the whole point of switching to set arithmetic: "one source of truth" becomes a property CI enforces.</p>
+</section>
+
+<section id="resolved">
+<h2><span class="num">8</span>Open questions, resolved</h2>
+<p>Two of the three that gated Phase 1 are settled; the study's §11 carries the full Q2 treatment. Summarised here so this plan stands on its own:</p>
+<table>
+  <tr><th>Question</th><th>Answer</th></tr>
+  <tr><td><strong>Q1 — is ACP durable in <code>base_state</code>?</strong></td><td><strong>Yes, fully.</strong> <code>acp_model</code>/<code>acp_server</code> are regular <code>Field</code>s on <code>ACPAgent</code> (not PrivateAttrs), so they already ride inside <code>state.agent</code> → base_state. <code>switch_acp_model</code> already sets <code>self._state.agent = new_agent</code> (via <code>model_copy</code>, precisely so autosave fires) and writes <code>agent_state["acp_current_model_id"]</code> — both persisted. So the server's ACP mirror (<code>event_service.py:1636-1639</code>) is pure redundancy that exists only because <code>start()</code> rebuilds from <code>stored.agent</code>. <strong>Phase 0 deletes it in the same step</strong> — no grace period.</td></tr>
+  <tr><td><strong>Q2 — should a restore re-read the changed profile?</strong></td><td><strong>Yes in intent — but as a revision-keyed 3-way merge, not a re-read.</strong> A blind re-read reintroduces #4032 the other way round (runtime <code>switch_llm</code> writes base_state only and never flows back to the profile, so a re-read would clobber the runtime switch). Merge on <code>AgentProfile.revision</code>: profile-changed-∧-runtime-didn't → take profile; runtime-changed → runtime wins. The hooks exist (<code>LaunchedAgentProfile</code> + <code>deriveSwitchPlan</code> #3720, monotonic <code>revision</code>, <code>POST /{id}/switch_profile</code>). Ship tier 2 (detect + surface "re-apply") now; decide tier 3 (auto-merge, needs a launch-time snapshot) in writing. <strong>Orthogonal to the duplication fix — must not block Phase 0/1.</strong></td></tr>
+  <tr><td><strong>Q3 — does anything outside this repo read <code>meta.json</code> directly?</strong></td><td>The one still worth checking (deployment tooling, migration scripts, runtime-api). The API is safe per §2.1; direct file readers would not be.</td></tr>
+</table>
+</section>
+
+<section id="sources">
+<h2><span class="num">9</span>Sources</h2>
+<ul class="sources">
+  <li><a class="src" href="meta-vs-base-state-duplication.html">Companion study — Two files, one truth</a><small>Where the copy is made, how it broke (#4032), the field inventory, and the compact §12 build plan this page expands.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/4032">issue #4032</a><small>The bug report: LLM profile timeout reset after agent-server restart.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4028">PR #4028</a> / <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4219">PR #4219</a><small>The two bandaids — mirror-on-write vs read-from-base_state. Both hand-scope to <code>llm</code>+<code>condenser</code>: the type confusion of §2.3 showing through.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4201">PR #4201</a><small>Indexes execution status for search/count — replaces a full-state load with a signature-gated raw enum read. The concrete cost of loading state for listing (§2.2).</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4100">PR #4100</a> / <a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4202">PR #4202</a><small>Lazy hydration + idle eviction — the codebase investing in <em>less</em> state loading, which is why Option B is cut.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/pull/4217">PR #4217</a> / <a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/4216">issue #4216</a><small>Trajectory secret-leak fix (export-boundary redaction) — a bandaid Phase 3 makes unnecessary.</small></li>
+  <li><a class="src" href="https://github.com/OpenHands/OpenHands/issues/15298">OpenHands #15298</a><small>Reference-only credentials — the endgame that makes even one copy safe (Phase 2b / Phase 3).</small></li>
+</ul>
+</section>
+
+<footer>Companion build plan to the meta.json / base_state.json duplication study. Grounded to software-agent-sdk @ upstream/main 99342c4f9 (v1.37.1); line numbers from that tree. The 3-bucket partition and "meta = persisted request" framing are the companion study's (smolpaws), re-derived here by set arithmetic; the four findings (§2), the per-field authority table (§3), the rule's second clause, the #4201 / Option-B correction, and the Phase-1 trap traces are this plan's contribution. No secret value or ciphertext appears on this page. 🐾</footer>
+</main>
+</div>
+</body>
+</html>
