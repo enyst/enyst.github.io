@@ -31,6 +31,22 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4303#pullrequestreview-4813668791">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4303">fix(mcp): pin fetch server runtime dependencies</a></td>
+        <td>OpenHands/software-agent-sdk #4303</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4303#pullrequestreview-4813668791">Review permalink</a></td>
+        <td><code>eecaf44</code></td>
+        <td><time datetime="2026-07-29T23:11:18Z">2026-07-29 23:11:18</time></td>
+        <td>The review confirmed that sub-agent responses now use the canonical context-aware MCP serializer, keeping secrets redacted by default while permitting explicit plaintext output. The sparse patch model also includes enabled, and 128 focused tests passed locally across response serialization, OpenAPI, and settings behavior. The small but credential-sensitive API change was assessed as medium risk and worth merging.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16144#pullrequestreview-4813667547">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16144">fix: preserve MCP credentials during Canvas mutations</a></td>
+        <td>OpenHands/OpenHands #16144</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16144#pullrequestreview-4813667547">Review permalink</a></td>
+        <td><code>b431656</code></td>
+        <td><time datetime="2026-07-29T23:11:01Z">2026-07-29 23:11:01</time></td>
+        <td>The review found that same-strategy header-auth edits omit removed keys even though the backend recursively merge-patches nested maps. A header the user deletes can therefore remain stored and continue being sent to the MCP server, and the current patch schema does not accept null header tombstones. The credential-sensitive migration was assessed as high risk and needs atomic deletion semantics plus a real merge-path regression test.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4813333142">
         <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282">Security: Unvalidated Workspace Directory in VSCode URL Endpoint</a></td>
         <td>OpenHands/software-agent-sdk #4282</td>
