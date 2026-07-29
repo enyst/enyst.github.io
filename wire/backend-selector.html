@@ -72,7 +72,7 @@
 </style>
 </head>
 <body class="bare">
-  <p class="note">Wireframe for <b>#15426</b> — Add-backend chooser reduced to <b>two setup paths: Agent-server &amp; Cloud</b>. Local vs Remote becomes a sub-choice inside Agent-server (the only hard difference: <b>Remote requires a session API key</b>). No "Enterprise" wording in the modal — just a subtle link to deployment docs. Low-fidelity on purpose — for discussion, not final visuals.</p>
+  <p class="note">Wireframe for <b>#15426</b> — Add-backend chooser reduced to <b>two paths: Agent-server &amp; Cloud</b>. No Local/Remote split: Agent-server just takes the real connection fields it uses today (URL + optional session API key). No "Enterprise" wording in the modal — just a subtle deployment-docs link. Low-fidelity on purpose — for discussion, not final visuals.</p>
 
   <div class="modal">
     <div class="m-head">
@@ -86,32 +86,21 @@
         <div class="ic">▤</div>
         <div class="c-main">
           <div class="c-title">Agent-server <span class="pill">self-run</span></div>
-          <div class="c-desc">Connect to an OpenHands agent-server you run yourself — on this machine or somewhere else.</div>
+          <div class="c-desc">Connect to an OpenHands agent-server — running on your machine or anywhere you can reach it.</div>
 
           <div class="sub">
-            <div class="sub-h">Where is it running?</div>
-            <div class="seg">
-              <div class="opt sel">
-                <div class="opt-t">Local</div>
-                <div class="opt-d">Running on this machine. Host is filled in for you.</div>
-                <span class="opt-badge badge-nokey">no key needed</span>
-              </div>
-              <div class="opt">
-                <div class="opt-t">Remote</div>
-                <div class="opt-d">On a VM, tunnel, or self-hosted box you reach over the network.</div>
-                <span class="opt-badge badge-key">session key required</span>
-              </div>
-            </div>
-
+            <div class="sub-h">Connection details</div>
             <div class="fields">
               <div class="field">
-                <label>Host</label>
-                <div class="inp auto">http://127.0.0.1:3000  ·  auto-detected</div>
+                <label>Agent server URL</label>
+                <div class="inp">https://agent.example.com</div>
               </div>
-              <!-- Local is selected, so no session key field. On Remote, this section becomes an
-                   editable Host + a required Session API key field (see the greyed note below). -->
+              <div class="field">
+                <label>Session API key <span style="color:var(--faint)">(optional)</span></label>
+                <div class="inp">Enter the X-Session-API-Key value</div>
+              </div>
             </div>
-            <div class="hint">Local needs no session key. Selecting <b>Remote</b> swaps this for an editable host + a required session API key.</div>
+            <div class="hint">Saved only in this browser. Deployment defaults stay available until you override them here.</div>
           </div>
         </div>
         <div class="radio"></div>
@@ -137,6 +126,6 @@
     </div>
   </div>
 
-  <p class="cap">Open questions this leaves for the thread: (1) is "Agent-server / Cloud" clearer than "Local / Remote / Cloud", or does hiding Local/Remote one level down lose the discoverability Devin wanted? (2) footer deployment-docs link vs a lightweight third row. Exact footer copy is a placeholder — e.g. "More about deployment options" or "Deployment docs".</p>
+  <p class="cap">Fields shown match today's agent-server onboarding (URL + optional Session API key). Open for the thread: footer deployment-docs link vs a lightweight third row; exact footer copy is a placeholder ("More about deployment options" / "Deployment docs").</p>
 </body>
 </html>
