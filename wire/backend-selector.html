@@ -66,9 +66,12 @@
   .btn{height:34px;padding:0 16px;border-radius:8px;font-weight:600;font-size:13px;display:grid;place-items:center;border:1px solid var(--line);background:#fff;color:var(--ink)}
   .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
   .cap{max-width:720px;color:var(--faint);font-size:11.5px;margin:14px 4px 0;font-family:var(--mono)}
+  /* bare mode = just the modal, exactly what the user would see (no reviewer commentary) */
+  body.bare{padding:20px}
+  body.bare .note, body.bare .cap, body.bare .hint{display:none}
 </style>
 </head>
-<body>
+<body class="bare">
   <p class="note">Wireframe for <b>#15426</b> — Add-backend chooser reduced to <b>two setup paths: Agent-server &amp; Cloud</b>. Local vs Remote becomes a sub-choice inside Agent-server (the only hard difference: <b>Remote requires a session API key</b>). No "Enterprise" wording in the modal — just a subtle link to deployment docs. Low-fidelity on purpose — for discussion, not final visuals.</p>
 
   <div class="modal">
