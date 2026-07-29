@@ -54,6 +54,8 @@
   .inp{height:34px;border:1px solid var(--line);border-radius:8px;background:#ffff;
        display:flex;align-items:center;padding:0 10px;color:var(--faint);font-size:12.5px}
   .inp.auto{background:#f3f4f6;color:var(--faint);font-style:italic}
+  .hint{margin-top:9px;font-size:11.5px;color:var(--faint);line-height:1.4}
+  .hint b{color:var(--mut)}
   .row2{display:flex;gap:9px}.row2 .field{flex:1}
   /* footer */
   .m-foot{padding:14px 24px 20px;border-top:1px solid var(--line);margin-top:8px;
@@ -101,13 +103,12 @@
             <div class="fields">
               <div class="field">
                 <label>Host</label>
-                <div class="inp auto">http://127.0.0.1:3000  ·  auto-detected for Local</div>
+                <div class="inp auto">http://127.0.0.1:3000  ·  auto-detected</div>
               </div>
-              <div class="field">
-                <label>Session API key <span style="color:var(--faint)">(required for Remote)</span></label>
-                <div class="inp">—</div>
-              </div>
+              <!-- Local is selected, so no session key field. On Remote, this section becomes an
+                   editable Host + a required Session API key field (see the greyed note below). -->
             </div>
+            <div class="hint">Local needs no session key. Selecting <b>Remote</b> swaps this for an editable host + a required session API key.</div>
           </div>
         </div>
         <div class="radio"></div>
