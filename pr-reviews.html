@@ -31,6 +31,22 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4175#pullrequestreview-4823640314">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4175">fix(security): redact git remote URL credentials in terminal output</a></td>
+        <td>OpenHands/software-agent-sdk #4175</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4175#pullrequestreview-4823640314">Review permalink</a></td>
+        <td><code>3184927</code></td>
+        <td><time datetime="2026-07-30T22:10:38Z">2026-07-30 22:10:38</time></td>
+        <td>The review confirmed that the fail-open registry exception path now applies deterministic token and URL masking, with all 44 focused tests passing. It found that successful registry masking is followed by the same two generic regex redactors again, causing duplicate full scans of every terminal observation and blurring ownership. The security fix is worth merging, with a focused cleanup recommended to reserve generic fallback redaction for absent or failing registries.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4823640161">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282">Security: Unvalidated Workspace Directory in VSCode URL Endpoint</a></td>
+        <td>OpenHands/software-agent-sdk #4282</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4823640161">Review permalink</a></td>
+        <td><code>083f9a0</code></td>
+        <td><time datetime="2026-07-30T22:10:36Z">2026-07-30 22:10:36</time></td>
+        <td>The review reproduced a Python syntax error caused by committed assistant prose and Markdown fences around vscode_router.py, preventing normal agent-server import. It also confirmed that the route still reads vscode_service.config even though the production VSCodeService has no config attribute, so the endpoint remains broken after parsing is restored. The high-risk security change needs clean Python, explicit workspace-root ownership, and production-shaped traversal tests before merge.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16192#pullrequestreview-4823255148">
         <td><a href="https://github.com/OpenHands/OpenHands/pull/16192">fix(settings): reject malformed LLM base URLs instead of saving them</a></td>
         <td>OpenHands/OpenHands #16192</td>
