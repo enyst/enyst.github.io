@@ -31,6 +31,46 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16106#pullrequestreview-4819124557">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16106">fix: render the VSCode button on self-hosted (local) backends</a></td>
+        <td>OpenHands/OpenHands #16106</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16106#pullrequestreview-4819124557">Review permalink</a></td>
+        <td><code>086991e</code></td>
+        <td><time datetime="2026-07-30T13:14:57Z">2026-07-30 13:14:57</time></td>
+        <td>The review found that self-hosted VSCode is routed through the existing authenticated agent-server boundary rather than a newly exposed service. Launcher configuration, ingress ordering, proxy targeting, and user-interface gating are kept consistent with focused tests. The network-sensitive change was assessed as high risk and needs human end-to-end validation of unauthorized access, upgrade behavior, and the pinned agent-server image.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16120#pullrequestreview-4819124057">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16120">fix(settings): disable save when edits are reverted</a></td>
+        <td>OpenHands/OpenHands #16120</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16120#pullrequestreview-4819124057">Review permalink</a></td>
+        <td><code>404c9b4</code></td>
+        <td><time datetime="2026-07-30T13:14:54Z">2026-07-30 13:14:54</time></td>
+        <td>The review found that save eligibility is derived from normalized form values compared with a refreshed persisted baseline. Hydration, successful saves, and revert-to-original behavior keep the baseline coherent without accumulating per-field dirty flags. The shared settings-state change was assessed as medium risk and worth merging.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16202#pullrequestreview-4819123640">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16202">Regenerate favicon PNG/ICO from favicon.svg for consistent design</a></td>
+        <td>OpenHands/OpenHands #16202</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16202#pullrequestreview-4819123640">Review permalink</a></td>
+        <td><code>0ea4fa2</code></td>
+        <td><time datetime="2026-07-30T13:14:51Z">2026-07-30 13:14:51</time></td>
+        <td>The review verified that the regenerated PNG files have the expected dimensions and that the ICO contains the intended three image sizes. The raster assets match the SVG source without introducing code or dependency churn. The isolated static-asset update was assessed as low risk and worth merging.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16181#pullrequestreview-4819123200">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16181">feat: link chat file paths to the Files drawer</a></td>
+        <td>OpenHands/OpenHands #16181</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16181#pullrequestreview-4819123200">Review permalink</a></td>
+        <td><code>16ec2a4</code></td>
+        <td><time datetime="2026-07-30T13:14:49Z">2026-07-30 13:14:49</time></td>
+        <td>The review found that workspace-path recognition and file-drawer navigation are centralized in one reusable component. The guarded call sites avoid nested interactive markup, while focused tests cover extraction, click behavior, and non-file text. The shared chat-rendering change was assessed as medium risk and worth merging.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16144#pullrequestreview-4819122612">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16144">fix: preserve MCP credentials during Canvas mutations</a></td>
+        <td>OpenHands/OpenHands #16144</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16144#pullrequestreview-4819122612">Review permalink</a></td>
+        <td><code>4a6b900</code></td>
+        <td><time datetime="2026-07-30T13:14:47Z">2026-07-30 13:14:47</time></td>
+        <td>The review found that editing a canonical remote server drops its top-level protocol headers before the mandatory local connectivity test. A server that requires those headers can therefore fail the probe and never reach the sparse patch that would have preserved them. The credential-sensitive change was assessed as high risk and needs a regression test covering header-preserving edit, test, and save behavior.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4818676269">
         <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282">Security: Unvalidated Workspace Directory in VSCode URL Endpoint</a></td>
         <td>OpenHands/software-agent-sdk #4282</td>
