@@ -31,6 +31,14 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4818108416">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282">Security: Unvalidated Workspace Directory in VSCode URL Endpoint</a></td>
+        <td>OpenHands/software-agent-sdk #4282</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4818108416">Review permalink</a></td>
+        <td><code>37dccee</code></td>
+        <td><time datetime="2026-07-30T11:07:58Z">2026-07-30 11:07:58</time></td>
+        <td>The reviewed head accidentally commits assistant reasoning and Markdown fences into vscode_router.py, so the module fails Python compilation and can prevent the agent server from importing. Even after removing that wrapper, the route still reads vscode_service.config although VSCodeService exposes no config attribute, leaving the endpoint broken. The review asks for clean Python, explicit workspace-root ownership, and real route coverage before merge.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16106#pullrequestreview-4817141310">
         <td><a href="https://github.com/OpenHands/OpenHands/pull/16106">fix: render the VSCode button on self-hosted (local) backends</a></td>
         <td>OpenHands/OpenHands #16106</td>
