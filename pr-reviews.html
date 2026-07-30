@@ -31,6 +31,46 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16179#pullrequestreview-4821486296">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16179">fix: make sidebar &quot;Load more&quot; discover folders, not folder contents</a></td>
+        <td>OpenHands/OpenHands #16179</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16179#pullrequestreview-4821486296">Review permalink</a></td>
+        <td><code>126ad25</code></td>
+        <td><time datetime="2026-07-30T17:22:00Z">2026-07-30 17:22:00</time></td>
+        <td>The review found that grouped pagination discards conversations that arrive after a folder first appears. The folder expansion control can only reveal retained rows, and the added test codifies two loaded conversations remaining inaccessible. The implementation should separate stable collapsed previews from the complete loaded conversation collection.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4311#pullrequestreview-4821486001">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4311">feat: report accumulated LLM cost in the automation completion callback</a></td>
+        <td>OpenHands/software-agent-sdk #4311</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4311#pullrequestreview-4821486001">Review permalink</a></td>
+        <td><code>20ad653</code></td>
+        <td><time datetime="2026-07-30T17:21:58Z">2026-07-30 17:21:58</time></td>
+        <td>The review found that fire-and-forget stats publication allows terminal errors to reach the client before the latest cost snapshot. A cached prior stats object can then be reported as authoritative, while the current automation receiver also rejects the new cost field until its coordinated schema change is deployed. The SDK needs authoritative completion ordering, a deterministic race regression, and a receiver-first rollout.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4821485682">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282">Security: Unvalidated Workspace Directory in VSCode URL Endpoint</a></td>
+        <td>OpenHands/software-agent-sdk #4282</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4821485682">Review permalink</a></td>
+        <td><code>955e24f</code></td>
+        <td><time datetime="2026-07-30T17:21:55Z">2026-07-30 17:21:55</time></td>
+        <td>The review found that the VSCode router reads a config attribute that VSCodeService does not define. Every enabled URL request therefore raises before path validation, leaving the endpoint unusable. The review asks for explicit workspace-root ownership and real route tests covering default, allowed, traversal, and out-of-root paths.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16127#pullrequestreview-4821485364">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16127">feat: add a domain-neutral extension-manifest host</a></td>
+        <td>OpenHands/OpenHands #16127</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16127#pullrequestreview-4821485364">Review permalink</a></td>
+        <td><code>c821b79</code></td>
+        <td><time datetime="2026-07-30T17:21:53Z">2026-07-30 17:21:53</time></td>
+        <td>The review found the extension-manifest host coherent and appropriately fail-closed. Validation, request derivation, capability checks, preflight behavior, setup routing, and focused tests align around clear ownership boundaries. The first-party extension package bump is pinned with matching registry integrity and repository provenance.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4313#pullrequestreview-4821485049">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4313">ci: enable freeze-on-ready and update sdk-release skill</a></td>
+        <td>OpenHands/software-agent-sdk #4313</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4313#pullrequestreview-4821485049">Review permalink</a></td>
+        <td><code>d0431ed</code></td>
+        <td><time datetime="2026-07-30T17:21:50Z">2026-07-30 17:21:50</time></td>
+        <td>The review found that none of the three updated reusable workflow callers ran on the exact head, so the new freeze path lacks runtime evidence. The first-consumer release state machine can create branches, mutate draft state, trigger publishing, and require a later merge-back, making syntax checks insufficient. The review asks for a disposable end-to-end canary and human release-infrastructure validation before merge.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4175#pullrequestreview-4820882619">
         <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4175">fix(security): redact git remote URL credentials in terminal output</a></td>
         <td>OpenHands/software-agent-sdk #4175</td>
