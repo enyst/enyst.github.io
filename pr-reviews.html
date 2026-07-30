@@ -31,6 +31,22 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4175#pullrequestreview-4820882619">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4175">fix(security): redact git remote URL credentials in terminal output</a></td>
+        <td>OpenHands/software-agent-sdk #4175</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4175#pullrequestreview-4820882619">Review permalink</a></td>
+        <td><code>0d2894a</code></td>
+        <td><time datetime="2026-07-30T16:11:18Z">2026-07-30 16:11:18</time></td>
+        <td>The review found that terminal redaction still fails open when the conversation secret registry masker raises. In that exception path, raw credential-bearing output bypasses both deterministic generic redactors and can reach the model. The PR needs a fail-closed fallback and a regression test before merging.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16087#pullrequestreview-4820879718">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16087">fix: identify PostHog users with Cloud identity</a></td>
+        <td>OpenHands/OpenHands #16087</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16087#pullrequestreview-4820879718">Review permalink</a></td>
+        <td><code>30fae19</code></td>
+        <td><time datetime="2026-07-30T16:10:57Z">2026-07-30 16:10:57</time></td>
+        <td>The review confirmed that the previous stale cross-account telemetry attribution bug is fixed. Backend, organization, credential, and removal transitions now establish explicit identity boundaries with focused regression coverage. The change remains medium risk because it affects privacy-sensitive shared telemetry state, but it is worth merging.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16127#pullrequestreview-4820300658">
         <td><a href="https://github.com/OpenHands/OpenHands/pull/16127">feat: add a domain-neutral extension-manifest host</a></td>
         <td>OpenHands/OpenHands #16127</td>
