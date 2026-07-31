@@ -31,6 +31,22 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4319#pullrequestreview-4824547794">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4319">fix: PATCH /api/settings loads the profile&#x27;s LLM when setting active_profile</a></td>
+        <td>OpenHands/software-agent-sdk #4319</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4319#pullrequestreview-4824547794">Review permalink</a></td>
+        <td><code>93d363a</code></td>
+        <td><time datetime="2026-07-31T01:08:50Z">2026-07-31 01:08:50</time></td>
+        <td>The review traced active-profile resolution through profile loading, secret serialization, validation, file locking, and persisted settings updates. The implementation returns 404 before persistence for unknown profiles, preserves explicit LLM overrides, and passed all 151 targeted settings and profiles tests locally. No actionable defects were found, though the API semantic change and secret-bearing settings path make the overall risk medium.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16214#pullrequestreview-4824547604">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16214">refactor(types): use client error events</a></td>
+        <td>OpenHands/OpenHands #16214</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16214#pullrequestreview-4824547604">Review permalink</a></td>
+        <td><code>5143f0c</code></td>
+        <td><time datetime="2026-07-31T01:08:48Z">2026-07-31 01:08:48</time></td>
+        <td>The review confirmed that Canvas now consumes the published TypeScript client’s canonical AgentErrorEvent and ConversationErrorEvent contracts instead of retaining local duplicates. The published client definitions were compared with the SDK Pydantic models, while updated fixtures, build checks, and both 60-test E2E suites align with the discriminated shapes. No actionable defects were found, and the change was assessed as low risk because it is a type-ownership cleanup without runtime or dependency changes.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16106#pullrequestreview-4824254330">
         <td><a href="https://github.com/OpenHands/OpenHands/pull/16106">fix: render the VSCode button on self-hosted (local) backends</a></td>
         <td>OpenHands/OpenHands #16106</td>
