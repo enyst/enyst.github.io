@@ -31,6 +31,22 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4311#pullrequestreview-4830234392">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4311">feat: report accumulated LLM cost in the automation completion callback</a></td>
+        <td>OpenHands/software-agent-sdk #4311</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4311#pullrequestreview-4830234392">Review permalink</a></td>
+        <td><code>495f2a4</code></td>
+        <td><time datetime="2026-07-31T16:12:24Z">2026-07-31 16:12:24</time></td>
+        <td>The callback plumbing and focused tests are substantial, but the implementation sends the conversation’s lifetime accumulated cost rather than the current automation run’s delta. That overreports resumed or attached conversations because persisted stats retain prior spend, and the local close path also reads mutable state without the required lock. The review asks for a baseline-and-delta design, lock-safe snapshotting, and regression tests for resumed and concurrent cases.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4830234023">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282">Security: Unvalidated Workspace Directory in VSCode URL Endpoint</a></td>
+        <td>OpenHands/software-agent-sdk #4282</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4830234023">Review permalink</a></td>
+        <td><code>d8d8bb8</code></td>
+        <td><time datetime="2026-07-31T16:12:20Z">2026-07-31 16:12:20</time></td>
+        <td>The changed router is not valid Python because reviewer prose and Markdown fences were committed into the module. Even after removing that text, the route reads vscode_service.config, but VSCodeService has no config attribute, so requests would fail. The review asks for a clean implementation using an authoritative workspace boundary plus route-level traversal tests and runtime evidence.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16178#pullrequestreview-4829765567">
         <td><a href="https://github.com/OpenHands/OpenHands/pull/16178">feat: add local Agent Canvas Planner support</a></td>
         <td>OpenHands/OpenHands #16178</td>
