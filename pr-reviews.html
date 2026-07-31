@@ -31,6 +31,46 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/3969#pullrequestreview-4827072377">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/3969">Handle OpenAI device auth rate limits</a></td>
+        <td>OpenHands/software-agent-sdk #3969</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/3969#pullrequestreview-4827072377">Review permalink</a></td>
+        <td><code>2b406e5</code></td>
+        <td><time datetime="2026-07-31T09:12:07Z">2026-07-31 09:12:07</time></td>
+        <td>The review found that the final OpenAI token exchange still raises a plain runtime error for a provider rate limit. A 429 at that hop bypasses the new typed route boundary and can still surface as an internal server error. The review requested status-preserving exchange errors and a retry-state regression test before merge.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16120#pullrequestreview-4827072175">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16120">fix(settings): disable save when edits are reverted</a></td>
+        <td>OpenHands/OpenHands #16120</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16120#pullrequestreview-4827072175">Review permalink</a></td>
+        <td><code>2c04d86</code></td>
+        <td><time datetime="2026-07-31T09:12:05Z">2026-07-31 09:12:05</time></td>
+        <td>The review confirmed that the pull-request-specific settings code is unchanged after merging the latest main branch. Its normalized authoritative baseline still disables no-op saves while preserving real edits, with focused unit and end-to-end coverage. The review found no actionable defect and retained a medium risk rating for the shared settings behavior.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16216#pullrequestreview-4827071874">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16216">fix: launch automation with its installed uvicorn</a></td>
+        <td>OpenHands/OpenHands #16216</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16216#pullrequestreview-4827071874">Review permalink</a></td>
+        <td><code>65eda94</code></td>
+        <td><time datetime="2026-07-31T09:12:03Z">2026-07-31 09:12:03</time></td>
+        <td>The review found that the launcher now runs the automation package and Uvicorn inside one isolated uv environment. Focused command tests and a real health-endpoint run support the new release, version, and Git-reference paths. The review found no actionable defect and classified the shared launcher change as medium risk.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4311#pullrequestreview-4827071385">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4311">feat: report accumulated LLM cost in the automation completion callback</a></td>
+        <td>OpenHands/software-agent-sdk #4311</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4311#pullrequestreview-4827071385">Review permalink</a></td>
+        <td><code>b676136</code></td>
+        <td><time datetime="2026-07-31T09:12:00Z">2026-07-31 09:12:00</time></td>
+        <td>The review found that submitting stats publication to an executor does not guarantee it enters the FIFO lock queue before terminal error handling. Remote close can therefore report an earlier cached cost, while the required automation receiver change remains unmerged. The review classified this billing and completion-callback path as high risk and requested authoritative ordering plus receiver-first rollout enforcement.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16219#pullrequestreview-4827071028">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16219">fix(agent-server): handle non-ASCII filenames in Git diff endpoints</a></td>
+        <td>OpenHands/OpenHands #16219</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16219#pullrequestreview-4827071028">Review permalink</a></td>
+        <td><code>d61d86f</code></td>
+        <td><time datetime="2026-07-31T09:11:57Z">2026-07-31 09:11:57</time></td>
+        <td>The review found that the current head does not contain the promised Unicode Git path fix. Its twelve-file diff instead adds unrelated credential encryption, enterprise MCP OAuth, observability, and persistence changes. The review classified this as high risk and asked the author to restore the intended branch before another review.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16178#pullrequestreview-4826728830">
         <td><a href="https://github.com/OpenHands/OpenHands/pull/16178">feat: add local Agent Canvas Planner support</a></td>
         <td>OpenHands/OpenHands #16178</td>
