@@ -31,6 +31,46 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16178#pullrequestreview-4826728830">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16178">feat: add local Agent Canvas Planner support</a></td>
+        <td>OpenHands/OpenHands #16178</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16178#pullrequestreview-4826728830">Review permalink</a></td>
+        <td><code>374b91e</code></td>
+        <td><time datetime="2026-07-31T08:20:44Z">2026-07-31 08:20:44</time></td>
+        <td>The review found that the local planner infers planner identity from the first generic child conversation. A pre-existing delegated child can therefore be adopted as the planner and prevent the real planner from being created. The review classified this as high risk and requested an explicit typed planner identity plus multi-child regression coverage.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4321#pullrequestreview-4826728584">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4321">fix(agent-server): handle non-ASCII filenames in Git endpoints</a></td>
+        <td>OpenHands/software-agent-sdk #4321</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4321#pullrequestreview-4826728584">Review permalink</a></td>
+        <td><code>e456771</code></td>
+        <td><time datetime="2026-07-31T08:20:41Z">2026-07-31 08:20:41</time></td>
+        <td>The review found that the new Git path decoder only works for non-ASCII names at the repository root. Splitting before decoding loses Git&#x27;s whole-path quote framing and leaves nested paths escaped. The review requested full-path decoding and a nested regression test before merge.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/3944#pullrequestreview-4826728369">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/3944">feat(security): AST-backed shell command-name resolution (#2721 Phase 2b)</a></td>
+        <td>OpenHands/software-agent-sdk #3944</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/3944#pullrequestreview-4826728369">Review permalink</a></td>
+        <td><code>a39a199</code></td>
+        <td><time datetime="2026-07-31T08:20:39Z">2026-07-31 08:20:39</time></td>
+        <td>The review found the AST-based shell detector structurally stronger than extending regex special cases. It noted broad focused coverage and a passing local security suite. The change remains high risk because it directly controls destructive-command classification and needs human security review.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4826728141">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282">Security: Unvalidated Workspace Directory in VSCode URL Endpoint</a></td>
+        <td>OpenHands/software-agent-sdk #4282</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4826728141">Review permalink</a></td>
+        <td><code>17ed2d6</code></td>
+        <td><time datetime="2026-07-31T08:20:37Z">2026-07-31 08:20:37</time></td>
+        <td>The review found that the existing VSCode router test suite fails on the proposed path-validation changes. It asked for the contract assertions to be updated and for traversal-focused regression cases to be added. The review classified the change as medium risk because it modifies a workspace security boundary without passing focused tests.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4320#pullrequestreview-4826727931">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4320">fix(profiles): repair v1 skills migration</a></td>
+        <td>OpenHands/software-agent-sdk #4320</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4320#pullrequestreview-4826727931">Review permalink</a></td>
+        <td><code>7d40076</code></td>
+        <td><time datetime="2026-07-31T08:20:34Z">2026-07-31 08:20:34</time></td>
+        <td>The review found the persisted profile schema change explicit and backward-compatible. It highlighted that the compatibility checker now follows the real model graph and that focused profile tests passed. The remaining risk is moderate because persisted configuration shapes can affect existing users.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16106#pullrequestreview-4825392683">
         <td><a href="https://github.com/OpenHands/OpenHands/pull/16106">fix: render the VSCode button on self-hosted (local) backends</a></td>
         <td>OpenHands/OpenHands #16106</td>
