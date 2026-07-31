@@ -31,6 +31,38 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16178#pullrequestreview-4829765567">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16178">feat: add local Agent Canvas Planner support</a></td>
+        <td>OpenHands/OpenHands #16178</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16178#pullrequestreview-4829765567">Review permalink</a></td>
+        <td><code>121ea08</code></td>
+        <td><time datetime="2026-07-31T15:14:22Z">2026-07-31 15:14:22</time></td>
+        <td>The review found that the latest slash-command commit does not fix the local planner’s generic-child identity assumption. The UI still treats the first sub-conversation as the planner and can route prompts, WebSocket state, and PLAN.md handling to the wrong child. It classified the integration as high risk and requested explicit planner identity, multi-child regression coverage, and a real local-stack run.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16181#pullrequestreview-4829765444">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16181">feat: link chat file paths to the Files drawer</a></td>
+        <td>OpenHands/OpenHands #16181</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16181#pullrequestreview-4829765444">Review permalink</a></td>
+        <td><code>0786454</code></td>
+        <td><time datetime="2026-07-31T15:14:21Z">2026-07-31 15:14:21</time></td>
+        <td>The review confirmed that nested workspace normalization now removes the full active working directory before using the generic workspace fallback. Markdown links and existing navigate-to-file actions share the corrected path logic, backed by focused tests and concrete video evidence. It classified the shared navigation change as medium risk and found the prior blocker resolved.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4316#pullrequestreview-4829765278">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4316">feat(sdk): classify conversation errors</a></td>
+        <td>OpenHands/software-agent-sdk #4316</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4316#pullrequestreview-4829765278">Review permalink</a></td>
+        <td><code>52f70a7</code></td>
+        <td><time datetime="2026-07-31T15:14:21Z">2026-07-31 15:14:21</time></td>
+        <td>The review confirmed that bare agent errors now remain unknown diagnostics instead of being mislabeled as recoverable outcomes. Knowledgeable producers explicitly classify tool validation, unexpected executor failures, and crash recovery, with telemetry regressions preserving those distinctions. It classified the additive public event contract as medium risk and found the earlier blocker resolved.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4319#pullrequestreview-4829765181">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4319">fix: PATCH /api/settings loads the profile&#x27;s LLM when setting active_profile</a></td>
+        <td>OpenHands/software-agent-sdk #4319</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4319#pullrequestreview-4829765181">Review permalink</a></td>
+        <td><code>a215ffc</code></td>
+        <td><time datetime="2026-07-31T15:14:20Z">2026-07-31 15:14:20</time></td>
+        <td>The review rechecked the latest comment-only cleanup and found no semantic change to the profile activation fix. Profile loading still precedes the locked transaction, invalid or unknown names fail before persistence, and explicit LLM diffs retain precedence. It classified the public secret-bearing settings change as medium risk and found it worth merging.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16220#pullrequestreview-4829207050">
         <td><a href="https://github.com/OpenHands/OpenHands/pull/16220">fix: reconcile non-native tool-call streamed &lt;function=...&gt; XML delta</a></td>
         <td>OpenHands/OpenHands #16220</td>
