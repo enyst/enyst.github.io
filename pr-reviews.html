@@ -31,6 +31,22 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4323#pullrequestreview-4832206078">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4323">fix(agent-server): bound webhook delivery memory with serialized batched draining</a></td>
+        <td>OpenHands/software-agent-sdk #4323</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4323#pullrequestreview-4832206078">Review permalink</a></td>
+        <td><code>3390901</code></td>
+        <td><time datetime="2026-07-31T21:07:59Z">2026-07-31 21:07:59</time></td>
+        <td>The review found the bounded single-flight webhook queue simple and well matched to the memory-amplification failure. It preserves FIFO delivery and retry behavior while adding count and byte backpressure with focused concurrency, batching, and eviction coverage. No actionable correctness or security issue was found, though shared delivery behavior makes rollout medium risk.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16229#pullrequestreview-4832205848">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16229">feat(settings): add Pi ACP provider configuration UI</a></td>
+        <td>OpenHands/OpenHands #16229</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16229#pullrequestreview-4832205848">Review permalink</a></td>
+        <td><code>9d9d3e1</code></td>
+        <td><time datetime="2026-07-31T21:07:58Z">2026-07-31 21:07:58</time></td>
+        <td>The review found that Pi is serialized as a custom ACP server without persisting its required launch command. The backend rejects that combination, so saved settings and profiles cannot reliably launch Pi, while the test currently encodes the invalid null command. It also flags the unpinned pi-acp runtime package because the latest release was only about one day old and inside the seven-day supply-chain waiting window.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4831487854">
         <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282">Security: Unvalidated Workspace Directory in VSCode URL Endpoint</a></td>
         <td>OpenHands/software-agent-sdk #4282</td>
