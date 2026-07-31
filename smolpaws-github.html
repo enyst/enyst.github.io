@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SmolPaws GitHub Entry Point — Engel Nyst</title>
+  <meta name="description" content="Architecture of the SmolPaws GitHub ingress — a Cloudflare Worker app + notification poller that maps each issue/PR thread to one durable agent conversation." />
+  <meta property="og:title" content="SmolPaws GitHub Entry Point" />
+  <meta property="og:description" content="Worker-based GitHub App + @smolpaws mention bridge — deterministic thread↔conversation mapping, allowlist gating, dedup, and reply-to-thread." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/smolpaws-github.html" />
+  <meta property="og:image" content="https://enyst.github.io/og-index.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="SmolPaws GitHub Entry Point" />
+  <meta name="twitter:description" content="Worker-based GitHub App + @smolpaws mention bridge — deterministic thread↔conversation mapping, allowlist gating, dedup, and reply-to-thread." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="arch.css" />
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="index.html">← Home</a>
+    <h1>SmolPaws GitHub Entry Point <span class="tag tag-live">live</span></h1>
+    <p class="meta">
+      How the GitHub ingress receives webhooks and notifications, maps each issue/PR to one durable conversation, and replies in-thread.<br>
+      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/github">apps/github/</a> &nbsp;&middot;&nbsp;
+      Conversation id: <a href="https://github.com/smolpaws/smolpaws/blob/main/apps/github/src/agentServerClient.ts">agentServerClient.ts</a> &nbsp;&middot;&nbsp;
+      Turn client: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/shared/turnClient.ts">turnClient.ts</a>
+    </p>
+
+    <h2>Overview</h2>
+    <p>Unlike the Slack, Discord, and WhatsApp ingresses &mdash; long-lived socket <em>bridges</em> that run inside the agent-server &mdash; the GitHub ingress is a <strong>Cloudflare Worker</strong>. It is webhook-first: GitHub delivers events over HTTPS, the Worker validates and queues them, and a queue consumer forwards each one to the shared SmolPaws runner (the agent-server) and posts the reply back on the issue or pull request.</p>
+
+    <p>Two things reach the Worker:</p>
+    <ul>
+      <li><strong>GitHub App webhooks</strong> &mdash; <code>POST /webhooks/github</code>, for repositories where the App is installed.</li>
+      <li><strong>Notification polling</strong> &mdash; a one-minute cron (<code>* * * * *</code>) that reads the account's notifications with a user token, to catch <code>@smolpaws</code> mentions on repos where the App is <em>not</em> installed.</li>
+    </ul>
+
+    <pre class="mermaid">
+flowchart LR
+    GH["GitHub\nissue / PR"] -->|"webhook\nPOST /webhooks/github"| W["Cloudflare Worker\nsmolpaws.liberty-labs.org"]
+    GH -.->|"notifications\n(cron poll)"| W
+    W -->|"validate + gate + dedup"| Q["Cloudflare Queue"]
+    Q --> C["Queue consumer"]
+    C -->|"buildConversationId()"| ID["github-&lt;repo&gt;-&lt;number&gt;"]
+    C -->|"HTTP turn"| AS["agent-server\n(SMOLPAWS_RUNNER_URL)"]
+    AS -->|"runs agent"| OH["OpenHands\nruntime"]
+    OH -->|"turn result +\noutbound messages"| AS
+    AS -->|"reply"| C
+    C -->|"POST issues/{n}/comments"| GH
+    </pre>
+
+    <h2>The key idea: one thread, one conversation</h2>
+    <p>This is the behavior worth documenting. Every event on the <em>same</em> GitHub issue or pull request maps to the <em>same</em> agent conversation, deterministically. There is no lookup table &mdash; the id is derived from the repo and the issue/PR number:</p>
+
+    <pre class="code">function buildConversationId(message): string {
+  const repo = (message.payload.repository?.full_name ?? 'repo')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  const threadNumber =
+    message.payload.issue?.number
+    ?? message.payload.pull_request?.number
+    ?? 0;
+  return `github-${repo}-${threadNumber}`;
+}</pre>
+
+    <p>So a comment on <code>OpenHands/software-agent-sdk#4299</code> always becomes conversation <code>github-openhands-software-agent-sdk-4299</code>. The practical effect: when you ping <code>@smolpaws</code> again in the same PR thread, it resumes the <em>same</em> conversation &mdash; it keeps the earlier context (the PR description it already read, the diff it already ran, the results it already found) instead of starting cold each time. In practice that reads as smarter follow-ups and fewer tokens spent re-deriving what it already knew.</p>
+
+    <p>GitHub is the natural home for this mapping because an issue/PR number <em>is</em> a stable thread identity. The socket bridges do the same conceptually (channel/thread → conversation id), but GitHub's is the cleanest: a URL already names the thread.</p>
+
+    <table>
+      <tr><th>GitHub thread</th><th>Conversation id</th></tr>
+      <tr><td><code>owner/repo</code> issue <code>#42</code></td><td><code>github-owner-repo-42</code></td></tr>
+      <tr><td><code>owner/repo</code> PR <code>#118</code></td><td><code>github-owner-repo-118</code></td></tr>
+    </table>
+
+    <h2>What triggers a run</h2>
+    <p>The Worker only acts on a narrow, deliberate set of events. Everything else is dropped early.</p>
+    <table>
+      <tr><th>Gate</th><th>Rule</th></tr>
+      <tr><td>Event type</td><td>Only <code>issues</code> (action <code>opened</code>), <code>issue_comment</code> (<code>created</code>), and <code>pull_request_review_comment</code> (<code>created</code>).</td></tr>
+      <tr><td>Mention or own thread</td><td>The body must contain <code>@smolpaws</code>, <em>or</em> the thread must be one smolpaws itself opened (so it can keep following up on its own issues/PRs).</td></tr>
+      <tr><td>Self-action guard</td><td>Events whose sender is <code>smolpaws</code> / <code>smolpaws[bot]</code> are ignored &mdash; no replying to itself, no loops.</td></tr>
+      <tr><td>Allowlist</td><td>Fail-closed. <code>ALLOWED_ACTORS</code> must be configured; optional <code>ALLOWED_OWNERS</code>, <code>ALLOWED_REPOS</code>, and <code>ALLOWED_INSTALLATIONS</code> narrow it further. The installation allowlist applies only to App webhooks (notifications have no installation id).</td></tr>
+    </table>
+
+    <h2>Deduplication</h2>
+    <p>GitHub can redeliver a webhook, and the same mention can surface through both the webhook path and the notification poll. Each candidate gets a stable identity &mdash; keyed on the comment id when present, otherwise the issue &mdash; and is recorded in the Cloudflare Cache with a 24-hour TTL before it is queued. A second delivery of the same identity is skipped, so a mention runs the agent once, not twice.</p>
+
+    <pre class="code">// comment-scoped when we have a comment id, else issue-scoped
+`${event}:${repo}:comment:${commentId}`
+`${event}:${repo}:issue:${issueNumber}`</pre>
+
+    <h2>From queue to reply</h2>
+    <ol>
+      <li>The consumer resolves a GitHub token &mdash; an <strong>installation</strong> token for App webhooks, or the user token for notification-sourced events.</li>
+      <li>It builds the conversation id and submits a turn to the agent-server via the shared <code>turnClient</code>, using the GitHub <code>delivery_id</code> as the idempotency key.</li>
+      <li>It waits for the turn result and any outbound messages the agent produced.</li>
+      <li>If there is a reply to post (and the outbound-message check says it should), it posts a comment back to <code>issues/{number}/comments</code> on the originating issue/PR &mdash; the same thread the request came from.</li>
+    </ol>
+
+    <h2>Security boundaries</h2>
+    <ul>
+      <li><strong>Signed webhooks.</strong> Deliveries are verified against <code>GITHUB_WEBHOOK_SECRET</code>; App auth uses <code>GITHUB_APP_ID</code> + <code>GITHUB_APP_PRIVATE_KEY</code> to mint short-lived installation tokens.</li>
+      <li><strong>Fail-closed allowlist.</strong> With no <code>ALLOWED_ACTORS</code> configured, nothing is processed.</li>
+      <li><strong>No self-loops.</strong> smolpaws never reacts to its own comments.</li>
+      <li><strong>Runner decoupling.</strong> The Worker forwards to <code>SMOLPAWS_RUNNER_URL</code> (the agent-server base URL) with <code>SMOLPAWS_RUNNER_TOKEN</code>; the agent runtime and conversation state live behind that boundary, not in the Worker.</li>
+    </ul>
+
+    <h2>Where it runs</h2>
+    <table>
+      <tr><th>Piece</th><th>Value</th></tr>
+      <tr><td>Production Worker</td><td><code>https://smolpaws.liberty-labs.org</code></td></tr>
+      <tr><td>Webhook endpoint</td><td><code>POST /webhooks/github</code></td></tr>
+      <tr><td>Health</td><td><code>GET /health</code> → <code>ok</code></td></tr>
+      <tr><td>Notification cron</td><td><code>* * * * *</code> (every minute)</td></tr>
+      <tr><td>Local worker</td><td><code>http://127.0.0.1:8787</code></td></tr>
+      <tr><td>Local agent-server</td><td><code>http://127.0.0.1:8788</code></td></tr>
+    </table>
+
+    <h2>How it differs from the socket bridges</h2>
+    <table>
+      <tr><th></th><th>GitHub</th><th>Slack / Discord / WhatsApp</th></tr>
+      <tr><td>Shape</td><td>Cloudflare Worker + queue</td><td>Long-lived socket bridge inside agent-server</td></tr>
+      <tr><td>Ingestion</td><td>Signed webhooks + cron notification poll</td><td>Persistent WebSocket / MD connection</td></tr>
+      <tr><td>Thread identity</td><td><code>github-&lt;repo&gt;-&lt;number&gt;</code> from the URL</td><td>channel/thread id from the platform event</td></tr>
+      <tr><td>Reply target</td><td>Comment on the same issue/PR</td><td>Message in the same thread</td></tr>
+    </table>
+    <p>Different transport, same contract: receive an event → derive a stable conversation id → dispatch a turn → deliver the result back where it came from. The agent, its state, and its turns all live in the agent-server.</p>
+
+    <div class="foot-nav"><a href="index.html">← Home</a></div>
+  </div>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+  </script>
+</body>
+</html>
