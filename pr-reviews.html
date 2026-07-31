@@ -31,6 +31,30 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16096#pullrequestreview-4828723060">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16096">fix(config-service): surface OpenRouter and other model-derived providers in Basic picker</a></td>
+        <td>OpenHands/OpenHands #16096</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16096#pullrequestreview-4828723060">Review permalink</a></td>
+        <td><code>ba34160</code></td>
+        <td><time datetime="2026-07-31T13:08:10Z">2026-07-31 13:08:10</time></td>
+        <td>The review confirmed that the revised provider extraction surfaces OpenRouter while rejecting bare model IDs and unknown or region-like prefixes. The focused negative regression coverage and full green mock-LLM suite address the earlier malformed-provider concern. It found no remaining actionable defect and classified the local discovery change as low risk.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16223#pullrequestreview-4828722962">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16223">feat: add MiniMax M3 model selection</a></td>
+        <td>OpenHands/OpenHands #16223</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16223#pullrequestreview-4828722962">Review permalink</a></td>
+        <td><code>d8f04f4</code></td>
+        <td><time datetime="2026-07-31T13:08:09Z">2026-07-31 13:08:09</time></td>
+        <td>The review found that changing the canonical frontend model migrates every fresh or defaulted conversation to MiniMax M3. Unit tests and deterministic mock-LLM runs prove wiring but not real-provider availability, agent quality, latency, or cost, while repository guidance still names the old default. It classified the rollout as high risk and requested real-path evidence plus an explicit human maintainer decision.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4322#pullrequestreview-4828722879">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4322">fix(sdk): exclude boolean false from anyOf non-null type selection</a></td>
+        <td>OpenHands/software-agent-sdk #4322</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4322#pullrequestreview-4828722879">Review permalink</a></td>
+        <td><code>f35eb1e</code></td>
+        <td><time datetime="2026-07-31T13:08:08Z">2026-07-31 13:08:08</time></td>
+        <td>The review found that filtering false only during type selection leaves a contradictory schema combining a concrete string type with an anyOf union that accepts no instances. The added regression test proves only that conversion does not throw and never checks the emitted schema semantics. It classified the MCP tool-registration boundary as medium risk and requested semantics-preserving normalization with stronger assertions.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16142#pullrequestreview-4828306680">
         <td><a href="https://github.com/OpenHands/OpenHands/pull/16142">fix(chat): allow dismissing failed pending user messages</a></td>
         <td>OpenHands/OpenHands #16142</td>
