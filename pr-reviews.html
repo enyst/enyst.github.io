@@ -31,6 +31,30 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/OpenHands/pull/16096#pullrequestreview-4827566695">
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16096">fix(config-service): surface OpenRouter and other model-derived providers in Basic picker</a></td>
+        <td>OpenHands/OpenHands #16096</td>
+        <td><a href="https://github.com/OpenHands/OpenHands/pull/16096#pullrequestreview-4827566695">Review permalink</a></td>
+        <td><code>bcc949d</code></td>
+        <td><time datetime="2026-07-31T10:13:14Z">2026-07-31 10:13:14</time></td>
+        <td>The review found that splitting every model identifier at a slash turns valid bare model names into provider entries. The agent-server contract explicitly returns bare identifiers, while its backend extraction logic is deliberately conservative to prevent bogus providers from reaching user interfaces. It requested authoritative provider validation and regression cases for bare and unknown model forms while preserving OpenRouter discovery.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4827566418">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282">Security: Unvalidated Workspace Directory in VSCode URL Endpoint</a></td>
+        <td>OpenHands/software-agent-sdk #4282</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4282#pullrequestreview-4827566418">Review permalink</a></td>
+        <td><code>e96ebca</code></td>
+        <td><time datetime="2026-07-31T10:13:12Z">2026-07-31 10:13:12</time></td>
+        <td>The review found that the VSCode router tests still assert the old relative workspace behavior and now contradict the canonical absolute path passed by the route. It also identified duplicated manual URL reconstruction in the router despite the service already owning URL creation. It requested updated traversal and encoding tests plus a single owner for URL construction before relying on the security boundary.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4316#pullrequestreview-4827566173">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4316">feat(sdk): classify conversation errors</a></td>
+        <td>OpenHands/software-agent-sdk #4316</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4316#pullrequestreview-4827566173">Review permalink</a></td>
+        <td><code>0db6c2b</code></td>
+        <td><time datetime="2026-07-31T10:13:10Z">2026-07-31 10:13:10</time></td>
+        <td>The review found that AgentErrorEvent is used for both recoverable tool validation failures and unexpected executor or crash-recovery failures. Defaulting every instance to a retryable agent outcome would hide real first-party diagnostics from telemetry and downstream consumers. It requested conservative defaults, explicit classifications at knowledgeable producers, and telemetry regression tests.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/3969#pullrequestreview-4827072377">
         <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/3969">Handle OpenAI device auth rate limits</a></td>
         <td>OpenHands/software-agent-sdk #3969</td>
