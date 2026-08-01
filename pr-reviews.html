@@ -31,6 +31,46 @@
       </tr>
     </thead>
     <tbody>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4281#pullrequestreview-4834633494">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4281">Enable ruff&#x27;s line-reducing rules and apply the safe fixes</a></td>
+        <td>OpenHands/software-agent-sdk #4281</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4281#pullrequestreview-4834633494">Review permalink</a></td>
+        <td><code>259aaf4</code></td>
+        <td><time datetime="2026-08-01T12:14:54Z">2026-08-01 12:14:54</time></td>
+        <td>The review found the selected Ruff rules pragmatic and the sampled safe rewrites structurally sound, including the immutable-value dict.fromkeys conversion. The migration nevertheless spans 98 files across agent, tool-execution, conversation, and evaluation paths, creating meaningful aggregate blast radius. It asks a human maintainer to satisfy the repository evaluation gate before merging despite the local simplicity of each rewrite.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4163#pullrequestreview-4834633461">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4163">fix(file_editor): stop insert gluing text onto a newline-less last line</a></td>
+        <td>OpenHands/software-agent-sdk #4163</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4163#pullrequestreview-4834633461">Review permalink</a></td>
+        <td><code>3ab0b42</code></td>
+        <td><time datetime="2026-08-01T12:14:52Z">2026-08-01 12:14:52</time></td>
+        <td>The review found the newline-less EOF fix minimal and correctly placed at the boundary between preserved lines and inserted text. Existing history remains untouched, writes stay atomic, and focused tests exercise the real file round trip and view fidelity. Because file editing is benchmark-sensitive tool behavior, it asks a human maintainer to perform lightweight evaluation validation before merging.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4164#pullrequestreview-4834633425">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4164">fix(grep): honor brace alternation in the include filter</a></td>
+        <td>OpenHands/software-agent-sdk #4164</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4164#pullrequestreview-4834633425">Review permalink</a></td>
+        <td><code>ae68403</code></td>
+        <td><time datetime="2026-08-01T12:14:51Z">2026-08-01 12:14:51</time></td>
+        <td>The review found that a comma-less brace group before an alternation causes the new parser to stop scanning and leave the whole pattern unexpanded. A mixed pattern such as x{literal}*.{ts,tsx} therefore still matches nothing even though later brace alternation is valid. It asks the author to distinguish a literal current group from the absence of later groups and add mixed-order regression cases.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4166#pullrequestreview-4834633390">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4166">fix(conversation): persist secrets added via update_secrets</a></td>
+        <td>OpenHands/software-agent-sdk #4166</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4166#pullrequestreview-4834633390">Review permalink</a></td>
+        <td><code>b94cb02</code></td>
+        <td><time datetime="2026-08-01T12:14:50Z">2026-08-01 12:14:50</time></td>
+        <td>The review found that deep-copying the registry recursively clones caller-owned dynamic secret providers merely to trigger autosave. Stateful providers can silently fork their counters or caches, while a valid lock-backed provider can make update_secrets fail with a deep-copy error. It asks the author to copy the registry mapping without cloning provider objects and to add a persistence round-trip regression test that proves identity and state continuity.</td>
+      </tr>
+      <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4168#pullrequestreview-4834633361">
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4168">fix(llm): clamp thinking budget and sibling key in joint-budget clamp</a></td>
+        <td>OpenHands/software-agent-sdk #4168</td>
+        <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4168#pullrequestreview-4834633361">Review permalink</a></td>
+        <td><code>0ca2cda</code></td>
+        <td><time datetime="2026-08-01T12:14:48Z">2026-08-01 12:14:48</time></td>
+        <td>The review found the joint-budget clamp coherent and verified that both output-budget keys stay aligned after dynamic input accounting. It confirmed that thinking remains strictly below max_tokens and is removed when no legal minimum budget can fit. Because this changes core LLM request construction, it asks a human maintainer to perform lightweight evaluation validation before merging.</td>
+      </tr>
       <tr data-review-key="https://github.com/OpenHands/software-agent-sdk/pull/4327#pullrequestreview-4834369343">
         <td><a href="https://github.com/OpenHands/software-agent-sdk/pull/4327">feat(hooks): discover hooks.json in .agents/ as well as .openhands/</a></td>
         <td>OpenHands/software-agent-sdk #4327</td>
