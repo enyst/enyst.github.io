@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The ask_oracle tool — a second opinion without switching your model — Engel Nyst</title>
+<meta name="description" content="OpenHands/software-agent-sdk PR #3673: a built-in ask_oracle tool lets the agent consult a stronger saved LLM profile for a second opinion — statelessly, with no history, no tools, and without switching its own active model." />
+<meta property="og:title" content="ask_oracle — a second opinion without switching your model" />
+<meta property="og:description" content="How PR #3673 adds a one-shot, tool-less consult to a saved 'oracle' LLM profile, and why it is not switch_llm and not a subagent." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://enyst.github.io/arch/openhands-ask-oracle.html" />
+<meta name="twitter:card" content="summary" />
+<style>
+  :root{
+    --fg:#1d1b18;--muted:#625f58;--subtle:#8b877d;--bg:#fbfaf6;--card:#fffefa;--elevated:#f3f0e7;
+    --accent:#315aa6;--accent-soft:#e7eefc;--warn:#b55f16;--ok:#2f7a43;--rule:#ded9cc;--code:#f0ece2;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.62 var(--sans)}
+  .wrap{display:grid;grid-template-columns:245px minmax(0,1fr);gap:46px;max-width:1220px;margin:0 auto;padding:32px 28px 96px}
+  nav{position:sticky;top:22px;align-self:start;font-size:13px}
+  nav h2{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav ol{list-style:none;margin:0;padding:0;counter-reset:toc}
+  nav li{counter-increment:toc;margin:7px 0}
+  nav li::before{content:counter(toc) ". ";color:var(--subtle)}
+  nav a{color:var(--fg);text-decoration:none}
+  nav a:hover{color:var(--accent)}
+  .back{display:inline-block;margin-bottom:18px;color:var(--muted);text-decoration:none;font-size:13px}
+  .back:hover{color:var(--accent)}
+  .title{border-bottom:1px solid var(--rule);padding-bottom:24px;margin-bottom:28px}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{font-size:38px;line-height:1.08;letter-spacing:-.02em;margin:7px 0 8px}
+  .sub{max-width:820px;color:var(--muted);font-size:17px}
+  .meta{font-size:13px;color:var(--subtle)}
+  h2{font-size:23px;margin:48px 0 12px}
+  h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:15px;margin:22px 0 6px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--code);border:1px solid var(--rule);padding:1px 5px;border-radius:4px}
+  a{color:var(--accent)}
+  a.src{font-family:var(--mono);font-size:12px;text-decoration:none;border-bottom:1px dotted var(--accent);white-space:nowrap}
+  p{margin:12px 0 16px}
+  ul{margin:12px 0 16px}
+  li{margin:5px 0}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:13px 16px;margin:16px 0 20px;border-radius:0 6px 6px 0}
+  .callout.warn{border-color:var(--warn);background:#fbefe3}
+  .callout.note{border-color:var(--subtle);background:var(--elevated)}
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px 0}
+  .stat{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px}
+  .stat b{display:block;font-size:22px}
+  .stat span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+  table{border-collapse:collapse;width:100%;font-size:14px;margin:14px 0 18px;background:var(--card)}
+  th,td{text-align:left;vertical-align:top;padding:9px 11px;border:1px solid var(--rule)}
+  th{font-family:var(--mono);font-size:12px;color:var(--accent);background:var(--elevated)}
+  .fig{margin:20px 0 8px}
+  .fig svg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--rule);border-radius:8px}
+  .fig figcaption{font-size:13px;color:var(--muted);text-align:center;margin:8px 0 18px}
+  .ok{color:var(--ok)}
+  details{border:1px solid var(--rule);border-radius:8px;margin:13px 0;background:var(--card)}
+  summary{cursor:pointer;padding:9px 12px;color:var(--muted);font-size:13px;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ "}
+  details[open] summary::before{content:"▾ "}
+  pre{margin:0;padding:14px 16px;overflow:auto;background:var(--code);border-top:1px solid var(--rule);font:13px/1.55 var(--mono)}
+  .foot{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-size:13px;color:var(--subtle)}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}nav{position:relative;top:auto}h1{font-size:31px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#what">What it adds</a></li>
+    <li><a href="#notswitch">Not switch_llm, not a subagent</a></li>
+    <li><a href="#mechanism">How one consult flows</a></li>
+    <li><a href="#surface">The surface: five small files</a></li>
+    <li><a href="#convention">Resolved by convention</a></li>
+    <li><a href="#merge">Main-merge note</a></li>
+    <li><a href="#proof">Proof and status</a></li>
+  </ol>
+</nav>
+<main>
+  <a class="back" href="../index.html">← Engel Nyst</a>
+  <header class="title">
+    <div class="eyebrow">OpenHands/software-agent-sdk PR #3673 · show-me</div>
+    <h1>A second opinion, without the agent switching its own model</h1>
+    <p class="sub">PR <a href="https://github.com/OpenHands/software-agent-sdk/pull/3673">#3673</a> adds a built-in <code>ask_oracle</code> tool. When the agent is stuck or wants a stronger reviewer, it consults a saved LLM profile named <code>oracle</code> for a one-shot answer — <strong>stateless</strong>: no conversation history, no tools, and the agent's own active model is never changed.</p>
+    <p class="meta">Head SHA <a href="https://github.com/OpenHands/software-agent-sdk/commit/b977f4d5f1965a2b6edb1298560c8826aea294fa"><code>b977f4d5</code></a> (after merging <code>main</code>). All source links below pin this SHA. Prepared by OpenHands (AI) on behalf of the user.</p>
+  </header>
+
+  <!-- ==================== 1 ==================== -->
+  <section id="what">
+    <h2><span class="num">1</span>What it adds: a callable "ask a smarter model" button</h2>
+    <div class="callout"><strong>★ Key takeaway:</strong> <code>ask_oracle</code> gives the agent a way to <em>borrow</em> a stronger model for a single question and then keep going on its own model. The Oracle is just a saved LLM profile named <code>oracle</code> — no new settings field, no wiring; save the profile and the tool works.</div>
+    <div class="stats">
+      <div class="stat"><b>1</b><span>new tool</span></div>
+      <div class="stat"><b>5</b><span>feature files</span></div>
+      <div class="stat"><b>0</b><span>new settings fields</span></div>
+      <div class="stat"><b>read-only</b><span>tool annotation</span></div>
+    </div>
+    <p>The agent adds it like any other tool — <code>Tool(name="ask_oracle")</code> — and calls it with a <code>question</code> and optional <code>context</code>. The tool answers from the <code>oracle</code> profile and hands the text back as an observation, so the agent can fold that advice into its next reply.</p>
+    <p>Definition: <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/definition.py#L28-L53">AskOracleAction — definition.py:28-53</a> · <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/definition.py#L87-L115">AskOracleTool.create — definition.py:87-115</a></p>
+  </section>
+
+  <!-- ==================== 2 ==================== -->
+  <section id="notswitch">
+    <h2><span class="num">2</span>The model you'd expect — and the one that's true</h2>
+    <p>The natural first reaction is "isn't this just switching the model, or spawning a subagent?" The SDK already has both of those, and <code>ask_oracle</code> is deliberately neither. The whole design is in the difference.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 980 430" role="img" aria-labelledby="f1t f1d">
+        <title id="f1t">Three ways to use another model, and how ask_oracle differs</title>
+        <desc id="f1d">switch_llm changes the active model for all future turns; delegate runs a full tool-using sub-agent; ask_oracle does a single stateless completion against the oracle profile and leaves the active model unchanged.</desc>
+        <defs>
+          <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/></marker>
+          <marker id="aw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="var(--warn)"/></marker>
+          <style>
+            .t{font:800 13px var(--sans);fill:var(--fg)}
+            .s{font:11px var(--mono);fill:var(--subtle)}
+            .lane{font:700 12px var(--mono);fill:var(--muted)}
+            .old{fill:var(--code);stroke:var(--subtle);stroke-width:1.4;stroke-dasharray:5 3}
+            .new{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+            .edge{stroke:var(--accent);stroke-width:1.6;fill:none}
+            .edgew{stroke:var(--warn);stroke-width:1.8;stroke-dasharray:5 3;fill:none}
+            .kept{font:700 11px var(--mono);fill:var(--ok)}
+          </style>
+        </defs>
+
+        <!-- lane dividers -->
+        <line x1="150" y1="46" x2="150" y2="410" stroke="var(--rule)"/>
+        <line x1="40" y1="160" x2="940" y2="160" stroke="var(--rule)"/>
+        <line x1="40" y1="285" x2="940" y2="285" stroke="var(--rule)"/>
+
+        <!-- row headers -->
+        <text x="52" y="110" class="lane">switch_llm</text>
+        <text x="52" y="230" class="lane">delegate</text>
+        <text x="52" y="352" class="lane">ask_oracle</text>
+
+        <!-- ROW 1: switch_llm -->
+        <rect x="176" y="72" width="150" height="60" rx="8" class="old"/>
+        <text x="251" y="98" text-anchor="middle" class="t">active model = A</text>
+        <text x="251" y="118" text-anchor="middle" class="s">before the call</text>
+        <rect x="470" y="72" width="150" height="60" rx="8" class="new"/>
+        <text x="545" y="98" text-anchor="middle" class="t">active model = B</text>
+        <text x="545" y="118" text-anchor="middle" class="s">for ALL later turns</text>
+        <path d="M326,102 L470,102" class="edgew" marker-end="url(#aw)"/>
+        <text x="398" y="92" text-anchor="middle" class="s" fill="var(--warn)">persistent swap</text>
+
+        <!-- ROW 2: delegate -->
+        <rect x="176" y="192" width="150" height="60" rx="8" class="old"/>
+        <text x="251" y="218" text-anchor="middle" class="t">active model = A</text>
+        <text x="251" y="238" text-anchor="middle" class="s">unchanged</text>
+        <rect x="470" y="186" width="180" height="72" rx="8" class="new"/>
+        <text x="560" y="210" text-anchor="middle" class="t">sub-agent (model B)</text>
+        <text x="560" y="230" text-anchor="middle" class="s">own tools · own history</text>
+        <text x="560" y="246" text-anchor="middle" class="s">runs a whole loop</text>
+        <path d="M326,222 L470,222" class="edge" marker-end="url(#a)"/>
+
+        <!-- ROW 3: ask_oracle (the subject) -->
+        <rect x="176" y="314" width="150" height="60" rx="8" class="old"/>
+        <text x="251" y="340" text-anchor="middle" class="t">active model = A</text>
+        <text x="251" y="360" text-anchor="middle" class="kept">✓ stays A</text>
+        <rect x="470" y="308" width="180" height="72" rx="8" class="new"/>
+        <text x="560" y="331" text-anchor="middle" class="t">oracle profile (B)</text>
+        <text x="560" y="351" text-anchor="middle" class="s">1 completion · no tools</text>
+        <text x="560" y="367" text-anchor="middle" class="s">no history</text>
+        <path d="M326,338 Q400,300 470,332" class="edge" marker-end="url(#a)"/>
+        <path d="M650,352 Q400,410 326,360" class="edge" marker-end="url(#a)"/>
+        <text x="488" y="404" text-anchor="middle" class="kept">answer returns; agent keeps model A</text>
+      </svg>
+      <figcaption>Fig 1 · Only <code>ask_oracle</code> both leaves the active model untouched <em>and</em> avoids spinning up a full agent. It borrows the stronger model for exactly one answer.</figcaption>
+    </figure>
+    <div class="callout note"><strong>ⓘ Read it this way:</strong> the green marks on the bottom row are the point — the agent's own model (A) is the same before and after the consult. Contrast: <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-sdk/openhands/sdk/tool/builtins/switch_llm.py#L151-L200">switch_llm.py:151</a> · <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/delegate/definition.py#L16">delegate/definition.py:16</a></div>
+  </section>
+
+  <!-- ==================== 3 ==================== -->
+  <section id="mechanism">
+    <h2><span class="num">3</span>How one consult flows, step by step</h2>
+    <p>The executor is small and does exactly four things: resolve the profile, build two messages, call the model once, return the text. Everything that makes it "stateless" is a thing it deliberately does <em>not</em> pass along.</p>
+    <figure class="fig">
+      <svg viewBox="0 0 980 340" role="img" aria-labelledby="f2t f2d">
+        <title id="f2t">ask_oracle executor data flow</title>
+        <desc id="f2d">The agent emits an AskOracleAction; the executor loads the oracle profile from the LLM profile store using the conversation cipher, builds an oracle system prompt plus the question, calls make_llm_completion once with no tools and no history, and returns the text as an observation.</desc>
+        <defs>
+          <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="var(--accent)"/></marker>
+          <style>
+            .t2{font:800 12.5px var(--sans);fill:var(--fg)}
+            .s2{font:10.5px var(--mono);fill:var(--subtle)}
+            .box{fill:var(--card);stroke:var(--rule);stroke-width:1.4}
+            .subj{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+            .e{stroke:var(--accent);stroke-width:1.6;fill:none}
+            .not{fill:#fbefe3;stroke:var(--warn);stroke-width:1.4;stroke-dasharray:4 3}
+            .notx{font:700 11px var(--mono);fill:var(--warn)}
+          </style>
+        </defs>
+        <!-- agent -->
+        <rect x="28" y="120" width="150" height="66" rx="8" class="box"/>
+        <text x="103" y="148" text-anchor="middle" class="t2">Agent (model A)</text>
+        <text x="103" y="167" text-anchor="middle" class="s2">emits AskOracleAction</text>
+        <!-- executor -->
+        <rect x="230" y="108" width="180" height="90" rx="8" class="subj"/>
+        <text x="320" y="136" text-anchor="middle" class="t2">AskOracleExecutor</text>
+        <text x="320" y="156" text-anchor="middle" class="s2">__call__ · impl.py:44</text>
+        <text x="320" y="176" text-anchor="middle" class="s2">no side effects on state</text>
+        <!-- profile store -->
+        <rect x="470" y="24" width="180" height="66" rx="8" class="box"/>
+        <text x="560" y="50" text-anchor="middle" class="t2">LLMProfileStore</text>
+        <text x="560" y="69" text-anchor="middle" class="s2">.load("oracle", cipher)</text>
+        <!-- messages -->
+        <rect x="470" y="120" width="180" height="66" rx="8" class="box"/>
+        <text x="560" y="146" text-anchor="middle" class="t2">2 messages</text>
+        <text x="560" y="165" text-anchor="middle" class="s2">oracle prompt + question</text>
+        <!-- completion -->
+        <rect x="702" y="120" width="180" height="66" rx="8" class="subj"/>
+        <text x="792" y="146" text-anchor="middle" class="t2">make_llm_completion</text>
+        <text x="792" y="165" text-anchor="middle" class="s2">model B · one call</text>
+        <!-- edges -->
+        <path d="M178,153 L230,153" class="e" marker-end="url(#b)"/>
+        <path d="M410,140 Q440,90 470,66" class="e" marker-end="url(#b)"/>
+        <path d="M410,160 L470,156" class="e" marker-end="url(#b)"/>
+        <path d="M650,153 L702,153" class="e" marker-end="url(#b)"/>
+        <!-- return -->
+        <path d="M792,186 Q792,270 320,270 Q200,270 103,190" class="e" marker-end="url(#b)"/>
+        <text x="470" y="288" text-anchor="middle" class="s2">AskOracleObservation (text) → agent continues on model A</text>
+        <!-- NOT passed -->
+        <rect x="702" y="212" width="180" height="60" rx="8" class="not"/>
+        <text x="792" y="236" text-anchor="middle" class="notx">NOT passed:</text>
+        <text x="792" y="254" text-anchor="middle" class="s2">history · tools · agent's LLM</text>
+      </svg>
+      <figcaption>Fig 2 · The two accented boxes are the whole tool; the dashed orange box names what it withholds — that omission <em>is</em> the "stateless" property.</figcaption>
+    </figure>
+    <table>
+      <tr><th>Step</th><th>What happens</th><th>Source</th></tr>
+      <tr><td>1</td><td>Resolve the Oracle: load the profile named <code>oracle</code>, decrypting stored secrets with the conversation's cipher.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/impl.py#L49-L51">impl.py:49-51</a></td></tr>
+      <tr><td>2</td><td>Build exactly two messages: the fixed Oracle system prompt + the agent's question (and optional context).</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/impl.py#L71-L86">impl.py:71-86</a></td></tr>
+      <tr><td>3</td><td>One completion — <code>make_llm_completion(oracle_llm, messages)</code>, no tools, no prior turns.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/impl.py#L88-L89">impl.py:88-89</a></td></tr>
+      <tr><td>4</td><td>Return the text as an observation; on any failure return an error observation instead of raising.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/impl.py#L99-L113">impl.py:99-113</a></td></tr>
+    </table>
+    <div class="callout note"><strong>ⓘ Non-example (what does <em>not</em> happen):</strong> the executor never mutates conversation state, never registers the Oracle LLM as the agent's model, and never gives the Oracle any tools. If the <code>oracle</code> profile is missing, it returns a friendly error observation (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/impl.py#L52-L59">impl.py:52-59</a>) — it does not crash the turn.</div>
+  </section>
+
+  <!-- ==================== 4 ==================== -->
+  <section id="surface">
+    <h2><span class="num">4</span>The surface: five small files, all additive</h2>
+    <p>This is a pure addition — no existing behavior is rewritten, so there is no "before" to redraw. The table is the whole feature.</p>
+    <table>
+      <tr><th>File</th><th>Role</th><th>Link</th></tr>
+      <tr><td>🟢 <code>ask_oracle/definition.py</code></td><td>Action, observation, tool schema, read-only annotation, and self-registration.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/definition.py">definition.py</a></td></tr>
+      <tr><td>🟢 <code>ask_oracle/impl.py</code></td><td>The executor — the four-step flow in §3.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/impl.py">impl.py</a></td></tr>
+      <tr><td>🟢 <code>ask_oracle/__init__.py</code></td><td>Public exports for the sub-package.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/__init__.py">__init__.py</a></td></tr>
+      <tr><td>✏️ <code>tools/__init__.py</code></td><td>Re-export <code>AskOracleTool</code> at the top level.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/__init__.py#L21">__init__.py:21</a></td></tr>
+      <tr><td>🟢 example <code>56_ask_oracle_tool/main.py</code></td><td>End-to-end: save two profiles, add the tool, drive a real consult.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/examples/01_standalone_sdk/56_ask_oracle_tool/main.py">main.py</a></td></tr>
+    </table>
+  </section>
+
+  <!-- ==================== 5 ==================== -->
+  <section id="convention">
+    <h2><span class="num">5</span>"Oracle" is a convention, not configuration</h2>
+    <p>An earlier revision of this PR added an <code>oracle_llm_profile</code> settings field; it was dropped in favor of a single fixed name. The tool looks up the profile literally called <code>oracle</code> — <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/definition.py#L25"><code>ORACLE_PROFILE_NAME = "oracle"</code> · definition.py:25</a>. To enable the Oracle, you just save that profile:</p>
+    <pre><code>store = LLMProfileStore()
+store.save("oracle", LLM(model="a-stronger-model", api_key=...))
+agent = Agent(llm=..., tools=[Tool(name="ask_oracle")])</code></pre>
+    <p>That keeps the agent schema untouched (no new settings to migrate) and makes the Oracle swappable at rest — point the <code>oracle</code> profile at any model without changing agent config. The example wires exactly this: <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/examples/01_standalone_sdk/56_ask_oracle_tool/main.py#L37-L61">main.py:37-61</a>.</p>
+    <div class="callout warn"><strong>⚠ Boundary:</strong> the Oracle profile can hold API keys. Loading uses the conversation's cipher so secrets stay encrypted at rest and are only decrypted in-process for the single call — the executor takes <code>conversation._cipher</code> rather than reading plaintext secrets itself (<a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-tools/openhands/tools/ask_oracle/impl.py#L49-L51">impl.py:49-51</a>).</div>
+  </section>
+
+  <!-- ==================== 6 ==================== -->
+  <section id="merge">
+    <h2><span class="num">6</span>Main-merge note: what changed to land on current <code>main</code></h2>
+    <p>The branch was ~190 commits behind. Merging <code>main</code> touched the feature in three small, mechanical ways — the tool logic itself was unaffected.</p>
+    <table>
+      <tr><th>Merge issue</th><th>Resolution</th><th>Where</th></tr>
+      <tr><td>Conflict in <code>settings/model.py</code> <code>create_agent()</code></td><td>Took main's refactor (new <code>default_tool_specs</code> defaulting, <code>self.mcp_config</code> passthrough); the branch's incidental edits here were superseded.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/openhands-sdk/openhands/sdk/settings/model.py#L1309-L1348">model.py:1309-1348</a></td></tr>
+      <tr><td>Example number collided with main's <code>55_persistent_memory</code></td><td>Renumbered the example <code>55 → 56</code>; the duplicate-example check now passes.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/examples/01_standalone_sdk/56_ask_oracle_tool/main.py">56_ask_oracle_tool/</a></td></tr>
+      <tr><td>Test drift from main's API changes</td><td>Assert on the live <code>conversation.agent.tools_map</code> (plugin load now replaces the agent with a copy), and add the new <code>call_context</code> param to the test LLM's <code>completion</code> override.</td><td><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/tests/tools/ask_oracle/test_ask_oracle.py">test_ask_oracle.py</a></td></tr>
+    </table>
+  </section>
+
+  <!-- ==================== 7 ==================== -->
+  <section id="proof">
+    <h2><span class="num">7</span>Proof and current status</h2>
+    <table>
+      <tr><th>Check</th><th>Result</th></tr>
+      <tr><td><code>pytest tests/tools/ask_oracle/test_ask_oracle.py</code></td><td class="ok">6 passed</td></tr>
+      <tr><td><code>pytest test_examples.py::test_directory_example_is_discovered</code></td><td class="ok">passed (example 56 discovered)</td></tr>
+      <tr><td><code>python .github/scripts/check_duplicate_example_numbers.py</code></td><td class="ok">no duplicates</td></tr>
+      <tr><td><code>pytest test_openapi_contract.py test_openapi_discriminator.py</code></td><td class="ok">13 passed (AskOracleAction in the Action union)</td></tr>
+      <tr><td><code>pyright</code> (ask_oracle pkg + example + model.py) · pre-commit hooks</td><td class="ok">clean</td></tr>
+    </table>
+    <ul>
+      <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/tests/tools/ask_oracle/test_ask_oracle.py#L114-L162">test_ask_oracle.py:114-162</a> — a captured test-LLM proves the Oracle sees only the system prompt + question, no history.</li>
+      <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/b977f4d5f1965a2b6edb1298560c8826aea294fa/tests/tools/ask_oracle/test_ask_oracle.py#L164-L207">test_ask_oracle.py:164-207</a> — missing profile and empty response both return error observations, not exceptions.</li>
+    </ul>
+    <p>The PR is <strong>mergeable</strong> after the merge; remaining CI/approval gating is normal branch protection.</p>
+    <details><summary>Feature diff (five files, additive)</summary><pre>examples/01_standalone_sdk/56_ask_oracle_tool/main.py   | +77
+openhands-tools/openhands/tools/ask_oracle/__init__.py  | +36
+openhands-tools/openhands/tools/ask_oracle/definition.py| +119
+openhands-tools/openhands/tools/ask_oracle/impl.py      | +113
+openhands-tools/openhands/tools/__init__.py             | +2
+tests/tools/ask_oracle/test_ask_oracle.py               | +208</pre></details>
+  </section>
+
+  <div class="foot">
+    <a class="back" href="../index.html">← Back to Engel Nyst</a> · Grounded to <a href="https://github.com/OpenHands/software-agent-sdk/pull/3673">PR #3673</a> at <code>b977f4d5</code>.
+  </div>
+</main>
+</div>
+</body>
+</html>
