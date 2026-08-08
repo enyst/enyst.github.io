@@ -93,6 +93,36 @@
 
     <h2 id="architecture-studies">Architecture Studies</h2>
     <div class="cards">
+      <a class="card" href="gateway-compat.html">
+        <div class="card-title">OpenHands Gateway Compat</div>
+        <div class="card-desc">Live test results: which OpenAI-compatible clients work with the agent-server's /v1/chat/completions endpoint. Curl, Python SDK, LibreChat, Open WebUI, Pipecat.</div>
+        <span class="card-tag">results</span>
+      </a>
+      <a class="card" href="arch/openhands-openai-compatible-gateway.html">
+        <div class="card-title">OpenHands OpenAI-Compatible Gateway</div>
+        <div class="card-desc">End-goal architecture for exposing the OpenHands agent-server as an OpenAI-compatible model endpoint.</div>
+        <span class="card-tag">architecture</span>
+      </a>
+      <a class="card" href="arch/openhands-deferred-init-runtime-boundary.html">
+        <div class="card-title">OpenHands Deferred Init Runtime Boundary</div>
+        <div class="card-desc">Current warm-pool deferred-init flow, PR 400-style app-state DI, and a safer runtime-context pattern.</div>
+        <span class="card-tag">architecture</span>
+      </a>
+      <a class="card" href="arch/openhands-client-defined-tools.html">
+        <div class="card-title">OpenHands Client-Defined Tools</div>
+        <div class="card-desc">How JSON tool specs become SDK tools, WebSocket action events, acknowledgement observations, and persisted client-side execution hooks.</div>
+        <span class="card-tag">architecture</span>
+      </a>
+      <a class="card" href="arch/openhands-credential-boundaries.html">
+        <div class="card-title">OpenHands credential boundaries</div>
+        <div class="card-desc">Issue #15298, verified: reference-only persistence, typed brokers, the real stdio MCP boundary, runtime-visible fallbacks, current-code seams, and a migration plan.</div>
+        <span class="card-tag tag-report">architecture</span>
+      </a>
+      <a class="card" href="arch/openhands-automations.html">
+        <div class="card-title">OpenHands Automations</div>
+        <div class="card-desc">How automation definitions, cron and webhook triggers, tarball storage, dispatch, sandboxes, callbacks, and watchdog reconciliation fit together.</div>
+        <span class="card-tag">architecture</span>
+      </a>
       <a class="card" href="arch/typescript-client-role-in-smolpaws.html">
         <div class="card-title">Do We Need typescript-client?</div>
         <div class="card-desc">Responsibility map: SmolPaws core does not import it; Agent Canvas depends on its browser-safe agent-server clients. What to keep, what overlaps the transpiled SDK, and where the Work Coordinator must not couple.</div>
@@ -113,11 +143,6 @@
         <div class="card-desc">Bot API 10.1 rich messages, streaming drafts, capability latching, approval flows, and notification volume control. The patterns worth adopting.</div>
         <span class="card-tag">study</span>
       </a>
-      <a class="card" href="gateway-compat.html">
-        <div class="card-title">OpenHands Gateway Compat</div>
-        <div class="card-desc">Live test results: which OpenAI-compatible clients work with the agent-server's /v1/chat/completions endpoint. Curl, Python SDK, LibreChat, Open WebUI, Pipecat.</div>
-        <span class="card-tag">results</span>
-      </a>
       <a class="card" href="voice-landscape.html">
         <div class="card-title">Voice for AI Agents</div>
         <div class="card-desc">The current state of voice tech: STT, TTS, real-time conversation, and the two architectures for giving an agent a voice.</div>
@@ -128,24 +153,9 @@
         <div class="card-desc">How executor's e2e harness records a test: Playwright video, asciicast terminal capture, a focus timeline derived from operations, watchable slow-mo, and an ffmpeg splice into one film.</div>
         <span class="card-tag">study</span>
       </a>
-      <a class="card" href="arch/openhands-openai-compatible-gateway.html">
-        <div class="card-title">OpenHands OpenAI-Compatible Gateway</div>
-        <div class="card-desc">End-goal architecture for exposing the OpenHands agent-server as an OpenAI-compatible model endpoint.</div>
-        <span class="card-tag">architecture</span>
-      </a>
-      <a class="card" href="arch/openhands-deferred-init-runtime-boundary.html">
-        <div class="card-title">OpenHands Deferred Init Runtime Boundary</div>
-        <div class="card-desc">Current warm-pool deferred-init flow, PR 400-style app-state DI, and a safer runtime-context pattern.</div>
-        <span class="card-tag">architecture</span>
-      </a>
       <a class="card" href="arch/agent-canvas-tool-visualizers.html">
         <div class="card-title">Agent Canvas Tool Visualizers</div>
         <div class="card-desc">How per-tool React visualizers plug into the conversation event renderer, plus a follow-up addon path for custom renderers.</div>
-        <span class="card-tag">architecture</span>
-      </a>
-      <a class="card" href="arch/openhands-client-defined-tools.html">
-        <div class="card-title">OpenHands Client-Defined Tools</div>
-        <div class="card-desc">How JSON tool specs become SDK tools, WebSocket action events, acknowledgement observations, and persisted client-side execution hooks.</div>
         <span class="card-tag">architecture</span>
       </a>
       <a class="card" href="arch/toolshield-llm-security-analyzer.html">
@@ -178,20 +188,10 @@
         <div class="card-desc">The wire-by-wire migration map — every symbol smolpaws imports from agent-sdk 0.10, where it lands in the fresh TS transpile (0.1), and what's clean / renamed / to-port / a deviation to decide. The hookup, not a rewrite.</div>
         <span class="card-tag tag-report">migration</span>
       </a>
-      <a class="card" href="arch/openhands-credential-boundaries.html">
-        <div class="card-title">OpenHands credential boundaries</div>
-        <div class="card-desc">Issue #15298, verified: reference-only persistence, typed brokers, the real stdio MCP boundary, runtime-visible fallbacks, current-code seams, and a migration plan.</div>
-        <span class="card-tag tag-report">architecture</span>
-      </a>
       <a class="card" href="arch/secrets-keyring-vs-cipher.html">
         <div class="card-title">Secrets: keyring refs vs. encrypted-at-rest</div>
         <div class="card-desc">Design comparison — the TS transpilation stores a keyring reference, the Python SDK stores an encrypted value on disk. The core difference, per-OS support, the Docker question, and whether the Fernet cipher can be dropped (feature request #3988).</div>
         <span class="card-tag">study</span>
-      </a>
-      <a class="card" href="arch/openhands-automations.html">
-        <div class="card-title">OpenHands Automations</div>
-        <div class="card-desc">How automation definitions, cron and webhook triggers, tarball storage, dispatch, sandboxes, callbacks, and watchdog reconciliation fit together.</div>
-        <span class="card-tag">architecture</span>
       </a>
       <a class="card" href="arch/agent-canvas-cloud-features-study.html">
         <div class="card-title">Teach: Agent Canvas Cloud UI Features</div>
