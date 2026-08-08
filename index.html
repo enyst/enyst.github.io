@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Engel Nyst</title>
-  <meta name="description" content="Software developer. Open source. AI agents. Analytical philosophy." />
-  <meta property="og:title" content="Engel Nyst" />
-  <meta property="og:description" content="Software developer. Open source. AI agents. Analytical philosophy." />
+  <title>Code Design Notebook</title>
+  <meta name="description" content="Code-grounded notes on how OpenHands, its SDK, and SmolPaws actually work — architecture studies, mechanism traces, and design decisions." />
+  <meta property="og:title" content="Code Design Notebook" />
+  <meta property="og:description" content="Code-grounded notes on how OpenHands, its SDK, and SmolPaws actually work — architecture studies, mechanism traces, and design decisions." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://enyst.github.io/" />
   <meta property="og:image" content="https://enyst.github.io/og-index.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Engel Nyst" />
-  <meta name="twitter:description" content="Software developer. Open source. AI agents. Analytical philosophy." />
+  <meta name="twitter:title" content="Code Design Notebook" />
+  <meta name="twitter:description" content="Code-grounded notes on how OpenHands, its SDK, and SmolPaws actually work — architecture studies, mechanism traces, and design decisions." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -22,10 +22,18 @@
 </head>
 <body>
   <div class="shell">
-    <h1 class="hero">Engel Nyst</h1>
-    <p class="tagline">Software developer. Open source. AI agents. Analytical philosophy.</p>
+    <h1 class="hero">Code Design Notebook</h1>
+    <p class="tagline">Code-grounded notes on how OpenHands, its SDK, and SmolPaws actually work — mechanism traces, architecture studies, and design decisions.</p>
 
-    <h2>How things work</h2>
+    <nav class="links" aria-label="Sections">
+      <a href="#how-things-work">How things work</a>
+      <a href="#channels">SmolPaws channels</a>
+      <a href="#architecture-studies">Architecture studies</a>
+      <a href="#investigations">Investigations &amp; dashboards</a>
+      <a href="#elsewhere">Elsewhere</a>
+    </nav>
+
+    <h2 id="how-things-work">How things work</h2>
     <div class="cards">
       <a class="card" href="arch/openhands-ask-oracle.html">
         <div class="card-title">ask_oracle: a second opinion without switching your model</div>
@@ -57,11 +65,10 @@
         <div class="card-desc">The model spawns subagents server-side — but the SDK already ships a portable client-side subagent system. A design decision, not just a gap: who orchestrates. Combined show-me + teach-me, with a quiz.</div>
         <span class="card-tag tag-report">study</span>
       </a>
-      <a class="card" href="arch/mention-gazette.html">
-        <div class="card-title">The Mention Gazette</div>
-        <div class="card-desc">A daily newspaper of where I was pinged on GitHub — review requests and mentions first, the rest below. Regenerated each morning.</div>
-        <span class="card-tag tag-daily">daily</span>
-      </a>
+    </div>
+
+    <h2 id="channels">SmolPaws channels</h2>
+    <div class="cards">
       <a class="card" href="smolpaws-whatsapp.html">
         <div class="card-title">SmolPaws WhatsApp Entry Point</div>
         <div class="card-desc">The primary channel — Baileys multi-device, a SQLite-backed poll loop, scopes and permissions, image/audio/document handling, and voice notes.</div>
@@ -84,7 +91,7 @@
       </a>
     </div>
 
-    <h2>Architecture Studies</h2>
+    <h2 id="architecture-studies">Architecture Studies</h2>
     <div class="cards">
       <a class="card" href="arch/typescript-client-role-in-smolpaws.html">
         <div class="card-title">Do We Need typescript-client?</div>
@@ -228,17 +235,21 @@
       </a>
     </div>
 
-    <h2>Investigations</h2>
+    <h2 id="investigations">Investigations &amp; dashboards</h2>
     <div class="cards">
       <a class="card" href="review-grove/">
         <div class="card-title">OpenHands Review Grove</div>
         <div class="card-desc">Sortable reviewer activity dashboard — who reviews what across OpenHands repositories.</div>
         <span class="card-tag tag-data">data</span>
       </a>
-
+      <a class="card" href="arch/mention-gazette.html">
+        <div class="card-title">The Mention Gazette</div>
+        <div class="card-desc">A daily newspaper of where I was pinged on GitHub — review requests and mentions first, the rest below. Regenerated each morning.</div>
+        <span class="card-tag tag-daily">daily</span>
+      </a>
     </div>
 
-    <h2>Elsewhere</h2>
+    <h2 id="elsewhere">Elsewhere</h2>
     <ul class="links">
       <li><a href="https://github.com/enyst">GitHub</a></li>
       <li><a href="https://github.com/All-Hands-AI/OpenHands">OpenHands</a></li>
