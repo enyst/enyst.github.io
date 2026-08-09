@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Three ways to end the OpenHands agent-server's meta.json / base_state.json split-brain — (a) exclude the agent from the stored record, (b) a minimal 'base_state wins' patch, (c) stop the stored record from inheriting the create-request at all — compared field by field, with the resume/reattach edge case resolved.">
+<link rel="icon" href="data:,">
+<title>Three ways to end the meta.json / base_state.json split</title>
+<style>
+  :root{
+    --fg:#1b1d1f; --muted:#5e646b; --subtle:#858b91;
+    --bg:#fbfbf8; --card:#ffffff; --raised:#f5f4ef;
+    --accent:#2b4eaa; --accent-soft:#e9eefb; --teal:#26736b; --teal-soft:#e5f3f0;
+    --warn:#a9570b; --warn-soft:#fbf0e3; --crit:#9b2929; --crit-soft:#faeaea;
+    --ok:#34753c; --ok-soft:#eaf4eb; --rule:#dfdfd8; --rule-strong:#babbb5;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.62 var(--sans)}
+  a{color:var(--accent)}
+  .wrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;width:100%;max-width:1200px;margin:0 auto;padding:34px 28px 100px}
+  nav,main{min-width:0}
+  nav{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav .home{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}
+  nav h2{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+  nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav li{counter-increment:toc;margin:5px 0}
+  nav li::before{content:counter(toc) ". ";color:var(--subtle)}
+  nav a{color:var(--fg);text-decoration:none} nav a:hover{color:var(--accent)}
+  header{padding:2px 0 26px;border-bottom:1px solid var(--rule);margin-bottom:30px}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{max-width:860px;margin:7px 0 8px;font-size:clamp(32px,5vw,54px);line-height:1.05;letter-spacing:-.04em}
+  header .sub{max-width:820px;margin:0;color:var(--muted);font-size:18px}
+  .meta{margin-top:16px;color:var(--subtle);font:12px/1.5 var(--mono)}
+  h2{font-size:24px;margin:52px 0 12px;letter-spacing:-.02em} h2 .num{margin-right:8px;color:var(--subtle);font-weight:500}
+  h3{font-size:17px;margin:24px 0 8px}
+  p{max-width:820px}
+  code{font:13px var(--mono);background:var(--raised);padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+  pre{max-width:820px;background:var(--raised);border:1px solid var(--rule);border-radius:7px;padding:14px 16px;overflow-x:auto;font:12.5px/1.5 var(--mono)}
+  pre code{background:none;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}
+  .verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}
+  .verdict article,.card{border:1px solid var(--rule);border-radius:8px;background:var(--card);padding:18px}
+  .verdict strong{display:block;margin:8px 0 4px;font-size:16px}
+  .verdict p{margin:0;color:var(--muted);font-size:14px}
+  .pill{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:2px 8px;font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+  .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.crit{color:var(--crit)} .pill.info{color:var(--accent)}
+  .callout{margin:16px 0;padding:13px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 5px 5px 0}
+  .callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+  .callout.crit{border-color:var(--crit);background:var(--crit-soft)}
+  .callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .callout p{margin:0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--rule)}
+  th{background:var(--raised);font-weight:700}
+  .src{font:12px var(--mono);text-decoration:none;border-bottom:1px dotted currentColor;overflow-wrap:anywhere}
+  ul{max-width:820px}
+  .foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--rule);color:var(--subtle);font:12px/1.6 var(--mono)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="home" href="../">← enyst.github.io</a>
+  <h2>On this page</h2>
+  <ol>
+    <li><a href="#verdict">The short version</a></li>
+    <li><a href="#recap">The split, in one paragraph</a></li>
+    <li><a href="#a">Option (a): exclude the agent</a></li>
+    <li><a href="#b">Option (b): base_state wins</a></li>
+    <li><a href="#c">Option (c): break the inheritance</a></li>
+    <li><a href="#edge">The resume/reattach edge</a></li>
+    <li><a href="#decision">Why (c)</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ol>
+</nav>
+<main>
+<header>
+  <div class="eyebrow">OpenHands agent-server · design decision</div>
+  <h1>Three ways to end the split.</h1>
+  <p class="sub">Two earlier notes proved the agent-server writes the whole agent to disk <strong>twice</strong> and planned the single-owner end state. This is the decision note: three concrete ways to actually get there — (a) exclude the agent from the stored record, (b) a minimal "base_state wins" patch, (c) stop the stored record from being a create-request at all — and why (c) wins.</p>
+  <p class="meta">Grounded to software-agent-sdk @ upstream/main be6cd3b80 · companions: <a href="meta-vs-base-state-duplication.html">the duplication study</a> · <a href="meta-vs-base-state-single-source.html">the single-source plan</a> · 🐾</p>
+</header>
+
+<section id="verdict">
+<h2><span class="num">1</span>The short version</h2>
+<div class="verdict">
+  <article>
+    <span class="pill warn">option a</span>
+    <strong>Exclude the agent</strong>
+    <p>Keep <code>StoredConversation(StartConversationRequest)</code>, mark <code>agent</code> as <code>exclude=True</code>. Correct end state, but you fight the class's own shape — every new request field silently leaks back into <code>meta.json</code> unless someone remembers to exclude it.</p>
+  </article>
+  <article>
+    <span class="pill crit">option b</span>
+    <strong>base_state wins</strong>
+    <p>Leave both files carrying the agent; just make resume prefer <code>base_state.json</code> and make <code>switch_llm</code> persist. Smallest blast radius, fixes Neal's symptom — but the ~65&nbsp;KB duplication and the footgun stay.</p>
+  </article>
+  <article>
+    <span class="pill ok">option c ✓</span>
+    <strong>Break the inheritance</strong>
+    <p>Stop <code>StoredConversation</code> from being a <code>StartConversationRequest</code>. The request carries the agent; the stored record lists only what it truly owns. The agent has nowhere to live but <code>base_state.json</code> — by construction.</p>
+  </article>
+</div>
+<p>All three reach the same destination the <a href="meta-vs-base-state-single-source.html">single-source plan</a> named: <code>base_state.json</code> is the one owner of the agent. They differ in <em>how honestly the type system enforces it</em>. (a) enforces by discipline, (b) doesn't enforce at all, (c) makes the duplication structurally impossible.</p>
+</section>
+
+<section id="recap">
+<h2><span class="num">2</span>The split, in one paragraph</h2>
+<p>A conversation's agent — its LLM, condenser, and tools — is persisted in two files. <code>base_state.json</code> is <code>ConversationState</code>, which already owns the full runtime state (agent, workspace, confirmation policy, security analyzer, iteration cap, stats, tags). <code>meta.json</code> is <code>StoredConversation</code>, which <strong>extends <code>StartConversationRequest</code></strong> and therefore re-persists the whole create request, agent included. On resume, <code>EventService.start()</code> rebuilds the agent from <code>meta.json</code> and hands it to <code>ConversationState.create()</code>, which does <code>state.agent = agent</code> — so the <code>meta.json</code> copy <em>wins</em>, and <code>base_state.json</code>'s agent is used only to check the tools still match. Write a model switch to one file and not the other, and a reload silently reverts it. That is the class of bug Neal reported.</p>
+<div class="callout"><p>Root cause in one line: <code>StoredConversation</code> is <em>"the create request, re-persisted."</em> The agent is in <code>meta.json</code> because the request had an agent — not because <code>meta.json</code> needs one.</p></div>
+</section>
+
+<section id="a">
+<h2><span class="num">3</span>Option (a): exclude the agent</h2>
+<p>Keep the inheritance, add a Pydantic <code>exclude=True</code> to the heavy fields so they don't serialize into <code>meta.json</code>, and flip resume to read the agent from <code>base_state.json</code>.</p>
+<pre><code><span class="kw">class</span> StoredConversation(StartConversationRequest):
+    <span class="com"># already excluded today:</span>
+    agent_profile_id: UUID | <span class="kw">None</span> = Field(default=<span class="kw">None</span>, exclude=<span class="kw">True</span>)
+    <span class="com"># (a) would add:</span>
+    agent: AgentBase = Field(exclude=<span class="kw">True</span>)   <span class="com"># stop persisting into meta.json</span></code></pre>
+<p><strong>Scope:</strong> small diff, but it's a diff <em>against the grain</em>. The class still declares it <em>is</em> a create request; you're carving exceptions out of it one field at a time. There's a partial precedent already — <code>agent_profile_id</code> carries a comment: <em>"exclude from the persistence payload so it does not re-appear in meta.json."</em> That comment is the tell: the model's default behavior is to leak, and every field is a landmine. Add a new field to <code>StartConversationRequest</code> next quarter and it silently lands in <code>meta.json</code> unless the author knows this history.</p>
+<p><span class="pill warn">verdict</span> Correct destination, fragile guardrail. Enforced by memory, not by types.</p>
+</section>
+
+<section id="b">
+<h2><span class="num">4</span>Option (b): base_state wins</h2>
+<p>Change nothing structural. Keep <code>agent</code> in both files, but fix the two concrete failure modes: on resume treat <code>base_state.json</code> as authoritative for the agent, and make <code>switch_llm</code> durably rewrite it so an idle-eviction reload can't revert the switch.</p>
+<ul>
+  <li>Resume: don't let the <code>meta.json</code> agent override a newer persisted <code>base_state.json</code>.</li>
+  <li><code>switch_llm</code>: persist the post-switch agent (and repoint condenser/title LLMs, per the <a href="https://github.com/OpenHands/software-agent-sdk">switch_llm footgun</a> we already logged).</li>
+</ul>
+<p><strong>Scope:</strong> the smallest, safest change; ships Neal's fix fast. But it treats the symptom. The ~65&nbsp;KB agent duplication remains, two writable copies of the same object remain, and the next code path that writes the wrong file re-opens the same bug. It is explicitly <em>not</em> "really remove the duplicates."</p>
+<p><span class="pill crit">verdict</span> A good stopgap. Not a fix for the design.</p>
+</section>
+
+<section id="c">
+<h2><span class="num">5</span>Option (c): break the inheritance</h2>
+<p>Fix the modeling error itself. <code>StoredConversation</code> stops inheriting from <code>StartConversationRequest</code>. The request still carries the agent on the wire; the <em>stored record</em> becomes a deliberate, explicit list of only what it owns.</p>
+<pre><code><span class="com"># before</span>
+<span class="kw">class</span> StoredConversation(StartConversationRequest):  <span class="com"># inherits agent, workspace, secrets, ...</span>
+    id: OpenHandsUUID
+    title: str | <span class="kw">None</span> = ...
+
+<span class="com"># after (c)</span>
+<span class="kw">class</span> StoredConversation(OpenHandsModel):   <span class="com"># owns its fields on purpose</span>
+    id: OpenHandsUUID
+    title: str | <span class="kw">None</span> = ...
+    <span class="com"># server-orchestration fields it genuinely needs (see partition)</span>
+    plugins: ...; client_tools: ...; secrets: ...
+    <span class="com"># NO agent field. The agent lives in ConversationState -> base_state.json.</span></code></pre>
+<p>Then the two lifecycle paths become explicit rather than accidental:</p>
+<ul>
+  <li><strong>New conversation:</strong> deserialize the <code>StartConversationRequest</code>; write the list/orchestration fields to <code>meta.json</code>, and the agent into <code>ConversationState</code> → <code>base_state.json</code>. No agent in <code>meta.json</code>, ever.</li>
+  <li><strong>Restore:</strong> load the agent and runtime state from <code>base_state.json</code>; <code>create()</code> keeps <code>state.agent</code> instead of overwriting it. Any runtime change (<code>switch_llm</code>) persists by rewriting <code>base_state.json</code>.</li>
+</ul>
+<p>The field re-homing sorts into three buckets, mechanically:</p>
+<table>
+  <tr><th>Bucket</th><th>Fields (examples)</th><th>Home under (c)</th></tr>
+  <tr><td>Already in <code>ConversationState</code></td><td>agent, workspace, confirmation_policy, security_analyzer, max_iterations, stuck_detection</td><td><code>base_state.json</code> (drop from meta)</td></tr>
+  <tr><td>Server orchestration, not in state</td><td>plugins, client_tools, secrets, agent_definitions, tool_module_qualnames, worktree, autotitle</td><td>explicit fields on <code>StoredConversation</code> → <code>meta.json</code></td></tr>
+  <tr><td>Pure list-view</td><td>id, title, created_at/updated_at, status, tags, metrics</td><td><code>meta.json</code></td></tr>
+</table>
+<p><span class="pill ok">verdict</span> Same destination as (a), but the guardrail is the type itself: with no <code>agent</code> field and no inheritance, the duplication cannot silently return.</p>
+</section>
+
+<section id="edge">
+<h2><span class="num">6</span>The resume/reattach edge</h2>
+<p>The sharp question about (c): a client sends a <code>StartConversationRequest</code> whose id already exists, so the server reloads the existing conversation. Doesn't the incoming request's agent then need to override <code>base_state.json</code>?</p>
+<p>Read the code, and the answer is no — because the server <strong>already</strong> ignores the request's agent on that path. <code>_start_conversation()</code> is get-or-create: if a record or open event service exists for the id, it returns the <em>existing</em> conversation (<code>created=False</code>) built from <code>existing_event_service.stored</code>. The only thing it selectively pulls from the incoming request is the Codex credential secret. The request's agent is discarded today.</p>
+<div class="callout ok"><p>So (c) doesn't introduce a new hazard here — it <em>matches</em> behavior that already exists. Reconfiguring a live conversation's model is the job of the dedicated <code>switch_llm</code> endpoint, not of re-POSTing the create request. Wiring a "request overrides base_state" branch would actually <em>resurrect</em> the split-brain: a client with a stale agent could clobber a persisted switch.</p></div>
+<p>The clean rule that falls out: <strong><code>start_conversation</code> never overrides the persisted agent; <code>switch_llm</code> is the only mutator, and it persists to <code>base_state.json</code>.</strong> One thing to verify while implementing: that no current caller (canvas / app-server) relies on re-sending <code>start_conversation</code> to change a model. The evidence so far says they use <code>switch_llm</code>.</p>
+</section>
+
+<section id="decision">
+<h2><span class="num">7</span>Why (c)</h2>
+<p>(a) and (c) end in the same place; (b) doesn't go all the way. The difference between (a) and (c) is where the invariant lives. (a) keeps the class saying "I am a create request" and then spends <code>exclude=True</code> annotations arguing otherwise — a guardrail made of discipline. (c) removes the false <em>is-a</em>: a stored record is not a create request, it just happens to have been born from one. Once that's true, "what lives in <code>meta.json</code>" is an explicit field list a reviewer reads directly, and the agent duplication is not a bug you prevent but a state you can't express.</p>
+<p>Cost is honest: (c) touches every reader of <code>stored.agent</code> (codex detection, secret scrubbing, title and condenser LLMs, client-tool injection, the ACP model swap) and needs a switch→reload regression test plus a matching note upstream. That's the price of fixing the model instead of the symptom — and it's the one Engel asked for: <em>really</em> remove the duplicates.</p>
+</section>
+
+<section id="sources">
+<h2><span class="num">8</span>Sources</h2>
+<ul>
+  <li><a class="src" href="https://github.com/OpenHands/software-agent-sdk">OpenHands/software-agent-sdk</a> — <code>openhands-agent-server/openhands/agent_server/models.py</code> (<code>StoredConversation</code>), <code>conversation_service.py</code> (<code>_start_conversation</code>, <code>_compose_conversation_info</code>), <code>event_service.py</code> (<code>start</code>), <code>openhands-sdk/openhands/sdk/conversation/state.py</code> (<code>ConversationState.create</code>).</li>
+  <li>Companion notes: <a class="src" href="meta-vs-base-state-duplication.html">the duplication study</a>, <a class="src" href="meta-vs-base-state-single-source.html">the single-source plan</a>.</li>
+</ul>
+<p class="foot">Written from a code read, not a repro, for the resume/reattach edge. Grounded to upstream/main be6cd3b80. 🐾 smolpaws</p>
+</section>
+
+</main>
+</div>
+</body>
+</html>
