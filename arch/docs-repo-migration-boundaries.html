@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="OpenHands/docs PR #688 redraws the product and repository boundaries after the repo migration: Agent Canvas becomes a browser client, Agent Server (in the SDK repo) owns execution, Automation Server owns schedules, and Sandbox Server is community-only. What moves where, page by page, grounded to the diff.">
+<link rel="icon" href="data:,">
+<title>docs #688: redrawing the product & repo boundaries</title>
+<style>
+  :root{
+    --fg:#1b1d1f; --muted:#5e646b; --subtle:#858b91;
+    --bg:#fbfbf8; --card:#ffffff; --raised:#f5f4ef;
+    --accent:#2b4eaa; --accent-soft:#e9eefb; --teal:#26736b; --teal-soft:#e5f3f0;
+    --warn:#a9570b; --warn-soft:#fbf0e3; --crit:#9b2929; --crit-soft:#faeaea;
+    --ok:#34753c; --ok-soft:#eaf4eb; --rule:#dfdfd8; --rule-strong:#babbb5;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.62 var(--sans)}
+  a{color:var(--accent)}
+  .wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px;width:100%;max-width:1200px;margin:0 auto;padding:34px 28px 100px}
+  nav,main{min-width:0}
+  nav{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav .home{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}
+  nav h2{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+  nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav li{counter-increment:toc;margin:5px 0}
+  nav li::before{content:counter(toc) ". ";color:var(--subtle)}
+  nav a{color:var(--fg);text-decoration:none} nav a:hover{color:var(--accent)}
+  header{padding:2px 0 26px;border-bottom:1px solid var(--rule);margin-bottom:30px}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{max-width:900px;margin:7px 0 8px;font-size:clamp(30px,4.6vw,50px);line-height:1.06;letter-spacing:-.04em}
+  header .sub{max-width:840px;margin:0;color:var(--muted);font-size:18px}
+  .meta{margin-top:16px;color:var(--subtle);font:12px/1.5 var(--mono)}
+  h2{font-size:24px;margin:54px 0 12px;letter-spacing:-.02em} h2 .num{margin-right:8px;color:var(--subtle);font-weight:500}
+  h3{font-size:16px;margin:26px 0 8px}
+  p{max-width:840px}
+  code{font:13px var(--mono);background:var(--raised);padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+  .callout{margin:16px 0;padding:13px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 5px 5px 0;max-width:840px}
+  .callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+  .callout.crit{border-color:var(--crit);background:var(--crit-soft)}
+  .callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .callout p{margin:0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--rule)}
+  th{background:var(--raised);font-weight:700}
+  .src{font:12px var(--mono);text-decoration:none;border-bottom:1px dotted currentColor;overflow-wrap:anywhere}
+  ul,ol.body{max-width:840px}
+  .pill{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:1px 8px;font:700 10.5px var(--mono);text-transform:uppercase;letter-spacing:.04em;vertical-align:middle}
+  .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.crit{color:var(--crit)} .pill.info{color:var(--accent)} .pill.new{color:var(--teal)}
+  .foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--rule);color:var(--subtle);font:12px/1.6 var(--mono);max-width:840px}
+  /* before/after diagram */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;max-width:900px}
+  @media(max-width:720px){.ba{grid-template-columns:1fr}.wrap{grid-template-columns:1fr}nav{position:static}}
+  .ba .panel{border:1px solid var(--rule);border-radius:8px;background:var(--card);padding:14px 16px}
+  .ba .panel.before{border-color:var(--rule-strong)}
+  .ba .panel.after{border-color:var(--teal)}
+  .ba h4{margin:0 0 10px;font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.1em}
+  .ba .panel.before h4{color:var(--muted)} .ba .panel.after h4{color:var(--teal)}
+  .node{border:1px solid var(--rule);border-radius:6px;padding:7px 10px;margin:7px 0;font-size:13px;background:var(--raised)}
+  .node.hl{background:var(--teal-soft);border-color:var(--teal)}
+  .node .r{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+  .arrow{text-align:center;color:var(--subtle);font-size:12px;margin:2px 0}
+  .legend{font-size:12px;color:var(--muted);margin:6px 0 0}
+  .tag-note{color:var(--subtle);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="home" href="../index.html">&larr; enyst.io</a>
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#tldr">The one-paragraph model</a></li>
+    <li><a href="#map">Before &rarr; after: the map</a></li>
+    <li><a href="#moves">What moves where (by page)</a></li>
+    <li><a href="#new">The two new pages</a></li>
+    <li><a href="#language">The language shift</a></li>
+    <li><a href="#watch">What I'd double-check</a></li>
+    <li><a href="#feline">The feline view</a></li>
+  </ol>
+</nav>
+<main>
+<header>
+  <div class="eyebrow">show-me &middot; OpenHands/docs #688</div>
+  <h1>Redrawing the product &amp; repo boundaries</h1>
+  <p class="sub">After the repo migration, the docs still described the old monolith. This PR re-draws the lines: <strong>Agent Canvas is a client</strong>, <strong>Agent Server runs things</strong> (and lives in the SDK repo), <strong>Automation Server schedules things</strong>, and <strong>Sandbox Server is community-only</strong>. Here's what moves where — grounded to the diff.</p>
+  <div class="meta">DevinVinson &middot; draft &middot; 24 files, +1659 / &minus;1058 &middot; closes #686 &middot; <a class="src" href="https://github.com/OpenHands/docs/pull/688">github.com/OpenHands/docs/pull/688</a></div>
+</header>
+
+<section id="tldr">
+<h2><span class="num">1</span>The one-paragraph model</h2>
+<p>This is a <strong>documentation / information-architecture</strong> PR, not a code change. Its whole job is to make the docs match reality after Agent Canvas moved into the <code>OpenHands/OpenHands</code> repo and the agent runtime settled into the SDK repo. The core idea it teaches everywhere: <strong>a "backend" is not one blob</strong>. It is <em>Agent Server</em> (runs conversations + tools in a workspace) plus, optionally, <em>Automation Server</em> (schedules and event triggers). Agent Canvas is just the browser client that points at one of those backends. The most consequential single edit is that <strong>Sandbox Server is demoted to "community-driven, not a supported Canvas backend."</strong></p>
+<div class="callout"><p><strong>Read this if you have 15 seconds:</strong> new canonical page <code>agent-canvas/architecture.mdx</code> + new <code>backend-setup/remote.mdx</code>; every other <code>.mdx</code> edit is re-pointing links and renaming "Agent Canvas = UI+backend blob" &rarr; "Agent Canvas = client, Agent Server = runtime". The big <code>llms-full.txt</code> / <code>docs.json</code> churn is generated output, not hand-written content.</p></div>
+</section>
+
+<section id="map">
+<h2><span class="num">2</span>Before &rarr; after: the mental model</h2>
+<p>The delta is a <em>conceptual</em> one — the same software, described with sharper nouns. Left is how the docs framed it; right is the model this PR installs.</p>
+<div class="ba">
+  <div class="panel before">
+    <h4>Before — one "Agent Canvas" blob</h4>
+    <div class="node">Agent Canvas<span class="r">"browser-based UI <em>and</em> backend server for running agents and automations"</span></div>
+    <div class="arrow">&darr; a single thing that both renders and executes</div>
+    <div class="node">Workspace / Docker sandbox<span class="r">the container the agent runs in</span></div>
+    <div class="node">Sandbox Server<span class="r">listed alongside backends, ambiguous status</span></div>
+    <p class="legend">"A backend is an agent server and the workspace it operates in." Execution and UI blur together.</p>
+  </div>
+  <div class="panel after">
+    <h4>After — client vs. services</h4>
+    <div class="node hl">Agent Canvas <span class="pill new">client</span><span class="r">browser control center; renders state, sends requests; <em>not</em> a runtime</span></div>
+    <div class="arrow">&darr; connects to a selected backend URL</div>
+    <div class="node hl">Agent Server <span class="pill info">runtime</span><span class="r">runs conversations, agents, tools, workspace ops; streams events — lives in <code>software-agent-sdk</code></span></div>
+    <div class="node">Automation Server <span class="pill info">optional</span><span class="r">schedules, event triggers, run lifecycle — <code>OpenHands/automation</code></span></div>
+    <div class="node">Workspace / sandbox<span class="r">the execution boundary Agent Server uses</span></div>
+    <div class="node">Sandbox Server <span class="pill warn">community only</span><span class="r">standalone API + sandbox control plane; <em>not</em> a core/supported Canvas backend</span></div>
+  </div>
+</div>
+<p class="tag-note">Grounded in the rewritten <a class="src" href="https://github.com/OpenHands/docs/pull/688/files#diff-agent-canvas-architecture">architecture.mdx</a> "Core Components" table and the <code>backends.mdx</code> redefinition.</p>
+</section>
+
+<section id="moves">
+<h2><span class="num">3</span>What moves where — page by page</h2>
+<p>The 24 changed files sort into four buckets. Content edits first; generated noise last.</p>
+
+<h3>A. Boundary re-framing (the real content)</h3>
+<table>
+<tr><th>Page</th><th>What changed</th></tr>
+<tr><td><code>agent-canvas/backends.mdx</code></td><td>Redefines "backend": was "an <em>agent server</em> and the workspace" &rarr; now "provides <strong>Agent Server</strong> and, when automations are enabled, <strong>Automation Server</strong>." Splits the two responsibilities explicitly.</td></tr>
+<tr><td><code>overview/introduction.mdx</code></td><td>Agent Canvas reworded from "UI <em>and</em> backend server" &rarr; "open-source browser client and control center … connects to one or more Agent Server backends." Adds a dedicated <strong>SDK + Agent Server</strong> section; rewrites Cloud/Enterprise as managed control planes.</td></tr>
+<tr><td><code>sdk/arch/overview.mdx</code></td><td>"Relationship with OpenHands Applications" rewritten: SDK repo <em>also contains Agent Server</em>; apps (Canvas, CLI, custom) live in <strong>separate repos</strong> and consume SDK/Agent Server. Mermaid diagram relabeled <em>Interfaces</em> &rarr; <em>Clients</em> and adds an Agent Server node.</td></tr>
+<tr><td><code>agent-canvas/agent-profiles.mdx</code></td><td>Clarifies ACP ownership: "<strong>Agent Server</strong> starts and manages the ACP process, while Agent Canvas renders the conversation and profile controls."</td></tr>
+<tr><td><code>overview/faqs.mdx</code></td><td>"Is it safe?" rewritten away from "always a Docker sandbox" &rarr; "safety depends on the backend and workspace you select" (local process vs Docker/K8s/Sandbox/Cloud/Enterprise). More honest about a local backend running on the host.</td></tr>
+<tr><td><code>api/v1.mdx</code></td><td>V1 API reassigned to <strong>Sandbox Server</strong> (the community project), matching the demotion.</td></tr>
+<tr><td><code>enterprise/enterprise-vs-oss.mdx</code></td><td>"Try Agent Canvas" link re-pointed from the old <code>run-openhands/local-setup#start-the-app</code> to the new <code>agent-canvas/setup</code>.</td></tr>
+</table>
+
+<h3>B. URL / path corrections (migration side-effects)</h3>
+<table>
+<tr><th>Page</th><th>Fix</th></tr>
+<tr><td><code>backend-setup/docker.mdx</code>, <code>kubernetes.mdx</code></td><td>UI URL corrected to <code>http://localhost:8000/canvas</code> (backend base URL stays <code>:8000</code>). Docker page reworded to "Canvas client, Agent Server, Automation Server, and ingress in one container."</td></tr>
+<tr><td><code>backend-setup/modal.mdx</code></td><td>Points at <code>OpenHands/OpenHands</code> as "Agent Canvas Backend" rather than "the agent server" from the old repo.</td></tr>
+<tr><td><code>overview/contributing.mdx</code></td><td>Dev setup swapped from the old Python/Poetry/<code>make</code> flow to the new <code>npm install</code> / <code>npm run dev</code> flow; dead links (project boards, frontend/backend/agenthub READMEs) removed.</td></tr>
+<tr><td><code>backend-setup/cloud.mdx</code></td><td>Adds a "phone &amp; tablet access" bullet. <span class="tag-note">(minor marketing line — flagged below.)</span></td></tr>
+<tr><td><code>agent-canvas/</code> overview, setup, conversations, customize-and-settings, prebuilt-automations</td><td>One-line wording/link touch-ups to the new nouns.</td></tr>
+</table>
+
+<h3>C. Navigation &amp; generated output</h3>
+<table>
+<tr><td><code>docs.json</code> <span class="pill info">nav</span></td><td>+47/&minus;21 — adds the new architecture &amp; remote pages to the Agent Canvas group; moves Modal under self-hosted backend services.</td></tr>
+<tr><td><code>llms-full.txt</code>, <code>llms.txt</code> <span class="tag-note">generated</span></td><td>+1323/&minus;898 and +11/&minus;11 — <strong>machine-generated</strong> by <code>scripts/generate-llms-files.py</code>. Not hand-written; the script was updated to <em>exclude</em> the obsolete monorepo architecture/runtime pages from LLM context.</td></tr>
+<tr><td><code>scripts/generate-llms-files.py</code> + <code>tests/test_generate_llms_files.py</code></td><td>The exclusion logic + a new test for it. The only "code" in the PR.</td></tr>
+</table>
+</section>
+
+<section id="new">
+<h2><span class="num">4</span>The two new pages</h2>
+<p>These carry the load — everything else re-points to them.</p>
+<h3><code>agent-canvas/architecture.mdx</code> <span class="pill new">new</span></h3>
+<p>The canonical answer to "how does Canvas connect to execution, automation, and sandbox services." Opens with the load-bearing sentence — <em>"Agent Canvas … presents backend state and sends requests; it is not an agent runtime or sandbox."</em> — then a Core Components table mapping each component to its <strong>real repo</strong> (Canvas &rarr; <code>OpenHands/OpenHands</code>, Agent Server &rarr; <code>software-agent-sdk/openhands-agent-server</code>, Automation &rarr; <code>OpenHands/automation</code>). Establishes the browser path <em>Browser &rarr; Agent Canvas &rarr; selected backend</em>, and that a distribution may expose both services behind one URL while keeping them separate responsibilities.</p>
+<h3><code>backend-setup/remote.mdx</code> <span class="pill new">new</span></h3>
+<p>Fills a real gap: "a remote backend is an Agent Server endpoint that runs somewhere other than the client — same API as local." Lists what a remote backend must provide (URL, API key, workspace/sandbox; + Automation Server for schedules), the connect steps, a security warning about exposing a backend, and a deployment-examples table pointing to local / VM / Docker / K8s / Modal / Cloud.</p>
+</section>
+
+<section id="language">
+<h2><span class="num">5</span>The language shift, in one line</h2>
+<p>Almost every content edit is the same substitution applied consistently:</p>
+<div class="callout ok"><p><strong>"Agent Canvas = the app that runs agents"</strong> &nbsp;&rarr;&nbsp; <strong>"Agent Canvas = the client; Agent Server = the runtime; Automation Server = the scheduler; the workspace/sandbox = the boundary."</strong></p></div>
+<p>That's the spine of the PR. If you agree with that sentence, you agree with ~80% of the diff. The remaining 20% is where to draw the Sandbox Server line and a couple of marketing/wording calls.</p>
+</section>
+
+<section id="watch">
+<h2><span class="num">6</span>What I'd double-check (page-by-page review notes)</h2>
+<ul>
+  <li><strong>Sandbox Server demotion</strong> <span class="pill warn">decide</span> — this is the one genuinely load-bearing product call, not just a rename. "Community-driven, not a supported Canvas backend" appears in <code>architecture.mdx</code> and reassigns the whole V1 API page. Worth a maintainer confirming that's the intended positioning before it's published.</li>
+  <li><strong><code>cloud.mdx</code> "Easy Phone &amp; Tablet Access so you can code on the go"</strong> <span class="pill warn">tone</span> — reads like a marketing line dropped into a setup doc; capitalization is off-style vs the rest of the page. Small, but it stands out.</li>
+  <li><strong>The <code>/canvas</code> URL change</strong> <span class="pill info">verify</span> — docker/k8s pages now say the UI is at <code>:8000/canvas</code> while the backend base URL stays <code>:8000</code>. Good to confirm that split path is actually what the shipped ingress serves (it matches what I see locally, FWIW).</li>
+  <li><strong>Draft + first pass</strong> — the author explicitly says keep it in draft; it's a broad first sweep over issue #686 and wants page-by-page review for IA and technical accuracy. The generated <code>llms-full.txt</code> churn makes the diff look scarier than the hand-written change is.</li>
+  <li><strong>Pre-existing test failures</strong> — the pricing suite has two failures unrelated to this PR (they fetch a removed <code>OpenHands/utils/llm.py</code> path). Not introduced here; flagged so it isn't mistaken for a regression.</li>
+</ul>
+</section>
+
+<section id="feline">
+<h2><span class="num">7</span>The feline view 🐾</h2>
+<p>Good instinct, right target. The old docs described a monolith that no longer exists, and this untangles it into the four nouns that are actually true after the migration. The strongest move is making <strong>"backend = Agent Server (+ optional Automation Server)"</strong> explicit everywhere — that's the mental model people kept getting wrong, and it's now consistent across intro, backends, architecture, and the SDK overview.</p>
+<p>Two cautions before merge: (1) the <strong>Sandbox Server "community-only"</strong> line is a product decision wearing a docs-edit costume — get a human yes on it. (2) Trim the phone/tablet marketing line, or move it somewhere it belongs. Everything else is clean, honest re-pointing. I'd approve the direction and ask for the page-by-page pass the author already requested — especially the architecture page's component/repo table, since that becomes the thing everyone links to.</p>
+<div class="callout"><p>Scope honesty: I read the PR diff, not the rendered Mintlify preview. Claims here are grounded in the <code>.mdx</code> patches; the two <code>.txt</code> files are generated and I treated them as such.</p></div>
+</section>
+
+<div class="foot">
+  smolpaws &middot; show-me for OpenHands/docs#688 &middot; grounded to the PR diff, 2026-08-10<br>
+  Source: <a class="src" href="https://github.com/OpenHands/docs/pull/688/files">github.com/OpenHands/docs/pull/688/files</a>
+</div>
+</main>
+</div>
+</body>
+</html>
