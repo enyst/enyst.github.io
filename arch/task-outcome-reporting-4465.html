@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="OpenHands PR #4465 attaches a structured TaskOutcome to the finish tool. This page shows how it unifies two outcome categories — agent-reported completion and system/harness failure — into one type discriminated by a `source` field, and how each is produced.">
+<link rel="icon" href="data:,">
+<title>PR #4465 — one TaskOutcome, two sources (agent vs system)</title>
+<style>
+  :root{
+    --fg:#1b1d1f; --muted:#5e646b; --subtle:#858b91;
+    --bg:#fbfbf8; --card:#ffffff; --raised:#f5f4ef;
+    --accent:#2b4eaa; --accent-soft:#e9eefb; --teal:#26736b; --teal-soft:#e5f3f0;
+    --warn:#a9570b; --warn-soft:#fbf0e3; --crit:#9b2929; --crit-soft:#faeaea;
+    --ok:#34753c; --ok-soft:#eaf4eb; --rule:#dfdfd8; --rule-strong:#babbb5;
+    --orange:#d2691e; --orange-soft:#fbeee0;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.62 var(--sans)}
+  a{color:var(--accent)}
+  .wrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;width:100%;max-width:1200px;margin:0 auto;padding:34px 28px 100px}
+  nav,main{min-width:0}
+  nav{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav .home{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}
+  nav h2{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+  nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav li{counter-increment:toc;margin:5px 0}
+  nav li::before{content:counter(toc) ". ";color:var(--subtle)}
+  nav a{color:var(--fg);text-decoration:none} nav a:hover{color:var(--accent)}
+  header{padding:2px 0 26px;border-bottom:1px solid var(--rule);margin-bottom:30px}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{max-width:860px;margin:7px 0 8px;font-size:clamp(30px,5vw,50px);line-height:1.06;letter-spacing:-.04em}
+  header .sub{max-width:820px;margin:0;color:var(--muted);font-size:18px}
+  .meta{margin-top:16px;color:var(--subtle);font:12px/1.5 var(--mono)}
+  h2{font-size:24px;margin:52px 0 12px;letter-spacing:-.02em} h2 .num{margin-right:8px;color:var(--subtle);font-weight:500}
+  h3{font-size:17px;margin:24px 0 8px}
+  p{max-width:820px}
+  code{font:13px var(--mono);background:var(--raised);padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+  pre{max-width:820px;background:var(--raised);border:1px solid var(--rule);border-radius:7px;padding:14px 16px;overflow-x:auto;font:12.5px/1.5 var(--mono)}
+  pre code{background:none;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}.fn{color:var(--accent)}
+  .verdict{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:22px 0}
+  .verdict article,.card{border:1px solid var(--rule);border-radius:8px;background:var(--card);padding:18px}
+  .verdict strong{display:block;margin:8px 0 4px;font-size:16px}
+  .verdict p{margin:0;color:var(--muted);font-size:14px}
+  .pill{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:2px 8px;font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+  .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.crit{color:var(--crit)} .pill.info{color:var(--accent)} .pill.agent{color:var(--teal)} .pill.system{color:var(--orange)}
+  .callout{margin:16px 0;padding:13px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 5px 5px 0}
+  .callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+  .callout.crit{border-color:var(--crit);background:var(--crit-soft)}
+  .callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .callout.star{border-color:var(--orange);background:var(--orange-soft)}
+  .callout p{margin:0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--rule)}
+  th{background:var(--raised);font-weight:700}
+  .src{font:12px var(--mono);text-decoration:none;border-bottom:1px dotted currentColor;overflow-wrap:anywhere}
+  ul{max-width:820px}
+  details{max-width:820px;margin:12px 0;border:1px solid var(--rule);border-radius:7px;background:var(--card)}
+  details summary{cursor:pointer;padding:10px 14px;font:600 13px var(--sans);color:var(--muted)}
+  details pre{margin:0;border:0;border-top:1px solid var(--rule);border-radius:0 0 7px 7px}
+  figure{margin:22px 0;max-width:920px}
+  figcaption{color:var(--subtle);font-size:13px;margin-top:8px}
+  .foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--rule);color:var(--subtle);font:12px/1.6 var(--mono)}
+  .del{color:var(--crit)} .add{color:var(--ok)}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr;gap:20px}nav{position:static}.verdict{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="home" href="../index.html">← enyst.github.io</a>
+  <h2>On this page</h2>
+  <ol>
+    <li><a href="#tldr">The answer, in one screen</a></li>
+    <li><a href="#model">One type, two sources</a></li>
+    <li><a href="#flow">Before → after: who writes the outcome</a></li>
+    <li><a href="#agent">The agent path (finish tool)</a></li>
+    <li><a href="#system">The system path (harness errors)</a></li>
+    <li><a href="#storage">Where it lives & who reads it</a></li>
+    <li><a href="#files">Changed files</a></li>
+    <li><a href="#open">Open questions for review</a></li>
+  </ol>
+</nav>
+<main>
+<header>
+  <div class="eyebrow">OpenHands · software-agent-sdk · PR #4465</div>
+  <h1>One <code>TaskOutcome</code>, two sources</h1>
+  <p class="sub">Rohit's PR attaches a structured task outcome to the <code>finish</code> tool. Engel's question: does it <em>merge</em> the two categories of outcome — agent-reported vs system/harness failure — and how? Short answer: <strong>yes, into a single type discriminated by a <code>source</code> field</strong>.</p>
+  <div class="meta">
+    fix: attach task outcome to finish tool · base <code>main</code> ← head <code>task-outcome-reporting</code> · 28 files, +1502 / −49 · head <code>be17960</code><br>
+    <a href="https://github.com/OpenHands/software-agent-sdk/pull/4465">github.com/OpenHands/software-agent-sdk/pull/4465</a> · links <a href="https://github.com/OpenHands/automation/issues/323">automation#323</a> · 🐾 smolpaws for Engel
+  </div>
+</header>
+
+<section id="tldr">
+<h2><span class="num">1</span>The answer, in one screen</h2>
+<div class="callout star"><p><strong>They are unified, not kept separate.</strong> There is <em>one</em> model — <code>TaskOutcome</code> — with a field <code>source: Literal["agent","system"]</code>. Both an agent's self-assessment and a harness/LLM failure land in the same shape; only <code>source</code> (plus <code>terminal_reason</code>) records which produced it. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/task_outcome.py#L37-L74">task_outcome.py:37</a></p></div>
+
+<div class="verdict">
+  <article>
+    <span class="pill agent">source = "agent"</span>
+    <strong>The agent decided it was done (or stuck)</strong>
+    <p>Produced when the agent calls <code>finish</code>. The tool now carries a structured <code>task_outcome</code> response schema, so the model reports <code>status</code>, <code>blockers</code>, <code>needs_user_action</code>, <code>confidence</code> alongside its user-facing message. <code>terminal_reason="finish_action"</code>.</p>
+  </article>
+  <article>
+    <span class="pill system">source = "system"</span>
+    <strong>The run died before the agent could finish</strong>
+    <p>Produced by the runtime when a harness/LLM failure ends the run (auth, quota, rate-limit, config, transient, exception, timeout, max-iterations, stuck). Synthesized from <code>ErrorClassification</code>, not the model. Fallback so a conversation <em>always</em> has an outcome.</p>
+  </article>
+</div>
+
+<p><strong>How the "merge" actually works:</strong> the two are merged at the <em>type</em> level (one schema, one storage slot on the conversation), and kept distinguishable at the <em>data</em> level (<code>source</code> + <code>terminal_reason</code>). Downstream consumers — the automation service especially — read one field and branch on <code>source</code>/<code>status</code> if they care. There is no separate "system outcome" object and no separate reporting tool (the old standalone <code>report_task_outcome</code> tool is removed).</p>
+</section>
+
+<section id="model">
+<h2><span class="num">2</span>One type, two sources</h2>
+<p>The whole contract is one small file. The status vocabulary and the discriminator are the parts that answer Engel's question:</p>
+<pre><code><span class="kw">TaskOutcomeStatus</span> = Literal[<span class="str">"success"</span>, <span class="str">"partial_success"</span>, <span class="str">"blocked"</span>, <span class="str">"failed"</span>, <span class="str">"unknown"</span>]
+<span class="kw">TaskOutcomeSource</span> = Literal[<span class="str">"agent"</span>, <span class="str">"system"</span>]   <span class="com"># ← the discriminator</span>
+
+<span class="kw">class</span> <span class="fn">TaskOutcome</span>(BaseModel):
+    status: TaskOutcomeStatus              <span class="com"># semantic assessment</span>
+    summary: str
+    blockers: list[TaskOutcomeBlocker] = []
+    confidence: float | None = None
+    needs_user_action: bool = False
+    source: TaskOutcomeSource = <span class="str">"agent"</span>    <span class="com"># agent | system</span>
+    reported_at: datetime | None = None
+    terminal_reason: str | None = None     <span class="com"># finish_action | exception | timeout | max_iterations | stuck | &lt;code&gt;</span></code></pre>
+<p>A <code>TaskOutcomeBlocker</code> is <code>{type, message, recoverable}</code> — the same blocker shape is used whether the blocker was named by the agent or derived from a failure classification. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/task_outcome.py#L22-L34">task_outcome.py:22</a></p>
+</section>
+
+<section id="flow">
+<h2><span class="num">3</span>Before → after: who writes the outcome</h2>
+<p>Before this PR there was no unified outcome on the conversation. A short-lived standalone <code>report_task_outcome</code> tool existed (opt-in, agent-only) and harness failures had no structured semantic outcome at all. After: both roads lead to one field.</p>
+<figure>
+<svg viewBox="0 0 900 340" width="100%" role="img" aria-label="Before and after diagram of task outcome production">
+  <style>
+    .lbl{font:600 13px var(--sans,sans-serif);fill:#1b1d1f}
+    .sub{font:11px var(--mono,monospace);fill:#5e646b}
+    .box{fill:#fff;stroke:#babbb5;stroke-width:1.5;rx:8}
+    .muted{fill:#f5f4ef;stroke:#dfdfd8;stroke-dasharray:4 3}
+    .agent{fill:#e5f3f0;stroke:#26736b;stroke-width:2}
+    .system{fill:#fbeee0;stroke:#d2691e;stroke-width:2}
+    .sink{fill:#e9eefb;stroke:#2b4eaa;stroke-width:2}
+    .edge{stroke:#858b91;stroke-width:1.6;fill:none;marker-end:url(#a)}
+    .edgen{stroke:#26736b;stroke-width:2;fill:none;marker-end:url(#ag)}
+    .edges{stroke:#d2691e;stroke-width:2;fill:none;marker-end:url(#sy)}
+    .hd{font:800 11px var(--sans,sans-serif);letter-spacing:.1em;fill:#858b91}
+  </style>
+  <defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#858b91"/></marker>
+    <marker id="ag" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#26736b"/></marker>
+    <marker id="sy" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#d2691e"/></marker>
+  </defs>
+
+  <!-- BEFORE -->
+  <text x="20" y="24" class="hd">BEFORE</text>
+  <rect class="box muted" x="20" y="40" width="150" height="46" rx="8"/>
+  <text x="30" y="60" class="lbl">agent calls finish</text>
+  <text x="30" y="76" class="sub">message only</text>
+
+  <rect class="box muted" x="20" y="110" width="150" height="46" rx="8"/>
+  <text x="30" y="130" class="lbl">report_task_outcome</text>
+  <text x="30" y="146" class="sub">standalone tool, opt-in</text>
+
+  <rect class="box muted" x="20" y="180" width="150" height="46" rx="8"/>
+  <text x="30" y="200" class="lbl">harness failure</text>
+  <text x="30" y="216" class="sub">no semantic outcome</text>
+
+  <text x="250" y="130" class="sub" style="fill:#9b2929">no single owner ·<tspan x="250" dy="15">consumers guess</tspan></text>
+
+  <!-- AFTER -->
+  <text x="470" y="24" class="hd">AFTER</text>
+  <rect class="box agent" x="470" y="52" width="180" height="52" rx="8"/>
+  <text x="482" y="74" class="lbl">FinishTool</text>
+  <text x="482" y="90" class="sub">+ task_outcome schema</text>
+
+  <rect class="box system" x="470" y="176" width="180" height="52" rx="8"/>
+  <text x="482" y="198" class="lbl">runtime error path</text>
+  <text x="482" y="214" class="sub">ErrorClassification</text>
+
+  <rect class="box sink" x="720" y="112" width="160" height="60" rx="8"/>
+  <text x="732" y="136" class="lbl">TaskOutcome</text>
+  <text x="732" y="153" class="sub">source: agent|system</text>
+  <text x="732" y="167" class="sub">on ConversationState</text>
+
+  <path class="edgen" d="M650,82 C690,90 690,120 718,128"/>
+  <text x="612" y="120" class="sub" style="fill:#26736b">from_finish()</text>
+  <path class="edges" d="M650,198 C690,190 690,160 718,150"/>
+  <text x="606" y="250" class="sub" style="fill:#d2691e">from_error()</text>
+</svg>
+<figcaption><strong>The delta (orange/teal):</strong> two producers now converge on one <code>TaskOutcome</code> stored on the conversation. The old opt-in tool is gone; harness failures gain a first-class outcome.</figcaption>
+</figure>
+</section>
+
+<section id="agent">
+<h2><span class="num">4</span>The agent path — <code>source="agent"</code></h2>
+<p>The <code>finish</code> tool used to just take a free-text <code>message</code>. Now it attaches a structured response schema, so the model fills in the semantic fields as part of finishing — no extra tool, no extra LLM call.</p>
+<pre><code><span class="com"># finish.py — the tool now carries a structured response schema</span>
+<span class="kw">return</span> [tool.<span class="fn">set_response_schema</span>(FinishTaskOutcomeResponse)]
+
+<span class="com"># task_outcome.py — normalize what the agent reported</span>
+<span class="kw">def</span> <span class="fn">task_outcome_from_finish</span>(outcome: TaskOutcome) -> TaskOutcome:
+    <span class="kw">return</span> outcome.model_copy(update={
+        <span class="str">"source"</span>: <span class="str">"agent"</span>,
+        <span class="str">"reported_at"</span>: utc_now(),
+        <span class="str">"terminal_reason"</span>: <span class="str">"finish_action"</span>,
+    })</code></pre>
+<p>The tool description now tells the model: use <code>message</code> for the user-facing summary, put status/blockers/confidence in <code>task_outcome</code>. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/tool/builtins/finish.py#L50-L58">finish.py:50</a> · <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/task_outcome.py#L88-L97">task_outcome.py:88</a></p>
+</section>
+
+<section id="system">
+<h2><span class="num">5</span>The system path — <code>source="system"</code></h2>
+<p>When the run ends without the agent finishing, the runtime synthesizes an outcome from the failure. This is the part that makes the abstraction "unified": a harness failure is expressed in the <em>same</em> vocabulary the agent uses.</p>
+<pre><code><span class="kw">def</span> <span class="fn">task_outcome_from_error</span>(*, code, detail, classification=None, terminal_reason=None):
+    status = <span class="str">"failed"</span>
+    <span class="kw">if</span> classification <span class="kw">is not</span> None:
+        recoverable = classification.retryable <span class="kw">or</span> classification.user_action != <span class="str">"none"</span>
+        needs_user_action = classification.user_action == <span class="str">"settings"</span>
+        <span class="kw">if</span> classification.kind <span class="kw">in</span> {AUTH, QUOTA, CONFIG, RATE_LIMIT, TRANSIENT}:
+            status = <span class="str">"blocked"</span>          <span class="com"># recoverable → "blocked", not "failed"</span>
+    <span class="kw">return</span> TaskOutcome(status=status, summary=summary,
+        blockers=[TaskOutcomeBlocker(type=blocker_type, message=summary, recoverable=recoverable)],
+        needs_user_action=needs_user_action, source=<span class="str">"system"</span>,
+        reported_at=utc_now(), terminal_reason=terminal_reason <span class="kw">or</span> code)</code></pre>
+<div class="callout"><p>The mapping decision worth noting for review: recoverable harness failures (auth / quota / config / rate-limit / transient) become <code>status="blocked"</code>, everything else <code>"failed"</code>. So <code>blocked</code> spans <em>both</em> "agent is blocked and needs help" and "harness is blocked but retryable" — the reader tells them apart by <code>source</code>. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/task_outcome.py#L99-L141">task_outcome.py:99</a></p></div>
+</section>
+
+<section id="storage">
+<h2><span class="num">6</span>Where it lives &amp; who reads it</h2>
+<ul>
+  <li><strong>Stored once</strong>, on <code>ConversationState.task_outcome</code> — persisted in <code>base_state.json</code> like the rest of runtime state. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/conversation/state.py#L222-L230">state.py:222</a></li>
+  <li><strong>Recorded via a callback wrapper</strong> — <code>LocalConversation</code> wraps its event callback with <code>_task_outcome_recording(...)</code>, so finishing (or failing) updates the field automatically. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py#L413-L418">local_conversation.py:413</a></li>
+  <li><strong>Exposed on the API</strong> — agent-server <code>ConversationInfo</code> gains a <code>task_outcome</code> field, and <code>BaseConversation</code> a <code>task_outcome</code> property, so SDK / remote / server consumers read it uniformly. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-agent-server/openhands/agent_server/models.py#L206-L209">models.py:206</a></li>
+  <li><strong>Forwarded to automations, opt-in</strong> — <code>BaseWorkspace</code> can attach the outcome as <code>agent_outcome</code> on the completion callback, but only when the automation service advertises support via <code>AUTOMATION_CALLBACK_SUPPORTS_AGENT_OUTCOME</code> (older services reject unknown fields). <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/workspace/base.py#L86-L106">workspace/base.py:86</a></li>
+</ul>
+<p>This is why the PR message frames it around automations: the whole point is that a background/automation run <em>always</em> ends with a machine-parsable outcome — whether the agent declared it or the harness died — so downstream services (e.g. "email the user that conversation X is blocked because Y") can act without per-automation configuration.</p>
+</section>
+
+<section id="files">
+<h2><span class="num">7</span>Changed files</h2>
+<p>28 files; the ones that carry the design:</p>
+<table>
+  <tr><th>File</th><th></th><th>Role</th></tr>
+  <tr><td><code>sdk/task_outcome.py</code></td><td><span class="pill ok">new</span></td><td>The unified model + both constructors (<code>from_finish</code>, <code>from_error</code>).</td></tr>
+  <tr><td><code>sdk/tool/builtins/finish.py</code></td><td>✏️</td><td>Attaches <code>FinishTaskOutcomeResponse</code> schema; reworded description.</td></tr>
+  <tr><td><code>sdk/conversation/state.py</code></td><td>✏️</td><td>New <code>task_outcome</code> field on persisted state.</td></tr>
+  <tr><td><code>sdk/conversation/impl/local_conversation.py</code></td><td>✏️</td><td><code>_task_outcome_recording</code> callback; agent-finish + error → outcome.</td></tr>
+  <tr><td><code>sdk/conversation/base.py</code> / <code>remote_conversation.py</code></td><td>✏️</td><td><code>task_outcome</code> property across conversation impls.</td></tr>
+  <tr><td><code>agent_server/models.py</code></td><td>✏️</td><td><code>task_outcome</code> on <code>ConversationInfo</code> (API surface).</td></tr>
+  <tr><td><code>sdk/workspace/base.py</code></td><td>✏️</td><td>Opt-in <code>agent_outcome</code> on automation completion callback.</td></tr>
+  <tr><td><code>examples/…/57_task_outcome_missing_mcp.py</code> · <code>tests/sdk/tool/test_finish_task_outcome.py</code></td><td><span class="pill ok">new</span></td><td>Worked example (blocked-on-missing-MCP) + 395-line test.</td></tr>
+</table>
+<details><summary>Show the core diff — <code>finish.py</code> (tool gains the schema)</summary>
+<pre><code>-        return [
+-            cls(action_type=FinishAction, observation_type=FinishObservation,
+-                description=TOOL_DESCRIPTION, executor=FinishExecutor(), …)
+-        ]
++        tool = cls(action_type=FinishAction, observation_type=FinishObservation,
++            description=TOOL_DESCRIPTION, executor=FinishExecutor(), …)
++        return [tool.set_response_schema(FinishTaskOutcomeResponse)]</code></pre>
+</details>
+</section>
+
+<section id="open">
+<h2><span class="num">8</span>Open questions for review</h2>
+<p>Reading the diff, the discussion points that map to the thread (Xingyao: "not sure we need that / prefer to delete"; Engel: "we <em>did</em> have finish-tool trouble in v0"):</p>
+<ul>
+  <li><strong>Overloading <code>finish</code>.</strong> Engel's v0 memory — some LLMs treated <code>finish</code> as mandatory-after-every-step. Adding a required-looking structured schema to <code>finish</code> could nudge that behavior back on weaker models. Worth an eval on a cheaper model before merge.</li>
+  <li><strong>One <code>status</code> vocabulary, two meanings for <code>blocked</code>.</strong> Agent-blocked and harness-blocked share the enum value and separate only by <code>source</code>. Fine if every consumer reads <code>source</code>; a foot-gun if any consumer keys on <code>status</code> alone.</li>
+  <li><strong>Additive surface.</strong> New field on persisted <code>ConversationState</code> + <code>ConversationInfo</code> + a workspace env flag. Xingyao's "hard to remove once added" caution applies; the opt-in env gate for automations is the mitigation.</li>
+</ul>
+<div class="callout ok"><p><strong>Net:</strong> the answer to the thread question is unambiguous in the code — the two outcome categories are <em>unified into one <code>TaskOutcome</code> type</em>, produced by two constructors, discriminated by <code>source</code>. The design debate is not "are they merged" but "should <code>finish</code> be the carrier, and is one <code>status</code> enum across both origins the right granularity."</p></div>
+</section>
+
+<div class="foot">
+  Built with the <code>show-me</code> skill · grounded to head <code>be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3</code> · from a code read of PR #4465, not a live run.<br>
+  🐾 smolpaws · for Engel · <a href="https://github.com/OpenHands/software-agent-sdk/pull/4465">PR #4465</a>
+</div>
+</main>
+</div>
+</body>
+</html>
