@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="KISS comparison of the outbox (delivery / result-return) in two designs: the OpenHands automation repo's single completion callback vs SmolPaws' message-work coordinator's durable per-message delivery queue — and where PR #4465's TaskOutcome fits.">
+<link rel="icon" href="data:,">
+<title>Outbox, compared — automation repo vs coordinator</title>
+<style>
+  :root{
+    --fg:#1b1d1f; --muted:#5e646b; --subtle:#858b91;
+    --bg:#fbfbf8; --card:#ffffff; --raised:#f5f4ef;
+    --accent:#2b4eaa; --accent-soft:#e9eefb; --teal:#26736b; --teal-soft:#e5f3f0;
+    --warn:#a9570b; --warn-soft:#fbf0e3; --crit:#9b2929; --crit-soft:#faeaea;
+    --ok:#34753c; --ok-soft:#eaf4eb; --rule:#dfdfd8; --rule-strong:#babbb5;
+    --orange:#d2691e; --orange-soft:#fbeee0;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.62 var(--sans)}
+  a{color:var(--accent)}
+  .wrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;width:100%;max-width:1200px;margin:0 auto;padding:34px 28px 100px}
+  nav,main{min-width:0}
+  nav{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav .home{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}
+  nav h2{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+  nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav li{counter-increment:toc;margin:5px 0}
+  nav li::before{content:counter(toc) ". ";color:var(--subtle)}
+  nav a{color:var(--fg);text-decoration:none} nav a:hover{color:var(--accent)}
+  header{padding:2px 0 26px;border-bottom:1px solid var(--rule);margin-bottom:30px}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{max-width:860px;margin:7px 0 8px;font-size:clamp(30px,5vw,50px);line-height:1.06;letter-spacing:-.04em}
+  header .sub{max-width:820px;margin:0;color:var(--muted);font-size:18px}
+  .meta{margin-top:16px;color:var(--subtle);font:12px/1.5 var(--mono)}
+  h2{font-size:24px;margin:52px 0 12px;letter-spacing:-.02em} h2 .num{margin-right:8px;color:var(--subtle);font-weight:500}
+  h3{font-size:17px;margin:24px 0 8px}
+  p{max-width:820px}
+  code{font:13px var(--mono);background:var(--raised);padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+  pre{max-width:820px;background:var(--raised);border:1px solid var(--rule);border-radius:7px;padding:14px 16px;overflow-x:auto;font:12.5px/1.5 var(--mono)}
+  pre code{background:none;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}.fn{color:var(--accent)}
+  .verdict{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:22px 0}
+  .verdict article{border:1px solid var(--rule);border-radius:8px;background:var(--card);padding:18px}
+  .verdict article.aut{border-top:3px solid var(--warn)}
+  .verdict article.coord{border-top:3px solid var(--teal)}
+  .verdict strong{display:block;margin:8px 0 4px;font-size:16px}
+  .verdict p{margin:0;color:var(--muted);font-size:14px}
+  .pill{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:2px 8px;font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+  .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.crit{color:var(--crit)} .pill.info{color:var(--accent)} .pill.aut{color:var(--warn)} .pill.coord{color:var(--teal)}
+  .callout{margin:16px 0;padding:13px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 5px 5px 0;max-width:840px}
+  .callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+  .callout.star{border-color:var(--orange);background:var(--orange-soft)}
+  .callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .callout p{margin:0}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+  th,td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--rule)}
+  th{background:var(--raised);font-weight:700}
+  td.aut{background:var(--warn-soft)} td.coord{background:var(--teal-soft)}
+  .src{font:12px var(--mono);text-decoration:none;border-bottom:1px dotted currentColor;overflow-wrap:anywhere}
+  ul{max-width:820px}
+  figure{margin:22px 0;max-width:940px}
+  figcaption{color:var(--subtle);font-size:13px;margin-top:8px}
+  .foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--rule);color:var(--subtle);font:12px/1.6 var(--mono)}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr;gap:20px}nav{position:static}.verdict{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="home" href="../index.html">← enyst.github.io</a>
+  <h2>On this page</h2>
+  <ol>
+    <li><a href="#tldr">The one idea</a></li>
+    <li><a href="#pict">The two outboxes, side by side</a></li>
+    <li><a href="#aut">Automation repo: one callback</a></li>
+    <li><a href="#coord">Coordinator: a delivery queue</a></li>
+    <li><a href="#table">Feature-by-feature</a></li>
+    <li><a href="#4465">Where PR #4465 fits</a></li>
+    <li><a href="#take">So what</a></li>
+  </ol>
+</nav>
+<main>
+<header>
+  <div class="eyebrow">SmolPaws · message-work · outbox</div>
+  <h1>Two outboxes, compared</h1>
+  <p class="sub">Your read weeks ago: in the automation repo the message queue's <em>inbox</em> was carefully designed, but the <em>outbox</em> felt thin. This is the KISS comparison — the automation repo's result-return vs our coordinator's delivery queue — and where Rohit's <code>TaskOutcome</code> (PR #4465) lands.</p>
+  <div class="meta">
+    sources: <code>~/repos/automation</code> @ main · <code>smolpaws/src/coordinator/</code> @ Aug 5 · <a href="smolpaws-message-work-adr.html">message-work ADR</a> · <a href="task-outcome-reporting-4465.html">#4465 show-me</a><br>
+    🐾 smolpaws · for Engel · from a code read, not a live run
+  </div>
+</header>
+
+<section id="tldr">
+<h2><span class="num">1</span>The one idea</h2>
+<div class="callout star"><p><strong>They solve different halves of "outbox," and that's the whole comparison.</strong> The automation repo's outbox is <em>one terminal result callback per run</em> — "the run finished, here's the status." Our coordinator's outbox is a <em>durable per-message delivery queue</em> — "these N messages must reach this channel, exactly-ish once, in order, and I must know if a send's fate is unknown." PR #4465 makes the automation repo's <em>one callback richer</em> (a structured <code>TaskOutcome</code>); it does not give it delivery semantics.</p></div>
+<div class="verdict">
+  <article class="aut">
+    <span class="pill aut">automation repo</span>
+    <strong>Result-return, once</strong>
+    <p>The SDK inside the sandbox POSTs <code>/v1/runs/{id}/complete</code> on exit with <code>{status, conversation_id, error}</code>. Coarse, terminal, fire-and-forget. A watchdog covers a missed callback. No per-message delivery, no ret/ack of user-facing messages.</p>
+  </article>
+  <article class="coord">
+    <span class="pill coord">coordinator</span>
+    <strong>Delivery queue, per message</strong>
+    <p>Each outbound (a <code>send_message</code> the agent emits) becomes a durable <code>delivery</code> work row: claim → send → ack, with head-of-line order, fenced claims, backoff, and a first-class <code>delivery_unknown</code> for "the send's effect is ambiguous — never blind-retry."</p>
+  </article>
+</div>
+</section>
+
+<section id="pict">
+<h2><span class="num">2</span>The two outboxes, side by side</h2>
+<figure>
+<svg viewBox="0 0 920 300" width="100%" role="img" aria-label="Side by side of the two outbox designs">
+  <style>
+    .t{font:600 13px var(--sans,sans-serif);fill:#1b1d1f}.s{font:11px var(--mono,monospace);fill:#5e646b}
+    .hd{font:800 11px var(--sans,sans-serif);letter-spacing:.1em}
+    .b{fill:#fff;stroke-width:2;rx:8}.aut{stroke:#a9570b}.co{stroke:#26736b}.n{stroke:#babbb5;stroke-width:1.5}
+    .e{fill:none;stroke-width:1.8}.ea{stroke:#a9570b;marker-end:url(#ma)}.ec{stroke:#26736b;marker-end:url(#mc)}.en{stroke:#858b91;marker-end:url(#mn)}
+  </style>
+  <defs>
+    <marker id="ma" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#a9570b"/></marker>
+    <marker id="mc" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#26736b"/></marker>
+    <marker id="mn" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#858b91"/></marker>
+  </defs>
+
+  <text x="20" y="20" class="hd" fill="#a9570b">AUTOMATION REPO · one terminal callback</text>
+  <rect class="b n" x="20" y="36" width="110" height="44"/><text x="30" y="55" class="t">agent run</text><text x="30" y="71" class="s">in sandbox</text>
+  <rect class="b aut" x="190" y="36" width="150" height="44"/><text x="200" y="55" class="t">SDK __exit__</text><text x="200" y="71" class="s">POST /runs/:id/complete</text>
+  <rect class="b n" x="400" y="36" width="150" height="44"/><text x="410" y="55" class="t">automation_runs</text><text x="410" y="71" class="s">status COMPLETED|FAILED</text>
+  <path class="e ea" d="M130,58 L188,58"/>
+  <path class="e ea" d="M340,58 L398,58"/>
+  <text x="150" y="110" class="s">one shot · {status, conversation_id, error} · watchdog if missed</text>
+
+  <line x1="20" y1="150" x2="620" y2="150" stroke="#dfdfd8"/>
+
+  <text x="20" y="184" class="hd" fill="#26736b">COORDINATOR · durable per-message delivery queue</text>
+  <rect class="b n" x="20" y="200" width="110" height="44"/><text x="30" y="219" class="t">agent emits</text><text x="30" y="235" class="s">send_message ×N</text>
+  <rect class="b co" x="185" y="200" width="140" height="44"/><text x="195" y="219" class="t">projector</text><text x="195" y="235" class="s">events → delivery rows</text>
+  <rect class="b co" x="380" y="192" width="160" height="60"/><text x="390" y="212" class="t">work (delivery)</text><text x="390" y="228" class="s">claim→send→ack</text><text x="390" y="243" class="s">order · backoff · unknown</text>
+  <rect class="b n" x="600" y="200" width="120" height="44"/><text x="610" y="219" class="t">channel</text><text x="610" y="235" class="s">WA/Slack/…</text>
+  <path class="e ec" d="M130,222 L183,222"/>
+  <path class="e ec" d="M325,222 L378,222"/>
+  <path class="e ec" d="M540,222 L598,222"/>
+  <text x="150" y="278" class="s">per message · exactly-ish once · head-of-line order · delivery_unknown never blind-retries</text>
+</svg>
+<figcaption>Same word, different scope. The automation outbox returns <em>one run result</em>; the coordinator outbox delivers <em>each message</em> with durability guarantees.</figcaption>
+</figure>
+</section>
+
+<section id="aut">
+<h2><span class="num">3</span>Automation repo — one completion callback</h2>
+<p>The automation service's result-return is a single endpoint. The SDK inside the execution sandbox calls it on context-manager exit:</p>
+<pre><code><span class="com"># automation/schemas.py:614 — the entire outbound payload</span>
+<span class="kw">class</span> <span class="fn">RunCompleteRequest</span>(BaseModel):
+    status: Literal[<span class="str">"COMPLETED"</span>, <span class="str">"FAILED"</span>]
+    run_id: str | None = None
+    conversation_id: str | None = None
+    error: str | None = None      <span class="com"># free-text, only when FAILED</span>
+
+<span class="com"># automation/router.py:325 — RUNNING → COMPLETED|FAILED, optimistic lock</span>
+<span class="kw">@router.post</span>(<span class="str">"/runs/{run_id}/complete"</span>)</code></pre>
+<ul>
+  <li><strong>Binary status</strong> — COMPLETED or FAILED, plus a free-text <code>error</code>. No "blocked", no "needs user action", no confidence, no structured blockers.</li>
+  <li><strong>Terminal, once per run</strong> — it reports the <em>run</em> ending, not individual user-facing messages. Fire-and-forget; a <strong>watchdog</strong> marks FAILED if the callback is missed (<code>watchdog.py:198</code>).</li>
+  <li><strong>No message delivery at all</strong> — there is no notion of "deliver these replies to a channel, retry, ack." That was never the automation outbox's job. <a class="src" href="https://github.com/OpenHands/automation">OpenHands/automation</a></li>
+</ul>
+<div class="callout warn"><p>This is the "unfinished outbox" feel: the <em>inbox</em> side (dispatcher: <code>SELECT … FOR UPDATE SKIP LOCKED</code> atomic claim, PENDING queue, per-run dedup) is a real queue; the <em>outbox</em> side is a single status ping. Fine for "did the background run pass or fail," thin for "reliably return work products to a human."</p></div>
+</section>
+
+<section id="coord">
+<h2><span class="num">4</span>Coordinator — a real delivery queue</h2>
+<p>Our coordinator treats delivery as first-class durable work. Each outbound message is a <code>delivery</code> row in the unified <code>work</code> table with its own lifecycle:</p>
+<pre><code><span class="com"># coordinator/types.ts — the delivery vocabulary</span>
+WorkState = <span class="str">'ready'</span> | <span class="str">'claimed'</span> | <span class="str">'done'</span> | <span class="str">'retry_wait'</span> | <span class="str">'failed'</span> | <span class="str">'delivery_unknown'</span>
+SettleOutcome = {done, externalMessageId} | {retry} | {delivery_unknown} | {fail}
+
+markSending(claim)   <span class="com"># durably set send_attempted=1 BEFORE the network send</span>
+settle(claim, outcome)</code></pre>
+<ul>
+  <li><strong>Per-message</strong> — the projector turns durable <code>send_message</code> action events into delivery rows (destination = the conversation's bound lane). <a class="src" href="#">DESIGN.md §8 D1</a></li>
+  <li><strong>Head-of-line order</strong> — a later message never overtakes an unresolved earlier one in the same lane.</li>
+  <li><strong>Fenced claims + backoff</strong> — single-winner claim under concurrent workers; expiry → exponential backoff → <code>failed</code>.</li>
+  <li><strong><code>delivery_unknown</code> is the headline</strong> — <code>send_attempted=1</code> is set durably <em>before</em> the send; if the claim then expires with the response lost, the row goes to <code>delivery_unknown</code> and <strong>never auto-retries</strong> (an ambiguous send is never blind-replayed). This is the exact gap the old runner's outbox had (<em>"no <code>delivery_unknown</code>: an ambiguous send is either dropped or blindly re-sent"</em>).</li>
+</ul>
+<div class="callout ok"><p>So the coordinator's outbox answers the questions the automation callback can't: <em>which</em> message, <em>in what order</em>, <em>delivered or not</em>, and <em>what to do when we can't tell</em>.</p></div>
+</section>
+
+<section id="table">
+<h2><span class="num">5</span>Feature-by-feature</h2>
+<table>
+  <tr><th>Outbox concern</th><th>Automation repo</th><th>Coordinator</th></tr>
+  <tr><td>Unit</td><td class="aut">whole run</td><td class="coord">each message / outbound</td></tr>
+  <tr><td>Result vocabulary</td><td class="aut">COMPLETED / FAILED + free-text error</td><td class="coord">ready/claimed/done/retry_wait/failed/<b>delivery_unknown</b></td></tr>
+  <tr><td>User-facing message delivery</td><td class="aut">— (not its job)</td><td class="coord">projected from <code>send_message</code>, delivered to a lane</td></tr>
+  <tr><td>Ordering</td><td class="aut">n/a</td><td class="coord">per-lane head-of-line, monotonic sequence</td></tr>
+  <tr><td>Retry / claim</td><td class="aut">watchdog re-check on missed callback</td><td class="coord">fenced compare-and-set claim, expiry, backoff</td></tr>
+  <tr><td>Ambiguous send</td><td class="aut">— (can double-send or drop)</td><td class="coord"><code>delivery_unknown</code>, never blind-retried</td></tr>
+  <tr><td>Idempotency</td><td class="aut">optimistic lock on run row</td><td class="coord">unique <code>(kind, source_key)</code>; deterministic event id on intake</td></tr>
+  <tr><td>Semantic outcome (success/blocked/…)</td><td class="aut">binary — <b>#4465 enriches this</b></td><td class="coord">not modeled here (delivery ≠ semantics)</td></tr>
+</table>
+</section>
+
+<section id="4465">
+<h2><span class="num">6</span>Where PR #4465 fits</h2>
+<p>#4465 (<code>TaskOutcome</code>) is an <strong>enrichment of the automation repo's completion callback</strong>, not a delivery-queue feature. It upgrades the coarse <code>{status: COMPLETED|FAILED, error}</code> into a structured <code>{status: success|partial_success|blocked|failed|unknown, blockers[], needs_user_action, confidence, source}</code> and forwards it as <code>agent_outcome</code> on that same completion callback (opt-in via <code>AUTOMATION_CALLBACK_SUPPORTS_AGENT_OUTCOME</code>). <a href="task-outcome-reporting-4465.html">details</a></p>
+<div class="callout"><p><strong>The clean way to see all three:</strong> the automation callback is a <em>run-level result</em> channel; #4465 makes that result <em>semantically rich</em>; the coordinator is a <em>message-level delivery</em> channel. #4465 and the coordinator are complementary, not overlapping — one answers "how did the task go," the other "did each reply actually get out."</p></div>
+<p>The one place they touch: a "blocked, needs user action" <code>TaskOutcome</code> is exactly the kind of thing that should <em>then</em> be delivered to the user — i.e. #4465 produces content that a coordinator-style outbox would deliver. Task outcome = <em>what to say</em>; delivery queue = <em>getting it there reliably</em>.</p>
+</section>
+
+<section id="take">
+<h2><span class="num">7</span>So what</h2>
+<ul>
+  <li><strong>Your instinct holds:</strong> the automation repo's outbox is genuinely the thin side — a single terminal status callback, no per-message delivery, no ambiguous-send handling. The inbox (dispatcher/queue) is the finished part.</li>
+  <li><strong>#4465 improves the thin side without changing its shape</strong> — richer result, still one callback per run. It does not add delivery semantics, and it doesn't need to.</li>
+  <li><strong>The coordinator is the missing delivery half</strong> — and it already models the hard case (<code>delivery_unknown</code>) that neither the automation callback nor the old SmolPaws runner handled.</li>
+  <li><strong>Open question for us:</strong> do we want the coordinator to also carry a <em>semantic</em> outcome per lane (mirroring #4465's <code>TaskOutcome</code>) so a "blocked" result can be delivered as a message, or keep semantics strictly upstream and let the coordinator stay a dumb, reliable pipe? KISS says: keep it a pipe; let <code>TaskOutcome</code> be payload.</li>
+</ul>
+</section>
+
+<div class="foot">
+  automation @ <code>~/repos/automation</code> main · coordinator @ <code>smolpaws/src/coordinator</code> (Aug 5) · ADR <a href="smolpaws-message-work-adr.html">smolpaws-message-work-adr</a><br>
+  🐾 smolpaws · for Engel · code read, not a live run · KISS by request
+</div>
+</main>
+</div>
+</body>
+</html>
