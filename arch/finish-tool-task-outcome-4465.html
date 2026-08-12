@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Before/after of just the FinishTool change in OpenHands PR #4465 — the tool description (prompt) reword and the added structured task_outcome response schema, shown against the unchanged FinishAction.">
+<link rel="icon" href="data:,">
+<title>FinishTool before → after (PR #4465)</title>
+<style>
+  :root{
+    --fg:#1b1d1f; --muted:#5e646b; --subtle:#858b91;
+    --bg:#fbfbf8; --card:#ffffff; --raised:#f5f4ef;
+    --accent:#2b4eaa; --accent-soft:#e9eefb; --teal:#26736b; --teal-soft:#e5f3f0;
+    --warn:#a9570b; --warn-soft:#fbf0e3; --crit:#9b2929; --crit-soft:#faeaea;
+    --ok:#34753c; --ok-soft:#eaf4eb; --rule:#dfdfd8; --rule-strong:#babbb5;
+    --orange:#d2691e; --orange-soft:#fbeee0;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.62 var(--sans)}
+  a{color:var(--accent)}
+  .wrap{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;width:100%;max-width:1200px;margin:0 auto;padding:34px 28px 100px}
+  nav,main{min-width:0}
+  nav{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav .home{display:inline-block;margin-bottom:24px;text-decoration:none;font-weight:700}
+  nav h2{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+  nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav li{counter-increment:toc;margin:5px 0}
+  nav li::before{content:counter(toc) ". ";color:var(--subtle)}
+  nav a{color:var(--fg);text-decoration:none} nav a:hover{color:var(--accent)}
+  header{padding:2px 0 26px;border-bottom:1px solid var(--rule);margin-bottom:30px}
+  .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{max-width:860px;margin:7px 0 8px;font-size:clamp(30px,5vw,50px);line-height:1.06;letter-spacing:-.04em}
+  header .sub{max-width:820px;margin:0;color:var(--muted);font-size:18px}
+  .meta{margin-top:16px;color:var(--subtle);font:12px/1.5 var(--mono)}
+  h2{font-size:24px;margin:52px 0 12px;letter-spacing:-.02em} h2 .num{margin-right:8px;color:var(--subtle);font-weight:500}
+  h3{font-size:16px;margin:22px 0 6px;font-family:var(--mono);letter-spacing:.02em}
+  p{max-width:820px}
+  code{font:13px var(--mono);background:var(--raised);padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+  pre{margin:0;background:var(--raised);border:1px solid var(--rule);border-radius:7px;padding:14px 16px;overflow-x:auto;font:12.5px/1.5 var(--mono)}
+  pre code{background:none;padding:0}
+  .kw{color:#7048a8}.str{color:var(--ok)}.com{color:var(--subtle);font-style:italic}.fn{color:var(--accent)}
+  .pill{display:inline-block;border:1px solid currentColor;border-radius:999px;padding:2px 8px;font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+  .pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)} .pill.crit{color:var(--crit)} .pill.info{color:var(--accent)}
+  .callout{margin:16px 0;padding:13px 16px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 5px 5px 0;max-width:820px}
+  .callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+  .callout.star{border-color:var(--orange);background:var(--orange-soft)}
+  .callout p{margin:0}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0;max-width:1000px}
+  .ba .side{border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--card)}
+  .ba .side.after{border-color:var(--orange)}
+  .ba .cap{font:700 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--rule)}
+  .ba .side.before .cap{color:var(--subtle);background:var(--raised)}
+  .ba .side.after .cap{color:var(--orange);background:var(--orange-soft)}
+  .ba pre{border:0;border-radius:0;background:transparent}
+  .hl{background:var(--orange-soft);display:block;border-left:3px solid var(--orange);padding-left:8px;margin-left:-11px}
+  .dim{opacity:.55}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;max-width:900px}
+  th,td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--rule)}
+  th{background:var(--raised);font-weight:700}
+  .src{font:12px var(--mono);text-decoration:none;border-bottom:1px dotted currentColor;overflow-wrap:anywhere}
+  ul{max-width:820px}
+  .foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--rule);color:var(--subtle);font:12px/1.6 var(--mono)}
+  @media(max-width:820px){.wrap{grid-template-columns:1fr;gap:20px}nav{position:static}.ba{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="home" href="../index.html">← enyst.github.io</a>
+  <h2>On this page</h2>
+  <ol>
+    <li><a href="#tldr">What changed, exactly</a></li>
+    <li><a href="#prompt">The prompt (tool description)</a></li>
+    <li><a href="#schema">The definition (action + schema)</a></li>
+    <li><a href="#model">What the model now sees</a></li>
+    <li><a href="#risk">The v0 risk</a></li>
+  </ol>
+</nav>
+<main>
+<header>
+  <div class="eyebrow">OpenHands · PR #4465 · FinishTool only</div>
+  <h1>FinishTool: before → after</h1>
+  <p class="sub">Just the agent-facing change: what the <code>finish</code> tool's <strong>prompt</strong> and <strong>definition</strong> looked like before, and after this PR. Everything else from #4465 (system outcomes, storage, automations) is left out on purpose.</p>
+  <div class="meta">
+    file <code>openhands-sdk/openhands/sdk/tool/builtins/finish.py</code> · before <code>1fae5eb</code> (main) → after <code>be17960</code> (head)<br>
+    <a href="https://github.com/OpenHands/software-agent-sdk/pull/4465">PR #4465</a> · companion: <a href="task-outcome-reporting-4465.html">full-PR show-me</a> · 🐾 smolpaws
+  </div>
+</header>
+
+<section id="tldr">
+<h2><span class="num">1</span>What changed, exactly</h2>
+<div class="callout star"><p><strong>Three edits, one behavior change.</strong> (1) The tool <em>description</em> (the prompt the LLM reads) is reworded. (2) <code>create()</code> attaches a structured <code>FinishTaskOutcomeResponse</code> via <code>set_response_schema(...)</code>. (3) <strong><code>FinishAction</code> is unchanged</strong> — still just <code>message: str</code>. The structured <code>task_outcome</code> rides on a <em>response schema</em>, not on the action.</p></div>
+<table>
+  <tr><th>Part</th><th>Before</th><th>After</th></tr>
+  <tr><td><code>FinishAction</code></td><td><code>message: str</code></td><td><span class="dim">unchanged — <code>message: str</code></span></td></tr>
+  <tr><td>Tool description / prompt</td><td>"the message should include: summary, next steps, explanation, follow-ups"</td><td>"use <code>message</code> for the summary; put status/blockers/user-action/confidence in <code>task_outcome</code>"</td></tr>
+  <tr><td>Response schema</td><td><span class="dim">none</span></td><td><code>set_response_schema(FinishTaskOutcomeResponse)</code></td></tr>
+  <tr><td>Import</td><td><span class="dim">—</span></td><td><code>from …task_outcome import FinishTaskOutcomeResponse</code></td></tr>
+</table>
+</section>
+
+<section id="prompt">
+<h2><span class="num">2</span>The prompt — <code>TOOL_DESCRIPTION</code></h2>
+<p>This is the text the model reads to decide how to call <code>finish</code>. The opening ("Signals the completion… use when…") is identical; only the trailing instruction block changed.</p>
+<div class="ba">
+  <div class="side before">
+    <div class="cap">before · 1fae5eb</div>
+<pre><code>Signals the completion of the current task
+or conversation.
+
+Use this tool when:
+- You have successfully completed the
+  user's requested task
+- You cannot proceed further due to
+  technical limitations or missing info
+
+<span class="hl">The message should include:
+- A clear summary of actions taken and
+  their results
+- Any next steps for the user
+- Explanation if you're unable to complete
+  the task
+- Any follow-up questions if more
+  information is needed</span></code></pre>
+  </div>
+  <div class="side after">
+    <div class="cap">after · be17960</div>
+<pre><code>Signals the completion of the current task
+or conversation.
+
+Use this tool when:
+- You have successfully completed the
+  user's requested task
+- You cannot proceed further due to
+  technical limitations or missing info
+
+<span class="hl">Use `message` for a concise user-facing
+summary of the result. Put structured
+status, blockers, user-action
+requirements, and confidence in the
+`task_outcome` fields.</span></code></pre>
+  </div>
+</div>
+<figcaption style="color:var(--subtle);font-size:13px;max-width:820px">The reword splits responsibilities: prose stays in <code>message</code>; machine-readable judgement moves to <code>task_outcome</code>. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/tool/builtins/finish.py#L48-L58">finish.py:48</a></figcaption>
+</section>
+
+<section id="schema">
+<h2><span class="num">3</span>The definition — action unchanged, schema added</h2>
+<div class="ba">
+  <div class="side before">
+    <div class="cap">before · create()</div>
+<pre><code><span class="kw">return</span> [
+    cls(
+        action_type=FinishAction,
+        observation_type=FinishObservation,
+        description=TOOL_DESCRIPTION,
+        executor=FinishExecutor(),
+        annotations=ToolAnnotations(
+            title=<span class="str">"finish"</span>, …
+        ),
+    )
+]
+<span class="com"># no structured output</span></code></pre>
+  </div>
+  <div class="side after">
+    <div class="cap">after · create()</div>
+<pre><code>tool = cls(
+    action_type=FinishAction,
+    observation_type=FinishObservation,
+    description=TOOL_DESCRIPTION,
+    executor=FinishExecutor(),
+    annotations=ToolAnnotations(
+        title=<span class="str">"finish"</span>, …
+    ),
+)
+<span class="hl"><span class="kw">return</span> [tool.<span class="fn">set_response_schema</span>(
+    FinishTaskOutcomeResponse)]</span></code></pre>
+  </div>
+</div>
+<p>The new schema is one field wrapping the outcome model:</p>
+<pre style="max-width:820px;margin:12px 0"><code><span class="kw">class</span> <span class="fn">FinishTaskOutcomeResponse</span>(BaseModel):
+    task_outcome: TaskOutcome   <span class="com"># status, summary, blockers[], confidence, needs_user_action</span></code></pre>
+<p><code>set_response_schema</code> merges the schema's fields into the tool's parameter schema (and rejects any name that collides with <code>message</code> or reserved fields). So the model emits <code>message</code> <em>and</em> <code>task_outcome</code> in a single <code>finish</code> call — no second tool, no extra round-trip. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/tool/tool.py#L114">tool.py: set_response_schema</a></p>
+</section>
+
+<section id="model">
+<h2><span class="num">4</span>What the model now sees when calling <code>finish</code></h2>
+<div class="ba">
+  <div class="side before">
+    <div class="cap">before · finish arguments</div>
+<pre><code>{
+  <span class="str">"message"</span>: <span class="str">"Done — added the endpoint
+             and tests pass."</span>
+}</code></pre>
+  </div>
+  <div class="side after">
+    <div class="cap">after · finish arguments</div>
+<pre><code>{
+  <span class="str">"message"</span>: <span class="str">"Done — added the endpoint
+             and tests pass."</span><span class="hl">,
+  <span class="str">"task_outcome"</span>: {
+    <span class="str">"status"</span>: <span class="str">"success"</span>,
+    <span class="str">"summary"</span>: <span class="str">"Endpoint added; 12 tests
+                green."</span>,
+    <span class="str">"blockers"</span>: [],
+    <span class="str">"needs_user_action"</span>: false,
+    <span class="str">"confidence"</span>: 0.9
+  }</span>
+}</code></pre>
+  </div>
+</div>
+<p>On the way in, <code>task_outcome_from_finish()</code> stamps <code>source="agent"</code>, <code>reported_at=now</code>, <code>terminal_reason="finish_action"</code> and stores it on the conversation. <a class="src" href="https://github.com/OpenHands/software-agent-sdk/blob/be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3/openhands-sdk/openhands/sdk/task_outcome.py#L88-L97">task_outcome.py:88</a></p>
+</section>
+
+<section id="risk">
+<h2><span class="num">5</span>The v0 risk worth an eval</h2>
+<div class="callout warn"><p>Engel's point on the thread: in v0, some LLMs treated <code>finish</code> as <em>required after every step</em> — they'd call it to ask a question or reply, not only to end. Making <code>finish</code> the carrier of a rich structured schema makes it a more "attractive" tool to call. Worth an eval on a cheaper/weaker model to confirm this reword doesn't nudge premature or over-eager <code>finish</code> calls back. The mitigation in-PR is that the schema is additive and <code>message</code> stays the primary field, but the prompt no longer lists "follow-up questions" as a finish use — which is arguably good (discourages finish-to-ask) but changes behavior.</p></div>
+</section>
+
+<div class="foot">
+  Before <code>1fae5eb1fa583d23fe63b1317c9b7fac4921e40d</code> · after <code>be17960b7846fdfc4bd66ce2fb6dd40bd890f6b3</code> · code read, not a live run.<br>
+  🐾 smolpaws · for Engel · <a href="https://github.com/OpenHands/software-agent-sdk/pull/4465">PR #4465</a> · <a href="task-outcome-reporting-4465.html">full-PR page</a>
+</div>
+</main>
+</div>
+</body>
+</html>
