@@ -30,7 +30,9 @@ The coordinator is no longer intake-only scaffolding:
 - Slack has a greenfield `SlackDeliveryTarget` and no longer needs the legacy `/turns` dispatch path in its new adapter;
 - deterministic tests cover SQLite durability, the real TypeScript agent-server, Relay processing, and Slack-target delivery.
 
-The remaining boundary is operational rather than architectural: deploy/restart the Liberty Labs `paws` process on the new fork code with the TypeScript agent-server running on port 8790, then complete a live soak. A response containing the legacy `Done — nothing to report back` fallback proves that an older `/turns` process is still serving Slack and is not evidence for the new Relay.
+An isolated, self-expiring live canary also completed the full Liberty Labs Socket Mode path on 2026-08-16 at fork commit `a69456fc6f818f23ecb6e2e064f3e03fceeafaf4`. The exact observed reply was `RELAY-LIVE-a69456fc6f81`, produced after Slack ingress, durable coordinator intake, the real TypeScript agent-server/agent loop, terminal `finish`, `syncDeliveryOutbox()`, `DeliveryDispatcher`, and `SlackDeliveryTarget`.
+
+That proves the real Slack transport and complete durable architecture with a deterministic test LLM. The remaining operational boundary is narrower: restart the normal host so it releases the obsolete Slack Socket Mode connection, then soak standalone `paws` on port 8790 with the configured real LLM profile. A response containing the legacy `Done — nothing to report back` fallback still proves that an older `/turns` process handled that particular event.
 
 ## Known pages needing status treatment
 
@@ -48,9 +50,9 @@ Action: mark superseded by the implemented TypeScript agent-server package and e
 
 ### `arch/smolpaws-message-work-adr.html`
 
-The decision remains current, but the wording and diagram still use the overloaded term `projector` and its header may understate the implementation status.
+The decision remains current, but the wording and diagram still use the overloaded term `projector` and its header understates the implementation status.
 
-Action: update status to **accepted / Slack canary implemented / live soak pending**. Replace the user-facing component vocabulary with:
+Action: update status to **accepted / isolated Slack live proof complete / production soak pending**. Replace the user-facing component vocabulary with:
 
 - **delivery outbox sync** / `syncDeliveryOutbox()` for agent EventLog → durable delivery work;
 - **Outbound Relay** for catch-up plus bounded dispatch orchestration;
@@ -60,7 +62,7 @@ Preserve `delivery_unknown` and the existing crash analysis; those semantics rem
 
 ### Slack architecture page
 
-Action: ensure the Slack page describes Socket Mode → durable coordinator → TypeScript agent-server → Outbound Relay → Delivery Dispatcher → Slack, and clearly distinguishes deterministic implementation proof from the still-pending Liberty Labs live soak.
+Action: ensure the Slack page describes Socket Mode → durable coordinator → TypeScript agent-server → Outbound Relay → Delivery Dispatcher → Slack, records the isolated Liberty Labs proof, and clearly distinguishes it from the still-pending normal-process real-provider soak.
 
 ### `index.html`
 
