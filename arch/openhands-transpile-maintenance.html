@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Maintaining the OpenHands TypeScript transpiles — Engel Nyst</title>
+  <meta name="description" content="How the OpenHands SDK and agent-server TypeScript transpiles stay aligned with Python: one pin, bounded drift reviews, tests-first porting, and generated differential oracles." />
+  <meta property="og:title" content="Maintaining the OpenHands TypeScript transpiles" />
+  <meta property="og:description" content="One pin, bounded intervals, generated discovery, tests-first porting, and differential evidence." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/openhands-transpile-maintenance.html" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .eyebrow { font-family:var(--mono); font-size:.72em; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:600; }
+    .lede { font-size:1.08em; max-width:760px; line-height:1.72; }
+    .flow { display:grid; gap:10px; margin:24px 0; }
+    .flow-row { display:grid; grid-template-columns:170px 28px minmax(0,1fr); align-items:center; gap:8px; }
+    .flow-row .stage { border:1px solid var(--border); border-radius:var(--border-radius); padding:11px 13px; background:var(--card); font-family:var(--mono); font-size:.78em; }
+    .flow-row .arrow { text-align:center; color:var(--muted); }
+    .flow-row .meaning { color:var(--muted); font-size:.91em; }
+    .rings { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:22px 0; }
+    .ring { border:1px solid var(--border); background:var(--card); border-radius:var(--border-radius); padding:16px; }
+    .ring h3 { margin:0 0 8px; font-size:1em; }
+    .ring code { font-size:.8em; }
+    .tag { display:inline-block; border:1px solid var(--border); border-radius:999px; padding:2px 8px; font-family:var(--mono); font-size:.68em; color:var(--muted); }
+    .matrix { width:100%; border-collapse:collapse; margin:18px 0; font-size:.9em; }
+    .matrix th,.matrix td { text-align:left; vertical-align:top; border-bottom:1px solid var(--border); padding:9px 10px; }
+    .matrix th { font-family:var(--mono); font-size:.78em; color:var(--muted); }
+    .sources li { margin:8px 0; }
+    @media(max-width:760px){ .rings{grid-template-columns:1fr}.flow-row{grid-template-columns:1fr}.flow-row .arrow{display:none} }
+  </style>
+</head>
+<body>
+<main class="shell">
+  <p class="eyebrow">OpenHands · TypeScript · transpile maintenance</p>
+  <h1>Keeping two transpiles alive</h1>
+  <p class="lede">
+    The SDK and agent-server are not one-time ports. They are a continuing relationship with the Python
+    <code>OpenHands/software-agent-sdk</code>: one pinned upstream commit, two TypeScript targets, and a
+    repeatable way to discover, classify, port, and prove every bounded change.
+  </p>
+
+  <div class="callout star">
+    <p><strong>The governing rule:</strong> hand-write policy, generate discovery, execute evidence, and freeze update history.</p>
+  </div>
+
+  <h2>1 · The three rings</h2>
+  <div class="rings">
+    <section class="ring">
+      <span class="tag">strictest parity</span>
+      <h3>SDK transpile</h3>
+      <p><code>enyst/openhands-agent</code> covers the upstream SDK, tools, and workspace packages. Observable Python behavior is the default contract; named deviations are exceptional.</p>
+    </section>
+    <section class="ring">
+      <span class="tag">protocol parity</span>
+      <h3>Agent-server transpile</h3>
+      <p><code>packages/openhands-agent-server</code> preserves the REST/WebSocket boundary. Additive behavior requires an explicit <code>EXT-SERVER-*</code> policy.</p>
+    </section>
+    <section class="ring">
+      <span class="tag">product-owned</span>
+      <h3>Coordinator and bridges</h3>
+      <p>SmolPaws owns durable intake, lane ordering, claims, retries, delivery ambiguity, and channel behavior. This layer borrows useful ideas from Automation but is not a transpile.</p>
+    </section>
+  </div>
+
+  <h2>2 · One pin, bounded intervals</h2>
+  <p>
+    A machine-readable manifest in the SDK package names the exact upstream repository, full commit SHA,
+    source/test/example scopes, and policy hints. The server consumes the vendored copy and verifies its
+    generated Python oracles against the same SHA.
+  </p>
+  <p>
+    Work is never “sync to HEAD”. A candidate may be discovered from current upstream, but the review unit
+    is immutable: <code>OLD_PIN..NEW_PIN</code>. The pin moves only when every relevant change has a disposition
+    and its required evidence is green.
+  </p>
+
+  <h2>3 · The update conveyor</h2>
+  <div class="flow">
+    <div class="flow-row"><div class="stage">scan</div><div class="arrow">→</div><div class="meaning">Generate commits, changed paths, tests, examples, target buckets, and policy hints.</div></div>
+    <div class="flow-row"><div class="stage">classify</div><div class="arrow">→</div><div class="meaning">Assign <code>PORT</code>, <code>NO_TARGET_CHANGE</code>, <code>DEVIATION</code>, <code>EXCLUDED</code>, or <code>DEFERRED</code>.</div></div>
+    <div class="flow-row"><div class="stage">red</div><div class="arrow">→</div><div class="meaning">Port or add the upstream test before changing implementation.</div></div>
+    <div class="flow-row"><div class="stage">green</div><div class="arrow">→</div><div class="meaning">Implement the smallest compatible behavior and run surrounding suites.</div></div>
+    <div class="flow-row"><div class="stage">prove</div><div class="arrow">→</div><div class="meaning">Run generated OpenAPI, wire, integration, build, pack, and smoke evidence.</div></div>
+    <div class="flow-row"><div class="stage">advance</div><div class="arrow">→</div><div class="meaning">Freeze the reviewed interval and move both transpiles to the same upstream SHA.</div></div>
+  </div>
+
+  <h2>4 · Why the dispositions differ</h2>
+  <table class="matrix">
+    <thead><tr><th>Disposition</th><th>Meaning</th><th>Maintenance effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>PORT</code></td><td>Target behavior or tests must change.</td><td>Tests first, then implementation.</td></tr>
+      <tr><td><code>NO_TARGET_CHANGE</code></td><td>The change was reviewed and needs no TypeScript edit.</td><td>A concrete reason is required.</td></tr>
+      <tr><td><code>DEVIATION</code></td><td>The area remains relevant, but target policy intentionally differs.</td><td>Upstream changes still require review against the alternative behavior.</td></tr>
+      <tr><td><code>EXCLUDED</code></td><td>The upstream subsystem is outside declared scope.</td><td>Changes wholly inside it create no port work unless scope changes.</td></tr>
+      <tr><td><code>DEFERRED</code></td><td>The change is in scope but intentionally postponed.</td><td>Tracking, compatibility consequence, and revisit trigger are mandatory.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5 · Generated oracles</h2>
+  <p>
+    A green target test suite proves implemented behavior, but not that every upstream change was noticed.
+    The maintenance system therefore combines completeness checks with behavioral evidence.
+  </p>
+  <ul>
+    <li><strong>Drift inventory:</strong> deterministic git facts for one bounded interval.</li>
+    <li><strong>Python OpenAPI operation oracle:</strong> paths, methods, parameters, media types, and status codes generated from the exact pin.</li>
+    <li><strong>Semantic OpenAPI schema oracle:</strong> dereferenced request and response schemas with presentation-only prose removed.</li>
+    <li><strong>SDK wire cases:</strong> the same language-neutral fixtures serialized by pinned Python and TypeScript.</li>
+    <li><strong>Runtime scenarios:</strong> deterministic server and cross-repository behavior, added incrementally where OpenAPI cannot prove semantics.</li>
+  </ul>
+  <p>Live LLM calls remain separate. They prove that a provider currently accepts the request, not that TypeScript matches Python.</p>
+
+  <h2>6 · Weekly rhythm</h2>
+  <p>
+    The SDK fork owns one scheduled watcher. It publishes a generated summary and artifacts for the drift
+    between the canonical pin and the exact observed upstream commit. The watcher is an alarm panel, not a
+    backlog factory: semantic issues are created only after a bounded interval is selected and reviewed.
+  </p>
+
+  <h2>7 · Documentation precedence</h2>
+  <p>
+    Code and tests describe current factual behavior. Transpilation contracts describe intended policy.
+    Architecture pages explain the current design. Release notes and historical migration studies preserve
+    their moment in time. A conflict between code and contract is investigated; it is not automatically
+    resolved by rewriting whichever side is less convenient.
+  </p>
+
+  <h2>Sources of truth</h2>
+  <ul class="sources">
+    <li><a href="https://github.com/enyst/openhands-agent/blob/main/docs/TRANSPILE_CONTRACT.md">SDK transpilation contract</a></li>
+    <li><a href="https://github.com/enyst/openhands-agent/blob/main/docs/DRIFT_TOOLING.md">Drift and differential-tooling design</a></li>
+    <li><a href="https://github.com/enyst/openhands-agent/blob/main/transpile/upstream.json">Canonical upstream manifest</a></li>
+    <li><a href="https://github.com/enyst/smolpaws/blob/main/packages/openhands-agent-server/TRANSPILE_RULES.md">Agent-server transpilation contract</a></li>
+    <li><a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/DESIGN.md">Durable message-work coordinator design</a></li>
+  </ul>
+
+  <footer>
+    <p>This page explains the maintenance constitution. It intentionally carries no live drift count, current pin, or parity total.</p>
+  </footer>
+</main>
+</body>
+</html>
