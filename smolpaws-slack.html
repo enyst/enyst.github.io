@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SmolPaws Slack Entry Point — Engel Nyst</title>
-  <meta name="description" content="Architecture of the SmolPaws Slack ingress app — Socket Mode, thread context, and the turn API." />
-  <meta property="og:title" content="SmolPaws Slack Entry Point" />
-  <meta property="og:description" content="Socket Mode architecture — thread tracking, access control, and guest rate limiting." />
+  <title>SmolPaws Slack Relay — Engel Nyst</title>
+  <meta name="description" content="Architecture of the greenfield SmolPaws Slack canary: durable coordinator intake, TypeScript OpenHands agent-server, delivery outbox, and Slack dispatch." />
+  <meta property="og:title" content="SmolPaws Slack Relay" />
+  <meta property="og:description" content="Socket Mode ingress through the durable coordinator, TypeScript agent-server, Outbound Relay, and Delivery Dispatcher." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://enyst.github.io/smolpaws-slack.html" />
   <meta property="og:image" content="https://enyst.github.io/og-slack.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="SmolPaws Slack Entry Point" />
-  <meta name="twitter:description" content="Socket Mode architecture — thread tracking, access control, and guest rate limiting." />
+  <meta name="twitter:title" content="SmolPaws Slack Relay" />
+  <meta name="twitter:description" content="Durable Slack ingress and delivery through the new TypeScript OpenHands stack." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -23,279 +23,112 @@
 <body>
   <div class="shell">
     <a class="back" href="index.html">← Home</a>
-    <h1>SmolPaws Slack Entry Point <span class="tag tag-live">live</span></h1>
+    <h1>SmolPaws Slack Relay <span class="tag tag-live">canary</span></h1>
     <p class="meta">
-      How the Slack ingress receives messages, fetches thread context, and dispatches to the agent server.<br>
-      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/slack">apps/slack/</a> &nbsp;&middot;&nbsp;
-      Bridge pattern: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/shared/bridgeAdapter.ts">bridgeAdapter.ts</a> &nbsp;&middot;&nbsp;
-      PRs: <a href="https://github.com/smolpaws/smolpaws/pull/106">#106</a>–<a href="https://github.com/smolpaws/smolpaws/pull/112">#112</a>, <a href="https://github.com/smolpaws/smolpaws/pull/118">#118</a>
+      The first complete bridge over the durable message-work architecture.<br>
+      Source: <a href="https://github.com/enyst/smolpaws/tree/main/apps/slack">apps/slack/</a> &nbsp;·&nbsp;
+      Coordinator: <a href="https://github.com/enyst/smolpaws/tree/main/src/coordinator">src/coordinator/</a> &nbsp;·&nbsp;
+      Operations: <a href="https://github.com/enyst/smolpaws/blob/main/docs/slack/instructions.md">canary instructions</a>
     </p>
 
-    <h2>Overview</h2>
-    <p>The Slack ingress connects to Slack via Socket Mode WebSocket (<code>@slack/bolt</code>), receives events, fetches thread context, and dispatches to the shared SmolPaws agent server over HTTP.</p>
+    <div class="callout">
+      <p><strong>Status:</strong> the greenfield Slack path, durable relay, dispatcher, and deterministic end-to-end test are implemented. The Liberty Labs <code>paws</code> process still needs to be restarted from the new checkout before the live canary can be considered complete.</p>
+    </div>
 
-    <p>As of <a href="https://github.com/smolpaws/smolpaws/pull/118">#118</a> it is a <strong>bridge</strong>: a <code>SlackAdapter extends BaseBridgeAdapter</code> that self-registers with the <code>bridgeRegistry</code> and is discovered by the bridge loader via <code>plugin.json</code>. When <code>SLACK_BOT_TOKEN</code> and <code>SLACK_APP_TOKEN</code> are present, the agent-server starts it automatically at boot &mdash; the same pattern Discord uses. The thin <code>index.ts</code> also runs it standalone.</p>
+    <h2>Architecture</h2>
+    <p>Slack no longer depends on the legacy <code>/turns</code> protocol in this design. An accepted Slack event becomes durable intake, the TypeScript OpenHands agent-server owns the conversation and agent events, and a separate outbound subsystem performs the Slack side effect.</p>
 
     <pre class="mermaid">
 flowchart LR
-    A["Slack\nSocket Mode"] <-->|WebSocket| B["SlackAdapter\n(@slack/bolt)"]
-    B -->|"dispatch()"| BA["BaseBridgeAdapter\n(shared)"]
-    BA -->|HTTP POST| C["agent-server\n127.0.0.1:8788"]
-    C -->|runs agent| D["OpenHands\nruntime"]
-    D -->|turn result +\noutbound msgs| C
-    C -->|poll + claim| BA
-    B -->|chat.postMessage\nwith thread_ts| A
+    S["Slack\nSocket Mode"] --> A["SlackAdapter\n+ slackHandler"]
+    A --> I["Coordinator\ndurable intake"]
+    I --> O["TypeScript OpenHands\nagent-server :8790"]
+    O --> E["Durable\nEventLog"]
+    E --> R["OutboundRelay\nsyncDeliveryOutbox()"]
+    R --> Q["Durable delivery\noutbox"]
+    Q --> D["DeliveryDispatcher"]
+    D --> T["SlackDeliveryTarget"]
+    T -->|"chat.postMessage"| S
     </pre>
 
-    <h2>Bridge Pattern</h2>
-    <p>The Slack app keeps its richer ingress logic (thread context, dedup, guest rate limiting, reactions) in <code>slackHandler.ts</code>, injected via <code>SlackDeps</code>. The adapter owns the platform connection lifecycle:</p>
+    <h2>Why Slack Is Greenfield</h2>
+    <p>The earlier Slack app existed to exercise Slack Events API and Socket Mode. It was never an in-use production bridge, so it has no compatibility obligation to the old immediate request/reply shape.</p>
+    <p>The useful Slack-specific pieces remain: Socket Mode, DMs and mentions, thread context, access policy, duplicate suppression, acknowledgement reactions, and message splitting. The execution path itself was rebuilt around durability.</p>
+
+    <h2>Component Boundaries</h2>
     <table>
-      <tr><th>File</th><th>Responsibility</th></tr>
-      <tr><td><code>plugin.json</code></td><td>Bridge manifest &mdash; <code>kind: "bridge"</code>, <code>requiredEnv</code>; discovered by the loader</td></tr>
-      <tr><td><code>index.ts</code></td><td>Thin entry point &mdash; <code>bridgeRegistry.startAdapter('slack', …)</code>, shutdown</td></tr>
-      <tr><td><code>adapter.ts</code></td><td><code>SlackAdapter</code> &mdash; Bolt connection lifecycle (<code>connect</code>/<code>disconnect</code>), event wiring, registry registration</td></tr>
-      <tr><td><code>slackHandler.ts</code></td><td><code>handleSlackEvent()</code> &mdash; testable ingress core, dependency-injected</td></tr>
-      <tr><td><code>bridgeAdapter.ts</code> (shared)</td><td><code>BaseBridgeAdapter</code> + <code>bridgeRegistry</code> &mdash; agent-server dispatch loop</td></tr>
+      <tr><th>Component</th><th>Responsibility</th></tr>
+      <tr><td><code>SlackAdapter</code></td><td>Socket Mode lifecycle, event filtering, Slack API wiring, and bridge-loader compatibility</td></tr>
+      <tr><td><code>slackHandler.ts</code></td><td>Slack ingress policy, normalization, allowlists, thread context, deduplication, and acknowledgement</td></tr>
+      <tr><td><code>SlackCoordinatorRuntime</code></td><td>Durable acceptance, intake integration, recovery ticks, outbox synchronization, and bounded dispatch</td></tr>
+      <tr><td><code>OutboundRelay</code></td><td>Coordinates EventLog catch-up and delivery processing without knowing Slack details</td></tr>
+      <tr><td><code>syncDeliveryOutbox()</code></td><td>Reads newly durable agent events and idempotently creates durable delivery rows</td></tr>
+      <tr><td><code>DeliveryDispatcher</code></td><td>Claims one delivery, fences the send, invokes the platform target, and settles its outcome</td></tr>
+      <tr><td><code>SlackDeliveryTarget</code></td><td>Maps a durable Slack lane to <code>chat.postMessage</code>, preserving channel and thread identity</td></tr>
+      <tr><td>TypeScript agent-server</td><td>Owns conversations, agent execution, persistence, and the durable EventLog</td></tr>
     </table>
 
-    <h2>Message Flow</h2>
+    <h2>Durability Contract</h2>
 
-    <pre class="mermaid">
-sequenceDiagram
-    participant U as Slack User
-    participant S as Slack API
-    participant I as apps/slack
-    participant A as agent-server
-    participant R as Agent Runtime
+    <h3>Inbound</h3>
+    <pre class="code">Slack event
+→ stable source message identity
+→ durable intake row
+→ deterministic agent event id
+→ append with run=true
+→ done / retry / failed</pre>
+    <p>A lost append response is safe to retry because the same Slack message produces the same agent event ID.</p>
 
-    U->>S: DM or @smolpaws mention
-    S->>I: event via Socket Mode
-    I->>I: dedup + checkAccess()
-    I->>S: reactions.add(eyes)
-    I->>I: stripBotMention()
-    alt threaded message
-        I->>S: conversations.replies()
-        S-->>I: thread history
-        I->>I: formatThreadContext()
-    end
-    I->>I: buildConversationId()
-    I->>A: submitConversationMessage()
-    A->>R: create/resume conversation
-    loop poll until terminal
-        I->>A: getTurnStatus()
-        I->>A: claimTurnOutboundMessages()
-        I-->>S: deliver outbound messages
-    end
-    I->>A: getTurnResult()
-    I->>S: chat.postMessage (thread_ts)
-    S->>U: sees reply
-    </pre>
+    <h3>Outbound</h3>
+    <pre class="code">durable agent event
+→ syncDeliveryOutbox()
+→ durable delivery row
+→ claim lane head
+→ validate
+→ mark send_attempted
+→ Slack API call
+→ done / failed / delivery_unknown</pre>
+    <p>Once <code>send_attempted</code> is durable, an exception is treated as ambiguous. The dispatcher does not blindly repeat a Slack post that may already have landed.</p>
 
-    <h2>Entry Decision Logic</h2>
-    <p>The bot decides whether to respond through layered checks:</p>
+    <h2>Conversation and Lane Identity</h2>
+    <p>One Slack DM or thread maps to one durable lane:</p>
+    <pre class="code">channel:slack:{team_id}:{channel_id}:{thread_ts-or-root}</pre>
+    <p>The first authoritative relay generation is intentionally isolated from earlier shadow experiments:</p>
+    <pre class="code">database: ~/.smolpaws/coordinator/slack-relay-v1.db
+conversation namespace: slack-relay:v1</pre>
+    <p>This prevents initial catch-up from rediscovering historical shadow responses and posting them into Slack.</p>
 
-    <h3>Event Filtering (adapter.ts)</h3>
-    <pre class="code">1. Ignore bot messages and self-mentions
-2. app_mention events → always process
-3. message.im events → always process (DMs)
-4. Channel thread replies → only if thread was previously mentioned
-5. Everything else → ignore</pre>
+    <h2>Reply Policy</h2>
+    <p>The first canary synchronizes the agent's normal terminal <code>finish</code> response into the delivery outbox. A normal Slack answer does not require a Slack-specific <code>send_message</code> tool.</p>
+    <p>The extraction policy remains replaceable. Explicit outbound-intent events can later support progress updates or multiple messages without changing the Delivery Dispatcher.</p>
 
-    <h3>checkAccess()</h3>
-    <pre class="code">1. Non-DMs: check team and channel allowlists (if configured)
-2. If user is in ALLOWED_USER_IDS → allowed
-3. If no user allowlist configured → allowed (open)
-4. Otherwise → guest (rate-limited to 5 conversations)</pre>
-
-    <h2>Thread Context</h2>
-    <p>When the bot is mentioned in a thread, it fetches prior messages via <code>conversations.replies</code> and prepends them as context to the prompt. This lets the agent understand the conversation that preceded the mention.</p>
-
-    <pre class="code">[Thread context]
-&lt;@U1&gt;: What is OpenHands?
-&lt;@U2&gt;: An AI agent platform for software development
-smolpaws: It's built on top of...
-
-[Current message]
-Can you explain the runtime architecture?</pre>
-
+    <h2>Verification</h2>
+    <p>The focused Slack suite includes a deterministic end-to-end test using:</p>
     <ul>
-      <li>Fetches up to 50 messages per thread</li>
-      <li>Bot's own messages labeled as <code>smolpaws</code>, others as <code>&lt;@UID&gt;</code></li>
-      <li>Current message excluded from context (it's the prompt itself)</li>
-      <li>Graceful degradation — if the fetch fails, dispatches without context</li>
-      <li>Not fetched for non-threaded messages (fresh mentions) or DMs</li>
+      <li>the real in-process TypeScript OpenHands agent-server;</li>
+      <li>a scripted LLM response that calls the real <code>finish</code> tool;</li>
+      <li>real SQLite coordinator state;</li>
+      <li><code>syncDeliveryOutbox()</code> and the Outbound Relay;</li>
+      <li>the Delivery Dispatcher and Slack Delivery Target boundary;</li>
+      <li>assertions that intake and delivery both settle durably.</li>
     </ul>
 
-    <h2>Conversation ID Generation</h2>
-    <p>Stable IDs derived from Slack's own identifiers:</p>
+    <h3>Live Liberty Labs Canary</h3>
+    <p>A test mention reached the installed <code>paws</code> bot, but its reply was the legacy fallback <code>🐾 Done — nothing to report back.</code>. That response proves the currently running process still uses the old <code>/turns</code> runtime. It is useful deployment evidence, but not a successful test of the new relay.</p>
+    <p>The live canary completes only after the local TypeScript agent-server and Slack process are restarted from the candidate checkout, followed by verification of the Slack reply, the agent-server EventLog, and the rows in <code>slack-relay-v1.db</code>.</p>
 
-    <table>
-      <tr><th>Context</th><th>Pattern</th><th>Example</th></tr>
-      <tr><td>DM</td><td><code>slack-im-{team}-{channel}</code></td><td><code>slack-im-T06P-D08X</code></td></tr>
-      <tr><td>Thread</td><td><code>slack-thread-{team}-{channel}-{root_ts}</code></td><td><code>slack-thread-T06P-C123-1717200000.000100</code></td></tr>
-    </table>
-
-    <ul>
-      <li>Each DM channel gets one persistent conversation</li>
-      <li>Each Slack thread maps to one agent conversation (root <code>thread_ts</code>)</li>
-      <li>Top-level channel mentions reply in a new thread using the message's own <code>ts</code> as root</li>
-    </ul>
-
-    <h2>Thread Follow-ups</h2>
-    <p>Once smolpaws has been mentioned in a thread, subsequent replies in that thread are processed <em>without</em> requiring another @mention. The <code>MentionedThreadTracker</code> keeps an in-memory set of tracked threads (capped at 1000, LRU-evicted).</p>
-
-    <pre class="mermaid">
-flowchart TB
-    A["@smolpaws help me"] -->|app_mention| B["handleSlackEvent"]
-    B --> C["mentionedThreads.track(thread_ts)"]
-    C --> D["dispatch to agent"]
-    E["follow-up reply\n(no @mention)"] -->|message event| F["mentionedThreads.isTracked?"]
-    F -->|yes| B
-    F -->|no| G["ignore"]
-    </pre>
-
-    <h2>Turn API Dispatch</h2>
-    <p>The Slack app uses the shared <code>turnClient.ts</code> — the same client used by Discord and the GitHub Cloudflare Worker.</p>
-
-    <pre class="mermaid">
-flowchart TB
-    subgraph "apps/slack"
-        A["slackHandler.ts"] --> B["agentServerClient.ts"]
-    end
-    subgraph "src/shared/turnClient.ts"
-        C1["submitConversationMessage()"]
-        C2["monitorTurn()"]
-        C3["getTurnStatus()"]
-        C4["claimTurnOutboundMessages()"]
-        C5["getTurnResult()"]
-        C2 --> C3 & C4 & C5
-    end
-    B --> C1
-    B --> C2
-    </pre>
-
-    <p>Key details:</p>
-    <ul>
-      <li><strong>deliveryOwnerId</strong> — random UUID per dispatch. First submitter wins delivery ownership.</li>
-      <li><strong>idempotencyKey</strong> — <code>{channel}:{ts}</code> to prevent double-processing.</li>
-      <li><strong>createConversation</strong> — sent on every submit. Server creates if new, appends if existing.</li>
-      <li><strong>Outbound messages</strong> — claimed during polling and delivered to Slack immediately.</li>
-      <li><strong>Guest usage</strong> — recorded only <em>after</em> successful dispatch, not before.</li>
-    </ul>
-
-    <h2>Safety Features</h2>
-
-    <table>
-      <tr><th>Feature</th><th>Implementation</th></tr>
-      <tr><td>Deduplication</td><td>In-memory <code>MessageDeduplicator</code> with 60s TTL, auto-prunes at 200 entries</td></tr>
-      <tr><td>Eyes reaction</td><td>👀 added to the triggering message immediately on acceptance (before dispatch)</td></tr>
-      <tr><td>Guest rate limiting</td><td>Non-allowlisted users get 5 conversations total, persisted to disk</td></tr>
-      <tr><td>Bot loop prevention</td><td>Ignores bot messages, self-mentions, and message subtypes</td></tr>
-      <tr><td>Message splitting</td><td>Long replies split at 5900 chars, preferring newlines then spaces</td></tr>
-      <tr><td>Graceful errors</td><td>Dispatch failures post a friendly error message, don't crash the process</td></tr>
-    </table>
-
-    <h2>Hermes Comparison</h2>
-    <p>The <a href="https://github.com/NousResearch/hermes-agent">Hermes agent</a> uses the same Socket Mode approach but at a very different scale:</p>
-
-    <table>
-      <tr><th>Aspect</th><th>Hermes (SlackAdapter)</th><th>SmolPaws (apps/slack)</th></tr>
-      <tr><td>Language</td><td>Python (<code>slack-bolt</code>)</td><td>TypeScript (<code>@slack/bolt</code>)</td></tr>
-      <tr><td>Scale</td><td>~3000-line adapter, 20+ platforms in one gateway</td><td>~600 lines source, standalone ingress app</td></tr>
-      <tr><td>Routing</td><td>Single <code>GatewayRunner</code> multiplexes all platforms</td><td>HTTP dispatch to shared agent-server</td></tr>
-      <tr><td>Thread context</td><td>Session-presence auto-reply, thread memory</td><td><code>conversations.replies</code> fetch + context formatting</td></tr>
-      <tr><td>Thread follow-ups</td><td>Bot-mentioned-thread tracking</td><td><code>MentionedThreadTracker</code> with LRU eviction</td></tr>
-      <tr><td>Dedup</td><td><code>MessageDeduplicator</code></td><td><code>MessageDeduplicator</code> with TTL + auto-prune</td></tr>
-      <tr><td>Slash commands</td><td>All gateway commands as native slashes</td><td>Not yet</td></tr>
-      <tr><td>Rich content</td><td>Block Kit, files, audio, approval buttons</td><td>Plain text</td></tr>
-    </table>
+    <h2>Current Rollout Boundary</h2>
+    <ol>
+      <li>Restart the Liberty Labs Slack canary from the reviewed fork checkout.</li>
+      <li>Verify one message across every durable boundary.</li>
+      <li>Exercise restart and ambiguous-delivery recovery.</li>
+      <li>Soak Slack before designing the WhatsApp cutover.</li>
+      <li>Migrate other bridges only after reviewing their existing semantics.</li>
+    </ol>
 
     <div class="callout">
-      <p>SmolPaws' design is intentionally simpler. The complexity lives in the agent server, not the ingress adapter. Each ingress is a thin adapter — receive platform events, build a conversation ID, dispatch, deliver results back.</p>
+      <p>Slack establishes the clean bridge contract. It is not a template to copy blindly into in-use bridges whose behavior, delivery guarantees, and rollback needs differ.</p>
     </div>
-
-    <h2>Slack Permissions</h2>
-
-    <h3>Bot token scopes</h3>
-    <table>
-      <tr><th>Scope</th><th>Purpose</th></tr>
-      <tr><td><code>app_mentions:read</code></td><td>Receive @mention events in channels</td></tr>
-      <tr><td><code>chat:write</code></td><td>Post replies</td></tr>
-      <tr><td><code>im:history</code></td><td>Read DM messages</td></tr>
-      <tr><td><code>reactions:write</code></td><td>Add 👀 acknowledgment reactions</td></tr>
-    </table>
-
-    <h3>Event subscriptions</h3>
-    <table>
-      <tr><th>Event</th><th>Purpose</th></tr>
-      <tr><td><code>app_mention</code></td><td>Channel/thread mentions</td></tr>
-      <tr><td><code>message.im</code></td><td>DM messages</td></tr>
-    </table>
-
-    <h2>Configuration</h2>
-
-    <table>
-      <tr><th>Variable</th><th>Required</th><th>Default</th><th>Purpose</th></tr>
-      <tr><td><code>SLACK_BOT_TOKEN</code></td><td>yes</td><td>—</td><td>Bot token (<code>xoxb-...</code>)</td></tr>
-      <tr><td><code>SLACK_APP_TOKEN</code></td><td>yes</td><td>—</td><td>App-level token for Socket Mode (<code>xapp-...</code>)</td></tr>
-      <tr><td><code>SMOLPAWS_RUNNER_URL</code></td><td>no</td><td><code>http://127.0.0.1:8788</code></td><td>Agent server base URL</td></tr>
-      <tr><td><code>SMOLPAWS_RUNNER_TOKEN</code></td><td>no</td><td>—</td><td>Auth token for agent server</td></tr>
-      <tr><td><code>SLACK_ALLOWED_TEAM_IDS</code></td><td>no</td><td>—</td><td>Comma-separated workspace IDs</td></tr>
-      <tr><td><code>SLACK_ALLOWED_CHANNEL_IDS</code></td><td>no</td><td>—</td><td>Comma-separated channel IDs</td></tr>
-      <tr><td><code>SLACK_ALLOWED_USER_IDS</code></td><td>no</td><td>—</td><td>Comma-separated user IDs</td></tr>
-    </table>
-
-    <h2>File Layout</h2>
-    <pre class="code">apps/slack/
-├── plugin.json               # bridge manifest (kind: "bridge", requiredEnv)
-├── package.json
-├── tsconfig.json
-├── AGENTS.md
-└── src/
-    ├── index.ts              # thin entry — bridgeRegistry.startAdapter('slack')
-    ├── adapter.ts            # SlackAdapter — Bolt lifecycle, event wiring, registration
-    ├── config.ts             # env parsing, allowlists
-    ├── slackContext.ts        # conversation IDs, access, thread context, dedup
-    ├── slackHandler.ts        # handleSlackEvent() — testable core logic
-    ├── agentServerClient.ts   # turn API wrapper
-    └── __tests__/
-        ├── agentServerClient.test.ts
-        ├── slackContext.test.ts
-        └── slackHandler.test.ts</pre>
-
-    <h2>Process Model</h2>
-    <ul>
-      <li>Runs as a bridge under the agent-server (auto-started when tokens are present), or standalone via <code>index.ts</code></li>
-      <li>68 tests covering all paths (context, handler, agent client, helpers)</li>
-      <li>Uses <code>@slack/bolt</code> Socket Mode (not HTTP webhooks)</li>
-      <li>Ingress core extracted into <code>slackHandler.ts</code> with injectable dependencies for testability</li>
-      <li>Connection lifecycle (<code>connect</code>/<code>disconnect</code>) managed by <code>BaseBridgeAdapter</code>; graceful shutdown on SIGINT / SIGTERM</li>
-      <li>Messages &gt; 5900 chars split at natural boundaries (newlines, then spaces)</li>
-    </ul>
-
-    <h2>Shared Infrastructure</h2>
-    <p>Slack, Discord, and GitHub all share the same turn client:</p>
-
-    <pre class="mermaid">
-flowchart TB
-    subgraph "Ingress Apps"
-        D["Discord\napps/discord"]
-        G["GitHub\napps/github"]
-        S["Slack\napps/slack"]
-    end
-    subgraph "Shared"
-        T["turnClient.ts\nsrc/shared/"]
-    end
-    subgraph "Backend"
-        A["agent-server\napps/agent-server"]
-    end
-    D --> T
-    G --> T
-    S --> T
-    T --> A
-    </pre>
-
-    <p>Each ingress is a thin adapter: receive platform events → build conversation ID → dispatch via <code>turnClient</code> → deliver results back. Agent logic, conversation state, and turn management all live in the agent server.</p>
 
     <div class="foot-nav"><a href="index.html">← Home</a></div>
   </div>
