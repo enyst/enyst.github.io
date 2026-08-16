@@ -5,19 +5,32 @@ This file is an explicit maintenance follow-up for published OpenHands/SmolPaws 
 ## Current sources of truth
 
 - SDK transpilation policy: [`enyst/openhands-agent/docs/TRANSPILE_CONTRACT.md`](https://github.com/enyst/openhands-agent/blob/main/docs/TRANSPILE_CONTRACT.md)
-- Drift control plane and oracle plan: [`enyst/openhands-agent/docs/DRIFT_TOOLING.md`](https://github.com/enyst/openhands-agent/blob/main/docs/DRIFT_TOOLING.md)
+- Drift control plane and oracle design: [`enyst/openhands-agent/docs/DRIFT_TOOLING.md`](https://github.com/enyst/openhands-agent/blob/main/docs/DRIFT_TOOLING.md)
 - Canonical upstream manifest: [`enyst/openhands-agent/transpile/upstream.json`](https://github.com/enyst/openhands-agent/blob/main/transpile/upstream.json)
 - Agent-server transpilation policy: [`enyst/smolpaws/packages/openhands-agent-server/TRANSPILE_RULES.md`](https://github.com/enyst/smolpaws/blob/main/packages/openhands-agent-server/TRANSPILE_RULES.md)
 - Agent-server package: [`enyst/smolpaws/packages/openhands-agent-server/README.md`](https://github.com/enyst/smolpaws/blob/main/packages/openhands-agent-server/README.md)
-- Durable coordinator: [`enyst/smolpaws/src/coordinator/DESIGN.md`](https://github.com/enyst/smolpaws/blob/main/src/coordinator/DESIGN.md)
+- Durable coordinator and Outbound Relay: [`enyst/smolpaws/src/coordinator/DESIGN.md`](https://github.com/enyst/smolpaws/blob/main/src/coordinator/DESIGN.md)
+- Slack coordinator canary operations: [`enyst/smolpaws/docs/slack/instructions.md`](https://github.com/enyst/smolpaws/blob/main/docs/slack/instructions.md)
 
 Public pages are explanatory snapshots. They must not become a hand-maintained live parity ledger.
 
 ## Maintenance machinery now implemented
 
-The SDK fork now owns one canonical upstream manifest, deterministic `scan` / `prepare` / `check` tooling, synthetic-git tests, CI coverage, and a weekly drift workflow. The server fork consumes the same manifest from its vendored SDK and validates that provenance before running package CI.
+The SDK fork owns one canonical upstream manifest, deterministic `scan` / `prepare` / `check` tooling, synthetic-git tests, CI coverage, and a weekly drift workflow. The server fork consumes the same manifest from its vendored SDK and validates that provenance before running package CI.
 
-The next executable compatibility layer is the generated Python agent-server OpenAPI oracle, followed by SDK wire goldens and deterministic Python/TypeScript server scenarios.
+Generated Python OpenAPI evidence, SDK wire-oracle infrastructure, and deterministic Python/TypeScript server checks now exist. Mutable drift and parity counts remain generated evidence rather than prose on this site.
+
+## Message-work rollout now implemented
+
+The coordinator is no longer intake-only scaffolding:
+
+- agent events are synced into a durable delivery outbox through `syncDeliveryOutbox()`;
+- `OutboundRelay` coordinates outbox catch-up and bounded dispatch;
+- `DeliveryDispatcher` owns claim → send fence → target delivery → settlement;
+- Slack has a greenfield `SlackDeliveryTarget` and no longer needs the legacy `/turns` dispatch path in its new adapter;
+- deterministic tests cover SQLite durability, the real TypeScript agent-server, Relay processing, and Slack-target delivery.
+
+The remaining boundary is operational rather than architectural: deploy/restart the Liberty Labs `paws` process on the new fork code with the TypeScript agent-server running on port 8790, then complete a live soak. A response containing the legacy `Done — nothing to report back` fallback proves that an older `/turns` process is still serving Slack and is not evidence for the new Relay.
 
 ## Known pages needing status treatment
 
@@ -35,9 +48,19 @@ Action: mark superseded by the implemented TypeScript agent-server package and e
 
 ### `arch/smolpaws-message-work-adr.html`
 
-The ADR remains useful, but its header says `status: proposed` even though the coordinator core and `EXT-SERVER-001` idempotent event append are implemented.
+The decision remains current, but the wording and diagram still use the overloaded term `projector` and its header may understate the implementation status.
 
-Action: update status to **accepted / core implemented**, explicitly noting that bridge canary, cutover, and old-runner removal remain rollout work.
+Action: update status to **accepted / Slack canary implemented / live soak pending**. Replace the user-facing component vocabulary with:
+
+- **delivery outbox sync** / `syncDeliveryOutbox()` for agent EventLog → durable delivery work;
+- **Outbound Relay** for catch-up plus bounded dispatch orchestration;
+- **Delivery Dispatcher** for durable delivery work → platform side effect.
+
+Preserve `delivery_unknown` and the existing crash analysis; those semantics remain current.
+
+### Slack architecture page
+
+Action: ensure the Slack page describes Socket Mode → durable coordinator → TypeScript agent-server → Outbound Relay → Delivery Dispatcher → Slack, and clearly distinguishes deterministic implementation proof from the still-pending Liberty Labs live soak.
 
 ### `index.html`
 
@@ -45,4 +68,4 @@ Action: update card descriptions/status labels for the pages above so the home p
 
 ## Completion rule
 
-After the page banners/status labels are updated, delete this file or replace it with a terse pointer explaining that historical banners are intentional. Do not copy weekly drift counts or current parity totals into the public site.
+After the page banners/status labels and Slack/ADR terminology are updated, delete this file or replace it with a terse pointer explaining that historical banners are intentional. Do not copy weekly drift counts or current parity totals into the public site.
