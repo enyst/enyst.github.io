@@ -13,8 +13,6 @@
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="SmolPaws Slack Coordinator Canary" />
-  <meta name="twitter:description" content="A greenfield Slack canary for the durable SmolPaws message-work architecture." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -25,57 +23,57 @@
     <a class="back" href="index.html">← Home</a>
     <h1>SmolPaws Slack Coordinator Canary <span class="tag">canary</span></h1>
     <p class="meta">
-      The first bridge wired end to end through the durable coordinator and the TypeScript OpenHands transpilation.<br>
-      Working source: <a href="https://github.com/enyst/smolpaws/tree/main/apps/slack">apps/slack/</a> &nbsp;&middot;&nbsp;
+      A greenfield Slack bridge for proving the durable SmolPaws message-work architecture.<br>
+      Source: <a href="https://github.com/enyst/smolpaws/tree/main/apps/slack">apps/slack/</a> &nbsp;&middot;&nbsp;
       Relay: <a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/outboundRelay.ts">outboundRelay.ts</a> &nbsp;&middot;&nbsp;
       Dispatcher: <a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/deliveryDispatcher.ts">deliveryDispatcher.ts</a>
     </p>
 
     <div class="callout">
-      <p><strong>Authority:</strong> current code, executable tests, and durable coordinator records. This page explains the architecture; it deliberately does not carry mutable deployment counts or claim that a particular local process is currently running the newest commit.</p>
+      <p><strong>Authority:</strong> current code, executable tests, the agent-server EventLog, and coordinator SQLite records. This page describes the architecture. It deliberately does not treat a visible Slack reply alone as proof that a local process is running the newest canary.</p>
     </div>
 
-    <h2>Overview</h2>
-    <p>Slack is a greenfield canary. It does not preserve the unused legacy Slack-to-<code>/turns</code> shape. The app still participates in the shared bridge registry for lifecycle compatibility, but its <code>dispatch()</code> method is fully overridden: durable coordinator acceptance is the ingress success boundary, and the background outbound path owns the eventual reply.</p>
+    <h2>Current architecture</h2>
+    <p><code>apps/slack</code> is intentionally greenfield. It runs as a standalone Socket Mode process, owns its Bolt connection and Slack coordinator runtime directly, and does not inherit <code>BaseBridgeAdapter</code>, join the shared bridge loader, or fall back to the legacy <code>/turns</code> path on port 8788.</p>
 
     <pre class="mermaid">
 flowchart LR
-    U["Slack user"] --> S["paws\nSocket Mode"]
+    U["Slack user"] --> S["SlackBridge / paws\nSocket Mode"]
     S --> I["durable intake\nSQLite"]
     I --> A["TypeScript OpenHands\nagent-server :8790"]
     A --> E["durable EventLog"]
     E --> R["Outbound Relay\nsyncDeliveryOutbox()"]
     R --> O["delivery outbox\nSQLite"]
     O --> D["Delivery Dispatcher"]
-    D --> T["Slack Delivery Target"]
+    D --> T["SlackDeliveryTarget"]
     T --> U
     </pre>
 
-    <h2>Why the split exists</h2>
-    <p>The system separates three facts that are often accidentally blended together:</p>
+    <h2>Ownership</h2>
     <table>
       <tr><th>Fact</th><th>Owner</th></tr>
-      <tr><td>What happened inside the agent conversation</td><td>Agent-server <code>EventLog</code></td></tr>
-      <tr><td>What external work must still happen</td><td>Coordinator SQLite outbox</td></tr>
-      <tr><td>How to perform a Slack side effect</td><td><code>SlackDeliveryTarget</code></td></tr>
+      <tr><td>Conversation events and agent execution</td><td>TypeScript agent-server <code>EventLog</code></td></tr>
+      <tr><td>External intake, ordering, retries, claims, and delivery outcomes</td><td>Coordinator SQLite store</td></tr>
+      <tr><td>Slack connection, formatting, thread coordinates, and network send</td><td><code>SlackBridge</code> and <code>SlackDeliveryTarget</code></td></tr>
     </table>
-    <p>The agent-server stays upstream-shaped. Queue semantics, Slack retries, lane ordering, and ambiguous external sends remain outside it.</p>
+    <p>The agent-server remains upstream-shaped. External queue semantics, Slack retries, and uncertain network effects stay in SmolPaws-owned coordinator infrastructure.</p>
 
     <h2>Message flow</h2>
     <pre class="mermaid">
 sequenceDiagram
     participant U as Slack user
-    participant S as SlackAdapter
-    participant C as Coordinator
+    participant S as SlackBridge
+    participant C as Coordinator runtime
     participant A as TS agent-server
     participant R as Outbound Relay
     participant D as Delivery Dispatcher
     participant API as Slack Web API
 
     U->>S: DM or @paws mention
-    S->>S: access, dedup, thread context
-    S->>C: accept durable intake
-    C-->>S: accepted
+    S->>S: policy, short-lived gate, thread context
+    S->>C: accept message
+    C->>C: persist intake row
+    C-->>S: durable acceptance complete
     C->>A: deterministic user event + run=true
     A->>A: agent loop writes durable events
     R->>A: search events from cursor
@@ -86,23 +84,23 @@ sequenceDiagram
     D->>API: chat.postMessage
     API-->>D: Slack message ts
     D->>C: settle done + external_message_id
-    API-->>U: thread reply appears
+    API-->>U: reply appears once
     </pre>
 
     <h2>Components</h2>
     <table>
       <tr><th>Component</th><th>Responsibility</th></tr>
-      <tr><td><code>apps/slack/src/adapter.ts</code></td><td>Socket Mode connection, event filtering, Slack Web API client, lifecycle</td></tr>
-      <tr><td><code>slackHandler.ts</code></td><td>Access control, deduplication, mention stripping, bounded thread context</td></tr>
-      <tr><td><code>coordinatorRuntime.ts</code></td><td>Owns the Slack canary worker loop and durable SQLite connection</td></tr>
-      <tr><td><code>MessageWorkCoordinator</code></td><td>Lane identity, idempotent intake, event append, outbox synchronization</td></tr>
-      <tr><td><code>OutboundRelay</code></td><td>Repeatedly calls <code>syncDeliveryOutbox()</code>, then performs a bounded dispatch drain</td></tr>
+      <tr><td><code>apps/slack/src/adapter.ts</code></td><td>Standalone Bolt/Socket Mode lifecycle and Slack Web API wiring</td></tr>
+      <tr><td><code>slackHandler.ts</code></td><td>Access policy, normalization, mention stripping, bounded thread context, and a short-lived duplicate gate</td></tr>
+      <tr><td><code>coordinatorRuntime.ts</code></td><td>Slack-hosted intake, reconciliation, outbox synchronization, and bounded delivery workers</td></tr>
+      <tr><td><code>MessageWorkCoordinator</code></td><td>Lane identity, durable intake, deterministic event append, and delivery-row creation</td></tr>
+      <tr><td><code>OutboundRelay</code></td><td>Calls <code>syncDeliveryOutbox()</code> and performs a bounded dispatch drain</td></tr>
       <tr><td><code>DeliveryDispatcher</code></td><td>Claim → validate → send fence → external call → fenced settlement</td></tr>
-      <tr><td><code>SlackDeliveryTarget</code></td><td>Routes payloads to the durable channel/thread coordinates with <code>chat.postMessage</code></td></tr>
+      <tr><td><code>SlackDeliveryTarget</code></td><td>Sends chunks to the durable Slack channel/thread coordinates</td></tr>
     </table>
 
-    <h2>Outbox semantics</h2>
-    <p><code>syncDeliveryOutbox()</code> catches a conversation up from its durable event cursor. For the first Slack canary, a successful terminal <code>finish</code> observation becomes one normal thread reply. The sync is safe to repeat because delivery source keys are derived from the originating agent event and destination lane.</p>
+    <h2>Why <code>syncDeliveryOutbox()</code>?</h2>
+    <p>The Relay repeatedly catches a conversation up from its durable agent-event cursor. For the first Slack canary, the normal terminal agent response becomes one durable delivery row. Repeating the sync is safe because the source identity combines the originating event and destination lane.</p>
 
     <pre class="code">agent event id + destination lane
               ↓
@@ -110,52 +108,53 @@ unique delivery source_key
               ↓
 replay becomes a no-op</pre>
 
-    <p>The policy seam remains explicit. Other products may choose explicit <code>send_message</code> actions, terminal responses, or multiple destinations without changing the store state machine.</p>
+    <p>The name is intentionally plainer than “projector”: the method synchronizes an outbox. It does not itself contact Slack.</p>
 
-    <h2>Delivery failure semantics</h2>
-    <p>The Dispatcher validates a row before crossing the side-effect boundary. Immediately before calling Slack, it durably sets <code>send_attempted = true</code>.</p>
+    <h2>Delivery semantics</h2>
+    <p>The Dispatcher validates work before the external boundary. Immediately before calling Slack, it durably sets <code>send_attempted = true</code>.</p>
     <table>
-      <tr><th>Failure point</th><th>Result</th></tr>
-      <tr><td>Malformed payload or missing target, before send fence</td><td>Known <code>failed</code> work</td></tr>
-      <tr><td>Claim expires before any send attempt</td><td>Safe to make ready again</td></tr>
+      <tr><th>Situation</th><th>Outcome</th></tr>
+      <tr><td>Invalid payload or no registered target</td><td>Known <code>failed</code> work before any network send</td></tr>
+      <tr><td>Claim expires before a send attempt</td><td>Safe to make ready again</td></tr>
       <tr><td>Exception after the send fence</td><td><code>delivery_unknown</code>; never blindly retry</td></tr>
       <tr><td>Slack confirms the message</td><td><code>done</code> with Slack <code>ts</code> as <code>external_message_id</code></td></tr>
     </table>
 
-    <h2>Slack policy retained</h2>
+    <h2>Idempotency boundaries</h2>
     <ul>
-      <li>DMs and channel <code>app_mention</code> events enter the app.</li>
-      <li>Once a thread is mentioned, follow-up replies in that process lifetime do not require another mention.</li>
-      <li>Stable lane identity uses workspace, channel, and thread root.</li>
-      <li>Thread history is bounded and permission-aware.</li>
-      <li>Bot messages, self-messages, and duplicate Slack event IDs are ignored.</li>
-      <li>Long responses are chunked before <code>chat.postMessage</code>.</li>
+      <li>Coordinator SQLite, keyed by stable Slack message identity, is the durable intake authority.</li>
+      <li>The in-memory duplicate gate only suppresses simultaneous or very recent callbacks.</li>
+      <li>A failed durable acceptance releases that gate immediately, before a best-effort Slack error reply.</li>
+      <li>Deterministic agent event IDs make append-response loss safe to replay.</li>
+      <li>Unique delivery source keys make outbox catch-up safe to replay.</li>
     </ul>
 
     <h2>Canary proof</h2>
-    <p>A visible Slack reply is necessary but not sufficient. An older process can also answer through the retired path. A valid end-to-end canary establishes all of the following:</p>
+    <p>A valid Liberty Labs canary establishes all of the following:</p>
     <ol>
       <li>The running checkout identifies the intended candidate commit.</li>
       <li>The TypeScript agent-server on port <code>8790</code> is healthy.</li>
-      <li>The triggering Slack event has a durable <code>intake</code> row that reaches <code>done</code>.</li>
+      <li>The triggering event has an <code>intake</code> row that reaches <code>done</code>.</li>
       <li>The server EventLog contains the deterministic user event and terminal agent output.</li>
-      <li><code>syncDeliveryOutbox()</code> creates the corresponding <code>delivery</code> row.</li>
+      <li><code>syncDeliveryOutbox()</code> creates a corresponding <code>delivery</code> row.</li>
       <li>The Dispatcher settles it <code>done</code> with the Slack message timestamp.</li>
-      <li>The reply appears in the correct thread exactly once.</li>
+      <li>The reply appears in the correct DM or thread exactly once.</li>
     </ol>
 
     <div class="callout">
-      <p>The read-only inspection commands and restart notes live in <a href="https://github.com/enyst/smolpaws/blob/main/docs/slack/instructions.md">docs/slack/instructions.md</a>. Credentials remain in the local environment/keychain and must never enter coordinator rows or logs.</p>
+      <p>A response containing <code>🐾 Done — nothing to report back.</code> identifies the old <code>BaseBridgeAdapter</code>/<code>/turns</code> fallback. It is not proof of the Relay canary.</p>
     </div>
 
     <h2>Verification layers</h2>
     <table>
       <tr><th>Layer</th><th>Evidence</th></tr>
       <tr><td>Coordinator state machines</td><td>Real-SQLite tests for dedup, ordering, fencing, retries, replay, and ambiguous sends</td></tr>
-      <tr><td>Agent-server seam</td><td>Integration test against the real in-process TypeScript server and deterministic event IDs</td></tr>
-      <tr><td>Slack delivery seam</td><td>Target/dispatcher/Relay tests with captured Slack channel, thread, and external ID</td></tr>
-      <tr><td>Workspace canary</td><td>Liberty Labs <code>paws</code> round trip plus durable DB/EventLog inspection</td></tr>
+      <tr><td>Agent-server seam</td><td>Real in-process TypeScript agent-server tests with deterministic LLM output</td></tr>
+      <tr><td>Outbound path</td><td>Relay, Dispatcher, Slack target, thread routing, send fence, and external-ID assertions</td></tr>
+      <tr><td>Workspace canary</td><td>Liberty Labs round trip plus durable DB and EventLog inspection</td></tr>
     </table>
+
+    <p>Operational commands and read-only inspection queries live in <a href="https://github.com/enyst/smolpaws/blob/main/docs/slack/instructions.md">docs/slack/instructions.md</a>.</p>
 
     <p class="foot-nav"><a href="index.html">← Back to architecture index</a></p>
   </div>
