@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SmolPaws Slack Coordinator Canary — Engel Nyst</title>
-  <meta name="description" content="The durable SmolPaws Slack path: Socket Mode ingress, coordinator intake, TypeScript OpenHands agent-server, delivery outbox, Relay, and Delivery Dispatcher." />
-  <meta property="og:title" content="SmolPaws Slack Coordinator Canary" />
-  <meta property="og:description" content="Slack → durable coordinator → TypeScript OpenHands agent-server → outbox → Delivery Dispatcher → Slack." />
+  <title>SmolPaws Slack Message Relay — Engel Nyst</title>
+  <meta name="description" content="The durable SmolPaws Slack path: Socket Mode ingress, Message Relay intake, TypeScript OpenHands agent-server, delivery outbox sync, and Delivery Dispatcher." />
+  <meta property="og:title" content="SmolPaws Slack Message Relay" />
+  <meta property="og:description" content="Slack → Message Relay → TypeScript OpenHands agent-server → delivery outbox → Delivery Dispatcher → Slack." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://enyst.github.io/smolpaws-slack.html" />
   <meta property="og:image" content="https://enyst.github.io/og-slack.png" />
@@ -21,25 +21,30 @@
 <body>
   <div class="shell">
     <a class="back" href="index.html">← Home</a>
-    <h1>SmolPaws Slack Coordinator Canary <span class="tag">canary</span></h1>
+    <h1>SmolPaws Slack Message Relay <span class="tag">live canary proven</span></h1>
     <p class="meta">
-      A greenfield Slack bridge for proving the durable SmolPaws message-work architecture.<br>
+      A greenfield Slack bridge for the durable SmolPaws Message Relay architecture.<br>
       Source: <a href="https://github.com/enyst/smolpaws/tree/main/apps/slack">apps/slack/</a> &nbsp;&middot;&nbsp;
-      Relay: <a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/outboundRelay.ts">outboundRelay.ts</a> &nbsp;&middot;&nbsp;
+      Core: <a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/messageRelay.ts">messageRelay.ts</a> &nbsp;&middot;&nbsp;
+      Outbound: <a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/outboundRelay.ts">outboundRelay.ts</a> &nbsp;&middot;&nbsp;
       Dispatcher: <a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/deliveryDispatcher.ts">deliveryDispatcher.ts</a>
     </p>
 
     <div class="callout">
-      <p><strong>Authority:</strong> current code, executable tests, the agent-server EventLog, and coordinator SQLite records. This page describes the architecture. It deliberately does not treat a visible Slack reply alone as proof that a local process is running the newest canary.</p>
+      <p><strong>Status · 2026-08-16:</strong> the complete Liberty Labs Socket Mode round trip has been proven through the TypeScript agent-server, real agent loop, durable outbox sync, Delivery Dispatcher, and Slack Web API. The isolated canary used a deterministic test LLM; the ordinary long-running <code>paws</code> process still needs its real-provider production soak.</p>
+    </div>
+
+    <div class="callout">
+      <p><strong>Authority:</strong> current code, executable tests, the agent-server EventLog, and Message Relay SQLite records. This page describes the architecture. A visible Slack reply alone is not sufficient evidence that the intended process handled it.</p>
     </div>
 
     <h2>Current architecture</h2>
-    <p><code>apps/slack</code> is intentionally greenfield. It runs as a standalone Socket Mode process, owns its Bolt connection and Slack coordinator runtime directly, and does not inherit <code>BaseBridgeAdapter</code>, join the shared bridge loader, or fall back to the legacy <code>/turns</code> path on port 8788.</p>
+    <p><code>apps/slack</code> is intentionally greenfield. It runs as a standalone Socket Mode process, owns its Bolt connection and <code>SlackRelayRuntime</code> directly, and does not inherit <code>BaseBridgeAdapter</code>, join the shared bridge loader, or fall back to the legacy <code>/turns</code> path on port 8788.</p>
 
     <pre class="mermaid">
 flowchart LR
     U["Slack user"] --> S["SlackBridge / paws\nSocket Mode"]
-    S --> I["durable intake\nSQLite"]
+    S --> I["Message Relay intake\nSQLite"]
     I --> A["TypeScript OpenHands\nagent-server :8790"]
     A --> E["durable EventLog"]
     E --> R["Outbound Relay\nsyncDeliveryOutbox()"]
@@ -53,17 +58,17 @@ flowchart LR
     <table>
       <tr><th>Fact</th><th>Owner</th></tr>
       <tr><td>Conversation events and agent execution</td><td>TypeScript agent-server <code>EventLog</code></td></tr>
-      <tr><td>External intake, ordering, retries, claims, and delivery outcomes</td><td>Coordinator SQLite store</td></tr>
+      <tr><td>External intake, ordering, retries, claims, and delivery outcomes</td><td>Message Relay SQLite store</td></tr>
       <tr><td>Slack connection, formatting, thread coordinates, and network send</td><td><code>SlackBridge</code> and <code>SlackDeliveryTarget</code></td></tr>
     </table>
-    <p>The agent-server remains upstream-shaped. External queue semantics, Slack retries, and uncertain network effects stay in SmolPaws-owned coordinator infrastructure.</p>
+    <p>The agent-server remains upstream-shaped. External queue semantics, Slack retries, and uncertain network effects stay in SmolPaws-owned Relay infrastructure.</p>
 
     <h2>Message flow</h2>
     <pre class="mermaid">
 sequenceDiagram
     participant U as Slack user
     participant S as SlackBridge
-    participant C as Coordinator runtime
+    participant M as Message Relay
     participant A as TS agent-server
     participant R as Outbound Relay
     participant D as Delivery Dispatcher
@@ -71,19 +76,19 @@ sequenceDiagram
 
     U->>S: DM or @paws mention
     S->>S: policy, short-lived gate, thread context
-    S->>C: accept message
-    C->>C: persist intake row
-    C-->>S: durable acceptance complete
-    C->>A: deterministic user event + run=true
+    S->>M: accept message
+    M->>M: persist intake row
+    M-->>S: durable acceptance complete
+    M->>A: deterministic user event + run=true
     A->>A: agent loop writes durable events
     R->>A: search events from cursor
-    R->>C: syncDeliveryOutbox()
-    C->>C: insert idempotent delivery row
-    D->>C: claim lane-head delivery
-    D->>C: mark send_attempted
+    R->>M: syncDeliveryOutbox()
+    M->>M: insert idempotent delivery row
+    D->>M: claim lane-head delivery
+    D->>M: mark send_attempted
     D->>API: chat.postMessage
     API-->>D: Slack message ts
-    D->>C: settle done + external_message_id
+    D->>M: settle done + external_message_id
     API-->>U: reply appears once
     </pre>
 
@@ -92,15 +97,15 @@ sequenceDiagram
       <tr><th>Component</th><th>Responsibility</th></tr>
       <tr><td><code>apps/slack/src/adapter.ts</code></td><td>Standalone Bolt/Socket Mode lifecycle and Slack Web API wiring</td></tr>
       <tr><td><code>slackHandler.ts</code></td><td>Access policy, normalization, mention stripping, bounded thread context, and a short-lived duplicate gate</td></tr>
-      <tr><td><code>coordinatorRuntime.ts</code></td><td>Slack-hosted intake, reconciliation, outbox synchronization, and bounded delivery workers</td></tr>
-      <tr><td><code>MessageWorkCoordinator</code></td><td>Lane identity, durable intake, deterministic event append, and delivery-row creation</td></tr>
-      <tr><td><code>OutboundRelay</code></td><td>Calls <code>syncDeliveryOutbox()</code> and performs a bounded dispatch drain</td></tr>
+      <tr><td><code>relayRuntime.ts</code></td><td>Slack-hosted intake, reconciliation, outbox synchronization, and bounded delivery workers</td></tr>
+      <tr><td><code>MessageRelay</code></td><td>Lane identity, durable intake, deterministic event append, and <code>syncDeliveryOutbox()</code></td></tr>
+      <tr><td><code>OutboundRelay</code></td><td>Catches EventLog changes up into the outbox and performs a bounded dispatch drain</td></tr>
       <tr><td><code>DeliveryDispatcher</code></td><td>Claim → validate → send fence → external call → fenced settlement</td></tr>
       <tr><td><code>SlackDeliveryTarget</code></td><td>Sends chunks to the durable Slack channel/thread coordinates</td></tr>
     </table>
 
     <h2>Why <code>syncDeliveryOutbox()</code>?</h2>
-    <p>The Relay repeatedly catches a conversation up from its durable agent-event cursor. For the first Slack canary, the normal terminal agent response becomes one durable delivery row. Repeating the sync is safe because the source identity combines the originating event and destination lane.</p>
+    <p>The Outbound Relay repeatedly catches a conversation up from its durable agent-event cursor. For the first Slack generation, the successful terminal <code>finish</code> observation becomes one durable delivery row. Repeating the sync is safe because the source identity combines the originating event and destination lane.</p>
 
     <pre class="code">agent event id + destination lane
               ↓
@@ -122,36 +127,42 @@ replay becomes a no-op</pre>
 
     <h2>Idempotency boundaries</h2>
     <ul>
-      <li>Coordinator SQLite, keyed by stable Slack message identity, is the durable intake authority.</li>
+      <li>Message Relay SQLite, keyed by stable Slack message identity, is the durable intake authority.</li>
       <li>The in-memory duplicate gate only suppresses simultaneous or very recent callbacks.</li>
-      <li>A failed durable acceptance releases that gate immediately, before a best-effort Slack error reply.</li>
+      <li>A failed durable acceptance releases that gate immediately so a Slack retry can try again.</li>
       <li>Deterministic agent event IDs make append-response loss safe to replay.</li>
       <li>Unique delivery source keys make outbox catch-up safe to replay.</li>
     </ul>
 
-    <h2>Canary proof</h2>
-    <p>A valid Liberty Labs canary establishes all of the following:</p>
+    <h2>Liberty Labs proof</h2>
+    <p>On 2026-08-16, an isolated, self-expiring canary at fork commit <code>a69456fc6f818f23ecb6e2e064f3e03fceeafaf4</code> completed the real Slack transport path. The observed response was:</p>
+
+    <pre class="code">RELAY-LIVE-a69456fc6f81</pre>
+
+    <p>The response travelled through real Socket Mode ingress, durable Relay intake, the real TypeScript agent-server and agent loop, a deterministic test LLM calling <code>finish</code>, <code>syncDeliveryOutbox()</code>, Delivery Dispatcher, Slack Delivery Target, and <code>chat.postMessage</code>. The canary used separate state, port, checkout, and SQLite storage, and stopped itself automatically.</p>
+
+    <p><a href="https://liberty-labs-ai.slack.com/archives/C098D7D02R1/p1786917005172259">Open the Liberty Labs canary thread</a>.</p>
+
+    <h2>What remains</h2>
+    <p>The architectural round trip is proven. The remaining boundary is operational rather than structural:</p>
     <ol>
-      <li>The running checkout identifies the intended candidate commit.</li>
-      <li>The TypeScript agent-server on port <code>8790</code> is healthy.</li>
-      <li>The triggering event has an <code>intake</code> row that reaches <code>done</code>.</li>
-      <li>The server EventLog contains the deterministic user event and terminal agent output.</li>
-      <li><code>syncDeliveryOutbox()</code> creates a corresponding <code>delivery</code> row.</li>
-      <li>The Dispatcher settles it <code>done</code> with the Slack message timestamp.</li>
-      <li>The reply appears in the correct DM or thread exactly once.</li>
+      <li>restart the ordinary host so the obsolete Slack Socket Mode connection is released;</li>
+      <li>run standalone <code>paws</code> against port <code>8790</code> with the configured real LLM profile;</li>
+      <li>verify the durable intake/delivery rows and EventLog;</li>
+      <li>soak restart and <code>delivery_unknown</code> reconciliation behavior before calling it the production Slack path.</li>
     </ol>
 
     <div class="callout">
-      <p>A response containing <code>🐾 Done — nothing to report back.</code> identifies the old <code>BaseBridgeAdapter</code>/<code>/turns</code> fallback. It is not proof of the Relay canary.</p>
+      <p>A response containing <code>🐾 Done — nothing to report back.</code> identifies the old <code>BaseBridgeAdapter</code>/<code>/turns</code> fallback. It is not proof of the Message Relay path.</p>
     </div>
 
     <h2>Verification layers</h2>
     <table>
       <tr><th>Layer</th><th>Evidence</th></tr>
-      <tr><td>Coordinator state machines</td><td>Real-SQLite tests for dedup, ordering, fencing, retries, replay, and ambiguous sends</td></tr>
+      <tr><td>Message Relay state machines</td><td>Real-SQLite tests for dedup, ordering, fencing, retries, replay, and ambiguous sends</td></tr>
       <tr><td>Agent-server seam</td><td>Real in-process TypeScript agent-server tests with deterministic LLM output</td></tr>
-      <tr><td>Outbound path</td><td>Relay, Dispatcher, Slack target, thread routing, send fence, and external-ID assertions</td></tr>
-      <tr><td>Workspace canary</td><td>Liberty Labs round trip plus durable DB and EventLog inspection</td></tr>
+      <tr><td>Outbound path</td><td>Outbox sync, Dispatcher, Slack target, thread routing, send fence, and external-ID assertions</td></tr>
+      <tr><td>Workspace canary</td><td>Real Liberty Labs Socket Mode round trip with the unique Relay response token</td></tr>
     </table>
 
     <p>Operational commands and read-only inspection queries live in <a href="https://github.com/enyst/smolpaws/blob/main/docs/slack/instructions.md">docs/slack/instructions.md</a>.</p>
