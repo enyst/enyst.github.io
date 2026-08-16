@@ -1,0 +1,70 @@
+name: Place transpile maintenance card
+
+on:
+  push:
+    paths:
+      - .github/workflows/place-transpile-maintenance-card.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  place:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Move card into Architecture Studies deterministically
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text()
+          href = 'arch/openhands-transpile-maintenance.html'
+          card_pattern = re.compile(
+              r'\s*<a class="card" href="arch/openhands-transpile-maintenance\.html">.*?</a>\s*',
+              re.S,
+          )
+          text = card_pattern.sub('\n', text)
+
+          card = '''
+              <a class="card" href="arch/openhands-transpile-maintenance.html">
+                <div class="card-title">Maintaining the OpenHands TypeScript transpiles</div>
+                <div class="card-desc">The living maintenance map: one canonical pin, bounded drift intervals, tests-first porting, generated Python OpenAPI oracles, SDK wire goldens, and clear policy for deviations and exclusions.</div>
+                <span class="card-tag tag-report">OpenHands · transpilation</span>
+              </a>
+          '''
+
+          heading = '<h2 id="architecture-studies">Architecture Studies</h2>'
+          heading_index = text.find(heading)
+          if heading_index < 0:
+              raise SystemExit('Architecture Studies heading not found')
+          grid_index = text.find('<div class="cards">', heading_index)
+          if grid_index < 0:
+              raise SystemExit('Architecture Studies card grid not found')
+          insertion = grid_index + len('<div class="cards">')
+          text = text[:insertion] + '\n' + card + text[insertion:]
+          if text.count(href) != 1:
+              raise SystemExit(f'Expected exactly one maintenance card, found {text.count(href)}')
+          path.write_text(text)
+          PY
+
+      - name: Remove one-shot workflow and commit
+        run: |
+          rm -f \
+            .github/workflows/add-transpile-maintenance-card.yml \
+            .github/workflows/place-transpile-maintenance-card.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .github/workflows index.html
+          if git diff --cached --quiet; then
+            echo "Transpile maintenance card is already correctly placed."
+            exit 0
+          fi
+          git commit -m "arch: place transpile maintenance under architecture studies"
+          git pull --rebase origin main
+          git push
