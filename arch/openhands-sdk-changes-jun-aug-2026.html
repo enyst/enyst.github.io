@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands SDK, June→August 2026 — what changed</title>
+  <meta name="description" content="An area-by-area synthesis of the OpenHands software-agent-sdk repo between v1.29.2 and v1.42.1: the prompt registry, the conversation tree, LLM provider connections, telemetry, plugins, and the breaking surface." />
+  <meta property="og:title" content="OpenHands SDK, June→August 2026 — what changed" />
+  <meta property="og:description" content="268 commits, ~71k lines added: prompt registry, conversation tree, LLM provider connections, agent-server telemetry, plugins, and the removed public surface." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/openhands-sdk-changes-jun-aug-2026.html" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .eyebrow { font-family:var(--mono); font-size:.72em; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:600; }
+    .lede { font-size:1.08em; max-width:760px; line-height:1.72; }
+    .scope { font-family:var(--mono); font-size:.74em; color:var(--muted); line-height:1.8; margin:10px 0 26px; }
+    .scope code { font-size:1em; }
+    .rings { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:22px 0; }
+    .ring { border:1px solid var(--border); background:var(--card); border-radius:var(--border-radius); padding:16px; }
+    .ring h3 { margin:0 0 8px; font-size:1em; }
+    .ring p { font-size:.86em; color:var(--muted); margin:0; }
+    .ring .n { font-family:var(--mono); font-size:1.6em; color:var(--accent); display:block; margin-bottom:4px; }
+    .tag { display:inline-block; border:1px solid var(--border); border-radius:999px; padding:2px 8px; font-family:var(--mono); font-size:.68em; color:var(--muted); }
+    .matrix { width:100%; border-collapse:collapse; margin:18px 0; font-size:.9em; }
+    .matrix th,.matrix td { text-align:left; vertical-align:top; border-bottom:1px solid var(--border); padding:9px 10px; }
+    .matrix th { font-family:var(--mono); font-size:.78em; color:var(--muted); }
+    .ba { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0; }
+    .ba > div { border:1px solid var(--border); border-radius:var(--border-radius); padding:14px 16px; background:var(--card); }
+    .ba h4 { font-family:var(--mono); font-size:.72em; text-transform:uppercase; letter-spacing:.08em; margin:0 0 8px; }
+    .ba .before h4 { color:var(--report); }
+    .ba .after h4 { color:var(--green); }
+    .ba code { font-size:.82em; }
+    .flow { display:grid; gap:10px; margin:24px 0; }
+    .flow-row { display:grid; grid-template-columns:170px 28px minmax(0,1fr); align-items:center; gap:8px; }
+    .flow-row .stage { border:1px solid var(--border); border-radius:var(--border-radius); padding:11px 13px; background:var(--card); font-family:var(--mono); font-size:.78em; }
+    .flow-row .arrow { text-align:center; color:var(--muted); }
+    .flow-row .meaning { color:var(--muted); font-size:.91em; }
+    .sources li { margin:8px 0; }
+    .break { border-left:3px solid var(--report); background:var(--card); border-radius:0 var(--border-radius) var(--border-radius) 0; padding:12px 18px; margin:12px 0; font-size:.9em; }
+    .break code { border:none; background:transparent; padding:0; }
+    @media(max-width:760px){ .rings{grid-template-columns:1fr}.ba{grid-template-columns:1fr}.flow-row{grid-template-columns:1fr}.flow-row .arrow{display:none} }
+  </style>
+</head>
+<body>
+<main class="shell">
+  <p class="eyebrow">OpenHands · software-agent-sdk · change synthesis</p>
+  <h1>Two months of the SDK, in one pass</h1>
+  <p class="lede">
+    Between late June and late August 2026 the <code>OpenHands/software-agent-sdk</code> repo grew from
+    <code>v1.29.2</code> to <code>v1.42.1</code> — fourteen minor releases, 268 commits, roughly 71,000 lines
+    added. This is the overall picture, not a changelog: the themes, the new capabilities, the refactors, and
+    the public surface that moved out from under callers.
+  </p>
+
+  <p class="scope">
+    Scope · <code>9663409</code> (v1.29.2, 2026-06-23) → <code>1de2e6d</code> (v1.42.1, 2026-08-20)<br />
+    Repo · <code>OpenHands/software-agent-sdk</code> — 4 packages: <code>openhands-sdk</code>, <code>openhands-agent-server</code>, <code>openhands-tools</code>, <code>openhands-workspace</code>
+  </p>
+
+  <div class="callout star">
+    <p><strong>The through-line:</strong> the SDK stopped treating prompts as Jinja files and conversation history as a flat list, and the agent-server grew a real product surface — telemetry, plugins, sub-agents, canvas extensions, and an OpenAI-compatible gateway — while the <em>observable</em> contract was hardened by deprecation deadlines that finally landed.</p>
+  </div>
+
+  <h2>Scale, by package</h2>
+  <div class="rings">
+    <section class="ring">
+      <span class="tag">+14,555 / −3,524</span>
+      <span class="n">openhands-sdk</span>
+      <p>The bulk of the work: prompt registry, conversation tree, LLM provider abstraction, profiles, MCP config, plugin formats, and a security guardrail stack.</p>
+    </section>
+    <section class="ring">
+      <span class="tag">+9,956 / −950</span>
+      <span class="n">agent-server</span>
+      <p>Mostly additions: telemetry subsystem, plugins/sub-agents/canvas-extension routers, OpenAI gateway, MCP CRUD, and persistence rework.</p>
+    </section>
+    <section class="ring">
+      <span class="tag">+461 / −260 · +69 / −97</span>
+      <span class="n">tools · workspace</span>
+      <p>Narrower edits: terminal hardening, Gemini edit/write diff sharing, apply_patch error structure, and workspace automation tags.</p>
+    </section>
+  </div>
+
+  <h2>1 · LLM &amp; providers</h2>
+  <p>
+    The <code>LLM</code> class is where the most surface moved. A LiteLLM-backed provider abstraction (#2363)
+    replaced direct provider dispatch inside <code>llm.py</code>, and a parallel
+    <code>ModelRuntimeMetadata</code> layer now resolves <em>route-aware</em> context/output limits (OpenRouter
+    is the motivating case: the catalog advertises a 1M-token model that a specific endpoint serves at 262k),
+    cached with a TTL and falling back to static metadata on any error.
+  </p>
+  <div class="ba">
+    <div class="before">
+      <h4>Before</h4>
+      <p>Provider behavior lived inline in <code>llm.py</code>; mutable <code>extra_headers</code> shared across calls; model limits came only from the static LiteLLM catalog.</p>
+    </div>
+    <div class="after">
+      <h4>After</h4>
+      <p><code>litellm_provider.py</code> + <code>utils/providers/openrouter.py</code> own provider specifics; <code>extra_headers</code> frozen into an <code>LLMCallContext</code>; runtime metadata resolves per-endpoint limits lazily.</p>
+    </div>
+  </div>
+  <p>
+    Two new credential concepts arrived. <strong>Provider connections</strong>
+    (<code>provider_connection_store.py</code> + a server router) hold a shared <code>api_key</code> + optional
+    <code>base_url</code> that many profiles reference by id and resolve <em>at read time</em>, so rotating a key
+    takes effect on the next activation with nothing copied into active settings. And a
+    <strong>cleanup profile</strong> (<code>clean_outward_text</code>) is a dedicated LLM profile used to polish
+    outward-facing agent text. <code>LLMProfileStore</code> was split into <code>LLMProfileLoader</code> /
+    <code>LLMProfileMutator</code> / <code>LLMProfileStore</code>, and calls were un-serialized from a global
+    config lock. Error handling was consolidated into a typed <code>exceptions/</code> package plus a closed
+    <code>FailureKind</code> vocabulary (auth / quota / rate_limit / config / transient / agent_action / internal),
+    and subscription validators are now composed rather than bypassed.
+  </p>
+
+  <h2>2 · Agent loop &amp; prompts</h2>
+  <p>
+    The most visible internal refactor: the system prompt is no longer authored in Jinja. All of the
+    <code>agent/prompts/*.j2</code> templates were deleted and replaced by a <em>Python prompt registry</em>
+    (<code>context/prompts/presets.py</code> with <code>sections/</code> — static, dynamic, and a new
+    <code>planning.py</code> ported from the retired <code>system_prompt_planning.j2</code>). Prompt assembly is
+    now programmatic and snapshot-tested rather than template-rendered.
+  </p>
+  <div class="flow">
+    <div class="flow-row"><div class="stage">Jinja .j2 files</div><div class="arrow">→</div><div class="meaning">Deleted: <code>system_prompt.j2</code>, <code>security_policy.j2</code>, <code>in_context_learning_example.j2</code>, <code>system_message_suffix.j2</code>, and every <code>model_specific/*</code> template.</div></div>
+    <div class="flow-row"><div class="stage">Python registry</div><div class="arrow">→</div><div class="meaning"><code>context/prompts/presets.py</code> + <code>sections/</code> compose the system message; planning moves to <code>sections/planning.py</code>.</div></div>
+  </div>
+  <p>
+    On the loop itself, the stuck detector now <em>nudges</em> before hard-terminating on a repeating
+    action-error pattern, and the goal loop no longer halts on a <code>STUCK</code> run. Parallel tool execution
+    propagates <code>contextvars</code> per worker thread, stamps structured error classifications, and records
+    observability spans for non-executed (cancelled) tool results. New agent capabilities include
+    <strong>structured output</strong> (attach a Pydantic <code>response_schema</code> to any tool spec so the
+    model must populate those fields), a <strong>vision-inspect helper tool</strong> that lets non-vision models
+    ask a saved vision profile about an image, and a canonical <code>default_tool_specs</code> that lets the SDK
+    own default tool <em>names</em> as data without importing <code>openhands-tools</code>.
+  </p>
+
+  <h2>3 · Tools</h2>
+  <p>
+    Tool changes are comparatively contained. The terminal gained client-configurable session env, Windows
+    hardening (multiline PowerShell submission, Ctrl-C cleanup, send-keys), and secret masking for all registered
+    secrets — not just exported ones. <code>apply_patch</code> replaced silent assert failures with structured
+    <code>DiffError</code> raises and fixed a race. The Gemini <code>edit</code>/<code>write_file</code> tools now
+    share one diff renderer via a new <code>file_change.py</code>, and <code>file_editor</code> preserves
+    whitespace in the <code>str_replace</code> fallback. Delegation got a visualizer overhaul and cleanup fixes,
+    and the task manager was reworked.
+  </p>
+
+  <h2>4 · Workspace &amp; git</h2>
+  <p>
+    The workspace layer grew an automation surface: a base workspace now derives <em>automation tags</em>, and a
+    completion callback POSTs conversation status (with accumulated LLM cost) to
+    <code>AUTOMATION_CALLBACK_URL</code>, carrying a structured <code>ConversationErrorEvent</code> on failure.
+    Cloud workspace followed with automation tags and SDK settings passthrough. On the git side, a new
+    <code>git_commits.py</code> adds a commit-history API (list commits + per-commit diffs rendered from git
+    objects, so deleted files still render), and the agent-server exposes a workspace archive endpoint for
+    git-delta / tar.gz plus <code>/git/commits</code>.
+  </p>
+
+  <h2>5 · Conversation, events &amp; persistence</h2>
+  <p>
+    This is the other structural headline: conversation history became a <strong>tree</strong>. Events carry a
+    <code>parent_id</code>, state tracks a movable <code>leaf_event_id</code> HEAD (with a reserved
+    <code>ROOT_PARENT_ID</code> for deliberately re-rooted trees), and the SDK + server expose fork-from-event,
+    navigate, and lineage over both local state and HTTP. A lazy-hydration pass makes persisted conversations
+    load on demand, idle conversations are evicted after a configurable TTL, and parent/child conversation
+    relationships are now persisted.
+  </p>
+  <p>
+    Events gained a privacy-safe failure contract (<code>ErrorClassification</code>, <code>FailureKind</code>)
+    that crosses the event/API boundary, and a corrective nudge is now emitted as an environment event. New
+    opt-in <strong>persistent memory</strong> reads two tiers of agent-maintained <code>MEMORY.md</code> indexes
+    (user <code>~/.openhands/memory/</code> and project <code>.openhands/memory/</code>) into prompt-ready text.
+  </p>
+
+  <h2>6 · Settings &amp; profiles</h2>
+  <p>
+    Profiles became store-agnostic (a protocol + hoisted router helpers as a cloud prereq), gained a seed
+    profile and a resolvable <code>default</code> LLM profile backfilled at seed time, and a public
+    <code>from_persisted()</code> entry point that loads persisted settings through migrations. Skill selection
+    flipped from an allow-list to a deny-list: <code>skill_refs</code> is replaced by <code>disabled_skills</code>.
+    MCP grew a settings-backed auth credential store, an <code>enabled</code> flag to switch a server off without
+    removing it, and OAuth token persistence via a FastMCP <code>AsyncKeyValue</code> adapter.
+  </p>
+  <div class="ba">
+    <div class="before">
+      <h4>Before</h4>
+      <p><code>skill_refs</code> allow-list selected skills; MCP servers had no per-server off switch or settings-backed OAuth.</p>
+    </div>
+    <div class="after">
+      <h4>After</h4>
+      <p><code>disabled_skills</code> deny-list (whole catalog on by default); <code>MCPServer.enabled</code>; MCP OAuth tokens live in settings with the same encryption/redaction path.</p>
+    </div>
+  </div>
+
+  <h2>7 · Agent-server</h2>
+  <p>
+    The server gained the most new <em>surface</em>, almost entirely additive. A new <strong>telemetry</strong>
+    subsystem emits an allowlisted set of lifecycle/failure events (never prompts, messages, paths, secrets, or
+    bodies) through a split-consent policy to PostHog or HTTP exporters, with pseudonymization and a
+    <code>DO_NOT_TRACK</code> kill switch. <strong>Canvas extensions</strong> got a manifest, containment,
+    installation persistence, and a staged check/apply refresh. <strong>Plugins</strong> grew a strategy-based
+    format loader (root <code>plugin.json</code> closed schema + Claude Code format), installed/local auto-load,
+    and full CRUD routers. <strong>Sub-agents</strong> got a discovery endpoint mirroring <code>discover_agents</code>.
+  </p>
+  <div class="rings">
+    <section class="ring">
+      <span class="tag">new subsystem</span>
+      <h3>Telemetry</h3>
+      <p><code>telemetry/</code> (service, policy, sanitizer, sink, subscriber, exporters) — off by default, consent-gated, pseudonymized.</p>
+    </section>
+    <section class="ring">
+      <span class="tag">new routers</span>
+      <h3>Surface</h3>
+      <p><code>plugins_router</code>, <code>sub_agents_router</code>, <code>provider_connections_router</code>, <code>openai/router.py</code>, MCP settings CRUD.</p>
+    </section>
+    <section class="ring">
+      <span class="tag">protocol</span>
+      <h3>OpenAI gateway</h3>
+      <p><code>/v1/models</code> + chat completions over the same session key — call the agent-server through the OpenAI protocol.</p>
+    </section>
+  </div>
+  <p>
+    Persistence was reworked around <code>base_state.json</code> as the single source of truth for the agent,
+    ending the <code>meta.json</code> duplication that had reverted restored conversations' LLM config and
+    doubled a trajectory secret leak. The REST API is now published as a typed OpenAPI contract with breakage
+    checks, secrets are redacted at more boundaries, the default bind host moved to loopback without a session
+    key, and WebSocket auth happens outside URLs.
+  </p>
+
+  <h2>8 · Security</h2>
+  <p>
+    The security stack deepened in two directions. <strong>ToolShield</strong> (#2911) adds an
+    LLM-as-guardrail analyzer that issues a <em>separate</em> guardrail completion evaluating each proposed
+    action against recent history — distinct from the actor LLM annotating its own risk — with optional
+    per-tool "safety experiences". And the pattern analyzer got an AST-backed shell-command resolver
+    (tree-sitter <code>shell_semantics.py</code>) so quoted, path-qualified, and nested command names become
+    visible to the force-delete detector, reporting <code>UNKNOWN</code> (fails-safe) when it cannot vouch for
+    what it saw. A secret-disclosure consent rule joined the agent security policy.
+  </p>
+
+  <h2>Breaking surface</h2>
+  <p>The deprecation pipeline finally cut. These public names are gone or on a deadline:</p>
+  <div class="break"><strong>Removed at 1.41.0</strong> — <code>StartACPConversationRequest</code> (use <code>StartConversationRequest</code>), <code>AgentDefinition.mcp_servers</code> (use <code>mcp_config</code>), <code>AgentProfileDiagnostics.resolved_mcp_servers</code> (use <code>resolved_mcp_config_keys</code>).</div>
+  <div class="break"><strong>Deprecated 1.40.0 → removed 1.45.0</strong> — <code>AgentBase.model_dump_succint</code> (use <code>model_dump(exclude_none=True)</code>).</div>
+  <div class="break"><strong>Renamed/reshaped</strong> — <code>skill_refs</code> → <code>disabled_skills</code>; Jinja prompt templates removed (internal, but downstream renderers that read them are broken); <code>extra_headers</code> → frozen <code>LLMCallContext</code>.</div>
+
+  <h2>Sources of truth</h2>
+  <ul class="sources">
+    <li><a href="https://github.com/OpenHands/software-agent-sdk/compare/966340979be26c2162e9ab8805557b715e1f1a78...1de2e6d1bfcf70c7c3d4eb13616811943f33dd75">GitHub compare of the two SHAs</a></li>
+    <li><a href="https://github.com/OpenHands/software-agent-sdk">OpenHands/software-agent-sdk</a> — <code>git log --oneline 9663409..1de2e6d</code>, <code>git diff --stat</code>, and per-file diffs read directly</li>
+  </ul>
+
+  <footer>
+    <p>Every claim above is grounded in the actual diff between the two commits. It is a synthesis by area, not a per-PR changelog.</p>
+  </footer>
+</main>
+</body>
+</html>
