@@ -1,0 +1,222 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhatsApp as a bridge — moving the primary channel onto the durable relay</title>
+<meta name="description" content="Design proposal: rewrite the SmolPaws WhatsApp channel as a standalone bridge (apps/whatsapp) on the durable Message Relay, following the Slack pattern — without losing the SQLite store, scopes, scheduler, or media." />
+<meta property="og:title" content="WhatsApp as a bridge — design proposal" />
+<meta property="og:description" content="Move the primary SmolPaws channel from the root process onto apps/whatsapp, the durable Message Relay, and the new TypeScript agent-server — losing nothing." />
+<meta property="og:type" content="article" />
+<style>
+  :root{
+    --fg:#1a1a1a; --muted:#5a5a5a; --subtle:#8a8a82;
+    --bg:#fdfdfb; --card:#ffffff; --elevated:#f7f6f1;
+    --accent:#2b4eaa; --accent-soft:#e6ecfa;
+    --rule:#e2e2dc; --rule-strong:#bdbcb4;
+    --code-bg:#f3f1ec; --warn:#b25b0e; --ok:#2f7a3a; --crit:#a02020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.6;font-size:16px}
+  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:4px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none} nav.toc a:hover{color:var(--accent)}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:28px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:32px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted);max-width:820px}
+  h2{font-size:22px;margin:44px 0 10px} h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:16px;margin:22px 0 8px}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule)}
+  pre code{background:transparent;padding:0}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg)}
+  td.sym code{background:transparent;padding:0;color:var(--accent);font-weight:600}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:14px 0;border-radius:0 4px 4px 0;font-size:14.5px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6} .callout.note{border-color:var(--muted);background:#f3f1ec}
+  .callout.ok{border-color:var(--ok);background:#eef6ef}
+  .fig{margin:18px 0 22px}
+  .fig svg{display:block;max-width:100%;height:auto;background:#fff;border:1px solid var(--rule);border-radius:6px}
+  .fig figcaption{font-size:13px;color:var(--muted);margin-top:6px;text-align:center}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid var(--rule-strong);color:var(--muted);white-space:nowrap}
+  .pill.keep{color:var(--ok);border-color:var(--ok);background:#eef6ef}
+  .pill.move{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+  .pill.new{color:var(--warn);border-color:var(--warn);background:#fbf1e6}
+  .pill.risk{color:var(--crit);border-color:var(--crit);background:#faeeee}
+  .toplink{display:inline-block;margin-top:10px;padding:7px 10px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;color:var(--accent);text-decoration:none;font-size:13px}
+  .status{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--warn);color:var(--warn);background:#fbf1e6}
+  .mono{font-family:var(--mono)}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr}}
+</style></head><body>
+<div class="wrap">
+  <nav class="toc"><h2>Contents</h2><ol>
+    <li><a href="#why">Why move at all</a></li>
+    <li><a href="#today">WhatsApp today</a></li>
+    <li><a href="#pattern">The Slack pattern</a></li>
+    <li><a href="#target">Target: apps/whatsapp</a></li>
+    <li><a href="#preserve">What must not be lost</a></li>
+    <li><a href="#flow">The relay flow</a></li>
+    <li><a href="#lifecycle">Start like a bridge</a></li>
+    <li><a href="#migration">Migration plan</a></li>
+    <li><a href="#risks">Risks &amp; open questions</a></li>
+  </ol>
+  <a class="toplink" href="../index.html">← Notebook</a>
+  </nav>
+
+  <main>
+  <header class="title">
+    <div class="eyebrow">SmolPaws · design proposal</div>
+    <h1>WhatsApp as a bridge</h1>
+    <p class="sub">Move the primary SmolPaws channel off the root process and onto the durable Message Relay — a standalone <code>apps/whatsapp</code> that starts like the Slack bridge, talks to the new TypeScript agent-server, and loses none of what makes WhatsApp the main channel.</p>
+    <p style="margin-top:12px"><span class="status">STATUS: PROPOSED</span> &nbsp; <span class="pill">bead smolpaws-kxa · P0</span> &nbsp; <span class="pill">epic smolpaws-zlo</span></p>
+  </header>
+
+  <h2 id="why"><span class="num">1</span>Why move at all</h2>
+  <p>WhatsApp is the oldest SmolPaws channel, and it shows: it lives in the repository <em>root</em> (<code>src/index.ts</code>), it boots as <em>the app itself</em>, and it predates the bridge abstraction the newer channels use. Every other channel — Discord, Slack, email — is an <code>apps/&lt;name&gt;</code> plugin that the host starts and stops independently. WhatsApp is the exception, and being the exception is now the problem.</p>
+  <p>Two forces make this a P0:</p>
+  <ul>
+    <li><strong>The cutover to the new transpiled stack.</strong> We are proving the new TypeScript OpenHands agent-server with Slack (<code>paws</code>) as the guinea pig. When it is proven, the primary channel has to follow — but only if WhatsApp can talk to that server the same durable way Slack does.</li>
+    <li><strong>One shape, many front doors.</strong> When WhatsApp is a bridge like the others, the whole system has one mental model: a thin front door per platform, one durable relay, one agent-server. Less bespoke code to reason about, and the eight-minute-understandable property survives.</li>
+  </ul>
+  <div class="callout note">The goal is <strong>not</strong> a behavior change for the user. WhatsApp should feel identical. The single intended difference is operational: it starts as its own process, on demand, instead of being the process.</div>
+
+  <h2 id="today"><span class="num">2</span>WhatsApp today</h2>
+  <p>The current channel is a Baileys multi-device client wrapped in a poll loop, with a set of concerns that the thin bridges simply do not carry. From <code>src/</code>:</p>
+  <table>
+    <tr><th>Concern</th><th>Where it lives now</th><th>What it does</th></tr>
+    <tr><td>Connection</td><td class="sym"><code>src/index.ts</code> · <code>connectWhatsApp()</code></td><td>Baileys socket, auth reload, reconnect, transient-error swallowing so the CDN socket dropping never crashes the process.</td></tr>
+    <tr><td>Versioning</td><td class="sym"><code>whatsapp-version.ts</code></td><td>Resolves a working WhatsApp web version.</td></tr>
+    <tr><td>Auth</td><td class="sym"><code>whatsapp-auth.ts</code></td><td>Multi-file auth state in <code>~/.smolpaws/whatsapp/auth</code>.</td></tr>
+    <tr><td>Identity</td><td class="sym"><code>whatsapp-jid.ts</code></td><td>JID / LID resolution for outbound targets.</td></tr>
+    <tr><td>Store</td><td class="sym"><code>~/.smolpaws/whatsapp/messages.db</code></td><td>SQLite record of all messages, both directions, per group.</td></tr>
+    <tr><td>Scopes</td><td class="sym"><code>scope.ts</code> · <code>control-scope.ts</code></td><td>Which chat maps to which group folder, control-scope privileges, per-group config, <code>triggerFree</code> groups.</td></tr>
+    <tr><td>Scheduler</td><td class="sym"><code>task-scheduler.ts</code></td><td>Cron / interval / once tasks, per scope, that fire prompts back into the agent.</td></tr>
+    <tr><td>Media</td><td class="sym"><code>src/index.ts</code> media helpers</td><td>Download inbound media, voice-note playback, image passthrough, outbound voice outbox.</td></tr>
+    <tr><td>Trigger</td><td class="sym"><code>src/index.ts</code> trigger logic</td><td><code>@smolpaws</code> gating, except in <code>triggerFree</code> groups.</td></tr>
+  </table>
+  <p>The important detail: WhatsApp already <em>has</em> a durable SQLite store and a coordinator. It is not starting from nothing — it is on the <strong>legacy dispatch path</strong> (the older <code>turnClient</code> / <code>/turns</code> route into the agent-server), while Slack has already moved to the durable Message Relay.</p>
+
+  <h2 id="pattern"><span class="num">3</span>The Slack pattern (the target we copy)</h2>
+  <p>Slack (<code>apps/slack</code>, the live <code>paws</code> app) is <span class="pill">kind: standalone</span>. It deliberately does <strong>not</strong> use <code>BaseBridgeAdapter</code>, <code>bridgeRegistry</code>, <code>turnClient</code>, or <code>/turns</code>. It runs as its own process and drives the durable relay directly. Its own <code>AGENTS.md</code> is blunt about it:</p>
+  <pre><code>Slack Socket Mode
+  -> SlackBridge / slackHandler
+  -> SlackRelayRuntime.accept()
+  -> MessageRelay durable intake (SQLite)
+  -> TypeScript OpenHands agent-server (:8790)
+  -> agent EventLog
+  -> OutboundRelay.syncDeliveryOutbox()
+  -> durable delivery outbox
+  -> DeliveryDispatcher
+  -> SlackDeliveryTarget
+  -> chat.postMessage</code></pre>
+  <p>The relay pieces are shared code in <code>src/coordinator/</code>, not Slack-specific:</p>
+  <table>
+    <tr><th>Component</th><th>Owns</th></tr>
+    <tr><td class="sym"><code>MessageRelay</code></td><td>Lane binding, durable intake, agent-server integration, <code>syncDeliveryOutbox()</code>.</td></tr>
+    <tr><td class="sym"><code>OutboundRelay</code></td><td>Catches agent events up into the durable delivery outbox, repeatedly.</td></tr>
+    <tr><td class="sym"><code>DeliveryDispatcher</code></td><td>The external side-effect boundary — the one place a reply actually leaves the building.</td></tr>
+    <tr><td class="sym"><code>&lt;Platform&gt;RelayRuntime</code></td><td>Runs the intake + outbound workers for one platform.</td></tr>
+    <tr><td class="sym"><code>&lt;Platform&gt;DeliveryTarget</code></td><td>Performs the platform-specific send.</td></tr>
+  </table>
+  <div class="callout">So the WhatsApp rewrite is not an invention. It is: <strong>keep WhatsApp's front-door code, drop the legacy dispatch, and plug into the same shared relay Slack already uses.</strong></div>
+
+  <h2 id="target"><span class="num">4</span>Target: <code>apps/whatsapp</code></h2>
+  <p>Mirror the Slack layout. Same file names, WhatsApp guts.</p>
+  <pre><code>apps/whatsapp/
+  plugin.json         # kind: "standalone"  (NOT loaded by the bridge loader)
+  package.json
+  src/
+    index.ts          # process entry: wire config -> runtime -> start
+    config.ts         # env + ~/.smolpaws paths, allowlist, relay server URL
+    adapter.ts        # WhatsAppBridge: owns the Baileys connection + poll loop
+    handler.ts        # trigger logic, scope resolution, media -> IncomingMessage
+    relayRuntime.ts   # WhatsAppRelayRuntime: intake + outbound workers
+    deliveryTarget.ts # WhatsAppDeliveryTarget: Baileys sendMessage / media
+    __tests__/</code></pre>
+  <p>The <code>plugin.json</code> mirrors Slack's, declaring <code>kind: "standalone"</code> so the bridge loader ignores it (the loader only auto-starts <code>kind: "bridge"</code> manifests). WhatsApp is started on its own, like <code>paws</code>.</p>
+  <table>
+    <tr><th>New file</th><th>Comes from</th><th>Disposition</th></tr>
+    <tr><td class="sym"><code>adapter.ts</code></td><td><code>src/index.ts</code> connect + poll loop</td><td><span class="pill move">move</span> lift <code>connectWhatsApp()</code>, reconnect, error-swallowing verbatim</td></tr>
+    <tr><td class="sym"><code>handler.ts</code></td><td><code>src/index.ts</code> trigger + <code>scope.ts</code></td><td><span class="pill move">move</span> produce <code>IncomingMessage</code> after trigger + scope checks</td></tr>
+    <tr><td class="sym"><code>deliveryTarget.ts</code></td><td><code>src/index.ts</code> send + media helpers</td><td><span class="pill move">move</span> the send side-effect boundary</td></tr>
+    <tr><td class="sym"><code>relayRuntime.ts</code></td><td><code>apps/slack/src/relayRuntime.ts</code></td><td><span class="pill new">adapt</span> copy the Slack runtime, swap the delivery target</td></tr>
+    <tr><td class="sym"><code>config.ts</code></td><td><code>src/config.ts</code></td><td><span class="pill move">move</span> WhatsApp-relevant env + paths</td></tr>
+  </table>
+
+  <h2 id="preserve"><span class="num">5</span>What must not be lost</h2>
+  <p>The enyst.io WhatsApp page already names why WhatsApp never became a bridge: it "carries concerns the bridges don't: the SQLite store, the scope/permission model, the scheduler, and media pipelines." Those concerns are the acceptance criteria for this rewrite. Nothing here gets dropped — it gets rehomed into <code>apps/whatsapp</code>.</p>
+  <table>
+    <tr><th>Concern</th><th>Plan</th><th>Status</th></tr>
+    <tr><td>SQLite message store (<code>messages.db</code>)</td><td>Keep as-is; the coordinator relay DB is separate and additive. The message DB stays the channel's own record.</td><td><span class="pill keep">keep</span></td></tr>
+    <tr><td>Scope / permission model</td><td>Move <code>scope.ts</code>, <code>control-scope.ts</code>, <code>registered_groups.json</code>, <code>triggerFree</code> into the handler path. Scope resolution runs <em>before</em> durable intake, so only accepted messages create work.</td><td><span class="pill move">move</span></td></tr>
+    <tr><td>Scheduler</td><td>The trickiest piece — see open questions. Scheduled tasks fire prompts <em>into</em> the agent without an inbound message. Options: keep the scheduler in <code>apps/whatsapp</code> and have it enqueue synthetic relay intakes, or lift the scheduler into shared coordinator code so any channel can use it.</td><td><span class="pill new">decide</span></td></tr>
+    <tr><td>Media pipelines</td><td>Inbound download + outbound (images, voice notes) move into <code>handler.ts</code> / <code>deliveryTarget.ts</code>. Voice-note playback for Bossy stays host-side.</td><td><span class="pill move">move</span></td></tr>
+    <tr><td>Connection resilience</td><td>The transient-error swallowing that keeps Baileys from crashing the process moves verbatim into <code>adapter.ts</code>.</td><td><span class="pill move">move</span></td></tr>
+    <tr><td>Auth / version / JID</td><td>Move the three helper modules unchanged.</td><td><span class="pill move">move</span></td></tr>
+  </table>
+
+  <h2 id="flow"><span class="num">6</span>The relay flow</h2>
+  <div class="fig">
+  <svg viewBox="0 0 860 240" role="img" aria-label="WhatsApp bridge relay flow">
+    <style>
+      .b{fill:#fff;stroke:#bdbcb4;rx:6} .bl{fill:#e6ecfa;stroke:#2b4eaa}
+      .t{font:12px ui-monospace,Menlo,monospace;fill:#1a1a1a} .tm{font:11px ui-monospace,Menlo,monospace;fill:#5a5a5a}
+      .a{stroke:#5a5a5a;stroke-width:1.4;marker-end:url(#ar)}
+    </style>
+    <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5a5a5a"/></marker></defs>
+    <rect class="b" x="10" y="30" width="120" height="46"/><text class="t" x="20" y="50">Baileys</text><text class="tm" x="20" y="66">poll loop</text>
+    <rect class="b" x="10" y="150" width="120" height="46"/><text class="t" x="20" y="170">handler</text><text class="tm" x="20" y="186">trigger+scope</text>
+    <rect class="bl" x="170" y="90" width="150" height="46"/><text class="t" x="180" y="110">MessageRelay</text><text class="tm" x="180" y="126">durable intake</text>
+    <rect class="bl" x="360" y="90" width="160" height="46"/><text class="t" x="370" y="110">agent-server</text><text class="tm" x="370" y="126">:8790 · EventLog</text>
+    <rect class="bl" x="560" y="90" width="150" height="46"/><text class="t" x="570" y="110">OutboundRelay</text><text class="tm" x="570" y="126">delivery outbox</text>
+    <rect class="b" x="560" y="176" width="150" height="46"/><text class="t" x="570" y="196">Dispatcher</text><text class="tm" x="570" y="212">+ WA target</text>
+    <rect class="b" x="740" y="30" width="110" height="46"/><text class="t" x="750" y="50">WhatsApp</text><text class="tm" x="750" y="66">sendMessage</text>
+    <line class="a" x1="70" y1="76" x2="70" y2="150"/>
+    <line class="a" x1="130" y1="168" x2="170" y2="120"/>
+    <line class="a" x1="320" y1="113" x2="360" y2="113"/>
+    <line class="a" x1="520" y1="113" x2="560" y2="113"/>
+    <line class="a" x1="635" y1="136" x2="635" y2="176"/>
+    <line class="a" x1="710" y1="188" x2="795" y2="76"/>
+  </svg>
+  <figcaption>Inbound is gated by trigger + scope before it ever becomes durable work. Outbound leaves the building in exactly one place: the Dispatcher.</figcaption>
+  </div>
+  <p>Durable boundaries carry over directly from the Slack design: coordinator SQLite keyed by the stable WhatsApp message identity is the idempotency authority; a process-local dedup gate is only a short-lived optimization and never the source of truth. Once a delivery row is marked <code>send_attempted</code>, a failure is <code>delivery_unknown</code> — never blindly re-send a message that may already have landed. WhatsApp gets its own versioned relay DB and conversation namespace (e.g. <code>whatsapp-relay:v1</code>); it must not reuse legacy conversation IDs, or it could rediscover and re-send historical replies.</p>
+
+  <h2 id="lifecycle"><span class="num">7</span>Start like a bridge, not like the app</h2>
+  <p>Today WhatsApp boots because it <em>is</em> <code>src/index.ts</code> — the thing you run. After the move, the host starts <code>apps/whatsapp</code> as a separate process, the same way <code>paws</code> is started:</p>
+  <pre><code>./scripts/run-local-smolpaws.sh npm --prefix apps/whatsapp run start</code></pre>
+  <p>This is the one intended behavioral difference Engel called out. It also unlocks the operational wins: WhatsApp can be restarted without touching the agent-server, it can run against a local or remote agent-server by config, and the repo root stops being a single channel's home.</p>
+  <div class="callout warn"><strong>The LaunchAgent question.</strong> WhatsApp is the primary channel and is expected to stay up. Bead <code>smolpaws-1zk.2</code> already covers keeping the host alive via a LaunchAgent and bootstrapping the agent-server when needed. The bridge move should land <em>with</em> a supervision story, not leave the main channel to be started by hand.</div>
+
+  <h2 id="migration"><span class="num">8</span>Migration plan</h2>
+  <ol>
+    <li><strong>Prerequisite.</strong> The new agent-server is proven by <code>paws</code> end-to-end (epic <code>smolpaws-zlo</code>, blocked-by <code>smolpaws-b1r</code> and <code>smolpaws-c6q</code>).</li>
+    <li><strong>Scaffold</strong> <code>apps/whatsapp</code> from the Slack layout — <code>plugin.json</code>, <code>config.ts</code>, empty runtime/target with tests.</li>
+    <li><strong>Lift the front door.</strong> Move connect/poll/reconnect into <code>adapter.ts</code>; move trigger + scope + media into <code>handler.ts</code>; move send into <code>deliveryTarget.ts</code>. No behavior change.</li>
+    <li><strong>Wire the relay.</strong> Copy <code>relayRuntime.ts</code> from Slack, point it at the WhatsApp delivery target and a fresh <code>whatsapp-relay:v1</code> coordinator DB.</li>
+    <li><strong>Resolve the scheduler.</strong> Decide keep-local vs lift-to-shared; wire scheduled prompts as synthetic intakes.</li>
+    <li><strong>Prove it locally</strong> with the same six-point canary Slack uses: ingress accepted → intake row → agent run → outbox row → dispatcher settled → reply in the right chat. A visible reply alone is not a pass.</li>
+    <li><strong>Add to the live test queue</strong> for the running smolpaws, behind the current channel, until confidence is high.</li>
+    <li><strong>Cut over</strong> the live primary channel; keep the old root path as a documented rollback until the bridge has soaked.</li>
+  </ol>
+
+  <h2 id="risks"><span class="num">9</span>Risks &amp; open questions</h2>
+  <table>
+    <tr><th>Item</th><th>Note</th></tr>
+    <tr><td><span class="pill risk">scheduler</span> Where does it live?</td><td>The scheduler is the one concern with no Slack precedent. Keeping it in <code>apps/whatsapp</code> is the smaller change; lifting it into shared coordinator code (bead <code>smolpaws-0de</code>) is the cleaner long-term shape but a bigger blast radius. Proposal: keep it local first, lift later.</td></tr>
+    <tr><td><span class="pill risk">history</span> Reused conversation IDs</td><td>WhatsApp has a long history of conversation IDs on the legacy path. The new relay must use a fresh namespace so it cannot rediscover and re-send old replies. This is the same trap the Slack design flagged.</td></tr>
+    <tr><td><span class="pill risk">messages.db</span> One store or two?</td><td>Does the channel keep its own <code>messages.db</code> and let the coordinator hold intake/outbox separately (proposed), or does the message record fold into the coordinator? Proposed: keep them separate — the message DB is the channel's ledger, the relay DB is the work queue.</td></tr>
+    <tr><td><span class="pill risk">supervision</span> Who keeps it up?</td><td>The primary channel must not depend on a human running a command. Tie the cutover to <code>smolpaws-1zk.2</code>.</td></tr>
+    <tr><td><span class="pill">control scope</span> Admin privileges</td><td>The <code>main</code> control scope has elevated rights (managing groups, scheduling for other groups). Confirm the relay path preserves control-scope semantics end to end.</td></tr>
+  </table>
+  <div class="callout ok"><strong>Bottom line.</strong> The rewrite is a lift-and-replug, not a redesign. WhatsApp keeps its store, scopes, scheduler, and media; it drops only the legacy dispatch and its "I am the app" boot; it gains the durable relay and the same shape as every other channel. The proof bar is the Slack six-point canary, run for WhatsApp.</div>
+
+  </main>
+</div>
+</body></html>

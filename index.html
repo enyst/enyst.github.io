@@ -28,6 +28,7 @@
     <nav class="links" aria-label="Sections">
       <a href="#how-things-work">How things work</a>
       <a href="#channels">SmolPaws channels</a>
+      <a href="#next-smolpaws">The next SmolPaws</a>
       <a href="#architecture-studies">Architecture studies</a>
       <a href="#investigations">Investigations &amp; dashboards</a>
       <a href="#elsewhere">Elsewhere</a>
@@ -98,6 +99,31 @@
         <div class="card-title">SmolPaws GitHub Entry Point</div>
         <div class="card-desc">A Cloudflare Worker GitHub App + @smolpaws mention poller — each issue/PR maps to one durable conversation, so pings in a thread resume the same context.</div>
         <span class="card-tag tag-live">live</span>
+      </a>
+    </div>
+
+    <h2 id="next-smolpaws">The next SmolPaws</h2>
+    <p class="tagline" style="margin-top:-4px">Three tracks in flight: move the primary channel onto the new transpiled stack, put a cat <em>inside</em> OpenHands, and make both cats talk in realtime voice.</p>
+    <div class="cards">
+      <a class="card" href="arch/whatsapp-as-bridge.html">
+        <div class="card-title">WhatsApp as a bridge</div>
+        <div class="card-desc">Design proposal: lift the primary channel out of the repo root into a standalone <code>apps/whatsapp</code> on the durable Message Relay — following the Slack pattern, starting as its own process, and losing none of the SQLite store, scopes, scheduler, or media. <span class="mono">bead smolpaws-kxa · P0</span></div>
+        <span class="card-tag tag-draft">proposed</span>
+      </a>
+      <a class="card" href="arch/smolpaws-message-work-adr.html">
+        <div class="card-title">ADR: Durable message work belongs around agent-server</div>
+        <div class="card-desc">The architecture decision the whole cutover rests on — keep the agent-server upstream-shaped and put durable channel intake and delivery in a small local coordinator. The Message Relay that Slack already uses and WhatsApp is moving to.</div>
+        <span class="card-tag tag-report">ADR · decision</span>
+      </a>
+      <a class="card" href="arch/openhands-transpile-maintenance.html">
+        <div class="card-title">Maintaining the OpenHands TypeScript transpiles</div>
+        <div class="card-desc">The living maintenance map behind the cutover: one canonical pin, bounded drift intervals, tests-first porting, and generated Python OpenAPI oracles keeping the new stack faithful to upstream.</div>
+        <span class="card-tag tag-report">OpenHands · transpilation</span>
+      </a>
+      <a class="card" href="arch/sdk-swap-surface.html">
+        <div class="card-title">SDK swap surface</div>
+        <div class="card-desc">The wire-by-wire migration map for hooking smolpaws to the new package — every symbol it imports, where it lands in the fresh transpile, and what's clean, renamed, to-port, or a deviation to decide.</div>
+        <span class="card-tag tag-report">migration</span>
       </a>
     </div>
 
