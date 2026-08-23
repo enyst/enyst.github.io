@@ -1,0 +1,151 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The insider cat — SmolPaws living inside OpenHands</title>
+<meta name="description" content="Implementation record: a SmolPaws that runs inside the OpenHands UI (odie) — a three-pose avatar driven off live agent status, a 'call the cat' button that opens a smolpaws-tagged conversation, and a local-environment identity injected via the agent-server system suffix." />
+<meta property="og:title" content="The insider cat — SmolPaws inside OpenHands" />
+<meta property="og:description" content="A cat that lives inside the OpenHands UI: three-pose avatar off live agent status, a call-the-cat button, and a local-environment identity. What shipped, where it lives, and how big it is." />
+<meta property="og:type" content="article" />
+<style>
+  :root{
+    --fg:#1a1a1a; --muted:#5a5a5a; --subtle:#8a8a82;
+    --bg:#fdfdfb; --card:#ffffff; --elevated:#f7f6f1;
+    --accent:#2b4eaa; --accent-soft:#e6ecfa;
+    --rule:#e2e2dc; --rule-strong:#bdbcb4;
+    --code-bg:#f3f1ec; --warn:#b25b0e; --ok:#2f7a3a; --crit:#a02020;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.6;font-size:16px}
+  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
+  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
+  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
+  nav.toc li{counter-increment:toc;margin:4px 0}
+  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
+  nav.toc a{color:var(--fg);text-decoration:none} nav.toc a:hover{color:var(--accent)}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:28px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:32px;margin:6px 0 4px;letter-spacing:-.01em}
+  header.title .sub{color:var(--muted);max-width:820px}
+  h2{font-size:22px;margin:44px 0 10px} h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
+  h3{font-size:16px;margin:22px 0 8px}
+  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+  pre{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule)}
+  pre code{background:transparent;padding:0}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg)}
+  td.sym code{background:transparent;padding:0;color:var(--accent);font-weight:600}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:14px 0;border-radius:0 4px 4px 0;font-size:14.5px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6} .callout.note{border-color:var(--muted);background:#f3f1ec}
+  .callout.ok{border-color:var(--ok);background:#eef6ef}
+  figure.shot{margin:18px 0 22px}
+  figure.shot img{display:block;max-width:100%;height:auto;border:1px solid var(--rule);border-radius:8px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+  figure.shot figcaption{font-size:13px;color:var(--muted);margin-top:8px;text-align:center}
+  .poses{display:flex;gap:22px;flex-wrap:wrap;margin:14px 0 8px}
+  .pose{text-align:center;font-size:12px;color:var(--muted)}
+  .pose svg{width:72px;height:72px;display:block;margin:0 auto 6px;background:#fff;border:1px solid var(--rule);border-radius:10px;padding:6px}
+  .pose b{color:var(--fg);font-weight:600}
+  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid var(--rule-strong);color:var(--muted);white-space:nowrap}
+  .pill.ok{color:var(--ok);border-color:var(--ok);background:#eef6ef}
+  .toplink{display:inline-block;margin-top:10px;padding:7px 10px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;color:var(--accent);text-decoration:none;font-size:13px}
+  .status{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--ok);color:var(--ok);background:#eef6ef}
+  .mono{font-family:var(--mono)}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr}}
+</style></head><body>
+<div class="wrap">
+  <nav class="toc"><h2>Contents</h2><ol>
+    <li><a href="#what">What it is</a></li>
+    <li><a href="#poses">Three poses</a></li>
+    <li><a href="#call">Call the cat</a></li>
+    <li><a href="#identity">A local identity</a></li>
+    <li><a href="#where">Where it lives &amp; size</a></li>
+    <li><a href="#decisions">Decisions on record</a></li>
+    <li><a href="#next">What's left</a></li>
+  </ol>
+  <a class="toplink" href="../index.html">← Notebook</a>
+  </nav>
+
+  <main>
+  <header class="title">
+    <div class="eyebrow">SmolPaws · implementation record</div>
+    <h1>The insider cat</h1>
+    <p class="sub">A SmolPaws that runs <em>inside</em> the OpenHands UI. It sits in the corner, changes pose with the agent's live status, and — when you call it — opens its own conversation with an identity that knows it is running on a local agent-server. This is what shipped in v1, where it lives, and how big it is.</p>
+    <p style="margin-top:12px"><span class="status">STATUS: v1 SHIPPED</span> &nbsp; <span class="pill">epic smolpaws-08f</span> &nbsp; <span class="pill">odie · feat/insider-cat</span> &nbsp; <span class="pill">HEAD fd6679a1c</span></p>
+  </header>
+
+  <h2 id="what"><span class="num">1</span>What it is</h2>
+  <p>Every other SmolPaws face lives <em>outside</em> the tools it helps with — WhatsApp, GitHub, Slack. The insider cat is the opposite: it lives inside <code>odie</code>, the OpenHands web UI itself. It is the same cat, wearing the UI as a body. It knows the OpenHands stack — the UI, the agent-server, the extensions and automation repos, the TypeScript client — well enough to answer questions about your other conversations and act on them.</p>
+  <figure class="shot">
+    <img src="../assets/insider-cat-inline.jpeg" alt="The insider cat rendered as a small avatar centered above the agent status pill inside an OpenHands conversation.">
+    <figcaption>The cat inline in a conversation — a 48px avatar centered above the “Thinking” pill, alive with the agent's status.</figcaption>
+  </figure>
+  <p>Two placements, both riding odie's existing rails: a launcher in the corner of the home screen, and — once you are in a conversation — a small avatar sitting right above the agent-status row, so the cat is present while it works.</p>
+
+  <h2 id="poses"><span class="num">2</span>Three poses, one live signal</h2>
+  <p>The avatar is not decorative. It is driven off odie's existing websocket <code>execution_status</code> — no new backend, no polling. One small pure function maps the live agent state to a pose, so the cat's body language <em>is</em> the agent's state.</p>
+  <div class="poses">
+    <div class="pose">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SmolPaws cat, neutral"><defs><radialGradient id="fur-n" cx="50%" cy="38%" r="65%"><stop offset="0%" stop-color="#dfe3ea"/><stop offset="100%" stop-color="#aab2c0"/></radialGradient></defs><path d="M16 22 L14 6 L28 16 Z" fill="url(#fur-n)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><path d="M48 22 L50 6 L36 16 Z" fill="url(#fur-n)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 18 L17 10 L24 16 Z" fill="#f2b8c6"/><path d="M46 18 L47 10 L40 16 Z" fill="#f2b8c6"/><ellipse cx="32" cy="34" rx="21" ry="19" fill="url(#fur-n)" stroke="#8b93a3" stroke-width="1.5"/><ellipse cx="24" cy="33" rx="3.4" ry="4.2" fill="#2b2f38"/><ellipse cx="40" cy="33" rx="3.4" ry="4.2" fill="#2b2f38"/><circle cx="25.1" cy="31.4" r="1.1" fill="#fff"/><circle cx="41.1" cy="31.4" r="1.1" fill="#fff"/><path d="M32 38 l-2.2 -1.6 h4.4 Z" fill="#f2b8c6"/><path d="M32 38 v2.4 M32 40.4 q-3 2 -6 0 M32 40.4 q3 2 6 0" fill="none" stroke="#8b93a3" stroke-width="1.2" stroke-linecap="round"/><path d="M18 36 h-9 M19 40 l-8 2 M46 36 h9 M45 40 l8 2" stroke="#c4cad4" stroke-width="1" stroke-linecap="round"/></svg>
+      <b>Normal</b><br>idle / neutral
+    </div>
+    <div class="pose">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SmolPaws cat, perked and working"><defs><radialGradient id="fur-u" cx="50%" cy="38%" r="65%"><stop offset="0%" stop-color="#e6ecfa"/><stop offset="100%" stop-color="#9fb0d6"/></radialGradient></defs><path d="M15 20 L12 2 L29 15 Z" fill="url(#fur-u)" stroke="#5f6f96" stroke-width="1.5" stroke-linejoin="round"/><path d="M49 20 L52 2 L35 15 Z" fill="url(#fur-u)" stroke="#5f6f96" stroke-width="1.5" stroke-linejoin="round"/><path d="M17 16 L15 6 L24 14 Z" fill="#f2b8c6"/><path d="M47 16 L49 6 L40 14 Z" fill="#f2b8c6"/><ellipse cx="32" cy="35" rx="21" ry="19" fill="url(#fur-u)" stroke="#5f6f96" stroke-width="1.5"/><circle cx="24" cy="33" r="5" fill="#fff" stroke="#5f6f96" stroke-width="0.8"/><circle cx="40" cy="33" r="5" fill="#fff" stroke="#5f6f96" stroke-width="0.8"/><circle cx="24.6" cy="33.4" r="3" fill="#2b2f38"/><circle cx="40.6" cy="33.4" r="3" fill="#2b2f38"/><circle cx="25.7" cy="32.1" r="1.1" fill="#fff"/><circle cx="41.7" cy="32.1" r="1.1" fill="#fff"/><path d="M32 39 l-2.2 -1.6 h4.4 Z" fill="#f2b8c6"/><path d="M32 39 v2.2 M32 41.2 q-3 2 -6 0 M32 41.2 q3 2 6 0" fill="none" stroke="#5f6f96" stroke-width="1.2" stroke-linecap="round"/><path d="M18 37 h-9 M19 41 l-8 2 M46 37 h9 M45 41 l8 2" stroke="#c4cad4" stroke-width="1" stroke-linecap="round"/></svg>
+      <b>Ears-up</b><br>working / just pinged
+    </div>
+    <div class="pose">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SmolPaws cat, sleeping"><defs><radialGradient id="fur-s" cx="50%" cy="42%" r="65%"><stop offset="0%" stop-color="#d7dbe2"/><stop offset="100%" stop-color="#a2aab8"/></radialGradient></defs><path d="M14 24 L8 12 L27 18 Z" fill="url(#fur-s)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><path d="M50 24 L56 12 L37 18 Z" fill="url(#fur-s)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="32" cy="37" rx="21" ry="18" fill="url(#fur-s)" stroke="#8b93a3" stroke-width="1.5"/><path d="M19 35 q5 4 10 0" fill="none" stroke="#2b2f38" stroke-width="1.8" stroke-linecap="round"/><path d="M35 35 q5 4 10 0" fill="none" stroke="#2b2f38" stroke-width="1.8" stroke-linecap="round"/><path d="M32 41 l-2 -1.4 h4 Z" fill="#f2b8c6"/><path d="M32 41 v2 M32 43 q-2.5 1.6 -5 0 M32 43 q2.5 1.6 5 0" fill="none" stroke="#8b93a3" stroke-width="1.1" stroke-linecap="round"/><path d="M18 39 h-9 M19 43 l-8 2 M46 39 h9 M45 43 l8 2" stroke="#c4cad4" stroke-width="1" stroke-linecap="round"/><path d="M50 16 h6 l-6 6 h6" fill="none" stroke="#8b93a3" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 8 h4 l-4 4 h4" fill="none" stroke="#aab2c0" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b>Sleeping</b><br>idle / asleep
+    </div>
+  </div>
+  <p class="mono" style="font-size:12.5px;color:var(--muted)">These are the actual production SVGs, inlined. They are three tiny files, ~1.3&nbsp;KB each, transparent, in SmolPaws' silver/paws palette.</p>
+
+  <h2 id="call"><span class="num">3</span>Call the cat</h2>
+  <p>The v1 trigger is a plain button (voice-wake comes with the realtime-voice spike, epic <span class="pill">smolpaws-3e1</span>). Pressing it uses odie's existing <code>createConversation</code> path, then routes to it with react-router. The one new thing it carries: a tag.</p>
+  <pre><code>tags = { smolpaws: "insider", clientsource: "agentcanvas" }</code></pre>
+  <p>The <code>smolpaws</code> tag is the convention that marks a conversation as <em>this cat's</em>. The value is the face — <code>insider</code> now, with room for <code>whatsapp</code> and others later. That is how every smolpaws conversation, across faces, can eventually be found and share one memory.</p>
+
+  <h2 id="identity"><span class="num">4</span>A local identity, injected the right way</h2>
+  <p>The cat needs to know who and where it is: SmolPaws, an OpenHands-born agent, running on a <strong>local</strong> agent-server (not the Cloud), sharing memory with its other faces, able to orient via the OpenHands skills. The interesting design choice is <em>how</em> that identity reaches the model.</p>
+  <table>
+    <tr><th>Option</th><th>Effect</th><th>Verdict</th></tr>
+    <tr><td class="sym"><code>conversationInstructions</code></td><td>Becomes a visible, auto-running <em>user</em> message.</td><td>Rejected — it would speak for the user and fire a turn on its own.</td></tr>
+    <tr><td class="sym"><code>system_message_suffix</code></td><td>Appends to the <em>system</em> prompt. Silent, no auto-run.</td><td class="mono" style="color:var(--ok)">Chosen.</td></tr>
+  </table>
+  <p>The identity text is injected through <code>AgentContext.system_message_suffix</code>, gated on <code>tags.smolpaws === "insider"</code>, and it preserves any existing suffix rather than clobbering it. It tells the cat to invoke the relevant OpenHands skills by name to orient itself.</p>
+
+  <h2 id="where"><span class="num">5</span>Where it lives &amp; how big it is</h2>
+  <p>All of the feature lives in one directory in odie, plus a handful of small integration edits. This is the durable size record.</p>
+  <table>
+    <tr><th>Location</th><th>What</th><th>Size</th></tr>
+    <tr><td class="sym"><code>src/components/features/insider-cat/</code></td><td>Avatar, pose mapping, call-the-cat hook, overlay, identity text, 3 avatar SVGs, and their tests.</td><td>646 LOC total<br>(343 source · 227 test · 3 SVGs)</td></tr>
+    <tr><td class="sym"><code>src/api/agent-server-adapter.ts</code></td><td>Thread <code>extraTags</code> through create; add the insider system suffix.</td><td>+52</td></tr>
+    <tr><td class="sym"><code>src/api/agent-server-config.ts</code></td><td>Config plumbing for the insider path.</td><td>+57</td></tr>
+    <tr><td class="sym"><code>…/agent-server-conversation-service.api.ts</code></td><td>Carry <code>extraTags</code> on the wire.</td><td>+31</td></tr>
+    <tr><td class="sym"><code>src/components/features/chat/chat-interface.tsx</code></td><td>Inline mount above the status row.</td><td>+5</td></tr>
+    <tr><td class="sym"><code>src/root.tsx</code></td><td>Corner launcher mount.</td><td>+2</td></tr>
+  </table>
+  <p>Whole change: <strong>24 files, +953 / −12</strong>. Tests: 40 focused specs (adapter + insider) on top of the wider suite; typecheck, lint, and build all green. Commits <code>97e5be3..fd6679a1</code> on branch <code>feat/insider-cat</code>.</p>
+  <div class="callout ok">Verified live on a Tailscale-served dev stack with <code>deepseek-v4-flash</code>: the cat renders, the button creates a correctly-tagged conversation, and the cat correctly reached for <code>/api/conversations/count</code> to answer a question about the user's other conversations.</div>
+
+  <h2 id="decisions"><span class="num">6</span>Decisions on record</h2>
+  <ul>
+    <li><strong>Identity via system suffix, not instructions.</strong> Silent, no auto-run turn. <span class="pill">chosen</span></li>
+    <li><strong>Tags merged under reserved keys.</strong> Caller <code>extraTags</code> merge <em>beneath</em> <code>clientsource</code> / <code>acpserver</code> so a caller cannot spoof reserved tags. A real bug found and fixed here — the adapter previously hardcoded the tag set and dropped caller tags.</li>
+    <li><strong>Pose off live status, no new backend.</strong> Reuse odie's websocket <code>execution_status</code>; a pure mapping function does the rest.</li>
+    <li><strong>Skills invoked by name, not force-loaded.</strong> The prompt names the skills to invoke. Force-loading would mean a shipped agent profile with <code>agent_context.skills</code> — a deliberate later refinement.</li>
+    <li><strong>Button first, voice later.</strong> v1 wake is a click; voice-wake is scoped to the realtime-voice epic.</li>
+  </ul>
+
+  <h2 id="next"><span class="num">7</span>What's left</h2>
+  <p>The insider cat's body and identity are done. One child of the epic stays open, on purpose:</p>
+  <table>
+    <tr><td><span class="pill">smolpaws-08f.2</span> Shared memory store</td><td>A shared <code>~/.openhands/smolpaws/memory/</code> (durable <code>MEMORY.md</code> + daily files), inside the OpenHands config dir because it ships to all users — read/written by every smolpaws face, so the insider cat and the WhatsApp cat remember the same things. Not built yet.</td></tr>
+  </table>
+  <div class="callout note">This page is a record, not a proposal — the v1 is merged on its branch. The two threads it hands off to are the <strong>shared memory</strong> store above and <strong>realtime voice</strong> (<span class="pill">smolpaws-3e1</span>), which will give the insider cat its first voice.</div>
+
+  </main>
+</div>
+</body></html>
