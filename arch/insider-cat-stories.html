@@ -86,7 +86,7 @@
     <div class="eyebrow">SmolPaws · behavior · user stories</div>
     <h1>The insider cat, from your side</h1>
     <p class="sub">This is the companion to the <a href="insider-cat.html">implementation record</a>. That page says how the cat is built. This one says only what you <em>see and do</em> — how you find it, call it, read its mood, and (soon) talk to it. Written as user stories, each with what it does today and what is still design.</p>
-    <p style="margin-top:12px"><span class="status">SHIPPED: body + identity</span> &nbsp; <span class="status design">DESIGN: voice · secretary</span> &nbsp; <span class="pill">epic smolpaws-08f</span> &nbsp; <span class="pill">epic smolpaws-3e1</span></p>
+    <p style="margin-top:12px"><span class="status">SHIPPED (local): body · identity · voice · Secretary board</span> &nbsp; <span class="pill">epic smolpaws-08f</span> &nbsp; <span class="pill">epic smolpaws-3e1</span> &nbsp; <span class="pill">epic smolpaws-s9e</span></p>
   </header>
 
   <div class="callout note">A user story here reads: <em>as a user, I want …, so that …</em>, followed by acceptance points. A <span style="color:var(--ok);font-weight:700">✓</span> is true in the shipped v1. A <span style="color:var(--warn);font-weight:700">○</span> is designed but not wired into the running build yet.</div>
@@ -118,7 +118,7 @@
       <li>One click on the launcher opens a fresh conversation and takes me straight into it.</li>
       <li>The conversation is the cat's — it starts already knowing it is SmolPaws, running here, with no prompt from me.</li>
       <li>Today the wake is a click.</li>
-      <li class="todo">Voice-wake comes with the realtime-voice work (below).</li>
+      <li>Tapping the cat now starts <a href="#voice">realtime voice</a>; a small “+” on the cat is the “new conversation” action.</li>
     </ul>
   </div>
   <p>Nothing else is required of you — no profile to pick, no key to paste. Clicking the cat uses the same “new conversation” path the rest of OpenHands uses; the one thing the cat adds is a quiet label on that conversation.</p>
@@ -170,46 +170,48 @@
   <p>The effect: you can call the cat and immediately ask “how many conversations do I have going?” or “what was I doing in that other one?” and it reaches for the real endpoints to answer, instead of guessing. In the shipped test it correctly pulled the live conversation count to answer exactly that.</p>
 
   <h2 id="voice"><span class="num">6</span>Talking to it — realtime voice</h2>
-  <p><span class="status design">DESIGN / PROTOTYPE</span> &nbsp; <span class="pill">epic smolpaws-3e1</span> — this is built on a spike branch, not yet in the shipped build. Here is the behavior it is being built toward.</p>
+  <p><span class="status">SHIPPED (local)</span> &nbsp; <span class="pill">epic smolpaws-3e1</span> — the cat now talks. It runs in the persistent Canvas shell, so the session lives across the whole app, not one page.</p>
   <div class="story">
     <div class="as">As a user</div>
-    <p class="line">I want to <b>click once and just talk to the cat</b>, so that I can ask for things hands-free and hear it answer, while it still does real work.</p>
+    <p class="line">I want to <b>click the cat and just talk</b>, so that I can ask for things hands-free and hear it answer, while it still does real work.</p>
     <ul class="accept">
-      <li class="todo"><b>Starting voice:</b> a single click on the Secretary rail item starts realtime voice. The browser asks once for microphone access; after that, the cat is listening.</li>
-      <li class="todo"><b>It knows where I am:</b> when voice starts, the cat is told the current page in one line — which conversation is open, or which settings page I'm on — so “continue this” or “what's here” makes sense.</li>
-      <li class="todo"><b>Full-duplex:</b> I can talk over it (barge-in); it doesn't wait for a beep.</li>
-      <li class="todo"><b>It acts, not just chats:</b> mid-conversation it can call into the real agent to actually do things, and in Secretary View it can read and fill my prompt box by voice.</li>
-      <li class="todo"><b>Written record:</b> both sides of the spoken exchange are transcribed into the chat, so the conversation is still readable afterward.</li>
-      <li class="todo"><b>Stopping voice:</b> clicking again ends the session and releases the microphone.</li>
+      <li><b>Starting voice:</b> one tap on the cat starts realtime voice. The browser asks once for the mic; then the cat shows a green glow and “🎙 listening — talk to me”.</li>
+      <li><b>It stays with me as I move.</b> The voice lives in the corner cat, which is mounted in the app shell — so it keeps listening while I navigate between the home, settings, and any conversation. It does not drop when I click away.</li>
+      <li><b>It knows where I am:</b> the cat is told the current page in one line — which conversation is open, or which settings page — so “continue this” / “what's here” make sense.</li>
+      <li><b>It acts, not just chats:</b> it calls the real OpenHands agent (the whole agent, tools and all) and speaks the answer back.</li>
+      <li><b>The answer is a real record:</b> the spoken reply is a short rephrase; the agent's full written answer is the record. The transcript is kept so the cat stays warm across reloads.</li>
+      <li><b>Stopping voice:</b> tapping the cat again ends the session and releases the mic.</li>
     </ul>
   </div>
-  <div class="callout note"><b>On the voice itself:</b> the spoken voice is a configuration choice, not fixed. It is set once on the voice server and easy to swap — including toward a feminine, deep, unhurried character. The words the cat says come from the same agent brain either way.</div>
+  <div class="callout ok"><b>Why it survives navigation.</b> The session is owned by one always-mounted host next to the router; every cat avatar (corner + inline) reflects and drives that single session through a small store. So the cat is “there” wherever you are, and there is never a second session. This is the fix to the earlier version, where voice lived inside the board's iframe and died the moment you navigated away.</div>
+  <div class="callout note"><b>On the voice itself:</b> the spoken voice is a configuration choice — currently a feminine, deep, faintly-bored deadpan. The words come from the same agent brain either way.</div>
 
-  <h2 id="secretary"><span class="num">7</span>The Secretary job — the cat manages your conversations</h2>
-  <p><span class="status design">DESIGN / PROTOTYPE</span> &nbsp; <span class="pill">epic smolpaws-s9e</span> — full design lives on <a href="secretary-cat.html">The Secretary</a> page. Behavior in brief:</p>
+  <h2 id="secretary"><span class="num">7</span>The Secretary — the board the cat manages</h2>
+  <p><span class="status">SHIPPED (local)</span> &nbsp; <span class="pill">epic smolpaws-s9e</span> — shipped as a real Agent Canvas <em>Skin</em>. Full design on <a href="secretary-cat.html">The Secretary</a> page.</p>
   <div class="story">
     <div class="as">As a user</div>
-    <p class="line">I want the cat to grow into a <b>secretary that watches all my conversations on one board</b>, so that I can dispatch, track, and act on work by talking to it.</p>
+    <p class="line">I want <b>a board that shows all my conversations by state</b>, so that I can see what's pending, running, waiting on me, or done — and act on it.</p>
     <ul class="accept">
-      <li class="todo">A <b>Secretary</b> item in the left rail, above New Chat. <b>Single click</b> starts voice; <b>double click</b> opens the Secretary view, carrying whichever conversation I had open.</li>
-      <li class="todo">The Secretary view shows a board of my conversations, with a prompt box wired to the real agent — the cat can read and fill that box for me.</li>
-      <li class="todo">By voice, I can ask it to answer, draft, or dispatch work across those conversations.</li>
+      <li>A <b>Secretary</b> entry at the top of the left sidebar opens the board as a full page inside Canvas (an installed skin, not a bolt-on).</li>
+      <li>The board is a fixed four-column layout — <b>Pending · In progress · Needs input · Done</b> — with one card per conversation (title, state, project, model, a link back into Canvas).</li>
+      <li>A prompt box wired to the real agent: what I type there runs a real agent turn.</li>
+      <li>The cat's voice (the corner cat above) is the way I talk to it; the board is the thing I look at.</li>
     </ul>
   </div>
-  <div class="callout warn"><b>Honest status:</b> the Secretary rail item and view exist on a spike branch and are <em>not</em> in the running build yet, so you won't see the menu item today. They are also currently built as a native page talking to a small voice server, not yet as the intended Agent Canvas <em>Skin</em>. See <a href="secretary-cat.html">the design page</a> for where this is headed.</div>
+  <div class="callout note"><b>How it's built:</b> the board is a git-backed skin (its own repo, installed through the Canvas skin runtime and served under <code>/skin</code>). The realtime voice was lifted <em>out</em> of the board and into the persistent cat overlay, so the board is now purely the view + the typed prompt box, and the one voice session is the cat.</div>
 
   <h2 id="status"><span class="num">8</span>What's real today, at a glance</h2>
   <table>
     <tr><th>Behavior</th><th>State</th><th>What you'd see</th></tr>
     <tr><td>Cat present in the UI (corner + inline)</td><td><span class="pill ok">shipped</span></td><td>The avatar, in both placements.</td></tr>
-    <tr><td>Click to call → tagged conversation</td><td><span class="pill ok">shipped</span></td><td>A new chat opens; it's tagged <code>smolpaws:insider</code>.</td></tr>
+    <tr><td>Click to call → tagged conversation</td><td><span class="pill ok">shipped</span></td><td>A new chat (via the cat's “+”), tagged <code>smolpaws:insider</code>.</td></tr>
     <tr><td>Poses off live agent status</td><td><span class="pill ok">shipped</span></td><td>Normal / ears-up / sleeping.</td></tr>
     <tr><td>Local identity known on wake</td><td><span class="pill ok">shipped</span></td><td>Grounded first answers about your workspace.</td></tr>
-    <tr><td>Realtime voice (start/stop, transcript, actions)</td><td><span class="pill">design</span></td><td>Spike branch only.</td></tr>
-    <tr><td>Secretary rail item + board view</td><td><span class="pill">design</span></td><td>Spike branch only — not in the running build.</td></tr>
+    <tr><td>Realtime voice, persistent across navigation</td><td><span class="pill ok">shipped</span></td><td>Tap the cat; green glow + “listening”, stays live as you move.</td></tr>
+    <tr><td>Secretary board as a Canvas skin</td><td><span class="pill ok">shipped</span></td><td>Top sidebar entry → the four-column board.</td></tr>
     <tr><td>Shared memory across faces</td><td><span class="pill">design</span></td><td><span class="pill">smolpaws-08f.2</span></td></tr>
   </table>
-  <div class="callout note">Want the how, not the what? The <a href="insider-cat.html">implementation record</a> has the code, sizes, and decisions. The <a href="secretary-cat.html">Secretary design</a> has where the voice + board are going.</div>
+  <div class="callout note">Want the how, not the what? The <a href="insider-cat.html">implementation record</a> has the code, sizes, and decisions. The <a href="secretary-cat.html">Secretary design</a> has the board + voice architecture.</div>
 
   </main>
 </div>
