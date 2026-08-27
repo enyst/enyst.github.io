@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Canvas Extensions: the architecture and the hard truth — Engel Nyst</title>
+  <meta name="description" content="A code-grounded teardown of OpenHands Canvas Extensions: package format, install and activation flow, design patterns, security model, strengths, gaps, and what should change before calling it a platform." />
+  <meta property="og:title" content="Canvas Extensions: the architecture and the hard truth" />
+  <meta property="og:description" content="How OpenHands loads installable UI bundles into Agent Canvas—and where the current design is excellent, unfinished, or dangerously easy to overstate." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/agent-canvas-extensions.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .lede { font-size: 1.08em; color: #d7d1c7; }
+    .status-grid, .pattern-grid, .truth-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px; margin: 20px 0;
+    }
+    .status-card, .pattern, .truth {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--border-radius); padding: 18px 20px;
+    }
+    .status-card strong, .pattern strong, .truth strong { display: block; margin-bottom: 7px; }
+    .status-card p, .pattern p, .truth p { margin: 0; font-size: 0.88em; color: var(--muted); }
+    .status-card.good { border-top: 3px solid var(--green); }
+    .status-card.moving { border-top: 3px solid var(--accent); }
+    .status-card.missing { border-top: 3px solid var(--report); }
+    .verdict {
+      margin: 24px 0; padding: 22px 24px; border: 1px solid rgba(220,107,74,.55);
+      border-left: 4px solid var(--report); border-radius: var(--border-radius);
+      background: rgba(220,107,74,.07);
+    }
+    .verdict p { margin: 0; }
+    .good-note { border-left-color: var(--green); }
+    .warning-note { border-left-color: var(--report); }
+    .pattern { border-top: 2px solid var(--teal); }
+    .pattern .label, .truth .label {
+      display: inline-block; margin-bottom: 9px; font: 600 .69em var(--mono);
+      letter-spacing: .08em; text-transform: uppercase; color: var(--teal);
+    }
+    .truth { border-left: 3px solid var(--report); }
+    .truth .label { color: var(--report); }
+    .score-good { color: var(--green); }
+    .score-mixed { color: var(--accent); }
+    .score-bad { color: var(--report); }
+    .layer {
+      display: grid; grid-template-columns: 150px 1fr; gap: 16px;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .layer b { font-family: var(--mono); font-size: .78em; color: var(--accent); }
+    .layer span { color: var(--muted); font-size: .92em; }
+    .priority {
+      display: grid; grid-template-columns: 54px 1fr; gap: 14px;
+      align-items: start; padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .priority > b {
+      font: 600 .75em var(--mono); color: var(--bg); background: var(--accent);
+      border-radius: 3px; padding: 4px 7px; text-align: center;
+    }
+    .priority p { margin: 0; }
+    .small { color: var(--muted); font-size: .84em; }
+    main a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,.3); }
+    main a:hover { border-bottom-color: var(--teal); }
+    main a.back, .foot-nav a { border-bottom: 0; }
+    @media (max-width: 560px) {
+      .layer { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'dark',
+      themeVariables: { primaryColor: '#1a1a18', primaryTextColor: '#e5e0d8',
+        primaryBorderColor: '#2a2a26', lineColor: '#6bbfab', secondaryColor: '#1a1a18',
+        tertiaryColor: '#1a1a18', fontSize: '14px' }
+    });
+  </script>
+</head>
+<body>
+  <main class="shell">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <h1>Canvas Extensions <span class="tag tag-report">architecture teardown</span></h1>
+    <p class="meta">
+      Studied from <a href="https://github.com/OpenHands/software-agent-sdk/commit/2002f9804c778e0f500fff7898f457869eb042cb">software-agent-sdk through 2002f9804</a>
+      and the unmerged Agent Canvas vertical slice at
+      <a href="https://github.com/OpenHands/OpenHands/commit/a52dc90d29f50922a9c2bb2186a9b6ec3ddd7d3a">a52dc90d</a>,
+      plus the <a href="https://github.com/OpenHands/OpenHands/commit/b747b09e746dd533a7f151548d26c137f65fc216">SVG-edit example</a>.
+      Current-state check: 27 August 2026.
+    </p>
+
+    <p class="lede">A Canvas Extension is a JavaScript bundle installed beside an Agent Server and loaded by Agent Canvas to add UI. In v1, “UI” means a page and a sidebar link. The backend stores, validates, and serves the bundle; the browser imports it and hands it a small host API.</p>
+
+    <div class="verdict">
+      <p><strong>The blunt version:</strong> this is a promising, thoughtfully defended <em>trusted local page-loader</em>. It is not yet a general extension platform, a safe marketplace runtime, or a capability-secured plugin system. Calling it any of those today would be architecture by aspiration.</p>
+    </div>
+
+    <div class="status-grid" aria-label="Implementation status">
+      <article class="status-card good">
+        <strong>Backend core: real</strong>
+        <p>Manifest validation, disabled-by-default installs, persistence, staged refresh machinery, REST management, and bundle serving are merged in software-agent-sdk.</p>
+      </article>
+      <article class="status-card moving">
+        <strong>Frontend: branch, not product</strong>
+        <p>The management UI, Blob-module loader, runtime registry, routed pages, and sidebar integration live on a feature branch, not Agent Canvas main.</p>
+      </article>
+      <article class="status-card missing">
+        <strong>Platform: mostly future tense</strong>
+        <p>The public tracker reports <a href="https://github.com/OpenHands/OpenHands/issues/16289">5 of 17 tasks complete</a>. Typed client generation, real-backend integration, CLI, audit, policy, themes, panels, and visualizers remain open.</p>
+      </article>
+    </div>
+
+    <h2>First: do not confuse the four extension nouns</h2>
+    <table>
+      <thead><tr><th>Thing</th><th>Changes</th><th>Runs where</th><th>Current format</th></tr></thead>
+      <tbody>
+        <tr><td>Skill</td><td>The agent's instructions and resources</td><td>Prompt / agent context</td><td><code>SKILL.md</code> package</td></tr>
+        <tr><td>Plugin</td><td>A bundle of agent capabilities such as skills and hooks</td><td>SDK / agent runtime</td><td><code>plugin.json</code> or compatible plugin format</td></tr>
+        <tr><td>MCP integration</td><td>Tools and resources reachable through a protocol</td><td>Separate process or remote service</td><td>MCP server configuration</td></tr>
+        <tr><td><strong>Canvas Extension</strong></td><td><strong>The Canvas application UI itself</strong></td><td><strong>The user's browser, in Canvas's JavaScript realm</strong></td><td><code>canvas-extension.json</code> + one browser ESM bundle</td></tr>
+      </tbody>
+    </table>
+    <p>The naming is defensible only if this boundary stays crisp: skills and plugins change what the agent can do; Canvas Extensions change what the human sees and can operate. The distribution plumbing is shared with plugins. The runtime is deliberately not.</p>
+
+    <h2>The package: tiny on purpose</h2>
+    <pre class="code">my-dashboard/
+├── canvas-extension.json
+└── dist/
+    └── extension.js       # self-contained browser ESM; no chunks or bare imports</pre>
+
+    <pre class="code">{
+  "schema_version": 1,
+  "name": "my-dashboard",
+  "display_name": "My dashboard",
+  "version": "0.1.0",
+  "entrypoint": "dist/extension.js",
+  "contributes": {
+    "pages": [
+      { "id": "home", "title": "Dashboard", "path": "/home" }
+    ]
+  }
+}</pre>
+
+    <p>The bundle exports one function. It does not receive React. It receives a host object and registers an imperative DOM mount callback:</p>
+
+    <pre class="code">export function activate(host) {
+  return host.registerPage("home", ({ container, path, navigate }) =&gt; {
+    container.textContent = `Nested path: ${path}`;
+    return () =&gt; container.replaceChildren();
+  });
+}</pre>
+
+    <div class="callout good-note">
+      <p><strong>This choice is better than it looks.</strong> Passing an <code>HTMLElement</code> rather than Canvas's React internals avoids coupling every extension to the host's React version, component tree, bundler, and private design system. The price is a rougher authoring experience and weaker UI consistency, but the ABI is much more survivable.</p>
+    </div>
+
+    <h2>Who owns what</h2>
+    <div class="layer"><b>software-agent-sdk</b><span>The generic fetch/install substrate, Canvas-specific manifest model, installed-state adapter, filesystem checks, staged refresh functions, and Agent Server HTTP router.</span></div>
+    <div class="layer"><b>typescript-client</b><span>It should own the generated browser contract for those routes. It does not yet; <a href="https://github.com/OpenHands/software-agent-sdk/issues/4354">the cutover task remains open</a>.</span></div>
+    <div class="layer"><b>Agent Canvas</b><span>Backend-scoped querying, install/enable UI, authenticated bundle fetch, dynamic import, host API, contribution registry, routes, mounts, and sidebar presentation.</span></div>
+    <div class="layer"><b>Extension author</b><span>The manifest and a single bundled ESM file. On enable, that code becomes as trusted as Canvas's own frontend code.</span></div>
+
+    <h2>The whole mechanism</h2>
+    <pre class="mermaid">
+sequenceDiagram
+  actor U as User
+  participant UI as Agent Canvas
+  participant AS as Agent Server
+  participant IM as InstallationManager
+  participant FS as ~/.openhands/canvas-extensions
+  participant JS as Browser JS realm
+
+  U->>UI: Install source + optional ref/subpath
+  UI->>AS: POST /api/canvas-extensions/install
+  AS->>IM: fetch, parse, validate, copy, record
+  IM->>FS: package + .installed.json (enabled=false)
+  AS-->>UI: installation + parsed manifest
+  U->>UI: Enable after trust warning
+  UI->>AS: PATCH installed/name { enabled: true }
+  UI->>AS: GET installed/name/bundle (authenticated)
+  AS->>FS: re-read manifest + re-check containment
+  AS-->>UI: JavaScript text
+  UI->>JS: Blob URL + dynamic import
+  JS-->>UI: activate(host)
+  JS->>UI: host.registerPage(declaredId, mount)
+  UI->>UI: add route target + sidebar item
+  U->>UI: Open /extensions/name/page
+  UI->>JS: mount({ container, path, navigate })
+    </pre>
+
+    <p>Why the Blob detour? The bundle endpoint requires the Agent Server session key. A module <code>import()</code> cannot attach that header, so Canvas fetches text with its authenticated client, creates a temporary <code>blob:</code> URL, imports it, then revokes the URL.</p>
+
+    <h2>The design patterns hiding underneath</h2>
+    <div class="pattern-grid">
+      <article class="pattern"><span class="label">ports &amp; adapters</span><strong>One generic installer, many formats</strong><p><code>InstallationManager[T]</code> owns fetching, copying, metadata, and enablement. An <code>InstallationInterface[T]</code> teaches it how to load a Canvas manifest, plugin, skill, or future artifact from a directory.</p></article>
+      <article class="pattern"><span class="label">manifest + registry</span><strong>Declare first, register second</strong><p>The manifest declares allowed page IDs. Runtime code must register one of those IDs. This keeps navigation reviewable before execution and rejects surprise contributions.</p></article>
+      <article class="pattern"><span class="label">facade</span><strong>A small host API</strong><p>The extension receives metadata, navigation, page registration, and an Agent Server request helper instead of being handed Canvas services directly. This is an API-shaping boundary—even though it is not a security boundary.</p></article>
+      <article class="pattern"><span class="label">lifecycle</span><strong>Disposers all the way down</strong><p><code>activate()</code>, <code>registerPage()</code>, and page mounts may return cleanup functions. Backend switches, disables, updates, and route unmounts run those functions in reverse order.</p></article>
+      <article class="pattern"><span class="label">two-phase update</span><strong>Check, then apply</strong><p>Refresh fetches into <code>.staging/</code>, validates there, then moves the old directory aside and the candidate into place. A failed second rename rolls the first one back.</p></article>
+      <article class="pattern"><span class="label">scope as identity</span><strong>The backend is part of state</strong><p>React Query keys and the activation signature include backend ID, organization, and connection revision. Requests close over the owning backend, preventing a late active-backend switch from redirecting extension traffic.</p></article>
+    </div>
+
+    <h2>What the design gets genuinely right</h2>
+    <ul>
+      <li><strong>Install is not execute.</strong> New and manually discovered Canvas Extensions are forced disabled, and the UI asks before first enable.</li>
+      <li><strong>Filesystem containment is checked twice.</strong> Textual <code>..</code>, absolute entrypoints, missing files, directories, dangling links, symlink cycles, and symlink escapes are rejected. The bundle path is resolved again immediately before serving.</li>
+      <li><strong>Backend switching is modeled, not patched.</strong> Backend identity is present in query keys, activation identity, and authenticated request clients.</li>
+      <li><strong>Contribution namespaces are simple.</strong> Routes live under <code>/extensions/{extension-name}/...</code>, so two extensions can both contribute <code>/dashboard</code> without colliding.</li>
+      <li><strong>The first contribution type is narrow.</strong> Proving pages before themes, conversation panels, slots, and event visualizers is the correct delivery order.</li>
+      <li><strong>The spec tells the truth about trust.</strong> It explicitly says same-realm code is trusted and cleanup is best-effort. That honesty is rare and valuable.</li>
+    </ul>
+
+    <h2>The hard truth</h2>
+    <div class="truth-grid">
+      <article class="truth">
+        <span class="label">security</span>
+        <strong>The host API is not a capability boundary</strong>
+        <p>The bundle runs in the same <code>window</code> as Canvas. It can ignore <code>host.agentServer</code>, read the DOM, patch globals, call <code>fetch</code>, inspect storage, and exfiltrate anything script can reach. Today that includes plaintext backend API keys in <code>localStorage</code>; <a href="https://github.com/OpenHands/OpenHands/issues/16492">#16492 calls this out directly</a>. The separate enable step is consent UX, not human-presence enforcement: any client with the same session authority can call the PATCH route. A permission manifest cannot repair either fact.</p>
+      </article>
+      <article class="truth">
+        <span class="label">contract drift</span>
+        <strong>There is no single wire contract yet</strong>
+        <p>The frontend hand-writes types and uses generic client methods because the generated client work is open. The frontend declares <code>nav_label</code> and <code>description</code> on pages; the backend model does not, and Pydantic silently drops those extras. The backend accepts any integer <code>schema_version</code>; TypeScript pretends only <code>1</code> exists.</p>
+      </article>
+      <article class="truth">
+        <span class="label">lifecycle</span>
+        <strong><code>activate()</code> is not the start of execution</strong>
+        <p>ES modules execute top-level code during <code>import()</code>, before Canvas calls <code>activate</code>. Disposers are voluntary. Event listeners, timers, monkey patches, DOM changes, and network calls survive disable unless the extension cleans them up correctly. “Hot disable” removes registered surfaces; it cannot revoke code.</p>
+      </article>
+      <article class="truth">
+        <span class="label">transactions</span>
+        <strong>“Atomic update” overstates the guarantee</strong>
+        <p>The staged swap rolls back a failed rename, which is good. But a process crash between the two renames can still strand the active install, and metadata is updated afterward. Worse, the exposed <code>force=true</code> install path still uses delete-then-copy from the generic manager. Metadata writes have no lock and are not atomic, so concurrent mutations can lose state or leave truncated JSON.</p>
+      </article>
+      <article class="truth">
+        <span class="label">identity</span>
+        <strong>The runtime keys revisions, not bytes</strong>
+        <p>Activation identity uses name, version, resolved Git ref, and declared pages—not a bundle digest. Reinstalling changed local code with the same version, or modifying installed bytes in place, need not trigger hot reload. Provenance is shown; content identity is absent.</p>
+      </article>
+      <article class="truth">
+        <span class="label">reliability</span>
+        <strong>An error boundary cannot contain arbitrary JavaScript</strong>
+        <p>The route catches the mount promise and reports activation failures. It cannot catch later timer callbacks or browser event handlers, undo mutations, cap CPU, stop memory growth, or restore patched globals. The implementation has a failure UI, not fault isolation.</p>
+      </article>
+      <article class="truth">
+        <span class="label">product surface</span>
+        <strong>It is a page extension, singular</strong>
+        <p>V1 contributes pages. Themes, conversation panels, header/footer slots, badges, visualizers, marketplace distribution, signing, CLI management, and a stable authoring kit are roadmap items. “Canvas Extensions” is the future umbrella; the implemented ABI is one registry method.</p>
+      </article>
+      <article class="truth">
+        <span class="label">verification</span>
+        <strong>The two halves have not earned integration confidence</strong>
+        <p>The backend has extensive focused tests and the frontend has useful mocks. The public cutover task states there are zero frontend tests against real Agent Server logic, and the multi-backend verification issue is still open. The seam most likely to drift is precisely the seam not exercised end to end.</p>
+      </article>
+    </div>
+
+    <div class="callout warning-note">
+      <p><strong>The SVG-edit example illustrates the ambiguity.</strong> Its Canvas bundle is same-realm code, but that code creates an iframe pointing at pinned-version files on <code>unpkg.com</code> and grants clipboard read/write. The iframe sensibly isolates SVG-edit's CSS and keyboard handlers, yet the extension loader itself remains fully privileged. It is a good compatibility demo, not evidence of a safe extension boundary.</p>
+    </div>
+
+    <h2>Architecture scorecard</h2>
+    <table>
+      <thead><tr><th>Dimension</th><th>Grade</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Repository ownership</td><td class="score-good">A−</td><td>Agent Server owns installed bytes; Canvas owns presentation. The missing generated client keeps it from an A.</td></tr>
+        <tr><td>Filesystem defense</td><td class="score-good">A</td><td>Containment is specific, symlink-aware, repeated at serve time, and heavily tested.</td></tr>
+        <tr><td>Backend/state scoping</td><td class="score-good">A−</td><td>Backend ID, org, and connection revision are first-class. Real-backend verification is still missing.</td></tr>
+        <tr><td>Extension ABI</td><td class="score-mixed">B−</td><td>The DOM mount contract is lean and durable; compatibility negotiation, deterministic ordering, assets, and author tooling are absent.</td></tr>
+        <tr><td>Update correctness</td><td class="score-mixed">C+</td><td>Thoughtful staging and rollback, undermined by the separate destructive force-install path and non-transactional metadata.</td></tr>
+        <tr><td>Contract discipline</td><td class="score-bad">D+</td><td>Handwritten frontend types already disagree with the backend, the version field is not enforced, and capability detection is a 404.</td></tr>
+        <tr><td>Runtime isolation</td><td class="score-bad">F</td><td>There is none by explicit design. This is acceptable only under a narrow trusted-code product promise.</td></tr>
+        <tr><td>Platform completeness</td><td class="score-bad">D</td><td>One contribution type, branch-only frontend, no CLI, no marketplace trust chain, and no real vertical test.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Should same-realm JavaScript be rejected?</h2>
+    <p>Not automatically. VS Code extensions, browser extensions, and desktop plugins all make different trust trades. A local, self-hosted tool can legitimately say: “this is code you trust as much as the app.” Same-realm execution buys rich integration, low latency, a tiny ABI, and freedom from an RPC serialization layer.</p>
+    <p>But the product must choose one of two honest identities:</p>
+    <table>
+      <thead><tr><th>Identity</th><th>Required design</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Trusted local extensions</strong></td><td>Keep same-realm loading, label it developer mode, restrict installation policy, solve origin-readable secrets, add audit/integrity/recovery, and never market manifest permissions as enforcement.</td></tr>
+        <tr><td><strong>Installable ecosystem / marketplace</strong></td><td>Move third-party UI into a unique-origin iframe or similarly isolated realm. Communicate through a versioned, permission-checked RPC broker with short-lived, extension-scoped capabilities. Signing and review then become meaningful additions rather than theater.</td></tr>
+      </tbody>
+    </table>
+    <p>The worst option is the middle: same-realm code with a permissions screen that creates the feeling of containment. The current spec avoids that lie. It should keep avoiding it.</p>
+
+    <h2>What I would change, in order</h2>
+    <div class="priority"><b>P0</b><p><strong>Do not ship broadly while backend keys remain script-readable.</strong> Resolve <a href="https://github.com/OpenHands/OpenHands/issues/16492">#16492</a>, or make extensions an unmistakable local developer-mode feature with no marketplace story.</p></div>
+    <div class="priority"><b>P0</b><p><strong>Generate the client contract and validate it at runtime.</strong> Make the Agent Server OpenAPI schema authoritative; enforce manifest version <code>1</code>; reject unknown fields; include <code>nav_label</code> only if both sides own it; add explicit capability discovery instead of 404 inference.</p></div>
+    <div class="priority"><b>P0</b><p><strong>Add one real vertical test.</strong> Install a fixture through the real Agent Server, confirm disabled state, enable it, fetch authenticated bytes, mount its page, switch backends, disable, and prove cleanup. Mocks should support that test, not substitute for it.</p></div>
+    <div class="priority"><b>P1</b><p><strong>Make installation transactional.</strong> Stage every install—including force reinstall—then swap. Lock per extension plus the metadata ledger; write metadata through temp-file + fsync + rename; recover interrupted swaps on startup.</p></div>
+    <div class="priority"><b>P1</b><p><strong>Give content a real identity.</strong> Persist and return a bundle SHA-256, include it in activation/cache identity, verify it when serving, and show it beside the resolved Git revision.</p></div>
+    <div class="priority"><b>P1</b><p><strong>Turn policy into code.</strong> Add maximum bundle/package sizes, reserved routes, allowed source policy, local-path policy, audit events, and deterministic contribution ordering. Keep the default “new install is disabled” inside the generic install policy instead of repairing a default-true base model afterward.</p></div>
+    <div class="priority"><b>P2</b><p><strong>Publish an authoring contract only after it survives.</strong> Provide an SDK package, bundler template, validator, source maps, CSS-token guide, compatibility negotiation, and a realistic sample that uses the Agent Server bridge—not just <code>textContent</code> or a remote iframe.</p></div>
+    <div class="priority"><b>P2</b><p><strong>Design isolation before marketplace distribution.</strong> A unique-origin iframe plus brokered RPC is boring compared with same-realm magic. Boring is the correct property for third-party code holding a path toward conversations, workspaces, terminals, and secrets.</p></div>
+
+    <h2>The final judgment</h2>
+    <p>The code has good instincts. It separates agent extensions from UI extensions. It uses a generic install adapter rather than copying plugin machinery. It treats backend identity as state, rechecks path containment at the last responsible moment, makes installation non-executing by default, and starts with one narrow contribution type.</p>
+    <p>Its weakness is not sloppy implementation. Its weakness is an unresolved product identity. The machinery is built like the beginning of an ecosystem, while the runtime trust model is suitable only for code the user would happily paste into Canvas's own source tree. Until that choice is resolved, every new contribution type multiplies authority faster than it multiplies value.</p>
+
+    <div class="verdict">
+      <p><strong>Recommendation:</strong> ship this as experimental trusted-local extensibility after the P0 contract and secret work. Learn from real page extensions. Do not call it a safe plugin platform, and do not add themes, panels, or visualizers merely to make the catalog look substantial. First make one page extension boringly installable, identifiable, recoverable, auditable, and honest.</p>
+    </div>
+
+    <h2>Source trail</h2>
+    <ul class="small">
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/4361">software-agent-sdk #4361</a> — manifest validation and entrypoint containment</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/4364">software-agent-sdk #4364</a> — persistence and disabled-by-default behavior</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/4374">software-agent-sdk #4374</a> — staged refresh and swap</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/commit/2002f9804c778e0f500fff7898f457869eb042cb">software-agent-sdk 2002f9804</a> — REST router, bundle delivery, parsed manifests</li>
+      <li><a href="https://github.com/OpenHands/OpenHands/commit/a52dc90d29f50922a9c2bb2186a9b6ec3ddd7d3a">Agent Canvas a52dc90d</a> — frontend vertical slice</li>
+      <li><a href="https://github.com/OpenHands/OpenHands/issues/16289">tracking epic #16289</a> — current phased plan and completion state</li>
+      <li><a href="https://github.com/OpenHands/OpenHands/issues/16492">Agent Canvas #16492</a> — origin-readable backend API keys</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/issues/4354">software-agent-sdk #4354</a> — generated client and capability discovery gap</li>
+    </ul>
+
+    <div class="foot-nav">
+      <a href="../index.html">&larr; notebook home</a> &nbsp;&middot;&nbsp;
+      <a href="agent-canvas-tool-visualizers.html">tool visualizers &rarr;</a> &nbsp;&middot;&nbsp;
+      <a href="https://github.com/OpenHands/OpenHands/issues/16289">implementation tracker &rarr;</a>
+    </div>
+  </main>
+</body>
+</html>
