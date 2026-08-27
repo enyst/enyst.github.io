@@ -4,9 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SmolPaws SDK-swap board — Engel Nyst</title>
-  <meta name="description" content="Live status board for the SmolPaws SDK swap: the seven migration steps tied to real beads and PRs, plus the surrounding backlog." />
+  <meta name="description" content="Live status board for the SmolPaws SDK swap: the components needed to live-test the new transpiled stack — engine, delivery relay, Slack and WhatsApp bridges — and the transpile pin's drift from upstream." />
   <meta property="og:title" content="SmolPaws SDK-swap board" />
-  <meta property="og:description" content="Where the SDK swap actually stands — the seven steps mapped to beads and PRs, plus the OpenHands-group backlog." />
+  <meta property="og:description" content="Component-by-component status for the live test of the new SmolPaws on the transpiled TypeScript stack." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://enyst.github.io/arch/smolpaws-sdk-swap-board.html" />
   <meta name="twitter:card" content="summary" />
@@ -57,119 +57,114 @@
   <p class="eyebrow">SmolPaws · OpenHands group · live tracker</p>
   <h1>SmolPaws SDK-swap board</h1>
   <p class="lede">
-    Where the SDK swap actually stands. The <a class="plain" href="smolpaws-sdk-swap.html">seven-step migration plan</a>
-    mapped to the real work — beads (<code>bd</code>) and PRs — so this group has one glanceable to-do instead of
-    re-deriving it each time. Hand-maintained; refreshed when state changes.
+    What we still need to assemble for a <strong>live test of the new SmolPaws</strong> — the one that runs on the
+    transpiled TypeScript stack instead of the old bespoke runner. Component by component, honest status. The plan is
+    the <a class="plain" href="smolpaws-sdk-swap.html">seven-step migration</a>; this board is where each piece actually
+    stands. Hand-maintained; refreshed when state changes.
   </p>
-  <p class="updated">Last updated 2026-07-13 · source of truth: beads in the <code>smolpaws</code> / <code>openhands-agent</code> repos + the <a class="plain" href="smolpaws-message-work-adr.html">message-work ADR</a></p>
+  <p class="updated">Last updated 2026-08-27 · source of truth: beads (epic <code>smolpaws-zlo</code>) + the pins on
+    <code>smolpaws/smolpaws</code> and <code>smolpaws/openhands-agent</code> main</p>
+
+  <div class="callout" style="margin:18px 0 6px">
+    <p><strong>The one-line status:</strong> the engine (transpiled agent-server) is at parity and pinned to upstream
+      <strong>v1.36.0</strong>; upstream has since moved to <strong>v1.44.0</strong>, so the pin needs to walk forward
+      eight release intervals (one bounded PR each, built by sibling agents on the Daytona cabin). The Slack
+      <code>paws</code> bridge — the low-risk guinea pig for the cutover — is substantially built. The new WhatsApp
+      bridge is the last big piece and hasn't started. Nothing is live-swapped yet; WhatsApp still runs the old stack.</p>
+  </div>
 
   <div class="legend">
-    <span class="pill done">✓ done</span>
+    <span class="pill done">✓ ready</span>
     <span class="pill wip">◐ in&nbsp;progress</span>
     <span class="pill next">→ next</span>
     <span class="pill todo">○ not&nbsp;started</span>
   </div>
 
-  <h2>The swap, step by step</h2>
-  <ol class="board">
-    <li>
-      <div class="step-head"><span class="step-title">Swap in <code>openhands-agent</code> for the old SDK</span> <span class="pill next">→ next</span></div>
-      <p class="step-body">Point the server at <code>@smolpaws/openhands-agent</code> instead of the old
-        <code>@smolpaws/agent-sdk</code> — the new SDK becomes the engine. Doing this first surfaces exactly what the
-        server actually relies on, which then scopes step 2. Not begun; the SDK it depends on is landing (dispatcher merged,
-        persistence in review).</p>
-      <div class="refs"><span class="b">unblocks: scope of step 2</span></div>
-    </li>
-    <li>
-      <div class="step-head"><span class="step-title">Agent-server parity (ish)</span> <span class="pill wip">◐ in progress</span></div>
-      <p class="step-body">Transpile the upstream <code>openhands-agent-server</code> to TS so the new SDK has a server to run on.
-        First slices landed — event/conversation routers, event &amp; conversation services, pubSub, sockets, OpenAPI, plus
-        bash/git/file routers. Durability now flows through the SDK's <code>EventLog</code> (server is a thin wrapper, like upstream).
-        Still ahead: remaining routers (P2/P3) and one narrow deterministic-append extension; external queue state stays out of this package.</p>
-      <div class="refs">
-        <span class="b">pkg: smolpaws/packages/openhands-agent-server</span>
-        <span class="b">verified green: 227 SDK tests · server build/test/openapi ✓</span>
-      </div>
-    </li>
-    <li>
-      <div class="step-head"><span class="step-title">Build durable message work around agent-server</span> <span class="pill wip">◐ ADR proposed</span></div>
-      <p class="step-body">The seam is chosen: one shared SQLite-backed Message Work Coordinator in the bridge runtime,
-        outside agent-server. Adapters compute lanes and accept/deliver through it. For webhook ingress, Cloudflare Queue
-        is an edge spool; a local HTTP-pull adapter acknowledges only after SQLite acceptance. No webhook tunnel is required.</p>
-      <div class="refs">
-        <a href="smolpaws-message-work-adr.html">message-work ADR + crash matrix</a>
-        <span class="b">coordinator/store implementation: not started</span>
-        <span class="b">existing BaseBridgeAdapter: transport seam, not coordinator</span>
-        <span class="b">smolpaws-e4j · -109 · -7dj · -6qo</span>
-      </div>
-    </li>
-    <li>
-      <div class="step-head"><span class="step-title">Swap agent-server + WhatsApp (keep the lifeline)</span> <span class="pill todo">○ not started</span></div>
-      <p class="step-body">Smallest end-to-end slice: migrate the legacy WhatsApp SQLite/poll monolith into a platform adapter
-        around the coordinator, preserving individual message boundaries. Everything after this happens with the lifeline intact.</p>
-      <div class="refs"><span class="b">depends on: steps 2–3</span></div>
-    </li>
-    <li>
-      <div class="step-head"><span class="step-title">Then Discord, GitHub, Email</span> <span class="pill todo">○ not started</span></div>
-      <p class="step-body">Migrate each transport onto the same coordinator seam. Discord already uses the base adapter;
-        Slack is half-migrated; GitHub already has a CF Queue but its Worker consumer still calls the runner; email dispatches directly.
-        GitHub/email become Worker → Queue → local pull adapters, while connected transports stay local.</p>
-      <div class="refs">
-        <span class="b">smolpaws-3iy GitHub webhook dedup</span>
-        <span class="b">smolpaws-z3l whitelisted-thread listen</span>
-      </div>
-    </li>
-    <li>
-      <div class="step-head"><span class="step-title">Slack-via-Chrome should keep working untouched</span> <span class="pill todo">○ verify later</span></div>
-      <p class="step-body">The heartbeat Slack reading goes through the browser, not the agent-server, so the swap shouldn't touch it.
-        Confirm once the new stack is live.</p>
-    </li>
-    <li>
-      <div class="step-head"><span class="step-title">Retest / adapt / redeploy <code>paws</code> (standalone Slack app)</span> <span class="pill todo">○ not started</span></div>
-      <p class="step-body">The separate Slack bot app rides the agent-server via the bridge adapter. Not in active use yet, but it will be;
-        it goes last and carefully.</p>
-      <div class="refs">
-        <span class="b">smolpaws-c6q Slack ingress</span>
-        <span class="b">smolpaws-c6s Socket Mode delivery</span>
-        <span class="b">smolpaws-c6r / c6t / c6u scaffold · context · ops</span>
-      </div>
-    </li>
-  </ol>
-
-  <h2>Transpile PRs &amp; sub-work</h2>
+  <h2>Components needed for a live test</h2>
+  <p class="step-body">Each row is a thing that has to work before we can run the new SmolPaws end-to-end. Ordered
+    roughly by the cutover sequence — engine first, one channel to prove it, then the primary channel.</p>
   <table>
-    <thead><tr><th>Item</th><th>Where</th><th>Status</th></tr></thead>
+    <thead><tr><th>Component</th><th>What it is</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td>LLM provider dispatcher (<code>createClientFromProfile</code>)</td><td><a class="plain" href="https://github.com/smolpaws/openhands-agent/pull/1">openhands-agent&nbsp;PR&nbsp;#1</a> · bead smolpaws-oz5</td><td><span class="pill done">✓ merged / closed</span></td></tr>
-      <tr><td>Event-log persistence (<code>EventLog</code> + <code>FileStore</code>)</td><td><a class="plain" href="https://github.com/smolpaws/openhands-agent/pull/2">openhands-agent&nbsp;PR&nbsp;#2</a></td><td><span class="pill wip">◐ open · in review</span></td></tr>
-      <tr><td>Agent-server TS package (routers, services, OpenAPI)</td><td>smolpaws/packages/openhands-agent-server</td><td><span class="pill wip">◐ slices landed</span></td></tr>
-      <tr><td>Gemini 2.5 reasoningEffort via thinkingBudget</td><td>bead openhands-agent-07e</td><td><span class="pill todo">○ follow-up</span></td></tr>
+      <tr>
+        <td><strong>Transpiled agent-server</strong><br><span class="backlog-note">the engine</span></td>
+        <td>Upstream <code>openhands-agent-server</code> rebuilt in TypeScript, running on the new SDK.
+          Routers, services, sockets, OpenAPI all ported; CI green.
+          <span class="refs"><span class="b">smolpaws-b1r</span></span></td>
+        <td><span class="pill done">✓ at parity</span></td>
+      </tr>
+      <tr>
+        <td><strong>SDK pin currency</strong><br><span class="backlog-note">keep up with upstream</span></td>
+        <td>Both repos pinned to upstream <strong>v1.36.0</strong> (<code>56ac317</code>). Upstream is now
+          <strong>v1.44.0</strong> — eight release intervals to walk forward, one bounded PR each, built by
+          sibling agents on the Daytona cabin.
+          <span class="refs"><span class="b">next: v1.36.0 → v1.37.0</span></span></td>
+        <td><span class="pill wip">◐ 8 intervals behind</span></td>
+      </tr>
+      <tr>
+        <td><strong>Delivery queue / turns</strong><br><span class="backlog-note">upstream-compatible</span></td>
+        <td>The design that replaces the old bespoke "turns" with an upstream-shaped delivery queue, plus the
+          written cutover + rollback plan.
+          <span class="refs"><span class="b">smolpaws-b1r.20</span> <span class="b">b1r.24</span></span></td>
+        <td><span class="pill wip">◐ design</span></td>
+      </tr>
+      <tr>
+        <td><strong>Message Relay + Dispatcher</strong><br><span class="backlog-note">durable, shared</span></td>
+        <td>One SQLite-backed coordinator outside the agent-server that every bridge accepts/delivers through.
+          Implementation exists (<code>src/coordinator/messageRelay.ts</code>, outbound relay) and drives the Slack app.
+          <span class="refs"><span class="b">message-work ADR</span></span></td>
+        <td><span class="pill wip">◐ in progress</span></td>
+      </tr>
+      <tr>
+        <td><strong>Slack bridge <code>paws</code></strong><br><span class="backlog-note">the guinea pig</span></td>
+        <td>Standalone Slack Socket Mode app (<code>apps/slack</code>, v2.0.0) on the Relay + Dispatcher path — the
+          low-risk channel we prove the new stack on before touching WhatsApp. Adapter, handler, live canary present.
+          <span class="refs"><span class="b">smolpaws-c6q</span> <span class="b">c6s</span></span></td>
+        <td><span class="pill next">→ prove end-to-end</span></td>
+      </tr>
+      <tr>
+        <td><strong>New WhatsApp bridge</strong><br><span class="backlog-note">the primary channel</span></td>
+        <td>Today WhatsApp is the <em>root</em> process in <code>src/</code>, not a bridge. Needs to become a real
+          <code>apps/whatsapp</code> adapter around the Relay, carrying its extra concerns (SQLite store,
+          scope/permission model, scheduler, media). Not started.
+          <span class="refs"><span class="b">smolpaws-kxa · kxa.1–.5</span></span></td>
+        <td><span class="pill todo">○ not started</span></td>
+      </tr>
+      <tr>
+        <td><strong>Other bridges</strong><br><span class="backlog-note">Discord · Email · GitHub</span></td>
+        <td>Scaffolded under <code>apps/</code> (adapters + dispatch), riding the same agent-server. Not on the
+          critical path for the first live test.</td>
+        <td><span class="pill wip">◐ scaffolded</span></td>
+      </tr>
+      <tr>
+        <td><strong>Slack-via-Chrome (heartbeat)</strong><br><span class="backlog-note">the lifeline reader</span></td>
+        <td>The daily heartbeat reads Slack through the browser Web API, not the agent-server — so the swap should
+          not touch it. Confirm once the new stack is live.</td>
+        <td><span class="pill done">✓ unaffected</span></td>
+      </tr>
     </tbody>
   </table>
-  <p class="backlog-note">PR #2 currently addressing a fresh AI-review round (lock edge cases). Nothing merged past #1 — merges are Engel's call.</p>
 
-  <h2>Surrounding backlog (in this group, not the swap itself)</h2>
-  <p class="step-body">Real work tracked in beads that lives in the OpenHands group but sits outside the migration chain. Grouped, not sequenced.</p>
+  <h2>The transpile pin, interval by interval</h2>
+  <p class="step-body">The engine advances one upstream release per bounded PR. SDK repo first, then the agent-server
+    re-vendors + ports the same interval. Both currently sit at v1.36.0.</p>
   <table>
-    <thead><tr><th>Theme</th><th>Beads</th></tr></thead>
+    <thead><tr><th>Interval</th><th>SDK <code>openhands-agent</code></th><th>Server <code>smolpaws</code> vendor</th></tr></thead>
     <tbody>
-      <tr><td><strong>Delivery / conversation correctness</strong><br><span class="backlog-note">much of this dissolves with step 3</span></td>
-          <td>smolpaws-e4j, -109, -7dj, -6qo, -c88, -wkh</td></tr>
-      <tr><td><strong>WhatsApp robustness</strong></td>
-          <td>smolpaws-39y (serial head-of-line block), -2z6 (cross-group mixup after restart), -1zk / -1zk.2 (onboarding + LaunchAgent), -wkh</td></tr>
-      <tr><td><strong>Architecture</strong></td>
-          <td>smolpaws-2g5 (automations vs ingress), -0de (shared scheduler/debounce), -bzo (channel plugin system)</td></tr>
-      <tr><td><strong>Research / memory</strong></td>
-          <td>smolpaws-owd (P0 · gbrain review), -ths (sleep-time consolidation), -x5k (gbrain MCP), -qjn (parallel tool calls)</td></tr>
-      <tr><td><strong>Voice / UX</strong></td>
-          <td>smolpaws-gi6, -9d3, -123 (STT), -dc8 (non-dev UX)</td></tr>
-      <tr><td><strong>Ops / infra</strong></td>
-          <td>smolpaws-xjw (<code>smolpaws doctor</code>), -43a (CI shell-injection guards), -95t (stable PATH), -ob9 (Daytona auto-wake)</td></tr>
+      <tr><td>… → v1.36.0 <span class="backlog-note">(56ac317)</span></td><td><span class="pill done">✓ merged</span></td><td><span class="pill done">✓ merged</span></td></tr>
+      <tr><td>v1.36.0 → v1.37.0 <span class="backlog-note">(next)</span></td><td><span class="pill next">→ next</span></td><td><span class="pill todo">○ after SDK</span></td></tr>
+      <tr><td>v1.37.0 → v1.44.0 <span class="backlog-note">(catch-up)</span></td><td><span class="pill todo">○ 7 more</span></td><td><span class="pill todo">○ 7 more</span></td></tr>
     </tbody>
   </table>
+  <p class="backlog-note">Sibling agents run the bounded "hash-interval" prompt on the Daytona cabin (red/green, PR
+    no-merge). Merges are Engel's call.</p>
 
   <div class="callout">
-    <p><strong>The honest read:</strong> the focused OpenHands work is the SDK-swap chain — steps 1–3. Step 3 now has a proposed ADR but no coordinator/store implementation. Several delivery bugs should be fixed by that shared module rather than patched per adapter. The unmerged burst-coalescing work under <code>smolpaws-0de</code> needs redesign: accepted messages stay separate durable events.</p>
+    <p><strong>The honest read:</strong> the engine is done and correct — the real remaining work is (1) walking the
+      pin forward eight releases so we're current with upstream, and (2) the message-delivery spine: finish the Relay +
+      Dispatcher, prove it through the Slack <code>paws</code> guinea pig, then build the new WhatsApp bridge and swap
+      it in with a rollback path. Nothing is live-swapped yet; the primary WhatsApp cat still runs the old stack, which
+      is the whole point of proving on Slack first.</p>
   </div>
 
   <nav class="foot-nav">
