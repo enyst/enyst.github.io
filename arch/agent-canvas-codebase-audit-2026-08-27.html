@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Canvas whole-codebase audit · ten seams worth fixing</title>
+  <meta name="description" content="A whole-codebase architecture audit of OpenHands Agent Canvas: thirteen subsystems reviewed, ten actionable issues filed, and the state-ownership pattern connecting them." />
+  <meta property="og:title" content="Agent Canvas whole-codebase audit · ten seams worth fixing" />
+  <meta property="og:description" content="Thirteen subsystems reviewed, ten actionable issues filed, and the state-ownership pattern connecting them." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/agent-canvas-codebase-audit-2026-08-27.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .eyebrow { font-family:var(--mono); font-size:.72em; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:600; }
+    .lede { max-width:760px; font-size:1.08em; line-height:1.72; }
+    .scope { color:var(--muted); font-family:var(--mono); font-size:.74em; line-height:1.8; margin:10px 0 26px; }
+    .scope code { font-size:1em; }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:24px 0; }
+    .metric { min-height:128px; padding:16px; border:1px solid var(--border); border-radius:var(--border-radius); background:var(--card); }
+    .metric strong { display:block; color:var(--accent); font-family:var(--serif); font-size:2.4em; font-weight:400; line-height:1; }
+    .metric span { display:block; margin-top:9px; color:var(--muted); font-size:.82em; line-height:1.45; }
+    .finding-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:20px 0; }
+    .finding { display:flex; flex-direction:column; padding:18px; border:1px solid var(--border); border-radius:var(--border-radius); background:var(--card); }
+    .finding h3 { margin:10px 0 8px; color:var(--ink); font-family:var(--sans); font-size:1em; letter-spacing:0; line-height:1.35; text-transform:none; }
+    .finding p { flex:1; margin:0 0 14px; color:var(--muted); font-size:.84em; }
+    .finding a { color:var(--teal); font-family:var(--mono); font-size:.75em; text-decoration:none; }
+    .finding a:hover { text-decoration:underline; }
+    .badge { align-self:flex-start; padding:3px 8px; border-radius:999px; color:var(--report); background:rgba(220,107,74,.12); font-family:var(--mono); font-size:.67em; font-weight:600; }
+    .badge.structural { color:var(--accent); background:rgba(201,168,76,.12); }
+    .sequence { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:20px 0; }
+    .wave { padding:17px; border-top:3px solid var(--accent); border-radius:0 0 var(--border-radius) var(--border-radius); background:var(--card); }
+    .wave:nth-child(2) { border-color:var(--teal); }
+    .wave:nth-child(3) { border-color:var(--report); }
+    .wave b { display:block; margin-bottom:6px; }
+    .wave p { margin:0; color:var(--muted); font-size:.82em; }
+    .coverage td:first-child { width:35%; font-weight:600; color:var(--ink); }
+    .coverage td:nth-child(2) { width:16%; }
+    .status { font-family:var(--mono); font-size:.74em; white-space:nowrap; }
+    .filed { color:var(--report); }
+    .clear { color:var(--green); }
+    .existing { color:var(--teal); }
+    .decision { padding:13px 16px; margin:12px 0; border-left:3px solid var(--muted); border-radius:0 var(--border-radius) var(--border-radius) 0; background:var(--card); }
+    .decision strong { color:var(--ink); }
+    .decision p { margin:4px 0 0; color:var(--muted); font-size:.86em; }
+    .foot-links { display:flex; flex-wrap:wrap; gap:18px; }
+    .foot-links a { color:var(--muted); text-decoration:none; }
+    .foot-links a:hover { color:var(--accent); }
+    @media(max-width:760px) {
+      .metrics,.finding-grid,.sequence { grid-template-columns:1fr; }
+      table { display:block; overflow-x:auto; }
+    }
+  </style>
+</head>
+<body>
+<main class="shell">
+  <p class="eyebrow">OpenHands · Agent Canvas · whole-codebase architecture review</p>
+  <h1>Ten seams worth fixing</h1>
+  <p class="lede">
+    A read-only pass across the entire Agent Canvas frontend found a consistent failure mode: state that belongs
+    to one backend, one source record, or one runtime instance is represented as if it were global. The code is
+    generally well-factored; the sharp edges appear where identity and ownership stop one layer too early.
+  </p>
+  <p class="scope">
+    Snapshot · <a href="https://github.com/OpenHands/OpenHands/commit/11d6b4a56eb4b7a190e0cb5b2c96e524db14afc7"><code>11d6b4a</code></a><br />
+    Date · 2026-08-27 · Method · <a href="https://gist.github.com/aarondfrancis/8735edbe48532f97ee5ea818db4dbd47">whole-codebase audit protocol</a> · Result · ten issues filed as <code>enyst</code>
+  </p>
+
+  <div class="callout">
+    <p><strong>The through-line:</strong> make the owner part of the data. Backend identity belongs in caches and health checks; source records belong underneath UI ordering; unsaved edits belong in an overlay; embedded runtimes belong to their React root.</p>
+  </div>
+
+  <div class="metrics" aria-label="Audit summary">
+    <div class="metric"><strong>13</strong><span>explicit subsystems inspected, including runtime, UI, packaging, telemetry, and CI</span></div>
+    <div class="metric"><strong>10</strong><span>actionable, independently rechecked issues filed with reproduction paths and acceptance criteria</span></div>
+    <div class="metric"><strong>3</strong><span>existing issues treated as owners instead of creating duplicates</span></div>
+    <div class="metric"><strong>0</strong><span>source changes made to Agent Canvas; this was deliberately a read-only review</span></div>
+  </div>
+
+  <h2>What the findings say together</h2>
+  <p>
+    The audit did not uncover one giant subsystem that needs a rewrite. It found small but consequential breaks in
+    otherwise sensible boundaries. A React Query key is scoped correctly while the service cache beneath it is not.
+    Canonical events are sorted correctly while their derived UI projection remembers arrival order. An embedded
+    provider exposes instance-shaped dependencies while mutable globals and body portals remain document-shaped.
+  </p>
+  <p>
+    These are representation problems before they are implementation problems. Each proposed fix reduces the number
+    of independently mutable truths: use scoped cache keys, derive display objects from current source data, represent
+    edits as an overlay, and pass runtime ownership explicitly instead of consulting an ambient singleton.
+  </p>
+
+  <h2>The ten filed issues</h2>
+  <div class="finding-grid">
+    <article class="finding">
+      <span class="badge">target isolation</span>
+      <h3>Scope the local settings cache by backend, revision, and exposure mode</h3>
+      <p>A process-global cache can return backend A’s redacted—or encrypted conversation-start—settings while backend B is active. Independent keys and timestamps make the real target explicit.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16945">#16945 · filed issue →</a>
+    </article>
+    <article class="finding">
+      <span class="badge">privacy correctness</span>
+      <h3>Retry Automation telemetry consent until the backend acknowledges it</h3>
+      <p>The hook records an attempt before it succeeds, so one transient failure can suppress synchronization for the rest of the session. Track in-flight and last-successful keys separately.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16946">#16946 · filed issue →</a>
+    </article>
+    <article class="finding">
+      <span class="badge">event correctness</span>
+      <h3>Make UI event projection independent of history arrival order</h3>
+      <p>Older pagination can load an action after its observation and leave both visible. The sorted event log should be canonical; rebuild its UI projection when history is inserted before the live tail.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16947">#16947 · filed issue →</a>
+    </article>
+    <article class="finding">
+      <span class="badge">form state</span>
+      <h3>Preserve unsaved SDK settings edits across background refetches</h3>
+      <p>Two mutable snapshots—values and dirty flags—are replaced together during hydration. A server baseline plus a local edits overlay makes refetch, save, and failure behavior unambiguous.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16948">#16948 · filed issue →</a>
+    </article>
+    <article class="finding">
+      <span class="badge">source of truth</span>
+      <h3>Keep Files and Changes source-driven after refresh</h3>
+      <p>Cloud file lists sit outside the invalidated key family, while Changes ordering retains stale objects rather than stable path identities. Both views can look refreshed while presenting old data.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16949">#16949 · filed issue →</a>
+    </article>
+    <article class="finding">
+      <span class="badge">scope identity</span>
+      <h3>Scope Home launch targets and recents by backend and organization</h3>
+      <p>Independent nullable fields can retain a workspace or repository after a same-kind backend switch. One discriminated, scoped launch target rules out cross-account and impossible combinations.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16950">#16950 · filed issue →</a>
+    </article>
+    <article class="finding">
+      <span class="badge">policy ownership</span>
+      <h3>Centralize the effective configuration for the next Home conversation</h3>
+      <p>Readiness, display, ACP switching, and launch reconstruct policy separately and can disagree about which LLM profile will actually run. One pure resolver should own that decision.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16951">#16951 · filed issue →</a>
+    </article>
+    <article class="finding">
+      <span class="badge structural">contract boundary</span>
+      <h3>Use TypeScript-client event contracts instead of redeclaring the wire</h3>
+      <p>Canvas maintains a parallel event model that has already drifted from the canonical client. Keep frontend refinements narrow and move presentation metadata off server event objects.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16952">#16952 · filed issue →</a>
+    </article>
+    <article class="finding">
+      <span class="badge structural">embedding boundary</span>
+      <h3>Make embedded runtime state and portal styling instance-scoped</h3>
+      <p>React-scoped query and i18n dependencies still swap global state, and dialogs portal outside the root’s CSS/theme scope. Runtime context and a per-root portal host complete the public embedding boundary.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16953">#16953 · filed issue →</a>
+    </article>
+    <article class="finding">
+      <span class="badge">target isolation</span>
+      <h3>Scope MCP health by backend and connection revision</h3>
+      <p>Identical server shapes on different backends share one global verdict even when credentials and network reachability differ. Capture backend scope when each probe starts and resolves.</p>
+      <a href="https://github.com/OpenHands/OpenHands/issues/16954">#16954 · filed issue →</a>
+    </article>
+  </div>
+
+  <h2>A practical order of work</h2>
+  <div class="sequence">
+    <section class="wave">
+      <b>1 · Protect boundaries</b>
+      <p>Start with #16945 and #16946. Cross-backend encrypted settings and unacknowledged privacy choices have the widest consequence even when the triggering races are narrow.</p>
+    </section>
+    <section class="wave">
+      <b>2 · Restore single sources</b>
+      <p>Then address #16947–#16951 and #16954: canonical event projection, edit overlays, source-driven workspace views, and backend-scoped Home/MCP state.</p>
+    </section>
+    <section class="wave">
+      <b>3 · Finish public boundaries</b>
+      <p>Land #16952 and #16953 in staged migrations. They pay down contract drift and make the embeddable package honestly instance-safe without forcing a flag-day rewrite.</p>
+    </section>
+  </div>
+
+  <h2>Coverage ledger</h2>
+  <p>The protocol required an explicit decision for every major area, including areas where the right answer was “no new issue.”</p>
+  <table class="coverage">
+    <thead><tr><th>Subsystem</th><th>Decision</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>API, backend registry, Cloud adapters</td><td><span class="status filed">filed</span></td><td>#16945: the service cache under correctly scoped React Query state was still backend-agnostic.</td></tr>
+      <tr><td>Conversation runtime, events, WebSocket</td><td><span class="status filed">filed</span></td><td>#16947: UI event projection depended on arrival order across history pages.</td></tr>
+      <tr><td>Local stack, ingress, packaging</td><td><span class="status clear">no filing</span></td><td>Supervisor consolidation and universal desktop build defaults were noted, but not strong enough to become standalone defects.</td></tr>
+      <tr><td>Chat and conversation presentation</td><td><span class="status filed">filed</span></td><td>#16947 owns the action/observation and paginated transcript correctness seam.</td></tr>
+      <tr><td>Workspace, files, Git, browser, terminal</td><td><span class="status filed">filed</span></td><td>#16949 unifies file-list invalidation and removes stale mirrored GitChange objects.</td></tr>
+      <tr><td>Settings, profiles, providers, secrets, ACP</td><td><span class="status filed">filed</span></td><td>#16948 and #16951 separate edits from baselines and centralize launch-time configuration.</td></tr>
+      <tr><td>Skills, plugins, MCP</td><td><span class="status existing">filed + existing</span></td><td>#16954 covers MCP health; existing #16843 and #16893 already own plugin and skill scoping.</td></tr>
+      <tr><td>Automations and manifests</td><td><span class="status filed">filed</span></td><td>#16946 covers consent acknowledgement; manifest ownership was intentionally left in the automation architecture.</td></tr>
+      <tr><td>Home, onboarding, sidebar, navigation</td><td><span class="status filed">filed</span></td><td>#16950 and #16951 cover target identity and the effective next-launch decision.</td></tr>
+      <tr><td>Telemetry and analytics</td><td><span class="status filed">filed</span></td><td>#16946 is the material retry seam; a broader event-union redesign did not survive validation.</td></tr>
+      <tr><td>Shared UI and public library surface</td><td><span class="status filed">filed</span></td><td>#16953 makes runtime dependencies and portals root-owned for embedded consumers.</td></tr>
+      <tr><td>Agent-facing Canvas UI bridge</td><td><span class="status clear">no filing</span></td><td>The bridge ownership matched the repository boundary and did not justify a new issue.</td></tr>
+      <tr><td>Tests, CI, developer tooling</td><td><span class="status clear">no filing</span></td><td>Stable test QueryClient and legacy shim cleanup are useful maintenance, but below the filing threshold.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>What deliberately was not filed</h2>
+  <div class="decision">
+    <strong>Duplicate backend-scope reports</strong>
+    <p>Plugin queries, skill queries, and saved-workspace/directory-search ownership already had homes in #16843, #16893, and #16844. The audit linked to those owners instead of inflating the issue count.</p>
+  </div>
+  <div class="decision">
+    <strong>Broad telemetry event union</strong>
+    <p>The idea looked attractive in inventory, but the current typed tracking layer already centralizes the important contracts. The remaining duplication did not demonstrate a material user-facing failure.</p>
+  </div>
+  <div class="decision">
+    <strong>Automation manifest ownership</strong>
+    <p>Canvas and Automation have distinct responsibilities by design: Canvas edits and presents; Automation schedules and dispatches. A second “canonical manifest” in the frontend would blur that boundary.</p>
+  </div>
+  <div class="decision">
+    <strong>Maintenance without a failure path</strong>
+    <p>Dev supervisor consolidation, modal-action typing, a stable test client, legacy Python shim ownership, and derived health booleans remain worthwhile follow-ups—but not all good refactors deserve issues.</p>
+  </div>
+
+  <h2>Method and confidence</h2>
+  <p>
+    The audit began with a repository map and ownership boundaries, then traced data from its origin through caches,
+    stores, adapters, hooks, and presentation. Candidate findings were checked against tests, current issues, and
+    intentional cross-repository ownership. Every filed issue includes a concrete failure path, a proposed
+    representation, acceptance criteria, migration risks, and the audited commit.
+  </p>
+  <p>
+    No Agent Canvas source files were changed and no corrective patch was mixed into the review. That separation is
+    useful: the issue set records what should change without letting an implementation choice retroactively define
+    the problem.
+  </p>
+
+  <footer>
+    <div class="foot-links">
+      <a href="../index.html">← notebook home</a>
+      <a href="https://github.com/OpenHands/OpenHands">OpenHands/OpenHands</a>
+      <a href="https://github.com/OpenHands/OpenHands/issues?q=is%3Aissue%20author%3Aenyst%2016945..16954">filed issues</a>
+      <a href="https://gist.github.com/aarondfrancis/8735edbe48532f97ee5ea818db4dbd47">audit protocol</a>
+    </div>
+  </footer>
+</main>
+</body>
+</html>
