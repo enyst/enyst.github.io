@@ -60,6 +60,7 @@
     <li><a href="#dev">Intentional deviations (3)</a></li>
     <li><a href="#hotspot">The hotspot file</a></li>
     <li><a href="#plan">Migration order</a></li>
+    <li><a href="#decisions">Decisions — Aug 30</a></li>
   </ol></nav>
   <main>
     <header class="title">
@@ -177,6 +178,46 @@
       </ol>
       <div class="callout ok"><strong>Bottom line:</strong> the swap is real but bounded. 13 are free, 4 are renames, 3 are tiny ports, and 3 are decisions — and the decisions all live in one file. This is a hookup, not a rewrite.</div>
       <div class="callout note">Grounded to: smolpaws <code>src/</code> + <code>apps/</code> imports of <code>@smolpaws/agent-sdk</code> (22 symbols, ~21 files) · new package <code>@smolpaws/openhands-agent@0.1.0</code> <code>src/</code> exports (170-test transpile). Companion: <a class="src" href="secrets-keyring-vs-cipher.html">secrets: keyring vs cipher</a> · <a class="src" href="https://github.com/OpenHands/software-agent-sdk/issues/3988">agent-sdk#3988</a>.</div>
+    </section>
+
+    <section id="decisions"><h2><span class="num">8</span>Decisions &amp; corrections — Aug 30, 2026</h2>
+      <p>A working session that both fixed the SDK and settled several open questions. The map above is the migration <em>surface</em>; this is what we decided to <em>do</em> — and one place the earlier picture was wrong.</p>
+
+      <div class="callout"><strong>★ The running Slack path already uses the new SDK.</strong> Traced from live processes, not docs: the <code>apps/slack</code> bridge holds an established connection to the TypeScript agent-server on <code>:8790</code>, which is <code>packages/openhands-agent-server</code> resolving <code>@smolpaws/openhands-agent</code> from its vendored build. So the "paws Slack app on the new transpile" is not a future migration — it is what serves Slack today. The legacy <code>apps/agent-server</code> <code>/turns</code> runner on <code>:8788</code> is still up but is reference code, unconnected to Slack.</div>
+
+      <h3>Plain text now ends a turn (SDK behavior fix)</h3>
+      <p>The Python SDK finishes a turn when the model replies with plain text (<code>_handle_content_response</code> sets the conversation to <code>FINISHED</code>). The transpile did <em>not</em>: it appended the assistant message and let the run loop continue until <code>finish</code>, stuck, or max-iterations — and it never nudged a reasoning-only reply. Both are now fixed in <code>openhands-agent</code>'s <code>dispatchLlmResponse</code>:</p>
+      <ul>
+        <li><strong>CONTENT</strong> → emit the assistant <code>MessageEvent</code>, then set <code>executionStatus = FINISHED</code>. Visible text is a complete turn; control returns to the user.</li>
+        <li><strong>REASONING_ONLY / EMPTY</strong> → emit the message, then append a corrective nudge (<code>source:"environment"</code>, user role) and keep looping.</li>
+      </ul>
+      <p>This makes "last agent message = terminal reply" true by construction, which is exactly what the coordinator's <code>terminalResponseExtractor</code> and the server's <code>getAgentFinalResponse()</code> already assumed. The companion <a class="src" href="sdk-stuck-detector-nudge.html">stuck-detector nudge</a> page describes the related asymmetry.</p>
+
+      <h3>Two ways a message reaches the channel</h3>
+      <p>These are independent, and both are intended — if the model both calls <code>send_message</code> and ends with text, both are delivered:</p>
+      <ul>
+        <li><strong><code>send_message</code> tool</strong> → a mid-turn outbound. The tool emits a plain <code>ActionEvent</code>; the coordinator's <code>sendMessageExtractor</code> delivers one message per call off the durable EventLog. The tool does <em>not</em> continue-vs-finish — the agent keeps working after it. It belongs directly in <code>openhands-agent</code> as a first-class built-in tool, and must not embed a delivery callback: queue semantics stay in the coordinator, not the SDK.</li>
+        <li><strong>Terminal reply</strong> → the end-of-turn <code>finish</code> observation or plain assistant text, delivered by <code>terminalResponseExtractor</code>.</li>
+      </ul>
+
+      <h3>Feature-by-feature: port / already-there / drop</h3>
+      <table>
+        <tr><th>Feature</th><th>Verdict</th><th>Where</th></tr>
+        <tr><td class="sym"><code>send_message</code></td><td>Port as SDK built-in tool (emits ActionEvent)</td><td>new: <code>openhands-agent/src/tool/</code></td></tr>
+        <tr><td>Task scheduling (<code>schedule_task</code>, <code>list_tasks</code>, <code>cancel/pause/resume_task</code>)</td><td>Keep. The scheduler (<code>src/task-scheduler.ts</code>) is already SDK-independent (cron + SQLite); only the tool wiring is SDK-coupled. Port the tools like <code>send_message</code>; enqueue turns via coordinator intake, not <code>/turns</code>.</td><td>tools: new SDK · scheduler: <code>src/</code></td></tr>
+        <tr><td>heartbeat</td><td>Keep — host concern, not SDK</td><td>launcher / <code>docs/smolpaws/HEARTBEAT.md</code></td></tr>
+        <tr><td>projectSkills</td><td>Already in the new SDK (<code>src/skills/</code> + <code>AgentContext</code>)</td><td>new SDK</td></tr>
+        <tr><td>activity / outbox</td><td>Already the coordinator (<code>outboundRelay</code>, <code>deliveryDispatcher</code>, <code>work</code>/<code>projection_cursors</code>)</td><td><code>src/coordinator/</code></td></tr>
+        <tr><td>workspace / repo helpers</td><td>Drop — VSCode-era leftovers; new SDK's <code>LocalWorkspace</code>/<code>RemoteWorkspace</code> cover real cases</td><td>—</td></tr>
+      </table>
+
+      <h3><code>task_tracker</code> ≠ task scheduling</h3>
+      <div class="callout note">The new SDK ships a built-in <code>task_tracker</code> tool (a per-conversation plan/checklist, in <code>DEFAULT_EXEC_TOOL_NAMES</code>). That is <em>not</em> smolpaws' cross-conversation cron scheduler (<code>schedule_task</code> et al.). Same word, different job — the scheduler still needs its tools ported; the tracker is already there.</div>
+
+      <h3>Bridges attach to a running core</h3>
+      <p>Target operational shape: the agent-server + coordinator are the always-on core; each bridge (Slack, then WhatsApp, Discord, …) is a lightweight client that <em>attaches</em> to the running core rather than bundling its own server. Today <code>apps/slack</code> runs as a standalone server-plus-bridge; that stays useful for canary/testing, but production is "core up, bridges attach." Note the current bridge base class (<code>BaseBridgeAdapter</code>, used by Discord/email) is welded to the legacy <code>/turns</code> client — the canonical bridge shape is the relay one Slack pioneered, and the others move onto it.</p>
+
+      <div class="callout ok"><strong>State on Aug 30:</strong> SDK fix landed (content-terminal + reasoning nudge), rebuilt &amp; re-vendored into <code>:8790</code>, Slack reconnected. Open follow-ups: port <code>send_message</code> + task tools into the new SDK, and a coordinator bug (<code>smolpaws-6ar</code>) where <code>syncDeliveryOutbox</code> hot-loops 404s on a stale conversation cursor after a server restart.</div>
     </section>
   </main>
 </div></body></html>
