@@ -192,6 +192,15 @@ _SENSITIVE_ENV_VARS = frozenset({<b>"SESSION_API_KEY"</b>})   <span class="c"># 
     <div class="keybox crit"><h3>What it does not cover</h3><p>The key written to the <strong>config file</strong> in the workspace (agent can <code>cat</code> it). <code>OH_SECRET_KEY</code>, which decrypts stored secrets. Any tool that reads the parent's <code>/proc/self/environ</code>, memory, or the file. It only screens the <em>bash</em> path.</p></div>
   </div>
   <div class="callout crit"><p>So a Run-scoped or injected agent that can read one file inside its own workspace can recover the Admin key and <strong>mint its own Admin tokens</strong> — or just call the co-located server as Admin directly. RBAC on the API never sees this, because the caller was never remote.</p></div>
+
+  <h3>Live example: the guard strips one name, the others sail past</h3>
+  <p>This isn't hypothetical. While reading the code for this page I found that <code>sanitized_env()</code> — the single chokepoint for <em>every</em> agent subprocess (bash, file_editor, grep, glob, hooks) — removed exactly one variable, the <strong>legacy V0 name</strong>:</p>
+  <pre><span class="c"># before — openhands-sdk/.../utils/command.py</span>
+_SENSITIVE_ENV_VARS = frozenset({"SESSION_API_KEY"})   <span class="c"># V0 only</span></pre>
+  <p>But the same process env also holds <code>OH_SECRET_KEY</code> (the cipher that decrypts <em>all</em> persisted secrets) and <code>OH_SESSION_API_KEYS_0</code> (the <strong>V1 name for the very session key</strong> the strip was meant to hide). Both were readable from a shell:</p>
+  <pre>echo "$OH_SECRET_KEY"            <span class="c"># cipher for every stored credential</span>
+echo "$OH_SESSION_API_KEYS_0"    <span class="c"># the session key, by its current name</span></pre>
+  <div class="callout warn"><p>Two failure modes in one line of code: a <strong>denylist</strong> (always incomplete) and <strong>name drift</strong> (V0 stripped, V1 not). Fixed in <a href="https://github.com/OpenHands/software-agent-sdk/pull/4801">software-agent-sdk#4801</a> — add <code>OH_SECRET_KEY</code>, strip the <code>OH_SESSION_API_KEYS_</code> prefix, regression test that fails before the change. It's a mitigation, not a wall: the deeper point stands — the credentials live in the runtime the agent executes in.</p></div>
 </section>
 
 <section id="file">
