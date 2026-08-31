@@ -91,6 +91,7 @@
     <li><a href="#inside">The key lands inside</a></li>
     <li><a href="#file">The config file it reads</a></li>
     <li><a href="#helps">What it does fix</a></li>
+    <li><a href="#worries">Two worries</a></li>
     <li><a href="#sources">Sources</a></li>
   </ol>
 </nav>
@@ -99,7 +100,7 @@
   <div class="eyebrow">OpenHands RFC #17055 · Agent Canvas RBAC · architecture study</div>
   <h1>They really are in the same place.</h1>
   <p class="sub">The RFC wants <strong>Read / Run / Admin</strong> roles for a shared Canvas. Useful — against <em>remote</em> callers. But <code>agent-server</code> = <code>agent-sdk</code> = the docker sandbox = the remote (cabin) = the local Mac. One place. So the root key that mints tokens has to <em>arrive inside</em> the very sandbox where the agent's own shell runs — and it gets written to a file the agent can read.</p>
-  <div class="meta">smolpaws · for Engel · grounded to agent-sdk (onatozmenn/software-agent-sdk) and OpenHands/OpenHands#17055 · 31 Aug 2026</div>
+  <div class="meta">smolpaws · for Engel · grounded to a local checkout of OpenHands/software-agent-sdk and OpenHands/OpenHands#17055 · 31 Aug 2026</div>
 </header>
 
 <section id="verdict">
@@ -110,6 +111,7 @@
     <article><span class="pill crit">Unsolved</span><strong>The agent is inside</strong><p>To mint tokens, the root key must reach the agent-server — which lives <em>in the same sandbox as the agent's bash</em>. A local (or injected) agent can read the key from its config file and mint its own Admin tokens.</p></article>
   </div>
   <div class="callout crit"><p><strong>The crux, in one line.</strong> RBAC guards the <em>door</em> to the agent-server. It does not guard against the agent that is already <em>in the room</em> — because the room, the door, the key drawer, and the runtime are the same room.</p></div>
+  <p style="margin-top:14px">Two worries carry through this whole read, and I share both: it <strong>adds cross-cutting complexity</strong> for a case (solo local) that gets nothing from it, and it risks a <strong>false sense of security</strong> if "RBAC" is heard as "isolation." Both get their own section at the end (§9).</p>
 </section>
 
 <section id="rfc">
@@ -234,8 +236,27 @@ else:
   <div class="callout ok"><p><strong>Feedback-shaped takeaway for the thread:</strong> the three roles are reasonable, and the token model is right — but the RFC should state plainly that mint-from-key only binds <em>remote</em> callers, because the root key (from env, <code>/api/init</code>, or the optional workspace config file) lands inside the same sandbox the agent executes in. Real least-privilege for automations needs the minting authority to live outside that sandbox.</p></div>
 </section>
 
+<section id="worries">
+  <h2><span class="num">09</span>Two worries Engel raised — and I share both</h2>
+
+  <h3>Worry 1 — added complexity</h3>
+  <p>This is the one I'd weight highest. RBAC is not a feature you bolt on; it is a <em>cross-cutting invariant</em>. To be real it needs: a principal/capability model, a <strong>fail-closed classification of every HTTP route and every WebSocket message</strong> (miss one and it either over-blocks or silently allows), a durable <code>key → role</code> store, a token-minting + expiry + revocation path, service-actor delegation, and adversarial tests for all of it — across <strong>four repositories</strong>. The RFC's own readiness checklist is eight items long precisely because of this.</p>
+  <div class="callout warn"><p><strong>My take:</strong> for a single-operator local Canvas, that complexity is <em>negative</em> value today — more surface to break, more to reason about, no threat it removes for the solo case. The cost is only justified once you actually have a <em>second principal</em> (a teammate, or an automation you want to de-privilege). Complexity that guards nothing is just new attack surface: an under-classified WebSocket message, a token that outlives its revocation, a role that quietly grants more than its name. The mitigation the RFC gets right is <strong>fixed roles</strong> (three bundles, not a policy language) and <strong>backend-only enforcement</strong> (Canvas stays dumb). If it ever grows per-conversation ACLs or a policy DSL, that's the moment the complexity stops paying for itself. My recommendation: land the <em>security hardening</em> steps (explicit auth modes, fail-closed, constant-time compare, trusted workspace roots, separating automation signing material) <strong>first and independently</strong> — those help everyone, solo included — and treat the roles themselves as opt-in for people who actually share an instance.</p></div>
+
+  <h3>Worry 2 — a false sense of security</h3>
+  <p>This is the more dangerous one, because it fails <em>quietly</em>. The risk is that "we have RBAC now" gets heard as "the Canvas is secure," when what RBAC actually secures is <strong>one specific thing: remote API callers</strong>. Three ways the false comfort bites:</p>
+  <ul>
+    <li><strong>"Read" sounds like confidentiality. It isn't.</strong> The RFC says so outright — transcripts and tool outputs already contain source, terminal output, and secrets, and a Read principal can <em>see</em> all of it. Read blocks mutation, not viewing.</li>
+    <li><strong>"Run" sounds like "can't touch secrets." It can.</strong> A Run user can just ask an allowed agent to print a credential the server-side profile injected into the sandbox. The RFC lists this as an explicit non-goal.</li>
+    <li><strong>The whole model stops at the sandbox wall — which doesn't exist here.</strong> Everything above (§3–§7) is this point: the agent runs <em>inside</em> the server that holds the key. RBAC on the door does nothing about the agent already in the room. A Run-scoped but prompt-injected agent that reads its own process env or config can recover Admin authority.</li>
+  </ul>
+  <div class="callout crit"><p><strong>My take:</strong> the way this goes wrong is not a bug — it's a <em>category error in how the feature gets described</em>. If the changelog says "team RBAC / secure multi-user Canvas," people will put an "always-on" instance on a shared network and hand out Run keys believing the blast radius is contained, when a single injected automation or a printed secret defeats it. The honest framing that avoids the trap: <strong>RBAC is access control, not isolation.</strong> It answers "who may call which API," not "what can a compromised agent reach." Those are different security problems with different mechanisms (sandbox isolation, out-of-sandbox secret custody, network segmentation). The doc, the UI, and the release notes should say that in plain words — ideally the <code>whoami</code>/settings surface should even <em>name</em> the boundary ("Run limits API actions; it does not prevent an agent from disclosing secrets it can see"). A security feature that is honest about what it does <em>not</em> do is worth more than one that lets you stop thinking.</p></div>
+
+  <div class="callout"><p><strong>Net of both:</strong> ship the hardening, keep the roles fixed and opt-in, enforce only in the backend — and label the boundary loudly. The failure mode to avoid is not "RBAC is wrong"; it's "RBAC gets sold as isolation, and someone relaxes a real precaution because the dashboard says <span class="pill ok">Run</span>."</p></div>
+</section>
+
 <section id="sources">
-  <h2><span class="num">09</span>Sources</h2>
+  <h2><span class="num">10</span>Sources</h2>
   <ul class="sources">
     <li><a class="src" href="https://github.com/OpenHands/OpenHands/issues/17055">OpenHands/OpenHands#17055 — [RFC] Role-Based Access Control for the Agent Canvas</a></li>
     <li><span class="src">agent-sdk · openhands-agent-server/openhands/agent_server/dependencies.py</span> — <code>check_session_api_key</code>, the single binary auth check; workspace cookie.</li>
