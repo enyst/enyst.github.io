@@ -69,16 +69,24 @@
   .sig{font-family:var(--mono);font-size:13px;color:var(--muted)}
   .foot-nav{margin-top:52px;border-top:1px solid var(--rule);padding-top:18px;font-family:var(--mono);font-size:13px}
   .foot-nav a{color:var(--muted);text-decoration:none}.foot-nav a:hover{color:var(--accent)}
+  .lensbar{display:flex;gap:8px;margin:16px 0 4px;flex-wrap:wrap}
+  .lens-btn{font-family:var(--mono);font-size:12.5px;font-weight:600;padding:6px 13px;border:1px solid var(--rule-strong);background:var(--card);border-radius:6px;cursor:pointer;color:var(--muted)}
+  .lens-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  body[data-lens=all] section.lens-wide{display:none}
+  body[data-lens=wide] section.lens-all{display:none}
+  table.split td,table.split th{text-align:right}
+  table.split td:first-child,table.split th:first-child{text-align:left}
   @media(max-width:760px){.wrap{grid-template-columns:1fr;gap:16px}nav.toc{position:static}}
 </style>
 </head>
-<body><div class="wrap">
+<body data-lens="all"><div class="wrap">
 <nav class="toc"><a class="back" href="../index.html">← Home</a><h2>Contents</h2><ol>
 <li><a href="#exec">Executive read — top five</a></li>
 <li><a href="#themes">Theme breakdown</a></li>
 <li><a href="#engel">For Engel — the shortlist</a></li>
 <li><a href="#relay">Relay list</a></li>
 <li><a href="#standout">Standout issues</a></li>
+<li><a href="#wide" onclick="setLens('wide',document.getElementById('lens-wide'))">Wide community — second lens</a></li>
 <li><a href="#note">Method &amp; honesty</a></li>
 </ol></nav>
 <main>
@@ -87,12 +95,17 @@
   <div class="eyebrow">demand survey · 648 open issues · make something people want</div>
   <h1>What OpenHands users actually want</h1>
   <p class="sub">Every open issue across <code>OpenHands/OpenHands</code>, <code>OpenHands/software-agent-sdk</code>, and <code>OpenHands/automation</code> — read against Paul Graham&rsquo;s evergreen rule, clustered by demand, weighted by signal, and routed to Engel&rsquo;s attention or to someone else&rsquo;s.</p>
-  <div class="meta">2026-09-02 · Engel Nyst / smolpaws · GitHub REST API, fully paginated, PRs excluded</div>
+  <div class="meta">2026-09-02 · Engel Nyst / smolpaws · GitHub REST API, fully paginated, PRs excluded · two lenses: all-community + wide-community</div>
 </header>
 
-<div class="callout">★ The one-line answer: users want the agent to <strong>know their whole codebase</strong> (multi-repo), <strong>not break</strong> (reliability), <strong>remember</strong> (memory), <strong>pick its own model</strong> (routing), and <strong>plug into their tools</strong> (integrations/automations). Three of the five sit squarely on Engel&rsquo;s named passions.</div>
+<div class="lensbar">
+  <button class="lens-btn active" id="lens-all" onclick="setLens('all',this)">Community (all 648)</button>
+  <button class="lens-btn" id="lens-wide" onclick="setLens('wide',this)">Wide community (248)</button>
+</div>
 
-<section id="exec"><h2><span class="num">1</span>Executive read — the top five wants, ranked</h2>
+<div class="callout">★ The one-line answer (<em>all-community view</em>): users want the agent to <strong>know their whole codebase</strong> (multi-repo), <strong>not break</strong> (reliability), <strong>remember</strong> (memory), <strong>pick its own model</strong> (routing), and <strong>plug into their tools</strong> (integrations/automations). Scroll to <a class="ext" href="#wide">§7 Wide community</a> for the second lens — what the non-maintainer base asks for once maintainer-authored issues are removed.</div>
+
+<section id="exec" class="lens-all"><h2><span class="num">1</span>Executive read — the top five wants, ranked</h2>
 
 <div class="rank"><div class="no">1</div><div class="body">
 <h4>Multi-repo / cross-repo awareness</h4>
@@ -125,7 +138,7 @@
 </div></div>
 </section>
 
-<section id="themes"><h2><span class="num">2</span>Theme breakdown</h2>
+<section id="themes" class="lens-all"><h2><span class="num">2</span>Theme breakdown</h2>
 
 <h3>A · Memory, context &amp; knowledge <span class="badge engel">for engel</span></h3>
 <p><strong>What people want:</strong> continuity. Persistent memory that actually loads (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4542">#4542</a> shows the flag is silently dropped), a real knowledge base instead of re-pasting context (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/16315">#16315</a>), defense against poisoned memory (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4251">#4251</a>, 15 💬), bounded attention over unbounded history (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/16817">#16817</a>), and output that doesn&rsquo;t eat the context window (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/3903">#3903</a>). Condenser correctness bugs (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4544">#4544</a>, <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4498">#4498</a>) and session-loss-on-restart (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4192">#4192</a>) are the same theme&rsquo;s sharp edge.</p>
@@ -188,7 +201,7 @@
 <p class="why" style="color:var(--muted);font-style:italic">Why relay: docs. High leverage per hour, low Engel-fit.</p>
 </section>
 
-<section id="engel"><h2><span class="num">3</span>For Engel — the shortlist, sorted by fit</h2>
+<section id="engel" class="lens-all"><h2><span class="num">3</span>For Engel — the shortlist, sorted by fit</h2>
 
 <div class="card engel"><h4>1 · Memory &amp; context continuity (Theme A)</h4>
 <p>The single strongest passion-fit in the corpus. Start with the concrete bug <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4542">#4542</a> (memory silently dropped) and the architectural asks <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4251">#4251</a> (memory-poisoning defense) and <a class="ext" href="https://github.com/OpenHands/OpenHands/issues/16315">#16315</a> (knowledge base). <a class="ext" href="https://github.com/OpenHands/OpenHands/issues/16817">#16817</a> &ldquo;bounded attention over unbounded history&rdquo; is concept-formation by another name.</p>
@@ -211,7 +224,7 @@
 <p class="why">Open-source AI &amp; privacy on the internet.</p></div>
 </section>
 
-<section id="relay"><h2><span class="num">4</span>Relay list — everything else, grouped</h2>
+<section id="relay" class="lens-all"><h2><span class="num">4</span>Relay list — everything else, grouped</h2>
 <table>
 <thead><tr><th>Group</th><th>Owner-area</th><th>Representative issues</th></tr></thead>
 <tbody>
@@ -228,7 +241,7 @@
 </table>
 </section>
 
-<section id="standout"><h2><span class="num">5</span>Standout issues, one by one</h2>
+<section id="standout" class="lens-all"><h2><span class="num">5</span>Standout issues, one by one</h2>
 <table>
 <thead><tr><th>Issue</th><th>Category</th><th>Route</th><th>One-line why</th></tr></thead>
 <tbody>
@@ -246,11 +259,107 @@
 </table>
 </section>
 
-<section id="note"><h2><span class="num">6</span>A note on method &amp; honesty</h2>
+<section id="wide" class="lens-wide"><h2><span class="num">6</span>Wide community — the second lens</h2>
+
+<div class="callout note">ⓘ <strong>What this lens is.</strong> &ldquo;Community&rdquo; (the view above) is everyone, including the 28 maintainers — we&rsquo;re part of the community too. <strong>&ldquo;Wide community&rdquo;</strong> drops any issue authored by someone with write access to <code>OpenHands/OpenHands</code>. The rule is applied by author login across all three repos, using the authoritative 28-login collaborators list.</div>
+
+<h3>6.1 · The raw split</h3>
+<p>Of the <strong>648</strong> open issues, <strong>400</strong> (62%) are maintainer-authored and <strong>248</strong> (38%) are wide-community. Maintainers write the vast majority — so the all-community view is heavily self-authored. Here&rsquo;s the split per repo:</p>
+<table class="split">
+<thead><tr><th>Repository</th><th>All</th><th>Maintainer</th><th>Wide community</th></tr></thead>
+<tbody>
+<tr><td>OpenHands/OpenHands</td><td>355</td><td>219</td><td>136</td></tr>
+<tr><td>OpenHands/software-agent-sdk</td><td>218</td><td>122</td><td>96</td></tr>
+<tr><td>OpenHands/automation</td><td>75</td><td>59</td><td>16</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>648</strong></td><td><strong>400</strong></td><td><strong>248</strong></td></tr>
+</tbody>
+</table>
+
+<h3>6.2 · Top wants — wide community only</h3>
+<p>Re-ranked on the 248 non-maintainer issues. The headline: what <em>rises</em> is the unglamorous crawl — errors, stalls, sandbox/install friction, and model-provider coverage — while maintainer-authored <em>roadmap/parity</em> items dominate the all-community view.</p>
+
+<div class="rank"><div class="no">1</div><div class="body">
+<h4>Unblocks &amp; reliability: the agent stalls, errors, and gets stuck</h4>
+<p>The single biggest real-world complaint from non-maintainers is that the agent goes quiet, times out, or dies mid-run. This is bare-metal, essential &ldquo;don&rsquo;t break&rdquo; demand — the same theme that was already #2, but here it&rsquo;s #1 by a wide margin.</p>
+<div class="ev"><span class="pill">#3992 · 13 💬 · weak/local-model termination</span><span class="pill">#4080 · 12 💬 · one bad event kills load</span><span class="pill">#4246 · 11 💬 · agent idle</span><span class="pill">#4248 · 14 💬 · execute_bash param</span><span class="pill">#4245 · 11 💬 · webhook crash</span><span class="pill">#4537 · 5 💬 · task-lock freeze</span></div>
+</div></div>
+
+<div class="rank"><div class="no">2</div><div class="body">
+<h4>Model / LLM provider coverage</h4>
+<p>Non-maintainers are constantly hitting the edge: their local or niche provider (LM Studio, ollama, Workers AI, Azure) doesn&rsquo;t work, or they want a universal OpenAI-compatible endpoint. Maintainers don&rsquo;t file these — they build them; the users tripping over them are the broad base.</p>
+<div class="ev"><span class="pill">#14525 · 6 💬 · OpenAI-compatible endpoint</span><span class="pill">#4247 · LM Studio</span><span class="pill">#4255 · 9 💬 · ollama timeout</span><span class="pill">#4250 · Workers AI</span><span class="pill">#4549 · Azure rejected</span></div>
+</div></div>
+
+<div class="rank"><div class="no">3</div><div class="body">
+<h4>Memory &amp; context continuity (rises — now mostly user-authored)</h4>
+<p>Memory climbs into the top three in the wide view, and its anchors are <em>user</em> issues here: the knowledge-base ask (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/16315">#16315</a>), bounded attention (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/16817">#16817</a>), memory-poisoning defense (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4251">#4251</a>), and context overflow (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/3903">#3903</a>). The one maintainer bug from the all-view (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4542">#4542</a>) isn&rsquo;t the anchor anymore — the demand is community-led.</p>
+<div class="ev"><span class="pill">#16817 · bounded attention</span><span class="pill">#16315 · knowledge base</span><span class="pill">#4251 · 15 💬 · memory poisoning</span><span class="pill">#3903 · 7 💬 · context overflow</span></div>
+</div></div>
+
+<div class="rank"><div class="no">4</div><div class="body">
+<h4>Docker / sandbox / install friction (rises)</h4>
+<p>Getting the thing running at all is a top non-maintainer concern: quickstart bind-mount failures, missing Chromium flags in the Docker image, and self-hosted mode. This barely registered in the all-community view because maintainers start the service already-installed.</p>
+<div class="ev"><span class="pill">#16511 · Docker bind-mount</span><span class="pill">#4256 · 8 💬 · no-sandbox Chromium</span><span class="pill">#10 · self-hosted (automation)</span><span class="pill">#17090 · Docker resource limits</span><span class="pill">#16300 · rustc/litellm build</span></div>
+</div></div>
+
+<div class="rank"><div class="no">5</div><div class="body">
+<h4>UX polish &amp; the &ldquo;open hands&rdquo; parity intent</h4>
+<p>The broadest UI asks are concrete and small: a usable onboarding explanation, a VS Code tab for local servers, themes, per-message cost/timestamps — plus the biggest single issue, the <em>community-authored</em> &ldquo;Open the closed hands&rdquo; parity epic (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/9689">#9689</a>, 29 💬, filed by a non-maintainer).</p>
+<div class="ev"><span class="pill">#9689 · 29 💬 · parity epic</span><span class="pill">#16690 · 8 💬 · Canvas slow</span><span class="pill">#15415 · onboarding explanation</span><span class="pill">#15973 · VS Code tab</span><span class="pill">#15498 · timestamps/cost</span><span class="pill">#16631 · light theme</span></div>
+</div></div>
+</section>
+
+<section id="delta" class="lens-wide"><h2><span class="num">7</span>The delta — what changes when you drop maintainer-authored issues</h2>
+
+<div class="callout">★ The interesting part isn&rsquo;t the ranking — it&rsquo;s what <em>disappears</em> and what <em>appears</em>. Across the corpus, maintainers file the big <em>roadmap/parity/architecture</em> items; the broad base files <em>runtime friction</em>.</div>
+
+<h3>7.1 · Rises</h3>
+<table>
+<thead><tr><th>Theme</th><th>All view</th><th>Wide view</th></tr></thead>
+<tbody>
+<tr><td>Agent reliability / stalls / errors</td><td>#2</td><td><strong>#1</strong></td></tr>
+<tr><td>Model / LLM provider coverage</td><td>#4</td><td><strong>#2</strong></td></tr>
+<tr><td>Memory &amp; context continuity</td><td>#3</td><td><strong>#3 (but now user-authored)</strong></td></tr>
+<tr><td>Docker / sandbox / install friction</td><td>barely listed</td><td><strong>#4</strong></td></tr>
+</tbody>
+</table>
+
+<h3>7.2 · Falls</h3>
+<table>
+<thead><tr><th>Theme</th><th>Why it falls</th></tr></thead>
+<tbody>
+<tr><td>Multi-repo awareness</td><td>Its top issues are <em>all</em> maintainer-authored — <a class="ext" href="https://github.com/OpenHands/OpenHands/issues/7752">#7752</a> (neubig), <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4242">#4242</a> (enyst), <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4239">#4239</a> (jpelletier1), <a class="ext" href="https://github.com/OpenHands/OpenHands/issues/15758">#15758</a> (jpelletier1). It&rsquo;s real demand, but it&rsquo;s demand maintainers are <em>already tracking themselves</em>, so it&rsquo;s invisible in the wide lens.</td></tr>
+<tr><td>Harness comparison (Harness Watch / ACP parity)</td><td>Filed almost entirely by maintainers (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4627">#4627</a>, <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4820">#4820</a>, <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/1060">#1060</a>). A maintainer priority, not yet a community pull.</td></tr>
+<tr><td>Prompting / system-prompt registry</td><td>Almost entirely maintainer-authored (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/3606">#3606</a>, <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/3914">#3914</a>). Deep architecture the broad base doesn&rsquo;t articulate.</td></tr>
+</tbody>
+</table>
+
+<h3>7.3 · Only shows up in the wide lens</h3>
+<p>The things the broad base asks for that maintainers <em>aren&rsquo;t already tracking themselves</em>:</p>
+<ul>
+  <li><strong>The agent goes quiet / stalls / doesn&rsquo;t tell you what&rsquo;s wrong.</strong> <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4246">#4246</a> &ldquo;agent remains idle, no feedback&rdquo; (11 💬), <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/3992">#3992</a> &ldquo;weaker/local models terminate agents&rdquo; (13 💬), <a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4245">#4245</a> webhook container crashes (11 💬).</li>
+  <li><strong>Local/niche model coverage.</strong> LM Studio (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4247">#4247</a>), ollama (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4255">#4255</a>), Workers AI (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4250">#4250</a>), Azure (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4549">#4549</a>) — a long tail of &ldquo;my provider doesn&rsquo;t work.&rdquo;</li>
+  <li><strong>Self-hosting &amp; sandbox ergonomics.</strong> Self-hosted mode (<a class="ext" href="https://github.com/OpenHands/automation/issues/10">#10</a>), resource limits (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/17090">#17090</a>), smolVM backend (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/16354">#16354</a>), Kubernetes workspaces (<a class="ext" href="https://github.com/OpenHands/software-agent-sdk/issues/4519">#4519</a>), statefulsets vs deployments (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/17000">#17000</a>).</li>
+  <li><strong>Enterprise surface.</strong> SSO/RBAC/multi-org (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/16312">#16312</a>) and declarative environment snapshots (<a class="ext" href="https://github.com/OpenHands/OpenHands/issues/16313">#16313</a>) — both filed by a single non-maintainer (afonsoft), but they represent an un-owned adoption lane.</li>
+</ul>
+
+<div class="callout warn">⚠ <strong>For Engel.</strong> The wide lens doesn&rsquo;t change his shortlist much — memory (#3) and model-selection (#2) stay central and gain community ownership. What it <em>does</em> add is a clear &ldquo;run the thing at all&rdquo; failure surface (stalls, sandbox, niche providers) that no maintainer is tracking as their own. Memory is the one theme that is <strong>both</strong> a strong Engel passion <em>and</em> strongly community-led in the wide view.</div>
+</section>
+
+<section id="note"><h2><span class="num">8</span>A note on method &amp; honesty</h2>
 <p style="font-size:14.5px;color:var(--muted)">This page was generated by fetching every <em>open</em> issue (state=open, PRs excluded) from <code>OpenHands/OpenHands</code> (355), <code>OpenHands/software-agent-sdk</code> (218), and <code>OpenHands/automation</code> (75) via the GitHub REST API with full pagination, on 2026-09-02. Signal was weighted as <em>number of issues in a cluster × comment count × reaction count</em>, and themes were formed by reading titles and bodies rather than by label alone, so counts are deliberately approximate (&ldquo;~N issues&rdquo;). Every issue number cited here is a real, currently-open issue with a working link — nothing is invented. The Engel-vs-relay calls are a judgment about <em>where each ask overlaps a named passion</em>, not a measure of importance; several &ldquo;relay&rdquo; items are higher-signal than the &ldquo;Engel&rdquo; items and are marked as such.</p>
+<p style="font-size:14.5px;color:var(--muted)"><strong>Wide-community rule:</strong> an issue is &ldquo;wide community&rdquo; if its author login is <em>not</em> in the authoritative 28-login collaborators list for <code>OpenHands/OpenHands</code> (write access): <code>DevinVinson, VascoSch92, aivong-openhands, ak684, all-hands-bot, chrisnelson-design, dylan-openhands, enyst, erisfully, hieptl, huybery, jlav, jpelletier1, jpshackelford, juanmichelini, li-boxuan, lilagrc, malhotra5, mamoodi, neubig, openhands-agent, owensweeney-spec, rajshah4, rbren, ryanhoangt, saurya, simonrosenberg, tofarr</code>. This filter treats the bot accounts (<code>all-hands-bot</code>, <code>openhands-agent</code>, <code>aivong-openhands</code>, <code>dylan-openhands</code>) as maintainer-authored, correctly excluding them from the wide view.</p>
 </section>
 
 <div class="foot-nav"><a href="../index.html">← Home</a> &nbsp;|&nbsp; Data: GitHub REST API · 2026-09-02 · Prepared by an OpenHands research sibling agent on behalf of Engel Nyst.</div>
 </main>
 </div>
+<script>
+function setLens(lens, btn){
+  document.body.setAttribute('data-lens', lens);
+  document.getElementById('lens-all').classList.toggle('active', lens==='all');
+  document.getElementById('lens-wide').classList.toggle('active', lens==='wide');
+  window.scrollTo({top:0,behavior:'auto'});
+}
+</script>
 </body></html>
