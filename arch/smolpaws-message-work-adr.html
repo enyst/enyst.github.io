@@ -63,7 +63,7 @@
       <h1>ADR: Durable message work belongs around agent-server</h1>
       <div class="sub">Keep the OpenHands agent-server upstream-shaped. Put durable channel intake and delivery in a small local coordinator that borrows Automation’s table-as-queue mechanics and Hermes’s per-session lane policy.</div>
       <div class="meta">
-        <span class="pill proposed">status: proposed</span>
+        <span class="pill proposed">status: accepted · implemented (Message Relay) · Slack live · WhatsApp/Discord bridges built, live soak pending</span>
         <span class="pill">agent-server dcd1bed</span>
         <span class="pill">automation 1ddde99</span>
         <span class="pill">Hermes 4e6d05c</span>
@@ -403,7 +403,7 @@ reconcile(now)                    → expired/reconciled count</code></pre>
     </section>
 
     <footer>
-      <p><strong>ADR status:</strong> proposed. Decision owner: SmolPaws / Engel Nyst. The architecture deliberately preserves the upstream-shaped agent-server while making external message reliability a first-class, testable module.</p>
+      <p><strong>ADR status:</strong> accepted and implemented. The subsystem shipped under the names <em>Message Relay</em> (the whole), <code>syncDeliveryOutbox()</code> (what this page calls the projector), <em>Outbound Relay</em>, and <em>Delivery Dispatcher</em>; <code>delivery_unknown</code> and the crash analysis below are unchanged. Slack runs on it in production; WhatsApp and Discord bridges are built on the shared <code>RelayRuntime</code> and await their live soak (<a href="smolpaws-bridges-topology.html">current map</a>). Originally: Decision owner: SmolPaws / Engel Nyst. The architecture deliberately preserves the upstream-shaped agent-server while making external message reliability a first-class, testable module.</p>
       <p><a href="smolpaws-sdk-swap.html">SDK migration plan</a> · <a href="openhands-agent-server-parity.html">agent-server parity</a> · <a href="../hermes-gateway.html">Hermes gateway study</a> · <a href="openhands-automations.html">Automation architecture</a></p>
     </footer>
   </main>

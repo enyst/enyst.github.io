@@ -74,8 +74,10 @@
     <div class="eyebrow">SmolPaws · design proposal</div>
     <h1>WhatsApp as a bridge</h1>
     <p class="sub">Move the primary SmolPaws channel off the root process and onto the durable Message Relay — a standalone <code>apps/whatsapp</code> that starts like the Slack bridge, talks to the new TypeScript agent-server, and loses none of what makes WhatsApp the main channel.</p>
-    <p style="margin-top:12px"><span class="status">STATUS: PROPOSED</span> &nbsp; <span class="pill">bead smolpaws-kxa · P0</span> &nbsp; <span class="pill">epic smolpaws-zlo</span></p>
+    <p style="margin-top:12px"><span class="status" style="border-color:#3d7a4a;color:#3d7a4a;background:#eef6ef">STATUS: IMPLEMENTED · live canary pending</span> &nbsp; <span class="pill">bead smolpaws-kxa · P0</span> &nbsp; <span class="pill">epic smolpaws-zlo</span></p>
   </header>
+
+  <div class="callout ok"><strong>Update · 2026-09-13.</strong> Implemented as <code>apps/whatsapp</code> on the shared <code>RelayRuntime</code>, with a deterministic end-to-end proof against the real TypeScript agent-server (kxa.1–kxa.3). Open: the live six-point canary on the Mac and the LaunchAgent cutover; the scheduler (kxa.4) and voice outbox still run on the legacy root process. The supervision question below is answered: a LaunchAgent starts the bridge, and the bridge boots the agent-server if needed. See <a href="smolpaws-bridges-topology.html">Bridges, one server, and the last steps</a>.</div>
 
   <h2 id="why"><span class="num">1</span>Why move at all</h2>
   <p>WhatsApp is the oldest SmolPaws channel, and it shows: it lives in the repository <em>root</em> (<code>src/index.ts</code>), it boots as <em>the app itself</em>, and it predates the bridge abstraction the newer channels use. Every other channel — Discord, Slack, email — is an <code>apps/&lt;name&gt;</code> plugin that the host starts and stops independently. WhatsApp is the exception, and being the exception is now the problem.</p>

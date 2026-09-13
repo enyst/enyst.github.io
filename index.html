@@ -107,18 +107,18 @@
     <div class="cards">
       <a class="card" href="smolpaws-whatsapp.html">
         <div class="card-title">SmolPaws WhatsApp Entry Point</div>
-        <div class="card-desc">The primary channel — Baileys multi-device, a SQLite-backed poll loop, scopes and permissions, image/audio/document handling, and voice notes.</div>
-        <span class="card-tag tag-live">live</span>
+        <div class="card-desc">The legacy root process that still serves the primary channel — Baileys multi-device, a SQLite-backed poll loop, scopes and permissions, media, and voice notes. Its successor, the standalone relay bridge, is built and awaits cutover.</div>
+        <span class="card-tag tag-live">live · legacy path</span>
       </a>
       <a class="card" href="smolpaws-slack.html">
         <div class="card-title">SmolPaws Slack Entry Point</div>
-        <div class="card-desc">Socket Mode bridge — a real Slack app with thread tracking, access control, and guest rate limiting, now managed by the bridge loader.</div>
+        <div class="card-desc">Socket Mode bridge <code>paws</code> — a standalone process on the durable Message Relay and the TypeScript agent-server, with thread tracking, access control, and guest rate limiting. The first channel on the new stack.</div>
         <span class="card-tag tag-live">live</span>
       </a>
       <a class="card" href="smolpaws-discord.html">
         <div class="card-title">SmolPaws Discord Entry Point</div>
-        <div class="card-desc">How the Discord ingress receives messages and dispatches to the agent server via the shared bridge adapter.</div>
-        <span class="card-tag tag-live">live</span>
+        <div class="card-desc">The legacy Discord adapter on the <code>/turns</code> runner, kept as history. Discord now runs as a standalone relay bridge like Slack and WhatsApp.</div>
+        <span class="card-tag tag-draft">historical</span>
       </a>
       <a class="card" href="smolpaws-github.html">
         <div class="card-title">SmolPaws GitHub Entry Point</div>
@@ -130,10 +130,15 @@
     <h2 id="next-smolpaws">The next SmolPaws</h2>
     <p class="tagline" style="margin-top:-4px">Three tracks in flight: move the primary channel onto the new transpiled stack, put a cat <em>inside</em> OpenHands, and make both cats talk in realtime voice.</p>
     <div class="cards">
+      <a class="card" href="arch/smolpaws-bridges-topology.html">
+        <div class="card-title">Bridges, one server, and the last steps</div>
+        <div class="card-desc">How the next SmolPaws runs: one TypeScript OpenHands agent-server, standalone relay bridges for WhatsApp, Slack, and Discord, LaunchAgents that start any bridge and let it boot the server. Where each channel stands on 2026-09-13, the WhatsApp device-linking setup, and the checklist to the cutover.</div>
+        <span class="card-tag tag-live">current map</span>
+      </a>
       <a class="card" href="arch/whatsapp-as-bridge.html">
         <div class="card-title">WhatsApp as a bridge</div>
-        <div class="card-desc">Design proposal: lift the primary channel out of the repo root into a standalone <code>apps/whatsapp</code> on the durable Message Relay — following the Slack pattern, starting as its own process, and losing none of the SQLite store, scopes, scheduler, or media. <span class="mono">bead smolpaws-kxa · P0</span></div>
-        <span class="card-tag tag-draft">proposed</span>
+        <div class="card-desc">The design that moved the primary channel out of the repo root into a standalone <code>apps/whatsapp</code> on the durable Message Relay — now implemented on the shared relay runtime; the live canary and cutover remain. <span class="mono">bead smolpaws-kxa · P0</span></div>
+        <span class="card-tag tag-live">implemented</span>
       </a>
       <a class="card" href="arch/insider-cat.html">
         <div class="card-title">The insider cat</div>
@@ -208,7 +213,7 @@
 
       <a class="card" href="arch/smolpaws-message-work-adr.html">
         <div class="card-title">ADR: Durable message work belongs around agent-server</div>
-        <div class="card-desc">The architecture decision record for SmolPaws message reliability: keep the OpenHands agent-server upstream-shaped and put durable channel intake and delivery in a small local coordinator, borrowing Automation's table-as-queue mechanics and Hermes's per-session lane policy. Status: proposed.</div>
+        <div class="card-desc">The architecture decision record for SmolPaws message reliability: keep the OpenHands agent-server upstream-shaped and put durable channel intake and delivery in a small local coordinator, borrowing Automation's table-as-queue mechanics and Hermes's per-session lane policy. Status: accepted and implemented as the Message Relay.</div>
         <span class="card-tag tag-report">ADR · decision</span>
       </a>
       <a class="card" href="gateway-compat.html">
@@ -288,7 +293,7 @@
       </a>
       <a class="card" href="arch/smolpaws-turn-monitoring-duplication.html">
         <div class="card-title">smolpaws: The Turn-Monitoring Loop, Twice</div>
-        <div class="card-desc">Architecture review: monitorTurn and monitorConversationTurn run the same agent-server poll loop twice and have drifted. Deepen one, delete the other.</div>
+        <div class="card-desc">Architecture review of the legacy <code>/turns</code> client: monitorTurn and monitorConversationTurn ran the same poll loop twice. Moot once the legacy runner retires; kept as history.</div>
         <span class="card-tag tag-report">review</span>
       </a>
       <a class="card" href="arch/teach-triggerfree-groups.html">
@@ -303,8 +308,8 @@
       </a>
       <a class="card" href="arch/sdk-swap-surface.html">
         <div class="card-title">SDK swap surface: hooking smolpaws to the new package</div>
-        <div class="card-desc">The wire-by-wire migration map — every symbol smolpaws imports from agent-sdk 0.10, where it lands in the fresh TS transpile (0.1), and what's clean / renamed / to-port / a deviation to decide. The hookup, not a rewrite.</div>
-        <span class="card-tag tag-report">migration</span>
+        <div class="card-desc">Historical wire-by-wire migration map from agent-sdk 0.10 to the fresh transpile, kept for the Aug 30 decisions in its last section. The swap itself is done.</div>
+        <span class="card-tag tag-report">historical · migration</span>
       </a>
       <a class="card" href="arch/secrets-keyring-vs-cipher.html">
         <div class="card-title">Secrets: keyring refs vs. encrypted-at-rest</div>

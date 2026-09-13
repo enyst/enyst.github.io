@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmolPaws bridges: process topology and the last steps</title>
+<meta name="description" content="How the new SmolPaws runs: one TypeScript OpenHands agent-server, standalone relay bridges per channel, LaunchAgents that start any bridge and let it boot the server. Where WhatsApp, Slack, and Discord stand, and what remains before the cutover.">
+<style>
+  :root{--fg:#1f1d1a;--muted:#6d675e;--accent:#8a5a2b;--accent-soft:#f6efe6;--warn:#a65f1f;--ok:#3d7a4a;--crit:#9b2f2f;--line:#e5dfd4;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--bg:#fbf9f5}
+  html{color-scheme:light}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  main{max-width:900px;margin:0 auto;padding:32px 20px 80px}
+  a{color:var(--accent)}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:30px;line-height:1.15;margin:6px 0 10px}
+  header.title .sub{color:var(--muted);margin:0;font-size:16px}
+  h2{font-size:21px;margin:38px 0 10px;padding-top:12px;border-top:1px solid var(--line)}
+  h2 .num{display:inline-block;min-width:26px;color:var(--accent);font-family:var(--mono);font-size:13px}
+  h3{font-size:16.5px;margin:22px 0 6px}
+  code{font-family:var(--mono);font-size:.9em;background:#f1ece3;padding:1px 5px;border-radius:3px}
+  pre{background:#1f1d1a;color:#f1ece3;padding:14px 16px;border-radius:6px;overflow:auto;font-size:13px;line-height:1.45}
+  pre code{background:none;padding:0;color:inherit}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;margin:12px 0}
+  th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:14px 0;border-radius:0 4px 4px 0;font-size:14.5px}
+  .callout.warn{border-color:var(--warn);background:#fbf1e6}.callout.ok{border-color:var(--ok);background:#eef6ef}.callout.note{border-color:var(--muted);background:#f3f1ec}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--line);color:var(--muted);background:#fff}
+  .status{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--ok);color:var(--ok);background:#eef6ef}
+  .back{font-size:13px;color:var(--muted)}
+  .done{color:var(--ok);font-weight:700}.todo{color:var(--warn);font-weight:700}.blocked{color:var(--crit);font-weight:700}
+  figure{margin:16px 0}figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+  @media (max-width:600px){header.title h1{font-size:24px}}
+</style>
+</head>
+<body>
+<main>
+  <p class="back"><a href="../index.html">← Notebook</a></p>
+  <header class="title">
+    <div class="eyebrow">SmolPaws · how it runs now</div>
+    <h1>Bridges, one server, and the last steps</h1>
+    <p class="sub">The next SmolPaws is a set of standalone channel bridges attached to one TypeScript OpenHands agent-server. Any bridge can be started on its own by a LaunchAgent; it boots the server if the server is not there. This page is the current map and the remaining checklist.</p>
+    <p style="margin-top:12px"><span class="status">STATUS: IMPLEMENTED · LIVE CUTOVER PENDING</span> &nbsp; <span class="pill">2026-09-13</span> &nbsp; <span class="pill">epic smolpaws-zlo</span> &nbsp; <span class="pill">bead smolpaws-kxa</span></p>
+  </header>
+
+  <div class="callout note">Source of truth for this page: <code>enyst/smolpaws</code> <code>docs/bridges.md</code>, <code>docs/whatsapp/README.md</code>, <code>src/coordinator/DESIGN.md</code>. When they disagree with this page, they win; this page is a snapshot.</div>
+
+  <h2 id="topology"><span class="num">1</span>Process topology</h2>
+  <p>Earlier pages disagreed about who starts whom. The Aug 30 decision said <em>core up, bridges attach</em>; the WhatsApp design asked for a supervision story. The implemented answer is both: the server is the always-on core, and <strong>every bridge knows how to bring it up</strong>, so starting any single bridge is enough.</p>
+  <figure>
+<pre><code>launchd (macOS)
+  ├─ com.smolpaws.bridge.whatsapp ─┐
+  ├─ com.smolpaws.bridge.slack ────┼─ scripts/run-local-bridge.sh &lt;bridge&gt;
+  └─ com.smolpaws.bridge.discord ──┘        │
+                                            ├─ GET http://127.0.0.1:8790/health
+                                            ├─ if down: start packages/openhands-agent-server, detached
+                                            └─ exec npm --prefix apps/&lt;bridge&gt; run start
+                                                       │
+                     apps/&lt;bridge&gt;: platform socket → RelayRuntime (SQLite intake/outbox)
+                                    → POST /api/conversations/{id}/events  (run)
+                                    → GET  /api/conversations/{id}/events/search
+                                    → DeliveryTarget → platform send
+                                                       │
+                          packages/openhands-agent-server  :8790  (~/.smolpaws/conversations)</code></pre>
+    <figcaption>One LaunchAgent per bridge. The launcher leaves the server running when a bridge exits, because the other bridges share it. <code>KeepAlive</code> restarts a crashed bridge without touching the server.</figcaption>
+  </figure>
+  <table>
+    <tr><th>Rule</th><th>Why</th></tr>
+    <tr><td>Any bridge can boot the server; none stops it.</td><td>"Start the WhatsApp bridge and it just works", also when Slack is down.</td></tr>
+    <tr><td>One durable SQLite store per bridge, one versioned conversation namespace per platform (<code>whatsapp-relay:v1</code>, <code>slack-relay:v1</code>, <code>discord-relay:v1</code>).</td><td>An old EventLog can never be rediscovered and re-sent; bridges fail independently.</td></tr>
+    <tr><td>The server knows nothing about channels.</td><td>Delivery, ordering, retries, idempotency live in the Message Relay; the server stays upstream-shaped and re-vendorable.</td></tr>
+    <tr><td>Every new conversation gets a real working directory and the SmolPaws identity context.</td><td>Before this, <code>paws</code> on Slack introduced itself as a generic assistant and its terminal tool ran in a directory that did not exist.</td></tr>
+  </table>
+
+  <h2 id="shared"><span class="num">2</span>What the bridges share</h2>
+  <p>Slack pioneered the relay shape; the loop it ran is now <code>src/coordinator/relayRuntime.ts</code> (<code>RelayRuntime</code>) and every bridge is a thin skin over it: a platform socket, a pure handler (who is allowed, what counts as addressed, how a batch becomes a prompt, which lane it belongs to), a delivery target, and an entrypoint that sets the conversation defaults.</p>
+  <table>
+    <tr><th>Concern</th><th>Where</th></tr>
+    <tr><td>Durable intake, lane→conversation binding, outbox sync, bounded dispatch</td><td><code>src/coordinator/relayRuntime.ts</code></td></tr>
+    <tr><td>What is deliverable</td><td><code>terminalResponseExtractor</code> (finish observation or end-of-turn text); WhatsApp adds <code>sendMessageExtractor</code> for mid-turn <code>send_message</code> actions</td></tr>
+    <tr><td>Workspace + identity context for new conversations</td><td><code>src/shared/relayConversationDefaults.ts</code>, <code>src/shared/smolpawsContext.ts</code> → server-side <code>agent.agent_context.system_message_suffix</code></td></tr>
+    <tr><td>Launch and supervision</td><td><code>scripts/run-local-bridge.sh</code>, <code>launchd/com.smolpaws.bridge.plist</code>, <code>scripts/install-bridge-launchagent.sh &lt;bridge&gt;</code></td></tr>
+  </table>
+
+  <h2 id="channels"><span class="num">3</span>Where each channel stands</h2>
+  <table>
+    <tr><th>Channel</th><th>Shape</th><th>State on 2026-09-13</th></tr>
+    <tr><td>Slack <code>paws</code></td><td>standalone relay</td><td><span class="done">live</span> in Liberty Labs. Two fixes landed from the September tests: the terminal tool no longer hangs a conversation forever (bounded default timeout, real error text) and every conversation now carries a workspace plus the identity docs.</td></tr>
+    <tr><td>WhatsApp</td><td>standalone relay (<code>apps/whatsapp</code>)</td><td><span class="todo">implemented, not yet cut over</span>. Ledger, scopes, trigger policy, media, per-scope workspace, QR or pairing-code linking, deterministic end-to-end test against the real server. Needs the live six-point canary on the Mac, then the LaunchAgent swap. Scheduler and voice outbox still run on the legacy root process.</td></tr>
+    <tr><td>Discord</td><td>standalone relay (<code>apps/discord</code>)</td><td><span class="todo">rewritten, needs a live check</span>. Left the <code>BaseBridgeAdapter</code>/<code>/turns</code> path; fail-closed allowlist kept.</td></tr>
+    <tr><td>GitHub, email</td><td>Cloudflare Workers → legacy <code>/turns</code> runner</td><td><span class="todo">unchanged</span>; move to relay intake after WhatsApp soaks.</td></tr>
+    <tr><td>Heartbeat</td><td>LaunchAgent → <code>:8790</code></td><td><span class="done">on the new server</span> since Aug 31.</td></tr>
+  </table>
+
+  <h2 id="whatsapp"><span class="num">4</span>WhatsApp: setup that a human must do once</h2>
+  <p>WhatsApp links a "device" to the phone's account; the bridge never pairs inline. On the Mac:</p>
+<pre><code>npm run whatsapp:auth                       # QR code in the terminal
+npm run whatsapp:auth -- --phone +15551234567   # or an 8-character pairing code
+# phone: Settings → Linked Devices → Link a Device
+npm run bridge:launchagent:install -- whatsapp</code></pre>
+  <p>An existing link from the legacy process is reused. Registered chats live in <code>~/.smolpaws/whatsapp/registered_groups.json</code> (the legacy <code>data/registered_groups.json</code> is still read). Full procedure, verification, and rollback: <code>docs/whatsapp/README.md</code>.</p>
+
+  <h2 id="last-steps"><span class="num">5</span>The last steps</h2>
+  <ol>
+    <li><span class="done">done</span> — Slack <code>paws</code> on the new stack with identity and workspace.</li>
+    <li><span class="done">done</span> — shared relay runtime; generic bridge launcher and LaunchAgent.</li>
+    <li><span class="done">done</span> — <code>apps/whatsapp</code> implemented with a deterministic end-to-end proof.</li>
+    <li><span class="todo">next</span> — live six-point WhatsApp canary on the Mac (ledger row → intake done → conversation + finished run → delivery rows → <code>send_attempted</code> + message id → reply in the right chat), behind the current channel.</li>
+    <li><span class="todo">next</span> — stop the legacy <code>com.smolpaws</code> LaunchAgent, install <code>com.smolpaws.bridge.whatsapp</code>, keep the legacy path as rollback until it has soaked.</li>
+    <li><span class="todo">then</span> — scheduler inside the bridge as synthetic intakes (bead <code>smolpaws-kxa.4</code>); voice outbox; Discord live check; GitHub/email onto relay intake.</li>
+    <li><span class="todo">then</span> — retire <code>apps/agent-server</code> (<code>/turns</code>) once nothing in use talks to it.</li>
+  </ol>
+
+  <h2 id="maintenance"><span class="num">6</span>Keeping the engine current</h2>
+  <p>Two weekly OpenHands Cloud automations now walk the transpiles forward: one advances <code>enyst/openhands-agent</code> one upstream release interval per PR (runbook <code>docs/DRIFT_AUTOMATION.md</code>), the other re-vendors that SDK into <code>packages/openhands-agent-server</code>, reviews the server-side units, and regenerates the Python OpenAPI oracle (runbook <code>packages/openhands-agent-server/docs/REVENDOR_AUTOMATION.md</code>). Both open PRs for a human to merge. The constitution is unchanged: <a href="openhands-transpile-maintenance.html">Maintaining the OpenHands TypeScript transpiles</a>.</p>
+
+  <h2 id="history"><span class="num">7</span>Pages this supersedes</h2>
+  <p>The older channel pages describe the legacy root process and the <code>/turns</code> adapters; they now carry a banner pointing here. <a href="whatsapp-as-bridge.html">WhatsApp as a bridge</a> is the design this implements. <a href="smolpaws-sdk-swap-board.html">The SDK-swap board</a> and <a href="smolpaws-sdk-swap.html">the original seven-step plan</a> are history.</p>
+</main>
+</body>
+</html>

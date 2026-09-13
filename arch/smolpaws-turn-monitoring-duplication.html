@@ -65,6 +65,7 @@
 <header class="title">
   <div class="eyebrow">Architecture review · smolpaws</div>
   <h1>The turn-monitoring loop lives in two places</h1>
+  <div class="callout warn" style="border-left:3px solid #a65f1f;background:#fbf1e6;padding:10px 14px;margin:14px 0;border-radius:0 4px 4px 0;font-size:14.5px"><strong>Superseded · 2026-09-13.</strong> Both loops belong to the legacy <code>/turns</code> client path, which is now reference code: Slack, WhatsApp, and Discord run on the Message Relay instead. The recommendation is moot once the legacy runner is retired. See <a href="smolpaws-bridges-topology.html">Bridges, one server, and the last steps</a>.</div>
   <p class="sub">smolpaws polls the agent-server the same way from two functions. <code>monitorTurn</code> (shared, 3 callers) and <code>monitorConversationTurn</code> (a local copy, 1 caller) run the identical poll → claim → terminal → result cycle — and have already drifted apart.</p>
 </header>
 
