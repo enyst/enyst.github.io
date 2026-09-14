@@ -46,14 +46,14 @@
   <div class="callout note">Source of truth for this page: <code>smolpaws/smolpaws</code> <code>docs/bridges.md</code>, <code>docs/whatsapp/README.md</code>, <code>src/coordinator/DESIGN.md</code>. When they disagree with this page, they win; this page is a snapshot.</div>
 
   <h2 id="topology"><span class="num">1</span>Process topology</h2>
-  <p>The shared server is the intended execution core. Each bridge launcher checks its health at startup and starts a detached server when needed. <strong>This is startup coordination, not continuous server supervision.</strong> Bridge <code>KeepAlive</code> does not by itself restart a server that fails while the bridge stays up. <a href="https://github.com/smolpaws/smolpaws/blob/c344f79f197ce60a9ba783f242ba39a309e601dd/scripts/run-local-bridge.sh#L71">Launcher source</a>.</p>
+  <p>The shared execution core is the transpiled TypeScript server composed by <code>apps/relay-server</code>. The product host binds scheduler and media tools; the package keeps its upstream-shaped API. Bridge launchers verify the product host and start one detached supervisor when needed. That supervisor restarts a failed server child independently of bridge lifetimes. <a href="https://github.com/smolpaws/smolpaws/pull/172">Implementation #172</a>.</p>
   <figure>
 <pre><code>launchd (macOS)
   ├─ com.smolpaws.bridge.whatsapp ─┐
   ├─ com.smolpaws.bridge.slack ────┼─ scripts/run-local-bridge.sh &lt;bridge&gt;
   └─ com.smolpaws.bridge.discord ──┘        │
                                             ├─ GET http://127.0.0.1:8790/health
-                                            ├─ if down: start packages/openhands-agent-server, detached
+                                            ├─ if down: start the shared product-server supervisor
                                             └─ exec npm --prefix apps/&lt;bridge&gt; run start
                                                        │
                      apps/&lt;bridge&gt;: platform socket → RelayRuntime (SQLite intake/outbox)
@@ -61,13 +61,13 @@
                                     → GET  /api/conversations/{id}/events/search
                                     → DeliveryTarget → platform send
                                                        │
-                          packages/openhands-agent-server  :8790  (~/.smolpaws/conversations)</code></pre>
+                          apps/relay-server → packages/openhands-agent-server  :8790</code></pre>
     <figcaption>One LaunchAgent per bridge. The launcher leaves the server running when a bridge exits, because the other bridges share it. <code>KeepAlive</code> restarts a crashed bridge without touching the server.</figcaption>
   </figure>
   <table>
     <tr><th>Rule</th><th>Why</th></tr>
     <tr><td>Any bridge can boot the server; none stops it.</td><td>"Start the WhatsApp bridge and it just works", also when Slack is down.</td></tr>
-    <tr><td>One durable SQLite relay store per bridge. WhatsApp and Discord conversation IDs derive directly from their lanes; Slack retains its existing namespace.</td><td>A fresh relay DB alone can rediscover an existing server conversation. Canary isolation must cover server persistence too. See <a href="whatsapp-readiness.html#history">history and state handoff</a>.</td></tr>
+    <tr><td>One durable SQLite relay store per bridge. WhatsApp and Discord conversation IDs derive directly from their lanes; Slack retains its existing namespace.</td><td>A fresh relay DB is not permission to reuse an old server EventLog: its owner tag must match. Canary isolation must cover server persistence too. See <a href="whatsapp-readiness.html#history">history and state handoff</a>.</td></tr>
     <tr><td>The server knows nothing about channels.</td><td>Delivery, ordering, retries, idempotency live in the Message Relay; the server stays upstream-shaped and re-vendorable.</td></tr>
     <tr><td>Every new conversation gets a real working directory and the SmolPaws identity context.</td><td>Before this, <code>paws</code> on Slack introduced itself as a generic assistant and its terminal tool ran in a directory that did not exist.</td></tr>
   </table>
@@ -86,22 +86,22 @@
   <table>
     <tr><th>Channel</th><th>Implemented path</th><th>Evidence / remaining work</th></tr>
     <tr><td>Slack <code>paws</code></td><td>Standalone Message Relay</td><td>Historical live transport canary with a deterministic LLM, plus later deployment reports. Verify the current process, provider and soak; those reports are not live telemetry. <a href="../smolpaws-slack.html">Slack evidence</a>.</td></tr>
-    <tr><td>WhatsApp</td><td><code>apps/whatsapp</code>, shared relay, text delivery, media ingress</td><td>Deterministic real-server test is present. Legacy primary service was still running during the September 14 Mac preflight, with no listener on <code>:8790</code>. <a href="whatsapp-readiness.html">History-safe startup and provider preflight precede the live text canary</a>; scheduling, outbound media/voice and recovery precede permanent replacement.</td></tr>
+    <tr><td>WhatsApp</td><td><code>apps/whatsapp</code>, shared relay, text delivery, media ingress</td><td>Deterministic real-server test is present. Legacy primary service was still running during the September 14 Mac preflight, with no listener on <code>:8790</code>. <a href="whatsapp-readiness.html">History-safe startup and provider preflight precede the live text canary</a>; scheduling, outbound media/voice and recovery are now implemented in #172; live validation and soak still precede permanent replacement.</td></tr>
     <tr><td>Discord</td><td><code>apps/discord</code>, standalone relay</td><td>Rewrite merged in #170; fail-closed allowlist preserved. Live validation remains.</td></tr>
     <tr><td>GitHub, email</td><td>Workers → legacy <code>/turns</code> runner</td><td>Remaining consumers of the legacy server; migrate before retiring it.</td></tr>
     <tr><td>Heartbeat</td><td>New-server integration</td><td>LaunchAgent loaded during local preflight; no new-server listener then. Verify a successful run before claiming current operation.</td></tr>
   </table>
 
   <h2 id="whatsapp"><span class="num">4</span>WhatsApp startup has a state handoff</h2>
-  <p>An existing device link can be reused. One account must have one active socket owner. Before using the launcher on an existing ledger, establish the <a href="whatsapp-readiness.html#history">cursor baseline, explicit state paths, one-chat allowlist and rollback handoff</a>. The old JSON cursors are not automatically imported into the new SQLite relay cursors.</p>
+  <p>An existing device link can be reused. One account must have one active socket owner. Before using the launcher on an existing ledger, establish the <a href="whatsapp-readiness.html#history">cursor baseline, explicit state paths, one-chat allowlist and rollback handoff</a>. The actual old JSON progress is now imported once into the shared message-identity journal; rollback also exports task changes and requires the updated legacy host.</p>
   <p>The <a href="https://github.com/smolpaws/smolpaws/blob/main/docs/whatsapp/README.md">bridge README</a> describes pairing and configuration. The <a href="https://github.com/smolpaws/smolpaws/blob/main/docs/whatsapp/READINESS.md">readiness plan</a> owns operational prerequisites. A service swap alone is not a complete migration.</p>
 
   <h2 id="last-steps"><span class="num">5</span>The remaining sequence</h2>
   <ol>
     <li><span class="done">implemented</span> — shared relay runtime, standalone WhatsApp/Discord bridges, identity/workspace launch additions and deterministic real-server test.</li>
-    <li><span class="todo">before live text</span> — history-safe handoff and isolated state (<code>kxa.6</code>); reproducible SDK vendor plus real-provider tool preflight (<code>kxa.7</code>).</li>
+    <li><span class="todo">before live text</span> — history handoff and reproducible vendoring are implemented. Next is the real-provider tool preflight (<code>kxa.7</code>).</li>
     <li><span class="todo">controlled test</span> — one trusted chat, one socket owner, six-boundary evidence, restart/replay and reconnect probes (<code>kxa.5</code>).</li>
-    <li><span class="todo">before permanent replacement</span> — scheduler, outbound media/voice, scope context and permissions, recovery, bounded HTTP calls and rehearsed rollback. Keep required legacy capabilities available until these pass.</li>
+    <li><span class="todo">before permanent replacement</span> — live validation of implemented scheduling, media/voice, scope rules and recovery, followed by the rehearsed rollback and soak. Keep the legacy service available until deployment proof passes.</li>
     <li><span class="todo">after soak</span> — complete other ingress migrations, then retire <code>apps/agent-server</code> when no active consumer remains.</li>
   </ol>
   <p>Detailed acceptance and Beads ownership: <a href="whatsapp-readiness.html">WhatsApp readiness</a>.</p>
