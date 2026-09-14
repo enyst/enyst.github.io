@@ -58,12 +58,14 @@
   </nav>
 
   <main>
+    <div class="callout"><strong>Implementation note · 2026-09-14.</strong> The accepted design below retains its original proposal and source snapshot. The caller-supplied <code>event_id</code> gap described in section 8 is now implemented as <a href="https://github.com/smolpaws/smolpaws/blob/main/packages/openhands-agent-server/TRANSPILE_RULES.md">EXT-SERVER-001</a>. Current names are Message Relay, <code>syncDeliveryOutbox()</code>, Outbound Relay and Delivery Dispatcher. Shared <code>RelayRuntime</code> backs the new bridges; final text and WhatsApp <code>send_message</code> delivery are implemented. <a href="https://github.com/smolpaws/smolpaws/blob/main/src/coordinator/DESIGN.md">Current design and tests</a> own implementation detail. Operational proof remains separate: <a href="whatsapp-readiness.html">readiness and rollback gates</a>.</div>
+
     <header>
       <div class="eyebrow">SmolPaws · ADR · message coordination</div>
       <h1>ADR: Durable message work belongs around agent-server</h1>
       <div class="sub">Keep the OpenHands agent-server upstream-shaped. Put durable channel intake and delivery in a small local coordinator that borrows Automation’s table-as-queue mechanics and Hermes’s per-session lane policy.</div>
       <div class="meta">
-        <span class="pill proposed">status: accepted · implemented (Message Relay) · Slack live · WhatsApp/Discord bridges built, live soak pending</span>
+        <span class="pill proposed">status: accepted · implemented (Message Relay) · standalone bridges built · deployment evidence is dated</span>
         <span class="pill">agent-server dcd1bed</span>
         <span class="pill">automation 1ddde99</span>
         <span class="pill">Hermes 4e6d05c</span>
@@ -305,7 +307,7 @@ reconcile(now)                    → expired/reconciled count</code></pre>
           <tr><td>Crash after lane mapping, before conversation creation</td><td>Lane row with reserved <code>conversation_id</code></td><td>Next resolution ensures that exact conversation exists before accepting intake.</td><td class="safe">Mapping remains repairable.</td></tr>
           <tr><td>After accept, before claim</td><td><span class="state ready">ready</span> row</td><td>Next worker claims it.</td><td class="safe">No loss.</td></tr>
           <tr><td>After claim, before agent-server call</td><td>Claim deadline + generation</td><td>Expiry returns work to ready; stale worker is fenced.</td><td class="safe">Safe retry.</td></tr>
-          <tr><td>Agent event appended; HTTP response lost</td><td>Deterministic <code>agent_event_id</code></td><td>Retry same append; agent-server returns existing event.</td><td class="gap">Requires idempotent append extension.</td></tr>
+          <tr><td>Agent event appended; HTTP response lost</td><td>Deterministic <code>agent_event_id</code></td><td>Retry same append; agent-server returns existing event.</td><td class="gap">Now implemented: EXT-SERVER-001.</td></tr>
           <tr><td>Event appended; execution request not observed</td><td>Event exists in EventLog</td><td>Retry <code>/run</code>; active response means already executing, idle response schedules it.</td><td class="safe">Event is not duplicated.</td></tr>
           <tr><td>Agent-server dies during execution</td><td>Conversation EventLog + coordinator intake checkpoint</td><td>Restore conversation, observe non-terminal state, request execution again.</td><td class="safe">Conversation history survives.</td></tr>
           <tr><td>Second message arrives while active</td><td>Next lane sequence</td><td>Append in sequence; agent-server records a rerun request.</td><td class="safe">No parallel lane execution.</td></tr>
@@ -345,7 +347,7 @@ reconcile(now)                    → expired/reconciled count</code></pre>
 
     <section id="contract">
       <h2><span class="num">8</span>One required agent-server contract delta</h2>
-      <p>The current message request contains role, content and <code>run</code>; agent-server creates a fresh event identity internally and returns only success. A coordinator that crashes after a successful append cannot safely distinguish “append happened” from “append never happened.”</p>
+      <p>At the original audit revision, the message request contained role, content and <code>run</code>; agent-server created a fresh event identity internally and returned only success. A coordinator that crashes after a successful append cannot safely distinguish “append happened” from “append never happened.”</p>
       <div class="decision">
         <strong>Add idempotent message append without adding queue semantics.</strong>
         Accept a caller-supplied deterministic <code>event_id</code> or idempotency key, persist the event once, and return the event identity. Repeating the same request returns the existing event; reusing the key with different content is a conflict.
@@ -384,7 +386,7 @@ reconcile(now)                    → expired/reconciled count</code></pre>
           <tr><td>Agent-server appends messages, schedules execution and requests a rerun when active.</td><td><a class="src" href="https://github.com/smolpaws/smolpaws/blob/dcd1bedfeca978bc34d9b8e8861cf02455c3c977/packages/openhands-agent-server/src/eventService.ts#L101-L142">eventService.ts:101–142</a></td></tr>
           <tr><td>Agent-server publishes newly durable events and a state update after execution.</td><td><a class="src" href="https://github.com/smolpaws/smolpaws/blob/dcd1bedfeca978bc34d9b8e8861cf02455c3c977/packages/openhands-agent-server/src/eventService.ts#L238-L264">eventService.ts:238–264</a></td></tr>
           <tr><td>Conversation ownership is already guarded by an expiring lease.</td><td><a class="src" href="https://github.com/smolpaws/smolpaws/blob/dcd1bedfeca978bc34d9b8e8861cf02455c3c977/packages/openhands-agent-server/src/conversationService.ts#L335-L362">conversationService.ts:335–362</a></td></tr>
-          <tr><td>The current message request has no caller event identity.</td><td><a class="src" href="https://github.com/smolpaws/smolpaws/blob/dcd1bedfeca978bc34d9b8e8861cf02455c3c977/packages/openhands-agent-server/src/models.ts#L39-L48">models.ts:39–48</a></td></tr>
+          <tr><td>At the original audit revision, the message request had no caller event identity.</td><td><a class="src" href="https://github.com/smolpaws/smolpaws/blob/dcd1bedfeca978bc34d9b8e8861cf02455c3c977/packages/openhands-agent-server/src/models.ts#L39-L48">models.ts:39–48</a></td></tr>
           <tr><td>Agent-server already derives its final response from durable assistant messages or successful finish observations.</td><td><a class="src" href="https://github.com/smolpaws/smolpaws/blob/dcd1bedfeca978bc34d9b8e8861cf02455c3c977/packages/openhands-agent-server/src/eventService.ts#L206-L220">eventService.ts:206–220</a></td></tr>
           <tr><td>Automation’s run row doubles as its queue and has explicit lifecycle states.</td><td><a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/models.py#L36-L45">models.py:36–45</a> · <a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/models.py#L121-L200">models.py:121–200</a></td></tr>
           <tr><td>Automation claims oldest pending rows, uses DB locking where available and launches asynchronously.</td><td><a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/dispatcher.py#L94-L122">dispatcher.py:94–122</a> · <a class="src" href="https://github.com/OpenHands/automation/blob/1ddde99947ed583056efdb7156450192a4f0c06e/openhands/automation/dispatcher.py#L347-L400">dispatcher.py:347–400</a></td></tr>
@@ -403,7 +405,7 @@ reconcile(now)                    → expired/reconciled count</code></pre>
     </section>
 
     <footer>
-      <p><strong>ADR status:</strong> accepted and implemented. The subsystem shipped under the names <em>Message Relay</em> (the whole), <code>syncDeliveryOutbox()</code> (what this page calls the projector), <em>Outbound Relay</em>, and <em>Delivery Dispatcher</em>; <code>delivery_unknown</code> and the crash analysis below are unchanged. Slack runs on it in production; WhatsApp and Discord bridges are built on the shared <code>RelayRuntime</code> and await their live soak (<a href="smolpaws-bridges-topology.html">current map</a>). Originally: Decision owner: SmolPaws / Engel Nyst. The architecture deliberately preserves the upstream-shaped agent-server while making external message reliability a first-class, testable module.</p>
+      <p><strong>ADR status:</strong> accepted and implemented. The subsystem shipped under the names <em>Message Relay</em> (the whole), <code>syncDeliveryOutbox()</code> (what this page calls the projector), <em>Outbound Relay</em>, and <em>Delivery Dispatcher</em>; <code>delivery_unknown</code> and the crash analysis below are unchanged. Slack has historical live transport evidence; WhatsApp and Discord bridges are built on the shared <code>RelayRuntime</code> and await their live soak (<a href="smolpaws-bridges-topology.html">current map</a>). Originally: Decision owner: SmolPaws / Engel Nyst. The architecture deliberately preserves the upstream-shaped agent-server while making external message reliability a first-class, testable module.</p>
       <p><a href="smolpaws-sdk-swap.html">SDK migration plan</a> · <a href="openhands-agent-server-parity.html">agent-server parity</a> · <a href="../hermes-gateway.html">Hermes gateway study</a> · <a href="openhands-automations.html">Automation architecture</a></p>
     </footer>
   </main>

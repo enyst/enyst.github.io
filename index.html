@@ -113,11 +113,11 @@
       <a class="card" href="smolpaws-slack.html">
         <div class="card-title">SmolPaws Slack Entry Point</div>
         <div class="card-desc">Socket Mode bridge <code>paws</code> — a standalone process on the durable Message Relay and the TypeScript agent-server, with thread tracking, access control, and guest rate limiting. The first channel on the new stack.</div>
-        <span class="card-tag tag-live">live</span>
+        <span class="card-tag tag-report">relay · historical canary</span>
       </a>
       <a class="card" href="smolpaws-discord.html">
         <div class="card-title">SmolPaws Discord Entry Point</div>
-        <div class="card-desc">The legacy Discord adapter on the <code>/turns</code> runner, kept as history. Discord now runs as a standalone relay bridge like Slack and WhatsApp.</div>
+        <div class="card-desc">The legacy Discord adapter on the <code>/turns</code> runner, kept as history. The standalone relay rewrite has merged; a live check remains.</div>
         <span class="card-tag tag-draft">historical</span>
       </a>
       <a class="card" href="smolpaws-github.html">
@@ -130,9 +130,14 @@
     <h2 id="next-smolpaws">The next SmolPaws</h2>
     <p class="tagline" style="margin-top:-4px">Three tracks in flight: move the primary channel onto the new transpiled stack, put a cat <em>inside</em> OpenHands, and make both cats talk in realtime voice.</p>
     <div class="cards">
+      <a class="card" href="arch/whatsapp-readiness.html">
+        <div class="card-title">WhatsApp: what stands between built and tested?</div>
+        <div class="card-desc">Three gates to a controlled text canary: history-safe handoff, isolated state, and a reproducible provider/server preflight. Then the separate work required for permanent replacement. Source evidence and Beads ownership, audited September 14.</div>
+        <span class="card-tag tag-report">current readiness plan</span>
+      </a>
       <a class="card" href="arch/smolpaws-bridges-topology.html">
         <div class="card-title">Bridges, one server, and the last steps</div>
-        <div class="card-desc">How the next SmolPaws runs: one TypeScript OpenHands agent-server, standalone relay bridges for WhatsApp, Slack, and Discord, LaunchAgents that start any bridge and let it boot the server. Where each channel stands on 2026-09-13, the WhatsApp device-linking setup, and the checklist to the cutover.</div>
+        <div class="card-desc">How the next SmolPaws runs: one TypeScript OpenHands agent-server, standalone relay bridges for WhatsApp, Slack, and Discord, LaunchAgents that start any bridge and let it boot the server. Audited September 14: implemented paths, dated deployment evidence, state boundaries, and the route to a controlled test.</div>
         <span class="card-tag tag-live">current map</span>
       </a>
       <a class="card" href="arch/whatsapp-as-bridge.html">
@@ -157,7 +162,7 @@
       </a>
       <a class="card" href="arch/smolpaws-message-work-adr.html">
         <div class="card-title">ADR: Durable message work belongs around agent-server</div>
-        <div class="card-desc">The architecture decision the whole cutover rests on — keep the agent-server upstream-shaped and put durable channel intake and delivery in a small local coordinator. The Message Relay that Slack already uses and WhatsApp is moving to.</div>
+        <div class="card-desc">The architecture decision the whole cutover rests on — keep the agent-server upstream-shaped and put durable channel intake and delivery in a small local coordinator. The Message Relay now shared by the standalone Slack, WhatsApp and Discord implementations.</div>
         <span class="card-tag tag-report">ADR · decision</span>
       </a>
       <a class="card" href="arch/openhands-transpile-maintenance.html">
@@ -167,7 +172,7 @@
       </a>
       <a class="card" href="arch/sdk-swap-surface.html">
         <div class="card-title">SDK swap surface</div>
-        <div class="card-desc">The wire-by-wire migration map for hooking smolpaws to the new package — every symbol it imports, where it lands in the fresh transpile, and what's clean, renamed, to-port, or a deviation to decide. Plus the Aug 30 decisions: plain text now ends a turn, <code>send_message</code> becomes an SDK tool, and the running Slack path is already on the new transpile.</div>
+        <div class="card-desc">Historical symbol inventory and August 30 decisions. Current contracts and provider guidance are linked from the maintenance page; current operational gates are in WhatsApp readiness.</div>
         <span class="card-tag tag-report">migration</span>
       </a>
     </div>
@@ -308,7 +313,7 @@
       </a>
       <a class="card" href="arch/sdk-swap-surface.html">
         <div class="card-title">SDK swap surface: hooking smolpaws to the new package</div>
-        <div class="card-desc">Historical wire-by-wire migration map from agent-sdk 0.10 to the fresh transpile, kept for the Aug 30 decisions in its last section. The swap itself is done.</div>
+        <div class="card-desc">Historical wire-by-wire migration map from agent-sdk 0.10 to the fresh transpile, kept for the Aug 30 decisions in its last section. Full ingress cutover remains tracked in the current readiness plan.</div>
         <span class="card-tag tag-report">historical · migration</span>
       </a>
       <a class="card" href="arch/secrets-keyring-vs-cipher.html">
