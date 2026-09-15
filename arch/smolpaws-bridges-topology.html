@@ -78,7 +78,7 @@
     <tr><th>Concern</th><th>Where</th></tr>
     <tr><td>Durable intake, lane→conversation binding, outbox sync, bounded dispatch</td><td><code>src/coordinator/relayRuntime.ts</code></td></tr>
     <tr><td>What is deliverable</td><td><code>terminalResponseExtractor</code> (finish observation or end-of-turn text); WhatsApp adds <code>sendMessageExtractor</code> for mid-turn <code>send_message</code> actions</td></tr>
-    <tr><td>Workspace + identity context for new conversations</td><td><code>src/shared/relayConversationDefaults.ts</code>, <code>src/shared/smolpawsContext.ts</code> → <code>agent_launch_additions.system_message_suffix_append</code>, applied by the server after profile resolution</td></tr>
+    <tr><td>Workspace + identity context</td><td><code>src/shared/relayConversationDefaults.ts</code> selects the workspace. <a href="https://github.com/smolpaws/smolpaws/pull/186">Merged context update #186</a> moves file loading into <code>apps/relay-server/src/context.ts</code>: trusted lane → configured files → per-conversation snapshot → SDK always-on skills. The 32,768-character launch suffix cap remains. <a href="whatsapp-readiness.html#context-files">Design and rollout status</a>.</td></tr>
     <tr><td>Launch and supervision</td><td><code>scripts/run-local-bridge.sh</code>, <code>launchd/com.smolpaws.bridge.plist</code>, <code>scripts/install-bridge-launchagent.sh &lt;bridge&gt;</code></td></tr>
   </table>
 
