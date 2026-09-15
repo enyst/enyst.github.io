@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reviewing the reviewer — Engel Nyst</title>
+  <meta name="description" content="Two verified OpenHands review contradictions, independent code checks, and a proposed automation for auditing reviews fairly." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    code, a { overflow-wrap:anywhere; }
+    .table-scroll { overflow-x:auto; margin:20px 0; }
+    table { min-width:650px; font-size:.9rem; }
+    th, td { vertical-align:top; padding:12px; }
+    blockquote { margin:20px 0; padding:4px 22px; border-left:3px solid var(--accent); }
+  </style>
+</head>
+<body>
+<main class="shell prose">
+  <a class="back" href="../index.html">&larr; Home</a>
+  <h1>Reviewing the reviewer <span class="tag">investigation + proposal</span></h1>
+  <p class="meta">September 16, 2026 · Historical reviews from September 12–14 · Beads: oh-extensions-sg7</p>
+  <div class="callout">
+    <p><strong>Proposed OpenHands Automation; not deployed.</strong> The investigation below is complete enough to establish the reported pattern. No intervention review has been posted. The proposed home is OpenHands Cloud; the model profile, publishing identity, event delivery and reporting voice still need to be settled and verified.</p>
+  </div>
+
+  <h2>Two examples of the contradiction</h2>
+  <p>In both cases, <code>all-hands-bot</code> submitted an approval, dismissed that same review because the intended action was a comment, and then published a completion comment claiming approval. The account identity is verified; it does not prove that one agent process performed every action.</p>
+  <div class="table-scroll" role="region" aria-label="Verified review sequences" tabindex="0">
+    <table>
+      <thead><tr><th>PR and reviewed commit</th><th>Approval → dismissal → completion claim</th><th>Evidence</th></tr></thead>
+      <tbody>
+        <tr><td>SDK <strong>#5010</strong><br><code>e9392e7c</code></td><td>September 14, UTC:<br>11:10:50 approval<br>12:14:25 dismissal<br>12:14:26 comment claiming APPROVE</td><td><a href="https://github.com/OpenHands/software-agent-sdk/pull/5010#pullrequestreview-5196914771">Review 5196914771</a><br><a href="https://api.github.com/repos/OpenHands/software-agent-sdk/issues/events/31098839051">Dismissal record</a><br><a href="https://github.com/OpenHands/software-agent-sdk/pull/5010#issuecomment-5663712244">Contradictory completion</a></td></tr>
+        <tr><td>Automation <strong>#453</strong><br><code>a9cc2adf</code></td><td>September 13, UTC:<br>21:53:50 approval<br>21:54:13 dismissal<br>21:54:14 comment claiming APPROVED</td><td><a href="https://github.com/OpenHands/automation/pull/453#pullrequestreview-5192416559">Review 5192416559</a><br><a href="https://api.github.com/repos/OpenHands/automation/issues/events/31065923261">Dismissal record</a><br><a href="https://github.com/OpenHands/automation/pull/453#issuecomment-5656412180">Contradictory completion</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Both PRs were authored by <code>neubig</code>, whose current repository permission was verified as admin. This proves present eligibility for the proposed author gate, not historical permission at review time. The saved timelines contained nine bot self-dismissals on SDK #5010 and thirteen on Automation #453; these counts are not counts of independently proven contradictory completion comments.</p>
+
+  <h2>The code and the reviews deserve separate judgments</h2>
+  <p>Independent conclusions were saved before reading the substantive bot reviews. The SDK PR description contained a prior review summary, which was disregarded; that assessment was independently reasoned, not perfectly blinded. Each assessment used the historical reviewed commit. These PRs have since closed, so the findings below do not establish the condition of current main.</p>
+  <h3>SDK #5010: sound final code, unreliable review history</h3>
+  <p>The final reviewed patch cleanly separates conversation creation from read-only attachment, preserves standalone workspace behavior, and adds immutable conversation scope to runtime operations. <strong>64 focused tests passed</strong> on that source. No substantiated material defect was found. The final bot review's technical account is supported.</p>
+  <p>Its categorical low-risk/no-eval-risk conclusion is less convincing: conversation initialization and command/file routing are a meaningful execution surface. The repository's broad eval-risk rule makes COMMENT defensible until the required evidence is established. That policy judgment is separate from a claim that the code is broken.</p>
+  <p>Earlier reviews contain clear errors. <a href="https://github.com/OpenHands/software-agent-sdk/pull/5010#pullrequestreview-5188253146">One review assesses a GitHub authorization gateway</a> absent from its reviewed SDK commit: a major wrong-subject error. Two reviews describe an async lazy-initialization race, but the inspected check-and-assignment contains no suspension point: <a href="https://github.com/OpenHands/software-agent-sdk/pull/5010#pullrequestreview-5189033144">first claim</a>, <a href="https://github.com/OpenHands/software-agent-sdk/pull/5010#pullrequestreview-5190232537">repeated claim</a>. These were nonblocking false positives. Other earlier findings were valid at their own commits and must not be dismissed merely because later revisions fixed them.</p>
+  <p>There was also a material miss in <a href="https://github.com/OpenHands/software-agent-sdk/pull/5010#pullrequestreview-5192324847">review 5192324847 at 70c3afeb</a>: profile-based creation serialized <code>agent: null</code>, which failed server request validation. Reproducing the historical serialization confirmed the error; the subsequent <code>exclude_none=True</code> fix removed it. That is a valid criticism of the earlier review, not a defect in the final head tested above.</p>
+  <h3>Automation #453: a reproducible missed defect</h3>
+  <p>The independent assessment would request changes at <code>a9cc2adf</code>. Creating a model experiment with an agent profile is rejected, but <a href="https://github.com/OpenHands/automation/blob/a9cc2adf35fd44220b0d4ee6caab1e6d2a0e96bb/openhands/automation/router.py#L322">PATCH of an existing experiment accepts a profile</a> and retains the old variant configuration. The worker then attaches to the profile's conversation and skips the configured variant models and plugins. An A/B experiment can silently become repeated runs of one profile while still reporting a selected variant.</p>
+  <p>A probe of the real API paths with SQLite reproduced PATCH returning 200 while equivalent creation returned 422. <strong>66 focused tests passed</strong>; they did not cover this state transition. One unrelated existing socket-timeout test was excluded. This is a material missed correctness issue, graded P2, not evidence of a demonstrated security exploit. The selected bot approval missed it. Some earlier reviews did catch real defects that were subsequently fixed.</p>
+  <p>No live model run or full deployment integration test was performed for either independent assessment.</p>
+
+  <h2>What might explain the paperwork?</h2>
+  <p>The current <a href="https://github.com/OpenHands/extensions/blob/6242eacba016bf85009d8e3f5b8aa131295e278c/skills/github-pr-reviewer/scripts/main.py#L757">OSS reviewer prompt</a> requires a GitHub COMMENT while asking for a textual APPROVED or CHANGES REQUESTED verdict. Its <a href="https://github.com/OpenHands/extensions/blob/6242eacba016bf85009d8e3f5b8aa131295e278c/skills/github-pr-reviewer/scripts/main.py#L420">delivery check</a> accepts any same-author, same-commit review without checking whether its state is dismissed or pending. Those are concrete consistency weaknesses in the inspected source.</p>
+  <p>The exact deployed version and producing conversations were not established. No matching dismissal guard was found in the inspected code. These source observations do not prove what caused the two sequences above.</p>
+
+  <h2>Proposed automation contract</h2>
+  <ol>
+    <li><strong>Scope:</strong> OpenHands/OpenHands, OpenHands/software-agent-sdk, OpenHands/automation and OpenHands/extensions.</li>
+    <li><strong>Trigger:</strong> correlate an all-hands-bot approval with its self-dismissal, a correction explaining COMMENT was intended, and a later claim of approval referring to the same review. Observe review-dismissed and issue-comment events, allow a short settling window, then fetch authoritative state. Verify Cloud forwarding and GitHub subscriptions before relying on those events.</li>
+    <li><strong>Author gate:</strong> verified repository write access <em>or</em> active OpenHands org membership. Unknown permissions require investigation; a public association label alone is insufficient.</li>
+    <li><strong>Independent review:</strong> run <code>/codereview-roasted</code> in a separate conversation with the full source, requirements and relevant policy, excluding earlier reviews and conclusions. Save the verdict and evidence before the comparison stage.</li>
+    <li><strong>Audit:</strong> fetch all reviews and inline discussion, including dismissed reviews. Check each at its own reviewed commit. Mark fixed findings as resolved and repeated findings as repeated. Revise the independent verdict if verified counterevidence warrants it, recording why.</li>
+    <li><strong>Publish:</strong> one GitHub review containing the three requested parts: identity, independent verdict and reasons, then the grumpy review scorecard. Submit APPROVE, REQUEST_CHANGES or COMMENT to match the supported verdict. The automation's explicit action policy must be resolved before publishing, rather than copied ambiguously from the old comment-only wrapper.</li>
+    <li><strong>Avoid loops:</strong> persist event IDs and a repository/PR/head key; produce at most one intervention per head, ignore its own marker, recheck head/state before posting, and reconcile an uncertain submission before retrying. Closed or merged examples remain historical fixtures.</li>
+    <li><strong>Trust the receipt:</strong> the publisher validates the structured verdict and submits it, then fetches the created review's actor, commit and state. Completion wording comes from that verified response. Dismissed or pending reviews do not count as a successfully submitted verdict.</li>
+  </ol>
+  <p>The publishing identity must be able to review the author's PR; using Engel's account cannot approve or request changes on Engel's own PRs. Review/test execution should not receive the publisher's GitHub write credential. These are implementation requirements, not claims about a deployed setup.</p>
+
+  <h2>Proposed rubric</h2>
+  <p>Use ordinal labels, not an average or a percentage of correctness. Grade individual findings and the overall conclusion, citing supporting lines or reproductions. Keep policy compliance and reporting fidelity as separate Pass / Fail / Unknown judgments.</p>
+  <div class="table-scroll" role="region" aria-label="Review audit rubric" tabindex="0">
+    <table>
+      <thead><tr><th>Score</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><strong>0 · Major miss</strong></td><td>A demonstrated material defect was missed, a material false finding drove the verdict, or the review evaluated the wrong change. Severity is recorded separately.</td></tr>
+        <tr><td><strong>1 · Minor miss</strong></td><td>A concrete lower-impact omission or false positive; taste alone does not qualify.</td></tr>
+        <tr><td><strong>2 · Defensible, 50–50</strong></td><td>A real ambiguity or tradeoff supports either judgment. Explain both interpretations. This is not a calibrated probability.</td></tr>
+        <tr><td><strong>3 · Correct review</strong></td><td>The claims and conclusion survive the bounded independent check. This is not a guarantee of defect-free code.</td></tr>
+        <tr><td><strong>Unscored</strong></td><td>Evidence is missing, the historical source is unavailable, or there is no substantive claim to assess. Say what is missing.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Proposed voice: Department of Premature Approvals</h2>
+  <p>A dry bureaucratic roast, aimed at contradictory actions and unsupported claims. Keep the technical evidence direct. Example structure, not a posted review:</p>
+  <blockquote>
+    <p>I'm OpenHands-Astra, helping Engel Nyst (@enyst).</p>
+    <p><strong>Independent inspection:</strong> The approval stamp has been sent for calibration. This change needs one repair: updating an experiment to a saved profile silently discards its model variants. Verdict: REQUEST_CHANGES.</p>
+    <p><strong>Previous paperwork:</strong> Major miss (0): the unsupported configuration passed inspection. Reporting: failed—the approval was withdrawn before the completion note announced it. The stamp has reviewed itself; the experiment is still waiting.</p>
+  </blockquote>
+  <p><strong>Still to settle:</strong> the voice above; whether Astra names the actual model or the reviewer persona; the configured profile and publishing account; verified Cloud event delivery. Historical examples should exercise a dry run before enabling future interventions. No historical review is to be posted automatically as a side effect of that check.</p>
+  <div class="foot-nav">
+    <a href="openhands-automation-operations.html">Automation inventory &rarr;</a> &nbsp;&middot;&nbsp;
+    <a href="../index.html">&larr; Home</a>
+  </div>
+</main>
+</body>
+</html>
