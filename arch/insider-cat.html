@@ -1,152 +1,274 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The insider cat — SmolPaws living inside OpenHands</title>
-<meta name="description" content="Implementation record: a SmolPaws that runs inside the OpenHands UI (odie) — a three-pose avatar driven off live agent status, a 'call the cat' button that opens a smolpaws-tagged conversation, and a local-environment identity injected via the agent-server system suffix." />
-<meta property="og:title" content="The insider cat — SmolPaws inside OpenHands" />
-<meta property="og:description" content="A cat that lives inside the OpenHands UI: three-pose avatar off live agent status, a call-the-cat button, and a local-environment identity. What shipped, where it lives, and how big it is." />
-<meta property="og:type" content="article" />
-<style>
-  :root{
-    --fg:#1a1a1a; --muted:#5a5a5a; --subtle:#8a8a82;
-    --bg:#fdfdfb; --card:#ffffff; --elevated:#f7f6f1;
-    --accent:#2b4eaa; --accent-soft:#e6ecfa;
-    --rule:#e2e2dc; --rule-strong:#bdbcb4;
-    --code-bg:#f3f1ec; --warn:#b25b0e; --ok:#2f7a3a; --crit:#a02020;
-    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
-  }
-  *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
-  body{line-height:1.6;font-size:16px}
-  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
-  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
-  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
-  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
-  nav.toc li{counter-increment:toc;margin:4px 0}
-  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
-  nav.toc a{color:var(--fg);text-decoration:none} nav.toc a:hover{color:var(--accent)}
-  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:28px}
-  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
-  header.title h1{font-size:32px;margin:6px 0 4px;letter-spacing:-.01em}
-  header.title .sub{color:var(--muted);max-width:820px}
-  h2{font-size:22px;margin:44px 0 10px} h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
-  h3{font-size:16px;margin:22px 0 8px}
-  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
-  pre{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule)}
-  pre code{background:transparent;padding:0}
-  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
-  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:top}
-  th{font-weight:600;background:var(--code-bg)}
-  td.sym code{background:transparent;padding:0;color:var(--accent);font-weight:600}
-  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:14px 0;border-radius:0 4px 4px 0;font-size:14.5px}
-  .callout.warn{border-color:var(--warn);background:#fbf1e6} .callout.note{border-color:var(--muted);background:#f3f1ec}
-  .callout.ok{border-color:var(--ok);background:#eef6ef}
-  figure.shot{margin:18px 0 22px}
-  figure.shot img{display:block;max-width:100%;height:auto;border:1px solid var(--rule);border-radius:8px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
-  figure.shot figcaption{font-size:13px;color:var(--muted);margin-top:8px;text-align:center}
-  .poses{display:flex;gap:22px;flex-wrap:wrap;margin:14px 0 8px}
-  .pose{text-align:center;font-size:12px;color:var(--muted)}
-  .pose svg{width:72px;height:72px;display:block;margin:0 auto 6px;background:#fff;border:1px solid var(--rule);border-radius:10px;padding:6px}
-  .pose b{color:var(--fg);font-weight:600}
-  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
-  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid var(--rule-strong);color:var(--muted);white-space:nowrap}
-  .pill.ok{color:var(--ok);border-color:var(--ok);background:#eef6ef}
-  .toplink{display:inline-block;margin-top:10px;padding:7px 10px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;color:var(--accent);text-decoration:none;font-size:13px}
-  .status{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--ok);color:var(--ok);background:#eef6ef}
-  .mono{font-family:var(--mono)}
-  @media(max-width:760px){.wrap{grid-template-columns:1fr}}
-</style></head><body>
-<div class="wrap">
-  <nav class="toc"><h2>Contents</h2><ol>
-    <li><a href="#what">What it is</a></li>
-    <li><a href="#poses">Three poses</a></li>
-    <li><a href="#call">Call the cat</a></li>
-    <li><a href="#identity">A local identity</a></li>
-    <li><a href="#where">Where it lives &amp; size</a></li>
-    <li><a href="#decisions">Decisions on record</a></li>
-    <li><a href="#next">What's left</a></li>
-  </ol>
-  <a class="toplink" href="../index.html">← Notebook</a>
-  <div style="margin-top:10px"><a class="src" href="insider-cat-stories.html">Behavior in user stories →</a></div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Insider Cat — a Canvas App for projects and conversations</title>
+  <meta name="description" content="Insider Cat as a Canvas App: durable conversations, explicit new and resume, a worktree voice implementation, verified UI behavior, and remaining provider testing.">
+  <meta property="og:title" content="Insider Cat — a sibling of SmolPaws inside Agent Canvas">
+  <meta property="og:description" content="The Secretary page becomes a Canvas App, using the selected backend and durable conversations. Implementation, usability, and voice direction.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/insider-cat.html">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    :root { --muted:#b0aaa0; }
+    .shell { max-width:1120px; padding-top:32px; }
+    .layout { display:grid; grid-template-columns:200px minmax(0,1fr); gap:42px; }
+    .toc { position:sticky; top:24px; align-self:start; font-size:14px; }
+    .toc ol { padding-left:20px; } .toc li { margin:9px 0; }
+    a { color:var(--teal); text-underline-offset:3px; overflow-wrap:anywhere; }
+    p, li { font-size:1rem; } p { line-height:1.75; }
+    h1 { font-size:clamp(2.4rem,5vw,3.8rem); } h2 { scroll-margin-top:20px; }
+    h3 { font-size:1rem; text-transform:none; letter-spacing:0; }
+    main { min-width:0; } .meta { font-size:14px; margin-bottom:24px; }
+    .eyebrow { color:var(--accent); font-family:var(--mono); font-size:14px; }
+    .status { display:inline-block; border:1px solid var(--accent); border-radius:4px; padding:4px 9px; color:var(--accent); font-size:14px; }
+    .callout p { font-size:1rem; } .table-wrap { overflow-x:auto; margin:20px 0; }
+    table { margin:0; font-size:14px; } th { font-size:14px; text-transform:none; letter-spacing:0; }
+    td, th { vertical-align:top; } code { overflow-wrap:anywhere; }
+    .flow { display:grid; gap:10px; padding:22px; border:1px solid var(--border); border-left:3px solid var(--teal); background:var(--card); margin:24px 0; }
+    .flow p { margin:0; } .flow small { color:var(--muted); font-size:14px; }
+    details { border:1px solid var(--border); padding:14px 18px; margin:16px 0; border-radius:6px; }
+    summary { cursor:pointer; color:var(--teal); font-weight:600; }
+    .source { color:var(--muted); font-size:14px; } .source a { font-size:14px; }
+    .skip { position:absolute; top:-100px; } .skip:focus { top:8px; background:var(--bg); padding:12px; z-index:2; }
+    :focus-visible { outline:2px solid var(--teal); outline-offset:4px; }
+    @media(max-width:800px) { .layout { grid-template-columns:1fr; gap:14px; } .toc { position:static; } .toc ol { display:flex; flex-wrap:wrap; gap:8px 24px; } .toc li { margin:0; } .shell { padding:24px 18px 64px; } }
+  </style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to article</a>
+<div class="shell layout">
+  <nav class="toc" aria-label="On this page">
+    <a href="../index.html">← Code Design Notebook</a>
+    <ol>
+      <li><a href="#what">The companion</a></li>
+      <li><a href="#apps">The Canvas App</a></li>
+      <li><a href="#implementation-status">September 15 prototype</a></li>
+      <li><a href="#status">What exists</a></li>
+      <li><a href="#behavior">Prototype history</a></li>
+      <li><a href="#conversations">Earlier continuity gaps</a></li>
+      <li><a href="#usability">Recommended experience</a></li>
+      <li><a href="#voice">OpenAI voice now</a></li>
+      <li><a href="#puck">Puck &amp; ElevenLabs</a></li>
+      <li><a href="#skill">The Insider skill</a></li>
+      <li><a href="#next">Implementation order</a></li>
+      <li><a href="#sources">Evidence &amp; limits</a></li>
+    </ol>
+    <p><a href="insider-cat-stories.html">User scenarios →</a></p>
   </nav>
+  <main id="content">
+    <header>
+      <p class="eyebrow">Agent Canvas · Apps · behavior and design</p>
+      <h1>Insider Cat</h1>
+      <p>A sibling of SmolPaws, living inside Agent Canvas. A companion you can talk to while it helps you find, understand, and coordinate your work.</p>
+      <p class="meta">Implementation updated <time datetime="2026-09-15">15 September 2026</time>; provider documentation reviewed September 14–15. <span class="status">Worktree prototype · not released</span></p>
+    </header>
+    <div class="callout"><p><strong>The Cat now has a durable App conversation and an implemented voice path in development worktrees.</strong> The standalone App lives in <a href="https://github.com/enyst/insider">enyst/insider</a>. The September 15 work adds persistent Canvas controls and an authenticated Agent Server voice broker. These changes are not presented as released or available from the repositories’ main branches. The <a href="#implementation-status">test record below</a> separates verified conversation behavior from OpenAI speech that has not been tested.</p></div>
 
-  <main>
-  <header class="title">
-    <div class="eyebrow">SmolPaws · implementation record</div>
-    <h1>The insider cat</h1>
-    <p class="sub">A SmolPaws that runs <em>inside</em> the OpenHands UI. It sits in the corner, changes pose with the agent's live status, and — when you call it — opens its own conversation with an identity that knows it is running on a local agent-server. This is what shipped in v1, where it lives, and how big it is.</p>
-    <p style="margin-top:12px"><span class="status">STATUS: v1 SHIPPED</span> &nbsp; <span class="pill">epic smolpaws-08f</span> &nbsp; <span class="pill">odie · feat/insider-cat</span> &nbsp; <span class="pill">HEAD fd6679a1c</span></p>
-  </header>
+    <h2 id="what">A sibling with its own place</h2>
+    <p>Insider Cat should share SmolPaws’ curiosity, warmth, directness, and habit of checking real evidence. Its home and responsibility are different: it helps the person using Canvas orient across projects, read progress, continue the right conversation, and hand work to other agents.</p>
+    <p><strong>Sibling is the product decision.</strong> The older prompt calls it SmolPaws and assumes a local agent-server. Preserve existing tags for compatibility, but do not infer shared identity, permissions, memories, or a local backend from them. The active backend and the capabilities actually supplied by the runtime determine what the Cat can do.</p>
+    <p>Use <strong>Insider Cat</strong> for the companion and <strong>Projects</strong> for its overview. “Secretary” is the older prototype’s skin name. Projects remains the home for choosing work; the new optional companion host capability keeps the Cat’s controls available while navigating elsewhere in Canvas.</p>
 
-  <h2 id="what"><span class="num">1</span>What it is</h2>
-  <p>Every other SmolPaws face lives <em>outside</em> the tools it helps with — WhatsApp, GitHub, Slack. The insider cat is the opposite: it lives inside <code>odie</code>, the OpenHands web UI itself. It is the same cat, wearing the UI as a body. It knows the OpenHands stack — the UI, the agent-server, the extensions and automation repos, the TypeScript client — well enough to answer questions about your other conversations and act on them.</p>
-  <figure class="shot">
-    <img src="../assets/insider-cat-inline.jpeg" alt="The insider cat rendered as a small avatar centered above the agent status pill inside an OpenHands conversation.">
-    <figcaption>The cat inline in a conversation — a 48px avatar centered above the “Thinking” pill, alive with the agent's status.</figcaption>
-  </figure>
-  <p>Two placements, both riding odie's existing rails: a launcher in the corner of the home screen, and — once you are in a conversation — a small avatar sitting right above the agent-status row, so the cat is present while it works.</p>
-
-  <h2 id="poses"><span class="num">2</span>Three poses, one live signal</h2>
-  <p>The avatar is not decorative. It is driven off odie's existing websocket <code>execution_status</code> — no new backend, no polling. One small pure function maps the live agent state to a pose, so the cat's body language <em>is</em> the agent's state.</p>
-  <div class="poses">
-    <div class="pose">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SmolPaws cat, neutral"><defs><radialGradient id="fur-n" cx="50%" cy="38%" r="65%"><stop offset="0%" stop-color="#dfe3ea"/><stop offset="100%" stop-color="#aab2c0"/></radialGradient></defs><path d="M16 22 L14 6 L28 16 Z" fill="url(#fur-n)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><path d="M48 22 L50 6 L36 16 Z" fill="url(#fur-n)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 18 L17 10 L24 16 Z" fill="#f2b8c6"/><path d="M46 18 L47 10 L40 16 Z" fill="#f2b8c6"/><ellipse cx="32" cy="34" rx="21" ry="19" fill="url(#fur-n)" stroke="#8b93a3" stroke-width="1.5"/><ellipse cx="24" cy="33" rx="3.4" ry="4.2" fill="#2b2f38"/><ellipse cx="40" cy="33" rx="3.4" ry="4.2" fill="#2b2f38"/><circle cx="25.1" cy="31.4" r="1.1" fill="#fff"/><circle cx="41.1" cy="31.4" r="1.1" fill="#fff"/><path d="M32 38 l-2.2 -1.6 h4.4 Z" fill="#f2b8c6"/><path d="M32 38 v2.4 M32 40.4 q-3 2 -6 0 M32 40.4 q3 2 6 0" fill="none" stroke="#8b93a3" stroke-width="1.2" stroke-linecap="round"/><path d="M18 36 h-9 M19 40 l-8 2 M46 36 h9 M45 40 l8 2" stroke="#c4cad4" stroke-width="1" stroke-linecap="round"/></svg>
-      <b>Normal</b><br>idle / neutral
+    <h2 id="apps">The page becomes a Canvas App</h2>
+    <p>The standalone repository is <a href="https://github.com/enyst/insider">enyst/insider</a>; the original development copy remains at <code>odie/apps/insider-cat</code>. The standalone copy contains its own source, skill, translations, tests, and build dependencies. Its <code>canvas-extension.json</code> declares the Projects page, and its prepared <code>extension.js</code> exports <code>activate(host)</code>. Canvas mounts it at <code>/extensions/insider-cat/projects</code>. The inventory is called <strong>Apps</strong> and lives at <code>/apps</code>; the manifest and API retain their older “canvas extensions” names.</p>
+    <div class="flow" aria-label="Canvas App architecture">
+      <p><strong>1. Agent Server installs the package</strong> and stores its manifest, revision, bundle, and enabled state.</p>
+      <p><strong>2. Canvas loads the enabled App</strong> and registers its Projects page.</p>
+      <p><strong>3. The page uses the host</strong> for authenticated requests to its owning backend and navigation within Canvas.</p>
+      <p><strong>4. Agent Server keeps the work</strong>: conversation IDs, user messages, agent events, and results remain available after leaving the page.</p>
     </div>
-    <div class="pose">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SmolPaws cat, perked and working"><defs><radialGradient id="fur-u" cx="50%" cy="38%" r="65%"><stop offset="0%" stop-color="#e6ecfa"/><stop offset="100%" stop-color="#9fb0d6"/></radialGradient></defs><path d="M15 20 L12 2 L29 15 Z" fill="url(#fur-u)" stroke="#5f6f96" stroke-width="1.5" stroke-linejoin="round"/><path d="M49 20 L52 2 L35 15 Z" fill="url(#fur-u)" stroke="#5f6f96" stroke-width="1.5" stroke-linejoin="round"/><path d="M17 16 L15 6 L24 14 Z" fill="#f2b8c6"/><path d="M47 16 L49 6 L40 14 Z" fill="#f2b8c6"/><ellipse cx="32" cy="35" rx="21" ry="19" fill="url(#fur-u)" stroke="#5f6f96" stroke-width="1.5"/><circle cx="24" cy="33" r="5" fill="#fff" stroke="#5f6f96" stroke-width="0.8"/><circle cx="40" cy="33" r="5" fill="#fff" stroke="#5f6f96" stroke-width="0.8"/><circle cx="24.6" cy="33.4" r="3" fill="#2b2f38"/><circle cx="40.6" cy="33.4" r="3" fill="#2b2f38"/><circle cx="25.7" cy="32.1" r="1.1" fill="#fff"/><circle cx="41.7" cy="32.1" r="1.1" fill="#fff"/><path d="M32 39 l-2.2 -1.6 h4.4 Z" fill="#f2b8c6"/><path d="M32 39 v2.2 M32 41.2 q-3 2 -6 0 M32 41.2 q3 2 6 0" fill="none" stroke="#5f6f96" stroke-width="1.2" stroke-linecap="round"/><path d="M18 37 h-9 M19 41 l-8 2 M46 37 h9 M45 41 l8 2" stroke="#c4cad4" stroke-width="1" stroke-linecap="round"/></svg>
-      <b>Ears-up</b><br>working / just pinged
+    <p>This replaces the skin server, iframe messaging, fixed browser ports, and page-owned credential handling. The typed App uses existing Apps and conversation endpoints. The new voice path adds conversation-scoped server endpoints and an optional persistent host surface. Apps remain trusted code running in Canvas’ browser context, so installing and enabling are separate actions.</p>
+
+    <h3>Install on the selected backend</h3>
+    <p>The instructions below install the version at the chosen source and ref. To exercise the September 15 prototype, install the prepared App from its development worktree and run the matching Odie and SDK worktrees. Installing the public <code>main</code> ref does not imply those unmerged changes are present.</p>
+    <ol>
+      <li>Use a Canvas build with Apps and an Agent Server with the Canvas Extensions endpoints. If Apps reports an unsupported backend, update that backend first. The inspected host currently supports local Agent Server connections, not the cloud backend.</li>
+      <li>Open <strong>Customize → Apps</strong>. Set Source to <code>github:enyst/insider</code>, Ref to <code>main</code> or a reviewed commit SHA, and leave Repository path empty. For a local checkout, use its absolute directory on the Agent Server machine as Source and leave both other fields empty. A container needs its own mounted path.</li>
+      <li>Review the installed App and enable it. Installation starts disabled. Open its <strong>Projects</strong> page from Canvas.</li>
+      <li>Choose the real workspace for the Cat and use a configured server agent profile. The server resolves that profile’s model and credentials; the bundle contains neither.</li>
+    </ol>
+    <p>The backend copies the prepared package; it does not run a build. Developers rebuild <code>extension.js</code> after editing the source, translations, or canonical Insider skill, then reinstall the updated package. The bundle includes the App’s copy from Canvas’s 15-language catalog. Keep it self-contained: the host serves the entrypoint as a browser module, without a separate static asset server.</p>
+
+    <h3>What the conversion changes</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Area</th><th>Canvas App behavior</th><th>Boundary</th></tr></thead>
+      <tbody>
+        <tr><td>Projects board</td><td>Conversation data comes from the owning backend. Refresh, explicit pagination, real workspace filtering, and distinct runtime states make coverage visible.</td><td>A conversation view, not a Beads board or automatic dispatcher. “Run ended” does not claim the task succeeded.</td></tr>
+        <tr><td>Selection</td><td>A target carries its full conversation ID. Selecting a card preserves typed text; opening a conversation uses Canvas navigation.</td><td>Selection supplies context. It does not send a follow-up to that worker by itself.</td></tr>
+        <tr><td>Typed Cat</td><td>A tagged controller is created through the normal conversation API. Later turns reuse its ID; saved events and links expose the written record.</td><td>The server’s selected profile supplies tools. The App does not turn browser API methods into agent tools or promise cross-task actions the profile cannot perform.</td></tr>
+        <tr><td>Identity</td><td>The build embeds the canonical Insider skill body. Creation appends it and active-controller context to the resolved profile, preserving its existing instructions and confirmation policy.</td><td>The sibling role applies to the controller. Workers do not become Insider Cat merely by appearing on the board.</td></tr>
+        <tr><td>Voice · worktree</td><td>Explicit Start voice connects the selected controller through an OpenAI WebRTC broker. Persistent controls show its identity, mute, stop speaking, end call, and its full conversation link.</td><td>Requires the new host companion capability, matching SDK broker, and a standard OpenAI API key. Typed chat works without them. Provider speech has not been verified.</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>Recommended default:</strong> resume one durable Insider conversation for the current backend and organization. Additional Cats should be deliberate: use <code>/new</code>, give them recognizable names, and resume them explicitly. This is a default interaction, not a singleton restriction.</p>
+    <p class="source">Package and installation guide: <a href="https://github.com/enyst/insider">enyst/insider</a>. Original development copy: <code>odie/apps/insider-cat/README.md</code>. Contract: <code>odie/src/types/canvas-extension.ts</code>; runtime: <code>src/components/features/canvas-extensions/canvas-extensions-runtime.tsx</code>; server: <code>openhands-agent-server/openhands/agent_server/canvas_extensions_router.py</code>. See also the <a href="agent-canvas-extensions.html">Apps architecture review</a>, with its September status correction.</p>
+
+    <h2 id="implementation-status">September 15: a working development prototype</h2>
+    <p>The changes are isolated on <code>gpt/insider-ui-voice</code> worktrees for the standalone App, Odie, and Agent Server. The browser test uses Canvas on port <code>8010</code> and its separate backend on <code>19000</code>; these are test addresses, not product defaults. The App is installed through the real Apps flow.</p>
+    <ul>
+      <li><strong>One conversation across both views.</strong> The first Cat was created from Projects. A follow-up in Canvas’s regular conversation view was saved under the same ID. Opening either view does not create another Cat.</li>
+      <li><strong>New means another Cat.</strong> <code>/new</code> from a regular Insider conversation opens a fresh App draft; the first message creates a distinct second ID. The App’s New button and <code>/new</code> command both navigate to the new-draft URL. Creation and picker selection then navigate to the chosen Cat’s canonical URL, so a bookmark or reload preserves the intended new/resume state.</li>
+      <li><strong>Resume deliberately.</strong> The picker exposes older Cats and remembers a choice for its backend and organization. Legacy top-level conversations tagged <code>smolpaws: insider</code> are accepted without rewriting their saved profile or instructions. Delegated children and explicitly different roles are excluded. Cat navigation, conversation headers, and cards identify Insider conversations.</li>
+      <li><strong>Keep typing while voice stays close.</strong> Cat controls live in a persistent dock below the page, reserving space so they do not cover the regular composer or Send button. The same Cat stays selected when moving between Projects and regular chat. The final browser check confirmed this placement and that long Cat IDs no longer widen the page.</li>
+      <li><strong>Condense without replacing the Cat.</strong> <code>/condense</code> keeps the ID and event log, requires a compatible configured condenser and enough history, and does not start another agent turn or approve pending tools. Resolve active work or approval requests first. Requesting compaction from the App or updated regular Canvas view ends that Cat’s active voice call, even if compaction later fails. Click <strong>Start voice</strong> after compaction completes to load the current context.</li>
+    </ul>
+    <p><strong>Condensation was also verified through the regular UI.</strong> The same Cat ID remained active, a condensation summary was persisted, and the full event history retained the original user messages and final answers. The <code>/condense</code> command was handled as a control action and did not become another agent message. The next captured model request contained the saved summary and new question, omitted a forgotten turn, and produced the fixture’s follow-up answer in that same conversation. This checks that subsequent turns actually receive the condensed context.</p>
+    <p>The verified browser conversation flows used a scripted model fixture behind the real Agent Server. Backend authentication and the missing-key preflight were checked. An OpenAI API key was unavailable, so this is <strong>not a live OpenAI speech demonstration</strong>.</p>
+    <p><strong>The native-browser WebRTC/audio test was not performed.</strong> Automatic approval review rejected the proposed temporary microphone/WebRTC overrides and request interception because that test approach lacked explicit authorization. No override ran. Client lifecycle unit tests remain useful evidence, but they do not establish native audio transport, recognition, speech output, or microphone usability.</p>
+    <details><summary>Development locations and voice contract</summary>
+      <p>The prepared App bundle must be rebuilt and reinstalled after source changes.</p>
+      <p>Canvas adds optional <code>host.registerCompanion({id, mount})</code>, <code>host.onConversationContextChangeRequested(listener)</code>, and Cat page icons. The shell owns the surface and its disposal; the App owns its call and controller binding. The context-change notification is scoped to the backend and organization and ends only the affected Cat’s call when regular-view compaction is requested. Older hosts without this notification require manually ending and restarting voice after regular-view compaction. Agent Server supplies <code>GET /api/conversations/{id}/voice</code>, <code>POST /api/conversations/{id}/voice/realtime</code>, and a controller-scoped call deletion endpoint. All use the normal backend authentication.</p>
+      <p>The voice availability response also reports <code>run_active</code> and <code>execution_status</code> from the actual agent run task. The readout requires an explicitly inactive run with status <code>finished</code>; a persisted finish event or detail snapshot alone is not sufficient.</p>
+    </details>
+    <details><summary>Validation scope at this snapshot</summary>
+      <ul>
+        <li>Standalone App: 43 passing tests, including bundle consistency, conversation continuity, localization, simulated voice lifecycle checks, compaction-request teardown while Projects is unmounted, and waiting for the complete agent run before reading its final answer.</li>
+        <li>Odie: 395 focused tests passed, with one existing TODO; type checking, lint, and the production build also passed.</li>
+        <li>SDK: 115 focused tests passed, plus one test through a real HTTP server.</li>
+        <li>Real browser: App installation, creation, regular-view follow-up, a second Insider through <code>/new</code>, missing-key handling, and condensation followed by another turn. The real backend also accepted legacy top-level Insider tags in its voice availability check and reported the missing API key.</li>
+      </ul>
+      <p>These results use isolated test state and a scripted model fixture. They do not include native browser audio or a successful OpenAI voice session.</p>
+    </details>
+
+    <h2 id="status">Where the work actually lives</h2>
+    <div class="table-wrap"><table>
+      <caption>Current integration and historical source snapshots; this is not a release ledger.</caption>
+      <thead><tr><th>Source</th><th>What it contains</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><code>gpt/insider-ui-voice</code><br>App + Odie + SDK worktrees</td><td>Conversation continuity, legacy resume, persistent Cat controls and badges, Realtime voice broker and client, safe condensation.</td><td>Local implementation and isolated integration testing. Not released; no verified live OpenAI speech.</td></tr>
+        <tr><td><a href="https://github.com/enyst/insider">enyst/insider</a><br><code>odie/apps/insider-cat</code></td><td>Installable Canvas App: Projects page, authenticated backend access, durable typed controller, embedded Insider guidance.</td><td>Standalone baseline plus the original Odie development package. The worktree adds the newer integration described above.</td></tr>
+        <tr><td><a href="https://github.com/enyst/playground/tree/894d2e5a55ee72de8f5411482a81c70d07caeab7"><code>odie: feat/insider-cat</code></a><br><code>894d2e5a55</code></td><td>Avatar, tagged text-chat launcher, identity and memory enrichment, persistent voice host, local Canvas controls, skin integration.</td><td>Historical combined Cat branch, absent from the inspected baseline Odie checkout <code>aae887734e</code>.</td></tr>
+        <tr><td><code>odie: spike/realtime-voice</code><br><code>22a0c6f23a</code></td><td>Earlier realtime experiment and standalone Secretary route.</td><td>Earlier architecture; do not combine its setup assumptions with the newer branch.</td></tr>
+        <tr><td><a href="https://github.com/smolpaws/secretary-skin/tree/1a70e91f2646f6c2565c29525463974d0929fc7c">Secretary skin</a><br><code>1a70e91</code></td><td>Separate skin server and four-column conversation board. Local checkout: <code>~/workspace/secretary-skin</code>, outside <code>~/repos</code>.</td><td>Companion prototype required by the newer voice hook.</td></tr>
+        <tr><td><code>purr-projects</code><br><code>868591d</code></td><td>Earlier project-oriented overview; also found under <code>~/workspace/skin</code>.</td><td>Precursor, not the current Secretary board implementation.</td></tr>
+        <tr><td><a href="https://github.com/smolpaws/OpenHands/tree/8313625a376a439846a9794fcc32c0ba7493c233"><code>feat/insider-shared-memory</code></a><br><code>8313625a37</code></td><td>Memory feature ancestry, incorporated into the combined Cat branch.</td><td>Available on the tagged inline-agent launch path; not connected to voice/board requests.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="behavior">Historical prototype behavior</h2>
+    <p>The following describes the earlier Cat feature branch and Secretary skin. It explains what informed the conversion; these are not setup instructions for the Canvas App above.</p>
+    <h3>The Cat and its two entry points</h3>
+    <p>The shell mounts one voice host and shares its state with the avatars. With a skin reported installed, clicking the Cat toggles voice and the separate “+” creates a fresh text conversation. Without an installed skin, the Cat itself creates that conversation. It does not resume an existing Cat thread.</p>
+    <p>The launcher uses the current Canvas configuration and adds <code>smolpaws: insider</code>. For an <strong>inline OpenHands agent</strong>, it appends the Insider identity to <code>AgentContext.system_message_suffix</code> and supplies memory tools. It preserves existing context without creating a synthetic user message. Agent-profile launches and ACP launches do not receive this same enrichment.</p>
+    <p>The inline avatar appears in ordinary conversations too, and its pose follows the viewed agent’s execution state. Running or waiting for confirmation raises its ears; idle, finished, or paused makes it sleep. That is not necessarily the Cat controller’s workload or microphone state. Voice adds connecting/live/error state. There is one voice host per mounted app, not an enforced single call across all browser tabs.</p>
+    <p class="source">Source: <a href="https://github.com/enyst/playground/tree/894d2e5a55ee72de8f5411482a81c70d07caeab7/src/components/features/insider-cat">Cat components</a> and <a href="https://github.com/enyst/playground/blob/894d2e5a55ee72de8f5411482a81c70d07caeab7/src/api/agent-server-adapter.ts#L1122">launch enrichment</a>.</p>
+
+    <h3>The board is a limited snapshot of conversations</h3>
+    <p>The skin renders <strong>Pending · In progress · Needs input · Done</strong>. Cards show title, execution state, optional project and model, and a shortened ID. A card click replaces the prompt draft with text naming that conversation. Its “open” link opens a new browser tab.</p>
+    <p>The server fetches only the first <strong>60</strong> conversations; the UI refreshes on load and by button. It does not follow every conversation live. The server retains three configured project groups and Beads-reading code, but the board flattens conversation groups into status columns. It does not render a ticket board, manage dependencies, or dispatch workers automatically.</p>
+    <p>Unknown states go to “Needs input”; errors and paused work share that column. A runtime status such as <code>finished</code> becomes “Done” without checking whether the user’s task succeeded. Those labels are presentation rules, not a reliable task-outcome model.</p>
+    <p class="source">Source: <a href="https://github.com/smolpaws/secretary-skin/blob/1a70e91f2646f6c2565c29525463974d0929fc7c/board.js">board.js</a> and <a href="https://github.com/smolpaws/secretary-skin/blob/1a70e91f2646f6c2565c29525463974d0929fc7c/server.mjs">server.mjs</a>. The skin SKILL still describes project lanes and per-conversation event reads.</p>
+
+    <h3>Voice survives navigation, but context does not follow it yet</h3>
+    <div class="flow" aria-label="Current prototype voice flow">
+      <p><strong>1. Canvas Cat</strong> asks the skin server for voice configuration and an ephemeral token.</p>
+      <p><strong>2. Browser ↔ OpenAI Realtime</strong> carries microphone and playback over WebRTC.</p>
+      <p><strong>3. The voice model chooses a bridge:</strong><br><code>ask_the_agent</code> → skin server → agent completion endpoint.<br><code>control_canvas</code> → local conversation list, navigation, or board draft.</p>
+      <p><strong>4. The result returns to the voice model</strong> for a spoken answer.</p>
+      <small>Current implementation, not the proposed durable controller architecture.</small>
     </div>
-    <div class="pose">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SmolPaws cat, sleeping"><defs><radialGradient id="fur-s" cx="50%" cy="42%" r="65%"><stop offset="0%" stop-color="#d7dbe2"/><stop offset="100%" stop-color="#a2aab8"/></radialGradient></defs><path d="M14 24 L8 12 L27 18 Z" fill="url(#fur-s)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><path d="M50 24 L56 12 L37 18 Z" fill="url(#fur-s)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="32" cy="37" rx="21" ry="18" fill="url(#fur-s)" stroke="#8b93a3" stroke-width="1.5"/><path d="M19 35 q5 4 10 0" fill="none" stroke="#2b2f38" stroke-width="1.8" stroke-linecap="round"/><path d="M35 35 q5 4 10 0" fill="none" stroke="#2b2f38" stroke-width="1.8" stroke-linecap="round"/><path d="M32 41 l-2 -1.4 h4 Z" fill="#f2b8c6"/><path d="M32 41 v2 M32 43 q-2.5 1.6 -5 0 M32 43 q2.5 1.6 5 0" fill="none" stroke="#8b93a3" stroke-width="1.1" stroke-linecap="round"/><path d="M18 39 h-9 M19 43 l-8 2 M46 39 h9 M45 43 l8 2" stroke="#c4cad4" stroke-width="1" stroke-linecap="round"/><path d="M50 16 h6 l-6 6 h6" fill="none" stroke="#8b93a3" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 8 h4 l-4 4 h4" fill="none" stroke="#aab2c0" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <b>Sleeping</b><br>idle / asleep
-    </div>
-  </div>
-  <p class="mono" style="font-size:12.5px;color:var(--muted)">These are the actual production SVGs, inlined. They are three tiny files, ~1.3&nbsp;KB each, transparent, in SmolPaws' silver/paws palette.</p>
+    <p>A generic page description is included once when the data channel opens. It does not include the viewed conversation’s ID or title. Updating a React reference on navigation does not send another context event. After moving from conversation A to B, “continue this” therefore has no reliable current target.</p>
+    <p>The current controls list the first <strong>20</strong> conversations, request navigation by ID, and read/set/append/clear the Secretary prompt box while its iframe is open. Writing the draft does not submit it. The list follows Canvas’ active backend, while the skin’s board and delegated work use its configured server: switching backends can separate what the Cat sees from where it acts.</p>
+    <p>Stopping closes the peer connection and stops microphone tracks. However, startup can still finish after Stop because there is no cancellation guard. A late agent result can also try to write to a closed channel. Startup errors set an error state and then call cleanup that resets it to idle. These paths need lifecycle tests before voice can be considered dependable.</p>
+    <p class="source">Source: <a href="https://github.com/enyst/playground/blob/894d2e5a55ee72de8f5411482a81c70d07caeab7/src/components/features/insider-cat/use-insider-voice.ts">voice hook</a>, <a href="https://github.com/enyst/playground/blob/894d2e5a55ee72de8f5411482a81c70d07caeab7/src/components/features/insider-cat/insider-voice-host.tsx">voice host</a>, <a href="https://github.com/enyst/playground/blob/894d2e5a55ee72de8f5411482a81c70d07caeab7/src/components/features/insider-cat/insider-location.ts">location description</a>, and <a href="https://github.com/enyst/playground/blob/894d2e5a55ee72de8f5411482a81c70d07caeab7/src/components/features/insider-cat/canvas-voice-control.ts">Canvas voice controls</a>.</p>
 
-  <h2 id="call"><span class="num">3</span>Call the cat</h2>
-  <p>The v1 trigger is a plain button (voice-wake comes with the realtime-voice spike, epic <span class="pill">smolpaws-3e1</span>). Pressing it uses odie's existing <code>createConversation</code> path, then routes to it with react-router. The one new thing it carries: a tag.</p>
-  <pre><code>tags = { smolpaws: "insider", clientsource: "agentcanvas" }</code></pre>
-  <p>The <code>smolpaws</code> tag is the convention that marks a conversation as <em>this cat's</em>. The value is the face — <code>insider</code> now, with room for <code>whatsapp</code> and others later. That is how every smolpaws conversation, across faces, can eventually be found and share one memory.</p>
+    <h2 id="conversations">The prototype’s three separate conversations</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Surface</th><th>Actual continuity</th><th>What it does not establish</th></tr></thead>
+      <tbody>
+        <tr><td>Cat “+” text conversation</td><td>A normal Canvas conversation with the Insider tag; inline OpenHands launches receive identity and memory enrichment.</td><td>The voice bridge does not bind itself to this conversation.</td></tr>
+        <tr><td>Spoken conversation</td><td>One live OpenAI session; the last 40 user/assistant transcript entries are kept in browser storage and inserted into instructions on restart.</td><td>No backend/account/conversation partitioning, durable task log, synchronized memory, or proof every transcribed word was heard.</td></tr>
+        <tr><td>Typed board request / delegated voice work</td><td>The skin sends one user message to <code>/v1/chat/completions</code>. With the inspected SDK, each request creates a new persisted conversation.</td><td>No reused conversation header, previous turns, Insider tags, identity suffix, or structured selected-card context. The bridge discards the returned conversation ID.</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>The work is durable but unlinked.</strong> The typed answer is displayed in the page; the voice path saves its spoken transcript. The earlier claim that the full written answer is the user’s accessible record overstates the integration: there is no retained link from either surface to that request’s saved agent conversation.</p>
+    <p>The SDK gateway continues an existing conversation through the request/response header <code>X-OpenHands-ServerConversation-ID</code>. The skin never reuses it. Its streaming option also waits for the agent to finish before wrapping the final answer in server-sent events; it does not stream agent progress as it happens.</p>
+    <p class="source">Source: <a href="https://github.com/enyst/agent-sdk/blob/5f4c9601d43e0eec3ec9ef374468b7493db89b7a/openhands-agent-server/openhands/agent_server/openai/router.py#L132">gateway router</a> and <a href="https://github.com/enyst/agent-sdk/blob/5f4c9601d43e0eec3ec9ef374468b7493db89b7a/openhands-agent-server/openhands/agent_server/openai/service.py#L552">conversation runner</a>. This establishes behavior for the inspected SDK; the deployed backend version was not exercised.</p>
+    <h3>Memory exists, with a narrower boundary than the old docs suggest</h3>
+    <p>The combined branch has <code>smolpaws_memory</code>: a durable note with revision-checked replacement and dated notes with append/read/list operations. It uses a dedicated <code>smolpaws/memory</code> directory under the configured persistence root, falling back to <code>~/.openhands</code>. The tool checks the Insider tag. It does not establish a shared store with the WhatsApp or Slack cat, and tool gating is not filesystem isolation from an agent that already has filesystem access.</p>
+    <p class="source">Source: <a href="https://github.com/enyst/playground/blob/894d2e5a55ee72de8f5411482a81c70d07caeab7/tools/smolpaws_memory_tool.py#L54">memory tool and tag guard</a> and <a href="https://github.com/enyst/playground/blob/894d2e5a55ee72de8f5411482a81c70d07caeab7/tools/smolpaws_memory_store.py#L51">store and revision handling</a>.</p>
+    <p>A tag is metadata. It does not by itself load a skill, grant access, or combine histories. Keep the Cat’s controller conversation distinct from the worker the person is viewing, and store their relationship with full conversation IDs and the backend identity. Browser-local spoken history should not be promoted to authoritative instructions or a successful action record.</p>
 
-  <h2 id="identity"><span class="num">4</span>A local identity, injected the right way</h2>
-  <p>The cat needs to know who and where it is: SmolPaws, an OpenHands-born agent, running on a <strong>local</strong> agent-server (not the Cloud), sharing memory with its other faces, able to orient via the OpenHands skills. The interesting design choice is <em>how</em> that identity reaches the model.</p>
-  <table>
-    <tr><th>Option</th><th>Effect</th><th>Verdict</th></tr>
-    <tr><td class="sym"><code>conversationInstructions</code></td><td>Becomes a visible, auto-running <em>user</em> message.</td><td>Rejected — it would speak for the user and fire a turn on its own.</td></tr>
-    <tr><td class="sym"><code>system_message_suffix</code></td><td>Appends to the <em>system</em> prompt. Silent, no auto-run.</td><td class="mono" style="color:var(--ok)">Chosen.</td></tr>
-  </table>
-  <p>The identity text is injected through <code>AgentContext.system_message_suffix</code>, gated on <code>tags.smolpaws === "insider"</code>, and it preserves any existing suffix rather than clobbering it. It tells the cat to invoke the relevant OpenHands skills by name to orient itself.</p>
+    <h2 id="usability">The experience to aim for</h2>
+    <p><strong>One default companion, one visible conversation, many explicit work targets.</strong> Resume the same controller for everyday conversation; use <code>/new</code> only when another Cat is wanted. Projects remains a view over existing work, with clear links to each conversation. The current voice call stays bound to its Cat while navigating. Board selection supplies the work target; opening another regular conversation alone does not update that selection or retarget work already underway.</p>
+    <ol>
+      <li><strong>Make voice an explicit control.</strong> Clicking the Cat opens its panel; a labelled “Talk to Insider Cat” button starts the microphone. Show Connecting, Listening, Muted, Speaking, and Disconnected independently of agent execution. Keep Mute, Stop speaking, End call, and Stop task separate.</li>
+      <li><strong>Show the current target.</strong> A small chip names the selected conversation and backend. Refresh that context after navigation and before an action. If a spoken name matches several conversations, show or read a short choice rather than choosing from truncated IDs.</li>
+      <li><strong>Preserve drafts.</strong> Selecting a card attaches its full ID and title as context. It should not overwrite typed text. Reading or editing a draft is different from sending it. Navigation should reuse the current Canvas tab by default.</li>
+      <li><strong>Put needed attention first.</strong> Show “Needs your input,” “Working,” and “Recent results,” with project filters and a visible refresh time. Keep errors distinct from approval requests. Show “Run ended” unless a result establishes success; a quiet or paused agent is not necessarily blocked.</li>
+      <li><strong>Make coverage honest.</strong> Fetch additional pages or say “Showing 60 conversations.” A query for “all my active tasks” must not silently use a first page of 20. Show loading, partial results, disconnected backend, and empty project states.</li>
+      <li><strong>Make every action inspectable.</strong> Show “Sent follow-up to …” with a conversation link after acceptance; show completion only after a result. Keep a short spoken answer and the full written result together. Preserve failures and pending work after reload.</li>
+      <li><strong>Keep the companion quiet by default.</strong> No automatic greeting on each reconnection or narration of every tool step. Give a brief acknowledgment during longer work, then speak when there is a useful result or the user needs to act.</li>
+    </ol>
+    <p>Keyboard access, readable labels, captions, transcript correction for names and paths, reduced motion, and a fully usable typed path belong in the first integrated version. The Cat’s pose and a green glow can add character; neither should be the only way to understand state.</p>
 
-  <h2 id="where"><span class="num">5</span>Where it lives &amp; how big it is</h2>
-  <p>All of the feature lives in one directory in odie, plus a handful of small integration edits. This is the durable size record.</p>
-  <table>
-    <tr><th>Location</th><th>What</th><th>Size</th></tr>
-    <tr><td class="sym"><code>src/components/features/insider-cat/</code></td><td>Avatar, pose mapping, call-the-cat hook, overlay, identity text, 3 avatar SVGs, and their tests.</td><td>646 LOC total<br>(343 source · 227 test · 3 SVGs)</td></tr>
-    <tr><td class="sym"><code>src/api/agent-server-adapter.ts</code></td><td>Thread <code>extraTags</code> through create; add the insider system suffix.</td><td>+52</td></tr>
-    <tr><td class="sym"><code>src/api/agent-server-config.ts</code></td><td>Config plumbing for the insider path.</td><td>+57</td></tr>
-    <tr><td class="sym"><code>…/agent-server-conversation-service.api.ts</code></td><td>Carry <code>extraTags</code> on the wire.</td><td>+31</td></tr>
-    <tr><td class="sym"><code>src/components/features/chat/chat-interface.tsx</code></td><td>Inline mount above the status row.</td><td>+5</td></tr>
-    <tr><td class="sym"><code>src/root.tsx</code></td><td>Corner launcher mount.</td><td>+2</td></tr>
-  </table>
-  <p>Whole change: <strong>24 files, +953 / −12</strong>. Tests: 40 focused specs (adapter + insider) on top of the wider suite; typecheck, lint, and build all green. Commits <code>97e5be3..fd6679a1</code> on branch <code>feat/insider-cat</code>.</p>
-  <div class="callout ok">Verified live on a Tailscale-served dev stack with <code>deepseek-v4-flash</code>: the cat renders, the button creates a correctly-tagged conversation, and the cat correctly reached for <code>/api/conversations/count</code> to answer a question about the user's other conversations.</div>
+    <h2 id="voice">OpenAI voice: two current choices</h2>
+    <p>The older <code>feat/insider-cat</code> voice prototype defaults to <code>gpt-realtime</code> and requests <code>gpt-4o-mini-transcribe</code>. Both now have published deprecation notices: the former is scheduled for removal on <strong>20 January 2027</strong>, the latter on <strong>26 February 2027</strong>. The September 15 worktree uses <code>gpt-realtime-2.1</code> instead of carrying those defaults forward. <a href="https://developers.openai.com/api/docs/deprecations">OpenAI deprecations</a>.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Choice</th><th>Role here</th><th>Recommendation</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://developers.openai.com/api/docs/models/gpt-realtime-2.1">GPT-Realtime-2.1</a><br><code>gpt-realtime-2.1</code></td><td>Current Realtime-family model with speech, reasoning, and function calling. The worktree’s supported WebRTC baseline.</td><td>Implemented with a server SDP broker and browser function-call relay. Real provider negotiation and speech still need testing with an API key.</td></tr>
+        <tr><td><a href="https://developers.openai.com/api/docs/models/gpt-live-1">GPT-Live 1</a><br><code>gpt-live-1</code></td><td>Newer full-duplex voice architecture, generally available 10 September 2026. Speech can continue while backend work runs.</td><td>Future migration candidate: evaluate client delegation to the existing OpenHands harness. It is not the model used by this worktree and uses a different session protocol.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="source">Release dates: <a href="https://developers.openai.com/api/docs/changelog">OpenAI API changelog</a>. Availability in a particular account was not tested.</p>
+    <p>GPT-Live separates conversational speech from backend reasoning and tools. Client delegation can call an existing agent harness, while the application owns durable work and authorization. Use that seam to preserve the OpenHands agent, its tools, and its conversation records. Keep the voice prompt short; load detailed Insider behavior into the agent that performs the work. <a href="https://developers.openai.com/api/docs/guides/live">GPT-Live guide</a>.</p>
+    <p>Client delegation emits <code>session.delegation.created</code> metadata rather than a ready-made tool request containing the conversation. An adapter must assemble the relevant transcript and current Canvas context, bind work to the Cat conversation, and report results. Do not point the existing <code>response.function_call_arguments.done</code> handler at GPT-Live and expect it to work. <a href="https://developers.openai.com/api/docs/guides/live-delegation">Delegation and tools</a>.</p>
+    <h3>The implemented worktree path</h3>
+    <p>The browser requests microphone access only after an explicit <strong>Start voice</strong> and a server availability check. Agent Server keeps the standard OpenAI API key, fixes the provider origin, and exchanges the WebRTC offer through OpenAI’s supported calls endpoint. Configure <code>OPENAI_API_KEY</code> in the owning backend’s <strong>Settings → Secrets</strong>, or in the server environment. The missing-key message opens Secrets. A key being configured does not prove it is valid, has model access, or has usable quota.</p>
+    <p>The Realtime model calls <code>send_to_insider</code> for user messages. The App sends the request to the bound Cat’s normal conversation API and waits for the backend to confirm that the entire run, including stop hooks, has settled with a <code>finished</code> status. It then reloads the saved answer for speech. A proposed finish event alone, a failed run, or a pending approval is not treated as a completed answer. An older broker that cannot verify completion directs the user to inspect the conversation instead. The App refuses a competing voice submission while a typed request is being sent or an approval is pending. The voice model does not run a separate worker harness. Explicit spoken hangup uses <code>end_voice_call</code>; a bare “stop” interrupts speech without cancelling the agent’s work.</p>
+    <p><strong>The written record is delegated text, not a verbatim voice transcript.</strong> Requests sent to the controller and its replies are saved and visible in both conversation views. The exact audio, all voice-model wording, and a complete audio transcript are not separately persisted. This distinction matters when a spoken summary is shorter than the durable result.</p>
+    <h3>Keep call lifetime separate from task lifetime</h3>
+    <p>Use browser WebRTC with a trusted server establishing sessions; keep the OpenAI project key on the server. Realtime supports ephemeral client credentials, and private orchestration can use a server-side connection. The prototype’s subscription-token experiment is not a documented production authentication contract. <a href="https://developers.openai.com/api/docs/guides/voice-webrtc?api=realtime">Realtime WebRTC</a> · <a href="https://developers.openai.com/api/docs/guides/voice-server-controls?api=live">Server-side controls</a>.</p>
+    <p>Interrupting speech should stop playback; stopping a worker requires a separate task action. For Realtime, WebRTC handles interruption-related audio truncation, and sessions have a 60-minute limit. A transcript-complete event does not prove the user heard the full answer. Persist confirmed task outcomes separately from spoken excerpts, and reconnect using the durable conversation without replaying a side effect. <a href="https://developers.openai.com/api/docs/guides/realtime-conversations">Realtime conversations</a>.</p>
+    <p>Evaluate <code>semantic_vad</code> with patient turn timing for thoughtful coding discussions, rather than relying only on a silence threshold. Test interruptions with real microphones and background speech. <a href="https://developers.openai.com/api/docs/guides/realtime-vad">OpenAI turn detection</a>.</p>
+    <p><strong>Decision:</strong> keep OpenAI as the voice provider and validate the implemented Realtime-2.1 path against the durable controller. Evaluate GPT-Live client delegation as a later migration using the same tasks. Measure interruption recovery, wrong-target actions, missing results, and total voice-plus-agent cost alongside conversational feel. Synthetic transport tests cannot establish speech quality or a working OpenAI account.</p>
 
-  <h2 id="decisions"><span class="num">6</span>Decisions on record</h2>
-  <ul>
-    <li><strong>Identity via system suffix, not instructions.</strong> Silent, no auto-run turn. <span class="pill">chosen</span></li>
-    <li><strong>Tags merged under reserved keys.</strong> Caller <code>extraTags</code> merge <em>beneath</em> <code>clientsource</code> / <code>acpserver</code> so a caller cannot spoof reserved tags. A real bug found and fixed here — the adapter previously hardcoded the tag set and dropped caller tags.</li>
-    <li><strong>Pose off live status, no new backend.</strong> Reuse odie's websocket <code>execution_status</code>; a pure mapping function does the rest.</li>
-    <li><strong>Skills invoked by name, not force-loaded.</strong> The prompt names the skills to invoke. Force-loading would mean a shipped agent profile with <code>agent_context.skills</code> — a deliberate later refinement.</li>
-    <li><strong>Button first, voice later.</strong> v1 wake is a click; voice-wake is scoped to the realtime-voice epic.</li>
-  </ul>
+    <h2 id="puck">What to borrow from Puck; where ElevenLabs fits</h2>
+    <p>Amp’s <a href="https://ampcode.com/docs/puck">Puck documentation</a> distinguishes conversations with the helper from work threads it creates, and uses the viewed thread/project as context. That is a useful precedent for keeping the Cat controller separate from its workers.</p>
+    <p>Amp’s <a href="https://ampcode.com/news/talk-to-puck">18 August “Talk to Puck” article</a> describes Realtime-2.1 delegating to the Puck agent, then speaking a summary while the full response appears in the thread. Its examples focus on active work, requests for input, progress, and follow-ups. Insider’s prototype had the voice-to-agent bridge; the App establishes a durable typed conversation to build on.</p>
+    <p>Borrow the continuity and focus on coordination, rather than copying a persona or promising monitoring with no scheduler behind it. “Keep me updated” needs a persisted follow-up mechanism with clear conditions, not an open microphone or an in-memory loop.</p>
+    <p>ElevenLabs’ <a href="https://elevenlabs.io/docs/eleven-api/guides/cookbooks/speech-engine">Speech Engine</a> is a relevant future comparison: it handles speech and turn-taking while the application owns the LLM. Its integration supplies conversation context and interruption signalling. Separately, ElevenAgents exposes <a href="https://elevenlabs.io/docs/eleven-agents/customization/conversation-flow">turn eagerness and interruption controls</a>, including a Patient setting useful for users pausing to think.</p>
+    <p>The existing Extensions ElevenLabs entry is an API-key connector, not a live-call subsystem. There is no need to add a second provider now. Keep provider-specific session logic behind a small interface while Canvas and the SDK retain conversation identity, authorization, and work records.</p>
 
-  <h2 id="next"><span class="num">7</span>What's left</h2>
-  <p>The insider cat's body and identity are done. One child of the epic stays open, on purpose:</p>
-  <table>
-    <tr><td><span class="pill">smolpaws-08f.2</span> Shared memory store</td><td>A shared <code>~/.openhands/smolpaws/memory/</code> (durable <code>MEMORY.md</code> + daily files), inside the OpenHands config dir because it ships to all users — read/written by every smolpaws face, so the insider cat and the WhatsApp cat remember the same things. Not built yet.</td></tr>
-  </table>
-  <div class="callout note">This page is a record, not a proposal — the v1 is merged on its branch. The two threads it hands off to are the <strong>shared memory</strong> store above and <strong>realtime voice</strong> (<span class="pill">smolpaws-3e1</span>), which will give the insider cat its first voice.</div>
+    <h2 id="skill">A skill for the Cat doing the work</h2>
+    <p>A dedicated <code>insider-cat/SKILL.md</code> has been added under Odie’s <code>.agents/skills</code> for this feature. It teaches the operational relationship: sibling identity; separate controller and selected worker; capabilities grounded in real tools; dispatch receipts distinct from completion; and spoken summaries based on inspectable results.</p>
+    <p>The skill applies when runtime context identifies an active Insider Cat session. Merely discussing cats, voice, or projects must not switch an ordinary coding agent’s role. Existing <code>smolpaws: insider</code> tags remain a compatibility marker, not a skill loader.</p>
+    <details><summary>Discovery and integration contract</summary>
+      <p>The repository copy is <code>odie/.agents/skills/insider-cat/SKILL.md</code>, with <code>references/integration.md</code>. The SDK accepts it as Agent Skills format, discovers it when Odie is the project, and places it in available skills. That is not automatic activation.</p>
+      <p>Project discovery depends on the conversation’s working directory and Git root. Serving Canvas from Odie does not expose this file to a controller rooted elsewhere. For reliable Cat bootstrap, package the skill into the Cat’s agent context/profile and activate it there, preserving other context. Do not globally force it into every conversation or assume the voice model has an SDK invocation tool.</p>
+      <p><strong>The App supplies the role explicitly.</strong> Its build embeds the canonical skill body, and controller creation appends it through <code>agent_launch_additions.system_message_suffix_append</code>. This works with the server’s selected OpenHands profile while preserving existing context. It avoids relying on the controller’s workspace to discover the repository copy. It does not install an <code>invoke_skill</code> tool, add worker-management tools, or wire the old skin’s voice bridge.</p>
+    </details>
+    <p>Keep ownership clear: Canvas owns the panel and browser interactions; the SDK/agent-server owns conversations, execution, and backend APIs; the TypeScript client exposes typed access; Automation owns scheduled follow-ups and dispatch lifecycle; Extensions owns the normal public skill/integration catalog. The Odie-local skill is an intentional feature-development copy.</p>
+    <p>In particular, the current generic SDK client-tool executor acknowledges dispatch immediately. An agent must not interpret that acknowledgment as successful navigation or a completed operation. A real result path is required for those claims.</p>
 
+    <h2 id="next">What remains after the worktree implementation</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Order</th><th>Work</th><th>Observable completion</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Implemented locally</td><td>Prepared Canvas App with the Projects board, full-ID selection, durable controller, explicit new/resume, and Insider guidance.</td><td>Real isolated UI/server checks create a Cat, continue it in the regular view, and create a distinct second Cat through <code>/new</code>. The package still needs review and release.</td></tr>
+        <tr><td>2 · Give the Cat real coordination tools</td><td>Expose supported worker creation, reading, follow-up, and result feedback to the chosen controller profile. Revalidate backend and target before each action.</td><td>“Continue this” sends one follow-up to the selected worker, with an inspectable receipt and result. Merely appending a target ID to a prompt is insufficient.</td></tr>
+        <tr><td>3 · Companion implemented locally</td><td>Persistent shell controls are bound to the controller. Richer viewed-conversation context remains a separate host feature.</td><td>Leaving Projects preserves the Cat controls and call. Returning to the same ID keeps the call; choosing another Cat or backend releases it. Ordinary navigation must not silently retarget voice work.</td></tr>
+        <tr><td>4 · Validate provider speech</td><td>The Realtime broker, client, explicit controls, cancellation guards, and saved-result relay are implemented. Native browser audio remains untested; use an authorized test approach, then exercise a real OpenAI call.</td><td>Confirm speech recognition, playback, interruption recovery, and account errors with a real microphone and credentials. Keep those results separate from lifecycle unit tests and missing-key preflight.</td></tr>
+        <tr><td>5 · Add durable follow-ups</td><td>Connect Automation for scheduled checks and notifications; define real task outcomes separately from runtime state.</td><td>Scheduled updates survive closing the page. Attention indicators match requests and results, and unchanged progress stays quiet.</td></tr>
+      </tbody>
+    </table></div>
+    <p>The new App removes the iframe bridge instead of carrying it forward. Validate future privileged actions at runtime, including the target and owning backend. An Insider skill explains behavior; it is not an access-control boundary.</p>
+
+    <h2 id="sources">Evidence and limits</h2>
+    <p>The September 15 implementation is local worktree development. Earlier skin voice demos remain historical reports. The current integration has not made a successful live OpenAI call: the needed API key was absent. Claims about spoken quality, provider access, or a heard answer would exceed the evidence.</p>
+    <p>Local checks cover App behavior, all 15 languages, generated-bundle consistency, controller identity, safe condensation, host navigation and cleanup, broker schemas, and simulated WebRTC lifecycles. The isolated browser run installs the App on a real Agent Server and verifies saved conversation turns with a scripted model fixture. It has confirmed App-to-regular-view continuity and a distinct second Insider through <code>/new</code>. The native browser WebRTC/audio test was not performed, and no live OpenAI speech result is claimed.</p>
+    <ul>
+      <li><a href="https://github.com/enyst/playground/tree/894d2e5a55ee72de8f5411482a81c70d07caeab7/src/components/features/insider-cat">Odie Cat branch</a> — launcher, state, host, voice protocol, local controls, and focused tests.</li>
+      <li><a href="https://github.com/smolpaws/secretary-skin/tree/1a70e91f2646f6c2565c29525463974d0929fc7c">Secretary skin</a> — board, configuration, token broker, and completion proxy.</li>
+      <li><a href="https://github.com/enyst/agent-sdk/blob/5f4c9601d43e0eec3ec9ef374468b7493db89b7a/openhands-sdk/openhands/sdk/context/agent_context.py">SDK agent context</a> and <a href="https://github.com/enyst/agent-sdk/blob/5f4c9601d43e0eec3ec9ef374468b7493db89b7a/openhands-sdk/openhands/sdk/tool/client_tool.py">client-tool execution</a> — skill activation and the dispatch acknowledgment boundary.</li>
+      <li><a href="insider-cat-stories.html">Current user scenarios</a> · <a href="secretary-cat.html">Historical Secretary proposal</a> · <a href="../voice-landscape.html">Historical voice landscape, with updated pointers</a>.</li>
+    </ul>
+    <p class="source">Worktree bases: standalone App <code>2fd65d9</code>, Odie <code>23ca81c9ff</code>, SDK <code>5f4c9601d4</code>, with uncommitted implementation changes described above. Local paths identify development locations; linked historical commits do not contain this new work. Revisit provider facts against official docs before a migration. Historical feature-branch tests were read, not rerun; the Insider skill was validated with the SDK loader.</p>
+    <footer>Engel’s Code Design Notebook · Insider Cat · September 2026</footer>
   </main>
 </div>
-</body></html>
+</body>
+</html>

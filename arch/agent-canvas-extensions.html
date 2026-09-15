@@ -88,8 +88,10 @@
       and the unmerged Agent Canvas vertical slice at
       <a href="https://github.com/OpenHands/OpenHands/commit/a52dc90d29f50922a9c2bb2186a9b6ec3ddd7d3a">a52dc90d</a>,
       plus the <a href="https://github.com/OpenHands/OpenHands/commit/b747b09e746dd533a7f151548d26c137f65fc216">SVG-edit example</a>.
-      Current-state check: 27 August 2026.
+      Original review: 27 August 2026. Frontend status corrected 14 September 2026.
     </p>
+
+    <div class="callout" role="note"><p><strong>September update: the frontend is now implemented.</strong> The inspected Odie main and current checkout contain the management UI, authenticated bundle loader, runtime registry, and routed pages; the inventory is now called <strong>Apps</strong> at <code>/apps</code>. Agent-server returns the parsed manifest. The manifest name, API paths, and contributed routes retain “canvas extensions” terminology. The <a href="insider-cat.html#apps">Insider Cat page now uses this package format</a>. The August implementation status and tracker counts below are historical. A separate <a href="insider-cat.html#implementation-status">September 15 worktree prototype</a> adds optional persistent companion surfaces and Cat page icons; it is not released and does not change the trusted same-realm execution model.</p></div>
 
     <p class="lede">A Canvas Extension is a JavaScript bundle installed beside an Agent Server and loaded by Agent Canvas to add UI. In v1, “UI” means a page and a sidebar link. The backend stores, validates, and serves the bundle; the browser imports it and hands it a small host API.</p>
 
@@ -103,12 +105,12 @@
         <p>Manifest validation, disabled-by-default installs, persistence, staged refresh machinery, REST management, and bundle serving are merged in software-agent-sdk.</p>
       </article>
       <article class="status-card moving">
-        <strong>Frontend: branch, not product</strong>
-        <p>The management UI, Blob-module loader, runtime registry, routed pages, and sidebar integration live on a feature branch, not Agent Canvas main.</p>
+        <strong>Frontend: implemented in current Odie</strong>
+        <p>The Apps management UI, Blob-module loader, runtime registry, routed pages, and navigation are present. Runtime loading remains gated by backend support and each App’s enabled state.</p>
       </article>
       <article class="status-card missing">
-        <strong>Platform: mostly future tense</strong>
-        <p>The public tracker reports <a href="https://github.com/OpenHands/OpenHands/issues/16289">5 of 17 tasks complete</a>. Typed client generation, real-backend integration, CLI, audit, policy, themes, panels, and visualizers remain open.</p>
+        <strong>Host v1: pages</strong>
+        <p>Persistent shell panels, voice sessions, and a fine-grained permission system are outside the inspected host API. The <a href="https://github.com/OpenHands/OpenHands/issues/16289">original tracker</a> belongs to the August review; its counts are not a current release status.</p>
       </article>
     </div>
 
