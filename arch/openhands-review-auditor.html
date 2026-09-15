@@ -20,10 +20,10 @@
 <body>
 <main class="shell prose">
   <a class="back" href="../index.html">&larr; Home</a>
-  <h1>Reviewing the reviewer <span class="tag">investigation + proposal</span></h1>
+  <h1>Reviewing the reviewer <span class="tag">implementation draft</span></h1>
   <p class="meta">September 16, 2026 · Historical reviews from September 12–14 · Beads: oh-extensions-sg7</p>
   <div class="callout">
-    <p><strong>Proposed OpenHands Automation; not deployed.</strong> The investigation below is complete enough to establish the reported pattern. No intervention review has been posted. The proposed home is OpenHands Cloud; the model profile, publishing identity and event delivery still need to be settled and verified. The dry bureaucratic voice has been chosen.</p>
+    <p><strong>OpenHands Automation implementation drafted; not deployed.</strong> No intervention review has been posted. The intended home is OpenHands Cloud. Engel selected an actual Astra model and the dry bureaucratic voice below. Native event-trigger validation passed; model access, the Cloud publishing identity, durable state and real event delivery remain prerequisites.</p>
   </div>
 
   <h2>Two examples of the contradiction</h2>
@@ -55,18 +55,24 @@
   <p>The current <a href="https://github.com/OpenHands/extensions/blob/6242eacba016bf85009d8e3f5b8aa131295e278c/skills/github-pr-reviewer/scripts/main.py#L757">OSS reviewer prompt</a> requires a GitHub COMMENT while asking for a textual APPROVED or CHANGES REQUESTED verdict. Its <a href="https://github.com/OpenHands/extensions/blob/6242eacba016bf85009d8e3f5b8aa131295e278c/skills/github-pr-reviewer/scripts/main.py#L420">delivery check</a> accepts any same-author, same-commit review without checking whether its state is dismissed or pending. Those are concrete consistency weaknesses in the inspected source.</p>
   <p>The exact deployed version and producing conversations were not established. No matching dismissal guard was found in the inspected code. These source observations do not prove what caused the two sequences above.</p>
 
-  <h2>Proposed automation contract</h2>
+  <h2>Automation contract</h2>
   <ol>
     <li><strong>Scope:</strong> OpenHands/OpenHands, OpenHands/software-agent-sdk, OpenHands/automation and OpenHands/extensions.</li>
-    <li><strong>Trigger:</strong> correlate an all-hands-bot approval with its self-dismissal, a correction explaining COMMENT was intended, and a later claim of approval referring to the same review. Observe review-dismissed and issue-comment events, allow a short settling window, then fetch authoritative state. Verify Cloud forwarding and GitHub subscriptions before relying on those events.</li>
+    <li><strong>Trigger:</strong> use an OpenHands <code>EventTrigger</code> with source <code>github</code> and events <code>pull_request_review.dismissed</code> and <code>issue_comment.created</code>. Correlate an all-hands-bot approval with its self-dismissal, a correction explaining COMMENT was intended, and a later unedited claim of approval referring to that exact review. Allow a bounded three-second settling window, then fetch authoritative state. Same-second timestamps are ambiguous and do not qualify. There is no scheduled polling or historical backfill.</li>
     <li><strong>Author gate:</strong> verified repository write access <em>or</em> active OpenHands org membership. Unknown permissions require investigation; a public association label alone is insufficient.</li>
     <li><strong>Independent review:</strong> run <code>/codereview-roasted</code> in a separate conversation with the full source, requirements and relevant policy, excluding earlier reviews and conclusions. Save the verdict and evidence before the comparison stage.</li>
     <li><strong>Audit:</strong> fetch all reviews and inline discussion, including dismissed reviews. Check each at its own reviewed commit. Mark fixed findings as resolved and repeated findings as repeated. Revise the independent verdict if verified counterevidence warrants it, recording why.</li>
-    <li><strong>Publish:</strong> one GitHub review containing the three requested parts: identity, independent verdict and reasons, then the grumpy review scorecard. Submit APPROVE, REQUEST_CHANGES or COMMENT to match the supported verdict. The automation's explicit action policy must be resolved before publishing, rather than copied ambiguously from the old comment-only wrapper.</li>
+    <li><strong>Publish:</strong> one GitHub review containing the three requested parts: identity, independent verdict and reasons, then the grumpy review scorecard. Submit APPROVE, REQUEST_CHANGES or COMMENT to match the supported verdict. Engel explicitly authorized all three actions; an old comment-only wrapper does not govern this automation.</li>
     <li><strong>Avoid loops:</strong> persist event IDs and a repository/PR/head key; produce at most one intervention per head, ignore its own marker, recheck head/state before posting, and reconcile an uncertain submission before retrying. Closed or merged examples remain historical fixtures.</li>
     <li><strong>Trust the receipt:</strong> the publisher validates the structured verdict and submits it, then fetches the created review's actor, commit and state. Completion wording comes from that verified response. Dismissed or pending reviews do not count as a successfully submitted verdict.</li>
   </ol>
   <p>The publishing identity must be able to review the author's PR; using Engel's account cannot approve or request changes on Engel's own PRs. Review/test execution should not receive the publisher's GitHub write credential. These are implementation requirements, not claims about a deployed setup.</p>
+
+  <h2>Implementation and deployment checks · September 16</h2>
+  <p>The draft uses the OpenHands SDK with native <code>openai/gpt-6-astra</code>, the Responses API and high reasoning, with no fallback model. It runs two fresh conversations. The model receives only tools for reading and searching admitted Git commits; the controller handles credentials, state and publication. The complete <code>/codereview-roasted</code> skill and risk reference are bundled from the inspected Extensions revision.</p>
+  <p>The live Cloud validation endpoint accepted the actual trigger filter: eight positive examples covered both events in all four repositories, and six negative examples excluded other actors, ordinary issues, other actions and another repository. This establishes supported event matching. It does <strong>not</strong> establish that GitHub events arrive in the intended Cloud organization. Source inspection shows matching is scoped to the organization receiving the event; adding a repository filter does not change that routing.</p>
+  <p>The current durable-state probe returned HTTP 503. Publishing remains disabled until persistent state is available and initialized. The implementation saves the independent assessment before comparison, uses conditional state updates to coordinate concurrent runs, and refuses automatic retries after an uncertain GitHub submission. Model access and the Cloud credential-to-publisher mapping also remain unverified. No new automation, webhook or model profile was registered during these checks.</p>
+  <p>Local tests exercise real Git fixtures, trigger correlation, complete pagination, independent-stage isolation, historical review evidence, author gating, stale inputs, publication receipts, ambiguous responses and credential-safe HTTP handling. They use mocked model and network transports; passing them is not a live Astra run or end-to-end Cloud delivery proof. PR code and tests are not executed by the draft reviewer. Oversized or unavailable source stops a run instead of silently cutting evidence.</p>
 
   <h2>Proposed rubric</h2>
   <p>Use ordinal labels, not an average or a percentage of correctness. Grade individual findings and the overall conclusion, citing supporting lines or reproductions. Keep policy compliance and reporting fidelity as separate Pass / Fail / Unknown judgments.</p>
@@ -90,7 +96,7 @@
     <p><strong>Independent inspection:</strong> The approval stamp has been sent for calibration. This change needs one repair: updating an experiment to a saved profile silently discards its model variants. Verdict: REQUEST_CHANGES.</p>
     <p><strong>Previous paperwork:</strong> Major miss (0): the unsupported configuration passed inspection. Reporting: failed—the approval was withdrawn before the completion note announced it. The stamp has reviewed itself; the experiment is still waiting.</p>
   </blockquote>
-  <p><strong>Still to settle:</strong> whether Astra names the actual model or the reviewer persona; the configured profile and publishing account; verified Cloud event delivery. Historical examples should exercise a dry run before enabling future interventions. No historical review is to be posted automatically as a side effect of that check.</p>
+  <p><strong>Remaining before enabling:</strong> verify Astra access and the matching profile, the Cloud publishing account, durable state, and actual native-event delivery. Historical examples exercise local detection and review fixtures; the production controller skips closed or merged PRs. No historical review is to be posted as a side effect of setup.</p>
   <div class="foot-nav">
     <a href="openhands-automation-operations.html">Automation inventory &rarr;</a> &nbsp;&middot;&nbsp;
     <a href="../index.html">&larr; Home</a>
