@@ -89,7 +89,7 @@
     <tr><td>WhatsApp</td><td><code>apps/whatsapp</code>, shared relay, text and media/voice delivery</td><td>Main-only overnight canary started September 15, 18:49 UTC, on SmolPaws c4ba8c4 / SDK 5f28eb8. The iPad confirmed text, image, playable voice and scheduled reply; queued media survived reconnect and the agent continued after host restart. Legacy WhatsApp is disabled but available for rollback. <a href="whatsapp-readiness.html">Evidence and overnight observation (957)</a>. Permanent replacement still awaits soak.</td></tr>
     <tr><td>Discord</td><td><code>apps/discord</code>, standalone relay</td><td>Rewrite merged in #170; fail-closed allowlist preserved. Live validation remains.</td></tr>
     <tr><td>GitHub, email</td><td>Workers → legacy <code>/turns</code> runner</td><td>Remaining consumers of the legacy server; migrate before retiring it.</td></tr>
-    <tr><td>Heartbeat</td><td>New-server integration</td><td>LaunchAgent loaded during local preflight; no new-server listener then. Verify a successful run before claiming current operation.</td></tr>
+    <tr><td>Heartbeat</td><td>Shared product-host startup</td><td><a href="https://github.com/smolpaws/smolpaws/pull/178">#178</a> shares the bridge launcher’s product-host check and supervised startup. Heartbeat uses session-key authentication and an absolute workspace. Each tick appends a stable event to its daily conversation and starts a run only when that event is new. See the <a href="https://github.com/smolpaws/smolpaws/blob/main/docs/bridges.md#heartbeat-startup">startup contract and tests</a>.</td></tr>
   </table>
 
   <h2 id="whatsapp"><span class="num">4</span>WhatsApp startup has a state handoff</h2>
