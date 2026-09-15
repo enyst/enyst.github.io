@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands Automations: where work runs — Engel Nyst</title>
+  <meta name="description" content="A dated inventory of Engel's local and Cloud OpenHands Automations: what is enabled, what each job can change, recent results, and decisions still to make." />
+  <meta property="og:title" content="OpenHands Automations: where work runs" />
+  <meta property="og:description" content="Three local jobs, six enabled Cloud jobs, two paused Cloud jobs — and the difference between configured, completed, and proven." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/openhands-automation-operations.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    .jump-links { display:flex; flex-wrap:wrap; gap:8px 20px; margin:22px 0; }
+    .jump-links a { font-size:.92rem; }
+    .table-scroll { overflow-x:auto; margin:18px 0; }
+    .table-scroll table { margin:0; min-width:720px; font-size:.9rem; }
+    th, td { vertical-align:top; padding:12px; }
+    th:first-child { width:24%; }
+    th:nth-child(2) { width:20%; }
+    th:nth-child(3) { width:35%; }
+    th:last-child { width:21%; }
+    td small { display:block; margin-top:6px; font-size:.84rem; color:var(--muted); }
+    td p { margin:0 0 8px; font-size:inherit; }
+    .state { font-family:var(--mono); font-size:.82rem; font-weight:600; }
+    .state.failed { color:#ee9e89; }
+    .state.complete { color:#9dd7aa; }
+    .state.pending { color:var(--accent); }
+    .callout.warn { border-left-color:#dc6b4a; }
+    .scope-note { color:var(--muted); }
+    .sources li { margin:10px 0; }
+    code, a { overflow-wrap:anywhere; }
+    @media(max-width:600px) { h1 .tag { display:block; margin:12px 0 0; } }
+  </style>
+</head>
+<body>
+<main class="shell prose">
+  <a class="back" href="../index.html">&larr; Home</a>
+  <h1>OpenHands Automations: where work runs <span class="tag">operations note</span></h1>
+  <p class="meta">Observed September 15, 2026. This is a dated record of Engel's OpenHands Automations, with proposed changes kept separate from the current setup.</p>
+
+  <div class="callout">
+    <p><strong>9 enabled definitions: 3 local and 6 in OpenHands Cloud.</strong> Another 2 Cloud definitions are paused. No automation run was pending or running at the capture. Enabled means eligible for a future trigger; it does not mean the last attempt worked.</p>
+  </div>
+  <p><strong>The immediate issue is local reliability.</strong> All three local jobs failed on their latest attempt. The Canvas entry point was unavailable, while the Agent Server, Automation service, and scheduler remained alive. Closing or losing the UI did not stop scheduled work.</p>
+
+  <nav class="jump-links" aria-label="On this page">
+    <a href="#local">Local jobs</a>
+    <a href="#cloud">Cloud jobs</a>
+    <a href="#paused">Paused and retired</a>
+    <a href="#decisions">Decisions ahead</a>
+    <a href="#evidence">Evidence and upkeep</a>
+  </nav>
+
+  <h2 id="local">The local backend · 3 enabled</h2>
+  <p>The local service runs work on the host through the Agent Server. The two maintenance jobs clone fresh copies of upstream repositories for each run. Gazette is different: it publishes from the shared documentation checkout, which makes ordinary editing work a publishing dependency.</p>
+  <p class="scope-note">These schedules use <strong>Europe/Amsterdam</strong>, currently the same civil time as Stockholm. All dates below are in 2026.</p>
+
+  <div class="table-scroll" role="region" aria-label="Enabled local automations" tabindex="0">
+    <table>
+      <thead><tr><th scope="col">Job and target</th><th scope="col">When · budget</th><th scope="col">Purpose and permitted changes</th><th scope="col">Latest recorded result</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Mention Gazette</strong><small><a href="https://github.com/enyst/enyst.github.io">enyst/enyst.github.io</a></small></td>
+          <td>Mon–Thu, 09:00<small>5 minutes · deterministic Python; no LLM</small></td>
+          <td>Groups unread GitHub notifications into a Gazette page. Commits that page and pushes documentation <code>main</code> directly. Refuses unrelated checkout changes.</td>
+          <td><span class="state failed">Failed · Sep 15</span><small>Shared checkout had unrelated edits; callback also failed. Last recorded completion: Sep 2.</small></td>
+        </tr>
+        <tr>
+          <td><strong>Weekly test sweep + simplify (agent-sdk)</strong><small><a href="https://github.com/OpenHands/software-agent-sdk">OpenHands/software-agent-sdk</a></small></td>
+          <td>Mon, 03:00<small>30 minutes · profile <code>gpt-5-6</code></small></td>
+          <td>Establishes green tests, conservatively removes redundant tests, simplifies code where justified, and reruns validation. May push a branch and open one ready-for-review PR; no-change runs produce no PR.</td>
+          <td><span class="state failed">Failed · Sep 14</span><small>Timed out after cloning and starting the conversation. No completed run in recorded history.</small></td>
+        </tr>
+        <tr>
+          <td><strong>Weekly test sweep + simplify (odie)</strong><small><a href="https://github.com/OpenHands/OpenHands">OpenHands/OpenHands</a></small></td>
+          <td>Mon, 05:00<small>30 minutes · profile <code>gpt-5-6</code></small></td>
+          <td>The same bounded cleanup procedure for Canvas: tests first, conservative removal, production simplification only when justified, then one PR with evidence.</td>
+          <td><span class="state failed">Failed · Sep 14</span><small>Remote-conversation environment error. Last recorded completion: Aug 12.</small></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Gazette's saved model field says <code>deep-flash</code>, but its inspected script makes no LLM call. Its macOS credential lookup and shared checkout currently tie it to this host. The next scheduled Gazette attempt is <strong>September 16 at 09:00</strong>; both weekly sweeps next fall on <strong>September 21</strong>.</p>
+
+  <h2 id="cloud">OpenHands Cloud · 6 enabled</h2>
+  <p>Cloud dispatches these definitions into run sandboxes. The account currently combines event-driven triage with scheduled notebook updates and TypeScript maintenance. There is no Cloud duplicate of the two local test-cleanup jobs in this inventory.</p>
+  <p class="scope-note">Cloud cron schedules are stored in <strong>UTC</strong>. Stockholm times shown here use September's <strong>CEST, UTC+2</strong>; they move one hour earlier locally when Stockholm returns to standard time.</p>
+
+  <div class="table-scroll" role="region" aria-label="Enabled OpenHands Cloud automations" tabindex="0">
+    <table>
+      <thead><tr><th scope="col">Job and target</th><th scope="col">When · budget</th><th scope="col">Purpose and permitted changes</th><th scope="col">Latest recorded result</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Attention router</strong><small>Current test: <a href="https://github.com/OpenHands/software-agent-sdk">software-agent-sdk</a> PRs only</small></td>
+          <td>00:23, 08:23, 16:23 UTC<small>02:23, 10:23, 18:23 Stockholm · 20 minutes · <code>deep-pro</code></small></td>
+          <td>Scores topic fit for Engel and files or updates Review Notebook notes. Current entrypoint limits the test to at most <strong>10 SDK PRs</strong>. Source skips unchanged items. <strong>TEST_MODE is not a dry run:</strong> the source writes real notebook notes.</td>
+          <td><span class="state complete">Completed · Sep 15</span><small>Latest scheduled attempt at 16:23 UTC. Completion does not prove every note was correct.</small></td>
+        </tr>
+        <tr>
+          <td><strong>Issue Duplicate Checker — detect</strong><small>OpenHands, software-agent-sdk, automation, extensions</small></td>
+          <td>GitHub issue opened<small>25 minutes · <code>deep-flash</code></small></td>
+          <td>Investigates a newly opened issue for an existing duplicate. The source workflow can comment and mark a candidate for the later close sweep; it does not immediately close the issue.</td>
+          <td><span class="state failed">Failed · Sep 13</span><small>Only recorded attempt: timeout with sandbox unavailable during verification.</small></td>
+        </tr>
+        <tr>
+          <td><strong>Issue Duplicate Checker — auto-close sweep</strong><small>Deployed repository scope unverified</small></td>
+          <td>Daily, 09:00 UTC<small>11:00 Stockholm · 25 minutes · saved profile <code>deep-pro</code></small></td>
+          <td>Local source describes revisiting marked duplicates after a waiting period and checking replies before closing eligible issues. This is an intended issue-closing effect; deployed scope and safeguards were not verified.</td>
+          <td><span class="state complete">Completed · Sep 15</span><small>Latest scheduled attempt at 09:00 UTC. Closures were not independently checked.</small></td>
+        </tr>
+        <tr>
+          <td><strong>QA Changes — Auto-Test</strong><small><a href="https://github.com/OpenHands/software-agent-sdk">software-agent-sdk</a></small></td>
+          <td>PR opened or ready for review<small>30 minutes · <code>deep-pro</code></small></td>
+          <td>Exercises changed behavior and appends an <code>Auto-Test</code> report to the PR description. The event filter excludes drafts and any case-insensitive <code>Auto-Test</code> text in the body. Its saved prompt claims a gate requiring more than three author commits merged to main; the deployed script gate was not verified. Report instructions prohibit new comments or reviews.</td>
+          <td><span class="state failed">Failed · Sep 13</span><small>Only recorded attempt: command timed out or was killed.</small></td>
+        </tr>
+        <tr>
+          <td><strong>Weekly upstream drift</strong><small>Configured clone: <a href="https://github.com/enyst/openhands-agent">enyst/openhands-agent</a></small></td>
+          <td>Mon, 06:00 UTC<small>08:00 Stockholm · 30 minutes · <code>deep-pro</code></small></td>
+          <td>Reviews one bounded Python SDK release interval, ports changes tests-first, and advances the pin only with required evidence. Pushes a branch and opens or resumes one PR; never merges or pushes main.</td>
+          <td><span class="state complete">Completed · Sep 14</span><small>Reported successful no-op: no new upstream release. Next scheduled: Sep 21.</small></td>
+        </tr>
+        <tr>
+          <td><strong>Weekly re-vendor</strong><small>Configured clone: <a href="https://github.com/enyst/smolpaws">enyst/smolpaws</a>; SDK source: enyst/openhands-agent</small></td>
+          <td>Wed, 06:00 UTC<small>08:00 Stockholm · 30 minutes · <code>deep-pro</code></small></td>
+          <td>Re-vendors SDK main, reviews delegated server changes, regenerates the pinned Python OpenAPI, and opens or resumes one PR. Never merges or pushes main.</td>
+          <td><span class="state pending">Not run yet</span><small>First scheduled attempt: Wed, Sep 16 at 06:00 UTC / 08:00 Stockholm.</small></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <p><strong>“Completed” is the runner's result.</strong> It does not independently prove the right notebook notes, GitHub comments, labels, closures, or PR edits happened. A failed run may also have made partial changes. Cloud downloads of custom execution bundles returned server errors during this audit, so details drawn from their local source remain unverified against the deployed bytes.</p>
+  </div>
+  <p>The two weekly transpile jobs are separate stages. SDK drift owns the bounded upstream review; re-vendor consumes the SDK result and handles the server units. Wednesday reads the configured SDK main; it does not merge Monday's PR or wait for that PR to be accepted. Both resume existing work and use a draft PR with a handoff when the time budget expires. The SDK's GitHub Actions discovery watcher is a separate system and is excluded from this OpenHands Automations inventory.</p>
+
+  <h2 id="paused">Paused Cloud jobs and retired local work</h2>
+  <div class="table-scroll" role="region" aria-label="Paused OpenHands Cloud automations" tabindex="0">
+    <table>
+      <thead><tr><th scope="col">Paused job</th><th scope="col">Saved schedule</th><th scope="col">Historical behavior and write effects</th><th scope="col">Last recorded result</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Roasted Code Review</strong><small>OpenHands/OpenHands and software-agent-sdk</small></td>
+          <td>Hourly, at :00 UTC<small>30 minutes · saved profile <code>gpt-5-6</code></small></td>
+          <td>Reviews up to five qualifying PRs on Engel's behalf, posts COMMENT reviews, and records them by pushing the public review log to documentation main. Its Opus 5 disclosure conflicts with the saved <code>gpt-5-6</code> profile; identity wording needs review before reuse.</td>
+          <td><span class="state">Paused</span><small>Last run completed Aug 1. Saved cadence does not currently trigger work.</small></td>
+        </tr>
+        <tr>
+          <td><strong>Daily external PR security screen</strong><small>Saved targets: SDK, legacy agent-canvas name, OpenHands</small></td>
+          <td>Daily, 09:00 UTC<small>11:00 Stockholm · 30 minutes</small></td>
+          <td>Inspects external contributors' PR diffs without executing their code. Historical policy posts ordinary review comments and sends one email if suspicious findings exist. The proposed lightweight replacement is not deployed.</td>
+          <td><span class="state">Paused</span><small>Last run completed Jul 2. Earlier planning records describe frequency and verbosity concerns.</small></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The local <strong>typescript-client Agent Server release maintainer</strong> was disabled and deleted on September 12, with no recorded runs. It is retired history, not an enabled job or an approved future plan.</p>
+
+  <h2 id="decisions">Decisions ahead · proposals, not applied changes</h2>
+  <p>The inventory records what exists. The following work still needs a decision or implementation; this audit changed no definitions, schedules, or run state.</p>
+  <ol>
+    <li><strong>Repair the local execution path.</strong> Restore Canvas ingress and callback reachability, then investigate the weekly conversation errors. Decide whether the two failing cleanup schedules should pause during that work. Their eventual home—local or Cloud—remains undecided.</li>
+    <li><strong>Give Gazette its own checkout.</strong> A dedicated checkout would prevent ordinary documentation edits from blocking publication. Keep local execution while its host-specific credential lookup remains, or explicitly redesign that dependency before moving it.</li>
+    <li><strong>Make weekly repository ownership explicit.</strong> The live prompts use the real <code>enyst/*</code> forks. The canonical repositories are <code>smolpaws/openhands-agent</code> and <code>smolpaws/smolpaws</code>. At this audit the SDK fork matched canonical main, but the server fork had diverged. The next re-vendor run would therefore start from a different baseline. A proposed policy is canonical main for source and PR base, with branches pushed to the enyst forks. That target policy has not been applied.</li>
+    <li><strong>Decide when the attention router graduates.</strong> Local source supports open PRs and issues across SDK, OpenHands, automation, and extensions. The live definition remains the bounded SDK-PR test. Topic fit alone drives routing. Expanding source capability is not the same as expanding the live schedule.</li>
+    <li><strong>Finish the security redesign before re-enabling.</strong> Beads <code>smolpaws-crm.9</code>–<code>.12</code> propose a compact clean-pass stamp, terse request-changes only for real findings, stateful re-checks, and a quieter cadence. The paused definition still contains the older review-and-email workflow.</li>
+    <li><strong>Recover deployed bundle evidence.</strong> Retrieve the custom execution bundles or a trustworthy source digest. Confirm the duplicate sweep's repository scope, waiting period, and reply veto, and verify the QA author gate before relying on those safeguards.</li>
+    <li><strong>Keep authored definitions distinct from registrations.</strong> The source-controlled “PR → Review Notebook note” event automation exists as code, but was not registered in either inspected deployment. The external reviewer/QA product ideas remain separately scoped work.</li>
+  </ol>
+
+  <h2 id="evidence">Evidence and keeping this useful</h2>
+  <p>This snapshot combines read-only Cloud definitions and run history, local service records and current execution artifacts, repository source, and dated Beads plans. The local scheduler was observed polling even while ingress was down. No pending or running automation rows were present; that does not establish whether unrelated agent conversations were active.</p>
+  <p>For each later change, record <strong>where it is registered, what it targets, what it can write, trigger and timezone, enabled state, latest verified outcome, and the reason for the decision</strong>. Keep the observation date beside the claim. Beads owns work status; this page explains the operating arrangement and decisions.</p>
+  <ul class="sources">
+    <li><a href="openhands-automations.html">OpenHands Automations architecture</a> — definition, queue, execution backend, callbacks, and watchdog.</li>
+    <li><a href="automation-local-to-cloud.html">Moving an automation between deployments</a> — code portability and deployment-specific registration.</li>
+    <li><a href="openhands-transpile-maintenance.html">Maintaining the TypeScript transpiles</a>, the <a href="https://github.com/smolpaws/openhands-agent/blob/main/docs/DRIFT_AUTOMATION.md">SDK drift runbook</a>, and the <a href="https://github.com/smolpaws/smolpaws/blob/main/packages/openhands-agent-server/docs/REVENDOR_AUTOMATION.md">server re-vendor runbook</a>.</li>
+    <li><a href="https://github.com/smolpaws/webmcp-notebook/tree/main/automation">Review Notebook automation source</a> — broader authored scope and topic-only routing policy.</li>
+    <li><a href="https://github.com/OpenHands/automation">OpenHands Automation service</a> and <a href="https://github.com/OpenHands/extensions">Extensions</a> — runtime and catalog sources.</li>
+  </ul>
+  <div class="foot-nav">
+    <a href="openhands-automations.html">Automation architecture &rarr;</a> &nbsp;&middot;&nbsp;
+    <a href="openhands-transpile-maintenance.html">Transpile maintenance &rarr;</a> &nbsp;&middot;&nbsp;
+    <a href="../index.html">&larr; Home</a>
+  </div>
+</main>
+</body>
+</html>

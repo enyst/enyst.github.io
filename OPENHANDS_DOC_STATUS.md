@@ -5,6 +5,9 @@ Beads owns task status; the site explains dated architecture, decisions and plan
 
 ## Current explanations
 
+- [OpenHands Automations operations](arch/openhands-automation-operations.html): September 15 deployment snapshot,
+  permitted effects, recent results, and pending location/target decisions. Distinguishes live registrations
+  from authored definitions, paused history, and future plans.
 - [WhatsApp readiness](arch/whatsapp-readiness.html): controlled text-canary gates, permanent-cutover gates,
   source evidence and Beads owners. Companion: `smolpaws/smolpaws/docs/whatsapp/READINESS.md`.
 - [Bridge topology](arch/smolpaws-bridges-topology.html): shared relay, lane identity, launch additions,
