@@ -40,7 +40,25 @@
 <main class="shell prose">
   <a class="back" href="../index.html">&larr; Home</a>
   <h1>OpenHands Automations: where work runs <span class="tag">operations note</span></h1>
-  <p class="meta">Observed September 15, 2026. This is a dated record of Engel's OpenHands Automations, with proposed changes kept separate from the current setup.</p>
+  <p class="meta">Observed September 15, 2026. The original audit is preserved below; subsequent changes record their own verification status.</p>
+
+  <h2 id="attention-update">September 15 update · weekly attention review</h2>
+  <div class="callout">
+    <p><strong>Deployed · Cloud input validation passed.</strong> The existing attention router now uses the weekly policy below. Cloud configuration was read back, the running source files matched the tested bundle byte for byte, and an input-only Cloud run completed successfully at 21:27 UTC on September 15.</p>
+  </div>
+  <ul>
+    <li><strong>Schedule:</strong> Monday at <strong>09:00 Europe/Stockholm</strong>, cron <code>0 9 * * 1</code>. The local time stays at 09:00 across daylight-saving changes: 07:00 UTC in summer, 08:00 UTC in winter.</li>
+    <li><strong>Repository scope:</strong> <a href="https://github.com/OpenHands/software-agent-sdk">OpenHands/software-agent-sdk</a> remains the current default. Expansion to other repositories is undecided.</li>
+    <li><strong>Base selection:</strong> the <strong>50 newest currently open PRs</strong>, ordered by creation time, newest first.</li>
+    <li><strong>Mention additions:</strong> union that selection with <strong>every PR containing an actual <code>@enyst</code> mention from the preceding rolling seven days</strong> within the scope. These additions are uncapped and include closed or merged PRs. A PR in both groups is reviewed once.</li>
+    <li><strong>Reading context:</strong> use each selected PR's full description and the full bodies of <strong>all linked closing issues</strong> returned by GitHub's sidebar relationship, <code>closingIssuesReferences</code>. This covers manually linked issues and issues linked for automatic closure.</li>
+    <li><strong>Weekly reassessment:</strong> rescore every selected candidate each week, including unchanged PRs. Remove the previous skip based on <code>updated_at</code>.</li>
+    <li><strong>Run limit:</strong> 30 minutes, the Cloud maximum. The collector does not silently cap mention additions or clip context; incomplete reads or failed scoring fail the run.</li>
+    <li><strong>Model and destination:</strong> retain <code>deep-pro</code>, resolving to <code>openhands/deepseek-v4-pro</code> through OpenHands. Continue filing or updating the same Review Notebook notes.</li>
+  </ul>
+  <p><strong>Verification:</strong> 17 focused tests cover selection, pagination, mention timing, complete linked context and failure behavior. The Cloud check resolved the actual profile and required credentials and collected the full inputs; it made no scoring calls or notebook writes. The normal scoring entrypoint is restored for <strong>Monday, September 21 at 09:00 Stockholm time</strong>. <a href="https://github.com/smolpaws/webmcp-notebook/tree/132bd0d19301c2de504c4f91dbd0102e38d13595/automation/attention-router">Versioned source and tests</a>. The historical ten-PR, eight-hour pilot below records the earlier configuration.</p>
+
+  <h2 id="inventory-snapshot">September 15 audit · before the attention-router change</h2>
 
   <div class="callout">
     <p><strong>9 enabled definitions: 3 local and 6 in OpenHands Cloud.</strong> Another 2 Cloud definitions are paused. No automation run was pending or running at the capture. Enabled means eligible for a future trigger; it does not mean the last attempt worked.</p>
@@ -48,6 +66,7 @@
   <p><strong>The immediate issue is local reliability.</strong> All three local jobs failed on their latest attempt. The Canvas entry point was unavailable, while the Agent Server, Automation service, and scheduler remained alive. Closing or losing the UI did not stop scheduled work.</p>
 
   <nav class="jump-links" aria-label="On this page">
+    <a href="#attention-update">Attention review update</a>
     <a href="#local">Local jobs</a>
     <a href="#cloud">Cloud jobs</a>
     <a href="#paused">Paused and retired</a>
@@ -167,7 +186,7 @@
     <li><strong>Repair the local execution path.</strong> Restore Canvas ingress and callback reachability, then investigate the weekly conversation errors. Decide whether the two failing cleanup schedules should pause during that work. Their eventual home—local or Cloud—remains undecided.</li>
     <li><strong>Give Gazette its own checkout.</strong> A dedicated checkout would prevent ordinary documentation edits from blocking publication. Keep local execution while its host-specific credential lookup remains, or explicitly redesign that dependency before moving it.</li>
     <li><strong>Make weekly repository ownership explicit.</strong> The live prompts use the real <code>enyst/*</code> forks. The canonical repositories are <code>smolpaws/openhands-agent</code> and <code>smolpaws/smolpaws</code>. At this audit the SDK fork matched canonical main, but the server fork had diverged. The next re-vendor run would therefore start from a different baseline. A proposed policy is canonical main for source and PR base, with branches pushed to the enyst forks. That target policy has not been applied.</li>
-    <li><strong>Decide when the attention router graduates.</strong> Local source supports open PRs and issues across SDK, OpenHands, automation, and extensions. The live definition remains the bounded SDK-PR test. Topic fit alone drives routing. Expanding source capability is not the same as expanding the live schedule.</li>
+    <li><strong>Decide whether to expand attention routing beyond SDK PRs.</strong> The September 15 update above replaces the pilot with weekly complete-context PR scoring. Both candidate lists still use the SDK repository; expansion to other repositories remains undecided. Topic fit alone continues to drive routing.</li>
     <li><strong>Finish the security redesign before re-enabling.</strong> Beads <code>smolpaws-crm.9</code>–<code>.12</code> propose a compact clean-pass stamp, terse request-changes only for real findings, stateful re-checks, and a quieter cadence. The paused definition still contains the older review-and-email workflow.</li>
     <li><strong>Recover deployed bundle evidence.</strong> Retrieve the custom execution bundles or a trustworthy source digest. Confirm the duplicate sweep's repository scope, waiting period, and reply veto, and verify the QA author gate before relying on those safeguards.</li>
     <li><strong>Keep authored definitions distinct from registrations.</strong> The source-controlled “PR → Review Notebook note” event automation exists as code, but was not registered in either inspected deployment. The external reviewer/QA product ideas remain separately scoped work.</li>
