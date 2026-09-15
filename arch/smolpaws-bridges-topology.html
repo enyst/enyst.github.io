@@ -86,7 +86,7 @@
   <table>
     <tr><th>Channel</th><th>Implemented path</th><th>Evidence / remaining work</th></tr>
     <tr><td>Slack <code>paws</code></td><td>Standalone Message Relay</td><td>Historical live transport canary with a deterministic LLM, plus later deployment reports. Verify the current process, provider and soak; those reports are not live telemetry. <a href="../smolpaws-slack.html">Slack evidence</a>.</td></tr>
-    <tr><td>WhatsApp</td><td><code>apps/whatsapp</code>, shared relay, text delivery, media ingress</td><td>Deterministic real-server test is present. Legacy primary service was still running during the September 14 Mac preflight, with no listener on <code>:8790</code>. <a href="whatsapp-readiness.html">History-safe startup and provider preflight precede the live text canary</a>; scheduling, outbound media/voice and recovery are now implemented in #172; live validation and soak still precede permanent replacement.</td></tr>
+    <tr><td>WhatsApp</td><td><code>apps/whatsapp</code>, shared relay, text and media/voice delivery</td><td>History handoff, scheduling, outbound media/voice and recovery are implemented in #172. On September 15, isolated real-provider tool calls and continuation passed; <code>:8790</code> answered health but lacked the product-host marker. <a href="whatsapp-readiness.html">Verify the deployed product host, then run the trusted-chat canary</a>. Live channel validation and soak still precede permanent replacement.</td></tr>
     <tr><td>Discord</td><td><code>apps/discord</code>, standalone relay</td><td>Rewrite merged in #170; fail-closed allowlist preserved. Live validation remains.</td></tr>
     <tr><td>GitHub, email</td><td>Workers → legacy <code>/turns</code> runner</td><td>Remaining consumers of the legacy server; migrate before retiring it.</td></tr>
     <tr><td>Heartbeat</td><td>New-server integration</td><td>LaunchAgent loaded during local preflight; no new-server listener then. Verify a successful run before claiming current operation.</td></tr>
@@ -99,7 +99,7 @@
   <h2 id="last-steps"><span class="num">5</span>The remaining sequence</h2>
   <ol>
     <li><span class="done">implemented</span> — shared relay runtime, standalone WhatsApp/Discord bridges, identity/workspace launch additions and deterministic real-server test.</li>
-    <li><span class="todo">before live text</span> — history handoff and reproducible vendoring are implemented. Next is the real-provider tool preflight (<code>kxa.7</code>).</li>
+    <li><span class="todo">before live text</span> — history handoff and reproducible vendoring are implemented; isolated real-provider tool calls and continuation passed. Finish the deployed product-host check (<code>kxa.7</code>).</li>
     <li><span class="todo">controlled test</span> — one trusted chat, one socket owner, six-boundary evidence, restart/replay and reconnect probes (<code>kxa.5</code>).</li>
     <li><span class="todo">before permanent replacement</span> — live validation of implemented scheduling, media/voice, scope rules and recovery, followed by the rehearsed rollback and soak. Keep the legacy service available until deployment proof passes.</li>
     <li><span class="todo">after soak</span> — complete other ingress migrations, then retire <code>apps/agent-server</code> when no active consumer remains.</li>
@@ -108,6 +108,7 @@
 
   <h2 id="maintenance"><span class="num">6</span>Keeping the engine current</h2>
   <p>Maintenance has three responsibilities: the SDK discovery watcher, bounded SDK pin advancement (<code>docs/DRIFT_AUTOMATION.md</code>), and server re-vendoring plus server-unit review (<code>packages/openhands-agent-server/docs/REVENDOR_AUTOMATION.md</code>). The runbooks describe how to execute them; this audit did not verify active cloud schedules. Provider compatibility also needs SDK-owned fixes between pin advances. See <a href="openhands-transpile-maintenance.html">Maintaining the OpenHands TypeScript transpiles</a>.</p>
+  <p>ChatGPT subscription authentication follows the same ownership split: SDK OAuth storage, refresh and transport; server device-login routes and profile restoration. See <a href="openhands-transpile-maintenance.html#subscription-auth">the subscription authentication boundary</a>.</p>
 
   <h2 id="history"><span class="num">7</span>Pages this supersedes</h2>
   <p>The older channel pages describe the legacy root process and the <code>/turns</code> adapters; they now carry a banner pointing here. <a href="whatsapp-as-bridge.html">WhatsApp as a bridge</a> is the design this implements. <a href="smolpaws-sdk-swap-board.html">The SDK-swap board</a> and <a href="smolpaws-sdk-swap.html">the original seven-step plan</a> are history.</p>
