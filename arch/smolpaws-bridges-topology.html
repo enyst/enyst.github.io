@@ -40,7 +40,7 @@
     <div class="eyebrow">SmolPaws · implemented process architecture</div>
     <h1>Bridges, one server, and the last steps</h1>
     <p class="sub">The next SmolPaws is a set of standalone channel bridges attached to one TypeScript OpenHands agent-server. Any bridge can be started on its own by a LaunchAgent; it boots the server if the server is not there. This page is the current map and the remaining checklist.</p>
-    <p style="margin-top:12px"><span class="status">STATUS: IMPLEMENTED · LIVE CUTOVER PENDING</span> &nbsp; <span class="pill">2026-09-14</span> &nbsp; <span class="pill">epic smolpaws-zlo</span> &nbsp; <span class="pill">bead smolpaws-kxa</span></p>
+    <p style="margin-top:12px"><span class="status">STATUS: WHATSAPP MAIN OVERNIGHT CANARY</span> &nbsp; <span class="pill">2026-09-15</span> &nbsp; <span class="pill">epic smolpaws-zlo</span> &nbsp; <span class="pill">bead smolpaws-kxa</span></p>
   </header>
 
   <div class="callout note">Source of truth for this page: <code>smolpaws/smolpaws</code> <code>docs/bridges.md</code>, <code>docs/whatsapp/README.md</code>, <code>src/coordinator/DESIGN.md</code>. When they disagree with this page, they win; this page is a snapshot.</div>
@@ -86,7 +86,7 @@
   <table>
     <tr><th>Channel</th><th>Implemented path</th><th>Evidence / remaining work</th></tr>
     <tr><td>Slack <code>paws</code></td><td>Standalone Message Relay</td><td>Historical live transport canary with a deterministic LLM, plus later deployment reports. Verify the current process, provider and soak; those reports are not live telemetry. <a href="../smolpaws-slack.html">Slack evidence</a>.</td></tr>
-    <tr><td>WhatsApp</td><td><code>apps/whatsapp</code>, shared relay, text and media/voice delivery</td><td>History handoff, scheduling, outbound media/voice and recovery are implemented in #172. On September 15, isolated real-provider tool calls and continuation passed. A Main-only connection trial reused the existing account and completed an empty-work rollback to the updated legacy bridge; no canary input arrived. <a href="whatsapp-readiness.html">Live replies, media and recovery still need proof</a>. Live channel validation and soak still precede permanent replacement.</td></tr>
+    <tr><td>WhatsApp</td><td><code>apps/whatsapp</code>, shared relay, text and media/voice delivery</td><td>Main-only overnight canary started September 15, 18:49 UTC, on SmolPaws c4ba8c4 / SDK 5f28eb8. The iPad confirmed text, image, playable voice and scheduled reply; queued media survived reconnect and the agent continued after host restart. Legacy WhatsApp is disabled but available for rollback. <a href="whatsapp-readiness.html">Evidence and overnight observation (957)</a>. Permanent replacement still awaits soak.</td></tr>
     <tr><td>Discord</td><td><code>apps/discord</code>, standalone relay</td><td>Rewrite merged in #170; fail-closed allowlist preserved. Live validation remains.</td></tr>
     <tr><td>GitHub, email</td><td>Workers → legacy <code>/turns</code> runner</td><td>Remaining consumers of the legacy server; migrate before retiring it.</td></tr>
     <tr><td>Heartbeat</td><td>New-server integration</td><td>LaunchAgent loaded during local preflight; no new-server listener then. Verify a successful run before claiming current operation.</td></tr>
@@ -99,9 +99,9 @@
   <h2 id="last-steps"><span class="num">5</span>The remaining sequence</h2>
   <ol>
     <li><span class="done">implemented</span> — shared relay runtime, standalone WhatsApp/Discord bridges, identity/workspace launch additions and deterministic real-server test.</li>
-    <li><span class="todo">before live text</span> — history handoff and reproducible vendoring are implemented; isolated real-provider tool calls and continuation passed. Finish the deployed product-host check (<code>kxa.7</code>).</li>
-    <li><span class="todo">controlled test</span> — one trusted chat, one socket owner, six-boundary evidence, restart/replay and reconnect probes (<code>kxa.5</code>).</li>
-    <li><span class="todo">before permanent replacement</span> — live validation of implemented scheduling, media/voice, scope rules and recovery, followed by the rehearsed rollback and soak. Keep the legacy service available until deployment proof passes.</li>
+    <li><span class="done">deployed host verified</span> — canonical SDK, real-provider multi-tool execution and continuation after process restart passed (<code>kxa.7</code>).</li>
+    <li><span class="done">controlled test passed</span> — iPad text, image, voice, scheduled reply and queued-media reconnect confirmed; final echoes repaired (<code>kxa.5</code>).</li>
+    <li><span class="todo">overnight observation</span> — Main-only new bridge is running with one socket owner; inspect ordinary replies, existing scheduled work and unsettled effects before permanent cutover (<code>957</code>). Legacy remains available through the drain/handoff procedure.</li>
     <li><span class="todo">after soak</span> — complete other ingress migrations, then retire <code>apps/agent-server</code> when no active consumer remains.</li>
   </ol>
   <p>Detailed acceptance and Beads ownership: <a href="whatsapp-readiness.html">WhatsApp readiness</a>.</p>
