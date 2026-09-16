@@ -11,7 +11,8 @@ Beads owns task status; the site explains dated architecture, decisions and plan
   chosen actual Astra model and exasperated robot babysitter voice, event-driven implementation draft,
   a supervised pilot with four reviews published and one withheld after the PR changed,
   and explicitly unresolved Cloud deployment prerequisites.
-  Continuous Cloud automation remains undeployed.
+  Future publishing uses `enyst`; the draft stays dry-run and recurring reviews stay off.
+  The four `smolpaws` pilot publications remain historical. Continuous Cloud automation remains undeployed.
 - [OpenHands Automations operations](arch/openhands-automation-operations.html): September 15 deployment snapshot,
   permitted effects, recent results, and pending location/target decisions. Distinguishes live registrations
   from authored definitions, paused history, and future plans.
