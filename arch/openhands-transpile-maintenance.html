@@ -136,6 +136,8 @@
   <p>Review both layers against the same pinned Python source. Prove credential-store and transport behavior in SDK tests, then device-flow and conversation behavior in server tests after reproducible re-vendoring. A successful live subscription call proves the external path works; it does not replace those tests. The original missed scope is tracked by <code>smolpaws-zlo.1</code> and <code>smolpaws-zlo.2</code>.</p>
   <p>Merged September 15: SDK <a href="https://github.com/smolpaws/openhands-agent/pull/31">#31 · OAuth and subscription transport</a>, with <a href="https://github.com/smolpaws/openhands-agent/blob/775869ec30ac2958701517a20556e9d50df977f6/transpile/subscription-auth.md">pinned-source port evidence</a>, followed by server <a href="https://github.com/smolpaws/smolpaws/pull/173">#173 · re-vendor and LLM routes</a>. SDK fixtures cover Python transformations and streaming edge cases; server regressions cover device state, validation, missing login and restart restoration. The real subscription validation/tool/continuation smoke also passed against the packed SDK.</p>
 
+  <p class="callout"><strong>LLM profile implementation reference:</strong> <a href="llm-profiles.html">the profile notebook</a> documents the current TypeScript configuration/store boundary, native provider APIs, switching, usage, tests and GitHub environments, with source links and explicit limits.</p>
+
   <h2>8 · Documentation precedence</h2>
   <p>
     Code and tests describe current factual behavior. Transpilation contracts describe intended policy.
