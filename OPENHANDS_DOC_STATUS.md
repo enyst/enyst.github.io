@@ -9,7 +9,8 @@ Beads owns task status; the site explains dated architecture, decisions and plan
 
 - [Reviewing the reviewer](arch/openhands-review-auditor.html): September 16 investigation,
   chosen actual Astra model and exasperated robot babysitter voice, event-driven implementation draft,
-  a supervised review pilot, and explicitly unresolved Cloud deployment prerequisites.
+  a supervised pilot with four reviews published and one withheld after the PR changed,
+  and explicitly unresolved Cloud deployment prerequisites.
   Continuous Cloud automation remains undeployed.
 - [OpenHands Automations operations](arch/openhands-automation-operations.html): September 15 deployment snapshot,
   permitted effects, recent results, and pending location/target decisions. Distinguishes live registrations
