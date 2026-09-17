@@ -15,6 +15,15 @@ Beads owns task status; the site explains dated architecture, decisions and plan
   The four `smolpaws` pilot publications remain historical. Continuous Cloud automation remains undeployed.
   Corrected detector replay reopened selection; four new manual reviews are verified as published by `enyst`:
   one approval and three requests for changes. Failed and stale attempts remain historical evidence, without a public verdict.
+  September 17: four of eight fresh candidates qualified for a bounded local OpenHands Automation trial.
+  The first local Automation trial failed before publication, posted zero reviews and is verified disabled.
+  The bounded retry completed with four requests for changes published as `enyst`; both local trial
+  definitions are verified disabled, and the Cloud Roasted reviewer stays paused. SDK #4862 received a
+  verified editorial correction withdrawing one finding with unproven dependency-path reachability;
+  its supported request for changes and all eleven historical scores remain unchanged. Original evidence
+  remains immutable. All twelve completed PRs are retired; unattended review quality remains unvalidated.
+  Literal-false event filters and absent schedules prevent recurring triggers.
+  Its persistent host checkpoints remain separate from the unresolved Cloud KV and native-event prerequisites.
 - [OpenHands Automations operations](arch/openhands-automation-operations.html): September 15 deployment snapshot,
   permitted effects, recent results, and pending location/target decisions. Distinguishes live registrations
   from authored definitions, paused history, and future plans.
