@@ -40,7 +40,7 @@
     <div class="eyebrow">SmolPaws · implemented process architecture</div>
     <h1>Bridges, one server, and the last steps</h1>
     <p class="sub">The next SmolPaws is a set of standalone channel bridges attached to one TypeScript OpenHands agent-server. Any bridge can be started on its own by a LaunchAgent; it boots the server if the server is not there. This page is the current map and the remaining checklist.</p>
-    <p style="margin-top:12px"><span class="status">STATUS: THREE-CHAT WHATSAPP CANARY</span> &nbsp; <span class="pill">2026-09-16</span> &nbsp; <span class="pill">epic smolpaws-zlo</span> &nbsp; <span class="pill">bead smolpaws-kxa</span></p>
+    <p style="margin-top:12px"><span class="status">STATUS: WHATSAPP ON SHARED :8790</span> &nbsp; <span class="pill">2026-09-17</span> &nbsp; <span class="pill">epic smolpaws-zlo</span> &nbsp; <span class="pill">bead smolpaws-kxa</span></p>
   </header>
 
   <div class="callout note">Source of truth for this page: <code>smolpaws/smolpaws</code> <code>docs/bridges.md</code>, <code>docs/whatsapp/README.md</code>, <code>src/coordinator/DESIGN.md</code>. When they disagree with this page, they win; this page is a snapshot.</div>
@@ -78,7 +78,7 @@
     <tr><th>Concern</th><th>Where</th></tr>
     <tr><td>Durable intake, lane→conversation binding, outbox sync, bounded dispatch</td><td><code>src/coordinator/relayRuntime.ts</code></td></tr>
     <tr><td>What is deliverable</td><td><code>bridgeResponseExtractor</code> combines explicit <code>send_message</code> actions, terminal replies and safe <code>ConversationErrorEvent</code> notices. WhatsApp, Slack and Discord share it in code. WhatsApp’s restarted canary is verified on <a href="https://github.com/smolpaws/smolpaws/pull/188">#188 · 02a8187</a>; the running Slack process has not yet reloaded this extractor. Deliveries keep their durable event identity. <a href="whatsapp-readiness.html#conversation-errors">Error handling and verification</a>.</td></tr>
-    <tr><td>Run limits and continuation</td><td>The normal limit is 500 steps per run. The temporary 12-step canary override has been removed from <code>:8791</code> settings and its four existing WhatsApp conversations. A new prompt continues saved history with a fresh run budget; the operator does not replay completed tools or rewind delivery cursors.</td></tr>
+    <tr><td>Run limits and continuation</td><td>The normal limit is 500 steps per run. The temporary 12-step canary override was removed on September 16; production WhatsApp now uses the shared <code>:8790</code> host with the normal limit. A new prompt continues saved history with a fresh run budget; the operator does not replay completed tools or rewind delivery cursors.</td></tr>
     <tr><td>Workspace + identity context</td><td><code>src/shared/relayConversationDefaults.ts</code> selects the workspace. <a href="https://github.com/smolpaws/smolpaws/pull/186">Merged context update #186</a> moves file loading into <code>apps/relay-server/src/context.ts</code>: trusted lane → configured files → per-conversation snapshot → SDK always-on skills. The 32,768-character launch suffix cap remains. <a href="whatsapp-readiness.html#context-files">Design and rollout status</a>.</td></tr>
     <tr><td>Launch and supervision</td><td><code>scripts/run-local-bridge.sh</code>, <code>launchd/com.smolpaws.bridge.plist</code>, <code>scripts/install-bridge-launchagent.sh &lt;bridge&gt;</code></td></tr>
   </table>
@@ -87,10 +87,10 @@
   <table>
     <tr><th>Channel</th><th>Implemented path</th><th>Evidence / remaining work</th></tr>
     <tr><td>Slack <code>paws</code></td><td>Standalone Message Relay</td><td>Historical live transport canary with a deterministic LLM, plus later deployment reports. Verify the current process, provider and soak; those reports are not live telemetry. <a href="../smolpaws-slack.html">Slack evidence</a>.</td></tr>
-    <tr><td>WhatsApp</td><td><code>apps/whatsapp</code>, shared relay, text and media/voice delivery</td><td>The initial Main-only canary started September 15, 18:49 UTC; OpenHands and Hunting joined September 16. Current context and error-handling deployments are recorded on the readiness page. The iPad confirmed text, image, playable voice and scheduled reply; queued media survived reconnect and the agent continued after host restart. Legacy WhatsApp is disabled but available for rollback. <a href="whatsapp-readiness.html">Evidence and overnight observation (957)</a>. Permanent replacement still awaits soak.</td></tr>
+    <tr><td>WhatsApp</td><td><code>apps/whatsapp</code>, shared relay, text and media/voice delivery</td><td>Production cutover September 17: Main, OpenHands and Hunting use the shared <code>:8790</code> product host with their existing conversations. The temporary <code>:8791</code> host is retired and legacy WhatsApp stays disabled. Text, image, voice and scheduled-reply evidence from the September 15–16 canary remains historical. <a href="whatsapp-readiness.html#current-scope">Current storage and cutover verification</a>.</td></tr>
     <tr><td>Discord</td><td><code>apps/discord</code>, standalone relay</td><td>Rewrite merged in #170; fail-closed allowlist preserved. Live validation remains.</td></tr>
     <tr><td>GitHub, email</td><td>Workers → legacy <code>/turns</code> runner</td><td>Remaining consumers of the legacy server; migrate before retiring it.</td></tr>
-    <tr><td>Heartbeat</td><td>Shared product-host startup</td><td><a href="https://github.com/smolpaws/smolpaws/pull/178">#178</a> shares the bridge launcher’s product-host check and supervised startup. Heartbeat uses session-key authentication and an absolute workspace. Each tick appends a stable event to its daily conversation and starts a run only when that event is new. See the <a href="https://github.com/smolpaws/smolpaws/blob/main/docs/bridges.md#heartbeat-startup">startup contract and tests</a>.</td></tr>
+    <tr><td>Heartbeat</td><td>Shared product-host startup</td><td><a href="https://github.com/smolpaws/smolpaws/pull/178">#178</a> shares the bridge launcher’s product-host check and supervised startup. Heartbeat uses an absolute workspace and supports session-key authentication when configured. Each tick appends a stable event to its daily conversation and starts a run only when that event is new. See the <a href="https://github.com/smolpaws/smolpaws/blob/main/docs/bridges.md#heartbeat-startup">startup contract and tests</a>.</td></tr>
   </table>
 
   <h2 id="whatsapp"><span class="num">4</span>WhatsApp startup has a state handoff</h2>
@@ -102,8 +102,8 @@
     <li><span class="done">implemented</span> — shared relay runtime, standalone WhatsApp/Discord bridges, workspace defaults, configured always-on context files and deterministic real-server tests.</li>
     <li><span class="done">deployed host verified</span> — canonical SDK, real-provider multi-tool execution and continuation after process restart passed (<code>kxa.7</code>).</li>
     <li><span class="done">controlled test passed</span> — iPad text, image, voice, scheduled reply and queued-media reconnect confirmed; final echoes repaired (<code>kxa.5</code>).</li>
-    <li><span class="todo">overnight observation</span> — Main, OpenHands and Hunting use the new bridge with one socket owner; inspect ordinary replies, remaining requested work, existing scheduled work and unsettled effects before permanent cutover (<code>957</code>). Legacy remains available through the drain/handoff procedure.</li>
-    <li><span class="todo">after soak</span> — complete other ingress migrations, then retire <code>apps/agent-server</code> when no active consumer remains.</li>
+    <li><span class="done">WhatsApp promoted</span> — Main, OpenHands and Hunting use the normal bridge and shared <code>:8790</code> host, with their existing conversations and one socket owner. Observe ordinary replies and schedules after the cutover; retain the migration backup.</li>
+    <li><span class="todo">remaining ingress</span> — complete other ingress migrations, then retire <code>apps/agent-server</code> when no active consumer remains.</li>
   </ol>
   <p>Detailed acceptance and Beads ownership: <a href="whatsapp-readiness.html">WhatsApp readiness</a>.</p>
 

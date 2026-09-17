@@ -117,8 +117,8 @@
     <div class="cards">
       <a class="card" href="smolpaws-whatsapp.html">
         <div class="card-title">SmolPaws WhatsApp Entry Point</div>
-        <div class="card-desc">The legacy root process that still serves the primary channel — Baileys multi-device, a SQLite-backed poll loop, scopes and permissions, media, and voice notes. Its successor, the standalone relay bridge, is built and awaits cutover.</div>
-        <span class="card-tag tag-live">live · legacy path</span>
+        <div class="card-desc">The former root process — Baileys multi-device, a SQLite-backed poll loop, scopes and permissions, media, and voice notes. Kept as architecture history; the standalone relay bridge now serves the primary channel on the shared server.</div>
+        <span class="card-tag tag-report">historical · legacy path</span>
       </a>
       <a class="card" href="smolpaws-slack.html">
         <div class="card-title">SmolPaws Slack Entry Point</div>
@@ -138,7 +138,7 @@
     </div>
 
     <h2 id="next-smolpaws">The next SmolPaws</h2>
-    <p class="tagline" style="margin-top:-4px">Three tracks in flight: move the primary channel onto the new transpiled stack, put a cat <em>inside</em> OpenHands, and make both cats talk in realtime voice.</p>
+    <p class="tagline" style="margin-top:-4px">Three tracks: run the primary channel on the new transpiled stack, put a cat <em>inside</em> OpenHands, and make both cats talk in realtime voice.</p>
     <div class="cards">
       <a class="card" href="arch/llm-profiles.html">
         <div class="card-title">LLM Profiles: configuration, runtime and maintenance</div>
@@ -146,18 +146,18 @@
         <span class="card-tag tag-report">implementation notebook</span>
       </a>
       <a class="card" href="arch/whatsapp-readiness.html">
-        <div class="card-title">WhatsApp: what stands between built and tested?</div>
-        <div class="card-desc">Three gates to a controlled text canary: history-safe handoff, isolated state, and a reproducible provider/server preflight. Then the separate work required for permanent replacement. Source evidence and Beads ownership, audited September 14.</div>
-        <span class="card-tag tag-report">current readiness plan</span>
+        <div class="card-title">WhatsApp: normal operation on the shared server</div>
+        <div class="card-desc">Main, OpenHands and Hunting moved to the normal shared server on September 17, preserving their conversations. Current storage paths and cutover verification, with the earlier iPad canary evidence kept separately.</div>
+        <span class="card-tag tag-live">production · shared :8790</span>
       </a>
       <a class="card" href="arch/smolpaws-bridges-topology.html">
         <div class="card-title">Bridges, one server, and the last steps</div>
-        <div class="card-desc">How the next SmolPaws runs: one TypeScript OpenHands agent-server, standalone relay bridges for WhatsApp, Slack, and Discord, LaunchAgents that start any bridge and let it boot the server. Audited September 14: implemented paths, dated deployment evidence, state boundaries, and the route to a controlled test.</div>
+        <div class="card-desc">One TypeScript OpenHands agent-server and standalone relay bridges. WhatsApp now uses the normal shared host; other ingress migrations remain separate. Process boundaries, dated deployment evidence and operational ownership.</div>
         <span class="card-tag tag-live">current map</span>
       </a>
       <a class="card" href="arch/whatsapp-as-bridge.html">
         <div class="card-title">WhatsApp as a bridge</div>
-        <div class="card-desc">The design that moved the primary channel out of the repo root into a standalone <code>apps/whatsapp</code> on the durable Message Relay — now implemented on the shared relay runtime; the live canary and cutover remain. <span class="mono">bead smolpaws-kxa · P0</span></div>
+        <div class="card-desc">The design that moved the primary channel out of the repo root into a standalone <code>apps/whatsapp</code> on the durable Message Relay — implemented on the shared relay runtime and promoted to normal operation on September 17. <span class="mono">bead smolpaws-kxa · P0</span></div>
         <span class="card-tag tag-live">implemented</span>
       </a>
       <a class="card" href="arch/insider-cat.html">
