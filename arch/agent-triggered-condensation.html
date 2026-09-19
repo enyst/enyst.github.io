@@ -6,7 +6,7 @@
   <title>Agent-triggered condensation: a note to your future self — Engel's notebook</title>
   <meta name="description" content="A proposed SmolPaws condenser: staged context warnings, an agent-called condense tool, a fresh active context, and a message to the agent's future self.">
   <meta property="og:title" content="Agent-triggered condensation: a note to your future self">
-  <meta property="og:description" content="The agent saves its own notes, requests a context reset, and resumes through its own tool call and result. Proposal, September 19, 2026.">
+  <meta property="og:description" content="The agent saves its own notes, requests a context reset, and resumes through its own tool call and result. Proposal updated September 20, 2026, with an explicitly configured hard-reset fallback.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://enyst.github.io/arch/agent-triggered-condensation.html">
   <link rel="stylesheet" href="../arch.css">
@@ -34,18 +34,18 @@
     <p class="eyebrow">SmolPaws · context and memory</p>
     <h1>A fresh context.<br>A note from yourself.</h1>
     <p class="lead">Give the agent advance warning, let it save what matters, and let it call <code>condense()</code> when ready. A new condenser clears the old active history. The agent resumes through its own tool call, a recovery instruction, and an optional message to its future self.</p>
-    <div class="meta"><span class="pill proposal">Proposal · not implemented</span><span class="pill">2026-09-19</span><span class="pill">smolpaws-te15</span><span class="pill">SDK first → server → pilot</span></div>
-    <nav class="contents" aria-label="Proposal sections"><a href="#intent">Intent</a><a href="#warnings">Warnings</a><a href="#tool">The tool</a><a href="#context">Next context</a><a href="#events">Events &amp; replay</a><a href="#decisions">Open decisions</a><a href="#work">Beads</a><a href="#sources">Sources</a></nav>
+    <div class="meta"><span class="pill proposal">Proposal · not implemented</span><span class="pill">Updated 2026-09-20</span><span class="pill">smolpaws-te15</span><span class="pill">SDK first → server → pilot</span></div>
+    <nav class="contents" aria-label="Proposal sections"><a href="#intent">Intent</a><a href="#warnings">Warnings</a><a href="#tool">The tool</a><a href="#context">Next context</a><a href="#events">Events &amp; replay</a><a href="#fallback">Emergency fallback</a><a href="#decisions">Open decisions</a><a href="#work">Beads</a><a href="#sources">Sources</a></nav>
   </header>
 
   <section id="intent">
     <h2>Let the agent prepare its own return</h2>
     <p>Engel's proposal starts from a simple expectation: the agent already has memory, daily notes, and tools for reading and writing them. Before clearing context, it should use those facilities to record unfinished requests, decisions, locations, and whatever else it will need to continue. The new tool can also carry a short personal handoff: a pointer to notes, the task it was doing, or simply “hi from your past self.”</p>
     <div class="grid">
-      <div class="panel"><h3>Selected behavior</h3><p>An opt-in condenser type, provisionally <code>agent_reset</code>, clears prior active history after an agent-originated request. It makes no summarizer LLM call. There is no retained old prefix, recent-history tail, or generated summary in this mode.</p></div>
+      <div class="panel"><h3>Selected behavior</h3><p>An opt-in condenser type, provisionally <code>agent_reset</code>, clears prior active history after an agent-originated request. It makes no summarizer LLM call. There is no retained old prefix, recent-history tail, or generated summary on this voluntary path. A separately configured emergency summarizer can recover at the hard limit.</p></div>
       <div class="panel"><h3>What persists</h3><p>The full event log, conversation identity, files, saved notes, profiles, usage accounting, and normal fixed context remain available. “Clear” describes what enters the next model request. Historical events remain stored and inspectable.</p></div>
     </div>
-    <p class="small">This refines the September 18 bead. Its earlier ideas about a recent tail, an LLM-written summary, and an automatic summarizer fallback are historical discussion, not decisions carried into this design.</p>
+    <p class="small">The September 19 proposal replaced the original summary-style tool handoff with a full voluntary reset. On September 20, Engel selected a separate, explicitly configured hard-condensation fallback. That fallback produces a summary; the voluntary tool path still does not.</p>
   </section>
 
   <section id="warnings">
@@ -54,7 +54,7 @@
     <p>The new condenser owns a configurable ascending list of warning thresholds. These defaults mean percentage of the <strong>resolved effective main-model input budget</strong>, counting the projected history, fixed context and tool declarations. They do not mean output tokens or the separate summarizer model's window.</p>
     <p>Warnings are visible to the agent and ask it to save notes before calling <code>condense</code>. They leave the timing to the agent; crossing a warning threshold does not itself clear context. The agent can also call the tool early.</p>
     <details open><summary>Recommended warning lifecycle</summary><p>Emit each level once per reset cycle and persist that progress across restarts. If one step jumps from 74% to 87%, emit one 85% warning and mark the lower levels passed. A committed reset rearms the levels for the next cycle. Unknown budgets or unavailable token counts remain explicitly unavailable; do not invent a percentage. Current local counting is an estimate, so leave headroom for notes and recovery.</p></details>
-    <p class="small">The existing <code>CondensationRequest</code> is an internal trigger and is excluded from the model's view. A warning therefore needs explicit model-visible rendering. The hard-ceiling response is a separate decision below.</p>
+    <p class="small">The existing <code>CondensationRequest</code> is an internal trigger and is excluded from the model's view. A warning therefore needs explicit model-visible rendering. The separately configured <a href="#fallback">hard-ceiling fallback</a> below handles emergency recovery; warning thresholds alone do not invoke it.</p>
   </section>
 
   <section id="tool">
@@ -87,26 +87,47 @@
   </section>
 
   <section id="events">
-    <h2>Existing event kinds, explicit new semantics</h2>
+    <h2>New tool payloads inside existing event kinds</h2>
     <p>The host already has <code>conversation.condense()</code>; the Python SDK and our pinned port do not expose an agent-callable condensation tool. Existing request events carry no notes or originating tool references, and the current view reduces requests to a flag. A thin wrapper around that API would not implement this proposal.</p>
     <div class="table-wrap"><table><thead><tr><th>Record</th><th>Proposed responsibility</th></tr></thead><tbody>
-      <tr><td><code>ActionEvent</code></td><td>The actual agent tool call and its authored message.</td></tr>
-      <tr><td><code>CondensationRequest</code></td><td>A correlated request to the configured condenser. Versioned metadata identifies the request and its originating call.</td></tr>
-      <tr><td><code>ObservationEvent</code></td><td>The matching result, with recovery text and the future-self message.</td></tr>
-      <tr><td><code>Condensation</code></td><td>The committed removal set and reset operation, with <code>summary: null</code>. Metadata identifies the preserved pair and the reset view.</td></tr>
-      <tr><td>Synthetic <code>MessageEvent</code></td><td>Deterministic environment-origin, user-role notice at the front of the new view.</td></tr>
+      <tr><td><code>ActionEvent</code><br><code>CondenseAction</code> payload</td><td>The genuine <code>condense</code> call, validated by a new tool-specific input schema, including the optional <code>message_to_future_self</code>. Keep its tool-call identity and original arguments.</td></tr>
+      <tr><td><code>CondensationRequest</code></td><td>Versioned request metadata distinguishes an agent tool request, an emergency fallback and a host command. Only the agent request references a genuine originating tool call; the current untyped request flag is insufficient.</td></tr>
+      <tr><td><code>ObservationEvent</code><br><code>CondenseObservation</code> payload</td><td>A new tool-specific output schema for the matching result, recovery text, future-self message and explicit failure outcome. Successful recovery text is exposed to the next model call only after the associated reset commits.</td></tr>
+      <tr><td><code>Condensation</code></td><td>The committed removal set and operation metadata. Voluntary reset: <code>summary: null</code> and references to the real tool pair. Emergency fallback: generated summary and fallback provenance, without an invented tool pair.</td></tr>
+      <tr><td>Synthetic <code>MessageEvent</code></td><td>Deterministic environment-origin, user-role notice at the front of the new view; distinct wording for voluntary reset and emergency fallback.</td></tr>
+      <tr><td><code>CondensationSummaryEvent</code></td><td>Only the summarizing fallback renders this event, after its environment notice. It is absent on the voluntary reset path.</td></tr>
     </tbody></table></div>
-    <p>Prefer reusing event kinds, with typed, versioned metadata for the reset. Whether that metadata is an optional event payload or a linked existing state-update event belongs in the contract task. <strong>No new kind is inherently required, but unchanged wire schemas are not promised.</strong> A reset-aware projection is necessary: the existing delete-and-insert-summary operation cannot express the chosen notice plus original tool pair by itself.</p>
+    <p><strong>Yes, the tool needs its own Action and Observation schemas.</strong> The proposed names <code>CondenseAction</code> and <code>CondenseObservation</code> are payload types, following existing tools such as <code>SwitchLLMAction</code> and <code>SwitchLLMObservation</code>. In TypeScript these are validated schemas and inferred types. They travel inside the existing <code>ActionEvent</code>/<code>ObservationEvent</code> envelopes; separate top-level <code>CondenseActionEvent</code>/<code>CondenseObservationEvent</code> kinds are not required. The previous table omitted this distinction. Typed, versioned reset metadata is also needed; its exact carrier remains a contract decision. A reset-aware projection must express both the voluntary notice/tool pair and the emergency notice/summary.</p>
     <details open><summary>Commit the boundary without losing arrivals</summary><p>Capture the history boundary consumed by the model that authored the tool call. Record intent without recursively running the conversation from inside its executor; that could wait on its own step lock. Settle the step, durably commit the tool result and reset operation with defined crash recovery, and only then make the next model call. Clear only the eligible earlier history. Messages arriving during note-taking, model completion, tool execution or reset must remain pending until a subsequent request actually consumes them.</p></details>
     <details><summary>Replay is a projection, not tool re-execution</summary><p>The durable log keeps chronological source records. Replay reconstructs the new view from stable operation references and synthesizes one deterministic notice. It must not execute <code>condense</code> again, duplicate the pair, revive cleared history, reset accounting, or declare a failed reset successful. Repeated resets and forks need the same explicit rules. A crash between intent, observation and reset commitment needs defined completion or failure behavior before another model request is allowed.</p></details>
     <details><summary>Provider histories must stay valid</summary><p>Verify assistant/tool adjacency, real call/result identity, response-batch integrity, and signed or encrypted reasoning handling across native clients. The synthetic user notice must remain distinct from genuine incoming user work. Existing profile-origin and concurrent-request projection rules still apply. The reset must not manufacture a claim that the agent authored a call which never occurred.</p></details>
     <p><strong>TRANSPILE treatment:</strong> tool/schema additions may be additive extensions; changed request handling, view replay and prompt ordering affect parity-governed behavior. Register the appropriate stable policy in <code>TRANSPILE_CONTRACT.md</code> and the canonical manifest, with tests and source evidence. Review and merge the SDK first, then vendor that exact commit into the server and update its contract.</p>
   </section>
 
+  <section id="fallback">
+    <h2>If the agent runs out of room first</h2>
+    <p><strong>Selected September 20:</strong> when the effective hard input limit is reached, or the main provider reports a recognized context-window overflow, use the explicitly configured emergency <code>LLMSummarizingCondenser.hard_context_reset()</code>. The harness cannot judge whether the agent’s notes are good enough; the trigger is context pressure before a voluntary reset has committed. Crossing 90% alone is still only a warning.</p>
+    <div class="grid">
+      <div class="panel"><h3>Configure both strategies</h3><p>The user must configure the agent-reset condenser and a separate emergency summarizer, including its LLM profile and bounded retry settings. Merely having a condenser profile in the catalog does not enable the fallback. A reset-only configuration makes no summary calls; without the fallback, an unrecoverable ceiling stops the affected run with an actionable error and retains the source history.</p></div>
+      <div class="panel"><h3>A fallback, not an ordinary pipeline</h3><p>Python’s <code>PipelineCondenser</code> passes a View through its members and stops at the first <code>Condensation</code>. It does not catch failures and select a backup strategy. An ordinary trailing summarizer could also condense at its soft event threshold before the agent is ready. Use explicit routing by request origin and emergency reason. A pipeline could host a suitably gated adapter, but a bare list of the two condensers does not define this behavior.</p></div>
+    </div>
+    <details open><summary>What “hard” means in the Python SDK</summary><p>A <code>HARD</code> condensation requirement first tries ordinary condensation, retaining its configured prefix and recent tail. If ordinary condensation raises <code>NoCondensationAvailableException</code> — for example, because no valid cut exists or summary generation fails — <code>RollingCondenser</code> calls <code>hard_context_reset()</code>. That method summarizes <em>all events in its input View</em>, forgets them and inserts the summary at offset zero. It already ignores <code>keep_first</code>. It retries failed summary generation with shorter event representations, subject to a configured bound. This proposal selects that full-view method directly for its emergency fallback; it does not mean “set <code>keep_first</code> to zero and run ordinary condensation.”</p></details>
+    <p>The recovery context starts with:</p>
+    <ol class="sequence">
+      <li class="fixed"><span class="role">Fixed context</span><p>The normal system, identity, memory snapshot, runtime information, skills and tools.</p></li>
+      <li><span class="role">1 · user</span><p><strong>The environment triggered emergency context condensation because the context limit was reached before an agent-triggered reset completed.</strong><br>Earlier active history was replaced by the summary below. Your notes may be incomplete. Take a deep breath, read the summary and your notes, and check unfinished user requests before continuing. The user may not know this happened.</p></li>
+      <li><span class="role">2 · summary</span><p>The fallback’s <code>CondensationSummaryEvent</code>, rendered in its existing user role after the environment warning. It is a generated summary, not a message authored by the agent’s past self.</p></li>
+      <li class="late"><span class="role">Then · new input</span><p>Genuine pending user input protected by the request boundary, followed by arrivals during fallback processing. Preserve its original text/media and order.</p></li>
+    </ol>
+    <p>There is no retained historical <code>keep_first</code> prefix and no fabricated <code>condense</code> Action/Observation pair on this automatic path. The new notice is separate from the summary and must be replayed exactly once with truthful environment provenance.</p>
+    <details><summary>Failure, concurrency and accounting</summary><p>Apply the upstream hard-reset algorithm to the eligible active View while protecting unseen user input separately. The added notice, pending-input protection and routing are explicit target policies, not claims of unchanged Python behavior. Include the notice, summary, pending input and fixed context in the resulting budget check. If configuration, bounded summary attempts, persistence or the resulting context fails, retain the source log and stop with an actionable recovery error; do not loop indefinitely or silently perform an empty reset. A fixed prompt that is oversized by itself cannot be repaired this way. Record each actual fallback LLM attempt as condenser usage. Do not repeat a paid completion merely because accounting persistence failed, and rearm warnings only after a committed recovery.</p></details>
+    <p class="small">“All events” describes the selected input View, not a promise of lossless full-text transfer: the current summarizer uses event previews, and retry clipping can shorten them further. The existing preview-loss bead remains relevant.</p>
+  </section>
+
   <section id="decisions">
     <h2>Decisions to settle before implementation</h2>
     <div class="table-wrap"><table><thead><tr><th>Question</th><th>Boundary for this proposal</th></tr></thead><tbody>
-      <tr><td>Hard limit or overflow</td><td>What happens if warnings are ignored and notes are not ready? Choose an explicit recoverable policy before implementation. The older bead's automatic LLM fallback has not been selected; the reset mode itself performs no summary call.</td></tr>
+      <tr><td>Fallback configuration and routing</td><td>The policy is selected above. Specify the validated configuration shape, explicit emergency reasons, protected-input boundary and operation metadata. Both strategies must be configured to enable fallback; ordinary event pressure and unrelated provider failures must not silently invoke it.</td></tr>
       <tr><td>Host or channel <code>/condense</code></td><td>A human command has no genuine agent-authored call/message. Decide how the new mode handles it. Existing summarizer commands continue their current contract; do not fabricate an agent tool call.</td></tr>
       <tr><td>Optional message limit</td><td>Choose a bounded size and an actionable rejection before any destructive view change. The limit must leave room for fixed context, tool exchange and recovery.</td></tr>
       <tr><td>Metadata and warning rendering</td><td>Choose versioned persistence, event validation, restart behavior and model-visible warning form. Keep synthetic maintenance notices separate from real user input.</td></tr>
@@ -116,33 +137,36 @@
 
   <section id="work">
     <h2>Tracked work, in dependency order</h2>
-    <p><code>smolpaws-te15</code> remains the proposal's parent. All six implementation tasks are open. Publishing this page and filing the beads does not implement or enable the feature.</p>
-    <div class="dependency" aria-label="Dependency order">te15.1 contract → [te15.2 tool/reset + te15.3 warnings] → te15.4 SDK review &amp; merge → te15.5 server → te15.6 verification &amp; controlled rollout</div>
+    <p><code>smolpaws-te15</code> remains the proposal's parent. All seven implementation tasks are open. Publishing this page and filing the beads does not implement or enable the feature.</p>
+    <div class="dependency" aria-label="Dependency order">te15.1 contract → [te15.2 tool/reset + te15.3 warnings] → te15.7 emergency fallback → te15.4 SDK review &amp; merge → te15.5 server → te15.6 verification &amp; controlled rollout</div>
     <div class="table-wrap"><table><thead><tr><th>Bead</th><th>Deliverable</th><th>Blocked by</th></tr></thead><tbody>
       <tr><td><code>smolpaws-te15.1</code></td><td>Event, lifecycle and TRANSPILE contract; settle open policy decisions.</td><td>—</td></tr>
       <tr><td><code>smolpaws-te15.2</code></td><td>SDK tool and reset projection, with red/green evidence for source-history and late-input preservation.</td><td>.1</td></tr>
       <tr><td><code>smolpaws-te15.3</code></td><td>Configurable staged warnings, persisted crossing state, available/unknown measurements.</td><td>.1</td></tr>
-      <tr><td><code>smolpaws-te15.4</code></td><td>Substantive SDK review, checks, documentation and merge.</td><td>.2, .3</td></tr>
-      <tr><td><code>smolpaws-te15.5</code></td><td>Server vendoring, settings and tool wiring; no summarizer-profile lookup for reset.</td><td>.4</td></tr>
+      <tr><td><code>smolpaws-te15.7</code></td><td>Explicitly configured hard-reset fallback, environment warning before summary, bounded recovery and source-history preservation.</td><td>.2, .3</td></tr>
+      <tr><td><code>smolpaws-te15.4</code></td><td>Substantive SDK review, checks, documentation and merge.</td><td>.2, .3, .7</td></tr>
+      <tr><td><code>smolpaws-te15.5</code></td><td>Server vendoring, both condenser settings and tool wiring; resolve the independent summarizer profile only when fallback is explicitly configured.</td><td>.4</td></tr>
       <tr><td><code>smolpaws-te15.6</code></td><td>Protected-server/relay tests, bounded live recovery check and separately authorized scoped rollout.</td><td>.5</td></tr>
     </tbody></table></div>
-    <p>Required evidence includes the complete warning → note write → tool → reset → note retrieval → continued task path; concurrent text/media; crash/restart at every persistence boundary; repeated reset; missing notes; mixed calls; exact native provider message ordering; and warning rearming. Live cost and actual continuation must be reported separately from deterministic tests.</p>
+    <p>Required evidence includes the complete warning → note write → tool → reset → note retrieval → continued task path; concurrent text/media; crash/restart at every persistence boundary; repeated reset; missing notes; mixed calls; exact native provider message ordering; and warning rearming. Also cover ignored warnings → emergency fallback → notice/summary → continuation, reset-only configuration, missing fallback credentials, exhausted retries, oversized fixed context and user arrivals during fallback. Live cost and actual continuation must be reported separately from deterministic tests.</p>
     <p class="small">Related work remains separate: <code>smolpaws-d3fw</code> (existing 1M/400k budget snapshots), <code>smolpaws-29dr</code> (summary preview loss), <code>smolpaws-neo</code> (history invariants), and <code>smolpaws-eh4z</code> (Fast-Jev evaluation). None silently changes this proposal.</p>
   </section>
 
   <section id="sources">
     <h2>Source anchors and scope</h2>
-    <p>This is a dated design proposal based on Engel's September 19 instructions, the prior bead, and inspected source. Authorship and note selection are motivations to test; a message-role change alone has not been demonstrated to solve continuity.</p>
+    <p>This is a dated design proposal based on Engel's September 19 instructions and September 20 fallback clarification, the prior bead, and inspected source. Authorship and note selection are motivations to test; a message-role change alone has not been demonstrated to solve continuity.</p>
     <ul class="source-list">
       <li><a href="https://github.com/OpenHands/software-agent-sdk/blob/1d1a10351bc1fc94cfc00a7e79f12251ecc3b92f/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py#L2926">Python host condensation operation</a> and <a href="https://github.com/OpenHands/software-agent-sdk/blob/1d1a10351bc1fc94cfc00a7e79f12251ecc3b92f/openhands-sdk/openhands/sdk/tool/builtins/__init__.py">registered SDK tools</a>: no agent-callable condense tool in this inspected revision.</li>
       <li><a href="https://github.com/OpenHands/software-agent-sdk/blob/50080b58d35b4824fda25fca2345d80bcd08aeff/openhands-sdk/openhands/sdk/event/condenser.py">Pinned Python condensation events</a>: the original request, persisted condensation, and user-role summary representation.</li>
       <li><a href="https://github.com/smolpaws/openhands-agent/blob/e34e559ff309e0048b3c012c36b32babf3cd1e66/src/context/view.ts">TypeScript view replay</a>, <a href="https://github.com/smolpaws/openhands-agent/blob/e34e559ff309e0048b3c012c36b32babf3cd1e66/src/context/view-properties.ts">tool/batch integrity</a>, and <a href="https://github.com/smolpaws/openhands-agent/blob/e34e559ff309e0048b3c012c36b32babf3cd1e66/src/conversation/local-conversation.ts">step serialization</a>.</li>
       <li><a href="https://github.com/smolpaws/openhands-agent/blob/e34e559ff309e0048b3c012c36b32babf3cd1e66/docs/TRANSPILE_CONTRACT.md">SDK TRANSPILE contract</a> and <a href="https://github.com/smolpaws/smolpaws/blob/f146d888b79bbf8eb5e1a2633172a19555285ac7/packages/openhands-agent-server/TRANSPILE_RULES.md">server contract</a>: classifications and ownership.</li>
       <li><a href="https://github.com/smolpaws/smolpaws/blob/f146d888b79bbf8eb5e1a2633172a19555285ac7/docs/context-files.md">Product context snapshots</a> and <a href="https://github.com/smolpaws/smolpaws/blob/f146d888b79bbf8eb5e1a2633172a19555285ac7/docs/condensation.md">existing standard condensation</a>.</li>
+      <li>September 20 source check: <a href="https://github.com/OpenHands/software-agent-sdk/blob/becbde606074dc1a4f9bccc0e819170f865d13b0/openhands-sdk/openhands/sdk/context/condenser/llm_summarizing_condenser.py#L325">Python full-view hard reset</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/becbde606074dc1a4f9bccc0e819170f865d13b0/openhands-sdk/openhands/sdk/context/condenser/base.py#L160">HARD requirement routing</a>, and <a href="https://github.com/OpenHands/software-agent-sdk/blob/becbde606074dc1a4f9bccc0e819170f865d13b0/openhands-sdk/openhands/sdk/context/condenser/pipeline_condenser.py">pipeline short-circuit behavior</a>. This inspection does not advance the transpilation pin.</li>
+      <li><a href="https://github.com/smolpaws/openhands-agent/blob/4cd5e39b28c6c61df0c3ac11ce2f950de9e4637a/src/tool/switch-llm.ts">Typed Action/Observation payload example</a> and <a href="https://github.com/smolpaws/openhands-agent/blob/4cd5e39b28c6c61df0c3ac11ce2f950de9e4637a/src/event/index.ts#L120">existing event envelopes</a>.</li>
       <li><a href="https://github.com/smolpaws/smolpaws/blob/main/.beads/issues.jsonl">SmolPaws Beads</a> owns task status; this page explains the proposal.</li>
     </ul>
   </section>
-  <footer class="foot-nav"><a href="../index.html">← Back to the notebook</a> · <a href="openhands-transpile-maintenance.html">Transpile maintenance</a> · <span class="small">Proposal only · 2026-09-19</span></footer>
+  <footer class="foot-nav"><a href="../index.html">← Back to the notebook</a> · <a href="openhands-transpile-maintenance.html">Transpile maintenance</a> · <span class="small">Proposal only · updated 2026-09-20</span></footer>
 </main>
 </body>
 </html>
