@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Insider Cat — Codex app-server Voice prototype</title>
-  <meta name="description" content="A dated source review of Codex Voice, ChatGPT authentication, and the conversation ownership needed to integrate it with Insider Cat.">
+  <title>Insider Cat — Codex Voice hands work to OpenHands</title>
+  <meta name="description" content="The current direct Codex Voice handoff to a saved OpenHands Cat, with protocol boundaries and earlier relay experiments preserved as history.">
   <link rel="stylesheet" href="../arch.css">
   <style>
     .shell { max-width:960px; }
@@ -17,6 +17,8 @@
     .flow { display:grid; gap:12px; padding:24px; border:1px solid var(--border); border-left:3px solid var(--teal); background:var(--card); }
     .flow p { margin:0; }
     .source { color:var(--muted); font-size:14px; }
+    details { margin-top:32px; padding:18px; border:1px solid var(--border); border-radius:8px; }
+    summary { cursor:pointer; color:var(--teal); font-weight:600; }
     :focus-visible { outline:2px solid var(--teal); outline-offset:4px; }
     @media(max-width:640px) { .shell { padding:24px 18px 64px; } }
   </style>
@@ -24,11 +26,47 @@
 <body>
   <main class="shell">
     <a class="back" href="insider-cat.html#voice">← Insider Cat: Voice</a>
-    <h1>Codex can provide Voice</h1>
-    <p class="meta">Source investigation · <time datetime="2026-09-15">15 September 2026</time> · Prototype and test record updated <time datetime="2026-09-16">16 September 2026</time>.</p>
-    <div class="callout"><p><strong>Codex has a ChatGPT-authenticated WebRTC Voice path.</strong> Its app-server exposes that path through experimental RPC methods, separately from Insider’s public Realtime API transport. The source establishes the authentication path; the <a href="#live-verification">September 16 live checks</a> below verify three saved request-and-answer round trips across two calls on this account. Neither establishes general account eligibility, quota, or billing terms.</p></div>
+    <h1>Codex provides Voice.<br>OpenHands does the work.</h1>
+    <p class="meta">Current implementation reviewed <time datetime="2026-09-20">20 September 2026</time>. Earlier September 15–16 research and trials are preserved below.</p>
+    <div class="callout"><p><strong>The current bridge forwards an explicit Voice handoff directly to the saved OpenHands Cat.</strong> It does not wait for a second reasoning model to choose an integration tool. Codex handles the experimental authenticated audio connection; the saved Cat owns tools, approvals, history, execution, and results.</p></div>
 
-    <h2 id="publication">Development record on September 19</h2>
+    <h2 id="direct-handoff">Current path: one bound Cat, direct handoff</h2>
+    <p>Agent Server creates an ephemeral Codex thread for each call and binds the call to one existing OpenHands Insider conversation. The browser negotiates WebRTC through the server, keeps its audio connection across Canvas navigation, and polls call status. A fresh call starts with bounded saved Cat context. The selected worker in the Projects board is not included in that Codex session.</p>
+    <div class="flow" aria-label="Implemented direct handoff">
+      <p><strong>Codex Voice:</strong> emit <code>thread/realtime/itemAdded</code> with <code>item.type = "handoff_request"</code>, <code>handoff_id</code>, and explicit <code>input_transcript</code>.</p>
+      <p><strong>Agent Server:</strong> validate and admit the handoff once within that call, then append the request to the bound Cat with <code>send_message(run=True)</code>.</p>
+      <p><strong>OpenHands:</strong> execute that saved Cat using its configured tools and policy. The bridge waits for the entire run, including stop hooks, to settle.</p>
+      <p><strong>Agent Server → Voice:</strong> select the new saved answer after the pre-request event watermark and send it through <code>thread/realtime/appendSpeech</code>. A proposed finish alone is not sufficient.</p>
+    </div>
+    <p>The Codex thread uses <code>dynamicTools: []</code> alongside restrictions on other tool sources. The pinned app-server can still create a background turn: <code>clientManagedHandoffs</code> suppresses automatic outbound answers, not incoming background work. That turn has no tools and neither dispatches requests nor supplies the saved OpenHands answer. This restriction is essential; forwarding a notification while leaving an independently capable Codex agent active would have two execution owners.</p>
+    <p>The browser does not resubmit Codex transcripts or tool events. The separate public OpenAI Realtime API path still uses a browser <code>send_to_insider</code> tool bridge. Its events and credentials are different. Public GPT-Live delegation metadata is also a different protocol: do not substitute it for the pinned Codex <code>input_transcript</code> contract.</p>
+    <p><strong>There is still a Voice-model boundary.</strong> Live must emit a handoff. Direct speech from initial history is not proof that a request was saved in OpenHands. The new bridge removes the additional tool-choice failure after a handoff arrives; it does not guarantee that every spoken utterance will produce a handoff.</p>
+    <p class="source">Published implementation: <a href="https://github.com/enyst/agent-sdk/blob/02a51ae46744aa5a7c27067179502ceffb404610/openhands-agent-server/openhands/agent_server/codex_voice.py">Codex Voice broker</a> and <a href="https://github.com/enyst/agent-sdk/blob/02a51ae46744aa5a7c27067179502ceffb404610/tests/agent_server/test_codex_voice.py">handoff and lifecycle tests</a>. Equivalent tested worktree change: <code>957c1c584</code>.</p>
+
+    <h2 id="agent-capabilities">A successful handoff cannot supply missing tools</h2>
+    <p>The real worker is the saved OpenHands Cat. A September 20 inspection of a Cat that could not count conversations found an empty configured agent tool list and no client tools. Its built-in reasoning and finish tools remained, but the browser’s conversation API access had never become an agent capability. Voice had reached the correct agent; the agent lacked the requested capability.</p>
+    <p>The durable fix is a suitable OpenHands configuration and a scoped coordination integration: start with list/count/read/wait, then add policy-aware create/send operations with inspectable receipts. The current App does not implement those agent tools. An Insider skill describes behavior but cannot grant them. Resuming an old Cat preserves its old saved configuration rather than silently upgrading it to the active profile.</p>
+    <p><code>ask_agent</code> is a reasonable description of the desired experience, not a current Codex tool. The existing SDK endpoint of that name is a stateless one-off question helper, not a saved agent run with tools. Replacing the current conversation append-and-run path with that endpoint would lose the intended execution ownership.</p>
+
+    <h2 id="current-lifecycle">Identity, safety, and call lifetime</h2>
+    <p>A handoff ID is admitted at most once within a call; this is not a claim of global exactly-once execution across crashes or new calls. Repeated or conflicting handoffs and overlapping work are bounded. An uncertain outcome is kept distinct from a request rejected before submission.</p>
+    <p><code>request_not_sent</code> identifies a rejection before admission; <code>relay_failed</code> tells the user to inspect the saved outcome before retrying; <code>connection_failed</code> covers transport and protocol failures. Accepted append-and-run work is shielded from call cleanup. End closes Voice and its temporary relay, not the accepted OpenHands task.</p>
+    <p>Opening the same Cat’s regular Canvas conversation preserves the connected peer. New Cat creates a new saved owner on the next typed send. Switching Cat or backend ends the old call. Condensation keeps the Cat ID but ends the old call so the next session loads current context. Long answers use a labelled spoken excerpt while the complete answer stays saved.</p>
+
+    <h2 id="current-verification">Direct-path verification, September 19–20</h2>
+    <p>A real WebRTC call with generated speech produced a saved user request and OpenHands answer, then returned that answer as spoken audio. A fresh call on the same Cat recalled the saved test word, saved the new question and answer, and spoke the correct word. Both used the existing Codex sign-in and a Luna/high OpenHands Cat. These are two observed end-to-end requests across two calls, not a promise of universal delegation.</p>
+    <p>The earlier Luna/high relay had received a handoff but completed without choosing <code>send_to_insider</code>; no request reached OpenHands. That failure motivated direct dispatch. It does not show that Luna cannot be the saved Cat’s model: the subsequent direct-path checks used it successfully.</p>
+    <p>A further September 20 test repaired the earlier saved Cat by adding the standard terminal, editor, task-tracker, and browser tools, preserving its ID, model, approval policy, and all existing events. A generated spoken calculation then caused a real terminal action and observation, saved the answer, and returned the matching result as audio. This verifies execution by the receiving OpenHands agent; it does not add backend inventory or worker-management tools. A transient waiting acknowledgment was misleading before the correct final response, so progress speech remains a usability follow-up.</p>
+    <p>Physical iPad microphone, speaker, interruptions, approvals, and repeated-use behavior remain device checks. The public API transport needs its own live provider test. A transcript or a plausible spoken answer alone is not enough evidence; verify the new request and result in the saved conversation.</p>
+
+    <h2 id="publication">Configuration and development record</h2>
+    <p>The prototype selects Codex with <code>OH_VOICE_PROVIDER=codex</code>, uses a dedicated Codex home (optionally <code>OH_CODEX_VOICE_HOME</code>), and gates the tested <code>codex-cli 0.154.0</code> executable and restricted effective configuration. Sign-in and account access must work on the server. See the <a href="https://github.com/enyst/insider#voice">App README</a> for setup; this notebook contains no account credentials or local runtime paths.</p>
+    <p>Codex background-thread model settings, the Live audio model, and the OpenHands Cat’s model are three separate choices. A background-thread setting cannot add tools to the Cat. The current bridge supplies no Codex dispatch tool; the single <code>send_to_insider</code> fixture below belongs to the retired relay design.</p>
+    <p>Development records: <a href="https://github.com/enyst/insider/pull/2">Insider App #2</a>, <a href="https://github.com/OpenHands/OpenHands/pull/17558">Canvas #17558</a>, and <a href="https://github.com/OpenHands/software-agent-sdk/pull/5180">Agent Server #5180</a>. They are not a release or account-eligibility guarantee.</p>
+
+    <details id="source-history"><summary>Historical source investigation and model-driven relay trials · September 15–16</summary>
+    <p><strong>Historical design below:</strong> these sections explain the protocol investigation and earlier tool-based relay. References to a Codex model choosing <code>send_to_insider</code>, or completing without that call, are superseded by the <a href="#direct-handoff">direct server handoff</a>. The observed trials and their limits remain useful evidence.</p>
+    <h2 id="historical-publication">Earlier development record on September 19</h2>
     <p>The implementation is recorded in <a href="https://github.com/enyst/insider/pull/1">Insider App draft PR #1</a>, <a href="https://github.com/OpenHands/OpenHands/pull/17558">Canvas draft PR #17558</a>, and <a href="https://github.com/OpenHands/software-agent-sdk/pull/5180">Agent Server draft PR #5180</a>. The tested SDK worktree is also preserved in <a href="https://github.com/enyst/agent-sdk/commit/7c806a9193a6e7579f06e3b1fc164de955f3752e">commit <code>7c806a9</code></a>; its Voice and condensation changes match that upstream draft. These are development records, not released features. The live speech evidence below remains dated September 16.</p>
 
     <h2 id="evidence">What was inspected</h2>
@@ -113,6 +151,7 @@
     </ol>
     <p><strong>Recommendation:</strong> continue with the tested Codex configuration and verify durable delegation over multiple turns before treating Voice as the Cat’s dependable input path. This account’s existing sign-in carried the live test without an OpenAI API key; that observation does not establish billing terms or access for other accounts. Keep the API-key transport available as a separate option.</p>
     <p>See <a href="insider-cat.html#implementation-status">the earlier Insider test record</a> and <a href="insider-cat-stories.html">the user scenarios</a>.</p>
+    </details>
     <footer>Engel’s Code Design Notebook · Insider Cat · September 2026</footer>
   </main>
 </body>
