@@ -7,6 +7,13 @@ Beads owns task status; the site explains dated architecture, decisions and plan
 
 ## Current explanations
 
+- [Insider Cat](arch/insider-cat.html): September 20 App behavior, Cat interface,
+  conversation continuity, and normal OpenHands tools and skills. The
+  [Voice implementation note](arch/insider-cat-codex-voice.html) records a real
+  spoken request invoking the API skill and querying the owning backend through
+  the terminal, then returning the saved answer as speech. Dedicated inventory
+  tools are optional; this flow needs the normal skills and accurate runtime
+  context. Physical iPad audio and worker-mutation flows remain separate checks.
 - [Agent-triggered condensation](arch/agent-triggered-condensation.html): September 19 proposal for staged context warnings, an agent-called reset tool and memory recovery through its own call/result. Not implemented; `smolpaws-te15` and its six dependent tasks own status. Hard-limit and manual-command behavior remain design decisions.
 - [Reviewing the reviewer](arch/openhands-review-auditor.html): September 16 investigation,
   chosen actual Astra model and exasperated robot babysitter voice, event-driven implementation draft,

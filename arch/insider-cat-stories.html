@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Insider Cat — user scenarios and recommended behavior</title>
-  <meta name="description" content="Everyday Insider Cat scenarios: the new Canvas App's Projects board and durable typed conversation, plus the remaining coordination and voice work.">
+  <meta name="description" content="Everyday Insider Cat scenarios: current Cat interface, durable OpenHands conversations, direct Voice handoff, and coordination through normal tools and OpenHands skills.">
   <meta property="og:title" content="Insider Cat — from your side">
   <meta property="og:description" content="What the Canvas App supports today and the next interactions to build for Insider Cat.">
   <meta property="og:type" content="article">
@@ -28,27 +28,27 @@
 <main class="shell">
   <a class="back" href="insider-cat.html">← Insider Cat: code, architecture, and sources</a>
   <h1>The Cat, from your side</h1>
-  <p class="meta">Behavior scenarios · 14 September 2026 · Canvas App conversion</p>
-  <div class="callout"><p>Insider Cat is <strong>a sibling of SmolPaws inside Agent Canvas</strong>. These September 14 scenarios describe the typed <a href="insider-cat.html#apps">Canvas App baseline</a>. The <a href="insider-cat.html#implementation-status">September 15 worktree update</a> adds explicit new/resume, same-ID condensation, persistent Cat controls, and a Realtime voice implementation. It is not released; native browser audio and live OpenAI speech remain untested. Read that update for current implementation and evidence limits.</p></div>
+  <p class="meta">Behavior scenarios · updated 20 September 2026</p>
+  <div class="callout"><p>Insider Cat is <strong>a saved OpenHands agent inside Agent Canvas</strong>, with a Cat-shaped page and optional Voice. The <a href="insider-cat.html#look">current interface</a> has one Talk control and a compact companion while navigating elsewhere. <a href="insider-cat-codex-voice.html#direct-handoff">Codex Voice hands requests directly to that saved Cat</a>; the separate OpenAI API path uses a browser tool bridge. Both depend on the Cat’s actual configured tools. Normal terminal access and OpenHands skills can use the backend API; bespoke coordination tools are optional. Physical iPad audio checks remain outstanding.</p></div>
 
   <section class="scenario" id="find">
     <p class="label">01 · Find the companion</p>
     <h2>“I want to talk to the Cat.”</h2>
-    <p><strong>Canvas App:</strong> install Insider Cat on the selected Agent Server, enable it in Customize → Apps, and open Projects. Use its typed panel with a configured server agent profile and workspace. The Cat conversation is saved on that backend. Installation alone does not add a shell avatar or start a microphone.</p>
-    <p><strong>Recommended:</strong> clicking opens the Cat panel and its durable conversation. “Talk to Insider Cat” starts voice explicitly; “New Cat conversation” is a separate action. The panel shows the active backend and selected work target before the microphone starts.</p>
+    <p><strong>Canvas App:</strong> install Insider Cat on the selected Agent Server, enable it in Customize → Apps, and open Projects. Choose a saved Cat, or select New Cat and send the first typed message using a configured OpenHands profile and workspace. The Cat conversation is saved on that backend. The avatar rests until something needs it; installation never starts the microphone.</p>
+    <p><strong>Current controls:</strong> Talk starts Voice explicitly after a backend availability check. Before selecting a Cat, Talk remains visible with a disabled state and explanation. New Cat is a separate action. The compact controls outside Projects retain the same call; they do not silently follow the regular conversation you are viewing.</p>
   </section>
 
   <section class="scenario" id="attention">
     <p class="label">02 · Get oriented</p>
     <h2>“Which conversations need me?”</h2>
     <p><strong>Canvas App:</strong> the board reads conversations from its owning backend, with Refresh, Load more, and workspace filtering. Approval requests, errors, paused work, and ended runs have distinct labels. Loaded coverage is visible; a workspace filter applies to the conversations loaded so far.</p>
-    <p><strong>Recommended:</strong> fetch the relevant pages, explain any incomplete coverage, and show when the data was refreshed. Separate a real approval or question from an error or paused run. Each answer includes the conversation title and a direct link. Project filters narrow the same source of work rather than creating another task database.</p>
+    <p><strong>OpenHands agent:</strong> use the normal terminal tool and enabled API skill with the actual backend URL and authentication source. Prefer the count endpoint for a total; fetch every relevant list/search page for details, explain incomplete coverage, and show when the data was refreshed. A bare fixture with only reasoning and finish tools needs its normal configuration restored; a new custom inventory tool is not required. Separate a real approval or question from an error or paused run. Each answer includes the conversation title and a direct link. Project filters narrow the same source of work rather than creating another task database.</p>
   </section>
 
   <section class="scenario" id="continue">
     <p class="label">03 · Continue the right work</p>
     <h2>“Continue this, using the approach we just discussed.”</h2>
-    <p><strong>Canvas App:</strong> select a worker to attach its full ID and backend as context for a typed Cat request. The request continues the Cat controller, preserving its discussion. Selecting a worker does not itself send that worker a message. The chosen profile still needs real coordination tools to act on it.</p>
+    <p><strong>Canvas App:</strong> select a worker to attach its full ID and backend as context for a typed Cat request. The request continues the Cat controller, preserving its discussion. Selecting a worker does not itself send that worker a message. The Cat can act through its normal terminal/API workflow when its backend context and permissions support the request.</p>
     <p><strong>Recommended:</strong> bind “this” to the full ID and backend of the currently selected worker. Send a follow-up to that worker, with relevant context from the Cat conversation. Keep its previous history. If two targets match or backend context has changed, resolve the target before acting. A title chip makes the choice visible.</p>
   </section>
 
@@ -62,14 +62,14 @@
   <section class="scenario" id="delegate">
     <p class="label">05 · Hand off a task</p>
     <h2>“Start a separate agent to investigate that failure.”</h2>
-    <p><strong>Canvas App:</strong> the controller has an explicit identity and a durable conversation. Its skill explains how to distinguish controller and workers and how to report accepted work. The App does not install a worker dispatcher or conflict manager, and cannot grant tools that the selected profile lacks.</p>
+    <p><strong>Canvas App:</strong> the controller has an explicit identity and a durable conversation. Its skill explains how to distinguish controller and workers and how to report accepted work. The Cat can use the OpenHands API skill and terminal to create a worker through the normal backend API. The App does not supply a separate dispatcher or conflict manager, and the request remains subject to existing permissions and approval policy.</p>
     <p><strong>Recommended:</strong> create a worker on the intended project/backend, retain its full ID, and show its link in the Cat conversation. Acknowledging dispatch means work was accepted, not completed. Keep the long result in the conversation and speak the important findings.</p>
   </section>
 
   <section class="scenario" id="interrupt">
     <p class="label">06 · Correct and interrupt</p>
     <h2>“Stop. I meant the other project.”</h2>
-    <p><strong>Canvas App:</strong> voice is not connected. Selected work is explicit in the typed page, and full Canvas conversation links let the person inspect the relevant task. A future voice connection must preserve that target clarity.</p>
+    <p><strong>Current Voice:</strong> Mute and End call affect the audio connection, not accepted OpenHands work. Stop speaking is available on the OpenAI API transport; the Codex path hides that unsupported control. A typed worker selection is explicit, but the Codex session starts from saved Cat context and does not receive that board selection.</p>
     <p><strong>Recommended:</strong> “stop” during a spoken reply stops speech first. Preserve useful worker execution unless the person asks to cancel it. Before applying the corrected target, check whether the original action has already started; never silently execute the same request twice. Show Mute, End call, and Stop task as different actions.</p>
   </section>
 
@@ -89,8 +89,8 @@
 
   <h2>What makes the experience trustworthy</h2>
   <p>The person should always be able to tell <strong>who they are speaking with, which work will change, whether the microphone is on, and where the result was saved</strong>. Personality comes through concise, curious, candid speech. Trust comes from correct targets and visible records.</p>
-  <p><a href="insider-cat.html#voice">Current OpenAI voice choices and ElevenLabs comparison</a> · <a href="insider-cat.html#skill">The Insider skill and its activation boundary</a> · <a href="insider-cat.html#next">Implementation priorities</a>.</p>
-  <footer>Engel’s Code Design Notebook · Canvas App behavior and remaining integrations</footer>
+  <p><a href="insider-cat.html#voice">The two implemented Voice transports</a> · <a href="insider-cat.html#skill">The Insider skill and its activation boundary</a> · <a href="insider-cat.html#next">Implementation priorities</a>.</p>
+  <footer>Engel’s Code Design Notebook · Canvas App behavior and OpenHands coordination</footer>
 </main>
 </body>
 </html>
