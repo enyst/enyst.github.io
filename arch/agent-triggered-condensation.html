@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent-triggered condensation: a note to your future self — Engel's notebook</title>
+  <meta name="description" content="A proposed SmolPaws condenser: staged context warnings, an agent-called condense tool, a fresh active context, and a message to the agent's future self.">
+  <meta property="og:title" content="Agent-triggered condensation: a note to your future self">
+  <meta property="og:description" content="The agent saves its own notes, requests a context reset, and resumes through its own tool call and result. Proposal, September 19, 2026.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/agent-triggered-condensation.html">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    .shell{max-width:1060px}.eyebrow,.label{font:600 .72rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+    h1{max-width:850px;font-size:clamp(2.25rem,6vw,4rem);line-height:1.08;margin:16px 0 22px}.lead{max-width:780px;font-size:1.13rem;color:var(--ink)}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 32px}.pill{padding:5px 11px;border:1px solid var(--border);border-radius:99px;font:.75rem var(--mono);color:var(--muted)}
+    .pill.proposal{color:var(--accent)}nav.contents{display:flex;flex-wrap:wrap;gap:12px 22px;padding:18px 0;border-block:1px solid var(--border);font-size:.85rem}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{border:1px solid var(--border);background:var(--card);border-radius:10px;padding:22px;min-width:0}.panel h3{margin-top:0}
+    .meter{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:22px 0}.meter div{padding:18px 14px;border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:6px;background:var(--card)}.meter b{display:block;font:600 1.6rem var(--mono);color:var(--ink)}.meter span{font-size:.8rem;color:var(--muted)}
+    .sequence{list-style:none;padding:0;display:grid;gap:10px}.sequence li{display:grid;grid-template-columns:145px minmax(0,1fr);gap:18px;border:1px solid var(--border);border-radius:8px;padding:18px 20px;margin:0;background:var(--card)}
+    .sequence .role{font:.75rem var(--mono);color:var(--accent);padding-top:3px}.sequence p{margin:0}.sequence .fixed{border-style:dashed}.sequence .future{border-color:var(--accent)}.sequence .late{opacity:.86}
+    .postcard{padding:24px;border:1px solid var(--accent);border-radius:8px;margin:20px 0;background:var(--card)}.postcard p{margin:10px 0 0}.postcard .label{margin-bottom:12px}
+    pre.code{white-space:pre-wrap;overflow-wrap:anywhere}.small{font-size:.85rem;color:var(--muted)}.table-wrap{overflow-x:auto}table{min-width:540px}td{vertical-align:top}td:first-child{white-space:nowrap}
+    details{border-bottom:1px solid var(--border);padding:16px 0}summary{cursor:pointer;font-weight:600;color:var(--ink)}details p{margin:12px 0 4px}a,code{overflow-wrap:anywhere}section{scroll-margin-top:24px}
+    .dependency{font:.85rem/1.9 var(--mono);padding:20px;border:1px solid var(--border);border-radius:8px;background:var(--card);overflow-wrap:anywhere}.source-list li{margin-bottom:12px}
+    @media(max-width:680px){.grid{grid-template-columns:1fr}.sequence li{grid-template-columns:1fr;gap:6px}.meter{grid-template-columns:repeat(2,1fr)}.shell{padding-top:25px}.panel,.postcard{padding:18px}nav.contents{gap:10px 16px}}
+    @media print{body{background:#fff!important;color:#111!important}p,li,td,strong,h1,h2,h3,.role,.label,.lead{color:#111!important}.shell{max-width:none}.panel,.postcard,.sequence li,.meter div{background:#fff!important}details>*{display:block}nav.contents{display:none}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <a class="back" href="../index.html">← Engel's code design notebook</a>
+  <header>
+    <p class="eyebrow">SmolPaws · context and memory</p>
+    <h1>A fresh context.<br>A note from yourself.</h1>
+    <p class="lead">Give the agent advance warning, let it save what matters, and let it call <code>condense()</code> when ready. A new condenser clears the old active history. The agent resumes through its own tool call, a recovery instruction, and an optional message to its future self.</p>
+    <div class="meta"><span class="pill proposal">Proposal · not implemented</span><span class="pill">2026-09-19</span><span class="pill">smolpaws-te15</span><span class="pill">SDK first → server → pilot</span></div>
+    <nav class="contents" aria-label="Proposal sections"><a href="#intent">Intent</a><a href="#warnings">Warnings</a><a href="#tool">The tool</a><a href="#context">Next context</a><a href="#events">Events &amp; replay</a><a href="#decisions">Open decisions</a><a href="#work">Beads</a><a href="#sources">Sources</a></nav>
+  </header>
+
+  <section id="intent">
+    <h2>Let the agent prepare its own return</h2>
+    <p>Engel's proposal starts from a simple expectation: the agent already has memory, daily notes, and tools for reading and writing them. Before clearing context, it should use those facilities to record unfinished requests, decisions, locations, and whatever else it will need to continue. The new tool can also carry a short personal handoff: a pointer to notes, the task it was doing, or simply “hi from your past self.”</p>
+    <div class="grid">
+      <div class="panel"><h3>Selected behavior</h3><p>An opt-in condenser type, provisionally <code>agent_reset</code>, clears prior active history after an agent-originated request. It makes no summarizer LLM call. There is no retained old prefix, recent-history tail, or generated summary in this mode.</p></div>
+      <div class="panel"><h3>What persists</h3><p>The full event log, conversation identity, files, saved notes, profiles, usage accounting, and normal fixed context remain available. “Clear” describes what enters the next model request. Historical events remain stored and inspectable.</p></div>
+    </div>
+    <p class="small">This refines the September 18 bead. Its earlier ideas about a recent tail, an LLM-written summary, and an automatic summarizer fallback are historical discussion, not decisions carried into this design.</p>
+  </section>
+
+  <section id="warnings">
+    <h2>Four chances to prepare</h2>
+    <div class="meter" aria-label="Default warning thresholds"><div><b>75%</b><span>Prepare notes</span></div><div><b>80%</b><span>Reminder</span></div><div><b>85%</b><span>Less room remains</span></div><div><b>90%</b><span>Prepare to reset soon</span></div></div>
+    <p>The new condenser owns a configurable ascending list of warning thresholds. These defaults mean percentage of the <strong>resolved effective main-model input budget</strong>, counting the projected history, fixed context and tool declarations. They do not mean output tokens or the separate summarizer model's window.</p>
+    <p>Warnings are visible to the agent and ask it to save notes before calling <code>condense</code>. They leave the timing to the agent; crossing a warning threshold does not itself clear context. The agent can also call the tool early.</p>
+    <details open><summary>Recommended warning lifecycle</summary><p>Emit each level once per reset cycle and persist that progress across restarts. If one step jumps from 74% to 87%, emit one 85% warning and mark the lower levels passed. A committed reset rearms the levels for the next cycle. Unknown budgets or unavailable token counts remain explicitly unavailable; do not invent a percentage. Current local counting is an estimate, so leave headroom for notes and recovery.</p></details>
+    <p class="small">The existing <code>CondensationRequest</code> is an internal trigger and is excluded from the model's view. A warning therefore needs explicit model-visible rendering. The hard-ceiling response is a separate decision below.</p>
+  </section>
+
+  <section id="tool">
+    <h2>The agent calls <code>condense</code></h2>
+    <pre class="code" aria-label="Illustrative tool arguments">condense({
+  message_to_future_self: "Hi from before the reset. Read the daily note I just saved; the next task is recorded there."
+})</pre>
+    <p>The parameter is optional free-form text. Field spelling is provisional; its meaning is the agent's own message, preserved verbatim. The tool does not write daily memory on the agent's behalf, discover missing notes, or ask another model to select what matters. Memory writes should have succeeded before it is called.</p>
+    <p>The tool records a correlated condensation request for the configured condenser. The new reset implementation handles that request at a safe step boundary and records a durable <code>Condensation</code>. Existing <code>LLMSummarizingCondenser</code> remains a separate supported configuration with its ordinary summarization behavior. Whether this new tool is exposed for that configuration is a contract decision; it must never silently discard a supplied future-self message.</p>
+    <div class="callout"><p><strong>Recommended first-version constraint:</strong> call <code>condense</code> as the only tool in its response. A mixed or duplicate tool batch receives an explanatory rejection for the reset request. Retaining one action while dropping its sibling actions would break existing batch integrity. Ordinary sibling execution follows the existing tool policy.</p></div>
+  </section>
+
+  <section id="context">
+    <h2>Exactly what the next context starts with</h2>
+    <ol class="sequence">
+      <li class="fixed"><span class="role">Fixed context</span><p>System prompt, identity, configured memory context, runtime/channel information, skills, and tool definitions, composed as usual.</p></li>
+      <li><span class="role">1 · user</span><p><strong>The agent triggered context condensation.</strong><br><span class="small">Exact synthetic notice. Its provenance is the environment; it is not a new message from the human.</span></p></li>
+      <li><span class="role">2 · assistant</span><p>The agent's genuine <code>condense</code> tool call, including its optional message. Preserve its real call ID and required reasoning/provenance.</p></li>
+      <li class="future"><span class="role">3 · tool</span><p>The matching result: confirmation of the agent-triggered reset, recovery instructions, and the message to its future self.</p></li>
+      <li class="late"><span class="role">Then · new input</span><p>Any genuine user input that arrived after the model request which authored the reset. It was not available when the agent prepared the reset and must survive, in order.</p></li>
+    </ol>
+    <div class="postcard">
+      <div class="label">Proposed tool-result wording</div>
+      <p>You triggered context condensation. Your earlier active history has been cleared; your notes and the stored conversation history remain available.</p>
+      <p>Take a deep breath. Find and read your notes to regain your bearings, then continue the user's work. The user may not know what just happened. Consider whether a brief heads-up or a little joke would help; use your judgment.</p>
+      <p><strong>Message from your past self:</strong><br>[the exact optional message you supplied]</p>
+    </div>
+    <p>The optional message block is omitted when no message was supplied. This wording guides the agent; it does not automatically send a message to the user. There is no <code>CondensationSummaryEvent</code> in the reset view.</p>
+    <div class="callout"><p><strong>Memory detail:</strong> SmolPaws currently snapshots fixed context for a conversation. Rendering that context again does not reload freshly edited memory files. This initial proposal keeps the snapshot and lets the agent read its newly saved daily notes through its tools. A refresh of trusted memory snapshots would need a separate explicit policy.</p></div>
+  </section>
+
+  <section id="events">
+    <h2>Existing event kinds, explicit new semantics</h2>
+    <p>The host already has <code>conversation.condense()</code>; the Python SDK and our pinned port do not expose an agent-callable condensation tool. Existing request events carry no notes or originating tool references, and the current view reduces requests to a flag. A thin wrapper around that API would not implement this proposal.</p>
+    <div class="table-wrap"><table><thead><tr><th>Record</th><th>Proposed responsibility</th></tr></thead><tbody>
+      <tr><td><code>ActionEvent</code></td><td>The actual agent tool call and its authored message.</td></tr>
+      <tr><td><code>CondensationRequest</code></td><td>A correlated request to the configured condenser. Versioned metadata identifies the request and its originating call.</td></tr>
+      <tr><td><code>ObservationEvent</code></td><td>The matching result, with recovery text and the future-self message.</td></tr>
+      <tr><td><code>Condensation</code></td><td>The committed removal set and reset operation, with <code>summary: null</code>. Metadata identifies the preserved pair and the reset view.</td></tr>
+      <tr><td>Synthetic <code>MessageEvent</code></td><td>Deterministic environment-origin, user-role notice at the front of the new view.</td></tr>
+    </tbody></table></div>
+    <p>Prefer reusing event kinds, with typed, versioned metadata for the reset. Whether that metadata is an optional event payload or a linked existing state-update event belongs in the contract task. <strong>No new kind is inherently required, but unchanged wire schemas are not promised.</strong> A reset-aware projection is necessary: the existing delete-and-insert-summary operation cannot express the chosen notice plus original tool pair by itself.</p>
+    <details open><summary>Commit the boundary without losing arrivals</summary><p>Capture the history boundary consumed by the model that authored the tool call. Record intent without recursively running the conversation from inside its executor; that could wait on its own step lock. Settle the step, durably commit the tool result and reset operation with defined crash recovery, and only then make the next model call. Clear only the eligible earlier history. Messages arriving during note-taking, model completion, tool execution or reset must remain pending until a subsequent request actually consumes them.</p></details>
+    <details><summary>Replay is a projection, not tool re-execution</summary><p>The durable log keeps chronological source records. Replay reconstructs the new view from stable operation references and synthesizes one deterministic notice. It must not execute <code>condense</code> again, duplicate the pair, revive cleared history, reset accounting, or declare a failed reset successful. Repeated resets and forks need the same explicit rules. A crash between intent, observation and reset commitment needs defined completion or failure behavior before another model request is allowed.</p></details>
+    <details><summary>Provider histories must stay valid</summary><p>Verify assistant/tool adjacency, real call/result identity, response-batch integrity, and signed or encrypted reasoning handling across native clients. The synthetic user notice must remain distinct from genuine incoming user work. Existing profile-origin and concurrent-request projection rules still apply. The reset must not manufacture a claim that the agent authored a call which never occurred.</p></details>
+    <p><strong>TRANSPILE treatment:</strong> tool/schema additions may be additive extensions; changed request handling, view replay and prompt ordering affect parity-governed behavior. Register the appropriate stable policy in <code>TRANSPILE_CONTRACT.md</code> and the canonical manifest, with tests and source evidence. Review and merge the SDK first, then vendor that exact commit into the server and update its contract.</p>
+  </section>
+
+  <section id="decisions">
+    <h2>Decisions to settle before implementation</h2>
+    <div class="table-wrap"><table><thead><tr><th>Question</th><th>Boundary for this proposal</th></tr></thead><tbody>
+      <tr><td>Hard limit or overflow</td><td>What happens if warnings are ignored and notes are not ready? Choose an explicit recoverable policy before implementation. The older bead's automatic LLM fallback has not been selected; the reset mode itself performs no summary call.</td></tr>
+      <tr><td>Host or channel <code>/condense</code></td><td>A human command has no genuine agent-authored call/message. Decide how the new mode handles it. Existing summarizer commands continue their current contract; do not fabricate an agent tool call.</td></tr>
+      <tr><td>Optional message limit</td><td>Choose a bounded size and an actionable rejection before any destructive view change. The limit must leave room for fixed context, tool exchange and recovery.</td></tr>
+      <tr><td>Metadata and warning rendering</td><td>Choose versioned persistence, event validation, restart behavior and model-visible warning form. Keep synthetic maintenance notices separate from real user input.</td></tr>
+    </tbody></table></div>
+    <p>The agent owns the content of its notes; the harness cannot prove they are sufficient. If notes are missing, unreadable, or incomplete, the recovery instruction should lead to inspection or an honest question to the user. Reset cannot repair a fixed prompt that already exceeds the budget.</p>
+  </section>
+
+  <section id="work">
+    <h2>Tracked work, in dependency order</h2>
+    <p><code>smolpaws-te15</code> remains the proposal's parent. All six implementation tasks are open. Publishing this page and filing the beads does not implement or enable the feature.</p>
+    <div class="dependency" aria-label="Dependency order">te15.1 contract → [te15.2 tool/reset + te15.3 warnings] → te15.4 SDK review &amp; merge → te15.5 server → te15.6 verification &amp; controlled rollout</div>
+    <div class="table-wrap"><table><thead><tr><th>Bead</th><th>Deliverable</th><th>Blocked by</th></tr></thead><tbody>
+      <tr><td><code>smolpaws-te15.1</code></td><td>Event, lifecycle and TRANSPILE contract; settle open policy decisions.</td><td>—</td></tr>
+      <tr><td><code>smolpaws-te15.2</code></td><td>SDK tool and reset projection, with red/green evidence for source-history and late-input preservation.</td><td>.1</td></tr>
+      <tr><td><code>smolpaws-te15.3</code></td><td>Configurable staged warnings, persisted crossing state, available/unknown measurements.</td><td>.1</td></tr>
+      <tr><td><code>smolpaws-te15.4</code></td><td>Substantive SDK review, checks, documentation and merge.</td><td>.2, .3</td></tr>
+      <tr><td><code>smolpaws-te15.5</code></td><td>Server vendoring, settings and tool wiring; no summarizer-profile lookup for reset.</td><td>.4</td></tr>
+      <tr><td><code>smolpaws-te15.6</code></td><td>Protected-server/relay tests, bounded live recovery check and separately authorized scoped rollout.</td><td>.5</td></tr>
+    </tbody></table></div>
+    <p>Required evidence includes the complete warning → note write → tool → reset → note retrieval → continued task path; concurrent text/media; crash/restart at every persistence boundary; repeated reset; missing notes; mixed calls; exact native provider message ordering; and warning rearming. Live cost and actual continuation must be reported separately from deterministic tests.</p>
+    <p class="small">Related work remains separate: <code>smolpaws-d3fw</code> (existing 1M/400k budget snapshots), <code>smolpaws-29dr</code> (summary preview loss), <code>smolpaws-neo</code> (history invariants), and <code>smolpaws-eh4z</code> (Fast-Jev evaluation). None silently changes this proposal.</p>
+  </section>
+
+  <section id="sources">
+    <h2>Source anchors and scope</h2>
+    <p>This is a dated design proposal based on Engel's September 19 instructions, the prior bead, and inspected source. Authorship and note selection are motivations to test; a message-role change alone has not been demonstrated to solve continuity.</p>
+    <ul class="source-list">
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/blob/1d1a10351bc1fc94cfc00a7e79f12251ecc3b92f/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py#L2926">Python host condensation operation</a> and <a href="https://github.com/OpenHands/software-agent-sdk/blob/1d1a10351bc1fc94cfc00a7e79f12251ecc3b92f/openhands-sdk/openhands/sdk/tool/builtins/__init__.py">registered SDK tools</a>: no agent-callable condense tool in this inspected revision.</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/blob/50080b58d35b4824fda25fca2345d80bcd08aeff/openhands-sdk/openhands/sdk/event/condenser.py">Pinned Python condensation events</a>: the original request, persisted condensation, and user-role summary representation.</li>
+      <li><a href="https://github.com/smolpaws/openhands-agent/blob/e34e559ff309e0048b3c012c36b32babf3cd1e66/src/context/view.ts">TypeScript view replay</a>, <a href="https://github.com/smolpaws/openhands-agent/blob/e34e559ff309e0048b3c012c36b32babf3cd1e66/src/context/view-properties.ts">tool/batch integrity</a>, and <a href="https://github.com/smolpaws/openhands-agent/blob/e34e559ff309e0048b3c012c36b32babf3cd1e66/src/conversation/local-conversation.ts">step serialization</a>.</li>
+      <li><a href="https://github.com/smolpaws/openhands-agent/blob/e34e559ff309e0048b3c012c36b32babf3cd1e66/docs/TRANSPILE_CONTRACT.md">SDK TRANSPILE contract</a> and <a href="https://github.com/smolpaws/smolpaws/blob/f146d888b79bbf8eb5e1a2633172a19555285ac7/packages/openhands-agent-server/TRANSPILE_RULES.md">server contract</a>: classifications and ownership.</li>
+      <li><a href="https://github.com/smolpaws/smolpaws/blob/f146d888b79bbf8eb5e1a2633172a19555285ac7/docs/context-files.md">Product context snapshots</a> and <a href="https://github.com/smolpaws/smolpaws/blob/f146d888b79bbf8eb5e1a2633172a19555285ac7/docs/condensation.md">existing standard condensation</a>.</li>
+      <li><a href="https://github.com/smolpaws/smolpaws/blob/main/.beads/issues.jsonl">SmolPaws Beads</a> owns task status; this page explains the proposal.</li>
+    </ul>
+  </section>
+  <footer class="foot-nav"><a href="../index.html">← Back to the notebook</a> · <a href="openhands-transpile-maintenance.html">Transpile maintenance</a> · <span class="small">Proposal only · 2026-09-19</span></footer>
+</main>
+</body>
+</html>
