@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Insider Cat — Codex app-server Voice prototype</title>
+  <meta name="description" content="A dated source review of Codex Voice, ChatGPT authentication, and the conversation ownership needed to integrate it with Insider Cat.">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    .shell { max-width:960px; }
+    a { overflow-wrap:anywhere; text-underline-offset:3px; }
+    p, li { line-height:1.75; }
+    code { overflow-wrap:anywhere; }
+    .table-wrap { overflow-x:auto; margin:24px 0; }
+    table { margin:0; }
+    td, th { vertical-align:top; }
+    .flow { display:grid; gap:12px; padding:24px; border:1px solid var(--border); border-left:3px solid var(--teal); background:var(--card); }
+    .flow p { margin:0; }
+    .source { color:var(--muted); font-size:14px; }
+    :focus-visible { outline:2px solid var(--teal); outline-offset:4px; }
+    @media(max-width:640px) { .shell { padding:24px 18px 64px; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <a class="back" href="insider-cat.html#voice">← Insider Cat: Voice</a>
+    <h1>Codex can provide Voice</h1>
+    <p class="meta">Source investigation · <time datetime="2026-09-15">15 September 2026</time> · Prototype and test record updated <time datetime="2026-09-16">16 September 2026</time>.</p>
+    <div class="callout"><p><strong>Codex has a ChatGPT-authenticated WebRTC Voice path.</strong> Its app-server exposes that path through experimental RPC methods, separately from Insider’s public Realtime API transport. The source establishes the authentication path; the <a href="#live-verification">September 16 live checks</a> below verify three saved request-and-answer round trips across two calls on this account. Neither establishes general account eligibility, quota, or billing terms.</p></div>
+
+    <h2 id="publication">Development record on September 19</h2>
+    <p>The implementation is recorded in <a href="https://github.com/enyst/insider/pull/1">Insider App draft PR #1</a> and <a href="https://github.com/OpenHands/software-agent-sdk/pull/5180">Agent Server draft PR #5180</a>. The tested SDK worktree is also preserved in <a href="https://github.com/enyst/agent-sdk/commit/7c806a9193a6e7579f06e3b1fc164de955f3752e">commit <code>7c806a9</code></a>; its Voice and condensation changes match that upstream draft. These are development records, not released features. The live speech evidence below remains dated September 16.</p>
+
+    <h2 id="evidence">What was inspected</h2>
+    <p>The Codex source was refreshed from <code>openai/codex</code> and reviewed at <a href="https://github.com/openai/codex/commit/c51cb968e43fd52255aacf568220aed4654c3f97"><code>c51cb968e4</code></a>. The implementation and upstream mock-test assertions below were read. The September 15 source-only investigation did not open a microphone or create a provider session. The separately dated September 16 live checks below used the authorized existing sign-in and generated speech.</p>
+    <p><strong>Correction to the earlier conclusion:</strong> separately billed public API access does not imply that every Codex Voice integration requires an API key. Codex has a separate authenticated application path. Calling the public Realtime API with a ChatGPT token and asking Codex app-server to manage its own Voice session are different integrations.</p>
+
+    <h2 id="authentication">Authentication depends on transport</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Path</th><th>Authentication in inspected source</th><th>Implication</th></tr></thead>
+      <tbody>
+        <tr><td>Insider → public Realtime API</td><td>Agent Server uses a standard OpenAI API key.</td><td>This transport still needs API access. The optional Codex relay below uses a separate authentication path.</td></tr>
+        <tr><td>Codex standalone realtime WebSocket</td><td>Calls <code>realtime_api_key()</code>, including an environment fallback for ChatGPT sessions.</td><td>Signing into ChatGPT alone does not satisfy this transport’s current key requirement.</td></tr>
+        <tr><td>Codex WebRTC call</td><td>Uses <code>ModelClient</code> and its current authentication. ChatGPT sessions use the ChatGPT bearer and account identity; API-key sessions use their API key.</td><td>This is the candidate for ChatGPT-authenticated Voice through app-server.</td></tr>
+        <tr><td>Codex attachment to an existing call</td><td>Uses the current model client’s authentication for the sideband connection.</td><td>It attaches to an already negotiated call; it is not an independent way to obtain one.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="source">Evidence: <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/core/src/realtime_conversation.rs#L1230">transport preparation</a>, <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/core/src/realtime_conversation.rs#L1773">API-key helper</a>, and <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/core/src/client.rs#L401">WebRTC authentication and sideband identity</a>.</p>
+    <p>The upstream test <code>conversation_webrtc_frameless_chatgpt_sends_codex_headers_to_backend</code> creates dummy ChatGPT authentication, starts WebRTC with protocol v3, and asserts a call to <code>/backend-api/codex/realtime/calls</code> with its access token. It also asserts client delegation and the selected voice model. This is explicit mock evidence of the intended path, not a live account test. <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/core/tests/suite/realtime_conversation.rs#L792">Read the test</a>.</p>
+
+    <h2 id="protocol">The app-server surface exists</h2>
+    <p>The protocol exposes <code>thread/realtime/start</code>, <code>appendAudio</code>, <code>appendText</code>, <code>appendSpeech</code>, <code>stop</code>, and <code>listVoices</code>. Clients opt into experimental APIs during initialization. Starting a call requires a Codex thread; the response acknowledges submission, while notifications report SDP, session start, transcripts, errors, and closure.</p>
+    <p><strong>Offline executable check:</strong> the installed <code>codex-cli 0.154.0</code> successfully generated JSON Schema and TypeScript bindings using a separate temporary configuration directory. Its experimental schema contains the three transports, v1/v2/v3, and all 19 start-parameter names in the reviewed source. The stable schema excludes realtime request methods. This proves that the executable exposes the protocol; schema generation does not negotiate a voice call.</p>
+    <div class="flow" aria-label="Candidate Codex Voice connection">
+      <p><strong>Browser:</strong> after an explicit Start Voice, create the WebRTC offer.</p>
+      <p><strong>Insider’s trusted backend:</strong> send <code>thread/realtime/start</code> with the mapped Codex thread ID, <code>outputModality: "audio"</code>, and <code>transport: { type: "webrtc", sdp }</code>.</p>
+      <p><strong>Codex app-server:</strong> establish the call using its own authentication and return the answer through <code>thread/realtime/sdp</code>.</p>
+      <p><strong>Browser:</strong> apply the answer and keep audio attached to that conversation across Canvas views.</p>
+    </div>
+    <p>Use an explicit protocol version. WebRTC and existing-call attachment accept v1 or v3 and reject v2 in this revision; omitting the version selects v1. Protocol v3 defaults to <code>gpt-live-1-codex</code>; v1/v2 default to <code>gpt-realtime-1.5</code>. A model override field exists, but its presence does not prove permission to use any public API model through ChatGPT authentication.</p>
+    <p>For v3, <code>initialItems</code> can supply bounded, role-bearing text history: at most 128 items and 8,192 estimated text tokens in total. <code>includeStartupContext: false</code> prevents automatic injection of Codex’s startup history. Existing-call attachment cannot configure a new model, voice, prompt, or initial history.</p>
+    <p>That initial history seeds Voice, not the backing Codex thread. Subsequent v3 <code>appendText</code> calls discard the supplied role, so they cannot serve as a role-preserving history import. Codex also persists its own realtime timeline; synchronization with the saved OpenHands conversation remains integration work. <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/codex-api/src/endpoint/realtime_websocket/methods_common.rs#L41">Text adapter</a>; <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/core/src/session/realtime_history.rs#L36">history persistence</a>.</p>
+    <p class="source">Evidence: <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/app-server-protocol/src/protocol/common.rs#L1056">RPC methods</a>, <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/app-server-protocol/src/protocol/v2/realtime.rs#L191">start parameters and transports</a>, and <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/core/src/realtime_conversation.rs#L1269">version selection and validation</a>.</p>
+
+    <h2 id="ownership">The difficult part is conversation ownership</h2>
+    <p>Codex app-server Voice is integrated with the Codex agent. Incoming voice handoffs are routed into the owning Codex thread before the public notification is emitted. Merely listening to those notifications and submitting the same request to OpenHands would risk running the work twice.</p>
+    <p><code>clientManagedHandoffs</code> does <strong>not</strong> turn off that incoming routing. It suppresses automatic delivery of Codex responses back to Voice so the client can append output explicitly. It is not an external-agent delegation switch.</p>
+    <p class="source">Evidence: <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/core/src/realtime_conversation.rs#L1663">incoming handoff routing</a>, <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/core/src/realtime_conversation.rs#L855">outgoing handoff guard</a>, and the parameter’s definition in the <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/app-server-protocol/src/protocol/v2/realtime.rs#L197">protocol</a>.</p>
+    <p>Two designs deserve separate evaluation:</p>
+    <ul>
+      <li><strong>A Codex-backed Insider controller:</strong> keep one Codex thread as the companion’s owner and adapt Canvas history, new/resume, condensation, approvals, and agent actions to that owner. This is a larger backend integration.</li>
+      <li><strong>A Codex relay to the existing OpenHands Cat:</strong> the Codex turn invokes a constrained integration tool that addresses one bound OpenHands conversation. OpenHands remains the authority for task outcomes. App-server supports dynamic tools, but the Codex model must choose to call the tool during its turn. This adds a Codex reasoning turn and requires explicit transcript synchronization and duplicate-request prevention. This is the design implemented in the prototype below. <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/app-server/tests/suite/v2/dynamic_tools.rs#L473">Dynamic tool request/response test</a>.</li>
+    </ul>
+    <p>For either design, persist the owner mapping on the server. Navigation must reuse it; New must create a distinct owner; resuming must reload the correct history; condensation must end the old voice session and seed the next from the condensed context. Each request must have one execution owner, with approvals and outcomes visible in the same conversation the user is reading.</p>
+
+    <h2 id="relay-prototype">Selected prototype: a relay to the saved Cat</h2>
+    <p class="meta"><time datetime="2026-09-16">16 September 2026</time> · Implemented in the isolated App and Agent Server worktrees. Fixture checks and three live delegated requests across two calls passed. Physical iPad microphone and broader live checks remain outstanding.</p>
+    <p>The selected design keeps OpenHands as the durable conversation owner. Each Voice call creates a fresh, ephemeral Codex relay thread, bound on the server to that one Insider controller. This refines the mapping proposal above: the saved OpenHands ID survives navigation and resumption; the Codex thread lasts only for the call. Restarting Voice seeds a bounded snapshot of the current saved Cat context instead of accumulating a second permanent history.</p>
+    <div class="flow" aria-label="Selected Insider Voice relay">
+      <p><strong>Voice → Codex relay:</strong> a delegated spoken request starts a Codex turn whose constrained tool addresses only the bound Cat.</p>
+      <p><strong>Relay → OpenHands:</strong> save the request once, retain the Cat’s approval policy, and wait for the actual run to settle.</p>
+      <p><strong>OpenHands → Voice:</strong> return the saved result or an explicit pending, approval, or failure status. Accepted work is not a completed result.</p>
+    </div>
+    <p>The browser must not also submit the transcript as a second OpenHands request. A backend-selected provider distinguishes this server-owned relay from the existing browser-owned public Realtime tool bridge. The original API-key path remains available.</p>
+    <p>Stopping Voice closes its connection and relay; it does not undo work already saved in OpenHands. Changing Cat, starting a new Cat, or condensing the current Cat ends the old call. Opening the same Cat in another Canvas view keeps its identity and active call.</p>
+    <p><strong>The relay keeps its own configuration and can share an existing sign-in with explicit user authorization.</strong> The prototype selects Codex with <code>OH_VOICE_PROVIDER=codex</code> and gives it a dedicated home, optionally set with <code>OH_CODEX_VOICE_HOME</code>. The tested executable is <code>codex-cli 0.154.0</code>; an untested version or enabled MCP configuration fails the availability check.</p>
+    <p><strong>Setup update, 16 September:</strong> for an existing file-store sign-in, link only the dedicated home’s <code>auth.json</code> to the existing Codex <code>auth.json</code>, and set <code>cli_auth_credentials_store = "file"</code> in the dedicated configuration. This shares the session without copying tokens or loading the ordinary home’s configuration, plugins, or MCP servers. The pinned version’s file-store save follows the symlink, so token refresh updates the shared file; this arrangement relies on that behavior and does not apply to keyring storage. <a href="https://github.com/openai/codex/blob/c51cb968e43fd52255aacf568220aed4654c3f97/codex-rs/login/src/auth/storage.rs#L206">File-store save implementation</a>.</p>
+    <p>The successful live trial set <code>model = "gpt-5.5"</code> and <code>model_reasoning_effort = "low"</code> in that dedicated configuration. These select the Codex reasoning relay, separately from the Live voice model. The saved OpenHands Cat also used GPT-5.5 in the trial.</p>
+    <p>This separation follows an executable test: an empty <code>mcp_servers</code> override still inherited a configured local MCP server, even with empty environments. The restricted fixture exposed only <code>send_to_insider</code> to the model. A dedicated configuration, feature restrictions, and a version check are required for this prototype; prompt instructions alone do not establish that boundary.</p>
+    <p>If no suitable existing session is available, sign in normally in the dedicated home. On the server machine, run <code>CODEX_HOME=/path/to/insider-codex-home codex login --device-auth</code>, then use that same directory for <code>OH_CODEX_VOICE_HOME</code>. The device flow lets the user finish sign-in on an iPad through <a href="https://auth.openai.com/codex/device">OpenAI’s device sign-in page</a>. Ordinary browser login uses a localhost callback, which normally points at the wrong machine when opened on a different device. Keep the generated one-time code private.</p>
+    <p>Short saved replies can be spoken in full. Long replies use an excerpt from the beginning and explicitly say that the full answer is saved in the conversation. The durable answer is never shortened to fit speech. Live captions are transient; they are not a second saved transcript.</p>
+    <p>Codex mode offers microphone mute and End call. Its current app-server protocol has no verified speech-only interruption operation, so the App hides the separate Stop speaking button for this provider. Spoken stop, spoken hangup, real microphone handling, and provider voice quality still require their own live validation.</p>
+
+    <h2 id="verification">Local verification on September 16</h2>
+    <p>In the earlier fixture checks, the actual installed app-server ran behind the actual Agent Server and Insider App. Only the provider endpoints, model replies, and microphone input were substituted. Browser peer statistics showed audio packets in both directions and an actively playing silent audio stream. Those fixture checks used no physical microphone, real provider session, or real account credential.</p>
+    <p>Two synthetic Voice requests produced exactly two saved requests and two saved final answers in one Cat. The first call survived App → regular conversation → App navigation; the second request was made from the regular view. Each captured Codex model request exposed only the bound <code>send_to_insider</code> tool. Mute disabled the outgoing audio track, and End closed the browser peer and provider sideband.</p>
+    <p>Automated checks cover provider selection, duplicate tool calls, stale events, rapid restart, saved-result settlement, long reply excerpts, approval and busy states, scoped call access, and cleanup. A disconnected relay cannot cancel work that OpenHands has already accepted. These checks establish the local integration, not real speech recognition, voice quality, account eligibility, or live-model compliance with the delegation instructions.</p>
+    <p><strong>Recorded focused checks:</strong> 64 App tests, 42 Agent Server Voice tests, and one HTTP regression passed; bundle parity, SDK hooks, and documentation links also passed. That backend revision was exercised with a resumed browser call and simulated provider hangup. Several earlier repeated fixture calls stalled during local ICE setup; a later call connected after all old fixture peers were released. Their exact transport cause was not established, so repeated real-provider calls remain an explicit validation item.</p>
+
+    <h2 id="live-verification">Live delegation and recall on September 16</h2>
+    <p>A real provider call then connected using the existing Codex ChatGPT sign-in, shared with explicit authorization through the file-store setup above. It needed no new login or OpenAI API key. Generated spoken input asked the Cat to save the test word “lantern.” Voice handed the request to the Codex relay, which called <code>send_to_insider</code>; the OpenHands Cat saved the request and its confirming answer. The verified result returned through <code>appendSpeech</code>, and the native WebRTC receiver reported nonzero audio energy. Opening the regular conversation view preserved the same connected peer.</p>
+    <p>A second spoken request from the regular view was saved once and answered with “lantern,” while the same peer remained connected. After End and a fresh real provider call on the same Cat, another recall request was recognized, saved as plain user text, and answered correctly by OpenHands and Voice. In total, three spoken requests and their answers were saved across two successful calls. These checks used real Voice and reasoning models with generated speech instead of a physical microphone.</p>
+    <p>The fresh-call result verifies that restarting Voice can recover the updated saved Cat context. Physical iPad microphone input, audible playback on that device, and broader repeated-call and approval behavior still need validation.</p>
+    <p><strong>Delegation is still model-dependent.</strong> An earlier live trial answered a recall question directly from Voice’s initial history without saving a new OpenHands request. The later successful trial used stronger Voice instructions, an explicit relay-mode instruction override, and the GPT-5.5/low relay settings above. That success does not establish that every utterance will delegate, and the protocol exposes no switch that forces it. A correct spoken answer alone is insufficient evidence: check the saved request and result. If a Codex relay turn completes without calling the Cat tool, the server now ends that call with an explicit unsent-request message and a text fallback. Direct Voice speech that never creates a relay turn remains outside that check.</p>
+    <p><strong>Current focused checks:</strong> 67 App tests and 44 Agent Server Voice tests passed, along with bundle parity, SDK hooks, and documentation validation. The temporary browser microphone substitutes were removed; all test peers, tracks, and audio contexts were closed.</p>
+
+    <h2 id="next">Remaining live checks</h2>
+    <ol>
+      <li><strong>Completed offline:</strong> verify the installed app-server’s generated protocol against the selected source revision. Updating a source checkout does not update the installed executable.</li>
+      <li><strong>Completed with fixtures:</strong> initialization, thread creation, WebRTC start/SDP/stop, two saved requests and results, navigation, mute, and cleanup through the running browser integration.</li>
+      <li><strong>Completed on this account:</strong> three saved request-and-answer round trips across two real Voice calls, including navigation during a call and recall after End and restart, using an explicitly authorized shared file-store session. Other accounts still need their own connection check.</li>
+      <li>On iPad, validate audible answers, recognition, live-model delegation, repeated calls, reload/resume, New, condensation, interruption, and approval pauses. Local fixture coverage does not replace this device and provider test.</li>
+    </ol>
+    <p><strong>Recommendation:</strong> continue with the tested Codex configuration and verify durable delegation over multiple turns before treating Voice as the Cat’s dependable input path. This account’s existing sign-in carried the live test without an OpenAI API key; that observation does not establish billing terms or access for other accounts. Keep the API-key transport available as a separate option.</p>
+    <p>See <a href="insider-cat.html#implementation-status">the earlier Insider test record</a> and <a href="insider-cat-stories.html">the user scenarios</a>.</p>
+    <footer>Engel’s Code Design Notebook · Insider Cat · September 2026</footer>
+  </main>
+</body>
+</html>
