@@ -7,7 +7,7 @@ Beads owns task status; the site explains dated architecture, decisions and plan
 
 ## Current explanations
 
-- [Agent-triggered condensation](arch/agent-triggered-condensation.html): September 20 proposal update: staged warnings, typed condense Action/Observation payloads, voluntary reset and an explicitly configured Python-style hard-reset fallback with an environment notice before its summary. Not implemented; `smolpaws-te15` and its seven dependent tasks own status. Manual-command behavior and exact metadata/configuration remain design decisions.
+- [Agent-triggered condensation](arch/agent-triggered-condensation.html): September 20 proposal update: staged warnings, typed condense Action/Observation payloads, a `condenser` option for voluntary reset and a separate optional `hard_condenser` for Python-style hard-reset fallback only after an actual provider context-window error, with an environment notice before its summary. Not implemented; `smolpaws-te15` and its seven dependent tasks own status. Manual-command behavior and exact metadata/configuration remain design decisions.
 - [Reviewing the reviewer](arch/openhands-review-auditor.html): September 16 investigation,
   chosen actual Astra model and exasperated robot babysitter voice, event-driven implementation draft,
   a supervised pilot with four reviews published and one withheld after the PR changed,
