@@ -7,7 +7,7 @@ Beads owns task status; the site explains dated architecture, decisions and plan
 
 ## Current explanations
 
-- [Agent-triggered condensation](arch/agent-triggered-condensation.html): September 20 proposal update: staged warnings, typed condense Action/Observation payloads, a `condenser` option for voluntary reset and a separate optional `hard_condenser` for Python-style hard-reset fallback only after an actual provider context-window error, with an environment notice before its summary. Not implemented; `smolpaws-te15` and its seven dependent tasks own status. Manual-command behavior and exact metadata/configuration remain design decisions.
+- [How SmolPaws resets its context](arch/smolpaws-agent-reset.html): 5 October 2026 implementation guide covering voluntary reset, warnings, the separate emergency summarizer, configuration and durable events. It links checked source revisions; it does not assert a live deployment state. The [September proposal](arch/agent-triggered-condensation.html) is retained as design history.
 - [Reviewing the reviewer](arch/openhands-review-auditor.html): September 16 investigation,
   chosen actual Astra model and exasperated robot babysitter voice, event-driven implementation draft,
   a supervised pilot with four reviews published and one withheld after the PR changed,
@@ -40,7 +40,7 @@ Beads owns task status; the site explains dated architecture, decisions and plan
 
 ## Historical pages retained with current links
 
-`arch/whatsapp-as-bridge.html`, `arch/openhands-agent-server-parity.html`,
+`arch/agent-triggered-condensation.html`, `arch/whatsapp-as-bridge.html`, `arch/openhands-agent-server-parity.html`,
 `arch/smolpaws-sdk-swap.html`, `arch/smolpaws-sdk-swap-board.html`, `arch/sdk-swap-surface.html`,
 `smolpaws-whatsapp.html`, `smolpaws-discord.html`, `smolpaws-github.html`.
 Their old proposals, runtime observations and source revisions remain historical evidence. Updating a banner

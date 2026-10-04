@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant SDK as SDK
+    participant Main as Main model
+    participant Hard as Hard condenser
+    SDK->>Main: Request with active context
+    Main-->>SDK: Context-window error
+    Note over SDK: Protect pending user input
+    SDK->>Hard: Summarize eligible active history
+    Note over Hard: Bounded retries with shorter previews
+    Hard-->>SDK: Summary
+    Note over SDK: Save summary and commit reset
+    SDK->>Main: Emergency notice + summary + pending input
+    Main-->>SDK: Continue the user's work

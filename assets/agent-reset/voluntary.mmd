@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Agent as Agent
+    participant SDK as SDK
+    participant Store as Stored history + notes
+    SDK->>Agent: Context warning on a model request
+    Agent->>Store: Save notes with existing tools
+    Store-->>Agent: Notes saved
+    Agent->>SDK: condense(message_to_future_self)
+    SDK->>Store: Save action, request and tool result
+    SDK->>Store: Commit Condensation reset record
+    Note over SDK,Store: Old events remain stored
+    SDK-->>Agent: Fresh view: notice + real tool exchange
+    Agent->>Store: Read notes
+    Store-->>Agent: Saved state and next steps
+    Note over Agent: Continue the user's work
