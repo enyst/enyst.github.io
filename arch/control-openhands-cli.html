@@ -92,6 +92,7 @@ control-openhands stop</code></pre>
 
 <section id=e2e><h2><span class=num>6</span>Compared with the e2e tests</h2>
 <p>Agent Canvas already has Playwright e2e suites on <code>main</code>: 26 spec files, 77 tests, about 9,200 lines. 23 specs run against a scripted mock model, one against a real Agent Server and model, one checks the launcher's network binding, and one measures markdown rendering speed.</p>
+<p><strong>The e2e tests assert about 10% of the behaviors in the feature map (68 of 715), and check some request-level details the map leaves out, such as an uploaded image reaching the model as base64 data.</strong></p>
 <div class="lane three">
 <div class="box warn"><span class=metric>68/715</span>map behaviors asserted by any e2e test (10%)</div>
 <div class="box warn"><span class=metric>55</span>of those asserted by tests that always run; 16 tests skip themselves in some environments</div>
