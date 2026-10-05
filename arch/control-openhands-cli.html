@@ -51,6 +51,7 @@ control-openhands stop</code></pre>
 <li><strong>Setting up stays separate from proving.</strong> An agent may create a secret through the API to save time, but the check passes only on what the UI shows. Without that rule, agents quietly verify the API and call it a UI pass.</li>
 <li><strong>Secrets and resources are handled for it.</strong> Keys are typed from files and never echoed, storage and network output are redacted, a launch is refused when memory is low, and stopping kills the process group, so nothing is left running.</li>
 <li><strong>Hard-won fixes live in one place.</strong> A fix to the harness protects every later agent instead of being rediscovered by each one. Section 5 lists the ones from a single day.</li>
+<li><strong>It reuses the app's own handles, and catches when they break.</strong> Recipes select elements by the <code>data-testid</code> handles the app already ships for its tests (set in about 1,350 places in its source on <code>main</code>), so they survive copy and layout changes; <code>testid=add-secret-form</code> is just the CLI's short form for one of them. Because the map relies on them, a broken handle surfaces as a bug instead of a check that quietly finds nothing: the Stop and Delete confirmations rendered without their test IDs because callers passed the wrong prop name (<a href=https://github.com/OpenHands/OpenHands/issues/17915>#17915</a>).</li>
 </ol>
 </section>
 
