@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cloudflare's new CLI: can it replace Wrangler? — Engel's notebook</title>
+  <meta name="description" content="A dated assessment of Cloudflare's cf beta for Liberty Labs: prebuilt releases, local D1, authentication, privacy boundaries, and the tests needed before replacing Wrangler.">
+  <meta property="og:title" content="Cloudflare's new CLI: can it replace Wrangler?">
+  <meta property="og:description" content="The useful part is deploying a reviewed build. The difficult part is preserving local writing, private content, and the release checks around it.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/cloudflare-cli-vs-wrangler.html">
+  <link rel="canonical" href="https://enyst.github.io/arch/cloudflare-cli-vs-wrangler.html">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    html { color-scheme: dark; scroll-padding-top: 24px; }
+    .shell { max-width: 1040px; font-size: 18px; }
+    header, .prose, footer { max-width: 72ch; margin-inline: auto; }
+    h1 { font-size: clamp(2.4rem, 6vw, 4rem); margin: 30px 0 22px; text-wrap: balance; }
+    h1 code { font: inherit; background: none; border: 0; padding: 0; }
+    h2, h3 { text-transform: none; letter-spacing: -.01em; }
+    h2 { font-size: 1.5rem; scroll-margin-top: 24px; }
+    h3 { font-family: var(--sans); font-size: 1.08rem; }
+    .lead { font-size: 1.15em; }
+    .meta { color: #aaa296; font-size: .82em; margin-bottom: 24px; }
+    strong { color: inherit; }
+    .callout { border: 1px solid var(--border); }
+    .contents { display: flex; flex-wrap: wrap; gap: 10px 22px; padding: 18px 0; border-block: 1px solid var(--border); font-size: .87em; }
+    a { color: var(--teal); overflow-wrap: anywhere; text-underline-offset: .2em; }
+    a:hover { color: var(--ink); }
+    a:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .heading-link { color: inherit; text-decoration: none; }
+    code { overflow-wrap: anywhere; }
+    pre.code { white-space: pre-wrap; overflow-wrap: anywhere; }
+    pre.code code { padding: 0; border: 0; background: transparent; font-size: inherit; }
+    .table-scroll { overflow-x: auto; margin: 24px 0; }
+    table { min-width: 660px; margin: 0; font-size: .85em; }
+    caption { text-align: left; color: #aaa296; padding-bottom: 12px; }
+    th { font: 700 .95em var(--sans); text-transform: none; letter-spacing: 0; }
+    th, td { vertical-align: top; }
+    .steps li { padding-left: 4px; margin-bottom: 16px; }
+    .sources { font-size: .9em; }
+    .sources li { margin-bottom: 10px; }
+    .small { color: #aaa296; font-size: .8em; }
+    footer { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 52px; }
+    @media (max-width: 740px) {
+      .shell { padding: 28px 20px 60px; font-size: 17px; }
+      h1 { font-size: 2.6rem; }
+      .contents { gap: 10px 18px; }
+      .callout { padding: 16px; }
+    }
+    @media print {
+      html { color-scheme: light; }
+      body { background: white; color: #111; }
+      h1, h2, h3, strong, a, th { color: #111; }
+      .meta, .small, caption { color: #555; }
+      .callout, pre.code, code, th { color: #111; background: #eee; }
+      .contents, .back { display: none; }
+      .table-scroll { overflow: visible; }
+      table { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header>
+    <a class="back" href="../index.html">← Engel's code design notebook</a>
+    <h1>Can <code>cf</code> replace Wrangler?</h1>
+    <p class="lead">Cloudflare's new CLI has a useful idea for Liberty Labs: build once, review the output, then deploy that output. Before adopting it, we need to know what happens to local writing, protected content, and the checks that decide what may leave the machine.</p>
+    <p class="meta">Research checked <time datetime="2026-10-05">5 October 2026</time> · Recommendation, not an implemented migration<br>Official documentation and selected source inspection; no <code>cf</code> installation, migration, or deployment was performed for this study.</p>
+    <nav class="contents" aria-label="On this page">
+      <a href="#recommendation">Recommendation</a>
+      <a href="#comparison">What changes</a>
+      <a href="#d1">Local D1</a>
+      <a href="#privacy">Release privacy</a>
+      <a href="#auth">Credentials</a>
+      <a href="#trial">Trial and decision</a>
+      <a href="#sources">Sources</a>
+    </nav>
+  </header>
+
+  <section class="prose" id="recommendation">
+    <h2><a class="heading-link" href="#recommendation">Keep Wrangler for now; test a smaller switch</a></h2>
+    <p>The new tool is <code>cf</code>, also installed as <code>cloudflare</code>. Cloudflare announced its open beta on 28 September 2026. It reaches across the Cloudflare API and is intended to succeed Wrangler. The announced maintenance window for Wrangler is eighteen months <em>after the beta ends</em>, so the announcement does not establish a fixed retirement date. <a href="https://blog.cloudflare.com/cloudflare-cf-cli-launch/">Launch announcement</a> · <a href="https://developers.cloudflare.com/cf/get-started/">Installation and command names</a>.</p>
+    <p><strong>Our recommendation:</strong> evaluate <code>cf</code> as a deployer of verified artifacts first. Keep the existing local authoring and database workflow until a trial proves equivalent behavior. Replacing the command at the end of a release is a smaller change than replacing the preview runtime, storage adapter, bundler, and deployment tool together.</p>
+    <p>Commands, configuration, and Build Output can change during beta. Pinning a tested version would be part of adopting it. <a href="https://developers.cloudflare.com/cf/wrangler/migrate/">Beta status</a>.</p>
+    <div class="callout"><p>The acceptance criterion is simple: a CLI change must preserve saved writing and the rules for who can read it. A successful build alone does not establish either.</p></div>
+    <p>Cloudflare documents <code>cf deploy --prebuilt</code> for deploying existing Build Output. That makes it a plausible fit for a reviewed release directory. It is not a drop-in reader of our existing release format; producing and verifying the new artifact would be part of the migration. <a href="https://developers.cloudflare.com/cf/ci/#build-once-then-deploy-the-build">Build once, then deploy</a>.</p>
+  </section>
+
+  <section id="comparison">
+    <div class="prose">
+      <h2><a class="heading-link" href="#comparison">What actually changes?</a></h2>
+      <p>Replacing Wrangler has three separate meanings: replacing its shell commands, replacing its build tool, and replacing its JavaScript APIs. We currently use more than the first.</p>
+    </div>
+    <p class="prose small">Documented behavior as checked on 5 October 2026. Scroll the table horizontally on a narrow screen.</p>
+    <div class="table-scroll" role="region" aria-label="Wrangler and cf comparison" tabindex="0">
+      <table>
+        <caption>Workflow comparison</caption>
+        <thead><tr><th scope="col">Concern</th><th scope="col">Current workflow</th><th scope="col"><code>cf</code> and the consequence</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Configuration</th><td>Wrangler JSON configuration.</td><td><code>cloudflare.config.ts</code>; project commands do not read the old file. Migration is required. <a href="https://developers.cloudflare.com/cf/wrangler/">Guide</a>.</td></tr>
+          <tr><th scope="row">Build tool</th><td>Pinned Wrangler plus explicit preparation scripts.</td><td>Can retain the Wrangler bundler; migration does not require Vite. That path needs Wrangler ≥ 4.136.0, newer than our current 4.132.0 pin. <a href="https://developers.cloudflare.com/cf/wrangler/migrate/">Migration requirements</a>.</td></tr>
+          <tr><th scope="row">Frozen release</th><td>A verified directory with compiled modules, approved public files, and separate database initialization input.</td><td>Build Output under <code>.cloudflare/output/v0/</code>; <code>--prebuilt</code> skips rebuilding and automatic setup. Preserve the recorded build mode. <a href="https://developers.cloudflare.com/cf/projects/#deploy-a-prebuilt-build">Prebuilt deployments</a>.</td></tr>
+          <tr><th scope="row">Local bindings</th><td>The preview imports Wrangler's <code>getPlatformProxy</code>.</td><td>A compatible public <code>cf</code> replacement has not been established. Changing CLI calls alone leaves this dependency. <a href="https://developers.cloudflare.com/workers/wrangler/api/">Wrangler API</a>.</td></tr>
+          <tr><th scope="row">Module and asset settings</th><td>Explicit module handling; requests pass through the Worker.</td><td>Build settings such as <code>noBundle</code> and module rules move to <code>wrangler.config.ts</code> with that bundler. Asset handling and observability also need reviewed mappings. <a href="https://developers.cloudflare.com/cf/wrangler/reference/">Config mapping</a>.</td></tr>
+          <tr><th scope="row">Operational gaps</th><td>Wrangler provides live log streaming and individual secret updates.</td><td>The beta still directs users to Wrangler for these tasks; version uploads can instead take a secrets file. <a href="https://developers.cloudflare.com/cf/wrangler/reference/#commands-not-yet-supported">Known gaps</a>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="prose">
+      <p><strong>Do not try an ordinary <code>cf deploy --dry-run</code> in the existing checkout as a harmless discovery command.</strong> Without the new configuration, automatic setup can write files and install packages; outside a terminal it can do so without prompting. Use a disposable copy and the documented migration preview first. <a href="https://developers.cloudflare.com/cf/wrangler/">Wrangler transition guidance</a>.</p>
+      <p>The migration guide also matters for our directory layout: a configuration in a subdirectory needs an explicit path, and migration writes beside that file. Review package discovery, generated paths, and follow-up items rather than assuming the repository root and configuration directory are interchangeable. <a href="https://developers.cloudflare.com/cf/wrangler/migrate/#preview-the-migration">Migration procedure</a>.</p>
+    </div>
+  </section>
+
+  <section class="prose" id="d1">
+    <h2><a class="heading-link" href="#d1">Local D1 is the first thing to protect</a></h2>
+    <p>Saved writing must remain in one authoritative local database. A new tool opening an empty database would look like lost work; two tools writing different databases would be worse, because both could appear to work.</p>
+    <p><code>cf</code> resource commands generally target remote resources. Local D1 operations use explicit <code>--local</code>; the documented SQL command is <code>cf d1 raw</code>, not <code>cf d1 query</code>. Local migration list/apply commands are supported. By default, local resource commands share a machine-wide state directory, while the Vite development server uses separate project state. An explicit <code>--persist-to</code> overrides the CLI location. <a href="https://developers.cloudflare.com/cf/projects/#local-resource-data">Local resource data</a>.</p>
+    <p><strong>Open question:</strong> can the chosen runtime, CLI operations, and preview adapter demonstrably address the same database? Similar directory names are not proof. A trial must write a synthetic record through the editor, read it through the CLI, restart both, and repeat the check in the other direction.</p>
+    <p>Backups and initialization need their own proof. Cloudflare's D1 guide documents SQL import through <code>wrangler d1 execute --file</code> and SQL export through <code>wrangler d1 export</code>. The inspected <code>cf</code> command registry does not register equivalent import/export commands. That does not rule out lower-level API access, but it leaves a workflow gap to resolve before removing Wrangler. <a href="https://developers.cloudflare.com/d1/best-practices/import-export-data/">D1 import/export</a> · <a href="https://github.com/cloudflare/cf/blob/4639bc0efb29683f21454898e4843081139966c9/packages/cli/src/commands/_generated/d1/index.ts">D1 command registry at 4639bc0</a>.</p>
+    <p>Database commands use IDs. Review migration directory, pattern, and table options explicitly: <code>cf migrate</code> does not carry those D1 settings across. <a href="https://developers.cloudflare.com/cf/wrangler/reference/">D1 configuration mapping</a>.</p>
+    <p>Our preview's use of <code>getPlatformProxy</code> is another independent requirement. An open upstream issue asks about programmatic API support; it is a user's report, not a maintainer promise. Retaining the working library is simpler than adding subprocess adapters just to claim we removed a dependency. <a href="https://github.com/cloudflare/cf/issues/109">API support question, #109</a>.</p>
+  </section>
+
+  <section class="prose" id="privacy">
+    <h2><a class="heading-link" href="#privacy">The release directory remains our boundary</a></h2>
+    <p>These are application requirements, regardless of which Cloudflare tool uploads the result:</p>
+    <p><strong>Working references, editor stash, credentials, and local backups are excluded from release artifacts regardless of the associated article's visibility.</strong></p>
+    <ol class="steps">
+      <li><strong>Only me / draft:</strong> exclude the writing and its exclusive media from everything sent for hosting.</li>
+      <li><strong>Invited members:</strong> keep shared writing in hosted D1, reached through authenticated Worker routes. Its protected media must pass the same access decision. It must not become a public static file.</li>
+      <li><strong>Public:</strong> allow public writing and approved assets, while keeping credentials and membership records out of the public directory.</li>
+      <li><strong>Existing hosted edits:</strong> a code update must preserve them. Database initialization and later content migrations remain separate, deliberate operations.</li>
+    </ol>
+    <p>The proposed <code>cf</code> sequence would therefore be:</p>
+    <pre class="code" aria-label="Proposed release sequence"><code>select approved writing and media
+→ assemble release files
+→ produce Cloudflare Build Output
+→ inspect the final files, modules, routes, bindings, and database input
+→ verify privacy and record hashes
+→ validate the prebuilt output without credentials
+→ after release approval, verify again and upload that same output</code></pre>
+    <p>Cloudflare's prebuilt CI workflow is useful machinery for the last steps. Its artifact validation does not know which of our records are drafts or who may read them. Our privacy checker must inspect the final Build Output as well as the approved database input, including module contents and the complete public-file list. <a href="https://developers.cloudflare.com/cf/ci/#build-once-then-deploy-the-build">Prebuilt CI workflow</a>.</p>
+    <p>Two defaults deserve explicit tests. <code>cf</code> does not run extra steps in a package's build script automatically, and deployment can create missing bound resources when identifiers are omitted. Our wrapper must call the privacy checks itself, require reviewed database identifiers, and reject unexpected resources or modes. <a href="https://developers.cloudflare.com/cf/projects/">Build and deployment behavior</a>.</p>
+    <p>We must also verify the translated settings for Worker-first asset handling, protected binary modules, logging, rate limits, and preview exposure. TypeScript configuration is executable code, so it belongs in code review; it is not a replacement for checking the resulting release.</p>
+  </section>
+
+  <section class="prose" id="auth">
+    <h2><a class="heading-link" href="#auth">There are two different kinds of credentials</a></h2>
+    <p><strong>CLI credentials</strong> let a developer or release job operate a Cloudflare account. <code>cf auth login</code> uses its own login; it does not reuse Wrangler's. It supports a browser approval flow, including <code>--no-browser</code> for approval on another device. Automation can use <code>CLOUDFLARE_API_TOKEN</code> and an explicit account ID. <a href="https://developers.cloudflare.com/cf/get-started/#sign-in">Sign-in and credential selection</a>.</p>
+    <p><strong>Application secrets</strong> let the deployed Worker perform site login and sign sessions. They remain separate from CLI credentials, public configuration, and public assets. Changing the deployment CLI should not change who counts as the owner or an invited reader.</p>
+    <p>The beta's <code>--secrets-file</code> option accompanies a version upload; it is not a reason to place secrets in the release artifact. If adopted, the release job would supply a separate, short-lived file outside that artifact. We would test preservation and rotation of existing secrets independently. <a href="https://developers.cloudflare.com/cf/wrangler/reference/#commands-not-yet-supported">Secret-update options</a>.</p>
+    <p>Pin the tool version, select the account explicitly, and give credentials only to the stage that needs remote access. The official CI guide supports this separation. A changed command's JSON response or exit status also needs a tested parser: the guide notes that an aborted destructive command can exit successfully. <a href="https://developers.cloudflare.com/cf/ci/">CI and non-interactive behavior</a>.</p>
+  </section>
+
+  <section class="prose" id="trial">
+    <h2><a class="heading-link" href="#trial">A bounded trial, with a clear decision</a></h2>
+    <p>The next experiment can answer the difficult questions without using real writing or deploying a site.</p>
+    <ol class="steps">
+      <li><strong>Isolate.</strong> Use a clean disposable checkout and synthetic public, members-only, and draft records. Pin <code>cf</code> and compatible build dependencies. Its documented Node requirement is 22.18 or later. <a href="https://developers.cloudflare.com/cf/get-started/#requirements">Requirements</a>.</li>
+      <li><strong>Inspect migration.</strong> Preview the explicit configuration path, then review an actual migration in the disposable copy. Keep the existing bundler for this first experiment. Record every changed file, generated setting, and unresolved item.</li>
+      <li><strong>Prove storage continuity.</strong> Exercise editor/CLI reads and writes against the same isolated D1, restart, export, restore, and compare. Check migration failure handling. Until this passes, retain the current preview and backup path.</li>
+      <li><strong>Attack the release boundary.</strong> Put distinctive canary strings in draft bodies, filenames, references, stash entries, and private media. Require their absence from the whole upload set. Tamper with an approved file and require the verifier to stop.</li>
+      <li><strong>Check the access matrix.</strong> Public visitors, invited readers, the owner, and revoked members must get the same results for pages, APIs, media, and editor actions. Check the compiled release locally, not just the source server.</li>
+      <li><strong>Measure the maintenance cost.</strong> Compare commands, adapters, configuration files, and dependencies after the experiment. Adopt <code>cf</code> for deployment only if it simplifies the reviewed release path. Remove Wrangler entirely only when its remaining library and database uses have supported replacements.</li>
+    </ol>
+    <div class="callout"><p><strong>Decision today:</strong> a promising deployment experiment, not an immediate wholesale migration. Prebuilt output is the strongest reason to try <code>cf</code>; local D1 continuity and the existing programmatic API are the strongest reasons to keep the trial small.</p></div>
+    <p class="small">A future remote trial would separately verify resource selection, secret delivery, real sign-in, and preservation of hosted edits. This note does not claim those checks have happened.</p>
+  </section>
+
+  <section class="prose" id="sources">
+    <h2><a class="heading-link" href="#sources">Sources and evidence limits</a></h2>
+    <p>Official docs were checked on 5 October 2026; the CLI is still in beta. Product behavior above is documented behavior, not the result of executing a migration. The release requirements and adoption criteria are our engineering judgment.</p>
+    <ul class="sources">
+      <li><a href="https://blog.cloudflare.com/cloudflare-cf-cli-launch/">Cloudflare's launch announcement</a> — 28 September 2026; direction and maintenance policy.</li>
+      <li><a href="https://developers.cloudflare.com/cf/wrangler/">For Wrangler users</a> — migration boundary and automatic-configuration warning.</li>
+      <li><a href="https://developers.cloudflare.com/cf/wrangler/migrate/">Migration procedure</a> and <a href="https://developers.cloudflare.com/cf/wrangler/reference/">command/configuration mapping</a> — bundlers, settings, and known gaps.</li>
+      <li><a href="https://developers.cloudflare.com/cf/projects/">Develop, build, and deploy</a> — prebuilt output, modes, and local-state semantics.</li>
+      <li><a href="https://developers.cloudflare.com/cf/get-started/">Install and authenticate</a> and <a href="https://developers.cloudflare.com/cf/ci/">CI guidance</a> — credential boundaries, pinning, and unattended behavior.</li>
+      <li><a href="https://developers.cloudflare.com/d1/best-practices/import-export-data/">D1 import/export</a>, <a href="https://github.com/cloudflare/cf/blob/4639bc0efb29683f21454898e4843081139966c9/packages/cli/src/commands/_generated/d1/index.ts">the D1 command registry at 4639bc0</a>, and <a href="https://developers.cloudflare.com/workers/wrangler/api/">Wrangler's programmatic API</a> — remaining workflow dependencies.</li>
+      <li><a href="https://github.com/cloudflare/cf/issues/109">Upstream issue #109</a> — a user-raised API-parity question, not a guaranteed roadmap.</li>
+    </ul>
+  </section>
+  <footer><a href="../index.html">← Back to the Notebook</a></footer>
+</main>
+</body>
+</html>
