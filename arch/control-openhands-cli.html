@@ -59,12 +59,13 @@ control-openhands stop</code></pre>
 <section id=fleet><h2><span class=num>4</span>CLI was used in 36 of 38 fixes</h2>
 <p>On 5 October Engel asked for every <code>ready-for-dev</code> issue from the mapping run to be fixed, but only where nobody else had offered. 38 qualified: 14 other issues already had a contributor's pull request, and two had volunteers in their comments. Each issue got its own git worktree off <code>main</code>, with a copy of the skill inside so that the CLI serves that worktree's code, and a pipeline: <strong>fix</strong> (reproduce live on <code>main</code>, failing test first, fix, prove live) &rarr; <strong>independent review</strong> (checks the tests fail on the old code, re-checks the fix live, looks at the evidence; up to two revision rounds) &rarr; <strong>pull request</strong>. Four agents ran at a time on a 4-CPU, 16&nbsp;GB machine; the CLI's memory guard refuses a launch below about 1.5&nbsp;GB free.</p>
 <div class=lane>
-<div class="box ok"><span class=metric>34/34</span>Agent Canvas fixers so far used the CLI (36 in all)</div>
-<div class=box><span class=metric>1,839</span>CLI calls</div>
-<div class=box><span class=metric>85</span>isolated stacks launched</div>
-<div class=box><span class=metric>195</span>screenshots</div>
+<div class="box ok"><span class=metric>36/36</span>Agent Canvas fixers used the CLI</div>
+<div class=box><span class=metric>3,454</span>CLI calls</div>
+<div class=box><span class=metric>170</span>isolated stacks launched</div>
+<div class=box><span class=metric>261</span>screenshots</div>
 </div>
-<p class=mini>Snapshot taken while the fleet was running: 34 of the 36 Agent Canvas fixers had started, and every one of them used the CLI; the last two had not begun yet. The remaining two of the 38 fixes (SDK #5495 and automation #551) work on Python services without a UI and used pytest plus rendered terminal captures instead.</p>
+<p class=mini>Final numbers across all 120 fleet agents: the fixers, the independent reviewers who re-checked each fix live, and the revisers and publishers. The remaining two of the 38 fixes (SDK #5495 and automation #551) work on Python services without a UI and used pytest plus rendered terminal captures instead.</p>
+<p>The result: all 38 fixes passed independent review, three of them after one revision round. 35 became pull requests: 33 on Agent Canvas, and one each on the SDK and the automation service. Two were held back because contributors claimed those issues while the fleet was running, and one is waiting on a push.</p>
 <p>Almost every fixer launched twice: once on unchanged <code>main</code> to reproduce the bug and capture a &ldquo;before&rdquo;, once on its own fixed build for the &ldquo;after&rdquo;. The reviewer launches again. No agent wrote harness code of its own. They picked the verb that fits the bug:</p>
 <div class=tablewrap><table>
 <tr><th>Bug</th><th>Verbs that carried it</th><th>What the CLI made observable</th></tr>
@@ -76,7 +77,7 @@ control-openhands stop</code></pre>
 <tr><td>Automation &ldquo;View logs&rdquo; says &ldquo;(no output)&rdquo; (<a href=https://github.com/OpenHands/OpenHands/issues/17947>#17947</a>)</td><td><code>browser network</code> &times;9, <code>api</code> &times;8</td><td>The request the log view makes and what the server returns.</td></tr>
 <tr><td>Command menu shortcut hint and missing pages (<a href=https://github.com/OpenHands/OpenHands/issues/17908>#17908</a>)</td><td><code>browser press</code> &times;13, <code>text</code> &times;12</td><td><code>Control+k</code> and <code>Meta+k</code> driven for real, with the hint text read back.</td></tr>
 </table></div>
-<p>Across the whole fleet, the most used verbs were <code>click</code> (222), <code>screenshot</code> (195), <code>goto</code> (130), <code>wait</code> (109), <code>doctor</code> (77), <code>toasts</code> (53), <code>errors</code> (45), <code>snapshot</code> (43) and <code>network</code> (28). <code>doctor</code> running 77 times is the point of rule 2: agents checked that they were looking at their own code before believing what they saw.</p>
+<p>Across the whole fleet, the most used verbs were <code>click</code> (455), <code>screenshot</code> (261), <code>goto</code> (245), <code>wait</code> (218), <code>doctor</code> (142), <code>toasts</code> (116), <code>snapshot</code> (79), <code>errors</code> (77) and <code>network</code> (51). <code>doctor</code> running 142 times is the point of rule 2: agents checked that they were looking at their own code before believing what they saw.</p>
 </section>
 
 <section id=once><h2><span class=num>5</span>Fixed once, for every agent</h2>
@@ -115,7 +116,7 @@ control-openhands stop</code></pre>
 <div class=box><strong>E2E stays the regression gate</strong>The e2e suites check exact requests against a scripted model, and the map does not replace that. Section 6 has the numbers in both directions.</div>
 <div class="box accent"><strong>Next</strong>Move isolation into the launcher itself (an <code>agent-canvas --isolated</code> flag), and consider offering the CLI as an MCP server so agents outside the repo can use it.</div>
 </div>
-<div class=callout ok>&#9733; The verdict from the day: 38 issues, each reproduced live on <code>main</code>, fixed and shown fixed with before/after evidence by one agent and re-checked live by another, with no harness code written per issue. That is the lever doing its job.</div>
+<div class=callout ok>&#9733; The verdict from the day: 38 issues fixed, each shown fixed with before/after evidence by one agent and re-checked by another (the 36 Agent Canvas ones live, through the CLI), with no harness code written per issue. That is the lever doing its job.</div>
 </section>
 
 <p class=byline>Written by Claude Code (an AI agent) with Engel Nyst, in the session that built and ran the harness. The numbers are a snapshot from 5 October 2026. Sources: <a href=https://github.com/OpenHands/OpenHands/pull/17961>PR #17961</a> (the skill, CLI and feature map), <a href=https://github.com/OpenHands/OpenHands/issues/17568>issue #17568</a> (the request for a repo-local verification skill), and <a href=pstack-software-factory.html>What we take from pstack</a> (the decision behind it).</p>
