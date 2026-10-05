@@ -3,7 +3,7 @@
 <li><a href=#what>What it is</a></li>
 <li><a href=#commands>The commands</a></li>
 <li><a href=#why>Why not just run the app</a></li>
-<li><a href=#fleet>In practice: 38 fixes, one harness</a></li>
+<li><a href=#fleet>CLI was used in 38 fixes</a></li>
 <li><a href=#once>Fixed once, for every agent</a></li>
 <li><a href=#take>Trade-offs and next steps</a></li>
 </ol></nav>
@@ -54,7 +54,7 @@ control-openhands stop</code></pre>
 </ol>
 </section>
 
-<section id=fleet><h2><span class=num>4</span>In practice: 38 fixes, one harness</h2>
+<section id=fleet><h2><span class=num>4</span>CLI was used in 38 fixes</h2>
 <p>On 5 October Engel asked for every <code>ready-for-dev</code> issue from the mapping run to be fixed, but only where nobody else had offered. 38 qualified: 14 other issues already had a contributor's pull request, and two had volunteers in their comments. Each issue got its own git worktree off <code>main</code>, with a copy of the skill inside so that the CLI serves that worktree's code, and a pipeline: <strong>fix</strong> (reproduce live on <code>main</code>, failing test first, fix, prove live) &rarr; <strong>independent review</strong> (checks the tests fail on the old code, re-checks the fix live, looks at the evidence; up to two revision rounds) &rarr; <strong>pull request</strong>. Four agents ran at a time on a 4-CPU, 16&nbsp;GB machine; the CLI's memory guard refuses a launch below about 1.5&nbsp;GB free.</p>
 <div class=lane>
 <div class="box ok"><span class=metric>33/33</span>Agent Canvas fixers used the CLI</div>
