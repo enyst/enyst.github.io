@@ -1,0 +1,102 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>control-openhands: agents using Agent Canvas like a user</title><meta name=description content="The CLI behind the verify-openhands skill: isolated stacks, a persistent browser, observation verbs and an evidence ledger, and how 33 parallel fix agents used it."><style>:root{--fg:#1a1a1a;--muted:#5a5a5a;--subtle:#8a8a82;--bg:#fdfdfb;--card:#fff;--elev:#f7f6f1;--accent:#2b4eaa;--soft:#e6ecfa;--rule:#e2e2dc;--code:#f3f1ec;--warn:#b25b0e;--ok:#2f7a3a;--crit:#a02020;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:-apple-system,BlinkMacSystemFont,Segoe UI,Inter,Helvetica,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--sans)}.wrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:46px;max-width:1180px;margin:0 auto;padding:32px 28px 90px}nav{position:sticky;top:24px;align-self:start;font-size:13px}nav h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}nav li{counter-increment:toc;margin:5px 0}nav li:before{content:counter(toc) ". ";color:var(--muted)}a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}nav a{color:var(--fg);border:0}header{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:28px}.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}h1{font-size:34px;line-height:1.15;margin:6px 0 8px;letter-spacing:-.01em}.sub{color:var(--muted);max-width:820px}h2{font-size:22px;margin:44px 0 10px}.num{color:var(--muted);font-weight:500;margin-right:8px}h3{font-size:16px;margin:22px 0 8px}code,.mono{font-family:var(--mono);font-size:.88em}code{background:var(--code);padding:1px 5px;border-radius:3px}.toplink{display:inline-block;margin-top:12px;padding:7px 10px;background:var(--soft);border:1px solid var(--accent);border-radius:6px;font-size:13px}.callout{border-left:3px solid var(--accent);background:var(--soft);padding:11px 14px;margin:14px 0;border-radius:0 5px 5px 0;font-size:14.5px}.warn{border-color:var(--warn);background:#fbf1e6}.ok{border-color:var(--ok);background:#eef6ef}.note{border-color:var(--muted);background:var(--code)}.lane{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}.box{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:13px;min-height:112px}.box strong{display:block;font-size:13px;margin-bottom:5px}.box.ok{border-color:var(--ok)}.box.warn{border-color:var(--warn)}.box.crit{border-color:var(--crit);background:#faeeee}.box.accent{border-color:var(--accent);background:var(--soft)}.metric{font:700 28px/1 var(--mono);display:block;margin-bottom:4px}table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}th,td{text-align:left;vertical-align:top;padding:8px 9px;border-bottom:1px solid var(--rule)}th{background:var(--code);font-weight:650}.pill{display:inline-block;font:11px var(--mono);padding:2px 7px;border-radius:999px;border:1px solid var(--rule);background:var(--elev);white-space:nowrap}.p0{color:var(--crit);border-color:var(--crit);background:#faeeee}.p1{color:var(--warn);border-color:var(--warn);background:#fbf1e6}.p2{color:var(--accent);border-color:var(--accent);background:var(--soft)}.flow{display:grid;grid-template-columns:1fr 90px 1fr;gap:12px;align-items:center;margin:18px 0}.arrow{text-align:center;color:var(--warn);font:700 24px var(--mono)}.mini{font-size:12.5px;color:var(--muted)}pre{background:var(--code);padding:12px 14px;border-radius:6px;overflow-x:auto;font:13px/1.55 var(--mono);margin:12px 0}pre code{background:none;padding:0}.tablewrap{overflow-x:auto}.byline{color:var(--subtle);font-size:13px;margin-top:44px;border-top:1px solid var(--rule);padding-top:14px}@media(max-width:820px){.wrap{grid-template-columns:1fr}.lane{grid-template-columns:1fr}.flow{grid-template-columns:1fr}.arrow{display:none}}@media(max-width:820px){.wrap{grid-template-columns:minmax(0,1fr);padding:24px 16px 70px}}</style></head><body><div class=wrap>
+<nav><a class=toplink href=../index.html>&larr; Home</a><h2>Contents</h2><ol>
+<li><a href=#what>What it is</a></li>
+<li><a href=#commands>The commands</a></li>
+<li><a href=#why>Why not just run the app</a></li>
+<li><a href=#fleet>In practice: 38 fixes, one harness</a></li>
+<li><a href=#once>Fixed once, for every agent</a></li>
+<li><a href=#take>Trade-offs and next steps</a></li>
+</ol></nav>
+<main>
+<header>
+<div class=eyebrow>how it works &middot; verify-openhands &middot; 5 October 2026</div>
+<h1>control-openhands: agents using Agent Canvas like a user</h1>
+<p class=sub>The command-line lever inside the <code>verify-openhands</code> skill from <a href=https://github.com/OpenHands/OpenHands/pull/17961>OpenHands PR #17961</a>. What it does, what its commands are, why an agent is better off with it than running the app directly, and what happened when 33 fix agents used it in parallel on the same day.</p>
+</header>
+
+<section id=what><h2><span class=num>1</span>What it is</h2>
+<p><code>control-openhands</code> is one Node command, about 5,500 lines, that lets an agent use Agent Canvas the way a person would, without fighting the environment, and leaves a record of what it saw. It builds the checkout when needed, starts it as an isolated stack, drives it in a real Chromium through the repo's own Playwright, and writes evidence. Every command prints one JSON object and exits <code>0</code> (ok), <code>1</code> (action failed), <code>2</code> (usage) or <code>3</code> (environment). A failure carries an error, a hint and a screenshot.</p>
+<p>It comes with a <strong>feature map</strong>: 27 family files and 715 stable IDs that cover every user-facing behavior, each with recipes written as exact commands from the user's point of view. The CLI is what makes those recipes rerunnable by the next agent. This is the &ldquo;feature map + control-app CLI for the product surfaces&rdquo; that <a href=pstack-software-factory.html>What we take from pstack</a> chose to adopt, built for Agent Canvas.</p>
+</section>
+
+<section id=commands><h2><span class=num>2</span>The commands</h2>
+<div class=tablewrap><table>
+<tr><th>Group</th><th>Commands</th><th>What they're for</th></tr>
+<tr><td>Lifecycle</td><td><code>launch</code> <code>doctor</code> <code>status</code> <code>restart</code> <code>service</code> <code>stop</code> <code>runs</code> <code>env</code></td><td>Build the checkout only when its build inputs change. Start a stack with its own private HOME, ports, keys and state, plus a browser. <code>doctor</code> checks the stack is healthy and serving <em>this</em> checkout's build. <code>restart</code> keeps state; <code>--rotate-key</code> makes the stored key stale; <code>service stop</code> takes one backend down to reach backend-down screens. <code>stop</code> ends the whole process group.</td></tr>
+<tr><td>Arrange</td><td><code>api</code> <code>llm</code> <code>fixture</code></td><td>Fast preconditions: API calls with the run's key, LLM profiles from a key file, throwaway git repos, folders and files. Never used as proof.</td></tr>
+<tr><td>Essential paths</td><td><code>login</code> <code>onboard</code> <code>workspace open</code> <code>conversation start/send/wait/events</code></td><td>Multi-step flows through the real UI that nearly every check needs.</td></tr>
+<tr><td>Drive and observe</td><td><code>browser</code> plus about 50 verbs</td><td>One browser that persists across calls. Clicks, fills, key presses, drag, paste, file choosers and viewports. It also reads what a screenshot can't show: <code>errors</code>, <code>network</code>, <code>toasts --history</code>, <code>storage</code>, <code>downloads</code>, <code>media</code>, <code>clipboard</code>, <code>tooltip</code> and the accessibility tree (<code>snapshot</code>).</td></tr>
+<tr><td>Evidence and map</td><td><code>evidence add/report</code> <code>map check/coverage/ids/routes</code></td><td>A pass/fail/blocked/not-run record per feature ID, and checks that keep the map in line with the code: valid IDs and commands, every route and feature directory either covered or listed as excluded.</td></tr>
+</table></div>
+<p>A recipe is just a sequence of these, for example adding a secret:</p>
+<pre><code>control-openhands launch --new --build auto --print-run   # isolated stack + browser; prints the run dir
+export OH_VERIFY_RUN=&lt;run dir&gt;
+control-openhands doctor                                   # is the served build this checkout?
+control-openhands onboard --skip
+control-openhands browser goto /settings/secrets
+control-openhands browser click 'testid=add-secret-button'
+control-openhands browser fill 'testid=add-secret-form >> testid=name-input' QA_TMP
+control-openhands browser screenshot --feature F14.create --name form
+control-openhands evidence add --feature F14.create --result pass ...
+control-openhands stop</code></pre>
+</section>
+
+<section id=why><h2><span class=num>3</span>Why not just run the app</h2>
+<p>An agent can run <code>npm run dev</code> and click around. For a one-off, that's fine; the <a href=pstack-software-factory.html#use>pstack note</a> says the same. The CLI earns its place when verification recurs and other agents must be able to rerun it:</p>
+<ol>
+<li><strong>Isolation, so several agents can work at once.</strong> Each run has its own HOME, ports, keys and state. Run directly, the app wants fixed ports and a shared <code>~/.openhands</code>, so two agents trample each other's settings and conversations, and every agent improvises its own launch.</li>
+<li><strong>It knows which code it's testing.</strong> <code>launch</code> rebuilds only when the build inputs change, and <code>doctor</code> refuses a stack whose served bundle doesn't match the checkout. The most damaging agent failure is &ldquo;verified the fix&rdquo; against a stale bundle, and nothing in the output warns of it.</li>
+<li><strong>A browser that persists across commands.</strong> An agent works in separate shell calls; a Playwright script per step restarts Chromium and loses the page. The daemon keeps one page open, so a check is a plain list of commands. That is what lets the map be written as instructions someone can rerun.</li>
+<li><strong>It sees what pixels don't show.</strong> Many of the bugs found while mapping were invisible in screenshots: telemetry requests despite Do Not Track (<code>network</code>), double error toasts that disappear within a second (<code>toasts --history</code>), hydration errors (<code>errors</code>), switches that Tab skips and icon buttons with no name (<code>snapshot</code>).</li>
+<li><strong>Setting up stays separate from proving.</strong> An agent may create a secret through the API to save time, but the check passes only on what the UI shows. Without that rule, agents quietly verify the API and call it a UI pass.</li>
+<li><strong>Secrets and resources are handled for it.</strong> Keys are typed from files and never echoed, storage and network output are redacted, a launch is refused when memory is low, and stopping kills the process group, so nothing is left running.</li>
+<li><strong>Hard-won fixes live in one place.</strong> A fix to the harness protects every later agent instead of being rediscovered by each one. Section 5 lists the ones from a single day.</li>
+</ol>
+</section>
+
+<section id=fleet><h2><span class=num>4</span>In practice: 38 fixes, one harness</h2>
+<p>On 5 October Engel asked for every <code>ready-for-dev</code> issue from the mapping run to be fixed, but only where nobody else had offered. 38 qualified: 14 other issues already had a contributor's pull request, and two had volunteers in their comments. Each issue got its own git worktree off <code>main</code>, with a copy of the skill inside so that the CLI serves that worktree's code, and a pipeline: <strong>fix</strong> (reproduce live on <code>main</code>, failing test first, fix, prove live) &rarr; <strong>independent review</strong> (checks the tests fail on the old code, re-checks the fix live, looks at the evidence; up to two revision rounds) &rarr; <strong>pull request</strong>. Four agents ran at a time on a 4-CPU, 16&nbsp;GB machine; the CLI's memory guard refuses a launch below about 1.5&nbsp;GB free.</p>
+<div class=lane>
+<div class="box ok"><span class=metric>33/33</span>Agent Canvas fixers used the CLI</div>
+<div class=box><span class=metric>1,774</span>CLI calls</div>
+<div class=box><span class=metric>80</span>isolated stacks launched</div>
+<div class=box><span class=metric>188</span>screenshots</div>
+</div>
+<p class=mini>Snapshot taken while the fleet was running, with 35 fixers started. The two others (SDK #5495 and automation #551) work on Python services without a UI and used pytest plus rendered terminal captures instead.</p>
+<p>Almost every fixer launched twice: once on unchanged <code>main</code> to reproduce the bug and capture a &ldquo;before&rdquo;, once on its own fixed build for the &ldquo;after&rdquo;. The reviewer launches again. No agent wrote harness code of its own. They picked the verb that fits the bug:</p>
+<div class=tablewrap><table>
+<tr><th>Bug</th><th>Verbs that carried it</th><th>What the CLI made observable</th></tr>
+<tr><td>First-run &ldquo;No backend is configured&rdquo; toast (<a href=https://github.com/OpenHands/OpenHands/issues/17901>#17901</a>)</td><td><code>launch --public</code>, <code>browser toasts</code> &times;19</td><td>A toast over the Add-a-backend step and the API-key screen, twice after a reload.</td></tr>
+<tr><td>A failed &ldquo;Run now&rdquo; shows two error toasts (<a href=https://github.com/OpenHands/OpenHands/issues/17906>#17906</a>)</td><td><code>api</code> &times;14, <code>browser wait-text</code> &times;27, <code>toasts</code> &times;17</td><td>Arranged through the API (delete the automation elsewhere), proved in the UI.</td></tr>
+<tr><td>Unknown URLs: bare 404 and a hydration error (<a href=https://github.com/OpenHands/OpenHands/issues/17904>#17904</a>)</td><td><code>browser errors</code> &times;17</td><td>Page and console errors counted before and after, not just a screenshot of the page.</td></tr>
+<tr><td>Icon-only buttons without accessible names (<a href=https://github.com/OpenHands/OpenHands/issues/17935>#17935</a>)</td><td><code>browser snapshot</code> &times;28</td><td>The accessibility tree, where a nameless button is visible as such.</td></tr>
+<tr><td>Header menu off-screen at phone width, ignores Escape (<a href=https://github.com/OpenHands/OpenHands/issues/17913>#17913</a>)</td><td><code>viewport phone|narrow</code>, <code>bbox</code>, <code>press Escape</code></td><td>Evidence such as <code>before-phone-390-menu-overflows-right-edge.png</code> and <code>after-narrow-320-menu-inside-viewport.png</code>.</td></tr>
+<tr><td>Automation &ldquo;View logs&rdquo; says &ldquo;(no output)&rdquo; (<a href=https://github.com/OpenHands/OpenHands/issues/17947>#17947</a>)</td><td><code>browser network</code> &times;9, <code>api</code> &times;8</td><td>The request the log view makes and what the server returns.</td></tr>
+<tr><td>Command menu shortcut hint and missing pages (<a href=https://github.com/OpenHands/OpenHands/issues/17908>#17908</a>)</td><td><code>browser press</code> &times;13, <code>text</code> &times;12</td><td><code>Control+k</code> and <code>Meta+k</code> driven for real, with the hint text read back.</td></tr>
+</table></div>
+<p>Across the whole fleet, the most used verbs were <code>click</code> (208), <code>screenshot</code> (188), <code>goto</code> (126), <code>wait</code> (104), <code>doctor</code> (74), <code>toasts</code> (53), <code>errors</code> (45), <code>snapshot</code> (43) and <code>network</code> (28). <code>doctor</code> running 74 times is the point of rule 2: agents checked that they were looking at their own code before believing what they saw.</p>
+</section>
+
+<section id=once><h2><span class=num>5</span>Fixed once, for every agent</h2>
+<p>The same day turned up several harness faults, from agents running it and from two reviewers of the PR. Each fix now protects every later run:</p>
+<ul>
+<li><strong><code>restart</code> replayed a stale proxy address</strong> saved at launch, so model calls failed after the machine's proxy changed. Machine-scoped settings now come from the current shell.</li>
+<li><strong><code>launch --run-id</code> could reuse a live run's directory</strong>, overwriting its keys. A named run must now be new, and the directory is created exclusively.</li>
+<li><strong>The build identity ignored <code>config/</code></strong>, which the app imports, so a config change kept serving the old bundle and <code>doctor</code> accepted it. A test now checks that every file the app imports from outside <code>src/</code> is a build input.</li>
+<li><strong><code>browser storage --values</code> printed an API key</strong> stored as a plain string. Values under secret-looking keys are now redacted whole.</li>
+<li><strong>About 85 recipe steps assumed a page an earlier step had left</strong>, and 17 depended on state a later step creates. A sweep of all 27 families fixed them, and every changed sequence was rerun as written.</li>
+</ul>
+</section>
+
+<section id=take><h2><span class=num>6</span>Trade-offs and next steps</h2>
+<div class=lane>
+<div class="box warn"><strong>It is real code to maintain</strong>5,500 lines in the repo, and test IDs and routes drift. <code>map check</code>, <code>map coverage</code> and 20 unit tests in CI guard it, but it needs an owner: in practice an agent, under review.</div>
+<div class="box warn"><strong>It can paper over UX</strong><code>login</code> fills Host Name with <code>Local</code>; a user who misses that field still meets a disabled Connect. The map drives screens by hand when the screen itself is under test.</div>
+<div class=box><strong>Overlap with E2E</strong>The Playwright E2E suites are fixed regression checks written per scenario. This is for open-ended &ldquo;does this change really work for a user&rdquo;, over the whole app, on any branch.</div>
+<div class="box accent"><strong>Next</strong>Move isolation into the launcher itself (an <code>agent-canvas --isolated</code> flag), and consider offering the CLI as an MCP server so agents outside the repo can use it.</div>
+</div>
+<div class=callout ok>&#9733; The verdict from the day: 38 issues, each reproduced live on <code>main</code>, fixed and shown fixed with before/after evidence by one agent and re-checked live by another, with no harness code written per issue. That is the lever doing its job.</div>
+</section>
+
+<p class=byline>Written by Claude Code (an AI agent) with Engel Nyst, in the session that built and ran the harness. The numbers are a snapshot from 5 October 2026. Sources: <a href=https://github.com/OpenHands/OpenHands/pull/17961>PR #17961</a> (the skill, CLI and feature map), <a href=https://github.com/OpenHands/OpenHands/issues/17568>issue #17568</a> (the request for a repo-local verification skill), and <a href=pstack-software-factory.html>What we take from pstack</a> (the decision behind it).</p>
+</main></div></body></html>
