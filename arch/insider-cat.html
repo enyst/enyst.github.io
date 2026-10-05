@@ -112,7 +112,7 @@
       <p class="eyebrow">Agent Canvas · Apps · behavior and architecture</p>
       <h1>Insider Cat</h1>
       <p>A sibling of SmolPaws inside Agent Canvas: one saved OpenHands agent, with a Cat-shaped place to talk, type, and find your work.</p>
-      <p class="meta">Updated <time datetime="2026-09-20">20 September 2026</time>. <span class="status">Development implementation · review pending</span></p>
+      <p class="meta">Updated <time datetime="2026-10-05">5 October 2026</time>. <span class="status">Development implementation · review pending</span></p>
     </header>
     <div class="callout"><p><strong>Voice is a way to reach the Cat. OpenHands does the work.</strong> The selected Cat has a durable conversation, agent configuration, tools, and approval policy on Agent Server. The Voice connection carries requests and speaks saved results; it does not replace that agent or grant it access to every conversation in Canvas.</p></div>
 
@@ -415,6 +415,9 @@
     <p>The earlier exploration drew on Amp’s <a href="https://ampcode.com/docs/puck">Puck</a> for the distinction between a companion conversation and worker threads, and <a href="https://ampcode.com/news/talk-to-puck">Talk to Puck</a> for Voice handing work to a real agent. ElevenLabs remains an alternative to evaluate later. Neither is a dependency of the current App. Provider comparisons in the <a href="../voice-landscape.html">voice landscape</a> are dated research, not current installation guarantees.</p>
 
     <h2 id="sources">Evidence, history, and limits</h2>
+    <h3 id="october-validation">5 October: integration maintenance</h3>
+    <p>The feature is split across three implementation PRs: Agent Server owns Voice and saved work, Canvas owns the companion surface, and the Insider App owns its controls and audio. <a href="https://github.com/OpenHands/software-agent-sdk/issues/5515">The integration issue</a> records acceptance criteria and current verification; <a href="https://github.com/OpenHands/OpenHands/issues/17557">the Canvas issue</a> tracks host behavior. The App and notebook repositories have issues disabled, so their PRs link back to those issues.</p>
+    <p>The failed Agent Server macOS job stopped while downloading a dependency from PyPI, before building or running tests. It was a connection timeout, not a demonstrated Voice failure. A fresh rerun and cross-repository checks are recorded on the linked issues and PRs; the September provider observations below remain historical evidence.</p>
     <p id="implementation-status"><strong>September 19–20 direct-handoff checks:</strong> generated speech reached the real saved OpenHands Cat and returned its saved answer as audio. A fresh call then recalled the saved test word, saving its new question and answer in that same Cat. These checks used the real provider and existing Codex sign-in, with generated input rather than a physical microphone. They establish those observed requests, not universal delegation or account eligibility. On September 20, a further natural spoken request also verified skill-guided API use: the Cat independently discovered and queried the conversation-count endpoint, saved the correct result, and returned matching speech. The request did not supply an endpoint or command.</p>
     <p>Physical iPad microphone, speaker, interruption, approval, and repeated-use behavior still needs device verification. The public API transport’s provider speech remains unverified. No fresh page screenshot is claimed here; the artwork is copied from the App source.</p>
     <ul>
