@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10110f">
+  <title>Give agents a way to prove it — OpenHands verification</title>
+  <meta name="description" content="How OpenHands gives agents a feature map, a CLI, and maintained rules to test the real product like a user. With recipes and real before/after evidence from the first full run.">
+  <meta property="og:title" content="Give agents a way to prove it">
+  <meta property="og:description" content="A map of the product. A way to run it. A standard of proof. Inside OpenHands’ agent-driven verification loop.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/verify-openhands.html">
+  <meta property="og:image" content="https://enyst.github.io/assets/verify-openhands/social.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://enyst.github.io/arch/verify-openhands.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/verify-openhands/presentation.css">
+  <script src="../assets/verify-openhands/presentation.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#presentation">Skip to presentation</a>
+<header class="topbar">
+  <a class="brand-link" href="../index.html">EN <span>/ field notes</span></a>
+  <nav class="chapter-links" aria-label="Presentation chapters">
+    <a href="#idea">The idea</a><a href="#map">The map</a><a href="#first-run">The evidence</a><a href="#maintenance">The upkeep</a><a href="#sources">Sources</a>
+  </nav>
+  <button id="present-toggle" type="button" aria-pressed="false">Present</button>
+</header>
+<div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+<main id="presentation">
+
+<section class="slide" id="idea" data-title="Give agents a way to prove it" aria-labelledby="title">
+  <div class="slide-inner">
+    <p class="eyebrow">OpenHands / verification as infrastructure <span class="section-number">01 / 12</span></p>
+    <div class="hero-grid">
+      <div>
+        <h1 id="title">Give agents a way<br>to <em>prove it.</em></h1>
+        <p class="lead">A map of the product. A way to run it. A standard of proof.</p>
+        <p>We taught agents how to use OpenHands itself: open the app, take the paths a user takes, check what actually happened, and leave evidence someone else can replay.</p>
+        <p class="small muted">The <code>verify-openhands</code> story · Engel Nyst<br>7 October 2026 · implementation and evidence snapshot</p>
+        <a class="text-link" href="#system">See how the pieces fit <span aria-hidden="true">↓</span></a>
+      </div>
+      <figure class="hero-visual">
+        <div class="browser-frame">
+          <div class="browser-top"><span aria-hidden="true">● ● ●</span><span>Agent Canvas · real verification run</span></div>
+          <button type="button" class="image-zoom" aria-label="Enlarge the real French settings screenshot"><img src="../assets/verify-openhands/application-french.png" width="1440" height="1000" alt="Agent Canvas Application settings after switching the interface to French in a real verification run."></button>
+        </div>
+        <figcaption>Actual F16 Application-settings evidence from <a href="https://github.com/OpenHands/OpenHands/pull/17961">the feature-map PR</a>. Screenshots throughout this page come from the original runs.</figcaption>
+      </figure>
+    </div>
+    <ol class="hero-loop" aria-label="The verification loop"><li><span>01</span> Find the behavior</li><li><span>02</span> Drive the product</li><li><span>03</span> Observe the result</li><li><span>04</span> Keep the proof</li></ol>
+  </div>
+</section>
+
+<section class="slide" id="system" data-title="Four pieces, one loop" aria-labelledby="system-title">
+  <div class="slide-inner">
+    <p class="eyebrow">The design <span class="section-number">02 / 12</span></p>
+    <h2 id="system-title">“Test it like a user”<br>needs an operating manual.</h2>
+    <p class="lead">The repository now carries the knowledge an agent needs to verify its own work.</p>
+    <div class="layer-list">
+      <article><span class="number">01</span><div><h3>The feature map</h3><p><strong>What can a user do?</strong> Stable behavior IDs, entry points, preconditions, exact recipes, expected observations, and known traps.</p></div><code>references/feature-map/</code></article>
+      <article><span class="number">02</span><div><h3>The control CLI</h3><p><strong>How do I run and use this checkout?</strong> Isolated stacks, a persistent browser, reusable actions, diagnostics, and evidence capture.</p></div><code>control-openhands</code></article>
+      <article><span class="number">03</span><div><h3>The verification rules</h3><p><strong>What counts as proof?</strong> Exercise real entry points. Re-read state after a mutation. Record each outcome. Make the recipe replayable.</p></div><code>SKILL.md + mapping.md</code></article>
+      <article><span class="number">04</span><div><h3>The maintenance rules</h3><p><strong>How does this stay true?</strong> Compare fixed revisions, read the intent of changes, drive affected behavior, and separate map drift from product bugs.</p></div><code>maintenance.md + report.md</code></article>
+    </div>
+    <p class="source-note">Merged in <a href="https://github.com/OpenHands/OpenHands/pull/17961">#17961</a>; maintained in <a href="https://github.com/OpenHands/OpenHands/pull/18085">#18085</a>. The existing <a href="control-openhands-cli.html">CLI deep dive</a> covers the command surface in more detail.</p>
+  </div>
+</section>
+
+<section class="slide" id="map" data-title="Map the product from the user’s side" aria-labelledby="map-title">
+  <div class="slide-inner">
+    <p class="eyebrow">A readable inventory <span class="section-number">03 / 12</span></p>
+    <h2 id="map-title">The unit is a behavior.</h2>
+    <p class="lead">“A secret is still there after a reload” gives an agent something concrete to prove.</p>
+    <div class="metrics"><dl><div><dt>feature families</dt><dd>27</dd></div><div><dt>mapped behaviors</dt><dd>716</dd></div><div><dt>routes inventoried</dt><dd>30</dd></div></dl></div>
+    <div class="two-col">
+      <div class="map-groups">
+        <details><summary>Starting work <span>125</span></summary><p>First run, app shell, Home, conversations and folders. F01–F04.</p></details>
+        <details><summary>Conversation &amp; workspace <span>143</span></summary><p>Composer, agent activity, header controls, files, diffs, terminal, browser and planner. F05–F08, F27.</p></details>
+        <details><summary>Settings &amp; configuration <span>174</span></summary><p>Providers, LLM profiles, router, agent profiles, secrets, agent behavior and application preferences. F09–F16.</p></details>
+        <details><summary>Customization <span>93</span></summary><p>MCP, skills, plugins and Canvas apps. F17–F20.</p></details>
+        <details><summary>Automations <span>127</span></summary><p>Dashboard, creation, detail, runs, logs and Git Sync. F21–F24.</p></details>
+        <details><summary>Backends &amp; runtimes <span>54</span></summary><p>Backend selection, Cloud, sharing, launcher, Docker, desktop and library use. F25–F26.</p></details>
+      </div>
+      <div class="code-window map-anatomy">
+        <header><span>F14-secrets.md · condensed anatomy</span></header>
+        <pre><code># F14 — Secrets
+Source: src/routes/secrets-settings.tsx, …
+
+## Sub-features
+F14.create: adding a secret persists it;
+it is listed after a reload.
+
+## How to get to it (user POV)
+Settings → Secrets · direct URL · command menu
+
+## Driving it with control-openhands
+Preconditions → commands → expected observation
+
+## Gotchas
+Real traps and linked known failures</code></pre>
+      </div>
+    </div>
+    <p class="callout"><strong>Mapped does not mean passed.</strong> The map keeps failures, blocked prerequisites, and gaps visible. Cloud accounts, external integrations and platform-specific behavior need their own available environment.</p>
+    <p class="source-note">Counts at merged maintenance revision <a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/feature-map/README.md#L225">a2a74bd</a>. The groups above are presentation groupings; the linked index owns the inventory.</p>
+  </div>
+</section>
+
+<section class="slide" id="lever" data-title="A reliable way to operate the real app" aria-labelledby="lever-title">
+  <div class="slide-inner">
+    <p class="eyebrow">The lever <span class="section-number">04 / 12</span></p>
+    <h2 id="lever-title">One checkout. One isolated run.<br>One browser that remembers.</h2>
+    <div class="two-col">
+      <div>
+        <p class="lead"><code>control-openhands</code> wraps the production launcher and the repo’s own Playwright.</p>
+        <p>Each run gets its own HOME, state, keys and ports. The browser stays alive across shell calls, continuously collecting errors, requests, toasts and downloads.</p>
+        <p><code>doctor</code> checks that the services are healthy and the browser is looking at <strong>this checkout’s build</strong>. A stale bundle cannot quietly become evidence for a new fix.</p>
+      </div>
+      <div class="code-window">
+        <header><span>From an installed OpenHands checkout</span><button class="copy-code" type="button">Copy</button></header>
+        <pre><code>export PATH="$PWD/.agents/skills/verify-openhands/scripts:$PATH"
+export OH_VERIFY_RUN=$(control-openhands launch --new --print-run)
+
+control-openhands doctor
+control-openhands onboard --skip
+control-openhands browser goto /settings/secrets
+control-openhands browser snapshot
+control-openhands browser errors
+
+# After verification:
+control-openhands stop</code></pre>
+      </div>
+    </div>
+    <div class="three-col">
+      <article><h3>Arrange</h3><p>API calls and fixtures create the preconditions: a repository, a profile, an automation, a backend that goes down.</p></article>
+      <article><h3>Drive</h3><p>Click, type, navigate, press keys, resize, upload and download through real product entry points.</p></article>
+      <article><h3>Observe</h3><p>Read the UI and accessibility tree, inspect network and toast history, check persisted state, and save artifacts.</p></article>
+    </div>
+    <p class="source-note">The CLI returns structured results with actionable failures. <a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/SKILL.md#L55">Read the launch, doctor, drive and cleanup contract.</a></p>
+  </div>
+</section>
+
+<section class="slide" id="proof" data-title="What counts as proof" aria-labelledby="proof-title">
+  <div class="slide-inner">
+    <p class="eyebrow">A recipe you can replay <span class="section-number">05 / 12</span></p>
+    <h2 id="proof-title">Save it. Reload it. Find it again.</h2>
+    <p class="lead">F14.create verifies persistence through the UI. Opening the form is only the beginning.</p>
+    <div class="proof-steps" aria-label="Recipe steps">
+      <button type="button" data-panel="recipe-drive">1 · Drive</button><button type="button" data-panel="recipe-observe">2 · Re-observe</button><button type="button" data-panel="recipe-record">3 · Record</button>
+    </div>
+    <div class="recipe-panel" id="recipe-drive">
+      <div class="code-window"><header><span>After launch, doctor and onboarding</span><button class="copy-code" type="button">Copy</button></header><pre><code>control-openhands browser goto /settings/secrets
+control-openhands browser click 'testid=add-secret-button'
+control-openhands browser fill 'testid=add-secret-form &gt;&gt; testid=name-input' QA_TMP_SECRET
+control-openhands browser fill 'testid=add-secret-form &gt;&gt; testid=value-input' dummy-value-123
+control-openhands browser click 'testid=add-secret-form &gt;&gt; testid=submit-button'</code></pre></div>
+      <p class="small muted">A dummy value in a disposable run. These steps exercise the actual form and Save action.</p>
+    </div>
+    <div class="recipe-panel" id="recipe-observe">
+      <div class="code-window"><header><span>The second view proves persistence</span><button class="copy-code" type="button">Copy</button></header><pre><code>control-openhands browser reload
+control-openhands browser count 'testid=secret-item &gt;&gt; has-text=QA_TMP_SECRET'
+
+# Expected observation: count 1 after reload.
+# If that is not what happened, do not record a pass.
+
+control-openhands browser screenshot --feature F14.create --name after-reload</code></pre></div>
+      <p class="small muted">Reloading asks the product for its saved state again. A success toast alone cannot establish that.</p>
+    </div>
+    <div class="recipe-panel" id="recipe-record">
+      <div class="code-window"><header><span>Only after observing the expected result</span><button class="copy-code" type="button">Copy</button></header><pre><code>control-openhands evidence add --feature F14.create --result pass \
+  --entry "Settings &gt; Secrets &gt; Add" \
+  --expected "row survives reload" --actual "count 1 after reload" \
+  --artifact evidence/F14.create/after-reload.png
+control-openhands evidence report
+control-openhands stop</code></pre></div>
+      <p class="small muted">The evidence survives cleanup. Use the actual returned artifact path if the screenshot name received a suffix.</p>
+    </div>
+    <ol class="rule-list">
+      <li><strong>Setup is not proof.</strong><p>API writes may arrange a test. A UI claim still needs UI evidence.</p></li>
+      <li><strong>One pass has a precise scope.</strong><p>The ledger records an ID and entry point: pass, fail, blocked or not-run.</p></li>
+      <li><strong>The result must be observable.</strong><p>Inspect saved state, real files or tool observations. Model wording cannot stand in for those checks.</p></li>
+    </ol>
+    <p class="source-note">Adapted from the actual <a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/feature-map/F14-secrets.md#L39">F14 Secrets recipe</a> and <a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/report.md#L16">evidence contract</a>. Run in order on a fresh isolated stack.</p>
+  </div>
+</section>
+
+<section class="slide" id="first-run" data-title="The first run found real bugs" aria-labelledby="first-run-title">
+  <div class="slide-inner">
+    <p class="eyebrow">Evidence / 01 <span class="section-number">06 / 12</span></p>
+    <div class="case-study-grid">
+      <div>
+        <h2 id="first-run-title">The Close button<br>was off the phone.</h2>
+        <p class="lead">A perfectly ordinary user action exposed a real layout failure.</p>
+        <p>Open Settings on a 390px viewport. Open the Agent Canvas update dialog. The 520px dialog spills past both edges; its title is cut off and its Close button is outside the screen.</p>
+        <p>The agent reproduced it, captured the before state, applied the shared viewport cap, and checked the fixed build at phone, narrow and desktop widths.</p>
+        <p><span class="tag success">Merged · 5 Oct</span> <a href="https://github.com/OpenHands/OpenHands/pull/18008">PR #18008</a> · fixes <a href="https://github.com/OpenHands/OpenHands/issues/17903">#17903</a></p>
+        <div class="code-window"><header><span>With the update dialog open</span></header><pre><code>control-openhands browser viewport phone
+control-openhands browser bbox \
+  'testid=agent-canvas-update-modal'
+control-openhands browser click \
+  'testid=close-agent-canvas-update-modal'
+control-openhands browser count \
+  'testid=agent-canvas-update-modal'
+# Expected: 0 after Close.</code></pre></div>
+        <p class="small muted">The PR reports x = −65 / width 520 before, x = 19.5 / width 351 after. The screenshot is paired with geometry and dismissal checks.</p>
+      </div>
+      <div class="evidence-pair">
+        <figure class="before"><span class="pill">Before · 390 × 844</span><button class="image-zoom" type="button" aria-label="Enlarge the update dialog before the fix"><img src="../assets/verify-openhands/update-dialog-before.png" width="390" height="844" loading="lazy" alt="Before: the update dialog extends beyond both sides of the phone viewport. The title is clipped and Close is off-screen."></button><figcaption>Clipped title.<br>No reachable Close button.</figcaption></figure>
+        <figure class="after"><span class="pill">After · 390 × 844</span><button class="image-zoom" type="button" aria-label="Enlarge the update dialog after the fix"><img src="../assets/verify-openhands/update-dialog-after.png" width="390" height="844" loading="lazy" alt="After: the update dialog fits within the phone viewport with margins, a complete title and a visible Close button."></button><figcaption>Full dialog in view.<br>Close works.</figcaption></figure>
+      </div>
+    </div>
+    <p class="source-note">Original, unmodified captures from <a href="https://github.com/OpenHands/OpenHands/pull/18008">#18008</a>. This is a finding from the first mapping effort; its fix merged while the larger feature-map PR was still being developed.</p>
+  </div>
+</section>
+
+<section class="slide" id="beyond-pixels" data-title="Observe what screenshots miss" aria-labelledby="beyond-title">
+  <div class="slide-inner">
+    <p class="eyebrow">Evidence / 02 <span class="section-number">07 / 12</span></p>
+    <h2 id="beyond-title">Some failures disappear<br>before the next screenshot.</h2>
+    <div class="two-col">
+      <div>
+        <p class="lead">One failed “Run now” action showed two error toasts.</p>
+        <p>The recipe creates an inert automation, loads its card, then deletes it through the API to make the UI stale. Clicking <strong>Run now</strong> takes the real error path.</p>
+        <p>Both the caller and a global error handler displayed a toast. <code>browser toasts --history</code> preserved the evidence. The fix leaves one useful error message.</p>
+        <p><a href="https://github.com/OpenHands/OpenHands/pull/18043">#18043</a> · merged 6 Oct · fixes <a href="https://github.com/OpenHands/OpenHands/issues/17906">#17906</a></p>
+        <div class="finding-list">
+          <article><h3>Keyboard behavior needs keyboard proof.</h3><p><a href="https://github.com/OpenHands/OpenHands/pull/18011">#18011</a> fixed Delete automation: Escape did nothing, focus stayed outside, and assistive technology had no named dialog. The verification used key presses and the accessibility tree.</p></article>
+          <article><h3>Visible content needs a fresh read.</h3><p><a href="https://github.com/OpenHands/OpenHands/pull/18032">#18032</a> fixed a stale Files preview after an agent edited a file. Even Refresh and a page reload had continued to show old contents.</p></article>
+        </div>
+      </div>
+      <div>
+        <div class="comparison-controls" aria-label="Toast screenshots"><button type="button" data-image="../assets/verify-openhands/automation-toasts-before.png" data-alt="Before the fix: an automation Run now failure displays two error toasts in the bottom-right corner." data-caption="Before #18043: one failed Run now action displays both Automation not found and a generic 404 toast." aria-pressed="true">Before · two toasts</button><button type="button" data-image="../assets/verify-openhands/automation-toasts-after.png" data-alt="After the fix: an automation Run now failure displays one Automation not found toast in the bottom-right corner." data-caption="After #18043: the failed Run now action displays one Automation not found toast." aria-pressed="false">After · one toast</button></div>
+        <figure class="browser-frame"><button class="image-zoom" type="button" aria-label="Enlarge the automation error screenshot"><img id="toast-image" src="../assets/verify-openhands/automation-toasts-before.png" width="1440" height="1000" loading="lazy" alt="Before the fix: an automation Run now failure displays two error toasts in the bottom-right corner."></button><figcaption id="toast-caption">Before #18043: one failed Run now action displays both “Automation not found” and a generic 404 toast.</figcaption></figure>
+        <noscript><p><a href="../assets/verify-openhands/automation-toasts-after.png">View the after screenshot: one error toast.</a></p></noscript>
+        <p class="small muted">Original captures from separate before/after stacks; fixture lists differ. The comparison is the number and content of error toasts. Click the image to inspect it.</p>
+      </div>
+    </div>
+    <p class="source-note">These PRs explicitly connect their fixes to the full agentic run. Screenshots support the claim; <a href="https://github.com/OpenHands/OpenHands/pull/18043">the reproduction and observation steps</a> make it checkable.</p>
+  </div>
+</section>
+
+<section class="slide" id="agents" data-title="Why this fits agents" aria-labelledby="agents-title">
+  <div class="slide-inner">
+    <p class="eyebrow">Why the structure matters <span class="section-number">08 / 12</span></p>
+    <h2 id="agents-title">Every new agent inherits<br>what the last one learned.</h2>
+    <div class="mechanism-list">
+      <article><span class="number">01</span><div><h3>Less product rediscovery</h3><p>The index points to the relevant family. A bounded task can load its recipes and gotchas without reconstructing the whole application.</p></div></article>
+      <article><span class="number">02</span><div><h3>Less environment guesswork</h3><p>Launch, health checks and build identity are shared infrastructure. Fixing the harness once helps every later run.</p></div></article>
+      <article><span class="number">03</span><div><h3>Continuity across tool calls</h3><p>The persistent browser retains the page and observations between short commands. Transient errors remain available to inspect.</p></div></article>
+      <article><span class="number">04</span><div><h3>Parallel work with separate state</h3><p>Each live worker gets its own stack, ports, keys and evidence. Source readers can work in parallel without sharing one browser session.</p></div></article>
+      <article><span class="number">05</span><div><h3>A smaller gap between claim and proof</h3><p>Stable IDs, expected observations and a second view make “verified” specific. Failures and missing prerequisites have explicit outcomes.</p></div></article>
+      <article><span class="number">06</span><div><h3>Reviewers can replay the work</h3><p>The next agent can run the same recipe against the actual fix. A summary becomes an inspectable record of behavior.</p></div></article>
+    </div>
+    <p class="callout"><strong>It was used beyond the first sweep.</strong> The <a href="control-openhands-cli.html#fleet">5 October fix-fleet report</a> records 36 Canvas fixers using the CLI; across the wider fix/review fleet, 170 isolated launches and 261 screenshots. These are usage counts, not a measured speedup or a correctness guarantee.</p>
+    <p class="source-note">The <a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/adaptation.md">OpenHands adaptation</a> explains the persistent browser and isolation. Unit tests and CI remain part of verification; this adds the live user experience.</p>
+  </div>
+</section>
+
+<section class="slide" id="maintenance" data-title="Maintain the map as part of the product" aria-labelledby="maintenance-title">
+  <div class="slide-inner">
+    <p class="eyebrow">The part that keeps it useful <span class="section-number">09 / 12</span></p>
+    <h2 id="maintenance-title">The map changes with the product.</h2>
+    <p class="lead">Maintenance asks three separate questions: is the feature present, does it work and look right, and was the change intended?</p>
+    <ol class="maintenance-flow">
+      <li><span>01</span><h3>Freeze revisions</h3><p>Pin BASE and TARGET. Comparable runs need known code and separate state.</p></li>
+      <li><span>02</span><h3>Read the changes</h3><p>Map changed paths to behavior IDs. Read PR and issue intent. Shared code widens the scope.</p></li>
+      <li><span>03</span><h3>Drive it live</h3><p>Replay recipes and known failures. Compare BASE and TARGET before attributing a regression.</p></li>
+      <li><span>04</span><h3>Reconcile</h3><p>Keep evidence, fix the right layer, and propose a reviewed baseline only after a completed pass.</p></li>
+    </ol>
+    <div class="two-col">
+      <div class="finding-list">
+        <article><h3>Map drift → correct the recipe.</h3><p>A renamed control or intended interaction change belongs in the map, backed by live evidence.</p></article>
+        <article><h3>Harness gap → extend the shared CLI.</h3><p>Prove the new interaction before other recipes depend on it.</p></article>
+      </div>
+      <div class="finding-list">
+        <article><h3>Product defect → report the bug.</h3><p>A broken behavior is not a reason to redefine success. Route it to Canvas, SDK or automation as appropriate.</p></article>
+        <article><h3>Missing prerequisite → record blocked.</h3><p>Name the account, platform or service needed. Partial and blocked passes do not advance the baseline.</p></article>
+      </div>
+    </div>
+    <p class="callout"><strong>Intent and runtime are independent.</strong> “Documented change” does not mean “works.” A merged fix still needs to be exercised; known failures get replayed.</p>
+    <p class="source-note"><a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/maintenance.md">The merged maintenance rules</a> define the comparison, intent ledger, live pass and baseline policy.</p>
+  </div>
+</section>
+
+<section class="slide" id="evolution" data-title="The first maintenance pass already mattered" aria-labelledby="evolution-title">
+  <div class="slide-inner">
+    <p class="eyebrow">A living system <span class="section-number">10 / 12</span></p>
+    <h2 id="evolution-title">The follow-ups close the loop.</h2>
+    <div class="timeline">
+      <article><time datetime="2026-10-05">5–6 October</time><div><span class="tag success">Product fixes</span><h3>The first run produces repair work.</h3><p>Phone layout, keyboard access, error feedback and stale file contents become reproducible issues and fix PRs. Several fixes land before the feature-map PR itself merges.</p><p><a href="https://github.com/OpenHands/OpenHands/pull/18008">#18008</a> · <a href="https://github.com/OpenHands/OpenHands/pull/18011">#18011</a> · <a href="https://github.com/OpenHands/OpenHands/pull/18043">#18043</a> · <a href="https://github.com/OpenHands/OpenHands/pull/18032">#18032</a></p></div></article>
+      <article><time datetime="2026-10-06T20:43:00Z">6 Oct · 20:43 UTC</time><div><span class="tag success">Foundation merged</span><h3>The map, CLI and rules land together.</h3><p><a href="https://github.com/OpenHands/OpenHands/pull/17961">#17961</a> gives the next agent the same operating knowledge and proof standard.</p></div></article>
+      <article><time datetime="2026-10-06T23:46:00Z">6 Oct · 23:46 UTC</time><div><span class="tag success">Maintenance merged</span><h3>New fixes change the expected behavior.</h3><p><a href="https://github.com/OpenHands/OpenHands/pull/18085">#18085</a> updates hooks, install-error recipes, preset metadata and credential-hidden Git Sync. Changed recipes are run on a fresh stack and independently replayed. The pass also finds new issues: <a href="https://github.com/OpenHands/OpenHands/issues/18088">#18088</a>, <a href="https://github.com/OpenHands/OpenHands/issues/18089">#18089</a>, <a href="https://github.com/OpenHands/OpenHands/issues/18090">#18090</a>.</p></div></article>
+      <article><time datetime="2026-10-07">7 October snapshot</time><div><span class="tag proposed">Proposed · open PR</span><h3>A practical daily pass.</h3><p><a href="https://github.com/OpenHands/OpenHands/pull/18093">#18093</a> proposes affected-family discovery, baseline and test-ID helpers, richer reports, smoke checks for untouched families, and rotating full recipes across the week. This is a proposed procedure and tooling, not a claim that a recurring scheduler is installed.</p></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="inspiration" data-title="Inspired by pstack" aria-labelledby="inspiration-title">
+  <div class="slide-inner">
+    <p class="eyebrow">Credit where it belongs <span class="section-number">11 / 12</span></p>
+    <h2 id="inspiration-title">The idea came from pstack.</h2>
+    <div class="two-col">
+      <div>
+        <p class="lead">Lauren Tan’s <a href="https://github.com/cursor/plugins/tree/main/pstack">pstack</a> treats verification as infrastructure that other agent workflows can build on.</p>
+        <p>Its <strong>create-verification-skill</strong> and <strong>maintain-verification-skill</strong> turn a repository into an executable guide to its own user-facing behavior.</p>
+        <p>We applied that pattern to OpenHands: the real launcher, isolated stacks, a persistent browser, a detailed feature map, and rules for evidence and change intent.</p>
+        <p>The reusable idea is to put product knowledge and a means of checking it <strong>inside the repository</strong>, where every agent can find them.</p>
+      </div>
+      <div>
+        <blockquote class="quote"><p>“A generated skill that was never executed is a draft, not a deliverable.”</p><footer>— <a href="https://github.com/cursor/plugins/blob/main/pstack/skills/create-verification-skill/SKILL.md">pstack · Create a verification skill</a></footer></blockquote>
+        <div class="finding-list"><article><h3>Read the original thinking</h3><p><a href="https://github.com/poteto/verification-skill-example">Lauren’s example feature map</a> shows the structure using a fictional application. <a href="https://github.com/cursor/plugins/blob/main/pstack/skills/maintain-verification-skill/SKILL.md">The maintenance skill</a> explains how to keep it useful.</p></article><article><h3>Meet the author</h3><p><a href="https://x.com/poteto/status/2082874054483255805">@poteto’s verification-skills announcement</a><br><a href="https://www.youtube.com/watch?v=MN9dGgmLyso">Matt Pocock’s conversation with Poteto ↗</a></p></article></div>
+      </div>
+    </div>
+    <p class="source-note">The <a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/adaptation.md">OpenHands attribution and adaptation notes</a> record what was borrowed and what was built for this product. See also our earlier <a href="pstack-software-factory.html">pstack decision note</a>.</p>
+  </div>
+</section>
+
+<section class="slide closing" id="sources" data-title="Make the next verification easier" aria-labelledby="sources-title">
+  <div class="slide-inner">
+    <p class="eyebrow">Take it with you <span class="section-number">12 / 12</span></p>
+    <h2 id="sources-title" class="closing-title">A fix should leave behind<br>a better way to verify the next one.</h2>
+    <p class="lead">That is what we meant to build: agents that can use the product, discover what is wrong, prove a repair, and improve the shared instructions.</p>
+    <div class="source-grid">
+      <article><h3>Start here</h3><ul><li><a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/SKILL.md">The verify-openhands skill</a></li><li><a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/feature-map/README.md">The complete feature map</a></li><li><a href="control-openhands-cli.html">The CLI deep dive and fix-fleet report</a></li></ul></article>
+      <article><h3>Inspect the rules</h3><ul><li><a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/mapping.md">Mapping and independent replay</a></li><li><a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/maintenance.md">Maintenance and baseline comparisons</a></li><li><a href="https://github.com/OpenHands/OpenHands/blob/a2a74bdbe76d76e5621a169d2ca875a6494257a4/.agents/skills/verify-openhands/references/report.md">Evidence and outcome reporting</a></li></ul></article>
+      <article><h3>Check the evidence</h3><ul><li><a href="https://github.com/OpenHands/OpenHands/pull/17961">The feature-map PR and original runs</a></li><li><a href="https://github.com/OpenHands/OpenHands/pull/18008">Phone dialog: before, after and geometry</a></li><li><a href="https://github.com/OpenHands/OpenHands/pull/18043">Duplicate toasts: reproduction and proof</a></li><li><a href="../assets/verify-openhands/sources.json">Screenshot origins and pinned revisions</a></li></ul></article>
+    </div>
+    <p class="source-note">This presentation describes the public work as checked on 7 October 2026. Source links are pinned where practical; PR links carry current status. The embedded captures are historical test artifacts, not fresh verification of today’s build.</p>
+    <p class="small"><a href="../index.html">← Engel’s Code Design Notebook</a> <span class="muted">· Static HTML, real evidence.</span></p>
+  </div>
+</section>
+</main>
+<nav class="footer-nav" aria-label="Slide controls"><span class="slide-hint">Arrow keys · scroll for detail</span><button id="prev-slide" type="button" aria-label="Previous slide">←</button><span id="slide-counter" aria-live="polite">01 / 12</span><button id="next-slide" type="button" aria-label="Next slide">→</button><button id="exit-presentation" type="button">Exit presentation</button></nav>
+<dialog id="image-dialog" aria-label="Enlarged test screenshot"><button id="close-image" type="button" aria-label="Close enlarged screenshot">Close ×</button><img id="expanded-image" alt=""><p id="expanded-caption"></p></dialog>
+</body>
+</html>
