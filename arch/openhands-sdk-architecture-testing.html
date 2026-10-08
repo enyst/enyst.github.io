@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing architecture when agents write the code — Engel's notebook</title>
+  <meta name="description" content="An OpenHands Agent SDK testing strategy for unattended PRs: protected architectural contracts, independent REST/WS verification, stateful and mutation testing, and self-healing agents.">
+  <meta property="og:title" content="Testing architecture when agents write the code">
+  <meta property="og:description" content="An OpenHands Agent SDK testing strategy for unattended PRs: protected architectural contracts, independent REST/WS verification, stateful and mutation testing, and self-healing agents.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/openhands-sdk-architecture-testing.html">
+  <meta property="og:image" content="https://enyst.github.io/og-index.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://enyst.github.io/arch/openhands-sdk-architecture-testing.html">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    html { color-scheme: dark; scroll-padding-top: 24px; }
+    .shell { max-width: 1040px; font-size: 18px; }
+    header, article, footer { max-width: 72ch; margin-inline: auto; }
+    h1 { font-size: clamp(2.4rem, 6vw, 4rem); line-height: 1.08; margin: 30px 0 22px; text-wrap: balance; }
+    h2, h3 { text-transform: none; letter-spacing: -.01em; }
+    h2 { font-size: 1.55rem; margin-top: 64px; scroll-margin-top: 24px; }
+    h3 { font-family: var(--sans); font-size: 1.15rem; color: var(--ink); }
+    p, li { font-size: 1em; }
+    .meta { color: #aaa296; font-size: .82em; margin-bottom: 24px; }
+    .eyebrow { display: block; font: 500 .7rem var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--accent); margin: 28px 0 0; }
+    strong { color: inherit; }
+    a { color: var(--teal); overflow-wrap: anywhere; text-underline-offset: .2em; }
+    a:hover { color: var(--ink); }
+    a:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .contents { display: flex; flex-wrap: wrap; gap: 10px 22px; padding: 18px 0; margin-bottom: 34px; border-block: 1px solid var(--border); font-size: .85em; }
+    .contents a { text-decoration: none; }
+    blockquote { border-left: 3px solid var(--accent); background: var(--card); margin: 26px 0; padding: 18px 24px; border-radius: 0 var(--border-radius) var(--border-radius) 0; }
+    blockquote p { margin: 0 !important; }
+    code { overflow-wrap: anywhere; }
+    pre.code { font-size: .82em; white-space: pre; tab-size: 2; scrollbar-color: var(--muted) var(--card); }
+    .prose pre.code code { padding: 0; border: 0; background: transparent; font-size: inherit; overflow-wrap: normal; }
+    .table-scroll { overflow-x: auto; margin: 26px 0; scrollbar-color: var(--muted) var(--card); }
+    table { min-width: 640px; margin: 0; font-size: .88em; line-height: 1.65; }
+    th { font: 700 1em/1.5 var(--sans); text-transform: none; letter-spacing: 0; }
+    th, td { vertical-align: top; padding: 12px 14px; }
+    .prose td code { padding: 0; background: transparent; }
+    .citation { white-space: nowrap; font: 500 .7em var(--mono); vertical-align: super; line-height: 0; }
+    .prose .citation a { border: 0; text-decoration: none; }
+    .diagram { margin: 30px 0; }
+    .diagram-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--border-radius); background: var(--card); scrollbar-color: var(--muted) var(--card); }
+    .diagram img { display: block; width: 100%; min-width: 600px; height: auto; }
+    .diagram-source { margin: 12px 0 0; font-size: .85em; }
+    .diagram-source summary { cursor: pointer; color: var(--teal); }
+    .diagram-source pre.code { font-size: .88em; }
+    footer { margin-top: 60px; padding-top: 24px; font-size: .8em; }
+    footer a { text-decoration: none; }
+    @media (max-width: 740px) {
+      .shell { padding: 28px 20px 60px; font-size: 17px; }
+      h1 { font-size: 2.65rem; margin-top: 22px; }
+      h2 { font-size: 1.4rem; margin-top: 48px; }
+      h3 { font-size: 1.08rem; }
+      .contents { gap: 10px 18px; }
+      blockquote { padding: 16px 18px; }
+      pre.code { padding: 16px; }
+    }
+    @media print {
+      html { color-scheme: light; }
+      body { background: white; color: #111; }
+      .shell { max-width: none; padding: 0; font-size: 11pt; }
+      header, article, footer { max-width: none; }
+      h1, h2, h3, strong, a, th { color: #111; }
+      .meta, .eyebrow { color: #555; }
+      .contents, .back, .diagram-source, footer { display: none; }
+      blockquote, pre.code, code, th { color: #111; background: #eee; }
+      .table-scroll, .diagram-scroll { overflow: visible; }
+      table { min-width: 0; font-size: .85em; }
+      .diagram img { min-width: 0; max-height: 18cm; object-fit: contain; }
+      pre.code { white-space: pre-wrap; overflow-wrap: anywhere; }
+      h2, h3 { break-after: avoid; }
+      tr, figure { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<main class="shell" id="top">
+  <header>
+    <a class="back" href="../index.html">← Engel's code design notebook</a>
+    <span class="eyebrow">Architecture study · OpenHands Agent SDK</span>
+    <h1>Testing architecture when agents write the code</h1>
+    <p class="meta">Verbatim response · Research from <time datetime="2026-10-07">7 October 2026</time> · Published <time datetime="2026-10-08">8 October 2026</time></p>
+    <nav class="contents" aria-label="On this page">
+      <a href="#existing-checks">Existing checks</a>
+      <a href="#authority-boundary">Authority boundary</a>
+      <a href="#executable-contracts">Executable contracts</a>
+      <a href="#testing-methods">Testing methods</a>
+      <a href="#replay-scenario">Replay scenario</a>
+      <a href="#design-patterns">Design patterns</a>
+      <a href="#self-healing">Self-healing</a>
+      <a href="#rollout">Rollout</a>
+    </nav>
+  </header>
+  <article class="prose" id="verbatim-response" aria-label="Complete testing strategy">
+<p><strong>I would build this around a separately governed, executable specification of the SDK’s architecture, exercised primarily through a running Agent Server’s REST and WebSocket APIs.</strong> Agents could change implementations freely within that specification. An independent verifier would decide whether a change still conforms, and repair agents would work from concrete failing traces.</p>
+<p>The central requirement is this:</p>
+<blockquote>
+<p><strong>The agent changing the implementation must not also control what counts as a successful verification.</strong></p>
+</blockquote>
+<p>A property test is just as editable as a unit test. A formal model can be weakened. An integration test can be skipped. Changing the testing method helps us detect different mistakes; separating authority over the specification and verdict makes those tests enforceable.</p>
+<p>I recovered the earlier discussion about OCL-like constraints and live behavioral verification, then inspected <code>OpenHands/software-agent-sdk</code> at <a href="https://github.com/OpenHands/software-agent-sdk/tree/69e26889401fe69157fff536e6a69049e6644cb3">commit <code>69e26889401fe69157fff536e6a69049e6644cb3</code></a>, the current <code>main</code> when I started. I also checked the current OpenHands application’s client dependency. I ran the repository’s import checker and isolated counterexamples against it. The other findings below come from source inspection; I am not presenting them as live-reproduced product defects.</p>
+<h2 id="existing-checks">1. What the repository already has—and where enforcement is weak</h2>
+<p>There is substantial useful material here. We do not need to invent a testing system from nothing.</p>
+<p>The repository already has architectural instructions, an import-boundary checker, a check that centralizes agent construction in the launch pipeline, persisted-settings compatibility machinery, OpenAPI checks, real HTTP/WS scenarios, and TypeScript integration tests against a server image built from the candidate branch. These are good foundations. <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/.agents/skills/custom-codereview-guide.md">Architecture review requirements</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/tests/agent_server/test_launch_architecture.py">launch architecture check</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/tests/cross/test_remote_conversation_live_server.py">real-server scenarios</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/.github/workflows/typescript-client-integration-tests.yml">TypeScript integration workflow</a>.</p>
+<p>But several findings illustrate exactly the problem you are describing.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Table 1"><table>
+<thead>
+<tr>
+<th scope="col">Existing mechanism</th>
+<th scope="col">What I found</th>
+<th scope="col">Consequence for unattended PRs</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Import-boundary checker</td>
+<td>In isolated probes, it rejected <code>import openhands.tools</code> inside the SDK, but accepted <code>from openhands import tools</code>. It also describes a workspace dependency restriction without scanning that package.</td>
+<td>Having an architectural check does not establish that it detects the prohibited dependency.</td>
+</tr>
+<tr>
+<td>Cross-package test selection</td>
+<td>The selector includes <code>openhands/**</code>, while production code lives under <code>openhands-sdk/**</code>, <code>openhands-agent-server/**</code>, and the other distribution directories.</td>
+<td>A source-only change can skip the real cross-package scenarios while the job completes successfully.</td>
+</tr>
+<tr>
+<td>REST compatibility check</td>
+<td>It deliberately returns success when it cannot find or generate the historical baseline, unless another check has independently failed.</td>
+<td>“Compatibility verified” and “compatibility not checked” can produce the same admission signal.</td>
+</tr>
+<tr>
+<td>REST/OpenAPI policy</td>
+<td>It explicitly excludes WebSocket/SSE compatibility and acknowledges some reliance on human review.</td>
+<td>Part of the primary client interface remains outside that compatibility policy.</td>
+</tr>
+</tbody></table></div>
+<p>Sources: <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/scripts/check_import_rules.py">import checker</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/.github/workflows/tests.yml#L482-L524">cross-test selector</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/.github/scripts/check_agent_server_rest_api_breakage.py#L994-L1022">baseline handling</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/openhands-agent-server/AGENTS.md">REST policy</a>.</p>
+<p>Those are limitations of the individual gates; they do not establish that every other CI check would accept the same change.</p>
+<p>There is also an important protocol distinction. The new <code>/sockets/session/{conversation_id}</code> interface already has explicit durable/transient envelopes, sequence-based replay, streaming-attempt identities, and bounded writer queues. However, the current TypeScript event-stream URL builder still uses <code>/sockets/events/{conversation_id}</code>. A strategy that tests only the new protocol would miss the interface existing clients actually use. <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/openhands-agent-server/openhands/agent_server/session_protocol.py">Session protocol</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/clients/typescript/src/client/conversation-event-stream.ts">TypeScript transport</a>.</p>
+<p><strong>My first investment would therefore be making existing enforcement trustworthy, then expanding what it can detect.</strong></p>
+<h2 id="authority-boundary">2. Establish an authority boundary around correctness</h2>
+<p>I would maintain an <strong>active conformance bundle</strong> containing:</p>
+<ul>
+<li>Architectural decisions and executable predicates.</li>
+<li>REST and WS contracts.</li>
+<li>Historical event/settings fixtures and supported-client versions.</li>
+<li>Scenario generators, comparison rules, and fault-injection controls.</li>
+<li>Required scenario IDs, selection rules, resource budgets, and exceptions.</li>
+<li>The verifier and its dependencies.</li>
+</ul>
+<p>An ordinary implementation PR is evaluated against the already accepted bundle.</p>
+<p>An agent may propose a better contract or verifier. That proposal does not become the active definition of correctness merely because its implementation PR merges.</p>
+<h3>This does not require another repository</h3>
+<p>The source can remain in this repository. The important boundary is <strong>who can activate a version of the bundle</strong>, and where it executes.</p>
+<p>Simply using the tests from <code>main</code> is insufficient. Otherwise an agent could first merge a weakened test and then merge the violating implementation. The active bundle needs a separately controlled release or activation process.</p>
+<p>Likewise, merely placing tests in <code>architecture_tests/</code> or adding <code>CODEOWNERS</code> would not solve the problem under your assumption that people will merge without reading.</p>
+<h3>The verifier must execute independently</h3>
+<p>The candidate server should run in an isolated environment. The verifier should run elsewhere and communicate through HTTP, WebSocket, and independently observed effects.</p>
+<p>In particular, the trusted verifier should not load the candidate’s:</p>
+<ul>
+<li><code>conftest.py</code> or pytest plugins;</li>
+<li>test-selection configuration;</li>
+<li>dependency environment;</li>
+<li>request-building and assertion helpers;</li>
+<li>replacement baselines or exception lists.</li>
+</ul>
+<p>Candidate-generated schemas and logs are useful evidence, but the candidate does not get to supply the final verdict.</p>
+<figure class="diagram">
+<div class="diagram-scroll" role="region" tabindex="0" aria-label="Independent evaluation diagram">
+<img src="../assets/openhands-sdk-architecture-testing/admission.svg" width="800" height="738" alt="Approved contracts and verifier feed independent evaluation. A candidate build runs an isolated Agent Server, whose REST, WS, observed effects feed that evaluation. The required result passes to merge candidate or sends a failing trace to the repair agent, which returns to the candidate build.">
+</div>
+<details class="diagram-source"><summary>Diagram source</summary><pre class="code"><code class="language-mermaid">flowchart TD
+    A[&quot;Approved contracts and verifier&quot;] --&gt; V[&quot;Independent evaluation&quot;]
+    C[&quot;Candidate build&quot;] --&gt; R[&quot;Isolated Agent Server&quot;]
+    R --&gt;|&quot;REST, WS, observed effects&quot;| V
+    V --&gt; G{&quot;Required result&quot;}
+    G --&gt;|&quot;Pass&quot;| M[&quot;Merge candidate&quot;]
+    G --&gt;|&quot;Failing trace&quot;| F[&quot;Repair agent&quot;]
+    F --&gt; C
+</code></pre></details>
+</figure>
+<p>For GitHub, I would publish the admission result through a designated GitHub App and require that identity as the expected source. GitHub supports this distinction; a check name alone is insufficient because write-capable integrations can otherwise set statuses. Organization rulesets can also require a workflow from a specified source repository, where the organization’s plan and configuration support it. <sup class="citation"><a href="https://docs.github.com/en/enterprise-cloud%40latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets" title="GitHub Docs — Available rules for rulesets" aria-label="Source 1: GitHub Docs — Available rules for rulesets">[1]</a></sup></p>
+<p>The candidate environment must not contain the credential that publishes that accepted result. A trusted workflow executing candidate code with privileged credentials would destroy the separation. GitHub documents this failure mode for privileged workflows that check out and execute untrusted code. <sup class="citation"><a href="https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target" title="GitHub Docs — Securely using pull_request_target" aria-label="Source 2: GitHub Docs — Securely using pull_request_target">[2]</a></sup></p>
+<h3>A pass must mean that verification actually happened</h3>
+<p>The verifier should generate its required scenario roster <strong>before</strong> execution. Every selected invariant needs an explicit result:</p>
+<ul>
+<li><strong>Pass:</strong> the required behavior was exercised and satisfied.</li>
+<li><strong>Fail:</strong> an observed execution violated the contract.</li>
+<li><strong>Blocked/inconclusive:</strong> verification could not establish the result.</li>
+</ul>
+<p>Missing baselines, unavailable dependencies, missing credentials, empty test collections, and skipped scenarios cannot become compatibility passes.</p>
+<p>This matters because GitHub explicitly treats a skipped job as successful for merge purposes. The final admission check must validate execution evidence itself. <sup class="citation"><a href="https://docs.github.com/en/pull-requests/reference/status-checks" title="GitHub Docs — Status checks" aria-label="Source 3: GitHub Docs — Status checks">[3]</a></sup></p>
+<p>The result should identify the tested merge revision, built artifact, active contract bundle, consumer versions, and executed scenarios. A changed PR head or changed merge base invalidates the previous result.</p>
+<p><strong>Ordinary implementation can remain fully automated. Changing architectural intent becomes a separate, much smaller decision surface.</strong> If that authority is delegated to agents too, their permissions and amendment rules must remain controlled; another unconstrained agent rubber-stamping changes recreates the original problem.</p>
+<h2 id="executable-contracts">3. Turn architectural decisions into a small set of executable contracts</h2>
+<p>Your OCL idea fits here. I would start with the discipline of explicit invariants, preconditions, postconditions, and temporal obligations. A full OCL execution stack is optional; named Python predicates and small protocol models are a practical starting point.</p>
+<p>Each contract should answer:</p>
+<ol>
+<li>What architectural decision are we preserving, and why?</li>
+<li>What observable or structural condition expresses it?</li>
+<li>Under which versions, backends, and execution modes does it apply?</li>
+<li>Which checker enforces it?</li>
+<li>Which valid example must pass?</li>
+<li>Which deliberate violation must fail?</li>
+<li>Who can authorize changing it?</li>
+</ol>
+<p>An illustrative manifest could look like this:</p>
+<pre class="code"><code class="language-yaml">id: WS-REPLAY-001
+surface: /sockets/session/{conversation_id}
+
+scope:
+  persistence: enabled
+  after_seq: explicit
+
+requirement: &gt;
+  A reconnecting client can recover the requested persisted suffix.
+  Transient and progress frames never advance the durable cursor.
+
+oracle: session_replay_matches_persisted_suffix
+
+negative_controls:
+  - omit_replayed_event
+  - advance_cursor_on_transient
+  - duplicate_event_at_replay_live_boundary
+</code></pre>
+<p>The named oracle must point to an actual independent checker. Merely writing the requirement in YAML and asking an LLM whether it was followed would leave the same ambiguity as prose instructions.</p>
+<h3>Initial contract portfolio</h3>
+<p>I would begin with approximately these families. They are proposed enforcement targets grounded in the repository’s existing design; some require clarification before becoming hard guarantees.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Table 2"><table>
+<thead>
+<tr>
+<th scope="col">Family</th>
+<th scope="col">What to preserve</th>
+<th scope="col">Strongest initial evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Package and construction boundaries</td>
+<td>Permitted dependency directions; canonical launch construction; explicit extension points.</td>
+<td>Static dependency analysis plus minimal-package execution.</td>
+</tr>
+<tr>
+<td>Configuration and persistence</td>
+<td>Defined settings survive create, save, restart, resume, and supported migration paths.</td>
+<td>Historical artifacts and stateful API scenarios.</td>
+</tr>
+<tr>
+<td>Durable history</td>
+<td>Event identity and ancestry remain valid; progress does not become persisted conversation history.</td>
+<td>Independent history inspection and restart tests.</td>
+</tr>
+<tr>
+<td>Streaming and replay</td>
+<td>Correct cursor behavior, replay/live handover, attempt supersession, and terminal reconciliation.</td>
+<td>Generated WS histories and fault injection.</td>
+</tr>
+<tr>
+<td>Run ownership</td>
+<td>One admitted owner; stale owners cannot mutate authoritative state.</td>
+<td>Concurrent API histories and process-level lease tests.</td>
+</tr>
+<tr>
+<td>Approval and cancellation</td>
+<td>Policy-gated effects respect confirmation; stop behavior matches the declared execution mode.</td>
+<td>External effect witnesses and controlled in-flight operations.</td>
+</tr>
+<tr>
+<td>Credentials</td>
+<td>Authorized delivery works; unrelated responses, logs, and persistence do not expose secrets.</td>
+<td>Synthetic secret canaries across the full lifecycle.</td>
+</tr>
+<tr>
+<td>Consumer compatibility</td>
+<td>Supported released clients continue to interpret responses and complete workflows.</td>
+<td>Pinned client/application scenarios against the candidate server.</td>
+</tr>
+<tr>
+<td>Resource bounds</td>
+<td>Slow consumers, failed starts, and cancelled runs do not leave unbounded queues or orphaned work.</td>
+<td>External process, connection, memory, and progress observation.</td>
+</tr>
+</tbody></table></div>
+<p>The registry should preserve architectural meaning. It should not canonize every implementation detail or automatically declare the current code correct.</p>
+<h2 id="testing-methods">4. The testing methods I would use</h2>
+<h3>A. Structural architecture testing</h3>
+<p>API behavior cannot reveal every architectural violation. Two implementations can return identical responses while one introduces a forbidden dependency or duplicates policy logic.</p>
+<p>For those constraints, inspect the code structurally.</p>
+<p>The existing import checker is a good starting point, once completed and qualified. It should account for all relevant packages, ordinary import forms, aliases, relative imports, and the sanctioned dynamic-loading mechanisms. New packages should require classification instead of silently falling outside the scan.</p>
+<p>Import Linter is an option if maintaining the custom checker becomes expensive: its forbidden-import contracts include indirect dependencies. I would prototype it against this repository’s namespace-package layout before replacing the existing mechanism. <sup class="citation"><a href="https://import-linter.readthedocs.io/en/stable/contract_types/forbidden/" title="Import Linter — Forbidden imports" aria-label="Source 4: Import Linter — Forbidden imports">[4]</a></sup></p>
+<p>I would also preserve checks around particularly valuable ownership boundaries:</p>
+<ul>
+<li>Where launch agents may be constructed.</li>
+<li>Where secret serialization occurs.</li>
+<li>Where durable events are committed and published.</li>
+<li>Which component owns conversation state mutation.</li>
+<li>Which component owns spawned work and its cleanup.</li>
+</ul>
+<p>These checks need to tolerate valid refactors. Matching a particular private helper name or exact source snippet is usually weaker than checking a dependency or ownership relationship.</p>
+<p>Then add <strong>minimal-package execution</strong>: install only the SDK and its declared dependencies in a clean environment and perform a small supported workflow. That detects accidental reliance on packages supplied by the development monorepo.</p>
+<h3>B. Published API contracts and actual consumer compatibility</h3>
+<p>Keep OpenAPI comparison, but compare against protected release artifacts. The candidate’s generated schema cannot be both the description of the change and the sole judge of its compatibility.</p>
+<p>I would use three complementary references:</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Table 3"><table>
+<thead>
+<tr>
+<th scope="col">Reference</th>
+<th scope="col">What it tells us</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Published REST/WS contract</td>
+<td>Whether the declared public surface changed compatibly.</td>
+</tr>
+<tr>
+<td>Independent behavioral predicates</td>
+<td>Whether the server actually performs the promised operation.</td>
+</tr>
+<tr>
+<td>Pinned released consumers</td>
+<td>Whether existing clients can still use it.</td>
+</tr>
+</tbody></table></div>
+<p>The current OpenHands application pins <code>@openhands/typescript-client</code> to <code>1.53.0</code>. That gives an immediately concrete consumer to test against the candidate server. <a href="https://github.com/OpenHands/OpenHands/blob/6e8157147936768bf358903a6341bc01e0ce1ac9/package.json">OpenHands package manifest at the inspected revision</a>.</p>
+<p>Testing only a newly generated client against a newly changed server allows both sides to agree on an incompatible change.</p>
+<p>There is a particularly relevant policy nuance here: the SDK’s REST checker deliberately accepts some response-type widening and new discriminated-union members. It expects consumers to tolerate unknown variants. That is an explicit policy choice, but the tolerance should be exercised in the released consumer. A server accepting additional request forms and a server emitting additional response forms place different demands on an old client. <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/.github/scripts/check_agent_server_rest_api_breakage.py#L29-L42">Current compatibility policy</a>.</p>
+<p>For WebSockets, define a separate versioned contract and test both supported transports. OpenAPI validation cannot establish replay, ordering, completion, or reconnect semantics.</p>
+<h3>C. Stateful, model-based testing over real REST/WS</h3>
+<p>This would be the center of the behavioral strategy.</p>
+<p>Build a small independent model tracking only the facts necessary to judge behavior:</p>
+<ul>
+<li>Accepted messages and whether they remain pending.</li>
+<li>Conversation/run lifecycle.</li>
+<li>Pending confirmation.</li>
+<li>Durable event identities and cursors.</li>
+<li>Streaming items and attempts.</li>
+<li>Effective configuration.</li>
+<li>Owned resources and observed effects.</li>
+</ul>
+<p>Then generate sequences of API operations and compare observations with that model after each step.</p>
+<p>Hypothesis stateful testing is suitable for generating operation sequences, carrying returned IDs into subsequent operations, checking invariants, and reducing failures to short reproducing programs. <sup class="citation"><a href="https://hypothesis.readthedocs.io/en/latest/stateful.html" title="Hypothesis — Stateful testing" aria-label="Source 5: Hypothesis — Stateful testing">[5]</a></sup></p>
+<p>The generated sequences should include ordinary and conflicting operations: create, send, run, interrupt, reconnect, fetch history, reject, resume, fork, close, and restart.</p>
+<p>A concrete example from this repository shows why sequence semantics matter: sending a message can return <strong>429 after the message has already been saved</strong>. The documented recovery is to retry <code>/run</code>, not resend the message. A test that equates every non-success response with “nothing happened” would encode the wrong behavior and could encourage duplicate messages. <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/openhands-agent-server/openhands/agent_server/event_router.py#L211-L228">Message admission contract</a>.</p>
+<p>The generator must also demonstrate useful reachability. A server that rejects every request should fail. A generator that never reaches execution, confirmation, replay, or takeover has not tested those invariants.</p>
+<p>Schemathesis can complement the custom model by chaining REST operations using real response-derived resource IDs. It helps explore the schema surface; the application-specific WS and lifecycle oracles still need to be specified. <sup class="citation"><a href="https://schemathesis.readthedocs.io/en/stable/explanations/stateful/" title="Schemathesis — Stateful testing" aria-label="Source 6: Schemathesis — Stateful testing">[6]</a></sup></p>
+<h3>D. Metamorphic testing</h3>
+<p>Here we check that a controlled transformation preserves the meaning that should remain unchanged.</p>
+<p>This is especially useful when the output space is too large to enumerate.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Table 4"><table>
+<thead>
+<tr>
+<th scope="col">Transformation</th>
+<th scope="col">Relation to check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Disconnect and reconnect a consumer</td>
+<td>Recovered durable history agrees with uninterrupted consumption.</td>
+</tr>
+<tr>
+<td>Drop transient token/progress frames</td>
+<td>Final persisted content remains unchanged.</td>
+</tr>
+<tr>
+<td>Change the chunk boundaries of identical provider output</td>
+<td>Final message content and identity relationships remain correct.</td>
+</tr>
+<tr>
+<td>Save, restart, and resume</td>
+<td>Defined effective settings and subsequent restrictions are preserved.</td>
+</tr>
+<tr>
+<td>Fork, then modify the fork</td>
+<td>The parent’s history remains unchanged.</td>
+</tr>
+<tr>
+<td>Interleave independent conversations in separate workspaces</td>
+<td>Messages, cancellation, and conversation-scoped state do not cross between them.</td>
+</tr>
+</tbody></table></div>
+<p>These relations must be grounded in the supported contract. For example, the session protocol explicitly declines to promise ordering between two open streaming items. A comparison demanding one exact total order would reject legitimate concurrency. <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/openhands-agent-server/openhands/agent_server/session_protocol.py#L1-L21">Delivery rules</a>.</p>
+<p>Normalization is part of the trusted oracle. Fresh IDs can be renamed consistently, but their relationships, multiplicity, parent links, and action/observation associations must remain intact. Sorting everything or deleting inconvenient fields can conceal the defect.</p>
+<p>Agreement between two executions is also insufficient by itself: both could be wrong. Absolute invariants and positive outcomes anchor these comparisons.</p>
+<h3>E. Fault injection, concurrency histories, and external effect observation</h3>
+<p>The difficult mistakes often occur between individually successful operations:</p>
+<ul>
+<li>Ownership changes just before a write.</li>
+<li>A process dies after an external effect but before its observation is persisted.</li>
+<li>A client reconnects while history replay overlaps live publication.</li>
+<li>Cancellation arrives while a tool or provider request is in flight.</li>
+<li>Startup fails after creating persistent resources.</li>
+<li>One client stops reading.</li>
+</ul>
+<p>Exercise these through the actual server artifact, real sockets, real storage, and representative subprocesses.</p>
+<p>Use controlled synchronization points instead of arbitrary sleeps. A separately controlled provider can announce that a request is in flight, withhold a response, stream partial content, fail an attempt, or acknowledge cancellation.</p>
+<p>That provider should be an <strong>external protocol peer</strong>, leaving the SDK’s internal paths intact. It gives deterministic control over the stimulus. Separate scheduled runs against real providers then test provider compatibility and realistic agent behavior.</p>
+<p>For effects, use something independently observable: a harmless tool operation writing to a dedicated witness, an HTTP sink, or process/resource observation outside the candidate. A returned status or candidate log saying “cancelled” is not enough.</p>
+<p>Two present API details need care:</p>
+<ul>
+<li><code>/interrupt</code> can return after a bounded wait while cleanup is still running.</li>
+<li>A subsequent <code>run()</code> can implicitly approve pending actions.</li>
+</ul>
+<p>Therefore, the model must distinguish <strong>interrupt requested from work stopped</strong>, and <strong>resumption from approval</strong>. Stronger quiescence and action-bound approval guarantees would require explicit design changes. <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/openhands-agent-server/openhands/agent_server/event_service.py#L1933-L1993">Interrupt implementation</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py#L1901-L1913">implicit confirmation</a>.</p>
+<p>Likewise, recovery of an event log does not prove an arbitrary external action happened exactly once. After a crash, an action’s outcome may genuinely be unknown. Tests should require honest representation of that uncertainty.</p>
+<h3>F. Architectural mutation testing: test whether the verifier can detect a violation</h3>
+<p>This is essential under your premise.</p>
+<p>For every important contract, maintain one or more intentionally broken variants.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Table 5"><table>
+<thead>
+<tr>
+<th scope="col">Contract</th>
+<th scope="col">Deliberate violation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Dependency direction</td>
+<td>Introduce the forbidden dependency through different valid import forms.</td>
+</tr>
+<tr>
+<td>Durable history</td>
+<td>Omit an event or publish it before persistence.</td>
+</tr>
+<tr>
+<td>Replay</td>
+<td>Introduce an off-by-one cursor or remove replay/live deduplication.</td>
+</tr>
+<tr>
+<td>Confirmation</td>
+<td>Execute a policy-gated effect before approval or after rejection.</td>
+</tr>
+<tr>
+<td>Cancellation</td>
+<td>Change status while leaving owned work running.</td>
+</tr>
+<tr>
+<td>Ownership</td>
+<td>Remove stale-writer fencing.</td>
+</tr>
+<tr>
+<td>Persistence</td>
+<td>Drop a meaningful value during migration.</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td>Bypass the canonical serialization path.</td>
+</tr>
+<tr>
+<td>Enforcement</td>
+<td>Skip the required scenario or make the baseline unavailable.</td>
+</tr>
+</tbody></table></div>
+<p>The original import-checker probes are a small demonstration of this method: the same prohibited relationship was detected in one form and missed in another.</p>
+<p>A mutation counts as useful evidence only when the relevant scenario runs and fails <strong>for the intended reason</strong>. Failure to build, failure to start, or a harness crash does not demonstrate that the behavioral invariant is protected.</p>
+<p>I would track:</p>
+<blockquote>
+<p><strong>Contract → representative violation → detecting observation</strong></p>
+</blockquote>
+<p>I would not make a global mutation percentage the architectural acceptance criterion.</p>
+<p>For a behavioral repair, the ideal evidence is:</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Table 6"><table>
+<thead>
+<tr>
+<th scope="col">Execution</th>
+<th scope="col">Required result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Reproducer against the defective revision</td>
+<td>Fails for the reported defect.</td>
+</tr>
+<tr>
+<td>Same independently held reproducer against the repair</td>
+<td>Passes.</td>
+</tr>
+<tr>
+<td>Existing conformance bundle against the repair</td>
+<td>Passes.</td>
+</tr>
+<tr>
+<td>Relevant deliberately broken variant</td>
+<td>Still rejected.</td>
+</tr>
+</tbody></table></div>
+<p>New features need independently accepted requirements; their absence in an older release should not automatically be labelled a historical defect.</p>
+<h3>G. Small formal models for difficult protocols</h3>
+<p>I would use formal modeling selectively for:</p>
+<ul>
+<li>Lease acquisition, takeover, and fencing.</li>
+<li>Replay/live handover.</li>
+<li>Streaming-attempt lifecycle.</li>
+<li>Run termination and cancellation ownership.</li>
+</ul>
+<p>TLA+ with TLC can check safety and liveness properties of the modeled state machine. Alloy also supports temporal models and bounded exploration. <sup class="citation"><a href="https://lamport.azurewebsites.net/tla/tools.html?unhideBut=hide-tlc&amp;unhideDiv=tlc" title="TLA+ — Tools and the TLC model checker" aria-label="Source 7: TLA+ — Tools and the TLC model checker">[7]</a> <a href="https://alloytools.org/alloy6.html" title="Alloy 6 — Temporal modeling" aria-label="Source 8: Alloy 6 — Temporal modeling">[8]</a></sup></p>
+<p>The useful result is a precise protocol and counterexample traces that become executable server scenarios.</p>
+<p>A checked model does not establish that the Python implementation conforms to it. Maintain that connection explicitly, and check that the model actually permits meaningful successful executions. An overconstrained model can appear correct because it excludes the problematic behavior—or all useful behavior.</p>
+<p>I would add one narrow model after the external harness exists, so its traces have somewhere concrete to run.</p>
+<h2 id="replay-scenario">5. A first worked scenario: conversation replay under disruption</h2>
+<p>If we implemented one substantial scenario first, I would choose this:</p>
+<ol>
+<li>Start the candidate server with persistence enabled.</li>
+<li>Create a conversation and attach a raw session-protocol consumer.</li>
+<li>Drive a deterministic provider through messages, tool actions, observations, and streaming output.</li>
+<li>Disconnect the consumer partway through execution.</li>
+<li>Continue producing events.</li>
+<li>Reconnect with the last durable cursor while further events arrive.</li>
+<li>After quiescence, compare the recovered suffix with authoritative persisted history and the API history view.</li>
+<li>Restart the server and verify that the same committed history remains available.</li>
+</ol>
+<p>The assertions should include:</p>
+<ul>
+<li>Durable sequence numbers retain their event identities.</li>
+<li>The requested suffix is recoverable.</li>
+<li>The replay/live seam does not introduce missing or duplicated events.</li>
+<li>Progress frames do not advance the durable cursor or appear in replay.</li>
+<li>Retried streams do not concatenate an abandoned attempt into the final answer.</li>
+<li>A slow or disconnected observer does not alter the execution outcome.</li>
+<li>The scenario actually reached streaming, disconnection, replay, and completion.</li>
+</ul>
+<p>Then vary cursor positions, history lengths, concurrent messages, provider failures, and subscriber speed.</p>
+<p>For the legacy client transport, run its corresponding reconnect/reconciliation scenario separately. Do not impose the new session protocol’s cursor semantics on a client that does not use it.</p>
+<p>This one family exercises architecture across storage, event identity, asynchronous publication, transport, client interpretation, and resource isolation. It remains useful across substantial internal refactors.</p>
+<h2 id="design-patterns">6. Use design patterns to reduce how many places can violate a rule</h2>
+<p>Testing becomes easier when the architecture creates a small number of enforceable boundaries.</p>
+<p>I would strengthen these patterns where the current implementation needs them:</p>
+<p><strong>A canonical construction pipeline.</strong> All launch paths resolve configuration and restrictions through the same mechanism. The existing launch architecture check is already an example. Verify effective behavior through create, profile-based launch, resume, fork, and delegation paths.</p>
+<p><strong>A single boundary for committing and publishing durable events.</strong> Make the required ordering explicit and observable. Test crashes around it. Begin with process-crash recovery; broader storage-failure guarantees require their own assumptions and evidence.</p>
+<p><strong>Explicit ownership of work.</strong> A run owns its tasks, connections, and applicable subprocesses. Completion includes the specified cleanup obligation. State transitions should not free an execution slot while its previous owner still occupies it.</p>
+<p><strong>A canonical secret boundary.</strong> Preserve the existing serialization mechanism and test its full lifecycle. Use synthetic secrets to verify both authorized delivery and absence from unauthorized surfaces. “Secret never appears anywhere” would be the wrong assertion because intended delivery must still work.</p>
+<p><strong>Explicit lifecycle results.</strong> Where callers need to distinguish “request accepted” from “operation completed,” expose that distinction. An authoritative run-completion identity would be easier to reconcile than timing-based inference.</p>
+<p><strong>Explicit retry semantics.</strong> Use idempotency mechanisms where the operation supports them. For arbitrary external tool effects, represent uncertain outcomes instead of automatically treating a retry as safe.</p>
+<p>These are focused architectural improvements. The objective is to concentrate obligations at boundaries while leaving agents room to refactor within them.</p>
+<h2 id="self-healing">7. Self-healing should extend the same enforcement system</h2>
+<p>I would use scheduled agents in two roles: discovering cases the fixed corpus misses, and repairing independently demonstrated violations.</p>
+<p>A proposed cadence:</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Table 7"><table>
+<thead>
+<tr>
+<th scope="col">Cadence</th>
+<th scope="col">Work</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Every candidate</td>
+<td>Small unconditional architecture/API core; affected compatibility scenarios; relevant negative controls.</td>
+</tr>
+<tr>
+<td>Daily</td>
+<td>Conformance against pinned current <code>main</code> and released artifacts; rotating stateful sequences; a few real-provider/application journeys.</td>
+</tr>
+<tr>
+<td>Weekly</td>
+<td>Longer histories, more concurrency schedules, resource-pressure cases, broader version/runtime combinations, and architecture-drift discovery.</td>
+</tr>
+<tr>
+<td>On verifier changes</td>
+<td>Requalify its required negative and positive controls before activating it.</td>
+</tr>
+</tbody></table></div>
+<p>A daily run should not be “look around and say whether the repository seems healthy.” Give it specific obligations and require traces.</p>
+<p>For example: verify interruption during provider streaming; reconnect during replay; resume an older stored conversation; verify confirmation through the consuming client; check that a slow observer does not stall another.</p>
+<h3>The repair loop</h3>
+<ol>
+<li><strong>Detect an observed violation.</strong> Record the contract ID, revision, artifact, configuration, seed, and relevant observations.</li>
+<li><strong>Reproduce in a fresh environment.</strong> Separate a product defect from unavailable infrastructure or a harness problem.</li>
+<li><strong>Minimize the trace.</strong> Reduce it to the smallest useful sequence while preserving the failure.</li>
+<li><strong>Give a repair agent that reproducer.</strong> Keep the expected result under the verifier’s control.</li>
+<li><strong>Evaluate the repair against the same active contract.</strong> Include affected compatibility and lifecycle scenarios.</li>
+<li><strong>Retain the reproducer.</strong> Promote it into the persistent corpus through the contract process.</li>
+<li><strong>Verify the resulting release or deployment.</strong> Merge success alone does not demonstrate that consumers received the fix.</li>
+</ol>
+<p>The repair agent may propose a harness correction. It should not weaken the harness and use that weakened result as sole evidence for its own product repair.</p>
+<p>Evidence also needs durable retention. This repository treats <code>.pr/</code> as temporary reviewer material and removes or cleans it up; it cannot be the only store for a recurring verification system’s historical traces. <a href="https://github.com/OpenHands/software-agent-sdk/blob/69e26889401fe69157fff536e6a69049e6644cb3/AGENTS.md#L180-L210">Artifact policy</a>.</p>
+<p>Weekly architecture agents can look for duplicated policy paths, unclassified dependencies, new opaque API fields, widening exceptions, and architectural decisions without executable checks. Their discoveries should become concrete predicates or focused proposals. An LLM’s declaration that a design “looks consistent” should not certify a hard invariant.</p>
+<p>There is practical precedent for combining mechanical architectural constraints with recurring cleanup agents: OpenAI’s engineering account describes custom dependency linters, structural checks, and background tasks that open focused refactoring PRs. That report also uses minimal merge gates in its own environment. For this public SDK, I would retain strong gates around compatibility, persistence, credentials, and execution ownership because failures propagate into downstream consumers. <sup class="citation"><a href="https://openai.com/index/harness-engineering/" title="OpenAI — Harness engineering" aria-label="Source 9: OpenAI — Harness engineering">[9]</a></sup></p>
+<h2 id="rollout">8. How I would roll this out</h2>
+<p>I would implement this in five bounded slices.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Table 8"><table>
+<thead>
+<tr>
+<th scope="col">Slice</th>
+<th scope="col">Deliverable</th>
+<th scope="col">Evidence that it is working</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1. Make current gates meaningful</strong></td>
+<td>Fix source-selection gaps; complete import checking; distinguish unavailable compatibility verification from a pass.</td>
+<td>Source-only changes select the required scenarios; known forbidden imports are rejected; missing baselines cannot certify compatibility.</td>
+</tr>
+<tr>
+<td><strong>2. Protect admission</strong></td>
+<td>Versioned active conformance bundle, independent execution, designated result publisher, exact revision/artifact binding.</td>
+<td>An ordinary PR cannot activate weaker rules, omit required cases, or publish its own accepted verdict.</td>
+</tr>
+<tr>
+<td><strong>3. Add the external lifecycle harness</strong></td>
+<td>Real-server REST/WS model covering replay, run ownership, confirmation, cancellation, restart, and secrets.</td>
+<td>Meaningful successful states are reached; minimized failing histories are reproducible; representative violations are detected.</td>
+</tr>
+<tr>
+<td><strong>4. Add consumer and historical compatibility</strong></td>
+<td>Pinned released TypeScript/OpenHands scenarios, historical conversation/settings artifacts, relevant packaged-runtime checks.</td>
+<td>Candidate changes work for existing consumers and preserved data under the declared compatibility policy.</td>
+</tr>
+<tr>
+<td><strong>5. Add recurring discovery and repair</strong></td>
+<td>Daily verification, weekly deeper exploration, retained incident corpus, bounded repair PRs.</td>
+<td>Failures produce fresh reproductions and repairs that pass the unchanged contract.</td>
+</tr>
+</tbody></table></div>
+<p>I would measure required-contract execution, meaningful state/transition reachability, detection of representative violations, escaped regressions, detection/repair time, and exception growth. Test counts and line coverage would not tell us whether this system is protecting the architecture.</p>
+<p><strong>The most valuable first step is small and concrete: repair the existing gate weaknesses, protect their active definitions, and establish the external conversation-lifecycle harness.</strong> That creates a basis on which agents can improve both the implementation and the testing strategy without being able to redefine a failure as success.</p>
+<p>The remaining human attention belongs at the level you are pointing toward: deciding which architectural promises matter and when those promises may deliberately change. Ordinary PR correctness can increasingly be established by executable evidence, with self-healing operating under the same rules.</p>
+
+  </article>
+  <footer><a href="../index.html#architecture-studies">← Architecture studies</a> · <a href="#top">Back to top</a></footer>
+</main>
+</body>
+</html>

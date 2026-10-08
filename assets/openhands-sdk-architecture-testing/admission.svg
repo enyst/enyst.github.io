@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="738" viewBox="0 0 800 738" role="img" aria-labelledby="admission-title admission-description">
+  <title id="admission-title">Independent evaluation</title>
+  <desc id="admission-description">Approved contracts and verifier feed independent evaluation. A candidate build runs an isolated Agent Server whose REST, WS, observed effects feed that evaluation. The required result passes to merge candidate or sends a failing trace to the repair agent, which returns to the candidate build.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#c9a84c"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #e5e0d8; text-anchor: middle; font-size: 19px; font-weight: 500; }
+    .edge { fill: none; stroke: #a59e8e; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; marker-end: url(#arrow); }
+    .loop { stroke: #c9a84c; }
+    .node { fill: #242420; stroke: #6e6652; stroke-width: 1.5; }
+    .evaluation { stroke: #c9a84c; stroke-width: 2; }
+    .decision { fill: #2b281e; stroke: #c9a84c; stroke-width: 2; }
+    .edge-label { font-size: 17px; font-weight: 400; }
+    .label-background { fill: #1a1a18; }
+  </style>
+  <rect width="800" height="738" fill="#1a1a18"/>
+
+  <g aria-label="Connections">
+    <path class="edge" data-from="A" data-to="V" d="M 224 112 V 336"/>
+    <path class="edge" data-from="C" data-to="R" d="M 584 112 V 184"/>
+    <path class="edge" data-from="R" data-to="V" d="M 584 248 V 300 H 430 V 336"/>
+    <path class="edge" data-from="V" data-to="G" d="M 341 408 V 442"/>
+    <path class="edge" data-from="G" data-to="M" d="M 215 502 H 174 V 624"/>
+    <path class="edge" data-from="G" data-to="F" d="M 467 502 H 568 V 624"/>
+    <path class="edge loop" data-from="F" data-to="C" d="M 678 657 H 764 V 80 H 694"/>
+  </g>
+
+  <g data-node="A">
+    <rect class="node" x="48" y="48" width="352" height="64" rx="9"/>
+    <text x="224" y="87">Approved contracts and verifier</text>
+  </g>
+  <g data-node="C">
+    <rect class="node" x="474" y="48" width="220" height="64" rx="9"/>
+    <text x="584" y="87">Candidate build</text>
+  </g>
+  <g data-node="R">
+    <rect class="node" x="474" y="184" width="220" height="64" rx="9"/>
+    <text x="584" y="223">Isolated Agent Server</text>
+  </g>
+  <g data-node="V">
+    <rect class="node evaluation" x="166" y="336" width="350" height="72" rx="9"/>
+    <text x="341" y="379">Independent evaluation</text>
+  </g>
+  <g data-node="G">
+    <path class="decision" d="M 341 442 L 467 502 L 341 562 L 215 502 Z"/>
+    <text x="341" y="509">Required result</text>
+  </g>
+  <g data-node="M">
+    <rect class="node" x="64" y="624" width="220" height="66" rx="9"/>
+    <text x="174" y="664">Merge candidate</text>
+  </g>
+  <g data-node="F">
+    <rect class="node" x="458" y="624" width="220" height="66" rx="9"/>
+    <text x="568" y="664">Repair agent</text>
+  </g>
+
+  <g aria-label="Connection labels">
+    <rect class="label-background" x="407" y="263" width="282" height="29" rx="4"/>
+    <text class="edge-label" x="548" y="284">REST, WS, observed effects</text>
+    <rect class="label-background" x="145" y="548" width="58" height="30" rx="4"/>
+    <text class="edge-label" x="174" y="569">Pass</text>
+    <rect class="label-background" x="512" y="548" width="112" height="30" rx="4"/>
+    <text class="edge-label" x="568" y="569">Failing trace</text>
+  </g>
+</svg>
