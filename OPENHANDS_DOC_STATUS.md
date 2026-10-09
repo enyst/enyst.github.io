@@ -19,8 +19,8 @@ The linked issues and PRs own current CI/test status; physical-device audio rema
 - [Checking the Agent SDK from outside](arch/agent-sdk-external-contract.html):
   9 October 2026 snapshot of the merged external verifier, the confirmed manual
   Cloud run, and the clarified replay contract. A live subscriber may miss
-  events; replay must recover them. The Cloud automation is disabled while its
-  strict live-order oracle is corrected. The [testing strategy](arch/openhands-sdk-architecture-testing.html)
+  events; replay must recover them. The Cloud automation is disabled, and its
+  registered bundle retains the old live-order check. The [testing strategy](arch/openhands-sdk-architecture-testing.html)
   remains the broader plan. The [merged evaluation](https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud)
   owns the dated evidence; this page does not report live run status.
 - [Insider Cat](arch/insider-cat.html): September 20 App behavior, Cat interface,

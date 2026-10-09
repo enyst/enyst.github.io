@@ -84,7 +84,7 @@
 
   <article>
     <div class="note">
-      <p><strong>Current state:</strong> The Cloud automation is registered but disabled. Its live-order check needs correction. We removed its temporary test endpoints and keys.</p>
+      <p><strong>Current state:</strong> The Cloud automation is registered but disabled. Its registered bundle has the old live-order check. We removed its temporary test endpoints and keys.</p>
     </div>
 
     <section id="reason">
@@ -101,7 +101,7 @@
         <table>
           <thead><tr><th scope="col">Part</th><th scope="col">Current state</th></tr></thead>
           <tbody>
-            <tr><td>Contract bundle</td><td>Three scenarios cover session replay, restart with saved storage, and a limited legacy event check. The merged oracle also requires gap-free live delivery. That rule needs removal.</td></tr>
+            <tr><td>Contract bundle</td><td>The 9 October bundle covers session replay, restart with saved storage, and a limited legacy event check. It also demands gap-free live delivery. The revised replay contract drops that demand.</td></tr>
             <tr><td>External verifier</td><td>A deterministic program sends REST and WebSocket requests. A separate scripted provider returns a fixed tool call. No paid model call is needed.</td></tr>
             <tr><td>Cloud automation</td><td>OpenHands Cloud can run the verifier bundle. The definition is disabled and has an inert staging schedule. Manual dispatch needs a separately prepared candidate.</td></tr>
             <tr><td>Evidence</td><td>Each required scenario gets pass, fail, or blocked. The saved JSON contains the candidate revision, artifact hash, bundle and configuration hashes, received frames, and REST observations.</td></tr>
@@ -144,8 +144,8 @@
       <h2>Path to regular checks</h2>
       <ol class="steps">
         <li>
-          <h3>Correct the replay check</h3>
-          <p>Remove the no-gap live requirement. Test recovery from the subscriber's last saved position. Check that replay returns every missing durable event in history order, even after restart.</p>
+          <h3>Use the corrected replay check</h3>
+          <p>Remove the no-gap live requirement from the Cloud bundle. Test recovery from the subscriber's last saved position. Check that replay returns every missing durable event in history order, even after restart.</p>
         </li>
         <li>
           <h3>Build a known candidate</h3>
