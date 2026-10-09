@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Checking the Agent SDK from outside — Engel's notebook</title>
-  <meta name="description" content="What the external OpenHands Agent SDK verifier checks, what its first Cloud run found, and what must exist before regular contract checks can begin.">
+  <meta name="description" content="What the external OpenHands Agent SDK verifier checks, why durable replay is the contract, and what experimental periodic checks need next.">
   <meta property="og:title" content="Checking the Agent SDK from outside">
-  <meta property="og:description" content="The first external Agent SDK contract test, its Cloud evidence, and the path to regular checks.">
+  <meta property="og:description" content="The first external Agent SDK test, its replay evidence, and the path to experimental periodic checks.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://enyst.github.io/arch/agent-sdk-external-contract.html">
   <meta name="twitter:card" content="summary">
@@ -69,8 +69,8 @@
   <header>
     <a class="back" href="../index.html">&larr; Engel's code design notebook</a>
     <h1>Checking the Agent SDK from outside</h1>
-    <p class="meta">Observed <time datetime="2026-10-09">9 October 2026</time> · Manual Cloud test · No active schedule</p>
-    <p class="lede">A separate verifier now tests a running Agent Server through REST and WebSocket. It does not import Agent SDK code. The first complete Cloud run found two failures against a proposed event-order rule.</p>
+    <p class="meta">Observed and clarified <time datetime="2026-10-09">9 October 2026</time> · Manual Cloud test · No active schedule</p>
+    <p class="lede">A separate verifier tests a running Agent Server through REST and WebSocket. A live subscriber can miss events. The server must let that subscriber recover durable events through replay.</p>
     <nav class="contents" aria-label="On this page">
       <a href="#reason">Why check from outside?</a>
       <a href="#built">What exists</a>
@@ -84,7 +84,7 @@
 
   <article>
     <div class="note">
-      <p><strong>Current state:</strong> The Cloud automation is registered but disabled. We removed its temporary test endpoints and keys. The job has no active schedule or required pull-request check.</p>
+      <p><strong>Current state:</strong> The Cloud automation is registered but disabled. Its live-order check needs correction. We removed its temporary test endpoints and keys.</p>
     </div>
 
     <section id="reason">
@@ -92,6 +92,7 @@
       <p>The <a href="openhands-sdk-architecture-testing.html">testing strategy</a> describes the larger aim. Code-writing agents can change repository tests. A trusted checker must hold the active rules and assign the result outside the candidate.</p>
       <p>A <strong>candidate</strong> is the Agent Server build under test. A <strong>contract</strong> is the list of required behaviors. The <strong>verifier</strong> sends requests to the candidate and checks the replies.</p>
       <p>The verifier uses public REST and WebSocket interfaces. It does not load candidate tests, plugins, helpers, or expected results. The verifier assigns each result from its own rules.</p>
+      <p><strong>Replay contract:</strong> A live subscriber can miss events. Replay must return missing durable events in history order, including after a server restart. A live stream does not have to deliver every event.</p>
     </section>
 
     <section id="built">
@@ -100,7 +101,7 @@
         <table>
           <thead><tr><th scope="col">Part</th><th scope="col">Current state</th></tr></thead>
           <tbody>
-            <tr><td>Contract bundle</td><td>Three required scenarios cover session replay, restart with saved storage, and a limited legacy event check. The live event-order rule is still a proposal.</td></tr>
+            <tr><td>Contract bundle</td><td>Three scenarios cover session replay, restart with saved storage, and a limited legacy event check. The merged oracle also requires gap-free live delivery. That rule needs removal.</td></tr>
             <tr><td>External verifier</td><td>A deterministic program sends REST and WebSocket requests. A separate scripted provider returns a fixed tool call. No paid model call is needed.</td></tr>
             <tr><td>Cloud automation</td><td>OpenHands Cloud can run the verifier bundle. The definition is disabled and has an inert staging schedule. Manual dispatch needs a separately prepared candidate.</td></tr>
             <tr><td>Evidence</td><td>Each required scenario gets pass, fail, or blocked. The saved JSON contains the candidate revision, artifact hash, bundle and configuration hashes, received frames, and REST observations.</td></tr>
@@ -118,14 +119,14 @@
         <table>
           <thead><tr><th scope="col">Scenario</th><th scope="col">Observed behavior</th><th scope="col">Result</th></tr></thead>
           <tbody>
-            <tr><td><code>WS-REPLAY-001</code></td><td>Saved history and replay matched. The live stream sent sequence 11 when the rule expected 10.</td><td>Fail against proposed order rule</td></tr>
-            <tr><td><code>WS-RESTART-001</code></td><td>The controller killed the server. Saved history and replay matched after restart. The live stream sent 13 when the rule expected 12.</td><td>Fail against proposed order rule</td></tr>
+            <tr><td><code>WS-REPLAY-001</code></td><td>Saved history and replay matched. The live stream sent sequence 11 when the old rule expected 10.</td><td>Old oracle failed</td></tr>
+            <tr><td><code>WS-RESTART-001</code></td><td>The controller killed the server. Saved history and replay matched after restart. The live stream sent 13 when the old rule expected 12.</td><td>Old oracle failed</td></tr>
             <tr><td><code>LEGACY-EVENTS-001</code></td><td>The legacy event endpoint returned all 14 saved events.</td><td>Pass for its limited scope</td></tr>
           </tbody>
         </table>
       </div>
-      <p>The verifier also saw a socket error that did not enter durable history. The restored history matched before the post-restart live-order failure.</p>
-      <p>The durable live-order rule is still a proposal. An independent owner must decide whether it is a public contract. The run records a real difference from that proposed rule.</p>
+      <p>The verifier also saw a socket error that did not enter durable history. A later replay recovered the first live gap in order. After restart, saved history matched. The old oracle stopped before it checked replay of the next gap.</p>
+      <p><strong>Decision on 9 October:</strong> The no-gap live rule is too strict. These two failed verdicts do not show a breach of the replay contract. The corrected verifier needs a new run.</p>
       <p>See the <a href="https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud">dated evaluation</a> and the <a href="https://github.com/enyst/automations/blob/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud/confirmed-run.json">exact confirmed-run evidence</a>. The first run remains there as a setup diagnostic.</p>
     </section>
 
@@ -133,7 +134,7 @@
       <h2>Why it is disabled</h2>
       <p>Cloud runs the verifier. It does not build a pinned SDK candidate for this job. The manual candidate, provider route, and restart control used temporary services. Those services are closed.</p>
       <p>The current Cloud definition has no active test keys. It cannot repeat this test without a new candidate, new controls, and new configuration.</p>
-      <p>The personal Cloud account can change its own automation bundle. An agent with that account key could change the test it faces. A separate owner must approve the active bundle and publish accepted results.</p>
+      <p>The verifier runs in a Cloud context separate from agents editing the code repositories. This gives the experiment a useful boundary. A required merge gate can add stronger approval and publication controls later.</p>
       <div class="note">
         <p><strong>A run status is not a contract result.</strong> All required scenarios must pass in the evidence. A failed observation is a fail. A missing candidate, key, or trace is blocked.</p>
       </div>
@@ -143,33 +144,34 @@
       <h2>Path to regular checks</h2>
       <ol class="steps">
         <li>
-          <h3>Approve the rules</h3>
-          <p>Decide the live-order guarantee first. Approve the exact verifier bundle digest and the effective configuration digest. Keep activation outside the implementation agent's control.</p>
+          <h3>Correct the replay check</h3>
+          <p>Remove the no-gap live requirement. Test recovery from the subscriber's last saved position. Check that replay returns every missing durable event in history order, even after restart.</p>
         </li>
         <li>
           <h3>Build a known candidate</h3>
-          <p>Choose one exact main or release commit for each run. Build its artifact and record the hash. Independently prove that the test endpoint serves that artifact. Isolate the candidate from verifier and publisher keys.</p>
+          <p>Choose one exact main or release commit for each run. Build its artifact and record the hash. Record which test endpoint serves it.</p>
         </li>
         <li>
           <h3>Provide test controls</h3>
-          <p>Host the scripted provider where the candidate can reach it. Protect the provider's request witness. Add a trusted restart control that kills the process and keeps its storage. Issue new limited keys for each run.</p>
+          <p>Host the scripted provider where the candidate can reach it. Record its request witness. Add a restart control that kills the process and keeps its storage. Issue limited test keys.</p>
         </li>
         <li>
-          <h3>Save and judge the evidence</h3>
-          <p>Run the approved verifier in Cloud. Export the exact evidence and its hash before the sandbox ends. Compare the executed bundle and configuration with approved digests. Check the independently signed artifact binding, provider witness, and restart record. Treat missing proof as blocked.</p>
+          <h3>Run an advisory experiment</h3>
+          <p>Run the corrected verifier in Cloud. Export evidence before the sandbox ends. Check the replay trace, provider witness, and restart record. Treat missing proof as blocked.</p>
         </li>
         <li>
-          <h3>Publish and repeat</h3>
-          <p>Use a separate identity to publish the result for the exact tested commit. Then start a regular main or release check. The proposed first cadence is daily at 09:00 in Stockholm. Retain failing storage until investigation ends. Then remove test keys and candidate resources.</p>
+          <h3>Repeat and review</h3>
+          <p>Start a regular main or release check. The proposed first cadence is daily at 09:00 in Stockholm. Review failed or blocked evidence. Retain failing storage until investigation ends. Then remove test keys and candidate resources.</p>
         </li>
       </ol>
-      <p>A required pull-request check can follow after the regular path is reliable. A new PR head or base needs a new test result.</p>
+      <p>Label these scheduled results experimental. They can guide repairs without blocking merges. A required pull-request check can follow when the run path is reliable.</p>
+      <p>Before that gate, independently approve the verifier bundle and configuration. Confirm the endpoint serves the exact candidate artifact. Publish the verdict from a separate identity. A new PR head or base needs a new result.</p>
     </section>
 
     <section id="coverage">
       <h2>What to test next</h2>
       <p>The present bundle focuses on event transport. Later rules can cover run ownership, cancellation, confirmation, secret delivery, streaming, storage faults, and client compatibility.</p>
-      <p>Each new rule needs a clear scope. A known good case must pass. A deliberate wrong case must fail. The approved bundle must change through the separate review path.</p>
+      <p>Each new rule needs a clear scope. A known good case must pass. A deliberate wrong case must fail. Required gates will need a separate review path for rule changes.</p>
     </section>
 
     <section id="sources">
