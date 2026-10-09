@@ -17,12 +17,15 @@ The linked issues and PRs own current CI/test status; physical-device audio rema
 ## Current explanations
 
 - [Checking the Agent SDK from outside](arch/agent-sdk-external-contract.html):
-  9 October 2026 snapshot of the merged external verifier, the confirmed manual
-  Cloud run, and the clarified replay contract. A live subscriber may miss
-  events; replay must recover them. The Cloud automation is disabled, and its
-  registered bundle retains the old live-order check. The [testing strategy](arch/openhands-sdk-architecture-testing.html)
-  remains the broader plan. The [merged evaluation](https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud)
-  owns the dated evidence; this page does not report live run status.
+  9 October 2026 snapshot of two manual Cloud evaluations. The first run exposed
+  an overstrict live-order rule. A later run of the corrected experimental bundle
+  passed replay, restart, and limited legacy checks against one pinned SDK commit.
+  The experimental definition remains inactive; there is no regular schedule.
+  Its candidate and verifier share a sandbox, so this pass does not isolate hostile code.
+  The [testing strategy](arch/openhands-sdk-architecture-testing.html)
+  remains the broader plan. The [first evaluation](https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud)
+  and [second evaluation](https://github.com/enyst/automations/blob/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud-self-contained/README.md)
+  own their dated evidence; this page does not report live run status.
 - [Insider Cat](arch/insider-cat.html): September 20 App behavior, Cat interface,
   conversation continuity, and normal OpenHands tools and skills. The
   [Voice implementation note](arch/insider-cat-codex-voice.html) records a real

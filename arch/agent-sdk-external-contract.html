@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Checking the Agent SDK from outside — Engel's notebook</title>
-  <meta name="description" content="What the external OpenHands Agent SDK verifier checks, why durable replay is the contract, and what experimental periodic checks need next.">
+  <meta name="description" content="How the external OpenHands Agent SDK verifier checks durable replay, what two manual Cloud evaluations found, and what periodic checks need next.">
   <meta property="og:title" content="Checking the Agent SDK from outside">
-  <meta property="og:description" content="The first external Agent SDK test, its replay evidence, and the path to experimental periodic checks.">
+  <meta property="og:description" content="Two manual Cloud evaluations of the Agent SDK replay contract and the path to experimental periodic checks.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://enyst.github.io/arch/agent-sdk-external-contract.html">
   <meta name="twitter:card" content="summary">
@@ -24,6 +24,7 @@
     h2 { scroll-margin-top: 24px; }
     p, li { max-width: 74ch; }
     a { color: var(--teal); overflow-wrap: anywhere; text-underline-offset: .2em; }
+    code { overflow-wrap: anywhere; }
     a:hover { color: var(--ink); }
     a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
     strong { color: inherit; }
@@ -69,12 +70,13 @@
   <header>
     <a class="back" href="../index.html">&larr; Engel's code design notebook</a>
     <h1>Checking the Agent SDK from outside</h1>
-    <p class="meta">Observed and clarified <time datetime="2026-10-09">9 October 2026</time> · Manual Cloud test · No active schedule</p>
+    <p class="meta">Observed and clarified <time datetime="2026-10-09">9 October 2026</time> · Manual Cloud evaluations · No active schedule</p>
     <p class="lede">A separate verifier tests a running Agent Server through REST and WebSocket. A live subscriber can miss events. The server must let that subscriber recover durable events through replay.</p>
     <nav class="contents" aria-label="On this page">
       <a href="#reason">Why check from outside?</a>
       <a href="#built">What exists</a>
-      <a href="#result">Cloud result</a>
+      <a href="#result">First Cloud result</a>
+      <a href="#cloud-process">Second Cloud result</a>
       <a href="#gap">Why it is disabled</a>
       <a href="#path">Path to regular checks</a>
       <a href="#coverage">What to test next</a>
@@ -84,12 +86,12 @@
 
   <article>
     <div class="note">
-      <p><strong>Current state:</strong> The Cloud automation is registered but disabled. Its registered bundle has the old live-order check. We removed its temporary test endpoints and keys.</p>
+      <p><strong>Current state:</strong> The separate experimental Cloud definition is inactive. One manual run of its corrected bundle passed all three scenarios. The test sandbox was removed after evidence export. No regular schedule is active.</p>
     </div>
 
     <section id="reason">
       <h2>Why check from outside?</h2>
-      <p>The <a href="openhands-sdk-architecture-testing.html">testing strategy</a> describes the larger aim. Code-writing agents can change repository tests. A trusted checker must hold the active rules and assign the result outside the candidate.</p>
+      <p>The <a href="openhands-sdk-architecture-testing.html">testing strategy</a> describes the larger aim. Code-writing agents can change repository tests. The contract lives in <a href="https://github.com/enyst/automations/tree/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/sources/sdk-lifecycle-conformance"><code>enyst/automations</code></a>, outside the SDK repository. A separate Cloud automation runs the verifier.</p>
       <p>A <strong>candidate</strong> is the Agent Server build under test. A <strong>contract</strong> is the list of required behaviors. The <strong>verifier</strong> sends requests to the candidate and checks the replies.</p>
       <p>The verifier uses public REST and WebSocket interfaces. It does not load candidate tests, plugins, helpers, or expected results. The verifier assigns each result from its own rules.</p>
       <p><strong>Replay contract:</strong> A live subscriber can miss events. Replay must return missing durable events in history order, including after a server restart. A live stream does not have to deliver every event.</p>
@@ -101,10 +103,10 @@
         <table>
           <thead><tr><th scope="col">Part</th><th scope="col">Current state</th></tr></thead>
           <tbody>
-            <tr><td>Contract bundle</td><td>The 9 October bundle covers session replay, restart with saved storage, and a limited legacy event check. It also demands gap-free live delivery. The revised replay contract drops that demand.</td></tr>
+            <tr><td>Contract bundle</td><td>The first 9 October bundle required gap-free live delivery. The experimental bundle checks replay recovery instead. Both bundles cover replay, restart with saved storage, and a limited legacy event check.</td></tr>
             <tr><td>External verifier</td><td>A deterministic program sends REST and WebSocket requests. A separate scripted provider returns a fixed tool call. No paid model call is needed.</td></tr>
-            <tr><td>Cloud automation</td><td>OpenHands Cloud can run the verifier bundle. The definition is disabled and has an inert staging schedule. Manual dispatch needs a separately prepared candidate.</td></tr>
-            <tr><td>Evidence</td><td>Each required scenario gets pass, fail, or blocked. The saved JSON contains the candidate revision, artifact hash, bundle and configuration hashes, received frames, and REST observations.</td></tr>
+            <tr><td>Cloud automation</td><td>The separate experimental definition is inactive and has an inert schedule. In the manual run, its native setup prepared one pinned SDK candidate in a fresh Cloud sandbox.</td></tr>
+            <tr><td>Evidence</td><td>Each required scenario gets pass, fail, or blocked. The experimental JSON records the source commit and archive hash, bundle and configuration hashes, import paths, received frames, and REST observations.</td></tr>
           </tbody>
         </table>
       </div>
@@ -130,11 +132,29 @@
       <p>See the <a href="https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud">dated evaluation</a> and the <a href="https://github.com/enyst/automations/blob/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud/confirmed-run.json">exact confirmed-run evidence</a>. The first run remains there as a setup diagnostic.</p>
     </section>
 
+    <section id="cloud-process">
+      <h2>What the second Cloud run found</h2>
+      <p>Later on 9 October, manual Cloud run <code>485b6639-46a0-4d31-9c8d-39a24872d98c</code> tested the corrected bundle against the same <a href="https://github.com/OpenHands/software-agent-sdk/tree/9f47d471ee6f91ba1d140d10d34f3b26d5ac2427">SDK commit</a>. The experimental bundle put its setup script at Cloud's native <code>setup.sh</code> path. That script installed the pinned workspace and verified the Git source archive hash. The candidate Agent Server ran as a separate process in the fresh Cloud sandbox. The scripted provider and restart control ran there too. No public tunnel or external candidate was used.</p>
+      <p>Cloud marked the run <code>COMPLETED</code>. The exported verifier evidence reports <strong>pass</strong> for all three scenarios. The Cloud status alone is not the contract verdict.</p>
+      <div class="table-scroll" role="region" tabindex="0" aria-label="Experimental Cloud scenario results">
+        <table>
+          <thead><tr><th scope="col">Scenario</th><th scope="col">Recorded check</th><th scope="col">Verdict</th></tr></thead>
+          <tbody>
+            <tr><td><code>WS-REPLAY-001</code></td><td>Replay covered 12 durable events. Reconnect after sequence 4 recovered the missing events. The next message replayed three new events. The provider witness was present; a socket error stayed out of durable history.</td><td>Pass</td></tr>
+            <tr><td><code>WS-RESTART-001</code></td><td>Restart kept storage and restored 12 durable events. REST history and replay still matched. The server continued after restart and replayed two new events.</td><td>Pass</td></tr>
+            <tr><td><code>LEGACY-EVENTS-001</code></td><td>The legacy endpoint returned 14 stored events. This is a limited transport check.</td><td>Pass</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Read the <a href="https://github.com/enyst/automations/blob/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud-self-contained/README.md">dated evaluation</a> and <a href="https://github.com/enyst/automations/blob/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud-self-contained/evidence.json">exact evidence</a>. The exported JSON is 295,853 bytes; its SHA-256 is <code>b2b81390c27c241bea29352cc1b7575c4bade89edff56fd352b79b3c2e76e315</code>.</p>
+      <p>The setup verified the Git source archive and the candidate's Python import paths. The source hash is not proof of the installed executable or its dependencies. The candidate shared a sandbox with the verifier. This manual pass is an advisory test of trusted pinned source, not a merge gate.</p>
+    </section>
+
     <section id="gap">
       <h2>Why it is disabled</h2>
-      <p>Cloud runs the verifier. It does not build a pinned SDK candidate for this job. The manual candidate, provider route, and restart control used temporary services. Those services are closed.</p>
-      <p>The current Cloud definition has no active test keys. It cannot repeat this test without a new candidate, new controls, and new configuration.</p>
-      <p>The verifier runs in a Cloud context separate from agents editing the code repositories. This gives the experiment a useful boundary. A required merge gate can add stronger approval and publication controls later.</p>
+      <p>The first Cloud test used temporary services outside Cloud. Those services are closed. The later experiment started the pinned candidate and test fixtures in one fresh Cloud sandbox. That sandbox was removed after evidence export.</p>
+      <p>The experimental definition remains inactive. One manual pass does not prove that a daily job can select each new main or release commit, preserve failure evidence, and recover from setup faults.</p>
+      <p>The contract lives outside the SDK repository. The candidate and verifier share a sandbox in this experiment. That setup cannot protect verifier files or credentials from hostile candidate code. Use it only for advisory checks of trusted revisions. A required merge gate needs a stronger boundary.</p>
       <div class="note">
         <p><strong>A run status is not a contract result.</strong> All required scenarios must pass in the evidence. A failed observation is a fail. A missing candidate, key, or trace is blocked.</p>
       </div>
@@ -144,28 +164,28 @@
       <h2>Path to regular checks</h2>
       <ol class="steps">
         <li>
-          <h3>Use the corrected replay check</h3>
-          <p>Remove the no-gap live requirement from the Cloud bundle. Test recovery from the subscriber's last saved position. Check that replay returns every missing durable event in history order, even after restart.</p>
+          <h3>Keep the corrected replay check</h3>
+          <p>Use the experimental bundle's replay rule for new results. Do not use the first bundle's live-order rule for a contract verdict. Record the exact bundle hash for every run.</p>
         </li>
         <li>
-          <h3>Build a known candidate</h3>
-          <p>Choose one exact main or release commit for each run. Build its artifact and record the hash. Record which test endpoint serves it.</p>
+          <h3>Select each new candidate</h3>
+          <p>Choose one exact main or release commit for each run. Verify its Git source archive hash in the fresh sandbox. Record the candidate's Python import paths and local port. The setup receipt is local evidence, not an attestation of installed code.</p>
         </li>
         <li>
-          <h3>Provide test controls</h3>
-          <p>Host the scripted provider where the candidate can reach it. Record its request witness. Add a restart control that kills the process and keeps its storage. Issue limited test keys.</p>
+          <h3>Repeat the Cloud setup</h3>
+          <p>Test the native setup in more fresh sandboxes. It must start a pinned candidate, a local scripted provider, and restart control with test keys. Treat a setup fault as blocked, and retain the Cloud setup log.</p>
         </li>
         <li>
-          <h3>Run an advisory experiment</h3>
-          <p>Run the corrected verifier in Cloud. Export evidence before the sandbox ends. Check the replay trace, provider witness, and restart record. Treat missing proof as blocked.</p>
+          <h3>Keep failure evidence</h3>
+          <p>Export exact evidence before each sandbox ends. Save failing traces and needed storage for review. Check the source hash, replay trace, provider witness, and restart record. Treat missing proof as blocked.</p>
         </li>
         <li>
-          <h3>Repeat and review</h3>
-          <p>Start a regular main or release check. The proposed first cadence is daily at 09:00 in Stockholm. Review failed or blocked evidence. Retain failing storage until investigation ends. Then remove test keys and candidate resources.</p>
+          <h3>Start advisory checks</h3>
+          <p>After repeatable manual runs, enable a regular main or release check. The proposed first cadence is daily at 09:00 in Stockholm. Review failed or blocked results, then remove test resources.</p>
         </li>
       </ol>
       <p>Label these scheduled results experimental. They can guide repairs without blocking merges. A required pull-request check can follow when the run path is reliable.</p>
-      <p>Before that gate, independently approve the verifier bundle and configuration. Confirm the endpoint serves the exact candidate artifact. Publish the verdict from a separate identity. A new PR head or base needs a new result.</p>
+      <p>Before that gate, run the candidate where it cannot read or change verifier files, credentials, or the result publisher's key. Independently approve the verifier bundle and configuration. Confirm that the endpoint serves the exact candidate artifact. Publish the verdict from a separate identity. A new PR head or base needs a new result.</p>
     </section>
 
     <section id="coverage">
@@ -178,9 +198,12 @@
       <h2>Sources</h2>
       <ul class="sources">
         <li><a href="openhands-sdk-architecture-testing.html">Testing architecture when agents write the code</a> — the larger strategy.</li>
-        <li><a href="https://github.com/enyst/automations/blob/e0065ca3498c4ea39a446afbc61d1a1de5d1a8f9/sources/sdk-lifecycle-conformance/README.md">Verifier design and Cloud setup</a> — the merged implementation guide.</li>
-        <li><a href="https://github.com/enyst/automations/blob/e0065ca3498c4ea39a446afbc61d1a1de5d1a8f9/sources/sdk-lifecycle-conformance/contracts.json">Required scenarios</a> — the proposed contract bundle.</li>
+        <li><a href="https://github.com/enyst/automations/blob/e0065ca3498c4ea39a446afbc61d1a1de5d1a8f9/sources/sdk-lifecycle-conformance/README.md">First verifier design and Cloud setup</a> — the merged implementation guide.</li>
+        <li><a href="https://github.com/enyst/automations/blob/e0065ca3498c4ea39a446afbc61d1a1de5d1a8f9/sources/sdk-lifecycle-conformance/contracts.json">First scenario rules</a> — the original bundle.</li>
+        <li><a href="https://github.com/enyst/automations/blob/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/sources/sdk-lifecycle-conformance/README.md">Experimental Cloud setup</a> — the corrected bundle and local candidate path.</li>
+        <li><a href="https://github.com/enyst/automations/blob/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/sources/sdk-lifecycle-conformance/contracts.json">Corrected scenario rules</a> — replay can recover missed live events.</li>
         <li><a href="https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud">First Cloud evaluation</a> — results, exact evidence, and limits.</li>
+        <li><a href="https://github.com/enyst/automations/blob/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud-self-contained/README.md">Second Cloud evaluation</a> — manual pass, exact evidence, and the shared sandbox limit.</li>
         <li><a href="openhands-automations.html">OpenHands Automations</a> — how the service starts and records a job.</li>
       </ul>
     </section>
