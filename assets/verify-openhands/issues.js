@@ -2,9 +2,19 @@
   "use strict";
   const input = document.querySelector("#issue-search");
   const select = document.querySelector("#status-filter");
+  const cohort = document.querySelector("#run-filter");
   const clear = document.querySelector("#clear-filters");
   const rows = [...document.querySelectorAll(".issue-row")];
   if (!input || !select || !rows.length) return;
+  document.querySelectorAll("video[data-preview-time]").forEach(video => {
+    const preview = () => {
+      if (video.paused && video.currentTime === 0 && video.duration > 0) {
+        video.currentTime = Math.min(Number(video.dataset.previewTime), video.duration / 2);
+      }
+    };
+    if (video.readyState >= 1) preview();
+    else video.addEventListener("loadedmetadata", preview, { once: true });
+  });
   const output = document.querySelector("#result-count");
   const empty = document.querySelector("#no-results");
   const normalize = value => value.toLocaleLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
@@ -14,7 +24,7 @@
     const state = select.value;
     let visible = 0;
     index.forEach(({row, text, states}) => {
-      row.hidden = !words.every(word => text.includes(word)) || (state !== "all" && !states.includes(state));
+      row.hidden = !words.every(word => text.includes(word)) || (state !== "all" && !states.includes(state)) || (cohort.value !== "all" && row.dataset.cohort !== cohort.value);
       const detail = document.getElementById(row.id.replace("issue-", "detail-"));
       if (detail) detail.hidden = row.hidden;
       if (!row.hidden) visible++;
@@ -39,25 +49,30 @@
     });
     output.textContent = `Showing ${visible} of ${rows.length} issues`;
     empty.hidden = visible !== 0;
-    clear.disabled = !input.value && state === "all";
+    clear.disabled = !input.value && state === "all" && cohort.value === "all";
   }
   input.addEventListener("input", filter);
   select.addEventListener("change", filter);
-  clear.addEventListener("click", () => { input.value = ""; select.value = "all"; filter(); input.focus(); });
+  cohort.addEventListener("change", filter);
+  clear.addEventListener("click", () => { input.value = ""; select.value = "all"; cohort.value = "all"; filter(); input.focus(); });
   let beforePrint = null;
   window.addEventListener("beforeprint", () => {
-    beforePrint = { query: input.value, status: select.value };
+    beforePrint = { query: input.value, status: select.value, cohort: cohort.value };
     input.value = "";
     select.value = "all";
+    cohort.value = "all";
     filter();
   });
   window.addEventListener("afterprint", () => {
     if (!beforePrint) return;
     input.value = beforePrint.query;
     select.value = beforePrint.status;
+    cohort.value = beforePrint.cohort;
     beforePrint = null;
     filter();
   });
   document.body.classList.add("js");
+  const requestedRun = new URLSearchParams(location.search).get("run");
+  if ([...cohort.options].some(option => option.value === requestedRun)) cohort.value = requestedRun;
   filter();
 })();
