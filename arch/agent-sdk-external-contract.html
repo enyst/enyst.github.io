@@ -86,7 +86,7 @@
 
   <article>
     <div class="note">
-      <p><strong>Current state:</strong> The separate experimental Cloud definition is inactive. One manual run of its corrected bundle passed all three scenarios. The test sandbox was removed after evidence export. No regular schedule is active.</p>
+      <p><strong>Current state:</strong> The separate experimental Cloud definition is inactive. One manual run of its corrected bundle passed all three scenarios. The test sandbox was removed after evidence export.</p>
     </div>
 
     <section id="reason">
@@ -94,7 +94,7 @@
       <p>The <a href="openhands-sdk-architecture-testing.html">testing strategy</a> describes the larger aim. Code-writing agents can change repository tests. The contract lives in <a href="https://github.com/enyst/automations/tree/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/sources/sdk-lifecycle-conformance"><code>enyst/automations</code></a>, outside the SDK repository. A separate Cloud automation runs the verifier.</p>
       <p>A <strong>candidate</strong> is the Agent Server build under test. A <strong>contract</strong> is the list of required behaviors. The <strong>verifier</strong> sends requests to the candidate and checks the replies.</p>
       <p>The verifier uses public REST and WebSocket interfaces. It does not load candidate tests, plugins, helpers, or expected results. The verifier assigns each result from its own rules.</p>
-      <p><strong>Replay contract:</strong> A live subscriber can miss events. Replay must return missing durable events in history order, including after a server restart. A live stream does not have to deliver every event.</p>
+      <p><strong>Replay contract:</strong> A live subscriber can miss events. Replay must return missing durable events in history order, including after a server restart.</p>
     </section>
 
     <section id="built">
@@ -104,13 +104,13 @@
           <thead><tr><th scope="col">Part</th><th scope="col">Current state</th></tr></thead>
           <tbody>
             <tr><td>Contract bundle</td><td>The first 9 October bundle required gap-free live delivery. The experimental bundle checks replay recovery instead. Both bundles cover replay, restart with saved storage, and a limited legacy event check.</td></tr>
-            <tr><td>External verifier</td><td>A deterministic program sends REST and WebSocket requests. A separate scripted provider returns a fixed tool call. No paid model call is needed.</td></tr>
+            <tr><td>External verifier</td><td>A deterministic program sends REST and WebSocket requests. A scripted provider returns a fixed tool call without a paid model call.</td></tr>
             <tr><td>Cloud automation</td><td>The separate experimental definition is inactive and has an inert schedule. In the manual run, its native setup prepared one pinned SDK candidate in a fresh Cloud sandbox.</td></tr>
             <tr><td>Evidence</td><td>Each required scenario gets pass, fail, or blocked. The experimental JSON records the source commit and archive hash, bundle and configuration hashes, import paths, received frames, and REST observations.</td></tr>
           </tbody>
         </table>
       </div>
-      <p>Repository CI checks the verifier's test cases and package. It does not test a live Agent Server candidate.</p>
+      <p>Repository CI checks the verifier's test cases and package. The manual Cloud evaluations test a live Agent Server candidate.</p>
     </section>
 
     <section id="result">
@@ -134,7 +134,7 @@
 
     <section id="cloud-process">
       <h2>What the second Cloud run found</h2>
-      <p>Later on 9 October, manual Cloud run <code>485b6639-46a0-4d31-9c8d-39a24872d98c</code> tested the corrected bundle against the same <a href="https://github.com/OpenHands/software-agent-sdk/tree/9f47d471ee6f91ba1d140d10d34f3b26d5ac2427">SDK commit</a>. The experimental bundle put its setup script at Cloud's native <code>setup.sh</code> path. That script installed the pinned workspace and verified the Git source archive hash. The candidate Agent Server ran as a separate process in the fresh Cloud sandbox. The scripted provider and restart control ran there too. No public tunnel or external candidate was used.</p>
+      <p>Later on 9 October, manual Cloud run <code>485b6639-46a0-4d31-9c8d-39a24872d98c</code> tested the corrected bundle against the same <a href="https://github.com/OpenHands/software-agent-sdk/tree/9f47d471ee6f91ba1d140d10d34f3b26d5ac2427">SDK commit</a>. The experimental bundle put its setup script at Cloud's native <code>setup.sh</code> path. That script installed the pinned workspace and verified the Git source archive hash. The candidate Agent Server, scripted provider, and restart control ran in the fresh Cloud sandbox. They used loopback endpoints within that sandbox rather than a public tunnel.</p>
       <p>Cloud marked the run <code>COMPLETED</code>. The exported verifier evidence reports <strong>pass</strong> for all three scenarios. The Cloud status alone is not the contract verdict.</p>
       <div class="table-scroll" role="region" tabindex="0" aria-label="Experimental Cloud scenario results">
         <table>
@@ -147,7 +147,7 @@
         </table>
       </div>
       <p>Read the <a href="https://github.com/enyst/automations/blob/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud-self-contained/README.md">dated evaluation</a> and <a href="https://github.com/enyst/automations/blob/eb84f3f23c8c07ec5ab1128d0a7b92a2fc869188/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud-self-contained/evidence.json">exact evidence</a>. The exported JSON is 295,853 bytes; its SHA-256 is <code>b2b81390c27c241bea29352cc1b7575c4bade89edff56fd352b79b3c2e76e315</code>.</p>
-      <p>The setup verified the Git source archive and the candidate's Python import paths. The source hash is not proof of the installed executable or its dependencies. The candidate shared a sandbox with the verifier. This manual pass is an advisory test of trusted pinned source, not a merge gate.</p>
+      <p>The source archive hash covers source files and Python import paths; it does not attest the installed executable or dependencies. Candidate and verifier shared a sandbox, so this run supports advisory checks of trusted pinned source. A required merge gate needs candidate isolation and independent result publication.</p>
     </section>
 
     <section id="gap">
@@ -210,7 +210,7 @@
   </article>
 
   <footer>
-    <p>This dated page does not report live Cloud state. <a href="https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf">ASD-STE100 Issue 9</a> guided its short, direct sentences. No controlled-vocabulary check was done.</p>
+    <p>This page records the two runs as of 9 October 2026. <a href="https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf">ASD-STE100 Issue 9</a> guided its short, direct sentences; the controlled vocabulary was not checked.</p>
     <p class="foot-nav"><a href="../index.html">&larr; Back to the notebook</a></p>
   </footer>
 </main>
