@@ -1,0 +1,667 @@
+[
+  {
+    "family": "F17",
+    "recipe_label": "Page and empty state",
+    "feature_ids": [
+      "F17.page-states"
+    ],
+    "image": "f17-catalog.png",
+    "alt": "MCP page with an empty Installed section and integration library.",
+    "caption": "The MCP library offers integrations while the Installed section is empty.",
+    "capture_command": "control-openhands browser screenshot --feature F17.page-states --name catalog",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /mcp",
+      "control-openhands browser text testid=mcp-installed-empty"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "MCP page shows its header, Installed empty state, and library cards.",
+    "scope_limitations": "Catalog view only; no server installed or tested.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F17",
+    "recipe_label": "Editor validation",
+    "feature_ids": [
+      "F17.custom-validation"
+    ],
+    "image": "f17-custom-validation.png",
+    "alt": "Add MCP server form with URL required validation message.",
+    "caption": "The custom-server form explains the required URL before attempting a connection.",
+    "capture_command": "control-openhands browser screenshot --feature F17.custom-validation --name custom-validation",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /mcp",
+      "control-openhands browser click testid=mcp-add-custom-server",
+      "control-openhands browser click 'testid=add-mcp-server-form >> testid=submit-button'"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Submitting the empty SSE form shows URL is required.",
+    "scope_limitations": "Only empty-URL validation illustrated; other transports and validation cases are not asserted.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F18",
+    "recipe_label": "Open from the sidebar",
+    "feature_ids": [
+      "F18.page"
+    ],
+    "image": "f18-catalog.png",
+    "alt": "Skills page with filter facets and a catalog of skill cards.",
+    "caption": "Browse the skills catalog with state, recommendation, source and category filters.",
+    "capture_command": "control-openhands browser screenshot --feature F18.page --name catalog",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /",
+      "control-openhands browser click testid=sidebar-skills-link --expect-url '/mcp(\\?|$)'",
+      "control-openhands browser click testid=sidebar-extensions-/skills --expect-url '/skills(\\?|$)'",
+      "control-openhands browser text testid=skills-result-summary"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Sidebar Customize and Skills navigation opens the catalog with facets and result count.",
+    "scope_limitations": "Catalog browse only; no skill enablement or invocation asserted.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F18",
+    "recipe_label": "Keyboard open",
+    "feature_ids": [
+      "F18.card"
+    ],
+    "image": "f18-docker-detail.png",
+    "alt": "Docker skill detail modal showing description, metadata and readable skill content.",
+    "caption": "Pressing Enter on a skill card opens its detail and usage information.",
+    "capture_command": "control-openhands browser screenshot --feature F18.card --name docker-detail",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /skills",
+      "control-openhands browser focus testid=skill-card-docker",
+      "control-openhands browser press Enter"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Docker detail modal opens from a focused card using Enter.",
+    "scope_limitations": "The skill is not invoked.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F19",
+    "recipe_label": "Add plugin form and error",
+    "feature_ids": [
+      "F19.add-plugin"
+    ],
+    "image": "f19-add-plugin.png",
+    "alt": "Add a plugin form with Source, Ref and Path fields.",
+    "caption": "Add plugin accepts a Git source or a local path with optional ref and path.",
+    "capture_command": "control-openhands browser screenshot testid=add-plugin-modal --feature F19.add-plugin --name add-plugin",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /plugins",
+      "control-openhands browser click testid=plugins-add-plugin-button"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "The Add a plugin form opens with source, ref and path inputs and disabled Install.",
+    "scope_limitations": "Form view only; no installation or error submission. Captured dialog alone to omit private catalog-cache paths.",
+    "image_dimensions": {
+      "width": 520,
+      "height": 412
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F20",
+    "recipe_label": "Add form and its closers",
+    "feature_ids": [
+      "F20.add-modal"
+    ],
+    "image": "f20-add-app.png",
+    "alt": "Add app dialog with App source, Ref and Path fields and disabled Install button.",
+    "caption": "The Add app form accepts a Git source or server path and installs apps disabled.",
+    "capture_command": "control-openhands browser screenshot --feature F20.add-modal --name add-app",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /apps",
+      "control-openhands browser click testid=canvas-extensions-add-button"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Add app form shows source, optional ref and path, and a disabled Install button.",
+    "scope_limitations": "Only opening the form illustrated; no installation or enablement.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F20",
+    "recipe_label": "Sidebar entry and empty page",
+    "feature_ids": [
+      "F20.entry-points",
+      "F20.page"
+    ],
+    "image": "f20-empty-apps.png",
+    "alt": "Canvas Apps page with trust notice and no installed apps.",
+    "caption": "Apps begin with a trust notice and an empty Installed apps section.",
+    "capture_command": "control-openhands browser screenshot --feature F20.entry-points --name empty-apps",
+    "preceding_cli_actions": [
+      "control-openhands browser click testid=sidebar-extensions-/apps --expect-url '/apps(\\?|$)'",
+      "control-openhands browser snapshot 'testid=canvas-extensions-screen >> main'"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Apps page is reachable from Customize and shows no installed apps.",
+    "scope_limitations": "Local backend only; no third-party app is installed.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F21",
+    "recipe_label": "Empty state",
+    "feature_ids": [
+      "F21.empty-state"
+    ],
+    "image": "f21-empty-dashboard.png",
+    "alt": "Automations dashboard with zero automations and recommended templates.",
+    "caption": "The empty dashboard provides creation controls and recommended workflows.",
+    "capture_command": "control-openhands browser screenshot --feature F21.empty-state --name empty-dashboard",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /automations",
+      "control-openhands browser wait testid=automations-empty --timeout 10000"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Empty dashboard shows no configured automations and recommended workflows.",
+    "scope_limitations": "No automation is executed or scheduled.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F21",
+    "recipe_label": "Grid cards",
+    "feature_ids": [
+      "F21.card-grid"
+    ],
+    "image": "f21-grid-cards.png",
+    "alt": "Automations dashboard with two inactive local QA automations.",
+    "caption": "Cards expose each automation trigger, inactive state, and available actions.",
+    "capture_command": "control-openhands browser screenshot --feature F21.card-grid --name grid-cards",
+    "preceding_cli_actions": [
+      "control-openhands api POST /api/automation/v1/preset/prompt --write --data '{\"name\":\"QA_F23 Pong\",\"prompt\":\"Reply with the single word: pong. Do not run any tools.\",\"trigger\":{\"type\":\"cron\",\"schedule\":\"0 9 * * *\",\"timezone\":\"UTC\"},\"enabled\":false}'",
+      "control-openhands api POST /api/automation/v1/preset/prompt --write --data '{\"name\":\"QA_F21 Beta\",\"prompt\":\"Beta event-driven QA fixture; never runs.\",\"trigger\":{\"type\":\"event\",\"source\":\"github\",\"on\":\"pull_request.opened\"},\"enabled\":false}'",
+      "control-openhands browser goto /automations",
+      "control-openhands browser reload"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Dashboard grid shows two local inactive automation cards.",
+    "scope_limitations": "Fixtures arranged with API; only UI cards are proof. Both automations disabled; no run or webhook dispatched.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F22",
+    "recipe_label": "Card opens setup, prerequisites",
+    "feature_ids": [
+      "F22.template-launch-setup"
+    ],
+    "image": "f22-custom-setup.png",
+    "alt": "Custom automation form showing Action, Schedule, Timezone, Automation name and LLM profile.",
+    "caption": "Custom setup collects the action and its settings after optional prerequisites.",
+    "capture_command": "control-openhands browser screenshot --feature F22.template-launch-setup --name custom-setup",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /automations/templates",
+      "control-openhands browser click testid=recommended-automation-card-custom-automation --expect-url /automations/new/custom-automation",
+      "control-openhands browser click testid=setup-continue-button"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Custom automation card opens prerequisite step; Continue reveals setup fields.",
+    "scope_limitations": "Setup form was not submitted. API-arranged dummy automations remain disabled; no external integrations installed.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F22",
+    "recipe_label": "Templates page",
+    "feature_ids": [
+      "F22.templates-page"
+    ],
+    "image": "f22-templates.png",
+    "alt": "Templates page showing recommended workflows and automation template cards.",
+    "caption": "Templates provide ready workflows and a Custom automation entry.",
+    "capture_command": "control-openhands browser screenshot --feature F22.templates-page --name templates",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /automations/templates",
+      "control-openhands browser wait testid=recommended-automation-card-custom-automation --timeout 10000"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "The Templates page displays its workflow grid and Custom automation card.",
+    "scope_limitations": "Templates browse only; no template creates an automation.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F23",
+    "recipe_label": "Open from the dashboard",
+    "feature_ids": [
+      "F23.open-detail",
+      "F23.header"
+    ],
+    "image": "f23-inactive-detail.png",
+    "alt": "QA_F23 Pong automation detail with Inactive status, prompt, configuration and empty activity.",
+    "caption": "Opening a card reveals its prompt, configuration and activity without running it.",
+    "capture_command": "control-openhands browser screenshot --feature F23.open-detail --name inactive-detail",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /automations",
+      "control-openhands browser click '[data-testid^=\"automation-card-\"] >> has-text=QA_F23 Pong >> role=heading' --expect-url '/automations/[0-9a-f-]+'"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Detail page shows QA_F23 Pong, Inactive, configuration and no activity.",
+    "scope_limitations": "Disabled local dummy fixture; runs, logs, editing and debug not asserted.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F24",
+    "recipe_label": "Open from the dashboard",
+    "feature_ids": [
+      "F24.open"
+    ],
+    "image": "f24-git-sync-settings.png",
+    "alt": "Git Sync settings for repository, interval, credentials and commit author.",
+    "caption": "The lower form includes manual sync interval, masked credential inputs and save actions.",
+    "capture_command": "control-openhands browser screenshot --feature F24.open --name git-sync-settings",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /automations/git-sync",
+      "control-openhands browser scroll testid=git-sync-save-button"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Lower Git Sync settings and Save actions are visible.",
+    "scope_limitations": "Inputs remain empty/default; no credentials entered or settings saved.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F24",
+    "recipe_label": "Open from the dashboard",
+    "feature_ids": [
+      "F24.open"
+    ],
+    "image": "f24-git-sync.png",
+    "alt": "Git Sync page with Disabled status and repository configuration fields.",
+    "caption": "Git Sync shows its status above repository, branch and path configuration.",
+    "capture_command": "control-openhands browser screenshot --feature F24.open --name git-sync",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /automations",
+      "control-openhands browser click testid=automations-git-sync --expect-url '/automations/git-sync(\\?|$)'"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Git Sync page opens from the dashboard; no repository is configured and syncing is disabled.",
+    "scope_limitations": "Local configuration view only; no repository saved, encryption changed or sync cycle run. Pending changes are the disabled run-owned dummy definitions.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F25",
+    "recipe_label": "Manage list and closing",
+    "feature_ids": [
+      "F25.manage-backends"
+    ],
+    "image": "f25-manage-local.png",
+    "alt": "Manage backends modal listing one connected Local backend and Add Backend.",
+    "caption": "Manage backends exposes the connected local server and edit, remove and add controls.",
+    "capture_command": "control-openhands browser screenshot --feature F25.manage-backends --name manage-local",
+    "preceding_cli_actions": [
+      "control-openhands browser goto /",
+      "control-openhands browser click testid=backend-selector",
+      "control-openhands browser click testid=manage-backends-menu-item"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Manage backends displays the connected Local server and its version with Edit and Remove.",
+    "scope_limitations": "One local backend only. No second backend, Cloud sign-in, organization, sharing or device authorization tested.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F26",
+    "recipe_label": "Runtime services",
+    "feature_ids": [
+      "F26.runtime-services"
+    ],
+    "image": "f26-local-runtime.png",
+    "alt": "OpenHands Canvas home running on a healthy local CLI-launched stack.",
+    "caption": "The CLI launches a real local Canvas with Agent Server and automation services.",
+    "capture_command": "control-openhands browser screenshot --feature F26.runtime-services --name local-runtime",
+    "preceding_cli_actions": [
+      "control-openhands launch --new --print-run",
+      "control-openhands doctor",
+      "control-openhands onboard --skip",
+      "control-openhands api GET /server_info --pick runtime_services.mode",
+      "control-openhands browser goto /"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "A real local CLI-launched Canvas is rendered; runtime_services.mode reports agent-canvas.",
+    "scope_limitations": "Only normal local runtime shown. This screenshot is not Docker, Electron, LAN, partial-stack or embeddable-library proof.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F27",
+    "recipe_label": "Empty tools",
+    "feature_ids": [
+      "F27.terminal-empty"
+    ],
+    "image": "f27-empty-terminal.png",
+    "alt": "Finished OK conversation beside an empty Terminal panel.",
+    "caption": "A no-tools conversation leaves the Terminal panel with no output.",
+    "capture_command": "control-openhands browser screenshot --feature F27.terminal-empty --name empty-terminal",
+    "preceding_cli_actions": [
+      "control-openhands conversation start --prompt 'Reply with only the word OK. Do not run any tools.' --wait --timeout 120",
+      "control-openhands browser click testid=right-panel-toggle",
+      "control-openhands browser click testid=conversation-tab-terminal",
+      "control-openhands browser wait-text 'No terminal output yet' --timeout 10000"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "A tiny real DeepSeek conversation replied OK; Terminal shows No terminal output yet.",
+    "scope_limitations": "One no-tools model request; no terminal command, browser tool, plan or task-list execution demonstrated.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  },
+  {
+    "family": "F27",
+    "recipe_label": "Usage totals",
+    "feature_ids": [
+      "F27.usage-metrics"
+    ],
+    "image": "f27-usage.png",
+    "alt": "Usage panel showing context window, token counts and total model cost beside the OK reply.",
+    "caption": "Usage breaks down context, tokens and cost for the real conversation.",
+    "capture_command": "control-openhands browser screenshot --feature F27.usage-metrics --name usage",
+    "preceding_cli_actions": [
+      "control-openhands conversation start --prompt 'Reply with only the word OK. Do not run any tools.' --wait --timeout 120",
+      "control-openhands browser click testid=right-panel-toggle",
+      "control-openhands browser click testid=conversation-tab-usage",
+      "control-openhands browser text testid=usage-panel"
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "source_revision": "8793c111c68db4b24e4ec3e882612229368ee426",
+    "observation": "Usage panel shows context-window percentage, token usage and cost for the completed conversation.",
+    "scope_limitations": "DeepSeek local run only; provider balance, compact-context effects and other workspace tools not asserted. The expected /api/llm/balance 404 occurred; pageErrors was 0. Displayed model cost was $0.0016.",
+    "image_dimensions": {
+      "width": 1440,
+      "height": 1000
+    },
+    "backend_versions": {
+      "agent_server": "1.53.0",
+      "automation": "1.19.0 (launcher default)",
+      "canvas": "1.26.0"
+    },
+    "captured_at": "2026-10-09",
+    "browser": "/usr/bin/chromium",
+    "run_selection": "OH_VERIFY_RUN explicitly set to this agent’s isolated run for every CLI command.",
+    "capture_type": "PNG via control-openhands browser screenshot",
+    "review": "Visually reviewed before publication; no credential values or private run paths visible."
+  }
+]
