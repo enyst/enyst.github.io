@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Map That Keeps Itself Honest</title>
+<style>
+  @font-face { font-family: "Instrument Serif"; src: url(fonts/instrument-serif-latin-400-normal.woff2) format("woff2"); font-style: normal; }
+  @font-face { font-family: "Instrument Serif"; src: url(fonts/instrument-serif-latin-400-italic.woff2) format("woff2"); font-style: italic; }
+  @font-face { font-family: "DM Sans"; src: url(fonts/dm-sans-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "DM Sans"; src: url(fonts/dm-sans-latin-500-normal.woff2) format("woff2"); font-weight: 500; }
+  @font-face { font-family: "DM Sans"; src: url(fonts/dm-sans-latin-700-normal.woff2) format("woff2"); font-weight: 700; }
+  @font-face { font-family: "JetBrains Mono"; src: url(fonts/jetbrains-mono-latin-400-normal.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "JetBrains Mono"; src: url(fonts/jetbrains-mono-latin-600-normal.woff2) format("woff2"); font-weight: 600; }
+  html, body { margin: 0; background: #0f0f0e; }
+  canvas { display: block; width: 100vw; height: auto; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+/*
+ * "The map that keeps itself honest": a short film about the verify-agent-server
+ * skill (OpenHands/software-agent-sdk PR #5621).
+ *
+ * Every frame is a pure function of time: renderFrame(t) draws the moment t
+ * (seconds) from scratch, so any frame can be rendered alone, in any order.
+ * Scene timings and the Lasseter principle each one leans on are listed in
+ * storyboard.md; comments below name the principle where it is applied.
+ */
+const W = 1920, H = 1080;
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+
+const C = {
+  bg: '#0f0f0e', card: '#1a1a18', card2: '#141413', border: '#2a2a26',
+  ink: '#e5e0d8', muted: '#8a847a', gold: '#c9a84c', mint: '#6bbfab',
+  green: '#7bc47f', red: '#dc6b4a',
+};
+const F = { serif: '"Instrument Serif"', sans: '"DM Sans"', mono: '"JetBrains Mono"' };
+
+// ── math, easing (slow in / slow out everywhere) ──────────────────────────
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, t) => a + (b - a) * t;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const E = {
+  io: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+  out: t => 1 - Math.pow(1 - t, 3),
+  in: t => t * t * t,
+  back: t => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); },
+};
+const io = (t, a, b) => E.io(prog(t, a, b));
+const out = (t, a, b) => E.out(prog(t, a, b));
+const back = (t, a, b) => E.back(prog(t, a, b));
+// Follow-through: a damped spring that settles on 0 after an impulse at t0.
+const wobble = (t, t0, amp = 1, f = 2.2, d = 4) => t < t0 ? 0 : amp * Math.exp(-d * (t - t0)) * Math.sin(2 * Math.PI * f * (t - t0));
+// Overshoot-and-settle scale for counters and cards (follow-through).
+const settle = (t, t0, amp = .12) => 1 + wobble(t, t0, amp, 2.4, 5);
+
+function rng(seed) { // mulberry32, so every "random" layout is the same each frame
+  return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+function hexA(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${n >> 8 & 255},${n & 255},${a})`; }
+
+// ── drawing helpers ───────────────────────────────────────────────────────
+function font(o) { return `${o.italic ? 'italic ' : ''}${o.w || 400} ${o.size || 40}px ${o.font || F.sans}`; }
+function text(s, x, y, o = {}) {
+  ctx.save();
+  ctx.globalAlpha = o.a ?? 1;
+  ctx.font = font(o);
+  ctx.fillStyle = o.c || C.ink;
+  ctx.textAlign = o.align || 'left';
+  ctx.textBaseline = o.base || 'alphabetic';
+  ctx.letterSpacing = (o.ls || 0) + 'px';
+  if (o.glow) { ctx.shadowColor = o.glow; ctx.shadowBlur = o.glowBlur || 24; }
+  ctx.fillText(s, x, y);
+  ctx.restore();
+}
+function measure(s, o = {}) { ctx.save(); ctx.font = font(o); ctx.letterSpacing = (o.ls || 0) + 'px'; const w = ctx.measureText(s).width; ctx.restore(); return w; }
+function wrap(s, maxW, o) {
+  const words = s.split(' '), lines = []; let cur = '';
+  for (const w of words) { const n = cur ? cur + ' ' + w : w; if (measure(n, o) > maxW && cur) { lines.push(cur); cur = w; } else cur = n; }
+  if (cur) lines.push(cur); return lines;
+}
+function para(s, x, y, maxW, o = {}) {
+  const lines = wrap(s, maxW, o), lh = o.lh || (o.size || 40) * 1.3;
+  lines.forEach((l, i) => text(l, x, y + i * lh, o));
+  return lines.length * lh;
+}
+function ellipsize(s, maxW, o) { if (measure(s, o) <= maxW) return s; while (s.length && measure(s + '…', o) > maxW) s = s.slice(0, -1); return s + '…'; }
+// Draw [[text, color, extra], ...] in one run; returns end x.
+function segs(list, x, y, o = {}) {
+  let cx = x;
+  for (const [s, c, ex] of list) { const oo = { ...o, c, ...(ex || {}) }; text(s, cx, y, oo); cx += measure(s, oo); }
+  return cx;
+}
+function rrect(x, y, w, h, r, fill, stroke, lw = 2, a = 1) {
+  ctx.save(); ctx.globalAlpha = a; ctx.beginPath(); ctx.roundRect(x, y, w, h, r);
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
+  ctx.restore();
+}
+function circle(x, y, r, fill, stroke, lw = 2, a = 1) {
+  ctx.save(); ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(x, y, Math.max(0, r), 0, Math.PI * 2);
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
+  ctx.restore();
+}
+function glowDot(x, y, r, color, a = 1) {
+  ctx.save(); ctx.globalAlpha = a;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, hexA(color, .55)); g.addColorStop(1, hexA(color, 0));
+  ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r); ctx.restore();
+}
+// Quadratic arc between two points; bend > 0 bows left of travel (arcs, not straight lines).
+function arcPoint(x0, y0, x1, y1, bend, p) {
+  const mx = (x0 + x1) / 2, my = (y0 + y1) / 2, dx = x1 - x0, dy = y1 - y0;
+  const cx = mx - dy * bend, cy = my + dx * bend;
+  const q = 1 - p;
+  return [q * q * x0 + 2 * q * p * cx + p * p * x1, q * q * y0 + 2 * q * p * cy + p * p * y1];
+}
+function drawArc(x0, y0, x1, y1, bend, p, color, lw = 3, a = 1, dash) {
+  ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round';
+  if (dash) ctx.setLineDash(dash);
+  ctx.beginPath(); const n = 48;
+  for (let i = 0; i <= n * p; i++) { const [x, y] = arcPoint(x0, y0, x1, y1, bend, i / n); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+  ctx.stroke(); ctx.restore();
+}
+function typed(s, lt, t0, cps = 55) { return s.slice(0, Math.max(0, Math.floor((lt - t0) * cps))); }
+function caret(x, y, size, lt, color = C.gold, a = 1) {
+  if (Math.floor(lt * 2.2) % 2 === 0) rrect(x + 3, y - size * .82, size * .55, size * .98, 2, color, null, 0, a);
+}
+function chip(label, x, y, o = {}) {
+  const size = o.size || 26, padX = o.padX || 18, h = o.h || size * 1.75;
+  const w = measure(label, { font: o.font || F.mono, size, w: o.w || 600, ls: o.ls }) + padX * 2;
+  const s = o.scale ?? 1, cx = x + (o.align === 'center' ? 0 : w / 2), cy = y + h / 2;
+  ctx.save(); ctx.translate(cx, cy); ctx.scale(s, s); ctx.translate(-w / 2, -h / 2);
+  rrect(0, 0, w, h, h / 2, hexA(o.color || C.gold, o.fillA ?? .16), o.color || C.gold, 2, o.a ?? 1);
+  text(label, padX, h / 2 + size * .36, { font: o.font || F.mono, size, w: o.w || 600, c: o.textC || o.color || C.gold, a: o.a ?? 1, ls: o.ls });
+  ctx.restore();
+  return w;
+}
+
+// ── background: dark workshop, lamplight glow, paper noise ────────────────
+const noise = document.createElement('canvas'); noise.width = noise.height = 256;
+{ const n = noise.getContext('2d'), img = n.createImageData(256, 256), r = rng(7);
+  for (let i = 0; i < img.data.length; i += 4) { const v = r() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  n.putImageData(img, 0, 0); }
+let noisePattern = null;
+function background(t) {
+  ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+  const lx = 960 + Math.sin(t * .13) * 120, ly = 470 + Math.cos(t * .11) * 40;
+  const g = ctx.createRadialGradient(lx, ly, 0, lx, ly, 1100);
+  g.addColorStop(0, 'rgba(201,168,76,0.075)'); g.addColorStop(.5, 'rgba(201,168,76,0.025)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  if (!noisePattern) noisePattern = ctx.createPattern(noise, 'repeat');
+  ctx.save(); ctx.globalAlpha = .035; ctx.fillStyle = noisePattern; ctx.fillRect(0, 0, W, H); ctx.restore();
+  const v = ctx.createRadialGradient(960, 540, 500, 960, 540, 1250);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.55)');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+}
+
+// ── the character: a small folded paper map with a gold pin ───────────────
+// Appeal: big readable eyes, simple silhouette, a pin that wobbles with
+// follow-through. Squash and stretch keep its volume (x scales by 1/sqrt(sq)).
+function mappy(o) {
+  const { x, y, s = 1, sq = 1, look = [0, 0], blink = 0, unfold = 1, mood = 'smile', wave = null,
+          pin = 0, tilt = 0, a = 1, airY = 0, armL = 0 } = o;
+  ctx.save(); ctx.globalAlpha = a;
+  // contact shadow shrinks as it leaves the ground
+  const k = 1 / (1 + Math.abs(airY) / (160 * s));
+  ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath();
+  ctx.ellipse(x, y + 3 * s, 78 * s * k * lerp(.45, 1, unfold) / Math.sqrt(sq), 11 * s * k, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.translate(x, y + airY); ctx.rotate(tilt); ctx.scale(s / Math.sqrt(sq), s * sq);
+  const bw = lerp(58, 150, unfold), bh = lerp(58, 168, unfold), legL = lerp(3, 24, unfold);
+  const top = -legL - bh;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  // legs and feet
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 7;
+  ctx.beginPath(); ctx.moveTo(-bw * .2, -legL - 2); ctx.lineTo(-bw * .22, -2); ctx.moveTo(bw * .2, -legL - 2); ctx.lineTo(bw * .22, -2); ctx.stroke();
+  ctx.fillStyle = C.ink;
+  ctx.beginPath(); ctx.ellipse(-bw * .22 - 6, -2, 13, 6, 0, 0, Math.PI * 2); ctx.ellipse(bw * .22 + 6, -2, 13, 6, 0, 0, Math.PI * 2); ctx.fill();
+  // arms (left rests, right can wave on an arc)
+  if (unfold > .5) {
+    ctx.lineWidth = 6; ctx.strokeStyle = C.ink;
+    const ay = top + bh * .55;
+    ctx.beginPath(); ctx.moveTo(-bw / 2 + 2, ay);
+    const la = 1.95 + armL; ctx.lineTo(-bw / 2 + 2 + Math.cos(la) * 44, ay + Math.sin(la) * 44); ctx.stroke();
+    const ra = wave === null ? 1.2 : -wave;
+    ctx.beginPath(); ctx.moveTo(bw / 2 - 2, ay); ctx.lineTo(bw / 2 - 2 + Math.cos(ra) * 46, ay + Math.sin(ra) * 46); ctx.stroke();
+  }
+  // body: three folded panels
+  ctx.save(); ctx.beginPath(); ctx.roundRect(-bw / 2, top, bw, bh, 6 + 6 * unfold); ctx.clip();
+  const shades = ['#ece6da', '#d8cfbf', '#e4ddcf'];
+  for (let i = 0; i < 3; i++) { ctx.fillStyle = shades[i]; ctx.fillRect(-bw / 2 + i * bw / 3 - .5, top, bw / 3 + 1, bh); }
+  // fold shading gradients for depth
+  for (let i = 1; i < 3; i++) {
+    const fx = -bw / 2 + i * bw / 3, g = ctx.createLinearGradient(fx - 10, 0, fx + 10, 0);
+    g.addColorStop(0, 'rgba(90,70,40,0)'); g.addColorStop(.5, 'rgba(90,70,40,0.22)'); g.addColorStop(1, 'rgba(90,70,40,0)');
+    ctx.fillStyle = g; ctx.fillRect(fx - 10, top, 20, bh);
+  }
+  // map doodles: contour rings, a dotted trail, an X
+  ctx.globalAlpha = a * clamp(unfold * 1.4 - .3);
+  ctx.strokeStyle = 'rgba(107,191,171,0.55)'; ctx.lineWidth = 2;
+  for (let r = 10; r <= 26; r += 8) { ctx.beginPath(); ctx.ellipse(-bw * .3, top + bh * .78, r * 1.3, r * .8, -.3, 0, Math.PI * 2); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(120,95,60,0.75)'; ctx.lineWidth = 3; ctx.setLineDash([2, 7]);
+  ctx.beginPath(); ctx.moveTo(-bw * .42, top + bh * .95); ctx.bezierCurveTo(-bw * .1, top + bh * .62, bw * .05, top + bh * 1.02, bw * .3, top + bh * .8); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle = C.red; ctx.lineWidth = 4;
+  const X = bw * .3, Y = top + bh * .8;
+  ctx.beginPath(); ctx.moveTo(X - 7, Y - 7); ctx.lineTo(X + 7, Y + 7); ctx.moveTo(X + 7, Y - 7); ctx.lineTo(X - 7, Y + 7); ctx.stroke();
+  ctx.globalAlpha = a;
+  ctx.restore();
+  // face
+  const ey = top + bh * (unfold > .5 ? .34 : .45), ex = bw * .18, er = lerp(7, 15.5, unfold);
+  const wow = mood === 'wow';
+  for (const sx of [-1, 1]) {
+    const cx = sx * ex, ry = er * 1.18 * (1 - .92 * blink) * (wow ? 1.15 : 1);
+    ctx.fillStyle = '#fbf8f2'; ctx.strokeStyle = '#2b2620'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.ellipse(cx, ey, er * (wow ? 1.1 : 1), Math.max(1.2, ry), 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    if (blink < .6) {
+      const pr = er * (wow ? .42 : .56);
+      const px = cx + look[0] * er * .42, py = ey + look[1] * er * .4;
+      ctx.fillStyle = '#16130f'; ctx.beginPath(); ctx.arc(px, py, pr, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(px - pr * .35, py - pr * .4, pr * .32, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  if (unfold > .4) {
+    // cheeks
+    ctx.fillStyle = 'rgba(220,107,74,0.28)';
+    ctx.beginPath(); ctx.ellipse(-ex - 8, ey + 26, 12, 7, 0, 0, Math.PI * 2); ctx.ellipse(ex + 8, ey + 26, 12, 7, 0, 0, Math.PI * 2); ctx.fill();
+    // mouth
+    const my = ey + 30; ctx.strokeStyle = '#2b2620'; ctx.lineWidth = 3.5; ctx.fillStyle = '#3a2a22';
+    if (mood === 'smile') { ctx.beginPath(); ctx.arc(0, my - 6, 11, .2 * Math.PI, .8 * Math.PI); ctx.stroke(); }
+    else if (mood === 'grin') { ctx.beginPath(); ctx.moveTo(-15, my - 2); ctx.quadraticCurveTo(0, my + 22, 15, my - 2); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+    else if (wow) { ctx.beginPath(); ctx.ellipse(0, my + 2, 7, 10, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
+    else if (mood === 'focus') { ctx.beginPath(); ctx.moveTo(-8, my); ctx.lineTo(8, my - 1); ctx.stroke(); }
+  }
+  // gold pin with follow-through wobble
+  ctx.save(); ctx.translate(0, top + 2); ctx.rotate(pin);
+  ctx.strokeStyle = '#8a7a52'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -lerp(10, 22, unfold)); ctx.stroke();
+  const pr = lerp(8, 14, unfold), py = -lerp(10, 22, unfold) - pr + 3;
+  ctx.fillStyle = C.gold; ctx.beginPath(); ctx.arc(0, py, pr, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(255,240,200,0.7)'; ctx.beginPath(); ctx.arc(-pr * .35, py - pr * .35, pr * .3, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+  ctx.restore();
+}
+// A hop: anticipation crouch, stretch in the air, squash on landing, settle.
+function hop(t, t0, d = .9, h = 80) {
+  const p = (t - t0) / d;
+  if (p < 0 || p > 1.6) return { air: 0, sq: 1, land: false };
+  if (p < .25) return { air: 0, sq: 1 - .22 * E.io(p / .25) };                       // anticipation
+  if (p < .8) { const q = (p - .25) / .55; return { air: -h * 4 * q * (1 - q), sq: 1 + .2 * Math.abs(1 - 2 * q) + .02 }; } // stretch
+  const q = (p - .8) / .8;
+  return { air: 0, sq: 1 - .26 * Math.exp(-5 * q) * Math.cos(2 * Math.PI * 1.4 * q) };  // squash, settle
+}
+function hops(t, list) { // combine several hops
+  let air = 0, sq = 1;
+  for (const [t0, d, h] of list) { const r = hop(t, t0, d, h); air += r.air; sq *= r.sq; }
+  return { air, sq };
+}
+function blinkAt(t, times) { let b = 0; for (const tb of times) b = Math.max(b, 1 - Math.abs(t - tb) / .09); return clamp(b); }
+
+function header(lt, kick, title, o = {}) {
+  const a = io(lt, .1, .7), dy = (1 - a) * 22;
+  text(kick, 110, 116 + dy, { font: F.mono, size: 24, w: 600, c: o.kc || C.gold, a, ls: 3 });
+  const a2 = io(lt, .3, .95);
+  text(title, 107, 192 + (1 - a2) * 22, { font: F.serif, size: o.size || 68, c: C.ink, a: a2 });
+}
+function caption(s, lt, t0, y = 985, o = {}) {
+  const a = io(lt, t0, t0 + .6) * (o.until ? 1 - io(lt, o.until, o.until + .5) : 1);
+  if (a <= 0) return;
+  text(s, o.x ?? 960, y + (1 - a) * 14, { size: o.size || 38, c: o.c || C.ink, a, align: o.align || 'center', font: o.font || F.sans, italic: o.italic, w: o.w });
+}
+
+// ── data (from the PR's map and replay table) ─────────────────────────────
+const FAMILIES = ['Server status', 'Auth and sessions', 'Deferred init', 'Conversation lifecycle', 'Run, pause, interrupt',
+  'Conversation events', 'Session socket', 'Confirmation, security, secrets', 'Model switching, plugins',
+  'Fork, navigate, condense, ask', 'Goals', 'Runtime, credentials', 'Bash', 'Files', 'Git', 'Workspace serving, VS Code',
+  'Workspaces registry', 'Settings and secrets', 'MCP', 'LLM profiles', 'Agent profiles', 'Meta profiles',
+  'LLM catalog, connections', 'OpenAI subscription', 'Skills', 'Plugins', 'Hooks, subagents, tools', 'Canvas extensions',
+  'App backend bridge', 'OpenAI-compatible gateway', 'Persistence and limits', 'Webhooks, telemetry', 'SDK remote client',
+  'TypeScript client'];
+const REPLAY = [[11,0,0],[19,2,0],[19,1,0],[25,7,0],[27,4,0],[23,5,0],[22,2,0],[20,3,0],[19,9,0],[19,6,0],[23,2,0],
+  [26,3,1],[24,5,0],[23,7,0],[22,5,1],[22,3,1],[21,3,0],[24,8,0],[25,3,0],[29,6,0],[28,4,0],[19,5,0],[21,5,0],[17,2,1],
+  [26,7,0],[21,4,0],[26,5,0],[24,5,0],[23,6,0],[22,4,0],[18,4,1],[24,6,0],[36,6,1],[23,9,0]];
+const fid = i => 'F' + String(i + 1).padStart(2, '0');
+const ROUTES = ['GET /api/conversations', 'WS /sockets/events/{conversation_id}', 'PUT /api/settings/secrets',
+  'GET /api/git/commits/{sha}/changes', 'GET /api/tools/catalog', 'DELETE /app-backends/{extension_name}',
+  'GET /api/conversations/{id}/events/search', 'GET /api/meta-profiles', 'GET /api/skills/installed/{skill_name}'];
+const NEW_ISSUES = [
+  [5622, 'H', 'Cipher key change: writes answer 200 and null stored keys'],
+  [5625, 'M', 'GET omits secrets added at create until the next save'],
+  [5626, 'M', 'Pause during a model call is not saved'],
+  [5633, 'M', 'A failed run blocks the event loop (~5 s /alive)'],
+  [5631, 'M', 'events/search with kind=MessageEvent finds nothing'],
+  [5635, 'M', 'Deleting a conversation leaves its sockets silent'],
+  [5639, 'M', 'LLM switched before the first run: tokens and cost lost'],
+  [5636, 'M', 'switch_llm returns 200 but keeps the old LLM'],
+  [5627, 'M', '/goal loop stays running after a graceful restart'],
+  [5638, 'M', 'Output over 1 MiB: only the last chunk comes back'],
+  [5640, 'M', 'download-trajectory 404 after /api/init sets the path'],
+  [5641, 'M', 'git changes ignores a repository below the path'],
+  [5642, 'M', 'git changes: a space gives 400, non-ASCII is mangled'],
+  [5623, 'M', "Secret PUT with '' or '**********' nulls the secret"],
+  [5643, 'M', 'Empty MCP server config accepted; MCP tools lost'],
+  [5632, 'M', 'A locked profile store freezes the server up to 30 s'],
+  [5624, 'M', "A blank or masked api_key replaces a connection's key"],
+  [5644, 'M', 'Profile validate ignores provider_connection_id'],
+  [5645, 'M', 'Install with an unknown ref returns 200 when cached'],
+  [5628, 'M', "Resumed conversation keeps a disabled plugin's skills"],
+  [5630, 'M', 'Sub-agent naming a missing skill: first message 500'],
+  [5637, 'M', 'Canvas backend outlives a SIGKILLed agent-server'],
+  [5634, 'M', 'App backend status hangs holding the app lock'],
+  [5646, 'M', "Canvas backend latches 'unhealthy' after one slow probe"],
+  [5648, 'M', '/app-backends WebSocket bridge drops the subprotocol'],
+  [5647, 'M', 'Chat completions usage reports conversation totals'],
+  [5629, 'M', 'A second server reverts meta.json to a stale copy'],
+  [5652, 'M', 'RemoteState fields return None on the second read'],
+  [5651, 'M', 'TS event stream stops after one refused reconnect'],
+  [5649, 'M', 'TS createConversation ignores maxIterations'],
+  [5650, 'M', 'TS binary download returns 11 mangled bytes'],
+];
+const REPRODUCED = [[5465, 'F10.fork-keeps-credentials'], [5539, 'F14.trajectory-concurrent'], [5100, 'F20.validate-unreachable-bounded'],
+  [4665, 'F25.marketplace-public'], [4080, 'F27.custom-tool-missing-on-resume'], [4846, 'F34.ws-callback-client']];
+
+// ── the route grid shared by the first two shots ──────────────────────────
+const GRID = (() => {
+  const r = rng(42), cells = [];
+  for (let i = 0; i < 203; i++) {
+    const col = i % 29, row = Math.floor(i / 29);
+    const kind = r();
+    cells.push({ x: 96 + col * 60, y: 410 + row * 44, rank: 0, c: kind < .45 ? C.mint : kind < .7 ? C.gold : kind < .9 ? C.ink : C.red, j: r() });
+  }
+  const order = cells.map((_, i) => i).sort(() => r() - .5);
+  order.forEach((ci, k) => cells[ci].rank = k);
+  return cells;
+})();
+function drawGrid(count, alphaFn) {
+  for (const c of GRID) {
+    const p = clamp((count - c.rank) / 8); if (p <= 0) continue;
+    const s = E.back(p), a = alphaFn ? alphaFn(c) : .8;
+    ctx.save(); ctx.translate(c.x + 24, c.y + 8); ctx.scale(s, s);
+    rrect(-24, -8, 48, 16, 8, hexA(c.c, .22 * a + .05), hexA(c.c, .9 * a), 2, 1);
+    ctx.restore();
+  }
+}
+
+// ── shots ─────────────────────────────────────────────────────────────────
+const SHOTS = [];
+function shot(name, dur, draw) { SHOTS.push({ name, dur, draw }); }
+
+// 1 · Hook — staging, timing: one quiet, enormous surface.
+shot('hook', 9, (lt) => {
+  const count = 211 * io(lt, .5, 4.3);
+  const dim = 1 - .62 * io(lt, 5.6, 6.3);
+  const kA = io(lt, .2, .9);
+  text('THE OPENHANDS AGENT SERVER', 960, 128, { font: F.mono, size: 26, w: 600, c: C.gold, a: kA, align: 'center', ls: 4 });
+  const n = Math.min(203, Math.round(count));
+  const pop = settle(lt, 4.3, .06); // follow-through as the counter lands
+  ctx.save(); ctx.translate(960, 250); ctx.scale(pop, pop);
+  text(`${n} routes`, 0, 0, { font: F.serif, size: 132, c: C.ink, a: io(lt, .3, .9) * (dim * .5 + .5), align: 'center' });
+  ctx.restore();
+  text('REST and WebSocket · webhooks · telemetry · the Python SDK and TypeScript clients', 960, 332,
+    { size: 32, c: C.muted, a: io(lt, 1.6, 2.3) * (dim * .6 + .4), align: 'center' });
+  drawGrid(count, () => dim);
+  // a few real route names drift up from the grid (secondary action)
+  ROUTES.slice(0, 6).forEach((rt, i) => {
+    const t0 = 2.2 + i * .45, a = io(lt, t0, t0 + .6) * (1 - io(lt, 5.3, 5.9)) * .9;
+    if (a <= 0) return;
+    const c = GRID[[12, 40, 75, 118, 150, 186][i]];
+    text(rt, c.x + 20, c.y - 16 - (lt - t0) * 10, { font: F.mono, size: 22, c: C.ink, a, align: 'center' });
+  });
+  text('190 on the default app · 203 with Docker runtime mode', 960, 752, { font: F.mono, size: 24, c: C.muted, a: io(lt, 3.6, 4.3) * dim, align: 'center' });
+  // anticipation: the grid dims and holds a beat before the question
+  const qa = io(lt, 6.4, 7.2);
+  text('How do you know it all works?', 960, 905 + (1 - qa) * 20, { font: F.serif, italic: true, size: 96, c: C.ink, a: qa, align: 'center' });
+});
+
+// 2 · The gap — staging with light: three spotlights, dark in between.
+shot('gap', 8.5, (lt) => {
+  const spots = [
+    { x: 400, y: 520, rx: 300, ry: 170, t: .5, label: 'unit tests', c: C.mint },
+    { x: 990, y: 560, rx: 230, ry: 130, t: 1.3, label: 'OpenAPI breakage check', c: C.gold },
+    { x: 1540, y: 500, rx: 230, ry: 150, t: 2.1, label: 'live-server tests', c: C.ink },
+  ];
+  const lit = c => {
+    let v = .16;
+    for (const s of spots) {
+      const k = back(lt, s.t, s.t + .7), dx = (c.x + 24 - s.x) / (s.rx * k + 1), dy = (c.y + 8 - s.y) / (s.ry * k + 1);
+      if (dx * dx + dy * dy < 1) v = Math.max(v, .95 * io(lt, s.t, s.t + .5));
+    }
+    return v;
+  };
+  for (const s of spots) {
+    const k = back(lt, s.t, s.t + .7); if (k <= 0) continue;
+    ctx.save(); ctx.translate(s.x, s.y); ctx.scale(s.rx * k, s.ry * k);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1.15);
+    g.addColorStop(0, hexA(s.c, .16)); g.addColorStop(1, hexA(s.c, 0));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 1.15, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    text(s.label, s.x, s.y - s.ry - 30, { font: F.mono, size: 30, w: 600, c: s.c, a: io(lt, s.t + .2, s.t + .7), align: 'center' });
+  }
+  drawGrid(211, lit);
+  text('203 routes', 110, 150, { font: F.serif, size: 64, c: C.muted, a: .8 });
+  caption('Each covered part of it.', lt, 3.2, 860, { size: 44 });
+  caption('Nothing let an agent drive the real server end to end, know what it should see,', lt, 4.3, 930, { size: 34, c: C.muted });
+  caption('and tell a stale instruction from a real product bug.', lt, 4.5, 976, { size: 34, c: C.muted });
+});
+
+// 3 · Meet the map — appeal, anticipation, squash and stretch, follow-through.
+shot('intro', 9.5, (lt) => {
+  const gx = 520, gy = 790;
+  let x = gx, air = 0, sq = 1, unfold = 0, tilt = 0, blink = 1, look = [0, 0], mood = 'smile';
+  if (lt < 1.4) { // rolls in on bouncing arcs
+    const p = prog(lt, 0, 1.4);
+    x = lerp(-120, gx, E.out(p));
+    air = -Math.abs(Math.sin(p * Math.PI * 2.5)) * 150 * (1 - p);
+    tilt = -(1 - E.out(p)) * Math.PI * 4;
+  } else if (lt < 2.0) { sq = 1 - .32 * E.io(prog(lt, 1.4, 2.0)); } // anticipation: crouch
+  else {
+    const h = hop(lt, 1.85, 1.1, 150); air = h.air; sq = lt < 2.0 ? .68 : h.sq;
+    unfold = back(lt, 2.0, 2.8);  // pops open with overshoot
+  }
+  if (lt > 2.4) blink = blinkAt(lt, [3.4, 6.8]);
+  if (lt > 3.6) look = [lerp(0, .9, io(lt, 4.6, 5.1)), lerp(0, -.2, io(lt, 4.6, 5.1))];
+  if (lt > 7.6) look = [lerp(.9, 0, io(lt, 7.6, 8.0)), 0];
+  const pin = wobble(lt, 2.9, .5, 2.0, 3.2) + wobble(lt, 6.2, .18, 2.2, 3); // follow-through
+  const greet = hop(lt, 6.0, .8, 34);
+  mappy({ x, y: gy, s: 1.35, sq: sq * greet.sq, airY: air + greet.air, unfold, tilt, blink, look, mood, pin,
+          wave: lt > 6.1 && lt < 7.6 ? .9 + Math.sin((lt - 6.1) * 9) * .45 * (1 - prog(lt, 6.1, 7.6)) : null });
+
+  const X = 880;
+  text('MEET THE MAP', X, 330, { font: F.mono, size: 26, w: 600, c: C.gold, a: io(lt, 3.4, 3.9), ls: 4 });
+  const ta = io(lt, 3.7, 4.4);
+  text('verify-agent-server', X - 3, 450 + (1 - ta) * 20, { font: F.serif, size: 112, c: C.ink, a: ta });
+  para('A contributor skill that lets an agent drive the real Agent Server, feature by feature, and know what it should see.',
+    X, 525, 900, { size: 36, c: C.ink, a: io(lt, 4.3, 4.9), lh: 48 });
+  para('OpenHands software-agent-sdk · PR #5621 · adapted from Lauren Tan’s (@poteto) pstack verification skills, already used for the Agent Canvas UI.',
+    X, 712, 900, { size: 27, c: C.muted, a: io(lt, 5.0, 5.6), lh: 38 });
+  const parts = ['1  control CLI', '2  feature map', '3  known bugs as expected failures'];
+  let cx = X;
+  parts.forEach((p, i) => {
+    const t0 = 6.6 + i * .35, s = back(lt, t0, t0 + .5);
+    if (s <= 0) return;
+    cx += chip(p, cx, 830, { size: 24, color: [C.mint, C.gold, C.red][i], scale: s, a: clamp(s) }) + 16;
+  });
+});
+
+// 4 · The control CLI — pose to pose: the terminal hits key poses; chips overlap.
+shot('cli', 13.5, (lt) => {
+  header(lt, '1 · CONTROL-AGENT-SERVER', 'One CLI drives the real server');
+  const tx = 100, ty = 240, tw = 1060, th = 600;
+  const ta = back(lt, .2, .9);
+  ctx.save(); ctx.translate(tx + tw / 2, ty + th / 2); ctx.scale(.94 + .06 * ta, .94 + .06 * ta); ctx.translate(-(tx + tw / 2), -(ty + th / 2));
+  rrect(tx, ty, tw, th, 14, C.card, C.border, 2, clamp(ta));
+  rrect(tx, ty, tw, 46, [14, 14, 0, 0], '#22221f', null, 0, clamp(ta));
+  [C.red, C.gold, C.mint].forEach((c, i) => circle(tx + 28 + i * 24, ty + 23, 7, c, null, 0, clamp(ta) * .8));
+  text('qa run · isolated server', tx + tw / 2, ty + 30, { font: F.mono, size: 18, c: C.muted, a: clamp(ta), align: 'center' });
+  const L = [
+    { t: .9, s: '$ control-agent-server launch --new --name qa', k: 'cmd' },
+    { t: 2.2, s: '  # private HOME, persistence, keys and port: nothing of yours', k: 'out' },
+    { t: 3.0, s: '$ control-agent-server api PUT /api/settings/secrets \\', k: 'cmd' },
+    { t: 4.0, s: '    --json \'{"name":"QA_F18_TOKEN","value":"**********"}\' \\', k: 'cmd' },
+    { t: 5.1, s: '    --expect 200,422', k: 'cmd' },
+    { t: 5.7, s: '  → 200   the redaction placeholder was accepted', k: 'out' },
+    { t: 6.6, s: '$ control-agent-server api GET /api/settings/secrets/QA_F18_TOKEN \\', k: 'cmd' },
+    { t: 7.9, s: '    --expect 200 --check . eq "$QA_F18_SECRET"', k: 'cmd', tail: '  # bug' },
+    { t: 9.6, s: '  → 404 Secret not found', k: 'out', c: C.red, tail: '   xfail: known bug reproduced', tc: C.gold },
+  ];
+  let y = ty + 98, cur = null;
+  const o = { font: F.mono, size: 24 };
+  for (const l of L) {
+    if (lt < l.t) break;
+    if (l.k === 'cmd') {
+      const full = l.s + (l.tail || ''), vis = typed(full, lt, l.t, 58);
+      const main = vis.slice(0, l.s.length), tail = vis.slice(l.s.length);
+      const ex = segs([[main.slice(0, 1), C.gold], [main.slice(1), C.ink], [tail, C.gold, { glow: tail ? hexA(C.gold, .8) : null, w: 600 }]], tx + 32, y, o);
+      if (vis.length < full.length) cur = [ex, y];
+    } else {
+      const a = io(lt, l.t, l.t + .35);
+      segs([[l.s, l.c || C.muted], [l.tail || '', l.tc || C.muted, { w: 600 }]], tx + 32, y, { ...o, a });
+    }
+    y += 50;
+    if (l.k === 'out') y += 10;
+  }
+  if (cur) caret(cur[0], cur[1], 24, lt);
+  else if (lt > .9) caret(tx + 32, y, 24, lt, C.gold, .7);
+  ctx.restore();
+
+  const CH = [
+    [1.7, 'Launches isolated servers', 'private HOME, persistence, keys and port'],
+    [3.2, 'Drives any REST route or WebSocket', 'with assertions: --expect and --check'],
+    [4.8, 'Arranges fixtures', 'git repos, skills, plugins, MCP servers, webhook sinks, a scripted LLM stub'],
+    [6.3, 'Records evidence', 'every exchange saved, secrets redacted'],
+    [10.3, 'Open-weights model for model recipes', 'DeepSeek, through the server’s own pre-flight'],
+  ];
+  CH.forEach(([t0, a, b], i) => {
+    const p = prog(lt, t0, t0 + .7); if (p <= 0) return;
+    const e = E.back(p), x0 = 1210, y0 = 240 + i * 132;
+    const dx = (1 - e) * 120, dy = -Math.sin(p * Math.PI) * 26; // enters on an arc
+    rrect(x0 + dx, y0 + dy, 620, 120, 12, C.card, C.border, 2, clamp(p * 2));
+    // accent bar follows through after the card has landed (overlapping action)
+    const bar = io(lt, t0 + .35, t0 + .9);
+    rrect(x0 + dx, y0 + dy + 14, 5, 92 * bar, 3, [C.mint, C.gold, C.ink, C.red, C.green][i], null, 0, clamp(p * 2));
+    text(a, x0 + 26 + dx, y0 + 44 + dy, { size: 28, w: 700, a: clamp(p * 2) });
+    para(b, x0 + 26 + dx, y0 + 80 + dy, 570, { size: 23, c: C.muted, a: clamp(p * 2), lh: 28 });
+  });
+  // the map watches the terminal and nods at each answer (secondary action)
+  const h = hops(lt, [[5.75, .7, 22], [9.7, .8, 30]]);
+  mappy({ x: 190, y: 1010, s: .5, sq: h.sq, airY: h.air, look: lt > 9.6 && lt < 10.6 ? [.3, -.2] : [.7, -.8],
+          blink: blinkAt(lt, [3.5, 8.4, 12.2]), pin: wobble(lt, 6.3, .3) + wobble(lt, 10.3, .3), mood: lt > 9.6 ? 'grin' : 'smile' });
+  caption('Every step is a command the next agent can rerun.', lt, 10.9, 975, { x: 280, align: 'left', size: 36 });
+});
+
+// 5 · The feature map — overlapping action (tiles), then staging one bullet.
+shot('map', 13.5, (lt) => {
+  header(lt, '2 · THE FEATURE MAP', 'Every agent-facing feature, written down and runnable');
+  const focus = io(lt, 6.8, 7.6);
+  const tile = i => { const c = i % 7, r = Math.floor(i / 7); return [107 + c * 246, 250 + r * 112, c, r]; };
+  for (let i = 0; i < 34; i++) {
+    const [x, y, c, r] = tile(i), t0 = .5 + (c + r) * .14 + (i % 3) * .03;
+    const p = prog(lt, t0, t0 + .55); if (p <= 0) continue;
+    const s = E.back(p) * (i === 17 ? 1 + .08 * focus : 1);
+    const a = clamp(p * 2) * (i === 17 ? 1 : 1 - .75 * focus);
+    ctx.save(); ctx.translate(x + 115, y + 48); ctx.scale(s, s); ctx.translate(-115, -48);
+    rrect(0, 0, 230, 96, 10, C.card, i === 17 && focus > 0 ? C.gold : C.border, 2, a);
+    text(fid(i), 16, 32, { font: F.mono, size: 20, w: 600, c: C.gold, a });
+    para(FAMILIES[i], 16, 62, 205, { size: 21, c: C.ink, a, lh: 24 });
+    ctx.restore();
+  }
+  // counters with follow-through
+  const sA = io(lt, 3.6, 4.1) * (1 - .8 * focus), cnt = io(lt, 3.7, 5.4);
+  const stats = [[Math.round(34 * cnt), 'families, one Markdown file each'], [Math.round(930 * cnt), 'stable sub-feature IDs'],
+                 [`${Math.round(193 * cnt)} / 203`, 'routes owned and driven']];
+  stats.forEach(([n, l], i) => {
+    const x = 107 + i * 440, s = settle(lt, 5.4 + i * .08, .1);
+    ctx.save(); ctx.translate(x, 900); ctx.scale(s, s);
+    text(String(n), 0, 0, { font: F.serif, size: 88, c: i === 2 ? C.mint : C.gold, a: sA });
+    ctx.restore();
+    text(l, x, 948, { size: 26, c: C.muted, a: sA });
+  });
+  const bw = 400, bx = 1430, by = 858, fill = io(lt, 4.0, 5.4);
+  rrect(bx, by, bw, 26, 13, C.card, C.border, 2, sA);
+  rrect(bx, by, bw * 193 / 203 * fill, 26, 13, hexA(C.mint, .8), null, 0, sA);
+  para('10 deliberately excluded, each with a reason', bx, by + 66, bw, { size: 24, c: C.muted, a: sA, lh: 30 });
+
+  // stage one bullet: the card grows out of the F18 tile (slow in / slow out)
+  const g = io(lt, 7.2, 8.2);
+  if (g > 0) {
+    const [fx, fy] = tile(17);
+    const x = lerp(fx, 150, g), y = lerp(fy, 300, g), w = lerp(230, 1620, g), h = lerp(96, 600, g);
+    ctx.save(); ctx.globalAlpha = .7 * g; ctx.fillStyle = C.bg; ctx.fillRect(0, 230, W, H); ctx.restore();
+    rrect(x, y, w, h, 14, C.card, C.gold, 2, 1);
+    const ca = io(lt, 8.1, 8.6);
+    text('F18 · SETTINGS AND SECRETS · ONE OF 930 SUB-FEATURES', 190, 360, { font: F.mono, size: 22, w: 600, c: C.muted, a: ca, ls: 2 });
+    text('WHAT SHOULD HAPPEN', 190, 420, { font: F.mono, size: 20, c: C.gold, a: ca, ls: 2 });
+    const ba = io(lt, 8.5, 9.1);
+    const ex = segs([['F18.secret-empty-value', C.gold, { font: F.mono, size: 30, w: 600 }], [':  a PUT whose value is empty or the redaction placeholder', C.ink]], 190, 470, { size: 34, a: ba });
+    text('must not leave a listed but unreadable secret or wipe an existing value.', 190, 518, { size: 34, c: C.ink, a: ba });
+    text('THE RECIPE · RUNS ON A FRESH SERVER', 190, 590, { font: F.mono, size: 20, c: C.mint, a: io(lt, 9.2, 9.6), ls: 2 });
+    rrect(190, 608, 1540, 250, 10, C.card2, C.border, 2, io(lt, 9.2, 9.6));
+    const R = [
+      [9.5, [['control-agent-server api GET /api/settings/secrets/QA_F18_TOKEN --expect 200 --check . eq "$QA_F18_SECRET"', C.ink]], 'the control: it reads back'],
+      [10.0, [['control-agent-server api PUT /api/settings/secrets --json \'{… "value": "**********" …}\' --expect 200,422', C.ink]], 'the form sends the placeholder back'],
+      [10.5, [['control-agent-server api GET /api/settings/secrets/QA_F18_TOKEN --expect 200 --check . eq "$QA_F18_SECRET"', C.ink], ['  # bug', C.gold, { w: 600 }]], 'today: 404, the secret is gone'],
+    ];
+    R.forEach(([t0, s, note], i) => {
+      const a = io(lt, t0, t0 + .4);
+      segs(s, 216, 660 + i * 74, { font: F.mono, size: 21, a });
+      text(note, 216, 692 + i * 74, { size: 22, c: i === 2 ? C.red : C.muted, a: a * io(lt, t0 + .3, t0 + .7), italic: false });
+    });
+    if (lt > 10.9) glowDot(1690, 808, 60 + 8 * Math.sin(lt * 5), C.gold, io(lt, 10.9, 11.3) * .8);
+  }
+  // the map peeks in from the corner to read along (secondary action)
+  const pk = io(lt, 8.3, 9.0);
+  if (pk > 0) mappy({ x: 1830, y: 1100 - 70 * pk, s: .48, look: [-.9, -.5], blink: blinkAt(lt, [11.6]), pin: wobble(lt, 9.0, .3), mood: 'focus' });
+});
+
+// 6 · Known bugs as expected failures — anticipation before the fork, exaggerated XPASS.
+shot('bugs', 11.5, (lt) => {
+  header(lt, '3 · KNOWN BUGS AS EXPECTED FAILURES', 'A bug the map knows about fails on purpose');
+  const ca = back(lt, .4, 1.1);
+  rrect(210, 250, 1500, 110, 14, C.card, C.border, 2, clamp(ca));
+  const pulse = lt > 1.4 ? .5 + .5 * Math.sin((lt - 1.4) * 5) : 0;
+  const codeW = measure('… --expect 200 --check . eq "$QA_F18_SECRET"  # bug', { font: F.mono, size: 38 });
+  segs([['… --expect 200 --check . eq "$QA_F18_SECRET"', C.ink], ['  # bug', C.gold, { w: 600, glow: hexA(C.gold, .4 + .6 * pulse), glowBlur: 30 }]],
+    960 - codeW / 2, 322, { font: F.mono, size: 38, a: clamp(ca) });
+  // left branch
+  drawArc(960, 365, 560, 528, -.18, io(lt, 2.0, 3.0), C.gold, 4, .9);
+  const lA = back(lt, 3.0, 3.6);
+  if (lA > 0) {
+    text('while the bug lasts', 540, 572, { size: 30, c: C.muted, a: clamp(lA), align: 'center' });
+    ctx.save(); ctx.translate(540, 640); ctx.scale(lA, lA);
+    chip('XFAIL · expected failure', 0, -28, { size: 30, color: C.gold, align: 'center' }); ctx.restore();
+    para('The replay reproduces it and says so; the run stays green.', 320, 730, 440, { size: 28, c: C.muted, a: io(lt, 3.4, 3.9), lh: 36 });
+  }
+  // anticipation: a beat, then the fix travels the right branch
+  drawArc(960, 365, 1360, 528, .18, io(lt, 4.6, 5.8), C.mint, 4, .9, [10, 10]);
+  const fp = io(lt, 4.6, 5.8);
+  if (fp > 0 && fp < 1) { const [px, py] = arcPoint(960, 365, 1360, 528, .18, fp); glowDot(px, py, 50, C.mint); circle(px, py, 12, C.mint); text('fix', px, py - 24, { font: F.mono, size: 22, c: C.mint, align: 'center' }); }
+  const rA = prog(lt, 5.8, 6.5);
+  if (rA > 0) {
+    text('the day someone fixes it', 1380, 572, { size: 30, c: C.muted, a: clamp(rA * 2), align: 'center' });
+    const s = E.back(rA) * settle(lt, 6.5, .14) * (1 + .25 * Math.exp(-6 * (lt - 5.8)) * (lt > 5.8)); // exaggerated pop
+    ctx.save(); ctx.translate(1380, 640); ctx.scale(s, s);
+    chip('XPASS · unexpected pass', 0, -28, { size: 30, color: C.red, align: 'center' }); ctx.restore();
+    if (lt < 7.2) for (let i = 0; i < 10; i++) { const an = i / 10 * Math.PI * 2, r = 60 + 220 * out(lt, 5.8, 7.0); circle(1380 + Math.cos(an) * r * 1.4, 640 + Math.sin(an) * r * .6, 5, C.red, null, 0, 1 - prog(lt, 6.2, 7.2)); }
+    para('The run fails until someone updates the map.', 1160, 730, 440, { size: 28, c: C.muted, a: io(lt, 6.4, 6.9), lh: 36 });
+  }
+  const look = lt < 3.0 ? [0, -.9] : lt < 5.8 ? [-.9, .1] : lt < 8.2 ? [.9, .1] : [0, 0];
+  const h = hops(lt, [[5.9, .8, 46]]);
+  mappy({ x: 960, y: 820, s: .62, sq: h.sq, airY: h.air, look, blink: blinkAt(lt, [2.6, 7.6, 10.4]),
+          mood: lt > 5.9 && lt < 7.4 ? 'wow' : 'smile', pin: wobble(lt, 6.7, .5) });
+  caption('A living contract, not a snapshot.', lt, 8.2, 985, { font: F.serif, italic: true, size: 64 });
+});
+
+// 7 · The swarm — arcs, overlapping and secondary action.
+shot('swarm', 12, (lt) => {
+  header(lt, 'HOW IT WAS BUILT', 'A full agentic run');
+  const cx = 960, cy = 560, rx = 650, ry = 270, hub = [960, 560];
+  const node = i => { const an = -Math.PI / 2 + i / 34 * Math.PI * 2; return [cx + Math.cos(an) * rx, cy + Math.sin(an) * ry]; };
+  const r = rng(3), bugged = new Set(); for (let i = 0; i < 34; i++) if (REPLAY[i][1] > 0) bugged.add(i);
+  const delays = Array.from({ length: 34 }, () => r());
+  // phase timings
+  const A = [.6, 3.8], B = [4.0, 6.6], Cc = [6.8, 8.7], D = [8.9, 10.3], Ee = [10.4, 12];
+  for (let i = 0; i < 34; i++) {
+    const [x, y] = node(i), na = io(lt, .2 + i * .02, .7 + i * .02);
+    const authored = lt > A[0] + .9 + delays[i] * 1.6 + 1.0, reviewed = lt > B[0] + .8 + delays[(i + 7) % 34] * 1.2 + .3;
+    const wave = lt > Ee[0] ? Math.max(0, 1 - Math.abs(((lt - Ee[0]) * 1.6) % 1.4 - i / 34 * 1.2) * 6) : 0;
+    circle(x, y, 32 + 6 * wave, C.card, authored ? C.gold : C.border, authored ? 3 : 2, na);
+    if (reviewed) circle(x, y, 40 + 6 * wave, null, C.mint, 2.5, na * io(lt, B[0] + 1, B[0] + 1.6));
+    if (wave > 0) glowDot(x, y, 70, C.gold, wave * .9);
+    text(fid(i), x, y + 7, { font: F.mono, size: 18, w: 600, c: authored ? C.ink : C.muted, align: 'center', a: na });
+    if (bugged.has(i)) {
+      const bt = D[0] + (i / 34) * 1.1 + .4;
+      const bs = back(lt, bt, bt + .4);
+      if (bs > 0) { ctx.save(); ctx.translate(x + 26, y - 26); ctx.scale(bs, bs); circle(0, 0, 9, C.red); ctx.restore(); }
+    }
+  }
+  // flyers: comet sprites with trails along arcs
+  function flyer(from, to, t0, d, color, bend, trail = 6) {
+    for (let k = trail; k >= 0; k--) {
+      const p = E.io(prog(lt - k * .035, t0, t0 + d)); if (p <= 0 || prog(lt, t0, t0 + d) >= 1) continue;
+      const [x, y] = arcPoint(from[0], from[1], to[0], to[1], bend, p);
+      circle(x, y, k ? 6 - k * .7 : 8, color, null, 0, k ? .5 - k * .06 : 1);
+    }
+  }
+  for (let i = 0; i < 34; i++) {
+    flyer(hub, node(i), A[0] + delays[i] * 1.6, 1.0, C.gold, .25);
+    flyer(hub, node(i), B[0] + delays[(i + 7) % 34] * 1.2, .8, C.mint, -.3);
+    if (bugged.has(i)) flyer(hub, node(i), D[0] + (i / 34) * 1.1, .4, C.red, .15, 3);
+  }
+  // completeness critic orbits the whole map once
+  let critic = null;
+  if (lt > Cc[0] && lt < Cc[1]) {
+    const p = E.io(prog(lt, Cc[0], Cc[1]));
+    for (let k = 10; k >= 0; k--) {
+      const an = -Math.PI / 2 + (p - k * .012) * Math.PI * 2;
+      const x = cx + Math.cos(an) * (rx + 70), y = cy + Math.sin(an) * (ry + 60);
+      circle(x, y, k ? 7 - k * .5 : 10, C.ink, null, 0, k ? .45 - k * .04 : 1);
+      if (!k) critic = [x, y];
+    }
+  }
+  // the map at the hub watches the work (secondary action)
+  let look = [Math.sin(lt * 1.7) * .8, Math.cos(lt * 1.3) * .5];
+  if (critic) { const dx = critic[0] - 960, dy = critic[1] - 520, m = Math.hypot(dx, dy); look = [dx / m, dy / m]; }
+  const h = hops(lt, [[10.4, .8, 30]]);
+  mappy({ x: 960, y: 640, s: .55, sq: h.sq, airY: h.air, look, blink: blinkAt(lt, [2.4, 5.2, 9.6]), pin: wobble(lt, 4.0, .25) + wobble(lt, 11.2, .3),
+          mood: lt > 10.4 ? 'grin' : 'focus' });
+  const caps = [[A, 'Author agents map each family and prove every recipe live', C.gold],
+                [B, 'Independent reviewer agents re-drive each family on fresh servers', C.mint],
+                [Cc, 'A completeness critic looks for gaps', C.ink],
+                [D, 'A hardening pass adds explicit # bug assertions', C.red],
+                [Ee, 'Then a full fresh replay of all 34 families', C.gold]];
+  caps.forEach(([[a, b], s, c], i) => {
+    const al = io(lt, a, a + .4) * (i < 4 ? 1 - io(lt, b, b + .3) : 1);
+    if (al <= 0) return;
+    circle(960 - measure(s, { size: 40 }) / 2 - 30, 972, 9, c, null, 0, al);
+    text(s, 960, 985, { size: 40, c: C.ink, a: al, align: 'center' });
+  });
+});
+
+// 8 · The reveal — anticipation, then the replay fills straight ahead; counters follow through.
+shot('reveal', 14, (lt) => {
+  header(lt, 'FULL FRESH REPLAY · PR HEAD · EACH FAMILY ON A FRESH SERVER', 'Every family, replayed from scratch');
+  const cmd = '$ control-agent-server map run --all --fresh --record';
+  const cmdA = 1 - io(lt, 2.7, 3.1);
+  if (cmdA > 0) {
+    const v = typed(cmd, lt, .5, 40), w = measure(cmd, { font: F.mono, size: 34 });
+    const ex = segs([[v.slice(0, 1), C.gold], [v.slice(1), C.ink]], 960 - w / 2, 820, { font: F.mono, size: 34, a: cmdA });
+    caret(ex, 820, 34, lt, C.gold, cmdA);
+  }
+  // the map: holds its breath (anticipation), then hops to the side
+  let mx = 960, my = 660, ms = .9, air = 0, sq = 1;
+  if (lt < 2.7) sq = 1 - .2 * io(lt, 1.9, 2.6);
+  else { const p = io(lt, 2.7, 3.5); mx = lerp(960, 1800, p); my = lerp(660, 790, p); ms = lerp(.9, .42, p); air = -Math.sin(p * Math.PI) * 200; sq = lt < 2.85 ? .8 : 1 + .15 * Math.sin(p * Math.PI); }
+  const celebrate = hops(lt, [[3.45, .7, 0], [9.0, .7, 50], [9.9, .7, 40]]);
+  // chart: one column per family; pass, then expected failures, then blocked
+  let P = 0, X = 0, B = 0;
+  const x0 = 110, pitch = 47, base = 790, cell = 12;
+  for (let j = 0; j < 34; j++) {
+    const [p, x, b] = REPLAY[j], tot = p + x + b, t0 = 3.0 + j * .085;
+    const n = Math.floor(tot * io(lt, t0, t0 + 2.1));
+    for (let k = 0; k < n; k++) {
+      const c = k < p ? C.mint : k < p + x ? C.gold : C.muted;
+      const fresh = clamp(1 - (n - k) / 4);
+      rrect(x0 + j * pitch, base - (k + 1) * cell, 36, cell - 2, 2, hexA(c, .55 + .45 * fresh), null, 0, 1);
+      if (k < p) P++; else if (k < p + x) X++; else B++;
+    }
+    text(String(j + 1).padStart(2, '0'), x0 + j * pitch + 18, base + 26, { font: F.mono, size: 16, c: C.muted, align: 'center', a: io(lt, 2.9, 3.4) });
+  }
+  const done = 3.0 + 33 * .085 + 2.1;
+  const K = [[P, 'pass', C.mint, done], [X, 'expected failures: known bugs reproduced', C.gold, done], [B, 'blocked: needs Docker, a token, VS Code, a login', C.ink, done],
+             [0, 'failures', C.red, 8.6], [0, 'unexpected passes', C.red, 9.3]];
+  K.forEach(([n, l, c, tl], i) => {
+    const x = 110 + i * 346, a = i < 3 ? io(lt, 3.0, 3.5) : io(lt, tl - .3, tl);
+    if (a <= 0) return;
+    const s = settle(lt, tl, i < 3 ? .1 : .22) * (i >= 3 ? back(lt, tl - .3, tl + .2) : 1); // the zeros land with a stamp
+    ctx.save(); ctx.translate(x, 930); ctx.scale(s, s);
+    text(String(n), 0, 0, { font: F.serif, size: 100, c: i >= 3 ? C.ink : c, a });
+    ctx.restore();
+    if (i >= 3 && lt > tl) { const rp = prog(lt, tl, tl + .8); circle(x + 26, 898, 30 + 60 * rp, null, C.red, 3, 1 - rp); }
+    para(l, x, 968, 300, { size: 24, c: i >= 3 ? C.red : C.muted, a, lh: 30 });
+  });
+  mappy({ x: mx, y: my, s: ms, sq: sq * celebrate.sq, airY: air + celebrate.air, look: lt < 2.7 ? [0, .2] : [-.9, -.3],
+          blink: lt < 2.7 ? .55 * io(lt, 1.9, 2.4) : blinkAt(lt, [6.0, 12.0]), mood: lt > 9.0 ? 'grin' : lt < 2.7 ? 'focus' : 'smile', pin: wobble(lt, 3.5, .5) + wobble(lt, 9.7, .4) });
+});
+
+// 9 · Taxonomy — cards fan out from one deck on arcs, rotation follows through.
+shot('taxonomy', 12, (lt) => {
+  header(lt, 'WHAT IT FOUND', 'About 135 product bugs, each a known-bug bullet');
+  const sev = [[1, 'high', C.red], [37, 'medium', C.gold], [89, 'low', C.mint], [8, 'trivial', C.muted]];
+  let x = 110; const bw = 1700, g = io(lt, .6, 2.0);
+  sev.forEach(([n, l, c], i) => {
+    const w = bw * n / 135 * g;
+    rrect(x, 268, Math.max(0, w - 4), 34, 6, hexA(c, .85), null, 0, 1);
+    const la = io(lt, 1.2 + i * .2, 1.7 + i * .2);
+    if (i === 0) text(`${n} ${l}`, x, 254, { size: 26, w: 700, c, a: la });
+    else text(`${n} ${l}`, x + 8, 336, { size: 26, w: 700, c, a: la });
+    x += bw * n / 135 * g;
+  });
+  const CARDS = [
+    ['State not saved, or stale', 'Pause during a model call not persisted; a /goal loop still “running” after restart.', C.gold],
+    ['Validation gaps', 'Blank or masked API keys accepted, overwriting real ones; an empty MCP config accepted.', C.gold],
+    ['Data loss on key change', 'The one high: after a cipher key change, writes answer 200 and null stored secrets, not 409.', C.red],
+    ['Responsiveness', 'One failed run blocks the event loop ~5 s; a locked profile store freezes the server up to 30 s.', C.gold],
+    ['WebSocket and process lifecycle', 'Deleted conversations leave sockets silent; Canvas app backends outlive a killed server.', C.mint],
+    ['Server and client contracts', 'Event search matches only full class paths; the TS client mangles binary downloads.', C.mint],
+    ['Git and file edge cases', 'Repos below a path ignored; filenames with spaces or non-ASCII mangled.', C.mint],
+  ];
+  CARDS.forEach(([t, d, c], i) => {
+    const row = i < 4 ? 0 : 1, col = row ? i - 4 : i;
+    const tx = row ? 325 + col * 430 : 110 + col * 430, ty = row ? 650 : 380;
+    const t0 = 2.3 + i * .42, p = prog(lt, t0, t0 + .9); if (p <= 0) return;
+    const e = E.out(p);
+    const [px, py] = arcPoint(960 - 205, 1180, tx, ty, (i % 2 ? .35 : -.35), e);
+    const rot = (1 - e) * (i % 2 ? .5 : -.5) + wobble(lt, t0 + .9, .05, 1.6, 4);
+    ctx.save(); ctx.translate(px + 205, py + 120); ctx.rotate(rot); ctx.translate(-205, -120);
+    rrect(0, 0, 410, 240, 12, C.card, i === 2 ? C.red : C.border, i === 2 ? 3 : 2, 1);
+    rrect(0, 18, 5, 60, 3, c, null, 0, 1);
+    para(t, 26, 50, 360, { size: 29, w: 700, c: C.ink, lh: 34 });
+    para(d, 26, measure(t, { size: 29, w: 700 }) > 360 ? 128 : 96, 362, { size: 24, c: C.muted, lh: 31 });
+    ctx.restore();
+  });
+  caption('Each one is a bullet with a recipe that reproduces it, so anyone can check.', lt, 6.6, 975, { size: 36, c: C.ink });
+});
+
+// 10 · The twist — anticipation (the PR pulls back before it sweeps in), exaggerated surprise.
+shot('twist', 12, (lt) => {
+  header(lt, 'THE TWIST', 'An upstream fix landed while the map was being written');
+  const tx = 600, ty = 290, tw = 1200, th = 300;
+  // flip: squash the tile to a line, swap its face, open with overshoot
+  const flip1 = io(lt, 4.6, 4.9), flip2 = back(lt, 4.9, 5.35);
+  const after = lt > 4.9, updated = lt > 8.4;
+  const sx = after ? flip2 : 1 - flip1;
+  ctx.save(); ctx.translate(tx + tw / 2, ty + th / 2); ctx.scale(Math.max(.02, sx), 1 + .06 * (1 - Math.abs(sx))); ctx.translate(-(tx + tw / 2), -(ty + th / 2));
+  const col = updated ? C.mint : after ? C.red : C.gold;
+  if (after && !updated) glowDot(tx + tw / 2, ty + th / 2, 600, C.red, .5 * (1 - prog(lt, 5.0, 7.5)) + .15);
+  rrect(tx, ty, tw, th, 14, C.card, col, 3, io(lt, .3, .8));
+  const a = io(lt, .4, .9);
+  text('F20.sdk-get-llm-linked', tx + 44, ty + 70, { font: F.mono, size: 32, w: 600, c: C.gold, a });
+  text('RemoteWorkspace.get_llm() on a provider-linked profile', tx + 44, ty + 130, { size: 40, c: C.ink, a });
+  if (!after) { chip('XFAIL · known bug, issue #5514', tx + 44, ty + 170, { size: 28, color: C.gold, a });
+    text('the replay reproduces it, as expected', tx + 44, ty + 268, { size: 28, c: C.muted, a }); }
+  else if (!updated) { chip('XPASS · unexpected pass', tx + 44, ty + 170, { size: 28, color: C.red });
+    text('known bug no longer reproduces: update the map', tx + 44, ty + 268, { font: F.mono, size: 26, c: C.red }); }
+  else { const ua = io(lt, 8.4, 8.8); chip('PASS · map updated', tx + 44, ty + 170, { size: 28, color: C.mint, a: ua, scale: back(lt, 8.4, 8.9) });
+    text('the # bug marker comes off; the bullet now guards the fix', tx + 44, ty + 268, { size: 28, c: C.muted, a: ua }); }
+  ctx.restore();
+  if (after && lt < 6.4) for (let i = 0; i < 16; i++) { const an = i / 16 * Math.PI * 2, r = 120 + 420 * out(lt, 4.95, 6.2); circle(tx + tw / 2 + Math.cos(an) * r, ty + th / 2 + Math.sin(an) * r * .5, 6, i % 2 ? C.red : C.gold, null, 0, 1 - prog(lt, 5.4, 6.4)); }
+  // the upstream PR: pulls back (anticipation), then sweeps in on an arc
+  const pull = io(lt, 1.6, 2.1) * (1 - io(lt, 2.1, 2.3));
+  const sweep = io(lt, 2.1, 3.2);
+  const [px, py] = arcPoint(1960, 720, 1000, 650, -.25, sweep);
+  const pxx = px + 40 * pull, pa = io(lt, 1.4, 1.8) * (1 - io(lt, 4.2, 4.7));
+  if (pa > 0) {
+    rrect(pxx, py, 720, 130, 12, C.card, C.mint, 2, pa);
+    text('PR #4952 · merged upstream', pxx + 30, py + 54, { font: F.mono, size: 28, w: 600, c: C.mint, a: pa });
+    text('fixes get_llm() for provider-linked profiles', pxx + 30, py + 100, { size: 32, c: C.ink, a: pa });
+  }
+  // the replay pulse travels from the PR into the tile
+  const rp = prog(lt, 3.8, 4.6);
+  if (rp > 0 && rp < 1) { const [qx, qy] = arcPoint(1360, 650, tx + tw / 2, ty + th, .2, E.io(rp)); glowDot(qx, qy, 60, C.gold); circle(qx, qy, 10, C.gold); }
+  // the map: surprise (exaggeration: tall stretch, wide eyes), then delight
+  const h = hops(lt, [[4.85, 1.0, 170], [8.3, .7, 40]]);
+  const wow = lt > 4.95 && lt < 6.3;
+  mappy({ x: 320, y: 800, s: .95, sq: h.sq * (wow ? 1.06 : 1), airY: h.air, look: lt < 1.4 ? [.9, -.6] : lt < 4.6 ? [.9, .3] : [.8, -.7],
+          blink: blinkAt(lt, [1.0, 7.4, 10.8]), mood: wow ? 'wow' : lt > 6.3 ? 'grin' : 'smile', pin: wobble(lt, 5.85, .7, 2.0, 3) + wobble(lt, 9.0, .3) });
+  caption('The map caught the fix the moment it landed.', lt, 6.6, 935, { font: F.serif, italic: true, size: 62 });
+  caption('Known bugs fail on purpose, until they don’t. Then the map has to change.', lt, 9.0, 1000, { size: 32, c: C.muted });
+});
+
+// 11 · Outcome — counters with follow-through; the issue wall scrolls along an arc.
+shot('outcome', 9, (lt) => {
+  header(lt, 'OUTCOME', 'Filed, reproduced, gathered in one place');
+  const S = [[.5, '31', C.gold, 'new issues', '#5622 – #5652'], [1.4, '6', C.mint, 'existing issues reproduced', 'each with a map reproduction'],
+             [2.3, '1', C.ink, 'umbrella issue', '#5653']];
+  S.forEach(([t0, n, c, l, sub], i) => {
+    const y = 400 + i * 205, s = back(lt, t0, t0 + .5) * settle(lt, t0 + .5, .08);
+    if (s <= 0) return;
+    ctx.save(); ctx.translate(180, y - 40); ctx.scale(s, s);
+    text(n, 0, 40, { font: F.serif, size: 150, c, align: 'center' }); ctx.restore();
+    text(l, 290, y - 18, { size: 40, c: C.ink, a: io(lt, t0 + .2, t0 + .6) });
+    text(sub, 290, y + 26, { font: F.mono, size: 26, c: C.muted, a: io(lt, t0 + .3, t0 + .7) });
+  });
+  text('enyst.github.io/arch/agent-server-bug-tracker.html', 110, 1010, { font: F.mono, size: 24, c: C.mint, a: io(lt, 3.2, 3.8) });
+  // the wall
+  const items = NEW_ISSUES.map(([n, s, t]) => ({ n, c: s === 'H' ? C.red : C.gold, t })).concat(REPRODUCED.map(([n, id]) => ({ n, c: C.mint, t: 'reproduced · ' + id, mono: true })));
+  const top = 240, bot = 1040, ih = 66, scroll = io(lt, 1.0, 8.4) * (items.length * ih - (bot - top) + 20);
+  ctx.save(); ctx.beginPath(); ctx.rect(960, top, 900, bot - top); ctx.clip();
+  items.forEach((it, i) => {
+    const y = top + 10 + i * ih - scroll; if (y < top - ih || y > bot) return;
+    const v = (y + ih / 2 - (top + bot) / 2) / ((bot - top) / 2); // −1..1 across the window
+    const x = 1000 + 70 * v * v; // the column curves on an arc as it scrolls
+    const a = io(lt, .6 + i * .02, 1.0 + i * .02) * clamp(1 - Math.pow(Math.abs(v), 3));
+    rrect(x, y, 800, ih - 10, 8, C.card, C.border, 1.5, a);
+    rrect(x, y + 8, 4, ih - 26, 2, it.c, null, 0, a);
+    text('#' + it.n, x + 22, y + 37, { font: F.mono, size: 22, w: 600, c: it.c, a });
+    text(ellipsize(it.t, 660, { size: 23, font: it.mono ? F.mono : F.sans }), x + 112, y + 37, { size: it.mono ? 21 : 23, font: it.mono ? F.mono : F.sans, c: C.ink, a });
+  });
+  ctx.restore();
+});
+
+// 12 · Handled with care — staging: one list, nothing else on screen.
+shot('hardening', 8.5, (lt) => {
+  header(lt, 'HANDLED PRIVATELY', 'Security-relevant findings were reported privately');
+  text('Four small hardening PRs came out of them:', 110, 300, { size: 36, c: C.muted, a: io(lt, .7, 1.2) });
+  const PRS = [['#5657', 'keep provider credentials out of completion logs'], ['#5659', 'ignore empty session API keys'],
+               ['#5660', 'treat an empty OH_SECRET_KEY as unset'], ['#5661', 'keep sockets and /v1 closed until deferred init completes']];
+  PRS.forEach(([n, t], i) => {
+    const t0 = 1.3 + i * .45, p = prog(lt, t0, t0 + .7); if (p <= 0) return;
+    const e = E.back(p), y = 345 + i * 118, x = 110 + (1 - e) * -160, dy = -Math.sin(p * Math.PI) * 30;
+    rrect(x, y + dy, 1360, 96, 12, C.card, C.border, 2, clamp(p * 2));
+    rrect(x, y + dy + 14, 5 * io(lt, t0 + .3, t0 + .8) + .01, 68, 3, C.mint, null, 0, 1);
+    text(n, x + 30, y + dy + 60, { font: F.mono, size: 30, w: 600, c: C.mint, a: clamp(p * 2) });
+    text(t, x + 160, y + dy + 60, { size: 33, c: C.ink, a: clamp(p * 2) });
+  });
+  para('And a review of community PR #4813 by BSmick6 found five follow-ups, offered as fixes on a branch.', 110, 900, 1400, { size: 32, c: C.muted, a: io(lt, 4.0, 4.6), lh: 42 });
+  const h = hops(lt, [[3.0, .7, 26], [5.0, .7, 26]]);
+  mappy({ x: 1700, y: 760, s: .7, sq: h.sq, airY: h.air, look: [-.9, -.2], blink: blinkAt(lt, [2.0, 6.6]), pin: wobble(lt, 3.6, .3) + wobble(lt, 5.6, .3) });
+});
+
+// 13 · Invitation — appeal: the map waves goodbye, folds itself up.
+shot('invite', 11, (lt) => {
+  const fold = 1 - io(lt, 9.0, 9.7);
+  const ant = lt > 8.6 && lt < 9.0 ? 1 - .2 * io(lt, 8.6, 9.0) : 1; // anticipation before folding
+  const h = hops(lt, [[.3, .8, 40], [9.0, .9, 90]]);
+  const waving = lt > 1.0 && lt < 7.8;
+  mappy({ x: 460, y: 760, s: 1.25, sq: h.sq * ant, airY: h.air, unfold: lt < 9.0 ? 1 : fold, look: lt < 6 ? [0, 0] : [.8, -.1],
+          blink: lt > 9.4 ? 1 : blinkAt(lt, [2.8, 6.4]), mood: 'grin', pin: wobble(lt, 1.1, .4) + wobble(lt, 9.8, .5),
+          wave: waving ? .9 + Math.sin((lt - 1.0) * 7) * .5 * (lt > 6.8 ? 1 - prog(lt, 6.8, 7.8) : 1) : null,
+          a: 1 - io(lt, 10.2, 10.8) });
+  const X = 800;
+  text('Open source.', X, 360, { font: F.serif, size: 120, c: C.ink, a: io(lt, .5, 1.1) });
+  text('Reproducible.', X, 480, { font: F.serif, size: 120, c: C.gold, a: io(lt, 1.1, 1.7) });
+  const cmd = '$ control-agent-server map run --all --fresh';
+  rrect(X, 545, 1000, 84, 12, C.card, C.border, 2, io(lt, 1.8, 2.2));
+  const v = typed(cmd, lt, 2.2, 36);
+  const ex = segs([[v.slice(0, 1), C.gold], [v.slice(1), C.ink]], X + 30, 600, { font: F.mono, size: 32 });
+  if (lt > 2.2) caret(ex, 600, 32, lt);
+  para('Every feature and every known bug, replayed on a fresh server, by you or by your agent.', X, 700, 1000, { size: 34, c: C.ink, a: io(lt, 3.8, 4.4), lh: 44 });
+  text('github.com/OpenHands/software-agent-sdk/pull/5621', X, 820, { font: F.mono, size: 26, c: C.mint, a: io(lt, 4.6, 5.1) });
+  text('enyst.github.io/arch/agent-server-bug-tracker.html', X, 862, { font: F.mono, size: 26, c: C.mint, a: io(lt, 4.8, 5.3) });
+  text('Made with HTML canvas, Playwright and ffmpeg · fonts under the SIL Open Font License · animation principles after John Lasseter (SIGGRAPH 1987)',
+    960, 1040, { size: 20, c: C.muted, a: io(lt, 5.6, 6.2) * .9, align: 'center' });
+});
+
+// ── timeline ──────────────────────────────────────────────────────────────
+let acc = 0; for (const s of SHOTS) { s.t0 = acc; acc += s.dur; }
+const DURATION = acc;
+const FADE = .35;
+function renderFrame(t) {
+  background(t);
+  for (const s of SHOTS) {
+    if (t < s.t0 || t >= s.t0 + s.dur) continue;
+    const lt = t - s.t0;
+    s.draw(lt, s.dur);
+    const env = Math.min(prog(lt, 0, FADE), 1 - prog(lt, s.dur - FADE, s.dur));
+    if (env < 1) { ctx.save(); ctx.globalAlpha = 1 - E.io(env); ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+  }
+}
+window.DURATION = DURATION;
+window.SHOTS = SHOTS.map(s => ({ name: s.name, t0: s.t0, dur: s.dur }));
+window.renderFrame = renderFrame;
+window.ready = Promise.all([
+  'normal 400 40px "Instrument Serif"', 'italic 400 40px "Instrument Serif"', '400 40px "DM Sans"', '500 40px "DM Sans"',
+  '700 40px "DM Sans"', '400 40px "JetBrains Mono"', '600 40px "JetBrains Mono"',
+].map(f => document.fonts.load(f))).then(() => document.fonts.ready).then(() => { renderFrame(0); return true; });
+// Preview in a browser: ?t=12.5 shows one frame, ?play plays in real time.
+const q = new URLSearchParams(location.search);
+window.ready.then(() => {
+  if (q.has('t')) renderFrame(parseFloat(q.get('t')));
+  if (q.has('play')) { const st = performance.now(); const loop = () => { renderFrame(((performance.now() - st) / 1000) % DURATION); requestAnimationFrame(loop); }; loop(); }
+});
+</script>
+</body>
+</html>
