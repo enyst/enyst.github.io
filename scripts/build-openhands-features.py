@@ -534,29 +534,28 @@ control-openhands stop</code></pre>
                     'captures': self.capture_count,
                     'inventory': [{k: f[k] for k in ('id', 'title', 'file', 'page', 'sha256', 'behaviors', 'recipes')} for f in self.families]}
         (SITE / 'assets/openhands-features/feature-map.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False)+'\n')
-        # This delimited block is the only homepage content owned by this script.
-        index = SITE / 'index.html'
+        # This delimited block is the only content of the verification table of
+        # contents (verify/index.html) owned by this script. The homepage links
+        # to that page with a single card.
+        index = SITE / 'verify/index.html'
         text = index.read_text()
-        nav = '<a href="#openhands-features">OpenHands features</a>'
-        if nav not in text:
-            text = text.replace('<a href="#how-things-work">', nav+'\n      <a href="#how-things-work">', 1)
         cards = f'''    <!-- BEGIN OPENHANDS FEATURES -->
     <section aria-labelledby="openhands-features">
     <h2 id="openhands-features">OpenHands features</h2>
     <p class="meta">The feature map, for humans: {manifest['behaviors']} behaviors in 27 families, with readable CLI scripts and real screenshots. Source snapshot: 9 October 2026.</p>
-    <div class="cards"><a class="card" href="openhands-features/index.html"><div class="card-title">Explore the OpenHands feature map</div><div class="card-desc">Choose a family or search a behavior ID. Follow the user entry point, the commands, and the expected result.</div><span class="card-tag tag-data">openhands-features · full index</span></a></div>
+    <div class="cards"><a class="card" href="../openhands-features/index.html"><div class="card-title">Explore the OpenHands feature map</div><div class="card-desc">Choose a family or search a behavior ID. Follow the user entry point, the commands, and the expected result.</div><span class="card-tag tag-data">openhands-features · full index</span></a></div>
 '''
         for key, name, numbers in GROUPS:
             cards += f'    <h3 style="margin:24px 0 12px">{esc(name)}</h3><div class="cards">\n'
             for f in self.families:
                 if f['number'] in numbers:
-                    cards += f'''      <a class="card" href="openhands-features/{f['page']}"><div class="card-title">{f['id']} · {esc(f['title'])}</div><div class="card-desc">{len(f['behaviors'])} behaviors · {len(f['recipes'])} readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>\n'''
+                    cards += f'''      <a class="card" href="../openhands-features/{f['page']}"><div class="card-title">{f['id']} · {esc(f['title'])}</div><div class="card-desc">{len(f['behaviors'])} behaviors · {len(f['recipes'])} readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>\n'''
             cards += '    </div>\n'
         cards += '    </section>\n    <!-- END OPENHANDS FEATURES -->\n\n'
         if '<!-- BEGIN OPENHANDS FEATURES -->' in text:
             text = re.sub(r'    <!-- BEGIN OPENHANDS FEATURES -->.*?    <!-- END OPENHANDS FEATURES -->\n\n', lambda _: cards, text, flags=re.S)
         else:
-            text = text.replace('    <h2 id="investigations">', cards+'    <h2 id="investigations">', 1)
+            text = text.replace('  </div>\n</body>', cards+'  </div>\n</body>', 1)
         index.write_text(text)
         print(f'Published {manifest["families"]} families, {manifest["behaviors"]} behaviors, {manifest["recipes_and_supporting_checks"]} recipes/checks, {self.capture_count} captures at {self.revision}.')
 
