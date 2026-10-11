@@ -55,7 +55,7 @@ if (mode === 'stills') {
     const a = w * per, b = Math.min(total, a + per); if (a >= b) return;
     const page = await openPage();
     const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'png', '-i', '-',
-      '-c:v', 'libx264', '-preset', 'slow', '-crf', '20', '-pix_fmt', 'yuv420p', '-tune', 'animation', join(tmp, `seg${w}.mp4`)], { stdio: ['pipe', 'inherit', 'inherit'] });
+      '-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-pix_fmt', 'yuv420p', '-tune', 'animation', join(tmp, `seg${w}.mp4`)], { stdio: ['pipe', 'inherit', 'inherit'] });
     const done = new Promise((ok, no) => ff.on('close', c => c ? no(new Error('ffmpeg ' + c)) : ok()));
     for (let f = a; f < b; f++) {
       const png = await grab(page, f / FPS);
@@ -67,7 +67,7 @@ if (mode === 'stills') {
   await writeFile(join(tmp, 'list.txt'), Array.from({ length: WORKERS }, (_, w) => `file 'seg${w}.mp4'`).join('\n'));
   const audio = opt('audio');
   const cat = ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', join(tmp, 'list.txt')];
-  if (audio) cat.push('-i', audio, '-c:a', 'aac', '-b:a', '160k', '-shortest');
+  if (audio) cat.push('-i', audio, '-af', `volume=${opt('audio-gain', '0')}dB`, '-c:a', 'aac', '-b:a', '128k', '-shortest');
   cat.push('-c:v', 'copy', '-movflags', '+faststart', join(here, OUT));
   await new Promise((ok, no) => spawn('ffmpeg', cat, { stdio: 'inherit' }).on('close', c => c ? no(new Error('concat ' + c)) : ok()));
   await rm(tmp, { recursive: true, force: true });

@@ -861,7 +861,7 @@ shot('hardening', 8.5, (lt) => {
 });
 
 // 13 · Invitation — appeal: the map waves goodbye, folds itself up.
-shot('invite', 11, (lt) => {
+shot('invite', 10.5, (lt) => {
   const fold = 1 - io(lt, 9.0, 9.7);
   const ant = lt > 8.6 && lt < 9.0 ? 1 - .2 * io(lt, 8.6, 9.0) : 1; // anticipation before folding
   const h = hops(lt, [[.3, .8, 40], [9.0, .9, 90]]);
@@ -869,7 +869,7 @@ shot('invite', 11, (lt) => {
   mappy({ x: 460, y: 760, s: 1.25, sq: h.sq * ant, airY: h.air, unfold: lt < 9.0 ? 1 : fold, look: lt < 6 ? [0, 0] : [.8, -.1],
           blink: lt > 9.4 ? 1 : blinkAt(lt, [2.8, 6.4]), mood: 'grin', pin: wobble(lt, 1.1, .4) + wobble(lt, 9.8, .5),
           wave: waving ? .9 + Math.sin((lt - 1.0) * 7) * .5 * (lt > 6.8 ? 1 - prog(lt, 6.8, 7.8) : 1) : null,
-          a: 1 - io(lt, 10.2, 10.8) });
+          a: 1 });
   const X = 800;
   text('Open source.', X, 360, { font: F.serif, size: 120, c: C.ink, a: io(lt, .5, 1.1) });
   text('Reproducible.', X, 480, { font: F.serif, size: 120, c: C.gold, a: io(lt, 1.1, 1.7) });
@@ -881,8 +881,27 @@ shot('invite', 11, (lt) => {
   para('Every feature and every known bug, replayed on a fresh server, by you or by your agent.', X, 700, 1000, { size: 34, c: C.ink, a: io(lt, 3.8, 4.4), lh: 44 });
   text('github.com/OpenHands/software-agent-sdk/pull/5621', X, 820, { font: F.mono, size: 26, c: C.mint, a: io(lt, 4.6, 5.1) });
   text('enyst.github.io/arch/agent-server-bug-tracker.html', X, 862, { font: F.mono, size: 26, c: C.mint, a: io(lt, 4.8, 5.3) });
-  text('Made with HTML canvas, Playwright and ffmpeg · fonts under the SIL Open Font License · animation principles after John Lasseter (SIGGRAPH 1987)',
-    960, 1040, { size: 20, c: C.muted, a: io(lt, 5.6, 6.2) * .9, align: 'center' });
+});
+
+// 14 · Closing card — staging: the title, the credits, and the folded map, asleep.
+shot('closing', 6, (lt) => {
+  const a = io(lt, .3, 1.1);
+  // the folded map breathes slowly (a whisper of squash and stretch), peeks once, then sleeps
+  const breathe = 1 + .03 * Math.sin(lt * 2.4);
+  mappy({ x: 960, y: 330, s: 1.3, sq: breathe, unfold: 0, blink: clamp(1 - io(lt, 1.4, 1.7) + io(lt, 2.8, 3.3)),
+          look: [0, .3], pin: wobble(lt, .4, .25, 1.6, 2.5), a });
+  text('The map that keeps itself honest', 960, 480, { font: F.serif, size: 96, c: C.ink, a, align: 'center' });
+  text('verify-agent-server · OpenHands software-agent-sdk · PR #5621', 960, 548, { size: 34, c: C.gold, a: io(lt, .7, 1.4), align: 'center' });
+  const ra = io(lt, 1.1, 1.8);
+  rrect(960 - 160 * ra, 600, 320 * ra, 2, 1, C.border, null, 0, 1);
+  const credits = [
+    'Technique adapted from Lauren Tan’s (@poteto) pstack verification skills',
+    'Bugs, issues and replay: the feature map’s full run on the PR head',
+    'Made with HTML canvas, Playwright and ffmpeg · music generated for this film',
+    'Fonts under the SIL Open Font License · animation principles after John Lasseter, SIGGRAPH 1987',
+  ];
+  credits.forEach((c, i) => text(c, 960, 668 + i * 46, { size: 27, c: C.muted, a: io(lt, 1.5 + i * .25, 2.1 + i * .25), align: 'center' }));
+  text('enyst.github.io', 960, 930, { font: F.mono, size: 30, w: 600, c: C.mint, a: io(lt, 2.6, 3.2), align: 'center', ls: 2 });
 });
 
 // ── timeline ──────────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 # The map that keeps itself honest: storyboard
 
-A 2 min 24 s film (1920×1080, 30 fps, H.264) about the `verify-agent-server`
+A 2 min 29.5 s film (1920×1080, 30 fps, H.264, with a quiet generated score) about the `verify-agent-server`
 skill from [OpenHands/software-agent-sdk PR #5621](https://github.com/OpenHands/software-agent-sdk/pull/5621)
 and what its full replay found. The images are made in a canvas with the
 palette and fonts of this site's `brand.css`.
@@ -40,7 +40,8 @@ hardening PRs.
 | 10 | 1:43.5–1:55.5 | **The twist** | The bullet `F20.sdk-get-llm-linked` sits at XFAIL (issue #5514). PR #4952 pulls back, then sweeps in: "merged upstream". A replay pulse reaches the tile, which flips to **XPASS · unexpected pass: known bug no longer reproduces: update the map** (the CLI's real hint). The map leaps in surprise, lands, grins. The tile settles to **PASS · map updated**. *The map caught the fix the moment it landed.* | **Anticipation** (the PR card's pull-back), **squash and stretch** (the flip squashes the tile to a line and opens it with overshoot), **exaggeration** (the tallest jump in the film, wide eyes), **timing** (surprise first, delight a beat later) |
 | 11 | 1:55.5–2:04.5 | **Outcome** | 31 new issues (#5622–#5652), 6 existing issues reproduced, 1 umbrella (#5653). A wall of real issue titles scrolls past, bending along an arc. Tracker URL. | **Follow-through** (numbers land and settle), **arcs** (the scrolling column curves), **slow in / slow out** (the scroll) |
 | 12 | 2:04.5–2:13 | **Handled privately** | Security-relevant findings were reported privately. The four public hardening PRs, titles only: #5657, #5659, #5660, #5661. Then the review of community PR #4813 (BSmick6): five follow-ups offered as fixes on a branch. | **Staging** (nothing else on screen, no detail beyond public titles), **arcs** with **follow-through** (cards slide in, accent bars land after) |
-| 13 | 2:13–2:24 | **Invitation** | *Open source. Reproducible.* `control-agent-server map run --all --fresh` types out. Links to the PR and the tracker. The map waves, crouches, folds itself back up and fades out. | **Appeal** (the wave goodbye), **anticipation** (a crouch before it folds), **squash and stretch** (the last hop) |
+| 13 | 2:13–2:23.5 | **Invitation** | *Open source. Reproducible.* `control-agent-server map run --all --fresh` types out. Links to the PR and the tracker. The map waves, crouches, folds itself back up and fades out. | **Appeal** (the wave goodbye), **anticipation** (a crouch before it folds), **squash and stretch** (the last hop) |
+| 14 | 2:23.5–2:29.5 | **Closing card** | *The map that keeps itself honest*, the PR line, and credits: Lauren Tan's (@poteto) pstack skills, the tools, the OFL fonts, Lasseter. Above the title the folded map breathes, peeks once and goes back to sleep. | **Staging** (a still frame after a busy film), **appeal**, a whisper of **squash and stretch** in its breathing |
 
 ## Principles everywhere
 
@@ -61,6 +62,17 @@ hardening PRs.
   system (Instrument Serif headlines, DM Sans body, JetBrains Mono code), the
   same lamplit background in every shot.
 
+## The score
+
+The music follows the same principles as the picture. It stays nearly
+silent under the hook, then a strummed chord blooms as the map unfolds. A
+steady pulse runs under the CLI and the map, and it grows busier and
+overlapping during the swarm. Before the replay it **holds its breath**
+with the character: the pad ducks over a suspended chord, which resolves as
+the columns start to fill, and a rising arpeggio climbs with them. Two bells
+mark the two zeros. The twist gets the same **anticipation**, a hush and
+then a bell on the flip. The last bell rings over the closing card.
+
 ## Production notes
 
 - `video.html` draws any moment `t` with `renderFrame(t)`, so frames can be
@@ -71,4 +83,7 @@ hardening PRs.
   `yuv420p`, `+faststart`).
 - Fonts are the OFL-licensed `@fontsource` builds of the site's three
   families, included in `fonts/`.
-- The film has no audio track; all of its words are on screen.
+- `score.py` synthesizes the score from sine partials with numpy: warm
+  pads, soft plucked arpeggios, a few bells, a small stereo room reverb.
+  Nothing is sampled or borrowed. The film is mixed to about −20 LUFS so
+  the score stays a quiet bed; all of its words are on screen.
