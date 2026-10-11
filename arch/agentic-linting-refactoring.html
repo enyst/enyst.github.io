@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agentic linting refactoring · Engel's Code Design Notebook</title>
+  <meta name="description" content="The OpenHands Agent Canvas linting refactor: shared theme tokens, component contracts, staged shadcn rules, the merged proposals and next steps, with a real Before/After video." />
+  <meta property="og:title" content="Agentic linting refactoring" />
+  <meta property="og:description" content="A Before/After film, the rollout so far, and what comes next: make the design rules something an agent can check and act on." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/agentic-linting-refactoring.html" />
+  <meta property="og:image" content="https://enyst.github.io/experiments/agentic-linting-refactoring/poster.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://enyst.github.io/arch/agentic-linting-refactoring.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    html { color-scheme: dark; scroll-padding-top: 24px; }
+    .page-intro { font-size: var(--text-lg); margin: 20px 0; }
+    .snapshot { color: var(--muted); font-size: .85em; margin: 0 0 24px; }
+    .links { gap: 12px 22px; }
+    .prose h3 { font: 700 1.05em var(--sans); margin: 0 0 8px; }
+    .prose a, .prose code { overflow-wrap: anywhere; }
+    a { text-underline-offset: .2em; }
+    a:focus-visible, button:focus-visible, video:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    ::selection { background: var(--accent); color: var(--bg); }
+    .film { margin: 0 0 18px; }
+    .film video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; background: var(--bg); border: 1px solid var(--border); border-radius: var(--border-radius); }
+    .film figcaption { color: var(--muted); font-size: .88em; line-height: 1.5; margin-top: 12px; }
+    .film-download { display: inline-block; font-weight: 700; margin-top: 12px; }
+    .chapters { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .chapters button { font: inherit; font-size: .85em; color: var(--ink); background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; cursor: pointer; }
+    .chapters button:hover { border-color: var(--teal); }
+    .rule-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: .9em; }
+    .rule-table th, .rule-table td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); padding: 12px 10px 12px 0; }
+    .rule-table th { color: var(--accent); font-weight: 500; }
+    .rule-table th:first-child { width: 55%; }
+    .rule-table code { padding: 0; background: transparent; }
+    .rule-table td:last-child { padding-right: 0; }
+    .rollout { list-style: decimal-leading-zero; }
+    .rollout li { padding: 0 0 22px 6px; margin-bottom: 22px; border-bottom: 1px solid var(--border); }
+    .rollout li::marker { font-family: var(--mono); color: var(--muted); }
+    .rollout .entry-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 8px; }
+    .rollout .entry-head h3 { margin: 0; }
+    .state { color: var(--green); font: 500 .8em var(--mono); }
+    .state-open { color: var(--accent); }
+    .rollout p:last-child { margin-bottom: 0; }
+    .steps li { margin-bottom: 14px; }
+    .evidence { color: var(--muted); font-size: .88em; }
+    .source-list li { margin-bottom: 12px; }
+    @media (max-width: 640px) {
+      .shell { padding: 36px 20px 60px; }
+      .rule-table { font-size: .88em; }
+      .rule-table th:first-child { width: 58%; }
+      .chapters button { flex: 1 1 140px; text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell shell--wide">
+    <a class="back" href="../index.html">← Engel's Code Design Notebook</a>
+    <h1 class="page">Agentic linting refactoring</h1>
+    <p class="page-intro">Make the design rules something a coding agent can check and act on: known Tailwind classes, readable theme colors, and shared controls whose appearance has one owner. This is the ongoing linting refactor in OpenHands Agent Canvas.</p>
+    <p class="snapshot">Status checked <time datetime="2026-10-11T20:40:07Z">11 October 2026, 20:40 UTC</time> · The first three PRs in the latest batch are merged; the secret-selection fix is open.</p>
+    <nav class="links" aria-label="On this page">
+      <a href="#film">Before / After</a>
+      <a href="#rules">The rules</a>
+      <a href="#progress">Progress</a>
+      <a href="#next">What's next</a>
+      <a href="#sources">Sources</a>
+    </nav>
+
+    <article class="prose">
+      <section aria-labelledby="film">
+        <h2 id="film">Before / After</h2>
+        <figure class="film">
+          <video id="lint-film" controls preload="metadata" playsinline poster="../experiments/agentic-linting-refactoring/poster.jpg" aria-label="Before and after the latest Agent Canvas linting refactor">
+            <source src="../experiments/agentic-linting-refactoring/agentic-linting-before-after.mp4" type="video/mp4" />
+            <track kind="captions" src="../experiments/agentic-linting-refactoring/captions.vtt" srclang="en" label="Change descriptions" />
+            <a href="../experiments/agentic-linting-refactoring/agentic-linting-before-after.mp4" download>Download the video (MP4, 1:24)</a>
+          </video>
+          <figcaption>Readable errors and success messages, a calmer secret-selection switch, the phone layout, and the two lint guards. Real Canvas recordings, short Before/After labels, and very quiet original music.</figcaption>
+        </figure>
+        <a class="film-download" href="../experiments/agentic-linting-refactoring/agentic-linting-before-after.mp4" download="agentic-linting-before-after.mp4">Download the video · MP4, 2.7 MB</a>
+        <div class="chapters" role="group" aria-label="Jump to a video chapter">
+          <button type="button" data-time="4" aria-controls="lint-film">0:04 · Readable errors</button>
+          <button type="button" data-time="14" aria-controls="lint-film">0:14 · Readable success</button>
+          <button type="button" data-time="24" aria-controls="lint-film">0:24 · Calmer switch</button>
+          <button type="button" data-time="34" aria-controls="lint-film">0:34 · Phone fit</button>
+          <button type="button" data-time="46" aria-controls="lint-film">0:46 · Caret guard</button>
+          <button type="button" data-time="56" aria-controls="lint-film">0:56 · Inline warnings</button>
+          <button type="button" data-time="68" aria-controls="lint-film">1:08 · Five themes</button>
+        </div>
+        <p class="evidence">Recorded with <a href="control-openhands-cli.html"><code>control-openhands</code></a>, production Canvas builds, Chrome, and the same real local Agent Server 1.54.0. The film compares a common base with all four proposal heads combined in an isolated worktree, including the still-open fix. The lint-only scenes show actual ESLint results. Credential fields stayed empty; no model execution was needed.</p>
+      </section>
+
+      <section aria-labelledby="rules">
+        <h2 id="rules">What an agent is being asked to respect</h2>
+        <p>Put a rule in the repository where every contributor can run it, give the finding an actionable message, and define the exceptions where the value is owned. A warning exposes migration work. An error makes a new violation fail lint.</p>
+        <table class="rule-table">
+          <caption>Current shadcn rules at the checked OpenHands revision</caption>
+          <thead><tr><th scope="col">Rule</th><th scope="col">Enforcement</th></tr></thead>
+          <tbody>
+            <tr><td><code>no-unknown-classes</code></td><td>Error for unknown utilities.</td></tr>
+            <tr><td><code>require-static-classes</code></td><td>Error on shared UI consumers, with documented narrow exceptions.</td></tr>
+            <tr><td><code>no-restyle</code></td><td>Error for the adopted divider, toggle, and caret contracts.</td></tr>
+            <tr><td><code>no-raw-colors</code></td><td>Warning while palette colors are migrated by semantic role.</td></tr>
+            <tr><td><code>no-inline-styles</code></td><td>Warning while dynamic styles are reviewed by their owners.</td></tr>
+            <tr><td><code>no-arbitrary-values</code></td><td>Warning; legitimate one-off values still need judgment.</td></tr>
+          </tbody>
+        </table>
+        <p>Primitive implementations own their appearance, so <code>no-restyle</code> and <code>require-static-classes</code> are off inside <code>src/ui</code>. Layout remains available to callers. Stateful carets expose <code>isOpen</code> for rotation; the generic caret icon retains caller orientation.</p>
+        <p>Numeric CSS custom properties and semantic token references pass the inline-style rule. Measured dimensions, portal positioning, accessibility helpers, and renderer contracts need an owner audit. The exact <code>agent-server-ui-root.tsx</code> exception preserves its public, caller-owned <code>style</code> and <code>styleOverrides</code> API.</p>
+      </section>
+
+      <section aria-labelledby="progress">
+        <h2 id="progress">The rollout so far</h2>
+        <ol class="rollout">
+          <li><div class="entry-head"><h3>Put Canvas tokens in the Tailwind theme</h3><span class="state">Merged · 21 September</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/17435">#17435</a> established the first shadcn-lint pass and mapped the existing <code>--oh-*</code> theme tokens into Tailwind. It gave the linter the same named colors the app uses.</p></li>
+          <li><div class="entry-head"><h3>Reject classes Tailwind does not know</h3><span class="state">Merged · 4 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/17644">#17644</a> enabled unknown-class errors with verified theme loading, so a plausible-looking but nonexistent utility cannot pass silently.</p></li>
+          <li><div class="entry-head"><h3>Make shared UI classes inspectable</h3><span class="state">Merged · 5 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/17916">#17916</a> required static classes on Canvas UI consumers. Primitive variant helpers stay under the component owner's control; documented exceptions account for the plugin's analysis limits.</p></li>
+          <li><div class="entry-head"><h3>Upgrade the analysis before adding more rules</h3><span class="state">Merged · 5 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/17987">#17987</a> pinned <code>@shadcn/lint</code> 0.2.0. The dependency upgrade and each later rule activation remain separate changes.</p></li>
+          <li><div class="entry-head"><h3>Expose raw palette colors as warnings</h3><span class="state">Merged · 6 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18006">#18006</a> staged <code>no-raw-colors</code> at warning severity, with eight exact legacy-token exceptions. <a href="https://github.com/OpenHands/OpenHands/issues/18004">#18004</a> tracks the migration that must precede error enforcement.</p></li>
+          <li><div class="entry-head"><h3>Give dividers and toggles one appearance owner</h3><span class="state">Merged · 10 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18194">#18194</a> enabled <code>no-restyle</code> errors for the first settled component contracts. Callers keep layout; the toggle button also permits opacity for disabled or pending state.</p></li>
+          <li><div class="entry-head"><h3>Make MCP feedback readable across themes</h3><span class="state">Merged · 11 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18270">#18270</a> moved error and success text to semantic feedback tokens, including darker text colors for the light palettes. Nine raw-color findings were removed. See the film at 0:04 and 0:14.</p></li>
+          <li><div class="entry-head"><h3>Let the caret own its rotation</h3><span class="state">Merged · 11 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18274">#18274</a> extended the appearance guard to carets. Stateful callers use <code>isOpen</code>; a caller-supplied <code>rotate-*</code> override now produces an actionable lint error. Existing UI appearance is preserved.</p></li>
+          <li><div class="entry-head"><h3>Audit inline styles before enforcing them</h3><span class="state">Merged · 11 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18275">#18275</a> turned <code>no-inline-styles</code> on as warnings. Its audit recorded 87 findings across 45 files after the exact embedding-root exception. Those are migration findings at that audited revision, rather than a claim about today's total lint count.</p></li>
+          <li><div class="entry-head"><h3>Use the shared switch for secret selection</h3><span class="state state-open">Open · 11 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18278">#18278</a> replaces the fixed bright-green “Also save as secret” appearance with the shared toggle and theme tokens. The secret name and help control wrap together on phones, and keyboard focus stays visible. Six raw-color findings are removed by this proposal.</p><p>The selected name's contrast changes from 1.70:1 to 12.55:1 in Light+, and from 1.56:1 to 10.40:1 in Solarized Light. The PR is approved and its checks pass at this snapshot; it still needs to merge. See 0:24 and 0:34 in the film.</p></li>
+        </ol>
+        <p>The two visual changes together remove <strong>15 raw-color findings</strong>. Inline-style warnings expose a separate existing backlog; these figures do not describe the net warning count.</p>
+      </section>
+
+      <section aria-labelledby="next">
+        <h2 id="next">What's next, in order</h2>
+        <ol class="steps">
+          <li><strong>Finish the secret-selection proposal.</strong> Merge <a href="https://github.com/OpenHands/OpenHands/pull/18278">#18278</a> after the remaining maintainer decision. Its implementation, live evidence, and checks are ready.</li>
+          <li><strong>Continue the color migration by role.</strong> Work through <a href="https://github.com/OpenHands/OpenHands/issues/18004">#18004</a> in bounded batches: feedback and status, warning text, neutral text, and scrims. Choose semantic tokens and check the actual backdrop in all five palettes. Geometric nearest-color suggestions do not decide a color's meaning.</li>
+          <li><strong>Promote raw-color warnings when the migration is ready.</strong> Rerun the audit on the then-current head, account for each remaining finding and narrow exception, and verify rendering before changing <code>no-raw-colors</code> to an error.</li>
+          <li><strong>Expand ownership contracts carefully.</strong> Typography, menus, and <code>Pre</code> need their own appearance decisions. Review dynamic-style owners before strengthening inline-style enforcement; preserve measured layout and public renderer interfaces.</li>
+        </ol>
+        <p>Each batch needs a linked issue, focused behavior or rule tests, a passing lint/build path, and real app evidence when the UI changes. The rule probes prove what ESLint rejects; the recordings prove what people see.</p>
+      </section>
+
+      <section aria-labelledby="sources">
+        <h2 id="sources">Sources and reproduction</h2>
+        <ul class="source-list">
+          <li><a href="https://github.com/OpenHands/OpenHands/blob/fddb0ddcfe0d5ab8e32dd109291406a1d33813f1/eslint.config.js#L394">Checked lint configuration</a> and <a href="https://github.com/OpenHands/OpenHands/blob/fddb0ddcfe0d5ab8e32dd109291406a1d33813f1/.agents/skills/frontend-development/references/guide.md">contributor guidance</a> at <code>fddb0ddc</code>, including the exact rule scopes and exceptions.</li>
+          <li><a href="https://github.com/OpenHands/OpenHands/issues/18004">Raw-color migration tracker #18004</a>. Its original 148-findings inventory is a historical audit, not the current remaining count.</li>
+          <li><a href="../experiments/agentic-linting-refactoring/sources.json">Video provenance</a> and <a href="../experiments/agentic-linting-refactoring/progress.json">dated PR-status snapshot</a>: source revisions, real-backend setup, chapter timings, media hash, and the original music method.</li>
+          <li><a href="control-openhands-cli.html">The control-openhands CLI</a> and <a href="../verify/index.html">the verification work</a>, which provide the app-driving and evidence loop used here.</li>
+        </ul>
+      </section>
+    </article>
+    <footer>Engel's Code Design Notebook · OpenHands Agent Canvas · 11 October 2026</footer>
+  </main>
+  <script>
+    const film = document.getElementById('lint-film');
+    document.querySelectorAll('button[data-time]').forEach(button => {
+      button.addEventListener('click', () => {
+        film.currentTime = Number(button.dataset.time);
+        film.play().catch(() => film.focus());
+      });
+    });
+  </script>
+</body>
+</html>
