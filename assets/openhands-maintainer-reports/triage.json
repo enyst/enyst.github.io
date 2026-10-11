@@ -9,27 +9,27 @@
   "maintainer_policy": "Keep submissions with bounded or well-supported fixes. Partial drafts, incomplete required functional evidence and proposals needing another repair cycle may be closed to limit the maintainer review queue. A code-positive assessment does not override submission readiness.",
   "github_actions_taken": false,
   "counts": {
-    "keep": 4,
+    "keep": 3,
     "close": 40,
-    "merged": 8,
+    "merged": 9,
     "already_closed": 1,
-    "total_open": 44,
+    "total_open": 43,
     "total_original": 53
   },
   "group_counts": {
-    "merged": 8,
-    "broader-positive": 4,
+    "merged": 9,
+    "broader-positive": 3,
     "closure-defect-or-duplicate": 19,
     "already-closed": 1,
     "closure-unready": 21
   },
   "issue_counts": {
-    "distinct_closed_issues": 7,
-    "distinct_open_issues": 31
+    "distinct_closed_issues": 8,
+    "distinct_open_issues": 30
   },
   "open_pr_issue_states": {
-    "linked_issue_closed": 7,
-    "linked_issue_open": 37
+    "linked_issue_closed": 8,
+    "linked_issue_open": 35
   },
   "heads_changed": 0,
   "records": [
@@ -1788,19 +1788,28 @@
       "pr_author": "errmakov",
       "pr_title": "fix: accept Ctrl for confirmation shortcuts off macOS",
       "pr_url": "https://github.com/OpenHands/OpenHands/pull/18127",
-      "state": "open",
+      "state": "merged",
       "draft": false,
-      "decision": "keep",
-      "group": "broader-positive",
-      "reason": "Corrects Ctrl shortcuts and platform hints, and prevents repeated or already-submitted confirmations. The submission supplies before/after real Agent Server recordings with a named real model; current-head code CI is green.",
-      "reason_label": "Why keep",
+      "decision": "archive",
+      "group": "merged",
+      "reason": "Merged on 2026-10-11T18:03:37Z. Linked issue #17928 is closed.",
+      "reason_label": "Archive status",
       "issue": 17928,
       "issue_author": "enyst",
       "issue_title": "[Bug]: Confirmation Continue/Cancel shortcuts are ⌘-only; Ctrl+Enter does nothing on Linux and Windows",
       "issue_url": "https://github.com/OpenHands/OpenHands/issues/17928",
-      "issue_state": "open",
-      "issue_closed_at": null,
-      "issue_closing_prs": [],
+      "issue_state": "closed",
+      "issue_closed_at": "2026-10-11T18:03:39Z",
+      "issue_closing_prs": [
+        {
+          "number": 18127,
+          "title": "fix: accept Ctrl for confirmation shortcuts off macOS",
+          "url": "https://github.com/OpenHands/OpenHands/pull/18127",
+          "state": "merged",
+          "merged_at": "2026-10-11T18:03:37Z",
+          "author": "errmakov"
+        }
+      ],
       "head_sha": "8032aa21bcb0418a8be7eb3b7c6af9330a147aba",
       "original_audit_head_sha": "8032aa21bcb0418a8be7eb3b7c6af9330a147aba",
       "head_matches_original_audit": true,
@@ -1808,9 +1817,9 @@
       "metadata_checked_at": "2026-10-11T05:32:11.619166+00:00",
       "created_at": "2026-10-07T16:28:09Z",
       "updated_at": "2026-10-07T16:28:29Z",
-      "merged_at": null,
-      "closed_at": null,
-      "merged_by": null,
+      "merged_at": "2026-10-11T18:03:37Z",
+      "closed_at": "2026-10-11T18:03:37Z",
+      "merged_by": "enyst",
       "preserve_pr": null,
       "alternative": null,
       "mergeable": true,
@@ -1942,7 +1951,8 @@
         "https://github.com/OpenHands/OpenHands/issues/17928#issuecomment-6009750167",
         "https://github.com/OpenHands/OpenHands/pull/18127",
         "https://github.com/OpenHands/OpenHands/pull/18127/files",
-        "https://github.com/OpenHands/OpenHands/issues/17928"
+        "https://github.com/OpenHands/OpenHands/issues/17928",
+        "https://github.com/OpenHands/OpenHands/pull/18127#pullrequestreview-5484296055"
       ],
       "audit_caveats": [
         "Reported live integration evidence and prior source assessment; this refresh did not play recordings or run the branch. macOS is unit-covered, not live-recorded."
@@ -1952,7 +1962,8 @@
       "original_decision": "keep",
       "original_group": "broader-positive",
       "original_reason": "Correct shortcut handling includes submitted/repeat guards and hints. Real-backend/real-LLM recordings and prior live verification support the submission; broader than a copy change.",
-      "original_technical_assessment": "Small scoped shortcut fix that follows issue triage, including the already-submitted guard and strong live evidence."
+      "original_technical_assessment": "Small scoped shortcut fix that follows issue triage, including the already-submitted guard and strong live evidence.",
+      "refresh_note": "Before the merge, the PR was run on main 2d174175ce in a live Agent Server 1.54.0 stack with deepseek-flash: Ctrl+Enter and Shift+Ctrl+Backspace each sent one confirmation response, a second press sent none, focus in the composer kept the draft, and Meta+Enter still worked. Held keys were covered by unit tests only."
     },
     {
       "pr": 17995,
@@ -4659,15 +4670,24 @@
       "draft": false,
       "decision": "close",
       "group": "closure-defect-or-duplicate",
-      "reason": "Omits the already-submitted and repeat-key guard required by #17928; its test expects a second confirmation request. Still-open #18127 implements that guard and provides real-backend, real-model shortcut recordings.",
+      "reason": "Omits the already-submitted and repeat-key guard required by #17928; its test expects a second confirmation request. #18127, merged on 11 October, implements that guard and closed #17928.",
       "reason_label": "Closure reason",
       "issue": 17928,
       "issue_author": "enyst",
       "issue_title": "[Bug]: Confirmation Continue/Cancel shortcuts are ⌘-only; Ctrl+Enter does nothing on Linux and Windows",
       "issue_url": "https://github.com/OpenHands/OpenHands/issues/17928",
-      "issue_state": "open",
-      "issue_closed_at": null,
-      "issue_closing_prs": [],
+      "issue_state": "closed",
+      "issue_closed_at": "2026-10-11T18:03:39Z",
+      "issue_closing_prs": [
+        {
+          "number": 18127,
+          "title": "fix: accept Ctrl for confirmation shortcuts off macOS",
+          "url": "https://github.com/OpenHands/OpenHands/pull/18127",
+          "state": "merged",
+          "merged_at": "2026-10-11T18:03:37Z",
+          "author": "errmakov"
+        }
+      ],
       "head_sha": "e4d8dffddbeebd44c50ace113765a983af1b9711",
       "original_audit_head_sha": "e4d8dffddbeebd44c50ace113765a983af1b9711",
       "head_matches_original_audit": true,
@@ -4684,9 +4704,9 @@
         "title": "fix: accept Ctrl for confirmation shortcuts off macOS",
         "url": "https://github.com/OpenHands/OpenHands/pull/18127",
         "author": "errmakov",
-        "state": "open",
+        "state": "merged",
         "draft": false,
-        "merged_at": null
+        "merged_at": "2026-10-11T18:03:37Z"
       },
       "mergeable": true,
       "mergeable_state": "blocked",
@@ -4822,7 +4842,7 @@
         "https://github.com/OpenHands/OpenHands/pull/18152"
       ],
       "audit_caveats": [
-        "Source-derived acceptance gap, not a newly run UI reproduction. The conclusion does not rely on screenshot provenance. #18127 is kept for review, not merged; #17928 stays open."
+        "Source-derived acceptance gap, not a newly run UI reproduction. The conclusion does not rely on screenshot provenance. #18127 has since been merged and closed #17928."
       ],
       "current_head_reviews": [],
       "reviews": [],
@@ -10396,6 +10416,12 @@
       "original_group": "closure-unready",
       "original_reason": "Useful signal-lifecycle code, but still a draft with main conflicts and unresolved submission/validator readiness. Close the unfinished submission; no UI recording is needed for this lifecycle change.",
       "original_technical_assessment": "Small lifecycle fix moves signal registration from imports into explicit main/CLI ownership. Current patch contains real child-process production-main shutdown regression and cheaper listener-count coverage after independent reviewer mutation testing. Positive code candidate; draft/process/conflicts still block merge."
+    }
+  ],
+  "updates": [
+    {
+      "at": "2026-10-11T18:03:37Z",
+      "text": "PR #18127 (errmakov) was merged after a live check, closing issue #17928. It moves from Keep to Already merged; PR #18152, the Close candidate for the same issue, now points to it. Other rows keep the snapshot above."
     }
   ]
 }
