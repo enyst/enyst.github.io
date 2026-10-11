@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Server bug tracker</title>
+  <meta name="description" content="Bugs the verify-agent-server feature map found in the OpenHands Agent Server API, with severity, status and a short summary for each filed issue." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    body { background: var(--bg); color: var(--ink); font-family: var(--sans); margin: 0; }
+    .tracker { max-width: 860px; margin: 0 auto; padding: 56px 16px 80px; }
+    .back { font: var(--text-sm) var(--mono); color: var(--teal); text-decoration: none; }
+    h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(2.2em, 6vw, 3.2em); margin: 18px 0 8px; }
+    .lede { color: var(--muted); max-width: 720px; line-height: 1.6; }
+    .lede a, .bug a { color: var(--teal); }
+    .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 10px 16px; }
+    .stat b { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.8em; color: var(--accent); }
+    .stat span { font: var(--text-xs) var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .filters button { font: var(--text-sm) var(--mono); background: var(--card); color: var(--ink); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+    .filters button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+    ul.bugs { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    .bug { min-width: 0; overflow-wrap: anywhere; background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 14px 16px; }
+    .bug[hidden] { display: none; }
+    .bug-head { display: flex; gap: 8px; align-items: center; font: var(--text-sm) var(--mono); }
+    .pill { font-size: .85em; border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
+    .sev-high { color: var(--report); }
+    .sev-medium { color: var(--accent); }
+    .st-open { color: var(--teal); }
+    .st-fixed { color: var(--green); }
+    .bug-title { font-weight: 700; margin: 8px 0 4px; line-height: 1.4; }
+    .bug-sum { color: var(--muted); margin: 0 0 8px; line-height: 1.55; }
+    .bug-ids code { font: var(--text-xs) var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+    footer { margin-top: 32px; color: var(--muted); font: var(--text-sm) var(--mono); }
+  </style>
+</head>
+<body>
+  <main class="tracker">
+    <a class="back" href="../index.html">&larr; home</a>
+    <h1>Agent Server bug tracker</h1>
+    <p class="lede">Bugs found while building an executable feature map of the OpenHands Agent Server API
+      (<a href="https://github.com/OpenHands/software-agent-sdk/pull/5621">#5621</a>). Each one is a known-bug bullet in the map, so the
+      map reports it as an expected failure while it lasts and as an unexpected pass once it is fixed.
+      The umbrella issue is <a href="https://github.com/OpenHands/software-agent-sdk/issues/5653">#5653</a>. Security findings are handled
+      separately and are not listed here.</p>
+    <div class="stats">
+      <div class="stat"><b>38</b><span>issues</span></div>
+      <div class="stat"><b>1</b><span>high, open</span></div>
+      <div class="stat"><b>36</b><span>medium, open</span></div>
+      <div class="stat"><b>1</b><span>fixed</span></div>
+    </div>
+    <div class="filters" role="group" aria-label="Filter">
+      <button data-f="all" aria-pressed="true">all</button>
+      <button data-f="high">high</button>
+      <button data-f="medium">medium</button>
+      <button data-f="fixed">fixed</button>
+    </div>
+    <ul class="bugs">
+      <li class="bug" data-sev="high" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5622">#5622</a><span class="pill sev-high">high</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">After a cipher key change, settings/secrets/profile writes answer 200 and null stored keys, not 409</div>
+        <p class="bug-sum">After the cipher key changes (new OH_SECRET_KEY, or a new session API key when it is unset), any write to settings, secrets or the active LLM profile answers 200 and rewrites values stored under the old key as null for good. The stores&#x27; &quot;different key&quot; guard never fires because undecryptable values load as None.</p>
+        <div class="bug-ids"><code>F18.secret-key-rotation</code> <code>F20.secret-key-rotation</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5625">#5625</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">GET omits secrets added at create or via POST .../secrets until the next save; restart can drop them</div>
+        <p class="bug-sum">Secrets from the create body (secrets) or POST /api/conversations/{id}/secrets are applied to the live ConversationState in place, which skips the autosave. GET, search and batch get read the base_state.json snapshot, so they omit the secret until another change (a tags PATCH, a message) saves the state.</p>
+        <div class="bug-ids"><code>F04.create-secrets-get</code> <code>F08.secrets-visible</code> <code>F08.secrets-unsaved-restart</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5626">#5626</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Pause during a model call not saved: GET says running (expected paused); after SIGKILL it is error</div>
+        <p class="bug-sum">POST /api/conversations/{id}/pause during an in-flight model call returns 200, appends a PauseEvent and sets the live status to paused, but base_state.json is not written until the model call returns or is interrupted. GET /api/conversations/{id} reads that file, so a client that pauses and polls GET keeps seeing running.</p>
+        <div class="bug-ids"><code>F05.pause-running-get</code> <code>F05.pause-running-crash</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5633">#5633</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Failed run blocks the event loop while logging a rich traceback: /alive takes ~5 s, not ~100 ms</div>
+        <p class="bug-sum">When a conversation run fails, EventService._run_and_publish logs it with logger.exception(...) on the server&#x27;s event loop. With default console logging (Rich, LOG_RICH_TRACEBACKS defaults to true), rendering the chained traceback of an ordinary LLM connection error (about 1,000 lines) takes about 5 s, and every request, socket and run on the server waits meanwhile.</p>
+        <div class="bug-ids"><code>F05.run-error-responsive</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5631">#5631</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">events/search and /count with kind=MessageEvent return nothing; only the full class path matches</div>
+        <p class="bug-sum">GET /api/conversations/{id}/events/search and GET /api/conversations/{id}/events/count only match the kind filter against the fully qualified class path (openhands.sdk.event.llm_convertible.message.MessageEvent). The query parameter&#x27;s documentation (e.g., ActionEvent, MessageEvent), the kind field on every event, and the TypeScript client&#x27;s EventSearchOptions.kind all use the bare class name.</p>
+        <div class="bug-ids"><code>F06.search-kind-short</code> <code>F34.events-search-kind</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5635">#5635</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Deleting or sandbox-pausing a conversation leaves its open WebSockets silent instead of closing them</div>
+        <p class="bug-sum">DELETE /api/conversations/{id} and POST /api/conversations/prepare-for-sandbox-pause close the conversation&#x27;s EventService but not the WebSockets subscribed to it. A client on /sockets/events/{id} or /sockets/session/{id} (SDK or TypeScript client) gets no close frame and no further events, so it neither learns of the delete nor reconnects after a pause.</p>
+        <div class="bug-ids"><code>F06.ws-delete-close</code> <code>F07.deleted-close</code> <code>F12.sandbox-pause-websocket</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5639">#5639</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">LLM switched in before the first run is not added to ConversationStats; its tokens and cost are lost</div>
+        <p class="bug-sum">An LLM switched in (POST /api/conversations/{id}/switch_llm, /switch_profile, or LocalConversation.switch_llm()) before the conversation&#x27;s first message or run is never added to ConversationStats. The run uses it, but its tokens and cost are missing from stats.usage_to_metrics and the combined totals, so cost displays and max_budget_per_run miss every call it makes.</p>
+        <div class="bug-ids"><code>F09.switch-llm-before-first-run</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5636">#5636</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">switch_llm returns 200 but keeps the old LLM when the posted usage_id is already registered</div>
+        <p class="bug-sum">POST /api/conversations/{id}/switch_llm answers 200 {&quot;success&quot;: true} but keeps the old LLM when the posted usage_id is already in the conversation&#x27;s LLM registry. Once the agent has initialized (any message, even with run: false), default is registered, and default is what saved profile configs carry and what usage_id falls back to when omitted.</p>
+        <div class="bug-ids"><code>F09.switch-llm-registered-usage-id</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5465">#5465</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Forks are saved without the model keys, so a fork&#x27;s first run fails with LLMAuthenticationError</div>
+        <p class="bug-sum">POST /api/conversations/{id}/fork (also behind RemoteConversation.fork) creates a fork whose persisted agent has no model keys. The server loads the fork&#x27;s agent from that file, so every fork of a conversation whose model needs an API key fails on its first run.</p>
+        <div class="bug-ids"><code>F10.fork-keeps-credentials</code> <code>F10.fork-run-memory</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5627">#5627</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">/goal loop active at a graceful restart stays `running` afterwards instead of `interrupted`</div>
+        <p class="bug-sum">When the agent server shuts down gracefully while a /goal loop is active, the loop is cancelled but no interrupted goal status is recorded. After the restart no loop runs (the conversation is paused), yet the last goal status still says active: true, status: &quot;running&quot;, and /goal/stop cannot clear it.</p>
+        <div class="bug-ids"><code>F11.goal-restart-active</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5638">#5638</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">execute_bash_command returns only the last chunk of output over 1 MiB; null exit_code past 100 chunks</div>
+        <p class="bug-sum">POST /api/bash/execute_bash_command should run a command and return its result, but when the command prints more than 1 MiB the route returns only the last stored BashOutput chunk. Earlier output is dropped without any truncation signal.</p>
+        <div class="bug-ids"><code>F13.execute-large-output</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5539">#5539</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Concurrent download-trajectory requests for one conversation return 500s or truncated zips</div>
+        <p class="bug-sum">GET /api/file/download-trajectory/{conversation_id} builds every request&#x27;s zip at the same path, &lt;conversations_path&gt;/&lt;hex&gt;.zip, and deletes that path after each response. When two requests for the same conversation overlap, one request&#x27;s zip write truncates the file another response is streaming, or one request&#x27;s cleanup deletes the file another request is about to send.</p>
+        <div class="bug-ids"><code>F14.trajectory-concurrent</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5640">#5640</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">download-trajectory returns 404 after POST /api/init sets conversations_path (expected 200 zip)</div>
+        <p class="bug-sum">On a deferred_init (warm-pool) server, POST /api/init can move conversation storage by sending conversations_path. Conversations are then created and persisted under that path, and GET /api/conversations/{id} finds them, but both trajectory download routes look in the launch-time default directory and answer 404.</p>
+        <div class="bug-ids"><code>F14.trajectory-init-path</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5641">#5641</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">GET /api/git/changes returns [] for a non-repo directory holding a repository, not its changes</div>
+        <p class="bug-sum">GET /api/git/changes (and the conversation-scoped GET /api/conversations/{runtime_conversation_id}/git/changes) returns 200 [] when path is a directory that is not itself a git repository but holds a repository one level below it. That is the layout of a repository-backed conversation ({base}/{repo}), so a consumer that passes the workspace root (e.g. a Changes view) shows no changes while the repository has uncommitted edits.</p>
+        <div class="bug-ids"><code>F15.changes-repo-below-path</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5642">#5642</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">git changes returns 400 for a modified file with a space in its name and mangles non-ASCII names</div>
+        <p class="bug-sum">GET /api/git/changes and GET /api/git/commits/{sha}/changes mis-parse file names that contain a space or a non-ASCII character. One modified tracked my notes.md makes the whole request fail with 400, hiding every other change from the client&#x27;s diff view.</p>
+        <div class="bug-ids"><code>F15.changes-special-names</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5623">#5623</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">PUT /api/settings/secrets with &#x27;&#x27; or &#x27;**********&#x27; answers 200 and nulls the secret instead of 422</div>
+        <p class="bug-sum">PUT /api/settings/secrets accepts a value that is empty, whitespace-only or the redaction placeholder **********, answers 200, and saves the secret with a null value. A client form that sends the placeholder back while editing only the description deletes the stored value with no error.</p>
+        <div class="bug-ids"><code>F18.secret-empty-value</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5643">#5643</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">POST /api/settings/mcp/{key} with {} returns 201 and new conversations lose all MCP tools; expected 422</div>
+        <p class="bug-sum">POST /api/settings/mcp/{settings_key} accepts a server body with neither command nor url (for example {}) and stores it as {&quot;enabled&quot;: true}. While that entry exists, every new conversation that uses the stored settings gets no MCP tools at all, including tools from valid servers next to it.</p>
+        <div class="bug-ids"><code>F19.settings-empty-server</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5632">#5632</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Waiting on a locked profile or connection store freezes the whole server; /alive stalls up to 30 s</div>
+        <p class="bug-sum">The /api/profiles, /api/agent-profiles, /api/meta-profiles and /api/llm/provider-connections handlers are async def but call file-locked stores synchronously. A request waiting for a store lock (up to the 30 s timeout) blocks the event loop, so every other route and socket stalls, /alive, /health and /ready included.</p>
+        <div class="bug-ids"><code>F20.store-busy-responsive</code> <code>F21.busy-blocks-server</code> <code>F22.store-busy-responsive</code> <code>F23.store-busy-responsive</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5100">#5100</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Profile validate takes ~120 s for an unreachable base_url and ~27 min for a silent provider</div>
+        <p class="bug-sum">POST /api/profiles/{name}/validate sends its 1-token pre-flight with the posted LLM&#x27;s own retry and timeout policy. With the defaults (num_retries 5, backoff 8/16/32/64 s, timeout 300 s) a closed port takes about 120 s to answer, and a provider that accepts the connection but never replies holds the request for about 27 minutes.</p>
+        <div class="bug-ids"><code>F20.validate-unreachable-bounded</code> <code>F20.validate-hang-bounded</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5624">#5624</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">PATCH provider connection with blank or &quot;**********&quot; api_key returns 200 and replaces the key, not 422</div>
+        <p class="bug-sum">PATCH /api/llm/provider-connections/{id} refuses {&quot;api_key&quot;: null} (&quot;api_key cannot be cleared&quot;), but accepts &quot;&quot;, whitespace-only strings and the redacted placeholder ********** with 200. Blank values clear the shared key; the placeholder is stored as the literal key.</p>
+        <div class="bug-ids"><code>F23.conn-patch-blank-key</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5644">#5644</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">/api/profiles/{name}/validate ignores provider_connection_id: linked draft valid:false, expected true</div>
+        <p class="bug-sum">POST /api/profiles/{name}/validate does not resolve provider_connection_id. A draft profile that links to a saved provider connection, with no inline key, is checked without any key and reported as valid: false with an authentication error, even when the connection holds a working key.</p>
+        <div class="bug-ids"><code>F23.validate-linked-draft</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5645">#5645</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Skill/Canvas install with an unknown ref returns 200 when the git source is cached (expected 400)</div>
+        <p class="bug-sum">POST /api/skills/install and POST /api/canvas-extensions/install reject a ref the git source does not have (400) only on the first fetch of that source. Once its clone is in the extensions cache, the same request answers 200, installs whatever commit the cache has checked out, and records the missing ref as requested_ref.</p>
+        <div class="bug-ids"><code>F25.install-unknown-ref</code> <code>F28.install-ref-cached</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/4665">#4665</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">GET /api/skills/marketplace returns an empty list instead of the ~70 OpenHands/extensions entries</div>
+        <p class="bug-sum">GET /api/skills/marketplace returns {&quot;skills&quot;: []} on every agent server running the default configuration, so a client&#x27;s Marketplace tab shows no installable skills. The public OpenHands/extensions repository lists about 70 entries (73 plugins at d008b81) in .plugin/marketplace.json, but the skills catalog only proceeds when marketplaces/default.json exists, and that file is no longer in the repository.</p>
+        <div class="bug-ids"><code>F25.marketplace-public</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5628">#5628</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Resumed conversation keeps a since-disabled plugin&#x27;s skills and commands; only its hooks are dropped</div>
+        <p class="bug-sum">An enabled installed plugin loads into a conversation at its first message. If the plugin is then disabled and the agent server restarts, the resumed conversation drops the plugin&#x27;s hooks but keeps its skills and commands.</p>
+        <div class="bug-ids"><code>F26.conversation-resume-disabled</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/4080">#4080</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Unimportable tool module on resume makes event routes 500 &#x27;Unknown kind&#x27; instead of dropping the tool</div>
+        <p class="bug-sum">A conversation created with tool_module_qualnames stores events whose kinds come from that module. If the module cannot be imported after a restart, _prepare_persisted_runtime logs Failed to import module ...</p>
+        <div class="bug-ids"><code>F27.custom-tool-missing-on-resume</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5630">#5630</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Sub-agent file naming a missing skill makes the first message return 500 instead of being skipped</div>
+        <p class="bug-sum">A file-based sub-agent whose frontmatter skills names a skill that does not exist breaks every conversation that loads it. POST /api/sub-agents lists the agent as valid, but the conversation&#x27;s first message returns 500, and so does every later one.</p>
+        <div class="bug-ids"><code>F27.subagents-bad-skill</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5637">#5637</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Canvas backend outlives a SIGKILLed agent-server; restart reports it stopped and starts a second one</div>
+        <p class="bug-sum">Canvas App backends run in their own session and are tracked only in memory. If the agent-server dies without its lifespan teardown (SIGKILL, OOM kill, crash), the backend survives with ppid 1 and the restarted server loses track of it.</p>
+        <div class="bug-ids"><code>F28.hard-restart-orphan</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5634">#5634</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">App backend status hangs holding the app lock when a child outlives the leader; expected unhealthy</div>
+        <p class="bug-sum">If a Canvas App backend&#x27;s leader exits while a child it spawned still holds the inherited stdout/stderr pipes, GET /api/canvas-extensions/installed/{name}/backend waits for the child to exit, holding the app&#x27;s lifecycle lock. A backend that spawns a helper and then crashes wedges its app: the Canvas UI polls status, and stop cannot run.</p>
+        <div class="bug-ids"><code>F28.status-exit-hang</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5646">#5646</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Canvas App backend stays &#x27;unhealthy&#x27; after one slow health probe instead of returning to &#x27;ready&#x27;</div>
+        <p class="bug-sum">GET /api/canvas-extensions/installed/{name}/backend probes a ready backend&#x27;s health path with a 1 s timeout. A single slow answer sets the state to unhealthy and it stays there: later status calls never probe again, even though the process is alive and /health answers at once.</p>
+        <div class="bug-ids"><code>F28.status-probe-latch</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5648">#5648</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">/app-backends WebSocket bridge negotiates no subprotocol (expected the backend&#x27;s choice, qa.v1)</div>
+        <p class="bug-sum">The Canvas App backend bridge (WS /app-backends/{name}/{path}) does not negotiate WebSocket subprotocols: the client&#x27;s Sec-WebSocket-Protocol offer is not forwarded to the app&#x27;s backend, and the bridge&#x27;s 101 response selects none. Browsers fail such a handshake (Chrome: &quot;Sent non-empty &#x27;Sec-WebSocket-Protocol&#x27; header but no response was received&quot;), so a Canvas App whose frontend uses a subprotocol (graphql-ws, many terminal protocols) cannot reach its backend over WebSocket.</p>
+        <div class="bug-ids"><code>F29.ws-subprotocol</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5647">#5647</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">Continued /v1/chat/completions turn reports conversation-total usage (13/7/20), not its own (3/2/5)</div>
+        <p class="bug-sum">POST /v1/chat/completions sent with X-OpenHands-ServerConversation-ID (continuing an existing conversation) returns a usage object holding the conversation&#x27;s running total across all earlier turns, not the tokens spent by that request. A client that sums usage per request (billing, quotas, dashboards) re-counts every earlier turn on each continued turn.</p>
+        <div class="bug-ids"><code>F30.chat-usage-per-request</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5629">#5629</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">A second server&#x27;s first load of a shared conversation reverts meta.json to its stale startup copy</div>
+        <p class="bug-sum">With two agent servers on one conversations directory, the second reads every meta.json once at startup. Its first load of a conversation (takeover from a dead owner, or a claim after the owner released it) starts from that copy and writes it back to meta.json.</p>
+        <div class="bug-ids"><code>F31.takeover-keeps-metadata</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5652">#5652</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">RemoteState confirmation_policy/security_analyzer/agent fail or return None on the second read</div>
+        <p class="bug-sum">On a RemoteConversation, state.confirmation_policy, state.security_analyzer and state.agent are right only on the first read after the cache is filled: that read strips kind from the cached dicts, so later reads raise or return None. Any SDK client that checks confirmation mode or the agent more than once between server snapshots gets exceptions or wrong answers.</p>
+        <div class="bug-ids"><code>F33.conversation-state-reread</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5651">#5651</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">ConversationEventStream on Node 22 WebSocket stops after one refused reconnect instead of backing off</div>
+        <p class="bug-sum">ConversationEventStream with reconnect: { enabled: true } stops retrying after its first refused reconnect attempt when it runs on Node 22&#x27;s global WebSocket. Every agent-server restart produces such an attempt, so a Node consumer loses its event stream for good.</p>
+        <div class="bug-ids"><code>F34.event-stream-reconnect-native</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5649">#5649</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">TS ConversationManager.createConversation ignores maxIterations/stuckDetection (server gets 500/true)</div>
+        <p class="bug-sum">ConversationManager.createConversation(agent, { maxIterations, stuckDetection }) in the TypeScript client (@openhands/typescript-client) accepts both options but never sends them. The server always creates the conversation with max_iterations: 500 and stuck_detection: true.</p>
+        <div class="bug-ids"><code>F34.manager-create-options</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5650">#5650</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">TS RemoteWorkspace.downloadAsBlob/fileDownload return 11 mangled bytes for a 5-byte binary file</div>
+        <p class="bug-sum">RemoteWorkspace.fileDownload() in the TypeScript client fetches GET /api/file/download without a responseType, so the transport decodes the application/octet-stream body as UTF-8 text. Every invalid UTF-8 sequence becomes U+FFFD, so fileDownload(), downloadAsBlob() and the browser downloadAndSave() silently return corrupted content for any binary file, in Node and in browsers.</p>
+        <div class="bug-ids"><code>F34.workspace-binary-download</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="open">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/4846">#4846</a><span class="pill sev-medium">medium</span><span class="pill st-open">open</span></div>
+        <div class="bug-title">TS WebSocket callback and bash clients never connect in Node: require(&#x27;ws&#x27;) is undefined in ESM build</div>
+        <p class="bug-sum">In Node, RemoteConversation.startWebSocketClient() (via WebSocketCallbackClient) and BashWebSocketClient never open a socket. Both pick a constructor at import time from window.WebSocket or require(&#x27;ws&#x27;); the package is ESM-only, so require is undefined, the error is swallowed, and Node 22&#x27;s global WebSocket is never tried.</p>
+        <div class="bug-ids"><code>F34.ws-callback-client</code> <code>F34.bash-websocket</code></div>
+      </li>
+      <li class="bug" data-sev="medium" data-status="fixed">
+        <div class="bug-head"><a href="https://github.com/OpenHands/software-agent-sdk/issues/5514">#5514</a><span class="pill sev-medium">medium</span><span class="pill st-fixed">fixed</span></div>
+        <div class="bug-title">RemoteWorkspace.get_llm on a provider-linked profile lacks the connection&#x27;s API key; run fails auth</div>
+        <p class="bug-sum">RemoteWorkspace.get_llm(profile_name=...) for a profile linked to a provider connection returns an LLM with api_key=None and without the connection&#x27;s base_url. A conversation built on it fails with LLMAuthenticationError, though activating the same profile runs on the connection&#x27;s key. get_llm() with a linked active_profile takes the same path.</p>
+        <div class="bug-ids"><code>F20.sdk-get-llm-linked</code></div>
+      </li>
+    </ul>
+    <footer>Status as of 9 October 2026. Severity is the mapping pass's estimate; the issues have the details.</footer>
+  </main>
+  <script>
+    const buttons = document.querySelectorAll(".filters button");
+    buttons.forEach((b) => b.addEventListener("click", () => {
+      buttons.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      const f = b.dataset.f;
+      document.querySelectorAll(".bug").forEach((li) => {
+        li.hidden = !(f === "all" || li.dataset.sev === f || li.dataset.status === f);
+      });
+    }));
+  </script>
+</body>
+</html>
