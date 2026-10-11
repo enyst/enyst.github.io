@@ -9,7 +9,15 @@ The generator preserves every behavior ID and checks literal command fidelity.
 Reviewed CLI screenshots and their provenance live in `assets/openhands-features/`;
 the `capture-*.json` manifests attach media beneath the corresponding recipes.
 New captures must match the selected source revision. The delimited OpenHands
-features section in the homepage is generated; other homepage content is retained.
+features section in [`verify/index.html`](verify/index.html), the verification
+table of contents, is generated; the rest of that page is retained. The homepage
+links to it with a single card.
+
+The [verification table of contents](verify/index.html) gathers the OpenHands
+agent-sdk verification work: the explainer video in
+`experiments/verify-agent-sdk-explainer/` (Manim scene, music and stills), the
+Agent Server map and its bug tracker, the core SDK map in progress, and the
+OpenHands app map.
 
 The [verification findings](arch/verify-openhands-issues.html) are a dated GitHub
 status and evidence snapshot. Update `assets/verify-openhands/issues.json`, then
