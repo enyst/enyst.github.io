@@ -2,6 +2,13 @@
 
 Architecture-page maintenance follow-ups: [`OPENHANDS_DOC_STATUS.md`](OPENHANDS_DOC_STATUS.md).
 
+The [Agentic linting refactoring page](arch/agentic-linting-refactoring.html)
+tracks the staged Canvas lint rollout and its next steps. Its Before/After
+video, direct MP4 download, captions, and provenance are stored in
+`experiments/agentic-linting-refactoring/`. Rule scopes and PR statuses are
+a dated snapshot; update the source revision and `progress.json` together
+with the page when refreshing them.
+
 The [OpenHands feature map](openhands-features/index.html) is a static snapshot
 of the maintained upstream recipes. Regenerate it from a clean, selected
 OpenHands revision with `python scripts/build-openhands-features.py --checkout ../playground`.
