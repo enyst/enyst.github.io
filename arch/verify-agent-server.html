@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10110f">
+  <title>A map that keeps itself honest — OpenHands Agent Server verification</title>
+  <meta name="description" content="How verify-agent-server lets an agent drive the real OpenHands Agent Server feature by feature: a control CLI, an executable map of 930 behaviors, and known bugs kept as expected failures. With a short film and the full replay results.">
+  <meta property="og:title" content="A map that keeps itself honest">
+  <meta property="og:description" content="A control CLI, an executable feature map, and known bugs as expected failures: verifying the OpenHands Agent Server the way agents use it.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/verify-agent-server.html">
+  <meta property="og:image" content="https://enyst.github.io/experiments/agent-server-feature-map-video/stills/frame-89s.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://enyst.github.io/arch/verify-agent-server.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/verify-openhands/presentation.css">
+  <script src="../assets/verify-openhands/presentation.js" defer></script>
+  <style>
+    .film { margin: 0; }
+    .film video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; background: #0f0f0e; border: 1px solid var(--line, #2a2a26); border-radius: 10px; }
+    .film figcaption { margin-top: .6rem; }
+    .hero-grid.film-hero { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: center; }
+    @media (max-width: 860px) { .hero-grid.film-hero { grid-template-columns: 1fr; } }
+    .status-row { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#presentation">Skip to presentation</a>
+<header class="topbar">
+  <a class="brand-link" href="../index.html">EN <span>/ field notes</span></a>
+  <nav class="chapter-links" aria-label="Presentation chapters">
+    <a href="#film">The film</a><a href="#parts">The parts</a><a href="#map">The map</a><a href="#known-bugs">Known bugs</a><a href="#results">The results</a><a href="#sources">Sources</a>
+  </nav>
+  <button id="present-toggle" type="button" aria-pressed="false">Present</button>
+</header>
+<div class="reading-progress" aria-hidden="true"><span id="reading-progress"></span></div>
+<main id="presentation">
+
+<section class="slide" id="film" data-title="A map that keeps itself honest" aria-labelledby="title">
+  <div class="slide-inner">
+    <p class="eyebrow">OpenHands / Agent Server verification <span class="section-number">01 / 10</span></p>
+    <div class="hero-grid film-hero">
+      <div>
+        <h1 id="title">A map that keeps<br>itself <em>honest.</em></h1>
+        <p class="lead">Drive the real server. Know what you should see. Tell a stale instruction from a real bug.</p>
+        <p><code>verify-agent-server</code> lets an agent drive the OpenHands Agent Server, the API that agents and programs use, feature by feature, through the same routes and clients they use. It is built by agents, for agents, and works at their speed.</p>
+        <p class="small muted">The <code>verify-agent-server</code> story · Engel Nyst<br>Software Agent SDK <a href="https://github.com/OpenHands/software-agent-sdk/pull/5621">PR #5621</a> · results from the full replay on 9 October 2026</p>
+        <a class="text-link" href="#problem">Read it as a story <span aria-hidden="true">↓</span></a>
+      </div>
+      <figure class="film">
+        <video controls preload="metadata" playsinline poster="../experiments/agent-server-feature-map-video/stills/frame-8s.png">
+          <source src="../experiments/agent-server-feature-map-video/agent-server-feature-map.mp4" type="video/mp4">
+          <a href="../experiments/agent-server-feature-map-video/agent-server-feature-map.mp4">Download the film (MP4, 2:29)</a>
+        </video>
+        <figcaption class="small muted">A 2½-minute film, animated with John Lasseter’s principles of animation, with a generated score. Its <a href="https://github.com/enyst/enyst.github.io/blob/main/experiments/agent-server-feature-map-video/storyboard.md">storyboard</a> and <a href="https://github.com/enyst/enyst.github.io/tree/main/experiments/agent-server-feature-map-video">source</a> are open.</figcaption>
+      </figure>
+    </div>
+    <ol class="hero-loop" aria-label="The verification loop"><li><span>01</span> Launch a fresh server</li><li><span>02</span> Drive the real API</li><li><span>03</span> Check what it answers</li><li><span>04</span> Keep the evidence</li></ol>
+  </div>
+</section>
+
+<section class="slide" id="problem" data-title="A large API, covered in parts" aria-labelledby="problem-title">
+  <div class="slide-inner">
+    <p class="eyebrow">The problem <span class="section-number">02 / 10</span></p>
+    <h2 id="problem-title">203 routes.<br>How do you know it all works?</h2>
+    <p class="lead">The Agent Server is what agents and programs drive: about 190 REST and WebSocket routes on the default app, 203 with Docker runtime mode, plus webhooks, telemetry, and the Python SDK and TypeScript clients that consume them.</p>
+    <div class="three-col">
+      <article><h3>Unit tests</h3><p>Check handlers and models in isolation, with no live server behind them.</p></article>
+      <article><h3>OpenAPI breakage check</h3><p>Catches changes to the published contract, not changes in behavior.</p></article>
+      <article><h3>Live-server tests</h3><p>Exercise a real server, for a selection of paths.</p></article>
+    </div>
+    <p class="callout"><strong>Each covered part of it.</strong> None gave an agent a single place to drive the real server end to end, know what it should observe, and tell a stale instruction from a real product bug.</p>
+  </div>
+</section>
+
+<section class="slide" id="parts" data-title="Three parts that work together" aria-labelledby="parts-title">
+  <div class="slide-inner">
+    <p class="eyebrow">The design <span class="section-number">03 / 10</span></p>
+    <h2 id="parts-title">A lever, a map,<br>and a way to keep it true.</h2>
+    <p class="lead">A contributor skill under <code>.agents/skills/verify-agent-server/</code>, adapted from Lauren Tan’s pstack verification skills, which OpenHands already used for <a href="verify-openhands.html">its Agent Canvas UI</a>.</p>
+    <div class="layer-list">
+      <article><span class="number">01</span><div><h3>The control CLI</h3><p><strong>How do I drive this checkout?</strong> Isolated servers, any REST route or WebSocket with assertions, fixtures for everything around the API, and evidence with secrets redacted.</p></div><code>control-agent-server</code></article>
+      <article><span class="number">02</span><div><h3>The executable feature map</h3><p><strong>What should happen?</strong> 34 families, 930 stable sub-feature IDs, and every agent-facing route owned by exactly one family. Each bullet carries a shell recipe that proves it on a fresh server.</p></div><code>references/feature-map/</code></article>
+      <article><span class="number">03</span><div><h3>Known bugs as expected failures</h3><p><strong>What is broken today?</strong> A known bug’s failing assertion is marked <code># bug</code>. The replay expects it to fail, and flags the day it stops failing.</p></div><code># bug → xfail / xpass</code></article>
+      <article><span class="number">04</span><div><h3>Maintenance levers</h3><p><strong>How does it stay true?</strong> Route coverage, recipe parse checks, route-table diffs between commits, owner lookup for changed files, and a cross-repo test guarding the structure.</p></div><code>map coverage · check · diff · owners</code></article>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="lever" data-title="One CLI drives the real server" aria-labelledby="lever-title">
+  <div class="slide-inner">
+    <p class="eyebrow">The lever <span class="section-number">04 / 10</span></p>
+    <h2 id="lever-title">Every step is a command<br>the next agent can rerun.</h2>
+    <div class="two-col">
+      <div>
+        <p class="lead"><code>control-agent-server</code> launches this checkout as an isolated server: its own HOME, persistence directory, keys and port.</p>
+        <p>It reaches every route through <code>api</code> and <code>ws</code>, with <code>--expect</code> for status codes and <code>--check</code> for what comes back. It arranges what the API needs around it: git repositories, skills, plugins, MCP servers, webhook sinks, and a scripted LLM stub.</p>
+        <p>Model-backed recipes run on DeepSeek, an open-weights model, through the server’s own pre-flight. Every command prints one JSON object, and saved exchanges have their secrets redacted.</p>
+      </div>
+      <div class="code-window">
+        <header><span>From a Software Agent SDK checkout</span><button class="copy-code" type="button">Copy</button></header>
+        <pre><code>export PATH="$PWD/.agents/skills/verify-agent-server/scripts:$PATH"
+export AGENT_SERVER_VERIFY_RUN=$(control-agent-server launch --new --print-run)
+control-agent-server doctor
+
+control-agent-server api PUT /api/settings/secrets \
+  --json '{"name": "QA_F18_TOKEN", "value": "**********"}' \
+  --expect 200,422
+control-agent-server api GET /api/settings/secrets/QA_F18_TOKEN \
+  --expect 200 --check . eq "$QA_F18_SECRET"   # bug</code></pre>
+      </div>
+    </div>
+    <p class="callout"><strong>No untracked one-off scripts.</strong> If a path cannot be driven with the CLI, that is a harness gap: extend the CLI, prove it live, then write the recipe, so the next agent can rerun it.</p>
+    <p class="source-note">Adapted from <a href="https://github.com/OpenHands/software-agent-sdk/blob/cee9a8bb8a392bd382a8d742b76d5b1c856fb2b4/.agents/skills/verify-agent-server/SKILL.md">SKILL.md</a> and the <code>F18.secret-empty-value</code> recipe at the PR head.</p>
+  </div>
+</section>
+
+<section class="slide" id="map" data-title="Every agent-facing feature, written down and runnable" aria-labelledby="map-title">
+  <div class="slide-inner">
+    <p class="eyebrow">An executable inventory <span class="section-number">05 / 10</span></p>
+    <h2 id="map-title">The unit is a behavior<br>an API consumer can observe.</h2>
+    <div class="metrics"><dl><div><dt>feature families</dt><dd>34</dd></div><div><dt>sub-feature IDs</dt><dd>930</dd></div><div><dt>routes owned and driven</dt><dd>193 / 203</dd></div></dl></div>
+    <div class="two-col">
+      <div class="map-groups">
+        <details><summary>Server and sessions <span>52</span></summary><p>Server status, auth and sessions, deferred init (warm pool). F01–F03.</p></details>
+        <details><summary>Conversations <span>216</span></summary><p>Lifecycle; run, pause and interrupt; events; the session socket; confirmation, security and secrets; model switching and plugins; fork, navigate, condense and ask; goals. F04–F11.</p></details>
+        <details><summary>Workspace and runtime <span>167</span></summary><p>Runtime and credentials, bash, files, git, workspace serving and VS Code, the workspaces registry. F12–F17.</p></details>
+        <details><summary>Settings, models and profiles <span>194</span></summary><p>Settings and secrets, MCP, LLM profiles, agent profiles, meta profiles, the LLM catalog and connections, OpenAI subscription. F18–F24.</p></details>
+        <details><summary>Extensions <span>147</span></summary><p>Skills, plugins, hooks, subagents and tools, Canvas extensions, the app backend bridge. F25–F29.</p></details>
+        <details><summary>Gateway, persistence and delivery <span>79</span></summary><p>The OpenAI-compatible gateway, persistence and limits, webhooks and telemetry. F30–F32.</p></details>
+        <details><summary>Clients <span>75</span></summary><p>The Python SDK remote client and the TypeScript client. F33–F34.</p></details>
+      </div>
+      <div class="code-window map-anatomy">
+        <header><span>F18-settings-and-secrets.md · one bullet</span></header>
+        <pre><code>- `F18.secret-empty-value`: a PUT whose value
+  is empty or the redaction placeholder must
+  not leave a listed but unreadable secret or
+  wipe an existing value.
+
+# The recipe, run on a fresh server:
+GET  …/secrets/QA_F18_TOKEN  --check . eq …  # control
+PUT  /api/settings/secrets  value "**********"
+GET  …/secrets/QA_F18_TOKEN  --check . eq …  # bug
+
+# Today: 200 on the PUT, then 404
+# "Secret not found". Filed as #5623.</code></pre>
+      </div>
+    </div>
+    <p class="callout"><strong>Every route has one owner.</strong> <code>map coverage</code> checks that each agent-facing route belongs to exactly one family and that a recipe drives it: 193 of 203 do, and 10 are excluded on purpose, each with its reason.</p>
+    <p class="source-note">Counts from <a href="https://github.com/OpenHands/software-agent-sdk/blob/cee9a8bb8a392bd382a8d742b76d5b1c856fb2b4/.agents/skills/verify-agent-server/references/feature-map/README.md">the map index</a> at the PR head; the groups above are presentation groupings and add up to the 930 IDs.</p>
+  </div>
+</section>
+
+<section class="slide" id="known-bugs" data-title="Known bugs fail on purpose" aria-labelledby="known-title">
+  <div class="slide-inner">
+    <p class="eyebrow">A living contract <span class="section-number">06 / 10</span></p>
+    <h2 id="known-title">A bug the map knows about<br>fails on purpose, until it doesn’t.</h2>
+    <div class="two-col">
+      <div class="finding-list">
+        <article><h3>While the bug lasts: xfail</h3><p>The replay reproduces it and reports an expected failure. The run stays green, and the bug stays visible.</p></article>
+        <article><h3>The day it is fixed: xpass</h3><p>The assertion passes and the replay reports an unexpected pass: <code>known bug no longer reproduces: update the map</code>. The run fails until someone drops the marker and the bullet starts guarding the fix.</p></article>
+        <article><h3>Outside the marker: a real failure</h3><p>If a known-bug bullet fails before its <code># bug</code> line, the arrange steps broke and the bug was not reproduced. The replay says so.</p></article>
+      </div>
+      <div>
+        <p class="lead">It already happened once, while the map was being written.</p>
+        <p>Upstream <a href="https://github.com/OpenHands/software-agent-sdk/pull/4952">PR #4952</a> fixed <code>RemoteWorkspace.get_llm()</code> on provider-linked profiles (<a href="https://github.com/OpenHands/software-agent-sdk/issues/5514">#5514</a>). The next replay flagged <code>F20.sdk-get-llm-linked</code> as an unexpected pass, and the map was updated: the bullet now checks that the linked-profile conversation finishes on the connection’s key.</p>
+        <div class="status-row"><span class="tag proposed">xfail · #5514</span><span class="tag">→ xpass</span><span class="tag success">pass · map updated</span></div>
+      </div>
+    </div>
+    <p class="callout"><strong>A living contract, not a snapshot.</strong> Fixes cannot slip by unnoticed, and the map cannot quietly keep describing a bug that is gone.</p>
+  </div>
+</section>
+
+<section class="slide" id="built" data-title="Written and proven by agents" aria-labelledby="built-title">
+  <div class="slide-inner">
+    <p class="eyebrow">How it was built <span class="section-number">07 / 10</span></p>
+    <h2 id="built-title">A full agentic run,<br>checked by agents.</h2>
+    <ol class="maintenance-flow">
+      <li><span>01</span><h3>Authors</h3><p>Agents mapped each family in parallel and proved every recipe live on the real server.</p></li>
+      <li><span>02</span><h3>Reviewers</h3><p>Independent agents re-drove each family on fresh servers, without the authors’ state.</p></li>
+      <li><span>03</span><h3>A critic</h3><p>A completeness critic looked for routes, consumers and behaviors no family covered yet.</p></li>
+      <li><span>04</span><h3>Hardening</h3><p>A pass added explicit <code># bug</code> assertions, then a full fresh replay of all 34 families.</p></li>
+    </ol>
+    <p class="source-note">Each family replays on its own fresh server with the launch flags its file declares: <code>control-agent-server map run --all --fresh --keep-going --record</code>.</p>
+  </div>
+</section>
+
+<section class="slide" id="results" data-title="What the replay found" aria-labelledby="results-title">
+  <div class="slide-inner">
+    <p class="eyebrow">The evidence <span class="section-number">08 / 10</span></p>
+    <h2 id="results-title">771 pass. 156 known bugs reproduced.<br>Zero surprises.</h2>
+    <div class="metrics"><dl><div><dt>pass</dt><dd>771</dd></div><div><dt>expected failures: known bugs reproduced</dt><dd>156</dd></div><div><dt>blocked</dt><dd>6</dd></div></dl></div>
+    <p class="lead">No failures and no unexpected passes in any of the 34 families. About 135 product bugs are recorded as known-bug bullets: 1 high, 37 medium, 89 low, 8 trivial. The six blocked rows need Docker, a GitHub token, the VS Code binary, or a human ChatGPT login.</p>
+    <div class="two-col">
+      <div class="finding-list">
+        <article><h3>State that isn’t saved, or comes back stale</h3><p>A pause during a model call isn’t persisted; a <code>/goal</code> loop still reads “running” after a restart.</p></article>
+        <article><h3>Data loss on key change (the one high)</h3><p>After the cipher key changes, writes answer 200 and permanently null stored secrets instead of refusing with 409.</p></article>
+        <article><h3>Validation gaps</h3><p>Blank or masked API keys accepted over real ones; an empty MCP server config accepted, so new conversations lose all MCP tools.</p></article>
+        <article><h3>Responsiveness</h3><p>One failed run blocks the event loop for about 5 s; a locked profile store can freeze the server for up to 30 s.</p></article>
+      </div>
+      <div class="finding-list">
+        <article><h3>WebSocket and process lifecycle</h3><p>Deleted conversations leave sockets silent; Canvas app backends outlive a killed server; the bridge drops the WebSocket subprotocol.</p></article>
+        <article><h3>Server and client contracts</h3><p>Event search matches only full class paths; per-request usage reports conversation totals; the TypeScript client mangles binary downloads.</p></article>
+        <article><h3>Git and file edge cases</h3><p>Repositories below a path are ignored; filenames with spaces or non-ASCII characters are mangled; large command output is truncated.</p></article>
+      </div>
+    </div>
+    <p class="callout"><strong>31 new issues, 6 existing ones reproduced, one umbrella.</strong> Issues #5622–#5652 were filed, six earlier issues got a comment with the map’s reproduction, and all of them are gathered in <a href="https://github.com/OpenHands/software-agent-sdk/issues/5653">#5653</a>. The <a href="agent-server-bug-tracker.html">bug tracker</a> lists each one with its severity, status and map IDs.</p>
+    <p class="source-note">Counts from <a href="https://github.com/OpenHands/software-agent-sdk/blob/cee9a8bb8a392bd382a8d742b76d5b1c856fb2b4/.pr/verify-agent-server-replay.md">the replay report</a>, run on commit <code>f688c8d</code>. Security-relevant findings were reported privately. Four small hardening PRs came out of them: <a href="https://github.com/OpenHands/software-agent-sdk/pull/5657">#5657</a> keeps provider credentials out of completion logs, <a href="https://github.com/OpenHands/software-agent-sdk/pull/5659">#5659</a> ignores empty session API keys, <a href="https://github.com/OpenHands/software-agent-sdk/pull/5660">#5660</a> treats an empty <code>OH_SECRET_KEY</code> as unset, and <a href="https://github.com/OpenHands/software-agent-sdk/pull/5661">#5661</a> keeps sockets and <code>/v1</code> closed until deferred init completes. A review of community PR <a href="https://github.com/OpenHands/software-agent-sdk/pull/4813">#4813</a> by BSmick6 found five follow-ups, offered as fixes on a branch.</p>
+  </div>
+</section>
+
+<section class="slide" id="inspiration" data-title="Inspired by pstack" aria-labelledby="inspiration-title">
+  <div class="slide-inner">
+    <p class="eyebrow">Credit where it belongs <span class="section-number">09 / 10</span></p>
+    <h2 id="inspiration-title">The idea came from pstack.</h2>
+    <div class="two-col">
+      <div>
+        <p class="lead">Lauren Tan’s (<a href="https://github.com/poteto">@poteto</a>) <a href="https://github.com/cursor/plugins/tree/main/pstack">pstack</a> treats verification as infrastructure that other agent workflows can build on.</p>
+        <p>OpenHands first applied it to the Agent Canvas UI with <a href="verify-openhands.html"><code>verify-openhands</code></a>: a browser-driven map of what a user can do. <code>verify-agent-server</code> applies the same pattern one layer down, to the API that agents and programs drive.</p>
+      </div>
+      <div class="finding-list">
+        <article><h3>Same pattern, different consumer</h3><p>The UI map proves what a person sees after a click. The API map proves what an agent, the SDK or the TypeScript client sees after a request.</p></article>
+        <article><h3>What this map adds</h3><p>Known bugs as executable expected failures, single ownership of every route, and route-table diffs that show which families a change touches.</p></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide closing" id="sources" data-title="Run it" aria-labelledby="sources-title">
+  <div class="slide-inner">
+    <p class="eyebrow">Open source, reproducible <span class="section-number">10 / 10</span></p>
+    <h2 id="sources-title" class="closing-title">Every feature and every known bug,<br>replayed on a fresh server.</h2>
+    <div class="code-window">
+      <header><span>From a Software Agent SDK checkout with the PR</span><button class="copy-code" type="button">Copy</button></header>
+      <pre><code>make build
+export PATH="$PWD/.agents/skills/verify-agent-server/scripts:$PATH"
+control-agent-server map run --all --fresh</code></pre>
+    </div>
+    <div class="source-grid">
+      <article><h3>Start here</h3><ul><li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5621">PR #5621: verify-agent-server</a></li><li><a href="https://github.com/OpenHands/software-agent-sdk/blob/cee9a8bb8a392bd382a8d742b76d5b1c856fb2b4/.agents/skills/verify-agent-server/SKILL.md">The skill</a></li><li><a href="https://github.com/OpenHands/software-agent-sdk/blob/cee9a8bb8a392bd382a8d742b76d5b1c856fb2b4/.agents/skills/verify-agent-server/references/feature-map/README.md">The feature map index</a></li></ul></article>
+      <article><h3>Check the evidence</h3><ul><li><a href="https://github.com/OpenHands/software-agent-sdk/blob/cee9a8bb8a392bd382a8d742b76d5b1c856fb2b4/.pr/verify-agent-server-replay.md">The full replay, family by family</a></li><li><a href="agent-server-bug-tracker.html">The Agent Server bug tracker</a></li><li><a href="https://github.com/OpenHands/software-agent-sdk/issues/5653">Umbrella issue #5653</a></li></ul></article>
+      <article><h3>The film</h3><ul><li><a href="../experiments/agent-server-feature-map-video/agent-server-feature-map.mp4">Watch or download (MP4, 2:29)</a></li><li><a href="https://github.com/enyst/enyst.github.io/blob/main/experiments/agent-server-feature-map-video/storyboard.md">Storyboard and animation principles</a></li><li><a href="verify-openhands.html">The sister story: verify-openhands</a></li></ul></article>
+    </div>
+    <p class="source-note">This page describes PR #5621 as checked on 11 October 2026, while it is open. Source links are pinned to its head commit; PR and issue links carry their current status.</p>
+    <p class="small"><a href="../index.html">← Engel’s Code Design Notebook</a> <span class="muted">· Static HTML, real evidence.</span></p>
+  </div>
+</section>
+</main>
+<nav class="footer-nav" aria-label="Slide controls"><span class="slide-hint">Arrow keys · scroll for detail</span><button id="prev-slide" type="button" aria-label="Previous slide">←</button><span id="slide-counter" aria-live="polite">01 / 10</span><button id="next-slide" type="button" aria-label="Next slide">→</button><button id="exit-presentation" type="button">Exit presentation</button></nav>
+</body>
+</html>
