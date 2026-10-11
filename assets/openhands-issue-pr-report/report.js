@@ -25,8 +25,8 @@
       if (show) visible++;
     }
     document.getElementById('open-result').textContent = visible
-      ? `${visible} of 59 open issues shown.`
-      : 'No open issues match these filters. Clear the filters to see all 59.';
+      ? `${visible} of ${openRows.length} open issues shown.`
+      : `No open issues match these filters. Clear the filters to see all ${openRows.length}.`;
   }
 
   function filterWeek() {
@@ -47,8 +47,8 @@
       group.hidden = ![...group.querySelectorAll('.closure-row')].some(row => !row.hidden);
     }
     document.getElementById('week-result').textContent = visible
-      ? `${visible} of 67 closures shown. The enyst / smolpaws list can be expanded below.`
-      : 'No closures match these filters. Clear the filters to see all 67.';
+      ? `${visible} of ${weekRows.length} closures shown. The enyst / smolpaws list can be expanded below.`
+      : `No closures match these filters. Clear the filters to see all ${weekRows.length}.`;
   }
 
   for (const [form, update] of [[openForm, filterOpen], [weekForm, filterWeek]]) {
