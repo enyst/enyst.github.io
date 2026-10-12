@@ -44,6 +44,11 @@
         <div class="card-desc">Feature maps written for agents, a CLI that drives the real server, and known bugs kept as expected failures. Start with a two-minute explainer video, then the Agent Server map and its bug tracker, the core SDK map in progress, and the OpenHands app map.</div>
         <span class="card-tag tag-report">video + table of contents · 11 October 2026</span>
       </a>
+      <a class="card" href="experiments/agent-server-feature-map-video/video.html">
+        <div class="card-title">The map that keeps itself honest</div>
+        <div class="card-desc">A short film about the verify-agent-server skill and the evidence-backed feature map it keeps tied to the running server.</div>
+        <span class="card-tag tag-report">film · Agent Server verification</span>
+      </a>
     </div>
 
     <h2 id="investigations">Investigations &amp; dashboards</h2>
@@ -108,6 +113,21 @@
         <div class="card-title">The Mention Gazette</div>
         <div class="card-desc">A daily newspaper of where I was pinged on GitHub — review requests and mentions first, the rest below. Regenerated each morning.</div>
         <span class="card-tag tag-daily">daily</span>
+      </a>
+      <a class="card" href="pr-reviews.html">
+        <div class="card-title">PR review log</div>
+        <div class="card-desc">A dated record of scheduled AI code reviews posted on behalf of Engel Nyst, with the reviewed pull request, commit, review, and summary.</div>
+        <span class="card-tag tag-data">review archive</span>
+      </a>
+      <a class="card" href="field-notes/index.html">
+        <div class="card-title">Field notes</div>
+        <div class="card-desc">Autonomous investigations by OpenHands, selected from public code and discussions.</div>
+        <span class="card-tag tag-report">field notes</span>
+      </a>
+      <a class="card" href="field-notes/field-note-openhands-software-agent-sdk-pr-5164.html">
+        <div class="card-title">A host gateway name is only half of an agent’s service-discovery contract</div>
+        <div class="card-desc">A source-grounded look at Docker networking, Canvas-advertised service URLs, and the context an agent uses to reach host services, based on SDK PR #5164.</div>
+        <span class="card-tag tag-report">field note · OpenHands · 19 September 2026</span>
       </a>
     </div>
 
@@ -279,6 +299,78 @@
       <div class="card-title">Checking the Agent SDK from outside</div>
       <div class="card-desc">What the external verifier checks, what its first Cloud run found, and what a regular contract check still needs. The Cloud automation is disabled.</div>
       <span class="card-tag tag-report">Agent SDK · 9 October 2026</span>
+    </a>
+
+    <a class="card" href="arch/codex-agents-vs-claude-rules.html">
+      <div class="card-title">Codex AGENTS.md vs Claude Code rules</div>
+      <div class="card-desc">How Codex applies repository instructions from the working directory while Claude rules can follow the path of each touched file, and where those trigger models differ.</div>
+      <span class="card-tag tag-report">comparison</span>
+    </a>
+
+    <a class="card" href="arch/eventlog-resume-orphaned-history.html">
+      <div class="card-title">The event tree that orphaned history on resume</div>
+      <div class="card-desc">Why a conversation resumed across Agent Server versions with 5,814 events intact but only its last 165 in context: the first new event was stamped as a hard tree root.</div>
+      <span class="card-tag tag-report">incident trace · SDK 1.33.0</span>
+    </a>
+
+    <a class="card" href="arch/finish-tool-task-outcome-4465.html">
+      <div class="card-title">FinishTool before and after: PR #4465</div>
+      <div class="card-desc">A focused before-and-after view of PR #4465’s FinishTool prompt change and structured <code>task_outcome</code> response, with FinishAction unchanged.</div>
+      <span class="card-tag tag-report">show-me · OpenHands #4465</span>
+    </a>
+
+    <a class="card" href="arch/hermes-crystallization-vs-dreaming.html">
+      <div class="card-title">Hermes skill crystallization vs SmolPaws dreaming</div>
+      <div class="card-desc">A comparison of Hermes’s MIT-licensed skill crystallization process with how SmolPaws consolidates its own memory.</div>
+      <span class="card-tag tag-report">comparison</span>
+    </a>
+
+    <a class="card" href="arch/issue-3984-agents-md-loading.html">
+      <div class="card-title">AGENTS.md loading: map today, deterministic path loading next</div>
+      <div class="card-desc">How root AGENTS.md maps and package instructions work today, and how file-operation triggers could load the applicable nested instructions deterministically.</div>
+      <span class="card-tag tag-report">SDK issue #3984</span>
+    </a>
+
+    <a class="card" href="arch/mcp-oauth-settings.html">
+      <div class="card-title">MCP OAuth and settings-backed authentication</div>
+      <div class="card-desc">How SDK #3964 and Canvas #1583 add a typed path to capture, encrypt, persist, and reuse MCP credentials across local and cloud conversations.</div>
+      <span class="card-tag tag-report">SDK #3964 · Canvas #1583</span>
+    </a>
+
+    <a class="card" href="arch/outbox-coordinator-vs-automation.html">
+      <div class="card-title">Two outboxes, compared</div>
+      <div class="card-desc">OpenHands Automation’s single completion callback alongside SmolPaws’ durable per-message delivery queue, including where PR #4465’s TaskOutcome fits.</div>
+      <span class="card-tag tag-report">architecture comparison</span>
+    </a>
+
+    <a class="card" href="arch/task-outcome-reporting-4465.html">
+      <div class="card-title">PR #4465: one TaskOutcome, two sources</div>
+      <div class="card-desc">How OpenHands uses one structured outcome for agent-reported completion and system or harness failure, distinguished by a <code>source</code> field.</div>
+      <span class="card-tag tag-report">OpenHands #4465</span>
+    </a>
+
+    <a class="card" href="arch/teach-typescript-client.html">
+      <div class="card-title">The typescript-client repo and the proposal to fold it into the SDK</div>
+      <div class="card-desc">An explainer on what typescript-client does, who uses it, how it stays in sync with the Python SDK, and the proposed repository move.</div>
+      <span class="card-tag tag-report">teach · SDK structure</span>
+    </a>
+
+    <a class="card" href="studies/index.html">
+      <div class="card-title">Studies</div>
+      <div class="card-desc">Research comparisons, with sources and limits kept close to the claims.</div>
+      <span class="card-tag tag-report">research index</span>
+    </a>
+
+    <a class="card" href="studies/swe-milestone-vs-slopcodebench.html">
+      <div class="card-title">When the next task inherits the last</div>
+      <div class="card-desc">A comparison of SWE-Milestone and SlopCodeBench: inherited regressions, structural erosion, session continuity, and what their numbers measure.</div>
+      <span class="card-tag tag-report">benchmark study</span>
+    </a>
+
+    <a class="card" href="wire/backend-selector.html">
+      <div class="card-title">Add a backend — wireframe</div>
+      <div class="card-desc">A low-fidelity chooser for Agent Server and Cloud backends, with the connection fields each path needs.</div>
+      <span class="card-tag tag-draft">wireframe · Canvas #15426</span>
     </a>
 
     <a class="card" href="arch/openhands-sdk-architecture-testing.html">
