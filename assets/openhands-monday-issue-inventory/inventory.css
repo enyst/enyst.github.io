@@ -1,0 +1,37 @@
+.report-header { max-width: 930px; }
+.report-header .lede { max-width: 860px; }
+.report-header .headline-count { color: var(--accent); }
+.inventory-nav { margin-bottom: 0; }
+.status.own { color: #b7d9ed; background: #1d2c35; }
+.status.missing { color: #e0c774; background: #332d1a; }
+.pr-counts { display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: .85rem; margin: 0 0 16px; }
+.pr-counts strong { color: var(--ink); }
+.pr-counts span, .context-note { color: #b0a89b; }
+.context-note { font-size: .86rem; }
+.attention-note { color: #ead38a; background: #292416; border-left: 2px solid var(--accent); padding: 10px 14px; font-size: .86rem; margin-bottom: 16px; }
+.other-proposals { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+.other-proposals summary { color: var(--teal); cursor: pointer; font-size: .9rem; }
+.other-proposals[open] summary { margin-bottom: 12px; }
+.other-proposals .pr-list { margin-top: 16px; }
+.other-proposals .pr-row { padding-left: 14px; border-left: 2px solid var(--border); }
+.no-other { margin-top: 18px; }
+.excluded-refs { margin-top: 16px; }
+.downloads-line { margin-top: 18px; }
+.method p + p { margin-top: 16px; }
+.summary-table th { min-width: 85px; }
+.summary-table th:first-child { min-width: 100px; }
+.pr-row .status { text-decoration: none; }
+#inventory-list > section { scroll-margin-top: 20px; }
+@media (max-width: 650px) {
+  .report-header h1 { font-size: 3rem; }
+  .pr-counts { display: grid; gap: 4px; }
+  .other-proposals .pr-row { padding-left: 10px; }
+  .summary-table th, .summary-table td { min-width: 0; }
+  .summary-table th:first-child { min-width: 0; }
+}
+@media print {
+  #inventory-list > section[hidden], #inventory-list .issue-card[hidden] { display: block !important; }
+  .other-proposals, .attention-note { color: black; }
+  .pr-counts strong, .pr-counts span, .context-note { color: black; }
+  .attention-note { background: white; }
+}

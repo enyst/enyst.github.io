@@ -4,12 +4,18 @@
 Input: assets/openhands-maintainer-reports/{created-week,triage}.json
 This renderer does not fetch GitHub or rerun any OpenHands fix branch.
 """
+import argparse
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 import csv
 import html
 import json
+from zoneinfo import ZoneInfo
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--only', choices=['all', 'triage'], default='all', help='Refresh only the PR queue without rewriting the historical weekly cohort pages.')
+args = parser.parse_args()
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / 'assets/openhands-maintainer-reports'
@@ -21,8 +27,9 @@ esc = lambda v: html.escape(str(v), quote=True)
 
 
 def stamp(value):
-    date = datetime.fromisoformat(value.replace('Z', '+00:00')).astimezone(timezone.utc)
-    return f'<time datetime="{esc(value)}">{date.day} {date.strftime("%B %Y, %H:%M:%S UTC")}</time>'
+    zone = ZoneInfo('Europe/Stockholm') if args.only == 'triage' else timezone.utc
+    date = datetime.fromisoformat(value.replace('Z', '+00:00')).astimezone(zone)
+    return f'<time datetime="{esc(value)}">{date.day} {date.strftime("%B %Y, %H:%M:%S %Z")}</time>'
 
 
 def author(login):
@@ -49,12 +56,18 @@ PATHS = {
     'closed': 'openhands-last-week-merged-issues.html',
     'open': 'openhands-last-week-open-issues.html',
     'triage': 'openhands-pr-keep-close.html',
+    'inventory': 'openhands-issues-since-monday.html',
 }
+
+
+def write_page(kind, content):
+    if args.only == 'all' or kind == args.only:
+        (OUT / PATHS[kind]).write_text(content)
 
 
 def base(kind, title, description, body):
     links = []
-    for k, label in [('closed', 'Posted last week · closed by merged PRs'), ('open', 'Posted last week · still open'), ('triage', 'PRs · Keep / Close')]:
+    for k, label in [('inventory', 'Since Monday · issues and own PRs'), ('closed', 'Posted last week · closed by merged PRs'), ('open', 'Posted last week · still open'), ('triage', 'PRs · Keep / Close')]:
         if k != kind:
             links.append(f'<a href="{PATHS[k]}">{label}</a>')
     return f'''<!doctype html>
@@ -130,13 +143,13 @@ if partials:
 body = f'''<header class="report-header"><p class="eyebrow">OpenHands / OpenHands · Issues posted in the last seven days</p><h1 class="page">Closed by merged PRs</h1><p class="lede"><strong class="headline-count">{len(closed)} issues</strong> posted by enyst or smolpaws during the week are now closed by a merged PR. Each issue below names the closing PR’s author.</p><p class="snapshot">Posted {window}. Status checked through {observed}.</p></header>
 <div class="stats two"><div><strong>{own}</strong><span>issues closed by enyst / smolpaws PRs</span></div><div><strong>{external}</strong><span>issues closed by other authors’ PRs</span></div></div>{partial_note}
 {filters('closed-list','issues',[('all',f'All {len(closed)} issues'),('own',f'PRs by enyst / smolpaws · {own}'),('other',f'PRs involving other authors · {external}')])}<section id="closed-list" aria-label="Issues closed by merged PRs" class="issue-list">{'\n'.join(issue_card(i,True) for i in closed)}<p class="empty-filter" hidden>No matching issues.</p></section>{other_section}{issue_method}'''
-(OUT / PATHS['closed']).write_text(base('closed', 'OpenHands · last week’s issues closed by merged PRs', f'{len(closed)} issues posted by enyst/smolpaws in the last seven days are closed by merged PRs, with every PR author.', body))
+write_page('closed', base('closed', 'OpenHands · last week’s issues closed by merged PRs', f'{len(closed)} issues posted by enyst/smolpaws in the last seven days are closed by merged PRs, with every PR author.', body))
 
 body = f'''<header class="report-header"><p class="eyebrow">OpenHands / OpenHands · Issues posted in the last seven days</p><h1 class="page">Still open</h1><p class="lede"><strong class="headline-count">{len(opened)} issues</strong> posted by enyst or smolpaws during the week remain open. Every issue below gives its open PR count, with links and authors.</p><p class="snapshot">Posted {window}. Status checked through {observed}.</p></header>
 <div class="stats"><div><strong>{active}</strong><span>issues with an open PR</span></div><div><strong>{len(opened)-active}</strong><span>issues without an open PR</span></div><div><strong>{unique_open_prs}</strong><span>distinct open PRs · drafts included</span></div></div>
 <p class="section-intro">All PR authors are included. There are {pr_matches} issue–PR links across {unique_open_prs} distinct open PRs. Counts refer to proposed implementation work; an open PR does not establish that the issue is fully solved.</p>
 {filters('open-list','issues',[('all',f'All {len(opened)} issues'),('with-pr',f'With an open PR · {active}'),('no-pr',f'No open PR · {len(opened)-active}')])}<section id="open-list" aria-label="Still-open issues and their PR counts" class="issue-list">{'\n'.join(issue_card(i) for i in opened)}<p class="empty-filter" hidden>No matching issues.</p></section>{issue_method}'''
-(OUT / PATHS['open']).write_text(base('open', 'OpenHands · last week’s issues still open', f'{len(opened)} issues posted by enyst/smolpaws in the last seven days remain open; open PR counts and authors for each.', body))
+write_page('open', base('open', 'OpenHands · last week’s issues still open', f'{len(opened)} issues posted by enyst/smolpaws in the last seven days remain open; open PR counts and authors for each.', body))
 
 
 def triage_card(row):
@@ -166,7 +179,7 @@ assert sum(map(len,close_groups.values())) == len(close)
 archive = []
 for row in sorted(archived, key=lambda r: -r['pr']):
     status = 'Merged' if row.get('merged_at') else 'Already closed without merge'
-    archive.append(f'<li><a href="{esc(row["pr_url"])}">PR #{row["pr"]} — {esc(row["pr_title"])}</a><span class="byline">{status} · by {author(row["pr_author"])}</span></li>')
+    archive.append(f'<li id="pr-{row["pr"]}"><a href="{esc(row["pr_url"])}">PR #{row["pr"]} — {esc(row["pr_title"])}</a><span class="byline">{status} · by {author(row["pr_author"])}</span></li>')
 close_html = ''
 for group, heading in [('closure-defect-or-duplicate','Defect or redundant fix'),('closure-unready','Incomplete work or evidence')]:
     rows = close_groups[group]
@@ -174,15 +187,17 @@ for group, heading in [('closure-defect-or-duplicate','Defect or redundant fix')
 updates_html = ''.join(f'<p class="snapshot">Update {stamp(u["at"])}: {esc(u["text"])}</p>' for u in triage.get('updates', []))
 body = f'''<header class="report-header"><p class="eyebrow">OpenHands / OpenHands · Maintainer review queue</p><h1 class="page">PRs to keep or close</h1><p class="lede"><strong>{len(keep)} Keep</strong> candidates and <strong>{len(close)} Close without merge</strong> candidates from the previously reviewed other-author PR queue. Each PR has its author and a specific reason.</p><p class="snapshot">Issue, PR and reference states checked through {stamp(triage['observed_at'])}. Code assessment dates from the original audit on 10 October 2026; refreshed heads are compared with that audit.</p>{updates_html}</header>
 <nav class="report-nav" aria-label="Queue sections"><a href="#keep">Keep · {len(keep)}</a><a href="#close">Close without merge · {len(close)}</a><a href="#done">Already merged / closed · {len(archived)}</a><a href="#method">Review scope</a></nav>
-<p class="callout">These are review recommendations. “Keep” retains a useful candidate for review. Closure reasons apply the maintainer’s policy that partial drafts and incomplete functional evidence can be closed. No PR closures or reviews are submitted by this report.</p>
+<p class="callout">The maintainer plans to solve the remaining issues independently. Every PR marked <strong>Close without merge</strong> is intended for closure and supersession by that work, with no code or implementation reused. “Keep” retains a candidate for review and does not mean approval. <a href="openhands-issues-since-monday.html">The issue inventory since Monday</a> identifies the work and distinguishes enyst/smolpaws PRs from other proposals. This page records current GitHub states; the inventory refresh itself submits no closures or reviews.</p>
 {filters('triage-list','PRs',[('all',f'All {len(keep)+len(close)} active PRs'),('keep',f'Keep · {len(keep)}'),('close',f'Close without merge · {len(close)}')])}
 <div id="triage-list"><section id="keep" data-filter-subgroup><h2 class="section-heading">Keep · {len(keep)} PRs</h2><div class="issue-list">{"".join(triage_card(r) for r in keep)}</div></section><section id="close" data-filter-subgroup><h2 class="section-heading">Close without merge · {len(close)} PRs</h2>{close_html}</section><p class="empty-filter" hidden>No matching PRs.</p></div>
 <section id="done"><h2 class="section-heading">Already merged or closed · {len(archived)} PRs</h2><p>Removed from the active recommendations.</p><ul class="archive-list">{''.join(archive)}</ul></section>
-<section class="method" id="method"><h2 class="section-heading">Review scope</h2><p>This page follows the original {len(all_triage)} open or draft other-author PRs reviewed for issues filed by enyst or smolpaws. It is a separate queue from the two creation-date cohort reports: issues here may be older than a week.</p><p>Reasons come from the earlier current-head production/test diff reviews, issue requirements, CI and available functional evidence. Fresh metadata confirms PR and issue states and whether the reviewed code head has changed. Existing links to reviews or contributor recordings are evidence, not a claim that this auditor reran every branch.</p><p>The earlier audit independently ran focused tests and a fail-before mutation check for PR #18151, and a minimal Chromium geometry reproduction for PR #18242. Those checks were not full OpenHands UI runs. No new branch runtime verification was performed for this refresh.</p><p><a href="../assets/openhands-maintainer-reports/triage.json">Checked triage dataset (JSON)</a> · <a href="../assets/openhands-maintainer-reports/triage.csv">Active recommendations (CSV)</a></p></section>'''
-(OUT / PATHS['triage']).write_text(base('triage','OpenHands PRs · Keep / Close without merge',f'{len(keep)} Keep and {len(close)} Close without merge candidates, with titles, authors and individual reasons.',body))
+<section class="method" id="method"><h2 class="section-heading">Review scope</h2><p>This page follows the original {len(all_triage)} open or draft other-author PRs reviewed for issues filed by enyst or smolpaws. It is a separate queue from the creation-date reports: some issues here predate the <a href="openhands-issues-since-monday.html">Monday issue inventory</a>.</p><p>Reasons come from the earlier current-head production/test diff reviews, issue requirements, CI and available functional evidence. Fresh metadata confirms PR and issue states and whether the reviewed code head has changed. Existing links to reviews or contributor recordings are evidence, not a claim that this auditor reran every branch.</p><p>The original audit independently ran focused tests and a fail-before mutation check for PR #18151, and a minimal Chromium geometry reproduction for PR #18242. Later independent checks are identified in the relevant rows. No branch runtime verification was performed during this inventory refresh.</p><p><a href="../assets/openhands-maintainer-reports/triage.json">Checked triage dataset (JSON)</a> · <a href="../assets/openhands-maintainer-reports/triage.csv">Active recommendations (CSV)</a></p></section>'''
+write_page('triage', base('triage','OpenHands PRs · Keep / Close without merge',f'{len(keep)} Keep and {len(close)} Close without merge candidates, with titles, authors and individual reasons.',body))
 
 
 def write_csv(filename, fields, rows):
+    if args.only == 'triage' and filename != 'triage.csv':
+        return
     with (ASSETS / filename).open('w', newline='') as stream:
         writer = csv.DictWriter(stream, fieldnames=fields, lineterminator='\n')
         writer.writeheader()
