@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Routing GitHub mentions to Codex and Claude — Engel Nyst</title>
+  <meta name="description" content="A plan for a personal Cloudflare Worker that routes trusted GitHub comments to hosted Codex and Claude agents without installing apps on the target repository." />
+  <meta property="og:title" content="Routing GitHub mentions to Codex and Claude" />
+  <meta property="og:description" content="Cloudflare Workers, Cron Triggers, D1, and Workflows around the OpenAI Agents API and Claude Managed Agents." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/github-mention-router.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <link rel="stylesheet" href="../arch.css" />
+  <style>
+    a { color: var(--teal); text-underline-offset: .2em; }
+    a:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; }
+    code, a { overflow-wrap: anywhere; }
+    th, td { vertical-align: top; }
+    th, .tag { font-size: .75rem; }
+    .table-scroll { overflow-x: auto; margin: 20px 0; }
+    .table-scroll table { min-width: 580px; margin: 0; }
+    .toc { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 0; margin: 24px 0 36px; list-style: none; font-size: .9em; }
+    .route-flow { margin: 24px 0; padding: 20px; background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); }
+    .route-flow ol { margin: 0; padding-left: 24px; }
+    .route-flow li { padding: 5px 0 9px; }
+    .route-flow small { display: block; color: var(--muted); font-size: .9em; }
+    .providers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 12px 0 4px; }
+    .provider { border: 1px solid var(--border); border-radius: var(--border-radius); padding: 12px 14px; }
+    .provider strong { display: block; }
+    .status { color: var(--accent); font-family: var(--mono); font-size: .78em; }
+    .source-note { font-size: .86em; color: var(--muted); }
+    @media (max-width: 520px) { .providers { grid-template-columns: 1fr; } .route-flow { padding: 14px; } }
+  </style>
+</head>
+<body>
+<main class="shell">
+  <a class="back" href="../index.html">&larr; Home</a>
+  <h1>Routing GitHub mentions to Codex and Claude <span class="tag tag-draft">draft plan</span></h1>
+  <p class="meta">12 October 2026 · Personal GitHub integration · Implementation home: <code>github-mention-router</code></p>
+
+  <div class="callout">
+    <p><strong>Use a Cloudflare Worker with Cron Triggers, D1, and Workflows.</strong> Poll public GitHub comments, accept requests from <code>enyst</code> and <code>smolpaws</code>, and route <code>@codex</code> to the OpenAI Agents API or <code>@claude</code> to Claude Managed Agents. Both providers supply hosted agent execution. The router owns authorization, durable delivery, and replies under the authorizing GitHub account.</p>
+  </div>
+  <p>This gives us a way to ask the two agents for help on OpenHands issues and PRs without installing their GitHub apps on the repository. A first version should return findings and proposed patches as comments. Branches and draft PRs can follow after the request and reply path works reliably.</p>
+  <p class="status">Proposed architecture. No watcher or provider execution has been activated by this draft.</p>
+
+  <nav aria-label="On this page">
+    <ul class="toc">
+      <li><a href="#access">GitHub access</a></li>
+      <li><a href="#cloudflare">Cloudflare services</a></li>
+      <li><a href="#providers">Provider APIs</a></li>
+      <li><a href="#intake">Comment intake</a></li>
+      <li><a href="#delivery">Reliable delivery</a></li>
+      <li><a href="#rollout">Rollout</a></li>
+    </ul>
+  </nav>
+
+  <h2 id="access">GitHub access determines the trigger</h2>
+  <p>The target supplied as <code>OpenHands/agent-sdk</code> currently resolves to <a href="https://github.com/OpenHands/software-agent-sdk">OpenHands/software-agent-sdk</a>, repository ID <code>1043426082</code>. Store the ID as the boundary and resolve the current name during preflight. A rename should change API paths, not silently change which repository may receive work.</p>
+  <p>Push access is enough to propose code through a writable branch. It does not establish authority to configure a repository webhook. GitHub requires repository ownership or admin access to create one. Polling its public comment API avoids that dependency. If an administrator later adds a webhook, it can feed the same request ledger while polling remains a reconciliation path. <a href="https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks">GitHub webhook requirements</a>.</p>
+  <p><code>smolpaws</code> needs permission to leave its request comment, but needs no push permission for the router to act. The router checks the GitHub author ID and uses the authorizing account for its own writes. The model providers do not become repository members through this arrangement.</p>
+
+  <div class="table-scroll" role="region" aria-label="Ownership of trigger and publication permissions" tabindex="0">
+    <table>
+      <thead><tr><th>Action</th><th>Who performs it</th><th>Required access</th></tr></thead>
+      <tbody>
+        <tr><td>Read public comments and source</td><td>Router and hosted sandbox</td><td>Public read access; authenticated API reads give a larger rate allowance.</td></tr>
+        <tr><td>Request Codex or Claude</td><td><code>enyst</code> or <code>smolpaws</code></td><td>Ability to comment, plus the router author allowlist.</td></tr>
+        <tr><td>Publish a result comment</td><td>Router as <code>enyst</code></td><td>A credential that can write the relevant issue or PR comment.</td></tr>
+        <tr><td>Publish a branch and draft PR</td><td>Router in the later code phase</td><td>Contents and pull request write access to that destination.</td></tr>
+        <tr><td>Install a repository webhook</td><td>A repository administrator</td><td>Separate administrative authority.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="cloudflare">A small controller on Cloudflare</h2>
+  <p><strong>Workers is the service to start with.</strong> A Cron Trigger can run a scheduled handler every minute to call GitHub. D1 should hold relational request state: scan cursors, accepted comments, provider session IDs, and the reply outbox. Workflows should carry each accepted job through dispatch, waiting, result collection, and publication. <a href="https://developers.cloudflare.com/workers/configuration/cron-triggers/">Cron Triggers</a>, <a href="https://developers.cloudflare.com/d1/">D1</a>, and <a href="https://developers.cloudflare.com/workflows/">Workflows</a>.</p>
+  <p>Workflows can persist execution state, retry steps, and wait for external events. That is useful when an agent takes several minutes or needs input. Keep the cron handler short; the hosted provider runs the coding tools. An initial D1 outbox is enough to hand accepted work to Workflows. Add Queues if traffic later needs a separate ingestion buffer.</p>
+
+  <figure class="route-flow" aria-labelledby="flow-caption">
+    <ol>
+      <li><strong>A new GitHub comment</strong><small>Trusted author, actual mention, allowed repository.</small></li>
+      <li><strong>Worker polls every minute</strong><small>Reads conversation and inline review comments with overlapping cursors.</small></li>
+      <li><strong>D1 accepts a unique request</strong><small>A durable row precedes dispatch; Workflows follows its lifecycle.</small></li>
+      <li><strong>The selected hosted agent works</strong>
+        <div class="providers">
+          <div class="provider"><strong><code>@codex</code></strong><small>OpenAI Agents API<br />Managed Codex harness</small></div>
+          <div class="provider"><strong><code>@claude</code></strong><small>Claude Managed Agents<br />Managed Claude harness</small></div>
+        </div>
+      </li>
+      <li><strong>Router collects and publishes the result</strong><small>Attributed GitHub reply, assessed commit, test evidence, and a durable receipt.</small></li>
+    </ol>
+    <figcaption id="flow-caption" class="source-note">Proposed request path. Provider webhooks wake the controller; periodic checks reconcile missed notifications.</figcaption>
+  </figure>
+
+  <h2 id="providers">The hosted APIs fit this job</h2>
+  <h3>Codex through the OpenAI Agents API</h3>
+  <p>OpenAI's Agents API runs a managed Codex harness with durable sessions and optional hosted sandboxes. It handles the agent loop, context compaction, and recovery. Start with <code>POST /v1/agents/sessions</code> and an <code>openai_hosted</code> environment. Select and pin a model available to the deployment account. <a href="https://developers.openai.com/api/docs/guides/agents-api/overview">Official OpenAI documentation</a>.</p>
+  <p>The documented beta header is <code>OpenAI-Beta: agents=v1</code>. The application key needs <code>api.agents.read</code>, <code>api.agents.write</code>, and <code>api.responses.write</code>. Keep it in the controller. Follow the quickstart with a controlled task before using the target repository. <a href="https://developers.openai.com/api/docs/guides/agents-api/quickstart">Agents API prerequisites</a>.</p>
+
+  <h3>Claude through Claude Managed Agents</h3>
+  <p>Anthropic's managed service also supplies a harness and cloud sandbox. Configure an agent and environment, then create a session and send a user event; <code>initial_events</code> can combine creation and the first request. Its endpoints use <code>anthropic-beta: managed-agents-2026-04-01</code> with the API's normal version header. The documentation says Managed Agents is enabled by default for API accounts; the deployment still needs a working API key and its own smoke test. <a href="https://platform.claude.com/docs/en/managed-agents/overview">Managed Agents overview</a> and <a href="https://platform.claude.com/docs/en/managed-agents/sessions">Starting a session</a>.</p>
+
+  <h3>A ChatGPT alternative with a different return path</h3>
+  <p>For a published ChatGPT Workspace Agent, OpenAI also documents <code>POST https://api.chatgpt.com/v1/workspace_agents/{id}/trigger</code>. It accepts input and a conversation key, supports idempotent trigger retries, and returns a ChatGPT conversation link. Its beta can expose run status, but the API currently cannot retrieve the agent's answer. That makes it useful when the desired destination is ChatGPT; an automatic GitHub reply would need an additional output tool. Use the Agents API for the proposed Codex route. <a href="https://developers.openai.com/workspace-agents/trigger-runs">Workspace Agent triggers</a>.</p>
+
+  <p>These routes create configured agent sessions. Supply the skills and instructions they need explicitly. Existing personal chats, desktop tasks, and their memory are not inputs in this design.</p>
+
+  <h2 id="intake">Define exactly which comments count</h2>
+  <p>GitHub separates PR conversation comments, inline review comments, and review summary bodies. The first two have repository-wide feeds, so they make a clear first-version boundary. <a href="https://docs.github.com/en/rest/issues/comments#list-issue-comments-for-a-repository">Issue comment API</a> and <a href="https://docs.github.com/en/rest/pulls/comments#list-review-comments-in-a-repository">Review comment API</a>.</p>
+  <div class="table-scroll" role="region" aria-label="Comment surfaces included in the first version" tabindex="0">
+    <table>
+      <thead><tr><th>Surface</th><th>Intake</th><th>Scope</th></tr></thead>
+      <tbody>
+        <tr><td>Issue comments and PR conversation comments</td><td><code>GET /repos/{owner}/{repo}/issues/comments</code></td><td>V1</td></tr>
+        <tr><td>Inline PR review comments and replies</td><td><code>GET /repos/{owner}/{repo}/pulls/comments</code></td><td>V1</td></tr>
+        <tr><td>A submitted review's summary body</td><td><a href="https://docs.github.com/en/rest/pulls/reviews#list-reviews-for-a-pull-request">Per-PR review enumeration</a> or a <code>pull_request_review</code> webhook</td><td>Later; a separate intake path is required.</td></tr>
+        <tr><td>Issue/PR descriptions, commit comments, Discussions</td><td>Separate APIs and event types</td><td>Outside the first comment watcher.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>For either V1 feed, use <code>since</code>, sort by update time ascending, request up to 100 items per page, and follow every <code>Link</code> page. The API's <code>since</code> filter is based on last update, so edits will appear in scans too.</p>
+  <p>Capture the scan's start time. Read from the last completed scan minus a five-minute overlap, persist discovered requests, and advance that surface's cursor only after all pages succeed. Keep a lease to prevent overlapping scans and retain a wider reconciliation scan for delayed observations. A failed second page must leave the cursor unchanged. Polling cannot recover a comment deleted before it is ever observed.</p>
+  <p><strong>At activation, establish a baseline.</strong> Accept new comments created after it; do not replay old requests. Freeze the first qualifying observed body. Editing an accepted comment must not start another paid job. Ask again in a new comment for a new request. The initial observed snapshot can already include an edit made between scans.</p>
+
+  <h3>Authorization and mention parsing</h3>
+  <p>Allow immutable GitHub author IDs for <code>enyst</code> and <code>smolpaws</code>. Read them from GitHub metadata. A copied name, a quoted request, and <code>author_association</code> do not authorize work.</p>
+  <p>Parse actual mention tokens in authored Markdown text, ignoring code, blockquotes, and URL destinations. Match case-insensitively with handle boundaries: <code>@codex-example</code> must not launch Codex. Both actual mentions in one comment create one request per provider. Router-generated replies must be excluded even though their GitHub author is allowlisted.</p>
+  <pre class="code">@codex review this change for cancellation and cleanup bugs
+@claude explain whether the proposed API preserves replay behavior</pre>
+  <p>Keep the original request and its source link. Before dispatch, fetch it again so deletion or removal of the request can cancel work that has not started. The surrounding thread is context; comments from other authors cannot expand the router's permissions.</p>
+
+  <h2 id="delivery">A durable request and a durable reply</h2>
+  <p>The accepted request key should be <code>repository ID + surface + comment ID + provider</code>. Put a uniqueness constraint on it in D1. Store the frozen request, policy version, target commit, provider session ID, Workflow ID, result state, and publication receipt.</p>
+  <p>A D1 request row is the durable handoff. Start Workflows with a deterministic ID derived from the request. A sweeper can launch a row left behind by a crash before Workflow creation. A repeated scan or callback resumes the same job. Workflow retries still need explicit protection around remote mutations.</p>
+  <pre class="code">accepted → dispatching → running → result ready → publishing → delivered
+
+Other outcomes: awaiting action · budget paused · failed · canceled
+Ambiguous responses: dispatch unknown · delivery unknown</pre>
+  <p><strong>A timeout after session creation is not proof that creation failed.</strong> If the provider accepted work but the controller lost the response, a blind retry can start another paid session. Verify the endpoint's supported idempotency and reconciliation mechanisms during implementation. When recovery cannot establish the outcome, park the request for an operator. Apply the same rule to sending input events and GitHub publication.</p>
+
+  <h3>Completion must be checked against the request</h3>
+  <p>Use provider webhooks to wake the job, then fetch current session state and events. OpenAI documents <code>agent.session.idle</code> and <code>agent.session.action_required</code>. Anthropic's webhook calls its idle event <code>session.status_idled</code>; its stream uses <code>session.status_idle</code>. Idle can mean waiting for permission or input. Collect the current request's answer and inspect its stop reason before marking it complete. <a href="https://developers.openai.com/api/docs/guides/agents-api/sessions/webhooks">OpenAI session webhooks</a> and <a href="https://platform.claude.com/docs/en/managed-agents/webhooks">Anthropic webhooks</a>.</p>
+  <p>Verify webhook signatures over the raw body, deduplicate provider event IDs, and accept events only for known sessions. Subscribe before running jobs. Persist the event before acknowledging it, and reconcile unfinished jobs periodically: callbacks may be duplicated, reordered, or lost. A budget pause should produce a budget status, not a success reply.</p>
+  <p>Use one session per request in V1 and include a bounded, current thread snapshot. Serialize work for the same thread and provider. Reusing one durable session per thread is a later enhancement: it needs per-request event ranges, head-change handling, and a policy for pending requests while the agent is running.</p>
+
+  <h3>Publish through an outbox</h3>
+  <p>Prepare the reply in D1 before calling GitHub. Include the provider and configured model, source request, assessed commit, findings, and actual test evidence. Write a stable hidden run marker into the comment and record its GitHub ID after success. After a lost acknowledgement, reconcile the destination thread for that marker under the expected writer before another attempt.</p>
+  <p>Replies posted as <code>enyst</code> should identify the agent that produced them. Record generated comment IDs and filter them before routing; also avoid copied mention tokens that ping or re-trigger agents. This closes the feedback loop where an agent quotes its original request in its own answer.</p>
+
+  <h2 id="credentials">Keep writing credentials in the controller</h2>
+  <p>The router needs GitHub publication access and provider API credentials. Provision them into Worker secrets during deployment. Keep them out of prompts, D1 payloads, logs, and agent-visible files or environment variables. Public source can enter a sandbox as a commit-pinned archive or through a public clone; neither requires the writing credential.</p>
+  <p>OpenAI's hosted sandbox accepts input files and setup commands and offers restricted network access. Configure the network explicitly and supply the dependencies required by the SDK's real tests. Anthropic supports GitHub repository mounts with an authorization token; that is an optional integration, not a prerequisite for this public-repository plan. <a href="https://developers.openai.com/api/docs/guides/agents-api/environments/openai-hosted">OpenAI hosted sandbox configuration</a> and <a href="https://platform.claude.com/docs/en/managed-agents/github">Claude GitHub access</a>.</p>
+  <p>The agent can produce findings and patch artifacts while deterministic router code controls publication. Repository instructions and other authors' text can guide analysis, but cannot grant the agent secrets, a new repository destination, or extra write permissions.</p>
+
+  <h2 id="code-changes">Add code changes through branches and draft PRs</h2>
+  <p>After the comment path is proven, explicit requests such as <code>@codex implement …</code> or <code>@claude implement …</code> can produce a patch against a pinned commit. The router should verify that it applies to the allowed repository, reject paths outside its publication policy, and publish to a deterministic proposal branch followed by a draft PR.</p>
+  <p>Before publishing a review or patch, recheck the target head. If the PR changed, assess the new head or clearly retain the result as a report on the earlier commit. Base-repository write access does not grant access to a contributor's fork branch: use a writable fork or propose a new branch in the allowed repository.</p>
+  <p>For the initial rollout, use ordinary comments for reviews. Formal approval and requests-for-changes affect repository gates and should be a separate policy choice. Direct pushes to the target's default branch and automatic merging stay outside this plan.</p>
+
+  <h2 id="cost">Bound jobs and measure cost</h2>
+  <p>Two single-page comment feeds at one-minute intervals make <strong>120 base GitHub reads per hour</strong>, before pagination, context fetches, and reconciliation. Read the response rate headers and back off on primary or secondary limits; the allowance is shared with other use of the same credential.</p>
+  <p>Workflows is available on Free and Paid plans. Workers Paid has a documented account minimum of <strong>$5 per month</strong>, plus applicable usage charges. A small trial can start within free limits if its actual workload fits. Provider model usage, tools, and hosted execution are separate costs; the infrastructure minimum is not a full agent budget. <a href="https://developers.cloudflare.com/workers/platform/pricing/">Cloudflare pricing</a> and <a href="https://developers.openai.com/api/docs/guides/agents-api/overview">OpenAI Agents API billing</a>.</p>
+  <p>Proposed starting limits are two concurrent jobs, one per thread/provider, twenty requests per day, and a twenty-minute watchdog. Reserve a daily admission budget atomically before launch. Treat the watchdog and controller budget as limits on new work, with in-flight usage still possible.</p>
+  <p>Claude supports a session budget set at creation. It stops issuing new model requests at its list-cost cap, but an in-flight request can take the final amount beyond that cap. Keep that margin and publish a paused status when it is reached. Verify current OpenAI controls independently instead of copying Claude's budget fields. <a href="https://platform.claude.com/docs/en/managed-agents/budgets">Claude session budgets</a>.</p>
+
+  <h2 id="rollout">Roll out in stages with evidence</h2>
+  <ol>
+    <li><strong>Repository and design.</strong> Initialize <code>github-mention-router</code>, keep activation off, and record the implementation contract and dependencies in its own Beads tracker. This draft is that starting point.</li>
+    <li><strong>Shadow intake.</strong> Read the real public comment feeds, produce durable request rows, and verify author filtering, mention parsing, pagination, cursor recovery, duplicate suppression, and historical baselines. Make no provider calls or GitHub writes.</li>
+    <li><strong>Provider preflight.</strong> Verify account access and sandbox dependencies through a controlled public fixture. Run one request through each hosted API and collect its result. Establish actual cost and timeout behavior.</li>
+    <li><strong>Replies on the fixture.</strong> Exercise signed callbacks, missing callbacks, controller restarts, response-loss recovery, stale PR heads, budget pauses, and output-loop suppression. Require one attributed delivered result per request.</li>
+    <li><strong>Target comments.</strong> Set the activation baseline and enable bounded comments on the allowed OpenHands repository. Keep intake, each provider, and publication independently switchable.</li>
+    <li><strong>Code proposals.</strong> Add branches and draft PRs only after the prior evidence holds. Keep protected destinations and formal review policy explicit.</li>
+  </ol>
+  <p>Review summaries need their own later intake work: enumerate reviews for candidate PRs and verify whether review activity advances the candidate timestamp. Include reconciliation for closed PRs. If webhook administration becomes available, a <code>pull_request_review</code> event is a cleaner trigger for that surface. Do not claim the two V1 feeds cover every GitHub comment type.</p>
+
+  <h2 id="decisions">Decisions to make at implementation time</h2>
+  <ul>
+    <li>Choose provider accounts, models, sandbox setup, and per-request spending limits after a real preflight.</li>
+    <li>Confirm the publication policy: comments first, then which implementation requests may create draft PRs.</li>
+    <li>Choose a dedicated GitHub credential with the minimum access available under the organization policy. The existing authorizing identity can bootstrap the integration; a separate token makes rotation and isolation easier.</li>
+    <li>Decide whether review summary bodies need priority before target activation, and whether follow-up comments should eventually reuse sessions.</li>
+  </ul>
+  <p class="source-note">API capabilities and repository naming checked against the linked sources on 12 October 2026. The lifecycle, limits, and rollout above are proposed design choices. Provider account execution and target activation belong to the implementation gates.</p>
+  <nav class="foot-nav" aria-label="Related pages"><a href="../index.html">&larr; Notebook</a> · <a href="../smolpaws-github.html">SmolPaws GitHub entry point</a> · <a href="openhands-automations.html">OpenHands Automations</a></nav>
+</main>
+</body>
+</html>
