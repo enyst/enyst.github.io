@@ -66,6 +66,8 @@
     <p class="snapshot">Status checked <time datetime="2026-10-12T06:45:42Z">12 October 2026</time> · Secret selection and shadcn 0.2.1 are merged. Text-medium cleanup and backend feedback colors are separate open proposals.</p>
     <nav class="links" aria-label="On this page">
       <a href="#film">Before / After</a>
+      <a href="#backend-film">Backend feedback</a>
+      <a href="#focus-film">Keyboard focus</a>
       <a href="#rules">The rules</a>
       <a href="#progress">Progress</a>
       <a href="#next">What's next</a>
@@ -118,6 +120,28 @@
         <p class="evidence">Backend colors are <a href="https://github.com/OpenHands/OpenHands/pull/18321">#18321</a>; the independent <code>text-medium</code> cleanup is <a href="https://github.com/OpenHands/OpenHands/pull/18320">#18320</a>. The real Agent Server is 1.54.0; no LLM call or credential entry was needed. <a href="../experiments/agentic-linting-refactoring/backend-feedback-sources.json">Source revisions and measurements</a> distinguish the recordings from the lint-only code comparison.</p>
       </section>
 
+      <section aria-labelledby="focus-film">
+        <h2 id="focus-film">Keyboard focus and the legacy scrim</h2>
+        <figure class="film">
+          <video id="keyboard-focus-film" controls preload="metadata" playsinline poster="../experiments/agentic-linting-refactoring/keyboard-focus-poster.jpg" aria-label="Before and after theme-aware backend focus and the legacy scrim CSS correction">
+            <source src="../experiments/agentic-linting-refactoring/keyboard-focus-and-legacy-scrim.mp4" type="video/mp4" />
+            <track kind="captions" src="../experiments/agentic-linting-refactoring/keyboard-focus-captions.vtt" srclang="en" label="Change descriptions" />
+            <a href="../experiments/agentic-linting-refactoring/keyboard-focus-and-legacy-scrim.mp4" download>Download the video (MP4, 0:56)</a>
+          </video>
+          <figcaption>Visible outlines for backend connection tabs and guidance in all five themes. Solarized focus stays readable on hovered neutral surfaces. The scrim scene shows the actual Tailwind output of the exported legacy drawer; the current app uses the settings hub.</figcaption>
+        </figure>
+        <a class="film-download" href="../experiments/agentic-linting-refactoring/keyboard-focus-and-legacy-scrim.mp4" download="keyboard-focus-and-legacy-scrim.mp4">Download this video · MP4, 1.9 MB</a>
+        <div class="chapters" role="group" aria-label="Jump to a keyboard focus video chapter">
+          <button type="button" data-time="15" aria-controls="keyboard-focus-film">0:15 · Connection tabs</button>
+          <button type="button" data-time="22" aria-controls="keyboard-focus-film">0:22 · Guidance focus</button>
+          <button type="button" data-time="29" aria-controls="keyboard-focus-film">0:29 · Solarized hover</button>
+          <button type="button" data-time="36" aria-controls="keyboard-focus-film">0:36 · Phone focus</button>
+          <button type="button" data-time="42" aria-controls="keyboard-focus-film">0:42 · Scrim opacity</button>
+          <button type="button" data-time="49" aria-controls="keyboard-focus-film">0:49 · Five themes</button>
+        </div>
+        <p class="evidence">The prepared batch is tracked in <a href="https://github.com/OpenHands/OpenHands/issues/18324">#18324</a>. Real production Canvas and Agent Server 1.54.0, desktop and phone, no LLM call, quiet original ambience. Default outlines measure 3.26–14.74:1 in the actual inspected states. <a href="../experiments/agentic-linting-refactoring/keyboard-focus-sources.json">Revisions, measurements, and the generated legacy CSS</a>.</p>
+      </section>
+
       <section aria-labelledby="rules">
         <h2 id="rules">What an agent is being asked to respect</h2>
         <p>Put a rule in the repository where every contributor can run it, give the finding an actionable message, and define the exceptions where the value is owned. A warning exposes migration work. An error makes a new violation fail lint.</p>
@@ -153,8 +177,9 @@
           <li><div class="entry-head"><h3>Update the shadcn analysis pack</h3><span class="state">Merged · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18315">#18315</a> pins <code>@shadcn/lint</code> 0.2.1 after signature, provenance, and source review. Paint-clearing SVG classes and custom font sizes are recognized correctly; adopted rule severities are unchanged.</p></li>
           <li><div class="entry-head"><h3>Remove the redundant font-size exception</h3><span class="state state-open">Open · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18320">#18320</a> removes <code>text-medium</code> from the raw-color allow list now that the pack recognizes it as a font size. Existing font sizes and the seven color exceptions remain unchanged. Local lint contracts and all CI checks pass.</p></li>
           <li><div class="entry-head"><h3>Make backend connection feedback readable</h3><span class="state state-open">Open · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18321">#18321</a> uses the existing feedback-text roles for connection errors and status messages, with a 5% semantic tint on error panels. Real desktop/phone measurements pass in all five themes: error text 4.55–4.92:1, connected status 4.91–9.96:1. The proposal removes 15 raw-color warnings, from 133 to 118 in its audited source tree; this is a proposal count, not a live count on main.</p></li>
+          <li><div class="entry-head"><h3>Use readable focus and valid legacy opacity</h3><span class="state state-open">Prepared · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/issues/18324">#18324</a> tracks the next independent color batch: backend outlines use the host focus role, Solarized focus meets 3:1 on hovered neutral surfaces, and the exported legacy drawer's scrim compiles to 50% opacity. The batch removes three raw-color findings in its own source audit. See the focus film above.</p></li>
         </ol>
-        <p>The two visual changes together remove <strong>15 raw-color findings</strong>. Inline-style warnings expose a separate existing backlog; these figures do not describe the net warning count.</p>
+        <p>The earlier MCP feedback and secret-selection changes together remove <strong>15 raw-color findings</strong>. Inline-style warnings expose a separate existing backlog; these figures do not describe the net warning count.</p>
       </section>
 
       <section aria-labelledby="next">
