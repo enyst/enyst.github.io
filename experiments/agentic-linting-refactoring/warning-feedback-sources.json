@@ -1,0 +1,126 @@
+{
+  "video": "warning-feedback-before-after.mp4",
+  "sha256": "dd060afe18fc3e74663e842d16bb71a185cb310ee8298d7e17cefced500eabc1",
+  "bytes": 1270761,
+  "durationSeconds": 45.083333,
+  "beforeRevision": "0f1b6f62507f1ccdb4e63f61cf3dc48356a0d4fa",
+  "afterRevision": "cca69c138ab220566aa436a40494567df98dff84",
+  "agentServer": "1.54.0",
+  "source": "Real control-openhands recordings and screenshots from local Agent Canvas and Agent Server runs. No model call, external account or saved credential. Slides identify the state and measured contrast.",
+  "evidence": {
+    "beforeAfterHomeAndAppsThemesViewports": 40,
+    "afterAcpConflictThemesViewports": 10,
+    "afterOnboardingBlockedStateViewports": 2
+  },
+  "contrast": {
+    "threshold": "4.5:1 minimum for small text",
+    "light-plus": {
+      "home": {
+        "before": 1.36,
+        "after": 5.26
+      },
+      "appsTrust": {
+        "before": 1.08,
+        "after": 5.8
+      }
+    },
+    "solarized-light": {
+      "home": {
+        "before": 1.3,
+        "after": 5.78
+      },
+      "appsTrust": {
+        "before": 1.0,
+        "after": 6.18
+      }
+    },
+    "acpConflictAfterByTheme": {
+      "light-plus": 6.1,
+      "openhands-deepsea": 9.82,
+      "openhands-neo": 9.03,
+      "openhands-neutral": 9.03,
+      "solarized-light": 6.5
+    },
+    "minimumAcrossFiveThemes": {
+      "homeAfter": 5.26,
+      "appsTrustAfter": 5.8,
+      "acpConflictAfter": 6.1
+    }
+  },
+  "music": "Original quiet ambience; final mix is very low (mean -46.2 dB, max -34.6 dB) with fades.",
+  "implementationRevision": "cca69c138ab220566aa436a40494567df98dff84",
+  "pr": "https://github.com/OpenHands/OpenHands/pull/18333",
+  "issue": "https://github.com/OpenHands/OpenHands/issues/18331",
+  "page": "https://enyst.github.io/arch/agentic-linting-refactoring.html#warning-feedback-film",
+  "directDownload": "https://enyst.github.io/experiments/agentic-linting-refactoring/warning-feedback-before-after.mp4",
+  "changes": [
+    "Add --oh-feedback-warning and the text-feedback-warning Tailwind role.",
+    "Default and dark-theme value: #c9b974; Light+: #7D5D08; Solarized Light: #735400.",
+    "Keep the control --oh-warning token unchanged; Apps notice tint and border remain warning-based.",
+    "Replace six raw palette findings across Home, Apps, ACP credential conflicts, and required-secret onboarding."
+  ],
+  "coverage": {
+    "themes": [
+      "light-plus",
+      "solarized-light",
+      "openhands-deepsea",
+      "openhands-neutral",
+      "openhands-neo"
+    ],
+    "homeAndApps": [
+      "desktop",
+      "phone"
+    ],
+    "acpConflict": [
+      "desktop",
+      "phone"
+    ],
+    "requiredSecretOnboarding": [
+      "desktop",
+      "phone"
+    ],
+    "horizontalOverflow": false,
+    "realBackend": "Agent Server 1.54.0",
+    "modelCalls": 0,
+    "credentialsSaved": 0
+  },
+  "checks": [
+    {
+      "name": "focused Vitest",
+      "result": "48 passed across four files"
+    },
+    {
+      "name": "host override browser regressions",
+      "result": "2 passed"
+    },
+    {
+      "name": "npm run lint",
+      "result": "passed; 0 errors, 733 warnings"
+    },
+    {
+      "name": "npm run build",
+      "result": "passed"
+    },
+    {
+      "name": "npm run build:lib",
+      "result": "passed"
+    },
+    {
+      "name": "full local npm test",
+      "result": "816 files passed, 1 failed; 8919 tests passed, 2 failed, 7 todo",
+      "note": "Both failures are in unrelated Docker session-key policy tests; the subprocess exits 127 in this local environment."
+    }
+  ],
+  "sourcePaths": [
+    "src/styles/agent-server-ui-style-scope.ts",
+    "src/tailwind.css",
+    "src/themes/color-theme/definitions/light-plus.ts",
+    "src/themes/color-theme/definitions/solarized-light.ts",
+    "src/components/features/home/llm-not-configured-banner.tsx",
+    "src/routes/canvas-extensions.tsx",
+    "src/components/features/settings/acp-conflict-warnings.tsx",
+    "src/components/features/onboarding/steps/setup-acp-secrets-step.tsx",
+    "__tests__/themes/color-themes.test.tsx",
+    "tests/e2e/mock-llm/regressions/mock-llm-ui-regressions.spec.ts"
+  ]
+}
