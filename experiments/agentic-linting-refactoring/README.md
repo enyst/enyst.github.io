@@ -18,5 +18,23 @@ at 30 seconds; it shows the actual secret-selection comparison. `captions.vtt`
 describes the on-screen changes; the soundtrack contains quiet music only.
 
 The source PRs retain the detailed tests, contrast measurements, app evidence,
-and reproducible capture recipes. The page distinguishes merged work from the
-still-open secret-selection proposal, which is included in the combined film.
+and reproducible capture recipes. The combined film includes the secret-selection
+change, now merged, and the page tracks the remaining open proposals.
+
+## Git Sync semantic colors
+
+The 79-second Before/After film,
+`git-sync-semantic-colors-before-after.mp4`, shows the same failed
+repository check and sync cycle in Light+ before and after PR #18346. Short
+title cards identify the hard-coded red utilities and their semantic
+feedback-token replacement. The page offers inline playback and a direct MP4
+download.
+
+Both clips were recorded with `control-openhands` from production
+Canvas builds and local Agent Server 1.54.0 in isolated baseline and PR
+worktrees. No credentials or model calls were used. The soundtrack reuses the
+Notebook's original ambient bed at a very low level (mean -46.1 dBFS, maximum
+-33.2 dBFS). The matching poster, captions, chapter times, revisions, and media
+hash are in `git-sync-semantic-colors-poster.png`,
+`git-sync-semantic-colors-captions.vtt`, and
+`git-sync-semantic-colors-sources.json`.
