@@ -63,12 +63,13 @@
     <a class="back" href="../index.html">← Engel's Code Design Notebook</a>
     <h1 class="page">Agentic linting refactoring</h1>
     <p class="page-intro">Make the design rules something a coding agent can check and act on: known Tailwind classes, readable theme colors, and shared controls whose appearance has one owner. This is the ongoing linting refactor in OpenHands Agent Canvas.</p>
-    <p class="snapshot">Status checked <time datetime="2026-10-12T09:20:46Z">12 October 2026</time> · Secret selection and shadcn 0.2.1 are merged. Four lint proposals are open: text-medium, backend feedback, focus and scrim, and form feedback.</p>
+    <p class="snapshot">Status checked <time datetime="2026-10-12T10:41:15Z">12 October 2026</time> · Secret selection and shadcn 0.2.1 are merged. The tracked set has five open proposals: separate text-medium cleanup and four color batches.</p>
     <nav class="links" aria-label="On this page">
       <a href="#film">Before / After</a>
       <a href="#backend-film">Backend feedback</a>
       <a href="#focus-film">Keyboard focus</a>
       <a href="#form-feedback-film">Form feedback</a>
+      <a href="#warning-feedback-film">Warning feedback</a>
       <a href="#rules">The rules</a>
       <a href="#progress">Progress</a>
       <a href="#next">What's next</a>
@@ -166,6 +167,29 @@
         <p class="evidence">Real control-openhands captures with Agent Server 1.54.0 in all five themes and on desktop and phone. Light+ contrast improves from 2.89:1 to 5.86:1; Solarized Light improves from 2.68:1 to 5.61:1. The PR replaces 19 raw-color findings across 15 consumers. <a href="../experiments/agentic-linting-refactoring/form-feedback-sources.json">Source revisions, measurements, and test results</a>.</p>
       </section>
 
+      <section aria-labelledby="warning-feedback-film">
+        <h2 id="warning-feedback-film">Theme-aware warning feedback</h2>
+        <figure class="film">
+          <video id="warning-feedback-video" controls preload="metadata" playsinline poster="../experiments/agentic-linting-refactoring/warning-feedback-poster.jpg" aria-label="Before and after warning text colors in OpenHands Agent Canvas">
+            <source src="../experiments/agentic-linting-refactoring/warning-feedback-before-after.mp4" type="video/mp4" />
+            <track kind="captions" src="../experiments/agentic-linting-refactoring/warning-feedback-captions.vtt" srclang="en" label="Change descriptions" />
+            <a href="../experiments/agentic-linting-refactoring/warning-feedback-before-after.mp4" download>Download the video (MP4, 0:45)</a>
+          </video>
+          <figcaption>Six raw yellow and amber findings become theme-aware warning text across Home, Canvas Apps, ACP credentials, and required-secret onboarding. The film labels the Before/After states, contrast values, and role change, with very quiet ambience.</figcaption>
+        </figure>
+        <a class="film-download" href="../experiments/agentic-linting-refactoring/warning-feedback-before-after.mp4" download="warning-feedback-before-after.mp4">Download this video · MP4, 1.3 MB</a>
+        <div class="chapters" role="group" aria-label="Jump to a warning feedback video chapter">
+          <button type="button" data-time="4" aria-controls="warning-feedback-video">0:04 · Home contrast</button>
+          <button type="button" data-time="10" aria-controls="warning-feedback-video">0:10 · Live Before</button>
+          <button type="button" data-time="16" aria-controls="warning-feedback-video">0:16 · Role change</button>
+          <button type="button" data-time="21" aria-controls="warning-feedback-video">0:21 · Solarized Light</button>
+          <button type="button" data-time="27" aria-controls="warning-feedback-video">0:27 · Live After</button>
+          <button type="button" data-time="33" aria-controls="warning-feedback-video">0:33 · Phone</button>
+          <button type="button" data-time="39" aria-controls="warning-feedback-video">0:39 · Five themes</button>
+        </div>
+        <p class="evidence">In Light+, Home warning contrast rises from 1.36:1 to 5.26:1 and Apps trust text from 1.08:1 to 5.80:1. In Solarized Light, they rise from 1.30:1 to 5.78:1 and 1.00:1 to 6.18:1. ACP conflict text stays above 6.10:1 across five themes. Captures cover desktop and phone widths with no horizontal overflow. The batch is <a href="https://github.com/OpenHands/OpenHands/pull/18333">PR #18333</a>, tracked by <a href="https://github.com/OpenHands/OpenHands/issues/18331">issue #18331</a>. <a href="../experiments/agentic-linting-refactoring/warning-feedback-sources.json">Source revisions, contrast measurements, and test results</a>.</p>
+      </section>
+
       <section aria-labelledby="rules">
         <h2 id="rules">What an agent is being asked to respect</h2>
         <p>Put a rule in the repository where every contributor can run it, give the finding an actionable message, and define the exceptions where the value is owned. A warning exposes migration work. An error makes a new violation fail lint.</p>
@@ -203,6 +227,7 @@
           <li><div class="entry-head"><h3>Make backend connection feedback readable</h3><span class="state state-open">Open · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18321">#18321</a> uses the existing feedback-text roles for connection errors and status messages, with a 5% semantic tint on error panels. Real desktop/phone measurements pass in all five themes: error text 4.55–4.92:1, connected status 4.91–9.96:1. The proposal removes 15 raw-color warnings, from 133 to 118 in its audited source tree; this is a proposal count, not a live count on main.</p></li>
           <li><div class="entry-head"><h3>Use readable focus and valid legacy opacity</h3><span class="state state-open">Open · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18327">#18327</a> implements issue <a href="https://github.com/OpenHands/OpenHands/issues/18324">#18324</a>: backend outlines follow the host focus role, Solarized focus reaches 3.26:1 on hovered neutral surfaces, and the exported legacy drawer scrim compiles to 50% opacity. The PR removes three raw-color warnings. See the focus film above.</p></li>
           <li><div class="entry-head"><h3>Use readable validation and service errors</h3><span class="state state-open">Open · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18330">#18330</a> moves 19 raw-color findings across 15 consumers to existing feedback and danger roles. Light+ contrast improves from 2.89:1 to 5.86:1, and Solarized Light from 2.68:1 to 5.61:1. All five themes pass on desktop and phone; see the film above.</p></li>
+          <li><div class="entry-head"><h3>Give warning text its own theme role</h3><span class="state state-open">Open · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18333">#18333</a> introduces <code>text-feedback-warning</code> for six yellow/amber findings across four warning paths. The role is separate from control <code>warning</code>; Light+ and Solarized Light text now passes 4.5:1 on the tested surfaces. See the warning film above and issue <a href="https://github.com/OpenHands/OpenHands/issues/18331">#18331</a>.</p></li>
         </ol>
         <p>The earlier MCP feedback and secret-selection changes together remove <strong>15 raw-color findings</strong>. Inline-style warnings expose a separate existing backlog; these figures do not describe the net warning count.</p>
       </section>
@@ -210,8 +235,8 @@
       <section aria-labelledby="next">
         <h2 id="next">What's next, in order</h2>
         <ol class="steps">
-          <li><strong>Review the independent open proposals.</strong> <a href="https://github.com/OpenHands/OpenHands/pull/18320">#18320</a> removes the font-size exception; <a href="https://github.com/OpenHands/OpenHands/pull/18321">#18321</a> updates backend feedback; <a href="https://github.com/OpenHands/OpenHands/pull/18327">#18327</a> covers focus and the legacy scrim; <a href="https://github.com/OpenHands/OpenHands/pull/18330">#18330</a> updates validation feedback. Secret selection and shadcn 0.2.1 have merged.</li>
-          <li><strong>Continue the color migration by role.</strong> Work through <a href="https://github.com/OpenHands/OpenHands/issues/18004">#18004</a> in bounded batches: feedback and status, warning text, neutral text, and scrims. Choose semantic tokens and check the actual backdrop in all five palettes. Geometric nearest-color suggestions do not decide a color's meaning.</li>
+          <li><strong>Keep the open proposals in their own scopes.</strong> <a href="https://github.com/OpenHands/OpenHands/pull/18320">#18320</a> is the independent lint-only <code>text-medium</code> cleanup; <a href="https://github.com/OpenHands/OpenHands/pull/18321">#18321</a> handles backend feedback; <a href="https://github.com/OpenHands/OpenHands/pull/18327">#18327</a> covers focus and the legacy scrim; <a href="https://github.com/OpenHands/OpenHands/pull/18330">#18330</a> handles validation feedback; and <a href="https://github.com/OpenHands/OpenHands/pull/18333">#18333</a> handles warning text. Text-medium stays separate from color changes.</li>
+          <li><strong>Choose the next independent color batch.</strong> After warning text, audit the remaining findings under <a href="https://github.com/OpenHands/OpenHands/issues/18004">#18004</a> for neutral text and scrims. Keep each semantic role in its own PR, and check its actual backdrop in all five palettes.</li>
           <li><strong>Promote raw-color warnings when the migration is ready.</strong> Rerun the audit on the then-current head, account for each remaining finding and narrow exception, and verify rendering before changing <code>no-raw-colors</code> to an error.</li>
           <li><strong>Expand ownership contracts carefully.</strong> Typography, menus, and <code>Pre</code> need their own appearance decisions. Review dynamic-style owners before strengthening inline-style enforcement; preserve measured layout and public renderer interfaces.</li>
         </ol>
@@ -223,7 +248,7 @@
         <ul class="source-list">
           <li><a href="https://github.com/OpenHands/OpenHands/blob/fddb0ddcfe0d5ab8e32dd109291406a1d33813f1/eslint.config.js#L394">Checked lint configuration</a> and <a href="https://github.com/OpenHands/OpenHands/blob/fddb0ddcfe0d5ab8e32dd109291406a1d33813f1/.agents/skills/frontend-development/references/guide.md">contributor guidance</a> at <code>fddb0ddc</code>, including the exact rule scopes and exceptions.</li>
           <li><a href="https://github.com/OpenHands/OpenHands/issues/18004">Raw-color migration tracker #18004</a>. Its original 148-findings inventory is a historical audit, not the current remaining count.</li>
-          <li><a href="../experiments/agentic-linting-refactoring/sources.json">Video provenance</a>, <a href="../experiments/agentic-linting-refactoring/form-feedback-sources.json">form-feedback evidence</a>, and <a href="../experiments/agentic-linting-refactoring/progress.json">dated PR-status snapshot</a>: source revisions, real-backend setup, chapter timings, media hashes, measurements, and the original music method.</li>
+          <li><a href="../experiments/agentic-linting-refactoring/sources.json">Video provenance</a>, <a href="../experiments/agentic-linting-refactoring/form-feedback-sources.json">form-feedback evidence</a>, <a href="../experiments/agentic-linting-refactoring/warning-feedback-sources.json">warning-feedback evidence</a>, and <a href="../experiments/agentic-linting-refactoring/progress.json">dated PR-status snapshot</a>: source revisions, real-backend setup, chapter timings, media hashes, measurements, and the original music method.</li>
           <li><a href="control-openhands-cli.html">The control-openhands CLI</a> and <a href="../verify/index.html">the verification work</a>, which provide the app-driving and evidence loop used here.</li>
         </ul>
       </section>
