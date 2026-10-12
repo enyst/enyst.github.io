@@ -63,7 +63,7 @@
     <a class="back" href="../index.html">← Engel's Code Design Notebook</a>
     <h1 class="page">Agentic linting refactoring</h1>
     <p class="page-intro">Make the design rules something a coding agent can check and act on: known Tailwind classes, readable theme colors, and shared controls whose appearance has one owner. This is the ongoing linting refactor in OpenHands Agent Canvas.</p>
-    <p class="snapshot">Status checked <time datetime="2026-10-11T20:40:07Z">11 October 2026, 20:40 UTC</time> · The first three PRs in the latest batch are merged; the secret-selection fix is open.</p>
+    <p class="snapshot">Status checked <time datetime="2026-10-12T06:45:42Z">12 October 2026</time> · Secret selection and shadcn 0.2.1 are merged. Text-medium cleanup and backend feedback colors are separate open proposals.</p>
     <nav class="links" aria-label="On this page">
       <a href="#film">Before / After</a>
       <a href="#rules">The rules</a>
@@ -76,7 +76,7 @@
       <section aria-labelledby="film">
         <h2 id="film">Before / After</h2>
         <figure class="film">
-          <video id="lint-film" controls preload="metadata" playsinline poster="../experiments/agentic-linting-refactoring/poster.jpg" aria-label="Before and after the latest Agent Canvas linting refactor">
+          <video id="lint-film" controls preload="metadata" playsinline poster="../experiments/agentic-linting-refactoring/poster.jpg" aria-label="Before and after the first four Agent Canvas linting proposals">
             <source src="../experiments/agentic-linting-refactoring/agentic-linting-before-after.mp4" type="video/mp4" />
             <track kind="captions" src="../experiments/agentic-linting-refactoring/captions.vtt" srclang="en" label="Change descriptions" />
             <a href="../experiments/agentic-linting-refactoring/agentic-linting-before-after.mp4" download>Download the video (MP4, 1:24)</a>
@@ -93,7 +93,29 @@
           <button type="button" data-time="56" aria-controls="lint-film">0:56 · Inline warnings</button>
           <button type="button" data-time="68" aria-controls="lint-film">1:08 · Five themes</button>
         </div>
-        <p class="evidence">Recorded with <a href="control-openhands-cli.html"><code>control-openhands</code></a>, production Canvas builds, Chrome, and the same real local Agent Server 1.54.0. The film compares a common base with all four proposal heads combined in an isolated worktree, including the still-open fix. The lint-only scenes show actual ESLint results. Credential fields stayed empty; no model execution was needed.</p>
+        <p class="evidence">Recorded with <a href="control-openhands-cli.html"><code>control-openhands</code></a>, production Canvas builds, Chrome, and the same real local Agent Server 1.54.0. The film compares a common base with all four proposal heads combined in an isolated worktree, all four now merged. The lint-only scenes show actual ESLint results. Credential fields stayed empty; no model execution was needed.</p>
+      </section>
+
+      <section aria-labelledby="backend-film">
+        <h2 id="backend-film">Backend feedback and font-size cleanup</h2>
+        <figure class="film">
+          <video id="backend-feedback-film" controls preload="metadata" playsinline poster="../experiments/agentic-linting-refactoring/backend-feedback-poster.jpg" aria-label="Before and after backend feedback colors, with the separate text-medium lint cleanup">
+            <source src="../experiments/agentic-linting-refactoring/backend-feedback-and-text-medium.mp4" type="video/mp4" />
+            <track kind="captions" src="../experiments/agentic-linting-refactoring/backend-feedback-captions.vtt" srclang="en" label="Change descriptions" />
+            <a href="../experiments/agentic-linting-refactoring/backend-feedback-and-text-medium.mp4" download>Download the video (MP4, 0:54)</a>
+          </video>
+          <figcaption>Readable backend connection errors and status text in Light+ and Solarized Light, the phone layout, and the separate removal of a redundant font-size exception. Real control-openhands footage, Before/After comparisons, and very quiet original ambience.</figcaption>
+        </figure>
+        <a class="film-download" href="../experiments/agentic-linting-refactoring/backend-feedback-and-text-medium.mp4" download="backend-feedback-and-text-medium.mp4">Download this video · MP4, 2.1 MB</a>
+        <div class="chapters" role="group" aria-label="Jump to a backend feedback video chapter">
+          <button type="button" data-time="14" aria-controls="backend-feedback-film">0:14 · Connection errors</button>
+          <button type="button" data-time="22" aria-controls="backend-feedback-film">0:22 · Solarized Light</button>
+          <button type="button" data-time="29" aria-controls="backend-feedback-film">0:29 · Connected status</button>
+          <button type="button" data-time="35" aria-controls="backend-feedback-film">0:35 · Phone errors</button>
+          <button type="button" data-time="41" aria-controls="backend-feedback-film">0:41 · Remove exception</button>
+          <button type="button" data-time="47" aria-controls="backend-feedback-film">0:47 · Five themes</button>
+        </div>
+        <p class="evidence">Backend colors are <a href="https://github.com/OpenHands/OpenHands/pull/18321">#18321</a>; the independent <code>text-medium</code> cleanup is <a href="https://github.com/OpenHands/OpenHands/pull/18320">#18320</a>. The real Agent Server is 1.54.0; no LLM call or credential entry was needed. <a href="../experiments/agentic-linting-refactoring/backend-feedback-sources.json">Source revisions and measurements</a> distinguish the recordings from the lint-only code comparison.</p>
       </section>
 
       <section aria-labelledby="rules">
@@ -127,7 +149,10 @@
           <li><div class="entry-head"><h3>Make MCP feedback readable across themes</h3><span class="state">Merged · 11 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18270">#18270</a> moved error and success text to semantic feedback tokens, including darker text colors for the light palettes. Nine raw-color findings were removed. See the film at 0:04 and 0:14.</p></li>
           <li><div class="entry-head"><h3>Let the caret own its rotation</h3><span class="state">Merged · 11 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18274">#18274</a> extended the appearance guard to carets. Stateful callers use <code>isOpen</code>; a caller-supplied <code>rotate-*</code> override now produces an actionable lint error. Existing UI appearance is preserved.</p></li>
           <li><div class="entry-head"><h3>Audit inline styles before enforcing them</h3><span class="state">Merged · 11 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18275">#18275</a> turned <code>no-inline-styles</code> on as warnings. Its audit recorded 87 findings across 45 files after the exact embedding-root exception. Those are migration findings at that audited revision, rather than a claim about today's total lint count.</p></li>
-          <li><div class="entry-head"><h3>Use the shared switch for secret selection</h3><span class="state state-open">Open · 11 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18278">#18278</a> replaces the fixed bright-green “Also save as secret” appearance with the shared toggle and theme tokens. The secret name and help control wrap together on phones, and keyboard focus stays visible. Six raw-color findings are removed by this proposal.</p><p>The selected name's contrast changes from 1.70:1 to 12.55:1 in Light+, and from 1.56:1 to 10.40:1 in Solarized Light. The PR is approved and its checks pass at this snapshot; it still needs to merge. See 0:24 and 0:34 in the film.</p></li>
+          <li><div class="entry-head"><h3>Use the shared switch for secret selection</h3><span class="state">Merged · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18278">#18278</a> replaces the fixed bright-green “Also save as secret” appearance with the shared toggle and theme tokens. The secret name and help control wrap together on phones, and keyboard focus stays visible. Six raw-color findings are removed by this proposal.</p><p>The selected name's contrast changes from 1.70:1 to 12.55:1 in Light+, and from 1.56:1 to 10.40:1 in Solarized Light. The PR is now merged. See 0:24 and 0:34 in the film.</p></li>
+          <li><div class="entry-head"><h3>Update the shadcn analysis pack</h3><span class="state">Merged · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18315">#18315</a> pins <code>@shadcn/lint</code> 0.2.1 after signature, provenance, and source review. Paint-clearing SVG classes and custom font sizes are recognized correctly; adopted rule severities are unchanged.</p></li>
+          <li><div class="entry-head"><h3>Remove the redundant font-size exception</h3><span class="state state-open">Open · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18320">#18320</a> removes <code>text-medium</code> from the raw-color allow list now that the pack recognizes it as a font size. Existing font sizes and the seven color exceptions remain unchanged. Local lint contracts and all CI checks pass.</p></li>
+          <li><div class="entry-head"><h3>Make backend connection feedback readable</h3><span class="state state-open">Open · 12 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18321">#18321</a> uses the existing feedback-text roles for connection errors and status messages, with a 5% semantic tint on error panels. Real desktop/phone measurements pass in all five themes: error text 4.55–4.92:1, connected status 4.91–9.96:1. The proposal removes 15 raw-color warnings, from 133 to 118 in its audited source tree; this is a proposal count, not a live count on main.</p></li>
         </ol>
         <p>The two visual changes together remove <strong>15 raw-color findings</strong>. Inline-style warnings expose a separate existing backlog; these figures do not describe the net warning count.</p>
       </section>
@@ -135,7 +160,7 @@
       <section aria-labelledby="next">
         <h2 id="next">What's next, in order</h2>
         <ol class="steps">
-          <li><strong>Finish the secret-selection proposal.</strong> Merge <a href="https://github.com/OpenHands/OpenHands/pull/18278">#18278</a> after the remaining maintainer decision. Its implementation, live evidence, and checks are ready.</li>
+          <li><strong>Review the independent next proposals.</strong> <a href="https://github.com/OpenHands/OpenHands/pull/18320">#18320</a> removes the font-size exception; <a href="https://github.com/OpenHands/OpenHands/pull/18321">#18321</a> migrates backend feedback colors. Secret selection and the package upgrade have already merged.</li>
           <li><strong>Continue the color migration by role.</strong> Work through <a href="https://github.com/OpenHands/OpenHands/issues/18004">#18004</a> in bounded batches: feedback and status, warning text, neutral text, and scrims. Choose semantic tokens and check the actual backdrop in all five palettes. Geometric nearest-color suggestions do not decide a color's meaning.</li>
           <li><strong>Promote raw-color warnings when the migration is ready.</strong> Rerun the audit on the then-current head, account for each remaining finding and narrow exception, and verify rendering before changing <code>no-raw-colors</code> to an error.</li>
           <li><strong>Expand ownership contracts carefully.</strong> Typography, menus, and <code>Pre</code> need their own appearance decisions. Review dynamic-style owners before strengthening inline-style enforcement; preserve measured layout and public renderer interfaces.</li>
@@ -153,12 +178,12 @@
         </ul>
       </section>
     </article>
-    <footer>Engel's Code Design Notebook · OpenHands Agent Canvas · 11 October 2026</footer>
+    <footer>Engel's Code Design Notebook · OpenHands Agent Canvas · 12 October 2026</footer>
   </main>
   <script>
-    const film = document.getElementById('lint-film');
     document.querySelectorAll('button[data-time]').forEach(button => {
       button.addEventListener('click', () => {
+        const film = document.getElementById(button.getAttribute('aria-controls'));
         film.currentTime = Number(button.dataset.time);
         film.play().catch(() => film.focus());
       });
