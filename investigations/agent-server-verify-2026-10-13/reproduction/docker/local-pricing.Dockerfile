@@ -1,0 +1,2 @@
+FROM qa-agent-server:acca181a
+ENV LITELLM_LOCAL_MODEL_COST_MAP=True
