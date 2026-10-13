@@ -9,6 +9,6 @@ Build order and image tags used:
 2. `local-pricing.Dockerfile` → `qa-agent-server:acca181a-local-pricing`.
 3. `runtime-layout.Dockerfile` → `qa-agent-server:acca181a-local-layout`.
 4. `runtime-uid.Dockerfile` → `qa-agent-server:acca181a-local-uid`.
-5. `nohealth-uid.Dockerfile` → `qa-agent-server:acca181a-local-uid-nohealth` for the controlled never-health startup branch.
+5. `nohealth-uid.Dockerfile` → `qa-agent-server:nohealth-uid-acca181a` for the controlled never-health startup branch.
 
 The final layout moves editable public source outside the mounted conversation workspace and permits UID1000 traversal/read/execute. The bundled-price setting avoids a remote price-table lookup at import time. Before driving probes, repeat the UID1000 empty-workspace import proof and verify all four package versions and `OPENHANDS_BUILD_GIT_SHA`. The saved proof JSON records the image used in this audit. The first two layouts were invalid runtime arrangements, not product failures.
