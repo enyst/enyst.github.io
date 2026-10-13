@@ -129,7 +129,7 @@ def issue_card(issue, triage):
 def write_csv(records):
     columns = ["issue", "issue_title", "issue_author", "issue_url", "issue_state", "issue_created_at", "has_own_pr", "own_open_pr_count", "other_open_pr_count", "pr", "pr_title", "pr_author", "pr_url", "pr_state", "pr_draft", "pr_merged_at", "pr_fix_scope", "pr_is_own", "pr_direct_closer"]
     with (ASSETS / "inventory.csv").open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=columns)
+        writer = csv.DictWriter(file, fieldnames=columns, lineterminator="\n")
         writer.writeheader()
         for issue in records:
             base = {"issue": issue["number"], "issue_title": issue["title"], "issue_author": issue["author"], "issue_url": issue["url"], "issue_state": issue["state"], "issue_created_at": issue["created_at"], "has_own_pr": bool(issue["own_prs"]), "own_open_pr_count": sum(active(pr) for pr in issue["own_prs"]), "other_open_pr_count": sum(active(pr) for pr in issue["other_prs"])}
