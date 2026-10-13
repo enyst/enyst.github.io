@@ -1,0 +1,15 @@
+{
+  "file": "F17-workspaces-registry.md",
+  "bullet": "No-op writes on read-only storage (`F17.noop-write-readonly`), known bug.",
+  "ids": [
+    "F17.noop-write-readonly"
+  ],
+  "line": 633,
+  "script": "PDIR=\"$AGENT_SERVER_VERIFY_RUN/home/.openhands\"\nBEFORE=$(control-agent-server api GET /api/workspaces --field .)\nchattr +i \"$PDIR\"\ntrap 'chattr -i \"$PDIR\"' EXIT\ncontrol-agent-server api GET /api/workspaces --expect 200 --check . eq \"$BEFORE\" --save F17.noop-write-readonly/get\ncontrol-agent-server api POST /api/workspaces --expect 500 --check exception contains 'Failed to save workspaces' \\\n  --json '{\"workspaces\": [{\"id\": \"/qa-f17/ro\", \"name\": \"qa-f17-ro\", \"path\": \"/qa-f17/ro\"}]}' --save F17.noop-write-readonly/real-add\ncontrol-agent-server state ls 'home/.openhands/workspaces.tmp*' --expect-count 0\ncontrol-agent-server api DELETE /api/workspaces --query path=/qa-f17/never --expect 404 \\\n  --check detail eq 'Workspace not found' --save F17.noop-write-readonly/delete-unknown  # bug\ncontrol-agent-server api POST /api/workspaces --json-file \"$F17/readd.json\" --expect 200 --check workspaces len-eq 5  # bug\ncontrol-agent-server api DELETE /api/workspaces/parents --query path=/qa-f17/never --expect 404  # bug\ncontrol-agent-server api POST /api/workspaces/parents --json-file \"$F17/plain-parent.json\" --expect 200 \\\n  --check workspaceParents len-eq 2  # bug\nchattr -i \"$PDIR\"\ntrap - EXIT\ncontrol-agent-server api GET /api/workspaces --expect 200 --check . eq \"$BEFORE\" --check . not-contains /qa-f17/ro\n",
+  "exit_code": 127,
+  "elapsed_ms": 2883,
+  "failed_line": 3,
+  "failed_command": "chattr +i \"$PDIR\"",
+  "stdout": "",
+  "stderr": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/private/F17-workspaces-registry.recipe.sh: line 7: chattr: command not found\n"
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F16-workspace-serving-and-vscode.md",
+  "bullet": "Root index (`F16.root-index`).",
+  "ids": [
+    "F16.root-index"
+  ],
+  "line": 136,
+  "script": "control-agent-server api GET \"<redacted:session-cookie>/$CID/workspace\" --expect 200 --check . contains qa-f16-root \\\n  --check-header content-type eq 'text/html; charset=utf-8' --check-header content-disposition missing --save F16.root-index/root\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/workspace/\" --expect 200 --check . contains qa-f16-root\n",
+  "exit_code": 0,
+  "elapsed_ms": 4162,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/e989ffd9-dd61-4c60-a155-c323de612e05/workspace\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-type\": \"text/html; charset=utf-8\",\n      \"content-length\": \"21\",\n      \"etag\": \"\\\"0d3d00c257ac2ae33c4dbebea1936926\\\"\"\n    },\n    \"body\": \"<h1>qa-f16-root</h1>\\n\",\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 282,\n  \"checks\": [\n    {\n      \"check\": \". contains qa-f16-root\",\n      \"ok\": true,\n      \"actual\": \"<h1>qa-f16-root</h1>\\n\"\n    },\n    {\n      \"check\": \"header content-type eq text/html; charset=utf-8\",\n      \"ok\": true,\n      \"actual\": \"text/html; charset=utf-8\"\n    },\n    {\n      \"check\": \"header content-disposition missing\",\n      \"ok\": true,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021937-8e5b-map-f16/evidence/F16.root-index/root.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/e989ffd9-dd61-4c60-a155-c323de612e05/workspace/\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-type\": \"text/html; charset=utf-8\",\n      \"content-length\": \"21\",\n      \"etag\": \"\\\"0d3d00c257ac2ae33c4dbebea1936926\\\"\"\n    },\n    \"body\": \"<h1>qa-f16-root</h1>\\n\",\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 383,\n  \"checks\": [\n    {\n      \"check\": \". contains qa-f16-root\",\n      \"ok\": true,\n      \"actual\": \"<h1>qa-f16-root</h1>\\n\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

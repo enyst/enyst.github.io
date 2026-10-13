@@ -1,0 +1,15 @@
+{
+  "file": "F17-workspaces-registry.md",
+  "bullet": "Children of a parent (`F17.parent-children`).",
+  "ids": [
+    "F17.parent-children"
+  ],
+  "line": 371,
+  "script": "control-agent-server api GET /api/file/search_subdirs --query \"path=$PARENT\" --expect 200 \\\n  --check items len-eq 2 --check items.0.path eq \"$PARENT/alpha\" --check items.1.path eq \"$PARENT/beta\" \\\n  --save F17.parent-children/subdirs\ncontrol-agent-server api GET /api/workspaces --check workspaces len-eq 5 --check . not-contains \"$PARENT/alpha\"\ncontrol-agent-server api POST /api/workspaces --json-file \"$F17/child.json\" --expect 200 \\\n  --check workspaces len-eq 6 --check workspaces.5.path eq \"$PARENT/alpha\" --check workspaces.5.parentPath eq \"$PARENT\" \\\n  --save F17.parent-children/register-child\ncontrol-agent-server api GET /api/workspaces --check workspaces.5.parentPath eq \"$PARENT\" --check . not-contains \"$PARENT/beta\"\n",
+  "exit_code": 1,
+  "elapsed_ms": 1303,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api GET /api/file/search_subdirs --query \"path=$PARENT\" --expect 200 --check items len-eq 2 --check items.0.path eq \"$PARENT/alpha\" --check items.1.path eq \"$PARENT/beta\" --save F17.parent-children/subdirs",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/file/search_subdirs\",\n    \"query\": [\n      [\n        \"path\",\n        \"\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"34\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Path must be absolute\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 187,\n  \"checks\": [\n    {\n      \"check\": \"items len-eq 2\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    },\n    {\n      \"check\": \"items.0.path eq /alpha\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    },\n    {\n      \"check\": \"items.1.path eq /beta\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021807-b1a5-map-f17/evidence/F17.parent-children/subdirs.json\",\n  \"hint\": \"expected 200, got 400\"\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,5 @@
+# F32 flush timer setup adaptation
+
+The frozen shell recipe's creation, send and observation commands each spawn Python CLI imports. Under concurrent verification load, these consume the six-second window and the snapshot has correctly flushed before the shell expects zero batches. The supplementary copy uses one control-agent-server exec transcript: a real httpx client creates the conversation, sends the second event at three seconds, observes the run-owned sink, and asserts a single batch containing both events arrives between five and eight seconds. All endpoints, timer configuration and assertions stay the same. Product source and frozen full-pass output remain unchanged.
+
+The first adapted two probes incorrectly omitted the required workspace and used a different agent body; the real API correctly rejected both with 422. Those transcripts remain preserved. The corrected probe provides agent_settings and an isolated LocalWorkspace, matching the CLI start body. No product defect is inferred from those setup failures.

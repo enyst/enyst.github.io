@@ -1,0 +1,15 @@
+{
+  "file": "F34-typescript-client.md",
+  "bullet": "Events list (`F34.events-list`).",
+  "ids": [
+    "F34.events-list"
+  ],
+  "line": 738,
+  "script": "TOTAL=$(control-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --field .)\ncat > \"$F34/events.mjs\" <<'JS'\nimport { m, host, apiKey, assert } from './lib.mjs';\nconst [cid, total] = process.argv.slice(2);\nconst events = new m.RemoteEventsList({ baseUrl: host, apiKey }, cid);\nassert.equal(await events.count(), Number(total));\nconst all = await events.getEvents();\nassert.equal(all.length, Number(total));\nassert.equal(new Set(all.map((e) => e.id)).size, all.length);\nconst users = await events.search({ source: 'user' });\nassert.deepEqual(users.items.map((e) => e.kind), ['MessageEvent']);\nconst actions = await events.search({ kind: 'openhands.sdk.event.llm_convertible.action.ActionEvent' });\nassert.ok(actions.items.length >= 1 && actions.items.every((e) => e.kind === 'ActionEvent'));\nassert.ok((await events.search({ body: 'QA-F34.TXT' })).items.length >= 1);\nconst first = await events.search({ limit: 2 });\nassert.equal(first.items.length, 2);\nconst second = await events.search({ limit: 2, page_id: first.next_page_id });\nassert.ok(!first.items.some((e) => second.items.some((s) => s.id === e.id)));\nassert.equal((await events.getEventById(all[0].id)).id, all[0].id);\nassert.deepEqual((await events.getEventsById([all[1].id, all[2].id])).map((e) => e.id), [all[1].id, all[2].id]);\nlet iterated = 0;\nfor await (const event of events) iterated += event.id ? 1 : 0;\nassert.equal(iterated, Number(total));\nconsole.log('QA_F34_EVENTS_OK');\nJS\ncontrol-agent-server exec --timeout 60 --expect-output QA_F34_EVENTS_OK --save F34.events-list/program -- node \"$F34/events.mjs\" \"$CID\" \"$TOTAL\"\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --check . eq \"$TOTAL\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 20223,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 10490,\n  \"stdout_tail\": \"QA_F34_EVENTS_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.events-list/program.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/49709e75-5cbf-4e9c-a626-98f997236636/events/count\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"2\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 19,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 704,\n  \"checks\": [\n    {\n      \"check\": \". eq 19\",\n      \"ok\": true,\n      \"actual\": \"19\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

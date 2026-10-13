@@ -1,0 +1,15 @@
+{
+  "file": "F24-openai-subscription.md",
+  "bullet": "Login across a restart (`F24.status-restart`).",
+  "ids": [
+    "F24.status-restart"
+  ],
+  "line": 277,
+  "script": "control-agent-server restart\ncontrol-agent-server api GET /api/llm/subscription/openai/status --expect 200 --check connected eq true \\\n  --check expires_at eq \"$EXP\" --save F24.status-restart/after-restart\n",
+  "exit_code": 0,
+  "elapsed_ms": 34431,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24\",\n  \"url\": \"http://127.0.0.1:53673\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 16742,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/llm/subscription/openai/status\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"84\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"vendor\": \"openai\",\n      \"connected\": true,\n      \"account_email\": null,\n      \"expires_at\": 1791863502000\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 395,\n  \"checks\": [\n    {\n      \"check\": \"connected eq true\",\n      \"ok\": true,\n      \"actual\": \"true\"\n    },\n    {\n      \"check\": \"expires_at eq 1791863502000\",\n      \"ok\": true,\n      \"actual\": \"1791863502000\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/F24.status-restart/after-restart.json\"\n}\n",
+  "stderr": ""
+}

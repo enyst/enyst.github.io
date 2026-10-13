@@ -1,0 +1,15 @@
+{
+  "file": "F07-session-socket.md",
+  "bullet": "Unknown conversation (`F07.unknown-conversation`).",
+  "ids": [
+    "F07.unknown-conversation"
+  ],
+  "line": 269,
+  "script": "control-agent-server ws listen /sockets/session/00000000-0000-4000-8000-0000000000f7 --query after_seq=-1 --expect-close 4004 --expect-frames 0 \\\n  --save \"F07.unknown-conversation/unknown-$CID\"\ncontrol-agent-server state cat \"evidence/F07.unknown-conversation/unknown-$CID.json\" --check summary.close.reason eq 'Conversation not found'\n",
+  "exit_code": 0,
+  "elapsed_ms": 2836,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"path\": \"/sockets/session/00000000-0000-4000-8000-0000000000f7\",\n  \"opened\": true,\n  \"frames\": 0,\n  \"kinds\": {},\n  \"stopped\": \"closed\",\n  \"close\": {\n    \"code\": 4004,\n    \"reason\": \"Conversation not found\"\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024935-e05c-map-f07/evidence/F07.unknown-conversation/unknown-c7e754eb-3ed6-43e2-aa98-e4a010314b36.json\",\n  \"first_frames\": []\n}\n{\n  \"ok\": true,\n  \"path\": \"evidence/F07.unknown-conversation/unknown-c7e754eb-3ed6-43e2-aa98-e4a010314b36.json\",\n  \"bytes\": 474,\n  \"mode\": \"0o600\",\n  \"content\": {\n    \"summary\": {\n      \"opened\": true,\n      \"frames\": 0,\n      \"kinds\": {},\n      \"stopped\": \"closed\",\n      \"close\": {\n        \"code\": 4004,\n        \"reason\": \"Conversation not found\"\n      }\n    },\n    \"frames\": [\n      {\n        \"direction\": \"opened\",\n        \"at\": \"2026-10-13T02:51:04Z\"\n      },\n      {\n        \"direction\": \"closed\",\n        \"at\": \"2026-10-13T02:51:04Z\",\n        \"stopped\": \"closed\",\n        \"close\": {\n          \"code\": 4004,\n          \"reason\": \"Conversation not found\"\n        }\n      }\n    ]\n  },\n  \"checks\": [\n    {\n      \"check\": \"summary.close.reason eq Conversation not found\",\n      \"ok\": true,\n      \"actual\": \"Conversation not found\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

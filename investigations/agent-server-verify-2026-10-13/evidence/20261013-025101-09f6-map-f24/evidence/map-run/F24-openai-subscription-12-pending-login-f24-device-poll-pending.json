@@ -1,0 +1,15 @@
+{
+  "file": "F24-openai-subscription.md",
+  "bullet": "Pending login (`F24.device-poll-pending`).",
+  "ids": [
+    "F24.device-poll-pending"
+  ],
+  "line": 365,
+  "script": "control-agent-server api POST /api/llm/subscription/openai/device/poll --json \"{\\\"device_code\\\": \\\"$DC\\\"}\" --expect 200 \\\n  --check connected eq false --check expires_at eq null --save F24.device-poll-pending/first\nsleep \"$INTERVAL\"\ncontrol-agent-server api POST /api/llm/subscription/openai/device/poll --json \"{\\\"device_code\\\": \\\"$DC\\\"}\" --expect 200 \\\n  --check connected eq false --save F24.device-poll-pending/second\ncontrol-agent-server state ls 'home/.openhands/auth/*' --expect-count 0\n",
+  "exit_code": 0,
+  "elapsed_ms": 7755,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/llm/subscription/openai/device/poll\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"device_code\": \"<redacted:device_code>\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"76\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"vendor\": \"openai\",\n      \"connected\": false,\n      \"account_email\": null,\n      \"expires_at\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 321,\n  \"checks\": [\n    {\n      \"check\": \"connected eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"expires_at eq null\",\n      \"ok\": true,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/F24.device-poll-pending/first.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/llm/subscription/openai/device/poll\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"device_code\": \"<redacted:device_code>\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"76\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"vendor\": \"openai\",\n      \"connected\": false,\n      \"account_email\": null,\n      \"expires_at\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 608,\n  \"checks\": [\n    {\n      \"check\": \"connected eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/F24.device-poll-pending/second.json\"\n}\n{\n  \"ok\": true,\n  \"pattern\": \"home/.openhands/auth/*\",\n  \"count\": 0,\n  \"files\": []\n}\n",
+  "stderr": ""
+}

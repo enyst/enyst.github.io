@@ -1,0 +1,314 @@
+{
+  "ok": false,
+  "file": "F22-meta-profiles.md",
+  "summary": {
+    "pass": 19,
+    "fail": 1,
+    "xfail": 5,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 92,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1784,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-00-preconditions.json"
+    },
+    {
+      "bullet": "Key required (`F22.auth-required`).",
+      "ids": [
+        "F22.auth-required"
+      ],
+      "line": 156,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2511,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-01-key-required-f22-auth-required.json"
+    },
+    {
+      "bullet": "Save in classes mode (`F22.save-classes`).",
+      "ids": [
+        "F22.save-classes"
+      ],
+      "line": 172,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1378,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-02-save-in-classes-mode-f22-save-classes.json"
+    },
+    {
+      "bullet": "Save in direct mode (`F22.save-direct`).",
+      "ids": [
+        "F22.save-direct"
+      ],
+      "line": 189,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 940,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-03-save-in-direct-mode-f22-save-direct.json"
+    },
+    {
+      "bullet": "Validation (`F22.validation`).",
+      "ids": [
+        "F22.validation"
+      ],
+      "line": 201,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1828,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-04-validation-f22-validation.json"
+    },
+    {
+      "bullet": "Router with no route (`F22.empty-router`), known bug.",
+      "ids": [
+        "F22.empty-router"
+      ],
+      "line": 216,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 954,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-05-router-with-no-route-f22-empty-router-kn.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server api POST /api/meta-profiles/qa-empty --json '{\"classifier_model\": \"deepseek-flash\"}' --expect 422 --save F22.empty-router/save",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles/qa-empty\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"46\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Meta-profile 'qa-empty' not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 44\n}\n{\n  \"ok\": false,\n  \"status\": 201,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/meta-profiles/qa-empty\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"classifier_model\": \"deepseek-flash\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 201,\n    \"headers\": {\n      \"content-length\": \"61\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"name\": \"qa-empty\",\n      \"message\": \"Meta-profile 'qa-empty' saved\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 46,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.empty-router/save.json\",\n  \"hint\": \"expected 422, got 201\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Overwrite (`F22.overwrite`).",
+      "ids": [
+        "F22.overwrite"
+      ],
+      "line": 238,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1670,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-06-overwrite-f22-overwrite.json"
+    },
+    {
+      "bullet": "Name rules (`F22.name-rules`).",
+      "ids": [
+        "F22.name-rules"
+      ],
+      "line": 253,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3209,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-07-name-rules-f22-name-rules.json"
+    },
+    {
+      "bullet": "Unknown names (`F22.not-found`).",
+      "ids": [
+        "F22.not-found"
+      ],
+      "line": 274,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3514,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-08-unknown-names-f22-not-found.json"
+    },
+    {
+      "bullet": "Activate (`F22.activate`).",
+      "ids": [
+        "F22.activate"
+      ],
+      "line": 290,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4361,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-09-activate-f22-activate.json"
+    },
+    {
+      "bullet": "Classes-mode routing (`F22.route-classes`).",
+      "ids": [
+        "F22.route-classes"
+      ],
+      "line": 308,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 17927,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-10-classes-mode-routing-f22-route-classes.json"
+    },
+    {
+      "bullet": "Direct routing (`F22.route-direct`).",
+      "ids": [
+        "F22.route-direct"
+      ],
+      "line": 341,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13508,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-11-direct-routing-f22-route-direct.json"
+    },
+    {
+      "bullet": "Missing LLM profile (`F22.route-missing-profile`).",
+      "ids": [
+        "F22.route-missing-profile"
+      ],
+      "line": 360,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 15054,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-12-missing-llm-profile-f22-route-missing-pr.json"
+    },
+    {
+      "bullet": "Restart (`F22.persist-restart`).",
+      "ids": [
+        "F22.persist-restart"
+      ],
+      "line": 387,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 39697,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-13-restart-f22-persist-restart.json"
+    },
+    {
+      "bullet": "Delete (`F22.delete`).",
+      "ids": [
+        "F22.delete"
+      ],
+      "line": 402,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 14309,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-14-delete-f22-delete.json"
+    },
+    {
+      "bullet": "Delete the active one (`F22.delete-active-clears`).",
+      "ids": [
+        "F22.delete-active-clears"
+      ],
+      "line": 417,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10844,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-15-delete-the-active-one-f22-delete-active-.json"
+    },
+    {
+      "bullet": "ACP clears the pointer (`F22.acp-clears-pointer`).",
+      "ids": [
+        "F22.acp-clears-pointer"
+      ],
+      "line": 434,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13863,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-16-acp-clears-the-pointer-f22-acp-clears-po.json"
+    },
+    {
+      "bullet": "Activation on ACP settings (`F22.activate-acp`), known bug.",
+      "ids": [
+        "F22.activate-acp"
+      ],
+      "line": 453,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 21345,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-17-activation-on-acp-settings-f22-activate-.json",
+      "failed_line": 16,
+      "failed_command": "jq -e '.status >= 400 and .status < 500' \"$F22/acp-activate.json\"",
+      "stdout_tail": "\"hard_context_reset_context_scaling\": 0.8\n        },\n        \"verification\": {\n          \"critic_enabled\": false,\n          \"critic_mode\": \"finish_and_message\",\n          \"enable_iterative_refinement\": false,\n          \"critic_threshold\": 0.6,\n          \"max_refinement_iterations\": 3,\n          \"critic_server_url\": null,\n          \"critic_model_name\": null,\n          \"critic_api_key\": null\n        }\n      },\n      \"conversation_settings\": {\n        \"schema_version\": 1,\n        \"max_iterations\": 500,\n        \"confirmation_mode\": false,\n        \"security_analyzer\": \"llm\"\n      },\n      \"llm_api_key_is_set\": true,\n      \"active_profile\": \"deepseek-flash\",\n      \"active_agent_profile_id\": null,\n      \"active_meta_profile\": \"qa-direct\",\n      \"misc_settings\": {}\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 448,\n  \"checks\": [\n    {\n      \"check\": \"active_meta_profile eq qa-direct\",\n      \"ok\": true,\n      \"actual\": \"qa-direct\"\n    },\n    {\n      \"check\": \"agent_settings.agent_kind eq openhands\",\n      \"ok\": true,\n      \"actual\": \"openhands\"\n    },\n    {\n      \"check\": \"agent_settings.enable_classify_and_switch_llm_tool eq true\",\n      \"ok\": true,\n      \"actual\": \"true\"\n    }\n  ]\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Corrupted files (`F22.corrupt-files`).",
+      "ids": [
+        "F22.corrupt-files"
+      ],
+      "line": 488,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 20833,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-18-corrupted-files-f22-corrupt-files.json"
+    },
+    {
+      "bullet": "Unreadable settings (`F22.corrupt-settings`), known bug.",
+      "ids": [
+        "F22.corrupt-settings"
+      ],
+      "line": 513,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 11770,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-19-unreadable-settings-f22-corrupt-settings.json",
+      "failed_line": 14,
+      "failed_command": "jq -e '.status == 409' \"$F22/corrupt-settings-activate.json\"",
+      "stdout_tail": ": \"Cannot load settings from /workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/home/.openhands/settings.json. File may be corrupted or encrypted with a different key. Refusing to overwrite with defaults to prevent data loss.\",\n      \"error_id\": \"a01623cc34694377ac7c23c856b81649\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 2637,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.corrupt-settings/activate.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"126\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"meta_profiles\": [\n        {\n          \"name\": \"qa-direct\",\n          \"classifier_model\": \"deepseek-flash\",\n          \"num_classes\": 0\n        }\n      ],\n      \"active_meta_profile\": \"qa-direct\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 766,\n  \"checks\": [\n    {\n      \"check\": \"active_meta_profile eq qa-direct\",\n      \"ok\": true,\n      \"actual\": \"qa-direct\"\n    }\n  ]\n}\nfalse\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Store busy (`F22.store-busy`).",
+      "ids": [
+        "F22.store-busy"
+      ],
+      "line": 541,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 66736,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-20-store-busy-f22-store-busy.json",
+      "failed_line": 13,
+      "failed_command": "test $((SECONDS - T0)) -le 33",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"status\": 503,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/meta-profiles/qa-busy\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"classifier_model\": \"deepseek-flash\",\n      \"classes\": [\n        {\n          \"description\": \"any\",\n          \"model\": \"deepseek-pro\"\n        }\n      ]\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 503,\n    \"headers\": {\n      \"content-length\": \"95\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"503: Meta-profile store is busy. Please retry.\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 30360,\n  \"checks\": [\n    {\n      \"check\": \"exception eq 503: Meta-profile store is busy. Please retry.\",\n      \"ok\": true,\n      \"actual\": \"503: Meta-profile store is busy. Please retry.\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.store-busy/save.json\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Lock wait blocks the server (`F22.store-busy-responsive`), known bug.",
+      "ids": [
+        "F22.store-busy-responsive"
+      ],
+      "line": 577,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 44673,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-21-lock-wait-blocks-the-server-f22-store-bu.json",
+      "failed_line": 21,
+      "failed_command": "test \"$SLOW\" = 0",
+      "stdout_tail": "ype\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 248,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.store-busy-responsive/alive-idle.json\"\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 28454,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.store-busy-responsive/alive.json\",\n  \"hint\": \"took 28454 ms, limit 3000 ms\"\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles/qa-busy\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"45\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Meta-profile 'qa-busy' not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 416\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Limit (`F22.limit`).",
+      "ids": [
+        "F22.limit"
+      ],
+      "line": 618,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 308725,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-22-limit-f22-limit.json"
+    },
+    {
+      "bullet": "TypeScript client (`F22.ts-client`).",
+      "ids": [
+        "F22.ts-client"
+      ],
+      "line": 641,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4620,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-23-typescript-client-f22-ts-client.json"
+    },
+    {
+      "bullet": "Persistence directory with `~` (`F22.persistence-dir`), known bug.",
+      "ids": [
+        "F22.persistence-dir"
+      ],
+      "line": 654,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 100692,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-24-persistence-directory-with-f22-persisten.json",
+      "failed_line": 9,
+      "failed_command": "control-agent-server state ls 'home/qa-f22-tilde/meta-profiles/qa-tilde.json' --run \"$T\" --expect-count 1",
+      "stdout_tail": "\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"124\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"meta_profiles\": [\n        {\n          \"name\": \"qa-tilde\",\n          \"classifier_model\": \"deepseek-flash\",\n          \"num_classes\": 1\n        }\n      ],\n      \"active_meta_profile\": \"qa-tilde\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 441,\n  \"checks\": [\n    {\n      \"check\": \"meta_profiles len-eq 1\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"name\\\": \\\"qa-tilde\\\", \\\"classifier_model\\\": \\\"deepseek-flash\\\", \\\"num_classes\\\": 1}]\"\n    },\n    {\n      \"check\": \"active_meta_profile eq qa-tilde\",\n      \"ok\": true,\n      \"actual\": \"qa-tilde\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"pattern\": \"home/qa-f22-tilde/settings.json\",\n  \"count\": 1,\n  \"files\": [\n    {\n      \"path\": \"home/qa-f22-tilde/settings.json\",\n      \"bytes\": 3743,\n      \"mode\": \"0o600\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"pattern\": \"home/qa-f22-tilde/meta-profiles/qa-tilde.json\",\n  \"count\": 0,\n  \"files\": []\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+  "launch_flags": []
+}

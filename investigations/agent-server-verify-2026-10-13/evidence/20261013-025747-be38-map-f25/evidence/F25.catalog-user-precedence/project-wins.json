@@ -1,0 +1,79 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/skills",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "load_public": false,
+      "load_user": true,
+      "load_org": false,
+      "project_dir": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/projects/qa-f25-proj"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "1531",
+      "content-type": "application/json"
+    },
+    "body": {
+      "skills": [
+        {
+          "name": "qa-f25-proj-skill",
+          "type": "agentskills",
+          "content": "# qa-f25-proj-skill\n\nWhen this skill is active, include the exact phrase QA_SKILL_MARKER.",
+          "triggers": [
+            "qa-f25-proj-skill"
+          ],
+          "source": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/projects/qa-f25-proj/.agents/skills/qa-f25-proj-skill/SKILL.md",
+          "description": "QA fixture skill qa-f25-proj-skill; mention QA_SKILL_MARKER when asked about qa-f25-proj-skill.",
+          "is_agentskills_format": true,
+          "disable_model_invocation": false
+        },
+        {
+          "name": "qa-f25-user",
+          "type": "agentskills",
+          "content": "QA_USER_BODY",
+          "triggers": [],
+          "source": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/home/.agents/skills/qa-f25-user/SKILL.md",
+          "description": "QA user skill",
+          "is_agentskills_format": true,
+          "disable_model_invocation": false
+        },
+        {
+          "name": "agents",
+          "type": "repo",
+          "content": "# QA project\n\nAlways mention QA_AGENTS_MD.\n",
+          "triggers": [],
+          "source": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/projects/qa-f25-proj/AGENTS.md",
+          "description": null,
+          "is_agentskills_format": false,
+          "disable_model_invocation": false
+        },
+        {
+          "name": "qa-legacy",
+          "type": "knowledge",
+          "content": "Legacy QA microagent.",
+          "triggers": [
+            "qa-legacy"
+          ],
+          "source": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/projects/qa-f25-proj/.openhands/skills/qa-legacy.md",
+          "description": null,
+          "is_agentskills_format": false,
+          "disable_model_invocation": false
+        }
+      ],
+      "sources": {
+        "sandbox": 0,
+        "registered_marketplaces": 0,
+        "sdk_base": 2,
+        "org": 0,
+        "project": 3
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 88
+}

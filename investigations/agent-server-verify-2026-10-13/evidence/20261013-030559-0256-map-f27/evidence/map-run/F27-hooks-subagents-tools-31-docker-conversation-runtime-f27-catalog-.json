@@ -1,0 +1,15 @@
+{
+  "file": "F27-hooks-subagents-tools.md",
+  "bullet": "Docker conversation runtime (`F27.catalog-docker-runtime`).",
+  "ids": [
+    "F27.catalog-docker-runtime"
+  ],
+  "line": 853,
+  "script": "rm \"$H/.cache/ms-playwright\"\ncontrol-agent-server restart --reset-config \\\n  --config-json '{\"conversation_runtime\": \"docker\", \"conversation_image\": \"ghcr.io/openhands/agent-server:1.2.3-python-minimal\"}'\ncontrol-agent-server api GET /api/tools/catalog --expect 200 --quiet \\\n  --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": false' \\\n  --save F27.catalog-docker-runtime/minimal-image\ncontrol-agent-server restart --reset-config \\\n  --config-json '{\"conversation_runtime\": \"docker\", \"conversation_image_has_browser\": false}'\ncontrol-agent-server api GET /api/tools/catalog --expect 200 --quiet \\\n  --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": false'\ncontrol-agent-server restart --reset-config --config-json '{\"conversation_runtime\": \"docker\"}'\ncontrol-agent-server api GET /server_info --auth none --expect 200 --check conversation_runtime eq docker\ncontrol-agent-server api GET /api/tools/catalog --expect 200 --quiet \\\n  --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": true' \\\n  --check tools contains '{\"name\": \"terminal\", \"user_selectable\": true, \"usable\": true' \\\n  --save F27.catalog-docker-runtime/stock-image\ntest ! -e \"$H/.cache/ms-playwright\"\n",
+  "exit_code": 1,
+  "elapsed_ms": 4,
+  "failed_line": 1,
+  "failed_command": "rm \"$H/.cache/ms-playwright\"",
+  "stdout": "",
+  "stderr": "rm: cannot remove '/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/home/.cache/ms-playwright': No such file or directory\n"
+}

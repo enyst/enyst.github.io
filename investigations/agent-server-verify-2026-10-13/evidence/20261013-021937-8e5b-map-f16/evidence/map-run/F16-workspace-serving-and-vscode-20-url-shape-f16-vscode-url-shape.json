@@ -1,0 +1,15 @@
+{
+  "file": "F16-workspace-serving-and-vscode.md",
+  "bullet": "URL shape (`F16.vscode-url-shape`).",
+  "ids": [
+    "F16.vscode-url-shape"
+  ],
+  "line": 393,
+  "script": "KEY=$(cat \"$AGENT_SERVER_VERIFY_RUN/private/session_api_key\")\ncontrol-agent-server api GET /api/vscode/url --expect 200 --check url eq \"http://localhost:$VPORT/?tkn=$KEY&folder=workspace\" --save F16.vscode-url-shape/global\ncontrol-agent-server api GET /api/vscode/url --query base_url=https://qa-f16.example:9443/ --query workspace_dir=/qa/f16 --expect 200 \\\n  --check url eq \"https://qa-f16.example:9443/?tkn=$KEY&folder=/qa/f16\"\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/vscode/url\" --expect 200 --check url eq \"http://localhost:$VPORT/?tkn=$KEY&folder=$WS\" --save F16.vscode-url-shape/scoped\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/vscode/url\" --query \"workspace_dir=$WS/sub\" --expect 200 --check url eq \"http://localhost:$VPORT/?tkn=$KEY&folder=$WS/sub\"\ncontrol-agent-server restart --config-json '{\"vscode_base_path\": \"/qa-f16/vscode/\"}'\ncontrol-agent-server api GET /api/vscode/url --expect 200 --check url eq \"http://localhost:$VPORT/qa-f16/vscode/?tkn=$KEY&folder=workspace\" --save F16.vscode-url-shape/base-path\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/vscode/url\" --query base_url=https://qa-f16.example --expect 200 \\\n  --check url eq \"https://qa-f16.example/qa-f16/vscode/?tkn=$KEY&folder=$WS\"\nunset KEY\n",
+  "exit_code": 1,
+  "elapsed_ms": 3873,
+  "failed_line": 2,
+  "failed_command": "control-agent-server api GET /api/vscode/url --expect 200 --check url eq \"http://localhost:$VPORT/?tkn=$KEY&folder=workspace\" --save F16.vscode-url-shape/global",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/vscode/url\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"87\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"url\": \"http://localhost:50393/?tkn=<redacted:session-cookie>&folder=workspace\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 813,\n  \"checks\": [\n    {\n      \"check\": \"url eq http://localhost:/?tkn=<redacted:session-cookie>&folder=workspace\",\n      \"ok\": false,\n      \"actual\": \"http://localhost:50393/?tkn=<redacted:session-cookie>&folder=workspace\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021937-8e5b-map-f16/evidence/F16.vscode-url-shape/global.json\",\n  \"hint\": \"failed check: url eq http://localhost:/?tkn=<redacted:session-cookie>&folder=workspace\"\n}\n",
+  "stderr": ""
+}

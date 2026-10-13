@@ -1,0 +1,999 @@
+{
+  "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+  "status": "complete_with_limitations",
+  "confirmed_bugs": [
+    {
+      "id": "F22.store-busy-responsive",
+      "title": "Synchronous profile-store locks freeze the server",
+      "severity": "high",
+      "feature_ids": [
+        "F22.store-busy-responsive",
+        "F23.store-busy-responsive"
+      ],
+      "expected": "GET /alive responds within 3000 ms while a meta-profile save waits on the store lock.",
+      "actual": "F22 meta-profile save lock waits stall /alive for 29,087 and 27,731 ms; F23 provider-connection list lock waits also stall /alive while idle controls remain fast.",
+      "repro_command": "control-agent-server map run --file F22 --only F22.save-classes,F22.store-busy-responsive --fresh --repeat 2 --record --keep-going\n.venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F23-llm-catalog-and-connections.md --only F23.models-no-bedrock,F23.conn-create,F23.conn-create-blank-key,F23.conn-patch-blank-key,F23.validate-linked-draft,F23.store-busy-responsive --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1",
+        "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F22-lock-confirm-1-doctor-after.json",
+        "/workspace/verification-artifacts/family-results/F22-lock-confirm-1-doctor-before.json",
+        "/workspace/verification-artifacts/family-results/F22-lock-confirm-2-doctor-after.json",
+        "/workspace/verification-artifacts/family-results/F22-lock-confirm-2-doctor-before-retry.json",
+        "/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1/evidence/F22.store-busy-responsive/alive-idle.json",
+        "/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1/evidence/F22.store-busy-responsive/alive.json",
+        "/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1/evidence/map-run/F22-meta-profiles-02-lock-wait-blocks-the-server-f22-store-bu.json",
+        "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/F22.store-busy-responsive/alive-idle.json",
+        "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/F22.store-busy-responsive/alive.json",
+        "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/map-run/F22-meta-profiles-02-lock-wait-blocks-the-server-f22-store-bu.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.store-busy-responsive/alive.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.store-busy-responsive/list.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-23-lock-wait-blocks-the-server-f23-store-bu.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.store-busy-responsive/alive.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.store-busy-responsive/list.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-06-lock-wait-blocks-the-server-f23-store-bu.json"
+      ],
+      "notes": "The async meta-profile router calls the synchronous file-locked MetaProfileStore on the event loop. The same root cause may be grouped with F20/F23 store lock stalls, if each endpoint's proof and counting convention are retained. Both clean confirmations use explicit fresh launch, successful doctor before map driving, doctor after recovery, and targeted stop. Second run required an initial OpenAPI warmup retry before driving. F22.save-classes supplies the undeclared store-directory prerequisite. No model inference occurs in the selected recipe. Grouped F22/F23 synchronous store operations on async request paths. Each endpoint has its own two fresh proofs. Root may group the separately verified F20 route with this mechanism, preserving every endpoint proof."
+    },
+    {
+      "id": "F28.prepare-corrupt-archive",
+      "title": "Matching-checksum non-gzip backend archive returns unhandled 500",
+      "severity": "low",
+      "feature_ids": [
+        "F28.prepare-corrupt-archive"
+      ],
+      "expected": "POST backend/prepare rejects invalid archive format with HTTP 409 and records no approval.",
+      "actual": "Both fresh runs return HTTP 500 with exception not a gzip file after checksum validation.",
+      "repro_command": "control-agent-server map run --file F28 --only F28.prepare-corrupt-archive --fresh --repeat 2 --record",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/F28.prepare-corrupt-archive/prepare.json",
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-01-non-gzip-artifact-f28-prepare-corrupt-ar.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/F28.prepare-corrupt-archive/prepare.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-01-non-gzip-artifact-f28-prepare-corrupt-ar.json"
+      ],
+      "notes": "tarfile.ReadError escapes the router ValueError mapping. The case stops at this invalid-format assertion; later no-write checks in the recipe are not reached."
+    },
+    {
+      "id": "F28.install-ref-cached",
+      "title": "Cached installs silently accept a nonexistent git ref",
+      "severity": "medium",
+      "feature_ids": [
+        "F25.install-unknown-ref",
+        "F28.install-ref-cached"
+      ],
+      "expected": "An unknown ref returns HTTP 400 and leaves the existing pinned install untouched.",
+      "actual": "Both Canvas and skill endpoints accept the nonexistent ref with 200 when the source is cached and install the cached checkout.",
+      "repro_command": "control-agent-server map run --file F28 --only F28.install-ref-cached --fresh --repeat 2 --record\n.venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F25-skills.md --only F25.marketplace-public,F25.install-bad-frontmatter,F25.install-documented-sources,F25.install-unknown-ref,F25.refresh-unfetchable,F25.sync-offline,F25.marketplace-stale-cache --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/F28.install-ref-cached/unknown-ref.json",
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-02-unknown-ref-on-a-cached-source-f28-insta.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/F28.install-ref-cached/unknown-ref.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-02-unknown-ref-on-a-cached-source-f28-insta.json",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.install-unknown-ref/cached.json",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.install-unknown-ref/first-clone.json",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-19-unknown-ref-f25-install-unknown-ref-know.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.install-unknown-ref/cached.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.install-unknown-ref/first-clone.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-07-unknown-ref-f25-install-unknown-ref-know.json"
+      ],
+      "notes": "The first pinned install is the positive control; the cache falls back after checkout failure. This shares a generic cached-repository cause with F25 but each driving bullet is counted separately unless grouping is explained. Grouped F25/F28 shared cached-repository fallback defect; each endpoint has two fresh proofs. No duplicate bug count."
+    },
+    {
+      "id": "F28.status-probe-latch",
+      "title": "One slow health probe permanently latches a recovered backend unhealthy",
+      "severity": "medium",
+      "feature_ids": [
+        "F28.status-probe-latch"
+      ],
+      "expected": "After direct health returns ok again, backend status returns ready without manual stop/start.",
+      "actual": "Both fresh runs keep reporting unhealthy during the five-second recovery poll, despite direct health ok and a live serving process.",
+      "repro_command": "control-agent-server map run --file F28 --only F28.status-probe-latch --fresh --repeat 2 --record",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/F28.status-probe-latch/after-recovery.json",
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-03-health-probe-latch-f28-status-probe-latc.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/F28.status-probe-latch/after-recovery.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-03-health-probe-latch-f28-status-probe-latc.json"
+      ],
+      "notes": "The slow probe has a one-second timeout. Once unhealthy, later status calls do not probe again. No timing-only model assertions are involved."
+    },
+    {
+      "id": "F28.hard-restart-orphan",
+      "title": "A live backend survives the server crash while status says stopped",
+      "severity": "high",
+      "feature_ids": [
+        "F28.hard-restart-orphan"
+      ],
+      "expected": "No backend process of the dead server survives its hard restart.",
+      "actual": "Both fresh runs report stopped with null pid after restart while pgrep of the run-private artifact path still finds the live backend.",
+      "repro_command": "control-agent-server map run --file F28 --only F28.hard-restart-orphan --fresh --repeat 2 --record",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/F28.hard-restart-orphan/status-after-crash.json",
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-04-backend-outlives-a-crash-f28-hard-restar.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/F28.hard-restart-orphan/status-after-crash.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-04-backend-outlives-a-crash-f28-hard-restar.json"
+      ],
+      "notes": "The backend starts a new session and survives SIGKILL with parent pid 1. Matching the artifact command path excludes an empty-cmdline zombie; this is separate from the unreaped-child observation limit in backend-stop/status-exit-hang. Automatic targeted CLI stop reaps owned orphans."
+    },
+    {
+      "id": "F22.empty-router",
+      "title": "A meta-profile with no routing mode is accepted",
+      "severity": "low",
+      "feature_ids": [
+        "F22.empty-router"
+      ],
+      "expected": "Reject a router with neither classes nor direct prompt with 422.",
+      "actual": "POST with only classifier_model returns 201 and persists an unusable routing configuration.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F22-meta-profiles.md --only F22.save-classes,F22.save-direct,F22.empty-router,F22.activate-acp,F22.corrupt-settings,F22.persistence-dir --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.empty-router/save.json",
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-05-router-with-no-route-f22-empty-router-kn.json",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/F22.empty-router/save.json",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-03-router-with-no-route-f22-empty-router-kn.json"
+      ],
+      "notes": "Validation defect; the model validator documents requiring one routing mode. Trap removes the test profile."
+    },
+    {
+      "id": "F22.activate-acp",
+      "title": "Meta-profile activation reports success while ACP drops it",
+      "severity": "medium",
+      "feature_ids": [
+        "F22.activate-acp"
+      ],
+      "expected": "Refuse activation or explicitly report that it was not applied.",
+      "actual": "Activation returns 200 activated while both settings and the list retain active_meta_profile=null on an ACP agent.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F22-meta-profiles.md --only F22.save-classes,F22.save-direct,F22.empty-router,F22.activate-acp,F22.corrupt-settings,F22.persistence-dir --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.activate-acp/activate.json",
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.activate-acp/list.json",
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-17-activation-on-acp-settings-f22-activate-.json",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/F22.activate-acp/activate.json",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/F22.activate-acp/list.json",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-04-activation-on-acp-settings-f22-activate-.json"
+      ],
+      "notes": "Both runs verify the ACP state and restore OpenHands settings afterwards; the copied recipe arranges the previously undeclared qa-direct activation."
+    },
+    {
+      "id": "F22.corrupt-settings",
+      "title": "Corrupted settings produce an unmapped meta-profile activation error",
+      "severity": "low",
+      "feature_ids": [
+        "F22.corrupt-settings"
+      ],
+      "expected": "Return 409 like LLM-profile activation and retain the corrupted file.",
+      "actual": "The LLM-profile control returns 409; meta-profile activation returns 500 for the same corrupted file. The file remains unchanged and is restored.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F22-meta-profiles.md --only F22.save-classes,F22.save-direct,F22.empty-router,F22.activate-acp,F22.corrupt-settings,F22.persistence-dir --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.corrupt-settings/activate.json",
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.corrupt-settings/llm-profile-activate.json",
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-19-unreadable-settings-f22-corrupt-settings.json",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/F22.corrupt-settings/activate.json",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/F22.corrupt-settings/llm-profile-activate.json",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-05-unreadable-settings-f22-corrupt-settings.json"
+      ],
+      "notes": "Status/error mapping only; no additional data loss is claimed."
+    },
+    {
+      "id": "F22.persistence-dir",
+      "title": "Meta-profile persistence does not expand the configured tilde path",
+      "severity": "medium",
+      "feature_ids": [
+        "F22.persistence-dir"
+      ],
+      "expected": "Write meta-profiles under the expanded OH_PERSISTENCE_DIR beside settings.json.",
+      "actual": "The configured home/qa-f22-tilde/settings.json exists, but its adjacent meta-profile is absent; the meta-profile uses the unexpanded path.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F22-meta-profiles.md --only F22.save-classes,F22.save-direct,F22.empty-router,F22.activate-acp,F22.corrupt-settings,F22.persistence-dir --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-24-persistence-directory-with-f22-persisten.json",
+        "/workspace/verification-artifacts/runs/20261013-022816-f88c-f22-tilde/evidence/F22.persistence-dir/save.json",
+        "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-06-persistence-directory-with-f22-persisten.json",
+        "/workspace/verification-artifacts/runs/20261013-034339-4b8d-f22-tilde/evidence/F22.persistence-dir/save.json"
+      ],
+      "notes": "Nested isolated servers are stopped by the recipe; saved response and state-location transcript prove both fresh attempts."
+    },
+    {
+      "id": "F23.models-no-bedrock",
+      "title": "Provider model lists include identifiers from Bedrock",
+      "severity": "low",
+      "feature_ids": [
+        "F23.models-no-bedrock"
+      ],
+      "expected": "A DeepSeek provider list excludes Bedrock-only deepseek.* identifiers.",
+      "actual": "Both provider lists contain deepseek.r1-v1:0, deepseek.v3-v1:0, and deepseek.v3.2.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F23-llm-catalog-and-connections.md --only F23.models-no-bedrock,F23.conn-create,F23.conn-create-blank-key,F23.conn-patch-blank-key,F23.validate-linked-draft,F23.store-busy-responsive --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.models-no-bedrock/anthropic.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.models-no-bedrock/deepseek.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-05-no-bedrock-ids-under-a-provider-f23-mode.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.models-no-bedrock/anthropic.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.models-no-bedrock/deepseek.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-01-no-bedrock-ids-under-a-provider-f23-mode.json"
+      ],
+      "notes": "The same recipe fetches Anthropic as a control, but its later negative assertion is not reached after the DeepSeek failure."
+    },
+    {
+      "id": "provider-connection-blank-keys",
+      "title": "Blank and redacted provider keys are accepted on creation and update",
+      "severity": "medium",
+      "feature_ids": [
+        "F23.conn-create-blank-key",
+        "F23.conn-patch-blank-key"
+      ],
+      "expected": "Reject blank, whitespace-only, and redacted placeholder keys and retain the previous shared key.",
+      "actual": "Whitespace and placeholder creates return 201 with api_key_set=false. PATCH accepts empty, whitespace, and placeholder values; subsequent linked-profile activation applies null, null, and the literal placeholder.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F23-llm-catalog-and-connections.md --only F23.models-no-bedrock,F23.conn-create,F23.conn-create-blank-key,F23.conn-patch-blank-key,F23.validate-linked-draft,F23.store-busy-responsive --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.conn-create-blank-key/list.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.conn-create-blank-key/placeholder.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.conn-create-blank-key/space.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.conn-patch-blank-key/patch-1.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.conn-patch-blank-key/patch-2.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.conn-patch-blank-key/patch-3.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-12-blank-keys-on-create-f23-conn-create-bla.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-16-blank-keys-on-update-f23-conn-patch-blan.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.conn-create-blank-key/list.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.conn-create-blank-key/placeholder.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.conn-create-blank-key/space.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.conn-patch-blank-key/patch-1.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.conn-patch-blank-key/patch-2.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.conn-patch-blank-key/patch-3.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-03-blank-keys-on-create-f23-conn-create-bla.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-04-blank-keys-on-update-f23-conn-patch-blan.json"
+      ],
+      "notes": "One grouped validation defect across create/update; both endpoint branches independently reproduced twice. All negative-test keys are synthetic."
+    },
+    {
+      "id": "F23.validate-linked-draft",
+      "title": "Draft validation does not resolve its provider connection key",
+      "severity": "medium",
+      "feature_ids": [
+        "F23.validate-linked-draft"
+      ],
+      "expected": "The same DeepSeek draft validates whether its key is inline or linked through provider_connection_id.",
+      "actual": "The inline-key positive control validates successfully; the linked draft returns valid=false with LLMAuthenticationError.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F23-llm-catalog-and-connections.md --only F23.models-no-bedrock,F23.conn-create,F23.conn-create-blank-key,F23.conn-patch-blank-key,F23.validate-linked-draft,F23.store-busy-responsive --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.validate-linked-draft/linked.json",
+        "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-18-validate-a-linked-draft-f23-validate-lin.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/F23.validate-linked-draft/linked.json",
+        "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-05-validate-a-linked-draft-f23-validate-lin.json"
+      ],
+      "notes": "Tiny real DeepSeek calls distinguish credential resolution from provider/network availability."
+    },
+    {
+      "id": "F24.status-offline",
+      "title": "Expired subscription status crashes when token refresh is offline",
+      "severity": "medium",
+      "feature_ids": [
+        "F24.status-offline"
+      ],
+      "expected": "Status returns connected=false after an unreachable token refresh, as it does for a rejected refresh.",
+      "actual": "An unexpired synthetic login reports connected=true; after expiry with the same unreachable proxy, status returns 500 All connection attempts failed.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F24-openai-subscription.md --only F24.status-offline,F24.device-start-offline --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24",
+        "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/map-run/F24-openai-subscription-18-status-with-an-expired-login-offline-f24.json",
+        "/workspace/verification-artifacts/runs/20261013-025510-6f5e-f24-offline/evidence/F24.status-offline/status.json",
+        "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24/evidence/map-run/F24-openai-subscription-01-status-with-an-expired-login-offline-f24.json",
+        "/workspace/verification-artifacts/runs/20261013-034812-81fc-f24-offline/evidence/F24.status-offline/status.json"
+      ],
+      "notes": "No human login or real account is completed; fixtures contain only explicitly fake access/refresh tokens."
+    },
+    {
+      "id": "F24.device-start-offline",
+      "title": "Offline device-login start returns an unhandled 500",
+      "severity": "low",
+      "feature_ids": [
+        "F24.device-start-offline"
+      ],
+      "expected": "Return a gateway failure such as 502/503/504 when OpenAI is unreachable.",
+      "actual": "A real throwaway device code is created and confirmed pending; after its loopback CONNECT relay stops, another device/start returns 500 All connection attempts failed.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F24-openai-subscription.md --only F24.status-offline,F24.device-start-offline --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24",
+        "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/map-run/F24-openai-subscription-19-start-and-poll-a-login-offline-f24-devic.json",
+        "/workspace/verification-artifacts/runs/20261013-025551-44ef-f24-outage/evidence/F24.device-start-offline/start.json",
+        "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24/evidence/map-run/F24-openai-subscription-02-start-and-poll-a-login-offline-f24-devic.json",
+        "/workspace/verification-artifacts/runs/20261013-034843-3ace-f24-outage/evidence/F24.device-start-offline/start.json"
+      ],
+      "notes": "No account login was completed. The later offline poll assertion is not reached and is listed as not-run."
+    },
+    {
+      "id": "F25.marketplace-public",
+      "title": "The public skills marketplace misses the current extensions manifest",
+      "severity": "medium",
+      "feature_ids": [
+        "F25.marketplace-public"
+      ],
+      "expected": "Return the skills from the actual public extensions manifest.",
+      "actual": "A real extensions checkout is available, but GET /api/skills/marketplace returns 200 with skills=[].",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F25-skills.md --only F25.marketplace-public,F25.install-bad-frontmatter,F25.install-documented-sources,F25.install-unknown-ref,F25.refresh-unfetchable,F25.sync-offline,F25.marketplace-stale-cache --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.marketplace-public/catalog.json",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-03-public-marketplace-catalog-f25-marketpla.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.marketplace-public/catalog.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-02-public-marketplace-catalog-f25-marketpla.json"
+      ],
+      "notes": "The current repository uses .plugin/marketplace.json while the service default expects marketplaces/default.json."
+    },
+    {
+      "id": "F25.install-bad-frontmatter",
+      "title": "Malformed skill frontmatter produces an unhandled server error",
+      "severity": "low",
+      "feature_ids": [
+        "F25.install-bad-frontmatter"
+      ],
+      "expected": "Reject malformed YAML frontmatter with a client error.",
+      "actual": "Skill install returns 500 with the YAML parser exception instead of 422.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F25-skills.md --only F25.marketplace-public,F25.install-bad-frontmatter,F25.install-documented-sources,F25.install-unknown-ref,F25.refresh-unfetchable,F25.sync-offline,F25.marketplace-stale-cache --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.install-bad-frontmatter/install.json",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-12-malformed-frontmatter-f25-install-bad-fr.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.install-bad-frontmatter/install.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-03-malformed-frontmatter-f25-install-bad-fr.json"
+      ],
+      "notes": "Synthetic local package; bad-input error mapping only."
+    },
+    {
+      "id": "documented-extension-source-unusable",
+      "title": "Documented skill and plugin source examples cannot be parsed",
+      "severity": "medium",
+      "feature_ids": [
+        "F25.install-documented-sources",
+        "F26.install-documented-source"
+      ],
+      "expected": "The source syntax advertised by the current OpenAPI descriptions installs successfully.",
+      "actual": "The supported repository plus repo_path forms install from GitHub, while the advertised github:owner/repo/subdirectory forms return 400 Failed to fetch source.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F25-skills.md --only F25.marketplace-public,F25.install-bad-frontmatter,F25.install-documented-sources,F25.install-unknown-ref,F25.refresh-unfetchable,F25.sync-offline,F25.marketplace-stale-cache --fresh --record --keep-going --timeout 360\n.venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F26-plugins.md --only F26.install-repo-root-name,F26.install-documented-source,F26.refresh-unfetchable,F26.conversation-resume-disabled --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.install-documented-sources/documented.json",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-16-documented-install-sources-f25-install-d.json",
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/F26.install-documented-source/documented.json",
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/F26.install-documented-source/working-form.json",
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/map-run/F26-plugins-11-documented-install-source-f26-install-do.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.install-documented-sources/documented.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-06-documented-install-sources-f25-install-d.json",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/F26.install-documented-source/documented.json",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/F26.install-documented-source/working-form.json",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-02-documented-install-source-f26-install-do.json"
+      ],
+      "notes": "Grouped documentation/parser contract across skills and plugins. Working GitHub installs are live positive controls. The later skill /tree/main URL variant is not reached."
+    },
+    {
+      "id": "extension-refresh-missing-source",
+      "title": "Refreshing a vanished skill or plugin source returns an unmapped 500",
+      "severity": "low",
+      "feature_ids": [
+        "F25.refresh-unfetchable",
+        "F26.refresh-unfetchable"
+      ],
+      "expected": "Refuse an unfetchable source with 400/422 and retain the prior install.",
+      "actual": "After a local installed source is moved away, both refresh endpoints return 500 with ExtensionFetchError.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F25-skills.md --only F25.marketplace-public,F25.install-bad-frontmatter,F25.install-documented-sources,F25.install-unknown-ref,F25.refresh-unfetchable,F25.sync-offline,F25.marketplace-stale-cache --fresh --record --keep-going --timeout 360\n.venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F26-plugins.md --only F26.install-repo-root-name,F26.install-documented-source,F26.refresh-unfetchable,F26.conversation-resume-disabled --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.refresh-unfetchable/refresh.json",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-20-refresh-of-a-vanished-source-f25-refresh.json",
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/F26.refresh-unfetchable/vanished.json",
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/map-run/F26-plugins-16-unfetchable-refresh-f26-refresh-unfetcha.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.refresh-unfetchable/refresh.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-08-refresh-of-a-vanished-source-f25-refresh.json",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/F26.refresh-unfetchable/vanished.json",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-03-unfetchable-refresh-f26-refresh-unfetcha.json"
+      ],
+      "notes": "Grouped shared fetch-error mapping; each endpoint independently reproduced twice. Later preservation assertions are not reached after the status failure."
+    },
+    {
+      "id": "F25.sync-offline",
+      "title": "Skills sync reports success after its git fetch fails",
+      "severity": "low",
+      "feature_ids": [
+        "F25.sync-offline"
+      ],
+      "expected": "Report an unsuccessful forced refresh when its origin cannot be fetched.",
+      "actual": "A direct git fetch proves the configured origin is unreachable, but POST /api/skills/sync returns status=success and Skills repository synced successfully.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F25-skills.md --only F25.marketplace-public,F25.install-bad-frontmatter,F25.install-documented-sources,F25.install-unknown-ref,F25.refresh-unfetchable,F25.sync-offline,F25.marketplace-stale-cache --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.sync-offline/sync.json",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-24-sync-without-a-reachable-origin-f25-sync.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.sync-offline/sync.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-10-sync-without-a-reachable-origin-f25-sync.json"
+      ],
+      "notes": "Response metadata defect; retaining the cached clone is permissible, but the forced sync result is inaccurate."
+    },
+    {
+      "id": "F25.marketplace-stale-cache",
+      "title": "Skills sync does not refresh the marketplace catalog cache",
+      "severity": "medium",
+      "feature_ids": [
+        "F25.marketplace-stale-cache"
+      ],
+      "expected": "After sync brings a newly listed skill into the clone, marketplace catalog lists that entry.",
+      "actual": "Sync succeeds and the cloned skill and manifest entry exist, but the catalog still omits qa-f25-pub-extra; one warmed catalog retains its prior entry, and the second retains a cached empty result.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F25-skills.md --only F25.marketplace-public,F25.install-bad-frontmatter,F25.install-documented-sources,F25.install-unknown-ref,F25.refresh-unfetchable,F25.sync-offline,F25.marketplace-stale-cache --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.marketplace-stale-cache/after-sync.json",
+        "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-32-catalog-after-a-sync-f25-marketplace-sta.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.marketplace-stale-cache/after-sync.json",
+        "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-11-catalog-after-a-sync-f25-marketplace-sta.json"
+      ],
+      "notes": "Independent from the public manifest-path issue: the local stand-in has a valid marketplaces/default.json. Sync invalidates only public-skills cache, leaving the catalog TTL cache."
+    },
+    {
+      "id": "F26.install-repo-root-name",
+      "title": "Manifestless repository plugins inherit the cache hash in their name",
+      "severity": "low",
+      "feature_ids": [
+        "F26.install-repo-root-name"
+      ],
+      "expected": "A manifestless repository installs under its repository directory name.",
+      "actual": "The source qa-f26-src installs as qa-f26-src-<16 hex>, derived from its URL-hashed cache directory.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F26-plugins.md --only F26.install-repo-root-name,F26.install-documented-source,F26.refresh-unfetchable,F26.conversation-resume-disabled --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/F26.install-repo-root-name/install.json",
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/map-run/F26-plugins-07-repository-root-name-f26-install-repo-ro.json",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/F26.install-repo-root-name/install.json",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-01-repository-root-name-f26-install-repo-ro.json"
+      ],
+      "notes": "Metadata/naming defect; fixture is removed before the assertion."
+    },
+    {
+      "id": "F26.conversation-resume-disabled",
+      "title": "A resumed conversation still activates a disabled plugin skill",
+      "severity": "medium",
+      "feature_ids": [
+        "F26.conversation-resume-disabled"
+      ],
+      "expected": "A resumed turn follows the plugin enabled state on disk.",
+      "actual": "After disabling the plugin and restarting, its hook no longer runs, but its first slash command still has activated_skills=[qa-f26-inst:qa-hello] on the user message.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F26-plugins.md --only F26.install-repo-root-name,F26.install-documented-source,F26.refresh-unfetchable,F26.conversation-resume-disabled --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/F26.conversation-resume-disabled/frames.json",
+        "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/map-run/F26-plugins-20-resume-after-disabling-f26-conversation-.json",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/F26.conversation-resume-disabled/frames.json",
+        "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-04-resume-after-disabling-f26-conversation-.json"
+      ],
+      "notes": "Two real DeepSeek turns per proof. The later include_skills GET assertion is not reached; the live socket activation itself is proven twice."
+    },
+    {
+      "id": "F27.subagents-bad-skill",
+      "title": "A sub-agent with an absent configured skill causes message POST 500",
+      "severity": "low",
+      "feature_ids": [
+        "F27.subagents-bad-skill"
+      ],
+      "expected": "Reject invalid agent configuration or return a client error when it is used.",
+      "actual": "The conversation is created, but appending a user message returns 500 Skill ... not found but was given to agent ...",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F27-hooks-subagents-tools.md --only F27.subagents-bad-skill,F27.custom-tool-modules,F27.custom-tool-missing-on-resume --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27",
+        "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/F27.subagents-bad-skill/send-control.json",
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/F27.subagents-bad-skill/send.json",
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/map-run/F27-hooks-subagents-tools-15-agent-with-a-missing-skill-f27-subagents.json",
+        "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27/evidence/F27.subagents-bad-skill/send-control.json",
+        "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27/evidence/F27.subagents-bad-skill/send.json",
+        "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27/evidence/map-run/F27-hooks-subagents-tools-01-agent-with-a-missing-skill-f27-subagents.json"
+      ],
+      "notes": "Bad configuration/error-mapping defect, not a model failure."
+    },
+    {
+      "id": "F27.custom-tool-missing-on-resume",
+      "title": "Resuming without the registered custom tool module returns an unhandled 500",
+      "severity": "low",
+      "feature_ids": [
+        "F27.custom-tool-missing-on-resume"
+      ],
+      "expected": "Report a missing custom-module prerequisite with a controlled client error.",
+      "actual": "After the real custom-tool turn persists its observation, restart without its module makes message POST return 500 because the observation discriminator is not registered.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F27-hooks-subagents-tools.md --only F27.subagents-bad-skill,F27.custom-tool-modules,F27.custom-tool-missing-on-resume --fresh --record --keep-going --timeout 360",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27",
+        "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/F27.custom-tool-missing-on-resume/send.json",
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/map-run/F27-hooks-subagents-tools-24-tool-module-gone-on-resume-f27-custom-to.json",
+        "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27/evidence/F27.custom-tool-missing-on-resume/send.json",
+        "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27/evidence/map-run/F27-hooks-subagents-tools-03-tool-module-gone-on-resume-f27-custom-to.json"
+      ],
+      "notes": "The initial custom tool executes successfully on real DeepSeek in both proofs; missing-module errors are not claimed as successful restores."
+    },
+    {
+      "id": "F27.server-info-browser-disabled",
+      "title": "Server info advertises the browser despite enable_browser=false",
+      "severity": "low",
+      "feature_ids": [
+        "F27.server-info-browser-disabled"
+      ],
+      "expected": "The server-info usable_tools agrees with the config-aware catalog.",
+      "actual": "Catalog browser usability is false on the disabled server, but server_info still includes browser_tool_set.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F27-browser-config.md --fresh --record --keep-going --timeout 240",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27",
+        "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/F27.server-info-browser-disabled/server-info.json",
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/map-run/F27-hooks-subagents-tools-29-usable-tools-with-the-browser-disabled-f.json",
+        "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27/evidence/F27.server-info-browser-disabled/server-info.json",
+        "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27/evidence/map-run/F27-browser-config-02-server-info-browser-disabled-f27-server-.json"
+      ],
+      "notes": "Metadata inconsistency. The fresh supplement retains the real host Chromium rather than requiring an unnecessary cache symlink."
+    },
+    {
+      "id": "F27.subagents-browser-disabled",
+      "title": "Disabled-browser servers still list the browser-only built-in agent",
+      "severity": "low",
+      "feature_ids": [
+        "F27.subagents-browser-disabled"
+      ],
+      "expected": "Exclude the browser-only web-researcher when enable_browser=false.",
+      "actual": "The catalog marks browser_tool_set unusable, but built-in discovery still returns web-researcher.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/run-map.py map run --file F27-browser-config.md --fresh --record --keep-going --timeout 240",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27",
+        "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/F27.subagents-browser-disabled/builtins.json",
+        "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/map-run/F27-hooks-subagents-tools-30-browser-only-sub-agent-with-the-browser-.json",
+        "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27/evidence/F27.subagents-browser-disabled/builtins.json",
+        "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27/evidence/map-run/F27-browser-config-03-subagents-browser-disabled-f27-subagents.json"
+      ],
+      "notes": "Only discovery was driven; no browser delegation or configuration bypass is claimed."
+    },
+    {
+      "id": "F27.browser-playwright-path",
+      "title": "The browser availability probe ignores PLAYWRIGHT_BROWSERS_PATH",
+      "severity": "medium",
+      "feature_ids": [
+        "F27.browser-playwright-path"
+      ],
+      "expected": "Find the real Chromium binary installed solely under PLAYWRIGHT_BROWSERS_PATH.",
+      "actual": "Two fresh Chromium-free layout-image containers report the browser unusable with the configured Playwright path. Linking the same binary into HOME/.cache/ms-playwright makes the catalog usable; removing that link reproduces the failure.",
+      "repro_command": ".venv/bin/python /workspace/verification-artifacts/takeover-f22-f28/browser_container.py",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1",
+        "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/F27.browser-playwright-path/catalog.json",
+        "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/F27.browser-playwright-path/layout.json",
+        "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/F27.browser-probe/before.json",
+        "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/F27.browser-probe/home-control.json",
+        "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-00-preconditions.json",
+        "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-01-home-cache-positive-control-f27-browser-.json",
+        "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-02-playwright-override-f27-browser-playwrig.json",
+        "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2/evidence/F27.browser-playwright-path/catalog.json",
+        "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2/evidence/F27.browser-playwright-path/layout.json",
+        "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2/evidence/F27.browser-probe/before.json",
+        "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2/evidence/F27.browser-probe/home-control.json",
+        "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2/evidence/map-run/F27-browser-container-00-preconditions.json",
+        "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2/evidence/map-run/F27-browser-container-01-home-cache-positive-control-f27-browser-.json",
+        "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2/evidence/map-run/F27-browser-container-02-playwright-override-f27-browser-playwrig.json"
+      ],
+      "notes": "The real host Chromium binary is mounted read-only; only probe/catalog usability is asserted, not a navigation test. Each container is removed after its attached-run proof."
+    }
+  ],
+  "harness_map_issues": [
+    {
+      "feature_ids": [
+        "F23",
+        "F28"
+      ],
+      "kind": "environment_disk_exhaustion",
+      "actual": "The 32 GB overlay filled during unrelated Docker VFS verification. F23/F28 replay aborted with ENOSPC while saving evidence and arranging fixtures; these attempts are excluded from product confirmations and are being rerun after 26 GB was freed.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022431-19cb-map-f23",
+        "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-023753-d1da-map-f22"
+      ],
+      "notes": "All three affected run process groups were stopped through their explicit CLI --run selection. Partial ledgers are preserved. The last F22 directory was an unstarted confirmation attempt with zero evidence files."
+    },
+    {
+      "feature_ids": [
+        "F22.store-busy"
+      ],
+      "kind": "harness_timing_fragility",
+      "actual": "Full replay failed shell elapsed <=33s, while the saved HTTP exchange correctly returned 503 after 30360 ms. CLI startup overhead under concurrent load is included in shell SECONDS.",
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-20-store-busy-f22-store-busy.json",
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.store-busy/save.json"
+      ],
+      "notes": "The subsequent DELETE timeout step was not reached in this raw bullet. This failure does not count as a product bug."
+    },
+    {
+      "feature_ids": [
+        "F22.activate-acp",
+        "F22.corrupt-settings",
+        "F22.store-busy-responsive"
+      ],
+      "kind": "undeclared_state_prerequisites",
+      "actual": "Several --only recipes depend on earlier state without declaring Requires. Activation and corrupted-settings need qa-direct active; responsive lock needs an existing meta-profile store directory.",
+      "notes": "Explicit prerequisite IDs or CLI setup restore reviewable reproduction. A discarded exploratory lock subset used save-direct alone, which saved the needed directory but failed its list-count assertion; neither exploratory attempt is used in the confirmed-bug count."
+    },
+    {
+      "feature_ids": [
+        "F28.restart-persistence",
+        "F28.uninstall"
+      ],
+      "kind": "map_count_drift",
+      "expected": "Unrelated installed-app counts 6 before uninstall and5 after.",
+      "actual": "New early qa-f28-flaky fixture installed by backend-stop makes counts7 and6; behavior checks after the obsolete count assert were skipped.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024207-5ac2-map-f28"
+      ],
+      "notes": "Fresh independent core persistence/uninstall supplement planned; no shared recipe edit."
+    },
+    {
+      "feature_ids": [
+        "F24.status-offline",
+        "F24.device-start-offline"
+      ],
+      "kind": "discarded_arrangement_attempt",
+      "actual": "The first copied precondition had incorrect indentation and did not carry its fixture variables into selected bullets. No bug assertion was reached; the corrected fresh replay reaches both markers.",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F24-repro-arrangement-invalid.json",
+        "/workspace/verification-artifacts/family-results/F24-repro.json"
+      ]
+    },
+    {
+      "feature_ids": [
+        "F27.browser-disabled-launch",
+        "F27.browser-disabled",
+        "F27.catalog-docker-runtime"
+      ],
+      "kind": "host_chromium_layout_assumption",
+      "actual": "The host already has standard Chromium. Primary negative-probe checks and cache-symlink assertions fail as preconditions, not product behavior. The focused config/catalog supplement uses the actual host layout and proves the remaining ordinary branches.",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F27-browser-config-repro.json"
+      ]
+    },
+    {
+      "feature_ids": [
+        "F28.backend-stop",
+        "F28.status-exit-hang"
+      ],
+      "kind": "pid1_zombie_observation_limit",
+      "actual": "The parent/child stop APIs and status transitions return their expected values, but kill -0 continues to see unreaped zombies. A group-stop timing bound also exceeds seven seconds in this environment. No additional live orphan is inferred from those PID checks; the separately confirmed hard-restart orphan has a nonempty artifact command line.",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F28.json"
+      ]
+    },
+    {
+      "feature_ids": [
+        "F28.restart-persistence",
+        "F28.uninstall"
+      ],
+      "kind": "focused_core_replay",
+      "actual": "The focused fresh fixture proves persistence, restart with an existing approval, uninstall, retained data/approval, repeated DELETE, and data removal without unrelated global install counts.",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F28-core-supplement.json"
+      ]
+    }
+  ],
+  "blocked": [
+    {
+      "feature_ids": [
+        "F24.login-complete"
+      ],
+      "prerequisite": "A human completing a real ChatGPT account login",
+      "actual": "Not attempted; throwaway device codes and fake persisted tokens test the credential-free branches without signing anyone in."
+    },
+    {
+      "feature_ids": [
+        "F28.backend-stop",
+        "F28.status-exit-hang"
+      ],
+      "prerequisite": "A host that reaps terminated descendant PIDs before kill -0 process-absence checks",
+      "actual": "Ordinary stop/status APIs succeeded, but the final process-absence/timing bounds are inconclusive for unreaped zombies. No extra product bug counted.",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F28.json"
+      ]
+    }
+  ],
+  "inconclusive": [],
+  "family_results": {
+    "F22": "/workspace/verification-artifacts/family-results/F22.json",
+    "F23": "/workspace/verification-artifacts/family-results/F23.json",
+    "F24": "/workspace/verification-artifacts/family-results/F24.json",
+    "F25": "/workspace/verification-artifacts/family-results/F25.json",
+    "F26": "/workspace/verification-artifacts/family-results/F26.json",
+    "F27": "/workspace/verification-artifacts/family-results/F27.json",
+    "F28": "/workspace/verification-artifacts/family-results/F28.json"
+  },
+  "not_run": [
+    {
+      "feature_id": "F24.device-start-offline",
+      "branch": "Offline poll assertion after the first failing device/start assertion"
+    },
+    {
+      "feature_id": "F25.install-documented-sources",
+      "branch": "The second advertised /tree/main URL variant after the first failing github shorthand"
+    },
+    {
+      "feature_id": "F26.conversation-resume-disabled",
+      "branch": "include_skills GET after the failing live socket assertion"
+    },
+    {
+      "feature_id": "F28.prepare-corrupt-archive",
+      "branch": "Later no-write assertions after the invalid-format failure"
+    }
+  ],
+  "coverage": [
+    {
+      "family": "F22",
+      "primary_run": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+      "raw_summary": {
+        "pass": 19,
+        "fail": 1,
+        "xfail": 5,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      },
+      "latest_feature_counts": {
+        "pass": 19,
+        "xfail": 5
+      },
+      "feature_total": 24
+    },
+    {
+      "family": "F23",
+      "primary_run": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+      "raw_summary": {
+        "pass": 23,
+        "fail": 0,
+        "xfail": 5,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      },
+      "latest_feature_counts": {
+        "pass": 22,
+        "xfail": 5
+      },
+      "feature_total": 27
+    },
+    {
+      "family": "F24",
+      "primary_run": "/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24",
+      "raw_summary": {
+        "pass": 18,
+        "fail": 0,
+        "xfail": 2,
+        "xpass": 0,
+        "blocked": 1,
+        "skipped": 0,
+        "no-commands": 0
+      },
+      "latest_feature_counts": {
+        "pass": 17,
+        "xfail": 2,
+        "blocked": 1
+      },
+      "feature_total": 20
+    },
+    {
+      "family": "F25",
+      "primary_run": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+      "raw_summary": {
+        "pass": 27,
+        "fail": 0,
+        "xfail": 7,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      },
+      "latest_feature_counts": {
+        "pass": 26,
+        "xfail": 7
+      },
+      "feature_total": 33
+    },
+    {
+      "family": "F26",
+      "primary_run": "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26",
+      "raw_summary": {
+        "pass": 22,
+        "fail": 0,
+        "xfail": 4,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      },
+      "latest_feature_counts": {
+        "pass": 21,
+        "xfail": 4
+      },
+      "feature_total": 25
+    },
+    {
+      "family": "F27",
+      "primary_run": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27",
+      "raw_summary": {
+        "pass": 23,
+        "fail": 5,
+        "xfail": 4,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      },
+      "latest_feature_counts": {
+        "pass": 26,
+        "xfail": 5
+      },
+      "feature_total": 31
+    },
+    {
+      "family": "F28",
+      "primary_run": "/workspace/verification-artifacts/runs/20261013-024207-5ac2-map-f28",
+      "raw_summary": {
+        "pass": 22,
+        "fail": 4,
+        "xfail": 4,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      },
+      "latest_feature_counts": {
+        "pass": 23,
+        "blocked": 2,
+        "xfail": 4
+      },
+      "feature_total": 29
+    }
+  ],
+  "primary_feature_counts": {
+    "pass": 154,
+    "xfail": 32,
+    "blocked": 3,
+    "total": 189
+  },
+  "severity_counts": {
+    "high": 2,
+    "low": 13,
+    "medium": 12
+  },
+  "grouping": {
+    "shared_store_lock": [
+      "F22.store-busy-responsive",
+      "F23.store-busy-responsive"
+    ],
+    "blank_provider_keys": [
+      "F23.conn-create-blank-key",
+      "F23.conn-patch-blank-key"
+    ],
+    "cached_missing_ref": [
+      "F25.install-unknown-ref",
+      "F28.install-ref-cached"
+    ],
+    "documented_sources": [
+      "F25.install-documented-sources",
+      "F26.install-documented-source"
+    ],
+    "vanished_source_refresh": [
+      "F25.refresh-unfetchable",
+      "F26.refresh-unfetchable"
+    ]
+  },
+  "complete": true,
+  "date_utc": "2026-10-13",
+  "server_version": "1.54.0",
+  "models": [
+    "deepseek/deepseek-flash",
+    "deepseek/deepseek-v4-pro"
+  ],
+  "proof_index": "/workspace/verification-artifacts/family-results/F22-F28-proof-index.json",
+  "evidence_audit": {
+    "candidate_files_checked": 166,
+    "configured_credential_matches": 0
+  },
+  "cleanup": {
+    "audit": "/workspace/verification-artifacts/family-results/F22-F28-cleanup-audit.json",
+    "own_runs_stopped": 19,
+    "all_ports_closed": true,
+    "live_server_processes": 0,
+    "docker_containers_removed": 2,
+    "evidence_preserved": true
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F17-workspaces-registry.md",
+  "bullet": "No-op writes leave the file alone (`F17.noop-write-untouched`), known bug.",
+  "ids": [
+    "F17.noop-write-untouched"
+  ],
+  "line": 260,
+  "script": "STAMP=$(stat -c '%i %y' \"$WS\")\ncontrol-agent-server api GET /api/workspaces --expect 200 --check workspaces len-eq 5\ntest \"$(stat -c '%i %y' \"$WS\")\" = \"$STAMP\"\ncontrol-agent-server api POST /api/workspaces --json-file \"$F17/readd.json\" --expect 200 --check workspaces len-eq 5 \\\n  --check workspaces.0.name eq qa-f17-repo --save F17.noop-write-untouched/readd\ntest \"$(stat -c '%i %y' \"$WS\")\" = \"$STAMP\"  # bug\ncontrol-agent-server api DELETE /api/workspaces --query path=/qa-f17/never --expect 404\ntest \"$(stat -c '%i %y' \"$WS\")\" = \"$STAMP\"  # bug\ncontrol-agent-server api DELETE /api/workspaces/parents --query path=/qa-f17/never --expect 404\ntest \"$(stat -c '%i %y' \"$WS\")\" = \"$STAMP\"  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 12,
+  "failed_line": 1,
+  "failed_command": "STAMP=$(stat -c '%i %y' \"$WS\")",
+  "stdout": "",
+  "stderr": "stat: cannot statx '': No such file or directory\n"
+}

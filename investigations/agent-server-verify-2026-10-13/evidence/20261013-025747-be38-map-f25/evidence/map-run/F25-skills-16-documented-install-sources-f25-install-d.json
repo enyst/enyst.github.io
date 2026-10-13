@@ -1,0 +1,15 @@
+{
+  "file": "F25-skills.md",
+  "bullet": "Documented install sources (`F25.install-documented-sources`), known bug.",
+  "ids": [
+    "F25.install-documented-sources"
+  ],
+  "line": 417,
+  "script": "DOC=$(control-agent-server api GET /openapi.json --auth none --field components.schemas.InstallSkillRequest.properties.source.description)\nfor SRC in github:<redacted:unrelated-repository>/skills/github https://github.com/<redacted:unrelated-repository>/tree/main/skills/github; do\n  case \"$DOC\" in\n    *\"'$SRC'\"*)\n      control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$SRC\"'\"}' --timeout 240 --expect 200 \\\n        --check name eq github --save F25.install-documented-sources/documented  # bug\n      control-agent-server api DELETE /api/skills/installed/github --expect 200\n      ;;\n  esac\ndone\n",
+  "exit_code": 1,
+  "elapsed_ms": 2394,
+  "failed_line": 5,
+  "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$SRC\"'\"}' --timeout 240 --expect 200 --check name eq github --save F25.install-documented-sources/documented",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/skills/install\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"source\": \"github:<redacted:unrelated-repository>/skills/github\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"74\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Failed to fetch skill source. Check that the source is valid.\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 60,\n  \"checks\": [\n    {\n      \"check\": \"name eq github\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.install-documented-sources/documented.json\",\n  \"hint\": \"expected 200, got 400\"\n}\n",
+  "stderr": ""
+}

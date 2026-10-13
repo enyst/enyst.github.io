@@ -1,0 +1,19 @@
+{
+  "command": [
+    "bash",
+    "/workspace/verification-artifacts/runs/20261013-024124-a231-map-f02/fixtures/qa-f02/jar.sh",
+    "GET",
+    "<redacted:session-cookie>/count",
+    "key",
+    "200",
+    "lacks:access-control-allow-origin",
+    "--",
+    "-H",
+    "Origin: https://qa-evil.example"
+  ],
+  "cwd": "/workspace/agent-sdk-verify",
+  "exit_code": 0,
+  "elapsed_ms": 85,
+  "stdout": "HTTP/1.1 200 OK\ndate: Tue, 13 Oct 2026 02:43:43 GMT\nserver: uvicorn\ncontent-length: 1\ncontent-type: application/json\naccess-control-allow-credentials: true\n\n1\nstatus=200\n",
+  "stderr": ""
+}

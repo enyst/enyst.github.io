@@ -1,0 +1,15 @@
+{
+  "file": "F33-sdk-remote-client.md",
+  "bullet": "Read the state twice (`F33.conversation-state-reread`), known bug.",
+  "ids": [
+    "F33.conversation-state-reread"
+  ],
+  "line": 1057,
+  "script": "control-agent-server exec --env PYTHONPATH=\"$F33\" --env CID=\"$BIG\" --save F33.conversation-state-reread/probe -- .venv/bin/python - <<'PY'\nimport os\nimport uuid\nimport f33\nfrom openhands.sdk import RemoteConversation\n\n\ndef read(conv, name):\n    try:\n        value = getattr(conv.state, name) if name != \"is_confirmation_mode_active\" else conv.is_confirmation_mode_active\n    except Exception as e:  # recorded, compared below\n        return f\"error: {type(e).__name__}\"\n    return value if isinstance(value, bool) else type(value).__name__\n\n\ncid = uuid.UUID(os.environ[\"CID\"])\nreads = {}\nfor name in (\"confirmation_policy\", \"security_analyzer\", \"agent\", \"is_confirmation_mode_active\"):\n    conv = RemoteConversation.attach(f33.workspace(\"large\"), cid, visualizer=None)\n    reads[name] = [read(conv, name), read(conv, name)]\n    conv.close()\nassert reads[\"confirmation_policy\"][0] == \"AlwaysConfirm\" and reads[\"security_analyzer\"][0] == \"LLMSecurityAnalyzer\", reads\nassert reads[\"agent\"][0] == \"Agent\" and reads[\"is_confirmation_mode_active\"][0] is True, reads\nf33.emit(\"reread\", reads=reads, stable=all(first == second for first, second in reads.values()))\nPY\ntest \"$(jq .stable \"$F33/reread.json\")\" = true  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 31948,
+  "failed_line": 26,
+  "failed_command": "test \"$(jq .stable \"$F33/reread.json\")\" = true",
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 31117,\n  \"stdout_tail\": \"{\\\"reads\\\": {\\\"agent\\\": [\\\"Agent\\\", \\\"error: ValidationError\\\"], \\\"confirmation_policy\\\": [\\\"AlwaysConfirm\\\", \\\"error: ValidationError\\\"], \\\"is_confirmation_mode_active\\\": [true, false], \\\"security_analyzer\\\": [\\\"LLMSecurityAnalyzer\\\", \\\"NoneType\\\"]}, \\\"stable\\\": false}\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034709-4e02-map-f33/evidence/F33.conversation-state-reread/probe.json\"\n}\n",
+  "stderr": ""
+}

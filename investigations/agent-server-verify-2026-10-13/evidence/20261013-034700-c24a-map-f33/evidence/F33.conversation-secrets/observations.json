@@ -1,0 +1,111 @@
+{
+  "events": [
+    {
+      "id": "9dcf1afc-3356-4f48-8b10-288d7747dcfa",
+      "timestamp": "2026-10-13T03:47:17.454017",
+      "source": "environment",
+      "parent_id": "5a1fb040-4cf7-4874-a797-7ca7d446d015",
+      "tool_name": "terminal",
+      "tool_call_id": "call_00_9Aoy6qHjwQI7Ij9WVQn77082",
+      "observation": {
+        "content": [
+          {
+            "cache_prompt": false,
+            "type": "text",
+            "text": "/workspace/verification-artifacts/runs/20261013-034700-c24a-map-f33/fixtures/qa-f33/secret\ntotal 12\ndrwx------ 3 agent agent 4096 Oct 13 03:47 .\ndrwx------ 4 agent agent 4096 Oct 13 03:47 ..\ndrwx------ 6 agent agent 4096 Oct 13 03:47 .git"
+          }
+        ],
+        "is_error": false,
+        "command": "pwd; ls -la",
+        "exit_code": 0,
+        "timeout": false,
+        "metadata": {
+          "exit_code": 0,
+          "pid": -1,
+          "username": "agent",
+          "hostname": "e7ee1a756865",
+          "working_dir": "/workspace/verification-artifacts/runs/20261013-034700-c24a-map-f33/fixtures/qa-f33/secret",
+          "py_interpreter_path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "prefix": "",
+          "suffix": "\n[The command completed with exit code 0.]"
+        },
+        "full_output_save_dir": "/workspace/verification-artifacts/runs/20261013-034700-c24a-map-f33/server/workspace/conversations/a0664fb44d0144e69b094bb78d0e5e4b/observations",
+        "kind": "TerminalObservation"
+      },
+      "action_id": "5a1fb040-4cf7-4874-a797-7ca7d446d015",
+      "extended_content": [],
+      "kind": "ObservationEvent"
+    },
+    {
+      "id": "79640b8e-3ff6-4e26-a316-3dbc9485d746",
+      "timestamp": "2026-10-13T03:47:19.267854",
+      "source": "environment",
+      "parent_id": "112ec461-7a28-4c75-89e2-f13e0cf8a9ca",
+      "tool_name": "terminal",
+      "tool_call_id": "call_00_yAoveob55qwB6X16xiDk3575",
+      "observation": {
+        "content": [
+          {
+            "cache_prompt": false,
+            "type": "text",
+            "text": ""
+          }
+        ],
+        "is_error": false,
+        "command": "for v in \"$QA_F33_TOKEN\" \"$QA_F33_LOOKUP\"; do printf %s \"$v\" | sha256sum | cut -c1-16; done > qa-f33-secret.sha",
+        "exit_code": 0,
+        "timeout": false,
+        "metadata": {
+          "exit_code": 0,
+          "pid": -1,
+          "username": "agent",
+          "hostname": "e7ee1a756865",
+          "working_dir": "/workspace/verification-artifacts/runs/20261013-034700-c24a-map-f33/fixtures/qa-f33/secret",
+          "py_interpreter_path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "prefix": "",
+          "suffix": "\n[The command completed with exit code 0.]"
+        },
+        "kind": "TerminalObservation"
+      },
+      "action_id": "112ec461-7a28-4c75-89e2-f13e0cf8a9ca",
+      "extended_content": [],
+      "kind": "ObservationEvent"
+    },
+    {
+      "id": "25e414d5-681b-49b5-8f70-b7c0eb446267",
+      "timestamp": "2026-10-13T03:47:20.830542",
+      "source": "environment",
+      "parent_id": "6b521b2e-08ac-4d30-817d-47d6cec93b57",
+      "tool_name": "terminal",
+      "tool_call_id": "call_00_BHErW9f7F5Hs7JfRskRA5181",
+      "observation": {
+        "content": [
+          {
+            "cache_prompt": false,
+            "type": "text",
+            "text": "-rw------- 1 agent agent 34 Oct 13 03:47 qa-f33-secret.sha\n--- file contents (hash prefixes only) ---\ne47b6626ef7e3dcb\n3162b10c1f49f69e"
+          }
+        ],
+        "is_error": false,
+        "command": "ls -la qa-f33-secret.sha && echo \"--- file contents (hash prefixes only) ---\" && cat qa-f33-secret.sha",
+        "exit_code": 0,
+        "timeout": false,
+        "metadata": {
+          "exit_code": 0,
+          "pid": -1,
+          "username": "agent",
+          "hostname": "e7ee1a756865",
+          "working_dir": "/workspace/verification-artifacts/runs/20261013-034700-c24a-map-f33/fixtures/qa-f33/secret",
+          "py_interpreter_path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+          "prefix": "",
+          "suffix": "\n[The command completed with exit code 0.]"
+        },
+        "full_output_save_dir": "/workspace/verification-artifacts/runs/20261013-034700-c24a-map-f33/server/workspace/conversations/a0664fb44d0144e69b094bb78d0e5e4b/observations",
+        "kind": "TerminalObservation"
+      },
+      "action_id": "6b521b2e-08ac-4d30-817d-47d6cec93b57",
+      "extended_content": [],
+      "kind": "ObservationEvent"
+    }
+  ]
+}

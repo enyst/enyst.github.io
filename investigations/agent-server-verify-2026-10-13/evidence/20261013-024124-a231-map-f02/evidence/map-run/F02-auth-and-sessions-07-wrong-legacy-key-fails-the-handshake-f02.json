@@ -1,0 +1,15 @@
+{
+  "file": "F02-auth-and-sessions.md",
+  "bullet": "Wrong legacy key fails the handshake (`F02.ws-legacy-reject`).",
+  "ids": [
+    "F02.ws-legacy-reject"
+  ],
+  "line": 253,
+  "script": "control-agent-server ws listen /sockets/bash-events --auth none --query session_api_key=qa-f02-wrong --expect-reject 403 --duration 5 --save F02.ws-legacy-reject/wrong-query\ncontrol-agent-server ws listen /sockets/bash-events --auth bad-header --expect-reject 403 --duration 5 --save F02.ws-legacy-reject/wrong-header\ncontrol-agent-server ws listen /sockets/bash-events --query session_api_key=qa-f02-stale --send '{\"command\":\"echo qa-f02-stale\"}' \\\n  --expect-reject 403 --expect-frames 0 --duration 5 --save F02.ws-legacy-reject/stale-query-good-frame\n",
+  "exit_code": 0,
+  "elapsed_ms": 919,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"path\": \"/sockets/bash-events\",\n  \"opened\": false,\n  \"frames\": 0,\n  \"kinds\": {},\n  \"stopped\": \"error\",\n  \"close\": {\n    \"error\": \"InvalidStatus: server rejected WebSocket connection: HTTP 403\",\n    \"http_status\": 403\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024124-a231-map-f02/evidence/F02.ws-legacy-reject/wrong-query.json\",\n  \"first_frames\": []\n}\n{\n  \"ok\": true,\n  \"path\": \"/sockets/bash-events\",\n  \"opened\": false,\n  \"frames\": 0,\n  \"kinds\": {},\n  \"stopped\": \"error\",\n  \"close\": {\n    \"error\": \"InvalidStatus: server rejected WebSocket connection: HTTP 403\",\n    \"http_status\": 403\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024124-a231-map-f02/evidence/F02.ws-legacy-reject/wrong-header.json\",\n  \"first_frames\": []\n}\n{\n  \"ok\": true,\n  \"path\": \"/sockets/bash-events\",\n  \"opened\": false,\n  \"frames\": 0,\n  \"kinds\": {},\n  \"stopped\": \"error\",\n  \"close\": {\n    \"error\": \"InvalidStatus: server rejected WebSocket connection: HTTP 403\",\n    \"http_status\": 403\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024124-a231-map-f02/evidence/F02.ws-legacy-reject/stale-query-good-frame.json\",\n  \"first_frames\": []\n}\n",
+  "stderr": ""
+}

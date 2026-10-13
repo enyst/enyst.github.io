@@ -1,0 +1,347 @@
+{
+  "ok": true,
+  "file": "F06-conversation-events.md",
+  "summary": {
+    "pass": 23,
+    "fail": 0,
+    "xfail": 5,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 97,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3242,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-00-preconditions.json"
+    },
+    {
+      "bullet": "Append a message without running (`F06.send-no-run`).",
+      "ids": [
+        "F06.send-no-run"
+      ],
+      "line": 116,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3769,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-01-append-a-message-without-running-f06-sen.json"
+    },
+    {
+      "bullet": "Paging and sort order (`F06.search-page`).",
+      "ids": [
+        "F06.search-page"
+      ],
+      "line": 139,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8248,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-02-paging-and-sort-order-f06-search-page.json"
+    },
+    {
+      "bullet": "Bad search parameters (`F06.search-validation`).",
+      "ids": [
+        "F06.search-validation"
+      ],
+      "line": 163,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4334,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-03-bad-search-parameters-f06-search-validat.json"
+    },
+    {
+      "bullet": "Filters (`F06.search-filters`).",
+      "ids": [
+        "F06.search-filters"
+      ],
+      "line": 172,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5273,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-04-filters-f06-search-filters.json"
+    },
+    {
+      "bullet": "Short kind names (`F06.search-kind-short`), known bug.",
+      "ids": [
+        "F06.search-kind-short"
+      ],
+      "line": 190,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1392,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-05-short-kind-names-f06-search-kind-short-k.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$CID/events/search\" --query kind=MessageEvent --expect 200 --check items len-eq 2 --save F06.search-kind-short/short-name",
+      "stdout_tail": "0-13T03:00:56.653430\\\", \\\"source\\\": \\\"user\\\", \\\"parent_id\\\": \\\"f19aa917-9da0-45f0-b6e4-856e5286f8a6\\\", \\\"llm_message\\\": {\\\"role\\\": \\\"user\\\", \\\"conte\\u2026\"\n    },\n    {\n      \"check\": \"items.0.kind eq MessageEvent\",\n      \"ok\": true,\n      \"actual\": \"MessageEvent\"\n    },\n    {\n      \"check\": \"items.1.kind eq MessageEvent\",\n      \"ok\": true,\n      \"actual\": \"MessageEvent\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/d97a4857-6ca9-4dd3-b375-45fbd47f2623/events/search\",\n    \"query\": [\n      [\n        \"kind\",\n        \"MessageEvent\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"32\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"items\": [],\n      \"next_page_id\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 92,\n  \"checks\": [\n    {\n      \"check\": \"items len-eq 2\",\n      \"ok\": false,\n      \"actual\": \"[]\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/F06.search-kind-short/short-name.json\",\n  \"hint\": \"failed check: items len-eq 2\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Time window (`F06.search-time-window`).",
+      "ids": [
+        "F06.search-time-window"
+      ],
+      "line": 207,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4766,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-06-time-window-f06-search-time-window.json"
+    },
+    {
+      "bullet": "Count (`F06.count`).",
+      "ids": [
+        "F06.count"
+      ],
+      "line": 224,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5262,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-07-count-f06-count.json"
+    },
+    {
+      "bullet": "Get one event (`F06.get-one`).",
+      "ids": [
+        "F06.get-one"
+      ],
+      "line": 235,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2643,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-08-get-one-event-f06-get-one.json"
+    },
+    {
+      "bullet": "Unknown event id (`F06.unknown-event`), known bug.",
+      "ids": [
+        "F06.unknown-event"
+      ],
+      "line": 248,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 3858,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-09-unknown-event-id-f06-unknown-event-known.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$CID/events/00000000-0000-4000-8000-0000000000e6\" --expect 404 --save F06.unknown-event/get-one",
+      "stdout_tail": " \"actual\": \"[{\\\"id\\\": \\\"7e7beb95-541c-42f3-9b13-b6235a6d10c1\\\", \\\"timestamp\\\": \\\"2026-10-13T03:00:58.454439\\\", \\\"source\\\": \\\"user\\\", \\\"parent_id\\\": \\\"e90b3b83-6e2b-480c-a067-44ee7c867a2e\\\", \\\"llm_message\\\": {\\\"role\\\": \\\"user\\\", \\\"conte\\u2026\"\n    },\n    {\n      \"check\": \"0.id eq 7e7beb95-541c-42f3-9b13-b6235a6d10c1\",\n      \"ok\": true,\n      \"actual\": \"7e7beb95-541c-42f3-9b13-b6235a6d10c1\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/d97a4857-6ca9-4dd3-b375-45fbd47f2623/events/00000000-0000-4000-8000-0000000000e6\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"151\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"'Unknown event_id: 00000000-0000-4000-8000-0000000000e6'\",\n      \"error_id\": \"d6fd6f69c37c455eb976adfa32296061\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1062,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/F06.unknown-event/get-one.json\",\n  \"hint\": \"expected 404, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Batch get (`F06.batch-get`).",
+      "ids": [
+        "F06.batch-get"
+      ],
+      "line": 268,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1861,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-10-batch-get-f06-batch-get.json"
+    },
+    {
+      "bullet": "Unknown conversation, bad id, no key (`F06.not-found-auth`).",
+      "ids": [
+        "F06.not-found-auth"
+      ],
+      "line": 278,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13768,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-11-unknown-conversation-bad-id-no-key-f06-n.json"
+    },
+    {
+      "bullet": "Message validation (`F06.send-validation`).",
+      "ids": [
+        "F06.send-validation"
+      ],
+      "line": 302,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8987,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-12-message-validation-f06-send-validation.json"
+    },
+    {
+      "bullet": "Image content (`F06.send-image`).",
+      "ids": [
+        "F06.send-image"
+      ],
+      "line": 316,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13987,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-13-image-content-f06-send-image.json"
+    },
+    {
+      "bullet": "Non-user role (`F06.send-non-user-role`), known bug.",
+      "ids": [
+        "F06.send-non-user-role"
+      ],
+      "line": 345,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 7217,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-14-non-user-role-f06-send-non-user-role-kno.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$CID/events\" --json '{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"QA_F06_ASSISTANT\"}]}' --expect 4xx --save F06.send-non-user-role/assistant",
+      "stdout_tail": "]\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 5,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 86,\n  \"checks\": [\n    {\n      \"check\": \". eq 5\",\n      \"ok\": true,\n      \"actual\": \"5\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/d97a4857-6ca9-4dd3-b375-45fbd47f2623/events\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"role\": \"assistant\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"QA_F06_ASSISTANT\"\n        }\n      ]\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"150\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"Only user messages are allowed to be sent to the agent.\",\n      \"error_id\": \"09cfbf65661e499f85e23093d20a52d3\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1208,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/F06.send-non-user-role/assistant.json\",\n  \"hint\": \"expected 4xx, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "First frame is a state snapshot (`F06.ws-snapshot`).",
+      "ids": [
+        "F06.ws-snapshot"
+      ],
+      "line": 373,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 9088,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-15-first-frame-is-a-state-snapshot-f06-ws-s.json"
+    },
+    {
+      "bullet": "Handshake: auth and close codes (`F06.ws-handshake`).",
+      "ids": [
+        "F06.ws-handshake"
+      ],
+      "line": 385,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 18447,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-16-handshake-auth-and-close-codes-f06-ws-ha.json"
+    },
+    {
+      "bullet": "Deleting a conversation closes its sockets (`F06.ws-delete-close`), known bug.",
+      "ids": [
+        "F06.ws-delete-close"
+      ],
+      "line": 410,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 14501,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-17-deleting-a-conversation-closes-its-socke.json",
+      "failed_line": 8,
+      "failed_command": "false",
+      "stdout_tail": "  \"opened\": true,\n  \"frames\": 0,\n  \"kinds\": {},\n  \"stopped\": \"closed\",\n  \"close\": {\n    \"code\": 4004,\n    \"reason\": \"Conversation not found\"\n  },\n  \"first_frames\": []\n}\n{\n  \"ok\": true,\n  \"capture\": \"f06-del\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/captures/f06-del.jsonl\",\n  \"opened\": true,\n  \"stopped\": \"stopped\",\n  \"frames\": 1,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 1\n  },\n  \"close\": null,\n  \"matching\": 1,\n  \"matching_kinds\": [\n    \"ConversationStateUpdateEvent\"\n  ],\n  \"frames_shown\": [\n    {\n      \"kind\": \"ConversationStateUpdateEvent\",\n      \"frame\": \"{\\\"id\\\": \\\"07ea9539-b17b-453e-ba82-c5cd199caa02\\\", \\\"timestamp\\\": \\\"2026-10-13T03:02:53.251099\\\", \\\"source\\\": \\\"environment\\\", \\\"key\\\": \\\"full_state\\\", \\\"value\\\": {\\\"id\\\": \\\"6e286f6b-ea26-48d6-b8b8-7bc3f9437331\\\", \\\"agent\\\": {\\\"llm\\\": {\\\"model\\\": \\\"deepseek/deepseek-flash\\\", \\\"api_key\\\": \\\"<redacted:api_key>\\\", \\\"auth_type\\\": \\\"api_key\\\", \\\"openrouter_site_url\\\": \\\"https://docs.all-hands.dev/\\\", \\\"openrouter_app_name\\\": \\\"OpenHands\\\", \\\"num_retries\\\": \\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/F06.ws-delete-close/socket.json\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Replay everything (`F06.ws-replay-all`).",
+      "ids": [
+        "F06.ws-replay-all"
+      ],
+      "line": 433,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10155,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-18-replay-everything-f06-ws-replay-all.json"
+    },
+    {
+      "bullet": "Replay since a timestamp (`F06.ws-replay-since`).",
+      "ids": [
+        "F06.ws-replay-since"
+      ],
+      "line": 445,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10045,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-19-replay-since-a-timestamp-f06-ws-replay-s.json"
+    },
+    {
+      "bullet": "Bad frames on the socket (`F06.ws-bad-frame`).",
+      "ids": [
+        "F06.ws-bad-frame"
+      ],
+      "line": 460,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6110,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-20-bad-frames-on-the-socket-f06-ws-bad-fram.json"
+    },
+    {
+      "bullet": "Send a message over the socket (`F06.ws-send`).",
+      "ids": [
+        "F06.ws-send"
+      ],
+      "line": 479,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4051,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-21-send-a-message-over-the-socket-f06-ws-se.json"
+    },
+    {
+      "bullet": "Run a turn and watch it live (`F06.send-run`, `F06.ws-live`).",
+      "ids": [
+        "F06.send-run",
+        "F06.ws-live"
+      ],
+      "line": 500,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 27222,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-22-run-a-turn-and-watch-it-live-f06-send-ru.json"
+    },
+    {
+      "bullet": "Log order is timestamp order (`F06.search-timestamp-order`), known bug.",
+      "ids": [
+        "F06.search-timestamp-order"
+      ],
+      "line": 543,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 3365,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-23-log-order-is-timestamp-order-f06-search-.json",
+      "failed_line": 7,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/count\" --query timestamp__gte=\"$OBS_T\" --check . ge \"$FROM_OBS\" --save F06.search-timestamp-order/count-since-observation",
+      "stdout_tail": "{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/636bc206-ecf3-4e24-8070-d1db23c74f83/events/count\",\n    \"query\": [\n      [\n        \"timestamp__gte\",\n        \"2026-10-13T03:03:39.597954\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 8,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 184,\n  \"checks\": [\n    {\n      \"check\": \". ge 9\",\n      \"ok\": false,\n      \"actual\": \"8\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/F06.search-timestamp-order/count-since-observation.json\",\n  \"hint\": \"failed check: . ge 9\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "A message reopens a finished conversation (`F06.send-resets-finished`).",
+      "ids": [
+        "F06.send-resets-finished"
+      ],
+      "line": 574,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2527,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-24-a-message-reopens-a-finished-conversatio.json"
+    },
+    {
+      "bullet": "History survives a restart (`F06.restart-persist`).",
+      "ids": [
+        "F06.restart-persist"
+      ],
+      "line": 589,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 39917,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-25-history-survives-a-restart-f06-restart-p.json"
+    },
+    {
+      "bullet": "Run capacity full (`F06.send-run-limit`).",
+      "ids": [
+        "F06.send-run-limit"
+      ],
+      "line": 609,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 31912,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-26-run-capacity-full-f06-send-run-limit.json"
+    },
+    {
+      "bullet": "A message while the agent runs (`F06.send-while-running`).",
+      "ids": [
+        "F06.send-while-running"
+      ],
+      "line": 637,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 16826,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/map-run/F06-conversation-events-27-a-message-while-the-agent-runs-f06-send-.json"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06",
+  "launch_flags": [
+    "--env",
+    "TZ=UTC"
+  ]
+}

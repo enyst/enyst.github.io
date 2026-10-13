@@ -1,0 +1,450 @@
+[
+  {
+    "feature": "F22.empty-router",
+    "run": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-05-router-with-no-route-f22-empty-router-kn.json",
+    "failed_line": 4,
+    "failed_command": "control-agent-server api POST /api/meta-profiles/qa-empty --json '{\"classifier_model\": \"deepseek-flash\"}' --expect 422 --save F22.empty-router/save"
+  },
+  {
+    "feature": "F22.empty-router",
+    "run": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-03-router-with-no-route-f22-empty-router-kn.json",
+    "failed_line": 4,
+    "failed_command": "control-agent-server api POST /api/meta-profiles/qa-empty --json '{\"classifier_model\": \"deepseek-flash\"}' --expect 422 --save F22.empty-router/save"
+  },
+  {
+    "feature": "F22.activate-acp",
+    "run": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-17-activation-on-acp-settings-f22-activate-.json",
+    "failed_line": 16,
+    "failed_command": "jq -e '.status >= 400 and .status < 500' \"$F22/acp-activate.json\""
+  },
+  {
+    "feature": "F22.activate-acp",
+    "run": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-04-activation-on-acp-settings-f22-activate-.json",
+    "failed_line": 17,
+    "failed_command": "jq -e '.status >= 400 and .status < 500' \"$F22/acp-activate.json\""
+  },
+  {
+    "feature": "F22.corrupt-settings",
+    "run": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-19-unreadable-settings-f22-corrupt-settings.json",
+    "failed_line": 14,
+    "failed_command": "jq -e '.status == 409' \"$F22/corrupt-settings-activate.json\""
+  },
+  {
+    "feature": "F22.corrupt-settings",
+    "run": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-05-unreadable-settings-f22-corrupt-settings.json",
+    "failed_line": 15,
+    "failed_command": "jq -e '.status == 409' \"$F22/corrupt-settings-activate.json\""
+  },
+  {
+    "feature": "F22.persistence-dir",
+    "run": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-24-persistence-directory-with-f22-persisten.json",
+    "failed_line": 9,
+    "failed_command": "control-agent-server state ls 'home/qa-f22-tilde/meta-profiles/qa-tilde.json' --run \"$T\" --expect-count 1"
+  },
+  {
+    "feature": "F22.persistence-dir",
+    "run": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-06-persistence-directory-with-f22-persisten.json",
+    "failed_line": 9,
+    "failed_command": "control-agent-server state ls 'home/qa-f22-tilde/meta-profiles/qa-tilde.json' --run \"$T\" --expect-count 1"
+  },
+  {
+    "feature": "F23.models-no-bedrock",
+    "run": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-05-no-bedrock-ids-under-a-provider-f23-mode.json",
+    "failed_line": 5,
+    "failed_command": "jq -e 'map(select(test(\"^deepseek\\\\.\"))) | debug | length == 0'"
+  },
+  {
+    "feature": "F23.models-no-bedrock",
+    "run": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-01-no-bedrock-ids-under-a-provider-f23-mode.json",
+    "failed_line": 5,
+    "failed_command": "jq -e 'map(select(test(\"^deepseek\\\\.\"))) | debug | length == 0'"
+  },
+  {
+    "feature": "F23.conn-create-blank-key",
+    "run": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-12-blank-keys-on-create-f23-conn-create-bla.json",
+    "failed_line": 12,
+    "failed_command": "test \"$S_SPACE $S_MASK\" = '422 422'"
+  },
+  {
+    "feature": "F23.conn-create-blank-key",
+    "run": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-03-blank-keys-on-create-f23-conn-create-bla.json",
+    "failed_line": 12,
+    "failed_command": "test \"$S_SPACE $S_MASK\" = '422 422'"
+  },
+  {
+    "feature": "F23.conn-patch-blank-key",
+    "run": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-16-blank-keys-on-update-f23-conn-patch-blan.json",
+    "failed_line": 21,
+    "failed_command": "test \"$APPLIED\" = '[sk-qa-f23-default][sk-qa-f23-default][sk-qa-f23-default]'"
+  },
+  {
+    "feature": "F23.conn-patch-blank-key",
+    "run": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-04-blank-keys-on-update-f23-conn-patch-blan.json",
+    "failed_line": 21,
+    "failed_command": "test \"$APPLIED\" = '[sk-qa-f23-default][sk-qa-f23-default][sk-qa-f23-default]'"
+  },
+  {
+    "feature": "F23.validate-linked-draft",
+    "run": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-18-validate-a-linked-draft-f23-validate-lin.json",
+    "failed_line": 3,
+    "failed_command": "control-agent-server api POST /api/profiles/qa-f23-draft/validate --timeout 120 --expect 200 --json \"{\\\"llm\\\": {\\\"model\\\": \\\"deepseek/deepseek-flash\\\", \\\"provider_connection_id\\\": \\\"$CONN\\\", \\\"num_retries\\\": 0}}\" --save F23.validate-linked-draft/linked --check valid eq true --check error eq null"
+  },
+  {
+    "feature": "F23.validate-linked-draft",
+    "run": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-05-validate-a-linked-draft-f23-validate-lin.json",
+    "failed_line": 3,
+    "failed_command": "control-agent-server api POST /api/profiles/qa-f23-draft/validate --timeout 120 --expect 200 --json \"{\\\"llm\\\": {\\\"model\\\": \\\"deepseek/deepseek-flash\\\", \\\"provider_connection_id\\\": \\\"$CONN\\\", \\\"num_retries\\\": 0}}\" --save F23.validate-linked-draft/linked --check valid eq true --check error eq null"
+  },
+  {
+    "feature": "F23.store-busy-responsive",
+    "run": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-23-lock-wait-blocks-the-server-f23-store-bu.json",
+    "failed_line": 14,
+    "failed_command": "control-agent-server api GET /alive --auth none --expect 200 --expect-max-ms 3000 --timeout 60 --save F23.store-busy-responsive/alive"
+  },
+  {
+    "feature": "F23.store-busy-responsive",
+    "run": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034323-e6ea-map-f23/evidence/map-run/F23-llm-catalog-and-connections-06-lock-wait-blocks-the-server-f23-store-bu.json",
+    "failed_line": 14,
+    "failed_command": "control-agent-server api GET /alive --auth none --expect 200 --expect-max-ms 3000 --timeout 60 --save F23.store-busy-responsive/alive"
+  },
+  {
+    "feature": "F24.status-offline",
+    "run": "/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/map-run/F24-openai-subscription-18-status-with-an-expired-login-offline-f24.json",
+    "failed_line": 8,
+    "failed_command": "control-agent-server api GET /api/llm/subscription/openai/status --run \"$OFF\" --expect 200 --check connected eq false --save F24.status-offline/status"
+  },
+  {
+    "feature": "F24.status-offline",
+    "run": "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24/evidence/map-run/F24-openai-subscription-01-status-with-an-expired-login-offline-f24.json",
+    "failed_line": 8,
+    "failed_command": "control-agent-server api GET /api/llm/subscription/openai/status --run \"$OFF\" --expect 200 --check connected eq false --save F24.status-offline/status"
+  },
+  {
+    "feature": "F24.device-start-offline",
+    "run": "/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/map-run/F24-openai-subscription-19-start-and-poll-a-login-offline-f24-devic.json",
+    "failed_line": 9,
+    "failed_command": "control-agent-server api POST /api/llm/subscription/openai/device/start --run \"$OUTAGE\" --expect 502,503,504 --save F24.device-start-offline/start"
+  },
+  {
+    "feature": "F24.device-start-offline",
+    "run": "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24/evidence/map-run/F24-openai-subscription-02-start-and-poll-a-login-offline-f24-devic.json",
+    "failed_line": 9,
+    "failed_command": "control-agent-server api POST /api/llm/subscription/openai/device/start --run \"$OUTAGE\" --expect 502,503,504 --save F24.device-start-offline/start"
+  },
+  {
+    "feature": "F25.marketplace-public",
+    "run": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-03-public-marketplace-catalog-f25-marketpla.json",
+    "failed_line": 1,
+    "failed_command": "control-agent-server api GET /api/skills/marketplace --timeout 180 --expect 200 --check skills len-ge 1 --save F25.marketplace-public/catalog"
+  },
+  {
+    "feature": "F25.marketplace-public",
+    "run": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-02-public-marketplace-catalog-f25-marketpla.json",
+    "failed_line": 1,
+    "failed_command": "control-agent-server api GET /api/skills/marketplace --timeout 180 --expect 200 --check skills len-ge 1 --save F25.marketplace-public/catalog"
+  },
+  {
+    "feature": "F25.install-bad-frontmatter",
+    "run": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-12-malformed-frontmatter-f25-install-bad-fr.json",
+    "failed_line": 1,
+    "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$F/qa-f25-badyaml\"'\"}' --expect 422 --save F25.install-bad-frontmatter/install"
+  },
+  {
+    "feature": "F25.install-bad-frontmatter",
+    "run": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-03-malformed-frontmatter-f25-install-bad-fr.json",
+    "failed_line": 1,
+    "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$F/qa-f25-badyaml\"'\"}' --expect 422 --save F25.install-bad-frontmatter/install"
+  },
+  {
+    "feature": "F25.install-documented-sources",
+    "run": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-16-documented-install-sources-f25-install-d.json",
+    "failed_line": 5,
+    "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$SRC\"'\"}' --timeout 240 --expect 200 --check name eq github --save F25.install-documented-sources/documented"
+  },
+  {
+    "feature": "F25.install-documented-sources",
+    "run": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-06-documented-install-sources-f25-install-d.json",
+    "failed_line": 5,
+    "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$SRC\"'\"}' --timeout 240 --expect 200 --check name eq github --save F25.install-documented-sources/documented"
+  },
+  {
+    "feature": "F26.install-documented-source",
+    "run": "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/map-run/F26-plugins-11-documented-install-source-f26-install-do.json",
+    "failed_line": 7,
+    "failed_command": "control-agent-server api POST /api/plugins/install --json '{\"source\": \"github:<redacted:unrelated-repository>/plugins/city-weather\"}' --timeout 240 --expect 200 --check name eq city-weather --save F26.install-documented-source/documented"
+  },
+  {
+    "feature": "F26.install-documented-source",
+    "run": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-02-documented-install-source-f26-install-do.json",
+    "failed_line": 7,
+    "failed_command": "control-agent-server api POST /api/plugins/install --json '{\"source\": \"github:<redacted:unrelated-repository>/plugins/city-weather\"}' --timeout 240 --expect 200 --check name eq city-weather --save F26.install-documented-source/documented"
+  },
+  {
+    "feature": "F25.install-unknown-ref",
+    "run": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-19-unknown-ref-f25-install-unknown-ref-know.json",
+    "failed_line": 7,
+    "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"file://'\"$G\"'\", \"repo_path\": \"skills/qa-f25-src-skill\", \"ref\": \"qa-f25-no-such-ref\", \"force\": true}' --expect 400 --save F25.install-unknown-ref/cached"
+  },
+  {
+    "feature": "F25.install-unknown-ref",
+    "run": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-07-unknown-ref-f25-install-unknown-ref-know.json",
+    "failed_line": 7,
+    "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"file://'\"$G\"'\", \"repo_path\": \"skills/qa-f25-src-skill\", \"ref\": \"qa-f25-no-such-ref\", \"force\": true}' --expect 400 --save F25.install-unknown-ref/cached"
+  },
+  {
+    "feature": "F25.refresh-unfetchable",
+    "run": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-20-refresh-of-a-vanished-source-f25-refresh.json",
+    "failed_line": 6,
+    "failed_command": "control-agent-server api POST /api/skills/installed/qa-f25-gone/refresh --expect 400,422 --save F25.refresh-unfetchable/refresh"
+  },
+  {
+    "feature": "F25.refresh-unfetchable",
+    "run": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-08-refresh-of-a-vanished-source-f25-refresh.json",
+    "failed_line": 6,
+    "failed_command": "control-agent-server api POST /api/skills/installed/qa-f25-gone/refresh --expect 400,422 --save F25.refresh-unfetchable/refresh"
+  },
+  {
+    "feature": "F26.refresh-unfetchable",
+    "run": "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/map-run/F26-plugins-16-unfetchable-refresh-f26-refresh-unfetcha.json",
+    "failed_line": 11,
+    "failed_command": "control-agent-server api POST /api/plugins/installed/qa-f26-gone/refresh --expect 400,422 --save F26.refresh-unfetchable/vanished"
+  },
+  {
+    "feature": "F26.refresh-unfetchable",
+    "run": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-03-unfetchable-refresh-f26-refresh-unfetcha.json",
+    "failed_line": 11,
+    "failed_command": "control-agent-server api POST /api/plugins/installed/qa-f26-gone/refresh --expect 400,422 --save F26.refresh-unfetchable/vanished"
+  },
+  {
+    "feature": "F25.sync-offline",
+    "run": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-24-sync-without-a-reachable-origin-f25-sync.json",
+    "failed_line": 4,
+    "failed_command": "control-agent-server api POST /api/skills/sync --expect 200 --check status eq error --save F25.sync-offline/sync"
+  },
+  {
+    "feature": "F25.sync-offline",
+    "run": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-10-sync-without-a-reachable-origin-f25-sync.json",
+    "failed_line": 4,
+    "failed_command": "control-agent-server api POST /api/skills/sync --expect 200 --check status eq error --save F25.sync-offline/sync"
+  },
+  {
+    "feature": "F25.marketplace-stale-cache",
+    "run": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-32-catalog-after-a-sync-f25-marketplace-sta.json",
+    "failed_line": 11,
+    "failed_command": "control-agent-server api GET /api/skills/marketplace --expect 200 --check skills contains '\"name\": \"qa-f25-pub-extra\"' --save F25.marketplace-stale-cache/after-sync"
+  },
+  {
+    "feature": "F25.marketplace-stale-cache",
+    "run": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/map-run/F25-skills-11-catalog-after-a-sync-f25-marketplace-sta.json",
+    "failed_line": 11,
+    "failed_command": "control-agent-server api GET /api/skills/marketplace --expect 200 --check skills contains '\"name\": \"qa-f25-pub-extra\"' --save F25.marketplace-stale-cache/after-sync"
+  },
+  {
+    "feature": "F26.install-repo-root-name",
+    "run": "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/map-run/F26-plugins-07-repository-root-name-f26-install-repo-ro.json",
+    "failed_line": 5,
+    "failed_command": "test \"$N\" = qa-f26-src"
+  },
+  {
+    "feature": "F26.install-repo-root-name",
+    "run": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-01-repository-root-name-f26-install-repo-ro.json",
+    "failed_line": 5,
+    "failed_command": "test \"$N\" = qa-f26-src"
+  },
+  {
+    "feature": "F26.conversation-resume-disabled",
+    "run": "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-030021-e114-map-f26/evidence/map-run/F26-plugins-20-resume-after-disabling-f26-conversation-.json",
+    "failed_line": 12,
+    "failed_command": "control-agent-server ws stop qa-f26-resume --kinds MessageEvent --contains '\"activated_skills\": [\"qa-f26-inst:qa-hello\"]' --expect-none --save F26.conversation-resume-disabled/frames"
+  },
+  {
+    "feature": "F26.conversation-resume-disabled",
+    "run": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-04-resume-after-disabling-f26-conversation-.json",
+    "failed_line": 12,
+    "failed_command": "control-agent-server ws stop qa-f26-resume --kinds MessageEvent --contains '\"activated_skills\": [\"qa-f26-inst:qa-hello\"]' --expect-none --save F26.conversation-resume-disabled/frames"
+  },
+  {
+    "feature": "F27.subagents-bad-skill",
+    "run": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/map-run/F27-hooks-subagents-tools-15-agent-with-a-missing-skill-f27-subagents.json",
+    "failed_line": 8,
+    "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$BCID/events\" --json '{\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"hi\"}], \"run\": false}' --expect 2xx,4xx --save F27.subagents-bad-skill/send"
+  },
+  {
+    "feature": "F27.subagents-bad-skill",
+    "run": "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27/evidence/map-run/F27-hooks-subagents-tools-01-agent-with-a-missing-skill-f27-subagents.json",
+    "failed_line": 8,
+    "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$BCID/events\" --json '{\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"hi\"}], \"run\": false}' --expect 2xx,4xx --save F27.subagents-bad-skill/send"
+  },
+  {
+    "feature": "F27.custom-tool-missing-on-resume",
+    "run": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/map-run/F27-hooks-subagents-tools-24-tool-module-gone-on-resume-f27-custom-to.json",
+    "failed_line": 4,
+    "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$MCID/events\" --json '{\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Reply with the single word ok.\"}], \"run\": false}' --expect 2xx,4xx --save F27.custom-tool-missing-on-resume/send"
+  },
+  {
+    "feature": "F27.custom-tool-missing-on-resume",
+    "run": "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-034502-5a13-map-f27/evidence/map-run/F27-hooks-subagents-tools-03-tool-module-gone-on-resume-f27-custom-to.json",
+    "failed_line": 4,
+    "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$MCID/events\" --json '{\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"Reply with the single word ok.\"}], \"run\": false}' --expect 2xx,4xx --save F27.custom-tool-missing-on-resume/send"
+  },
+  {
+    "feature": "F27.server-info-browser-disabled",
+    "run": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/map-run/F27-hooks-subagents-tools-29-usable-tools-with-the-browser-disabled-f.json",
+    "failed_line": 2,
+    "failed_command": "control-agent-server api GET /server_info --auth none --expect 200 --check usable_tools contains terminal --check usable_tools not-contains browser_tool_set --save F27.server-info-browser-disabled/server-info"
+  },
+  {
+    "feature": "F27.server-info-browser-disabled",
+    "run": "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27/evidence/map-run/F27-browser-config-02-server-info-browser-disabled-f27-server-.json",
+    "failed_line": 2,
+    "failed_command": "control-agent-server api GET /server_info --auth none --check usable_tools contains terminal --check usable_tools not-contains browser_tool_set --save F27.server-info-browser-disabled/server-info"
+  },
+  {
+    "feature": "F27.subagents-browser-disabled",
+    "run": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/map-run/F27-hooks-subagents-tools-30-browser-only-sub-agent-with-the-browser-.json",
+    "failed_line": 2,
+    "failed_command": "control-agent-server api POST /api/sub-agents --json '{\"load_user\": false, \"load_project\": false}' --expect 200 --check agents contains '\"name\": \"bash-runner\"' --check agents not-contains '\"name\": \"web-researcher\"' --save F27.subagents-browser-disabled/builtins"
+  },
+  {
+    "feature": "F27.subagents-browser-disabled",
+    "run": "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-035121-8592-map-f27/evidence/map-run/F27-browser-config-03-subagents-browser-disabled-f27-subagents.json",
+    "failed_line": 2,
+    "failed_command": "control-agent-server api POST /api/sub-agents --json '{\"load_user\":false,\"load_project\":false}' --check agents contains '\"name\": \"bash-runner\"' --check agents not-contains '\"name\": \"web-researcher\"' --save F27.subagents-browser-disabled/builtins"
+  },
+  {
+    "feature": "F27.browser-playwright-path",
+    "run": "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-02-playwright-override-f27-browser-playwrig.json",
+    "failed_line": 6,
+    "failed_command": "control-agent-server api GET /api/tools/catalog --quiet --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": true' --save F27.browser-playwright-path/catalog"
+  },
+  {
+    "feature": "F27.browser-playwright-path",
+    "run": "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-040554-b24c-qa-f27-browser-path-2/evidence/map-run/F27-browser-container-02-playwright-override-f27-browser-playwrig.json",
+    "failed_line": 6,
+    "failed_command": "control-agent-server api GET /api/tools/catalog --quiet --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": true' --save F27.browser-playwright-path/catalog"
+  },
+  {
+    "feature": "F22.store-busy-responsive",
+    "run": "/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1/evidence/map-run/F22-meta-profiles-02-lock-wait-blocks-the-server-f22-store-bu.json",
+    "failed_line": 21,
+    "failed_command": "test \"$SLOW\" = 0"
+  },
+  {
+    "feature": "F22.store-busy-responsive",
+    "run": "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/map-run/F22-meta-profiles-02-lock-wait-blocks-the-server-f22-store-bu.json",
+    "failed_line": 21,
+    "failed_command": "test \"$SLOW\" = 0"
+  },
+  {
+    "feature": "F28.prepare-corrupt-archive",
+    "run": "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-01-non-gzip-artifact-f28-prepare-corrupt-ar.json",
+    "failed_line": 6,
+    "failed_command": "control-agent-server api POST /api/canvas-extensions/installed/qa-f28-notgz/backend/prepare --json \"{\\\"revision\\\": \\\"$NREV\\\"}\" --expect 409 --save F28.prepare-corrupt-archive/prepare"
+  },
+  {
+    "feature": "F28.install-ref-cached",
+    "run": "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-02-unknown-ref-on-a-cached-source-f28-insta.json",
+    "failed_line": 4,
+    "failed_command": "control-agent-server api POST /api/canvas-extensions/install --json \"{\\\"source\\\": \\\"file://$GX\\\", \\\"ref\\\": \\\"qa-no-such-ref\\\", \\\"force\\\": true}\" --expect 400 --check detail contains 'Could not read canvas extension source' --save F28.install-ref-cached/unknown-ref"
+  },
+  {
+    "feature": "F28.status-probe-latch",
+    "run": "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-03-health-probe-latch-f28-status-probe-latc.json",
+    "failed_line": 11,
+    "failed_command": "control-agent-server api GET /api/canvas-extensions/installed/qa-f28-flaky/backend --until-ok 5 --check state eq ready --save F28.status-probe-latch/after-recovery"
+  },
+  {
+    "feature": "F28.hard-restart-orphan",
+    "run": "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-04-backend-outlives-a-crash-f28-hard-restar.json",
+    "failed_line": 11,
+    "failed_command": "false"
+  },
+  {
+    "feature": "F28.prepare-corrupt-archive",
+    "run": "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-01-non-gzip-artifact-f28-prepare-corrupt-ar.json",
+    "failed_line": 6,
+    "failed_command": "control-agent-server api POST /api/canvas-extensions/installed/qa-f28-notgz/backend/prepare --json \"{\\\"revision\\\": \\\"$NREV\\\"}\" --expect 409 --save F28.prepare-corrupt-archive/prepare"
+  },
+  {
+    "feature": "F28.install-ref-cached",
+    "run": "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-02-unknown-ref-on-a-cached-source-f28-insta.json",
+    "failed_line": 4,
+    "failed_command": "control-agent-server api POST /api/canvas-extensions/install --json \"{\\\"source\\\": \\\"file://$GX\\\", \\\"ref\\\": \\\"qa-no-such-ref\\\", \\\"force\\\": true}\" --expect 400 --check detail contains 'Could not read canvas extension source' --save F28.install-ref-cached/unknown-ref"
+  },
+  {
+    "feature": "F28.status-probe-latch",
+    "run": "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-03-health-probe-latch-f28-status-probe-latc.json",
+    "failed_line": 11,
+    "failed_command": "control-agent-server api GET /api/canvas-extensions/installed/qa-f28-flaky/backend --until-ok 5 --check state eq ready --save F28.status-probe-latch/after-recovery"
+  },
+  {
+    "feature": "F28.hard-restart-orphan",
+    "run": "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28",
+    "transcript": "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-04-backend-outlives-a-crash-f28-hard-restar.json",
+    "failed_line": 11,
+    "failed_command": "false"
+  }
+]

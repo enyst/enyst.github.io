@@ -1,0 +1,15 @@
+{
+  "file": "F06-conversation-events.md",
+  "bullet": "Replay everything (`F06.ws-replay-all`).",
+  "ids": [
+    "F06.ws-replay-all"
+  ],
+  "line": 433,
+  "script": "IDS=$(control-agent-server api GET \"<redacted:session-cookie>/$CID/events/search\" --field items | jq -c '[.[].id]')\nALL=$(control-agent-server ws listen \"/sockets/events/$CID\" --query resend_mode=all --duration 3 \\\n  --save F06.ws-replay-all/all | jq -r .saved)\njq -e --argjson ids \"$IDS\" '[.frames[] | select(.direction == \"received\") | .frame] | (.[0].key == \"full_state\") and ([.[1:][].id] == $ids)' \"$ALL\"\nLEGACY=$(control-agent-server ws listen \"/sockets/events/$CID\" --query resend_all=true --duration 3 \\\n  --save F06.ws-replay-all/resend-all-legacy | jq -r .saved)\njq -e --argjson ids \"$IDS\" '[.frames[] | select(.direction == \"received\") | .frame] | [.[1:][].id] == $ids' \"$LEGACY\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 10155,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "true\ntrue\n",
+  "stderr": ""
+}

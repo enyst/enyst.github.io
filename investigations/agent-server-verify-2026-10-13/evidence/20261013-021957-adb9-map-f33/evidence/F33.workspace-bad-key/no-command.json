@@ -1,0 +1,45 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/bash/bash_events/search",
+    "query": [
+      [
+        "kind__eq",
+        "BashCommand"
+      ],
+      [
+        "sort_order",
+        "TIMESTAMP_DESC"
+      ],
+      [
+        "limit",
+        "1"
+      ]
+    ],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "329",
+      "content-type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "command": "sleep 20",
+          "cwd": "/workspace/verification-artifacts/runs/20261013-021957-adb9-map-f33/fixtures/qa-f33/exec",
+          "timeout": 2,
+          "id": "a8c2e0f9a9384897aae50d7571d9de0e",
+          "timestamp": "2026-10-13T02:21:26.149726Z",
+          "kind": "BashCommand"
+        }
+      ],
+      "next_page_id": "20261013022126134254_BashCommand_bb8073cbd842493c8a82761b0a7a8052"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 484
+}

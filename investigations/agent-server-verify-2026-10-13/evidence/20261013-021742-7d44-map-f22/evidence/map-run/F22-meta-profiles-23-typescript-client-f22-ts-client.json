@@ -1,0 +1,15 @@
+{
+  "file": "F22-meta-profiles.md",
+  "bullet": "TypeScript client (`F22.ts-client`).",
+  "ids": [
+    "F22.ts-client"
+  ],
+  "line": 641,
+  "script": "test -f clients/typescript/dist/clients.js || (cd clients/typescript && npm ci && npm run build)\ncontrol-agent-server exec --timeout 120 --expect-output QA_F22_TS_OK --save F22.ts-client/program -- node \"$F22/ts_meta_profiles.mjs\"\ncontrol-agent-server api GET /api/meta-profiles --check active_meta_profile eq qa-direct --check meta_profiles len-eq 1 \\\n  --check meta_profiles not-contains '\"name\": \"qa-ts\"' --save F22.ts-client/list-after\n",
+  "exit_code": 0,
+  "elapsed_ms": 4620,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 1070,\n  \"stdout_tail\": \"QA_F22_TS_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.ts-client/program.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"126\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"meta_profiles\": [\n        {\n          \"name\": \"qa-direct\",\n          \"classifier_model\": \"deepseek-flash\",\n          \"num_classes\": 0\n        }\n      ],\n      \"active_meta_profile\": \"qa-direct\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 417,\n  \"checks\": [\n    {\n      \"check\": \"active_meta_profile eq qa-direct\",\n      \"ok\": true,\n      \"actual\": \"qa-direct\"\n    },\n    {\n      \"check\": \"meta_profiles len-eq 1\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"name\\\": \\\"qa-direct\\\", \\\"classifier_model\\\": \\\"deepseek-flash\\\", \\\"num_classes\\\": 0}]\"\n    },\n    {\n      \"check\": \"meta_profiles not-contains \\\"name\\\": \\\"qa-ts\\\"\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"name\\\": \\\"qa-direct\\\", \\\"classifier_model\\\": \\\"deepseek-flash\\\", \\\"num_classes\\\": 0}]\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.ts-client/list-after.json\"\n}\n",
+  "stderr": ""
+}

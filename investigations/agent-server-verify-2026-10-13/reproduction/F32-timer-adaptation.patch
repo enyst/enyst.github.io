@@ -1,0 +1,59 @@
+--- .agents/skills/verify-agent-server/references/feature-map/F32-webhooks-and-telemetry.md	2026-10-13 02:14:19.957463966 +0000
++++ /workspace/verification-artifacts/harness-f29-f34/.agents/skills/verify-agent-server/references/feature-map/F32-webhooks-and-telemetry.md	2026-10-13 02:28:38.106669624 +0000
+@@ -286,17 +286,45 @@
+   at about 6 s.
+   ```sh
+   control-agent-server restart --config-json "{\"webhooks\": [{\"base_url\": \"$WH/qa-f32-d\", \"event_buffer_size\": 100, \"flush_delay\": 6}]}"
+-  T0=$SECONDS
+-  TID=$(control-agent-server conversation start --placeholder-agent --no-autotitle --print-id)
+-  sleep 3
+-  control-agent-server conversation send "$TID" --text QA_F32_TIMER --no-run
+-  control-agent-server sink read --path "/qa-f32-d/events/${TID//-/}" --expect-max 0
+-  control-agent-server sink read --path "/qa-f32-d/events/${TID//-/}" --expect-min 1 --wait 15
+-  ELAPSED=$((SECONDS - T0))
+-  test "$ELAPSED" -ge 5
+-  test "$ELAPSED" -le 8
+-  control-agent-server sink read --path "/qa-f32-d/events/${TID//-/}" --expect-min 1 --expect-max 1 --contains QA_F32_TIMER --save F32.flush-delay/one-batch
+-  control-agent-server sink read --path "/qa-f32-d/events/${TID//-/}" --contains '"key": "full_state"' --expect-min 1 --expect-max 1
++  control-agent-server exec --timeout 40 --expect-output QA_F32_TIMER_VERIFIED --save F32.flush-delay/timed-probe -- .venv/bin/python - <<'PYTIMER'
++  import json
++  import os
++  import time
++  from pathlib import Path
++
++  import httpx
++
++  sink = Path(os.environ["AGENT_SERVER_VERIFY_RUN"]) / "fixtures/webhooks.jsonl"
++  with httpx.Client(base_url=os.environ["AGENT_SERVER_URL"],
++                    headers={"X-Session-API-Key": os.environ["SESSION_API_KEY"]}, timeout=20) as http:
++      t0 = time.monotonic()
++      response = http.post("<redacted:session-cookie>", json={"agent": {"llm": {"model": "openai/qa-placeholder", "api_key": "qa-placeholder",
++                           "base_url": "http://127.0.0.1:9/v1", "num_retries": 0}, "tools": []}, "autotitle": False})
++      response.raise_for_status()
++      cid = response.json()["id"]
++      path = "/qa-f32-d/events/" + cid.replace("-", "")
++
++      def deliveries():
++          return [json.loads(line) for line in sink.read_text().splitlines() if json.loads(line)["path"] == path] if sink.exists() else []
++
++      time.sleep(3)
++      http.post(f"<redacted:session-cookie>/{cid}/events", json={"role": "user", "content": [{"type": "text", "text": "QA_F32_TIMER"}],
++                "run": False}).raise_for_status()
++      assert not deliveries(), "delivery happened before 6-second timer"
++      deadline = time.monotonic() + 15
++      while not deliveries() and time.monotonic() < deadline:
++          time.sleep(0.1)
++      elapsed = time.monotonic() - t0
++      captured = deliveries()
++      assert len(captured) == 1, len(captured)
++      assert 5 <= elapsed <= 8, elapsed
++      payload = captured[0]["body"]
++      assert "QA_F32_TIMER" in json.dumps(payload), payload
++      assert any(event.get("key") == "full_state" for event in payload), payload
++      print(json.dumps({"cid": cid, "elapsed_seconds": round(elapsed, 3), "batches": len(captured),
++                        "has_snapshot": True, "has_second_message": True}))
++      print("QA_F32_TIMER_VERIFIED")
++  PYTIMER
+   ```
+   Nothing was posted after 3 s; one batch with the snapshot and the message
+   arrived 5 to 8 s after creation. The field's own description claims the

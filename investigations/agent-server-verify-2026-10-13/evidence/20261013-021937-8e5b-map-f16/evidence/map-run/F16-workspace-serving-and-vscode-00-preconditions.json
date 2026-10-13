@@ -1,0 +1,13 @@
+{
+  "file": "F16-workspace-serving-and-vscode.md",
+  "bullet": "Preconditions",
+  "ids": [],
+  "line": 97,
+  "script": "control-agent-server llm preset deepseek\nF=\"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f16\"\nmkdir -p \"$F/ws/sub/docs\" \"$F/ws/empty-dir\" \"$F/bare\" \"$F/outside-dir\"\nprintf '<h1>qa-f16-root</h1>\\n' > \"$F/ws/index.html\"\nprintf '<p>qa-f16-sub</p>\\n' > \"$F/ws/sub/index.html\"\nprintf 'qa-f16 notes v1\\n' > \"$F/ws/sub/docs/notes.txt\"\nprintf '{\"qa\": \"f16\"}\\n' > \"$F/ws/data.json\"\nprintf '<svg xmlns=\"http://www.w3.org/2000/svg\"/>\\n' > \"$F/ws/pic.svg\"\nprintf 'body{color:red}\\n' > \"$F/ws/style.css\"\nhead -c 4096 /dev/urandom > \"$F/ws/img.png\"\nprintf 'qa-f16-blob' > \"$F/ws/blob.qaunknown\"\nprintf 'qa-f16 spaced\\n' > \"$F/ws/my file \u00e9.txt\"\nprintf 'qa-f16-outside\\n' > \"$F/outside.txt\"\nprintf 'qa-f16-outside-dir\\n' > \"$F/outside-dir/file.txt\"\nln -sfn data.json \"$F/ws/inside-link.json\"\nln -sfn ../outside.txt \"$F/ws/escape-link.txt\"\nln -sfn ../outside-dir \"$F/ws/dir-link\"\nprintf 'qa-f16-bare\\n' > \"$F/bare/readme.txt\"\nCID=$(control-agent-server conversation start --no-run --tools none --no-autotitle --workspace \"$F/ws\" --print-id)\nWS=$(control-agent-server api GET \"<redacted:session-cookie>/$CID\" --field workspace.working_dir)\nBARE=$(control-agent-server conversation start --no-run --tools none --no-autotitle --workspace \"$F/bare\" --print-id)\ntest -n \"$WS\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 9868,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"profiles\": [\n    {\n      \"profile\": \"deepseek-flash\",\n      \"model\": \"deepseek/deepseek-flash\",\n      \"validate\": {\n        \"status\": 200,\n        \"body\": {\n          \"valid\": true,\n          \"error\": null\n        }\n      },\n      \"saved\": 201,\n      \"activated\": 200\n    },\n    {\n      \"profile\": \"deepseek-pro\",\n      \"model\": \"deepseek/deepseek-v4-pro\",\n      \"saved\": 201\n    }\n  ]\n}\n",
+  "stderr": ""
+}

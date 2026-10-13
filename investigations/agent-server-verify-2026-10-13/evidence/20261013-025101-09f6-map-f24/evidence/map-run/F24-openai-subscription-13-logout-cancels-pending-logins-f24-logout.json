@@ -1,0 +1,15 @@
+{
+  "file": "F24-openai-subscription.md",
+  "bullet": "Logout cancels pending logins (`F24.logout-cancels-pending`).",
+  "ids": [
+    "F24.logout-cancels-pending"
+  ],
+  "line": 379,
+  "script": "control-agent-server api POST /api/llm/subscription/openai/logout --expect 200 --check connected eq false\ncontrol-agent-server api POST /api/llm/subscription/openai/device/poll --json \"{\\\"device_code\\\": \\\"$DC\\\"}\" --expect 404 \\\n  --check detail eq 'Subscription device login not found or expired' --save F24.logout-cancels-pending/poll-after-logout\n",
+  "exit_code": 0,
+  "elapsed_ms": 2005,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/llm/subscription/openai/logout\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"76\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"vendor\": \"openai\",\n      \"connected\": false,\n      \"account_email\": null,\n      \"expires_at\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 253,\n  \"checks\": [\n    {\n      \"check\": \"connected eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/llm/subscription/openai/device/poll\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"device_code\": \"<redacted:device_code>\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"59\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Subscription device login not found or expired\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 182,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Subscription device login not found or expired\",\n      \"ok\": true,\n      \"actual\": \"Subscription device login not found or expired\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/F24.logout-cancels-pending/poll-after-logout.json\"\n}\n",
+  "stderr": ""
+}

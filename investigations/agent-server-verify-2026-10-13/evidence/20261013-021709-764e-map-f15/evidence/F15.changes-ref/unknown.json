@@ -1,0 +1,31 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/git/changes",
+    "query": [
+      [
+        "path",
+        "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15-repo"
+      ],
+      [
+        "ref",
+        "qa-f15-no-such-ref"
+      ]
+    ],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "content-length": "96",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "Git command failed: git --no-pager rev-parse --verify 'qa-f15-no-such-ref^{commit}'"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 74
+}

@@ -1,0 +1,3 @@
+# F34 reconnect observation adaptation
+
+Only the copied watcher's post-disconnect observation window changes from 60 to 120 seconds. Restart stop/start overhead under concurrent verification plus the client's exponential backoff placed its next attempt beyond the original 60-second observation. In the first supplementary run, both ws and Node24 native streams scheduled six attempts, while the Node22 known marker describes one. The copied recipe keeps all positive-control and bug assertions unchanged, and uses the current Node24.21.0 runtime. An xpass therefore describes runtime-specific map drift, not a product fix. Frozen client/server source and original results remain untouched.

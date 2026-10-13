@@ -1,0 +1,15 @@
+{
+  "file": "F33-sdk-remote-client.md",
+  "bullet": "Deltas kept out of `state.events` (`F33.conversation-streaming-state`), known bug.",
+  "ids": [
+    "F33.conversation-streaming-state"
+  ],
+  "line": 891,
+  "script": "test \"$(jq '.local.MessageEvent // 0' \"$F33/stream.json\")\" -eq \"$(control-agent-server conversation events \"$STREAM\" --kinds MessageEvent | jq .matching)\"\ntest \"$(jq '.local.StreamingDeltaEvent // 0' \"$F33/stream.json\")\" -eq 0  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 918,
+  "failed_line": 2,
+  "failed_command": "test \"$(jq '.local.StreamingDeltaEvent // 0' \"$F33/stream.json\")\" -eq 0",
+  "stdout": "",
+  "stderr": ""
+}

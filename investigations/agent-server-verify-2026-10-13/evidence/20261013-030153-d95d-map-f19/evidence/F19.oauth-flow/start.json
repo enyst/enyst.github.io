@@ -1,0 +1,47 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/oauth/start",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "name": "qa-oauth",
+      "server": {
+        "type": "http",
+        "url": "http://127.0.0.1:57017/mcp",
+        "auth": {
+          "strategy": "oauth2",
+          "authentication": {
+            "type": "oauth",
+            "client_auth_method": "none",
+            "scopes": [
+              "mail.read"
+            ]
+          }
+        }
+      },
+      "timeout": 60,
+      "tool_call": {
+        "name": "read_subject",
+        "arguments": {
+          "subject": "hi"
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "429",
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": true,
+      "job_id": "2ec34d1d993e45ea80926a08279744cb",
+      "authorization_url": "http://127.0.0.1:57017/authorize?response_type=code&client_id=49d96717-770a-4d78-90c6-9f1a7cb7742a&redirect_uri=http%3A%2F%2Flocalhost%3A44689%2Fcallback&state=X45cm8UYrHIp1fbI1DT_MePl6LixZBL9OgRFwn5XFOc&code_challenge=IEWBjWseFCD5F6ATmFeN7jMV0CEt5_yBIOLVjGEvAd8&code_challenge_method=S256&resource=http%3A%2F%2F127.0.0.1%3A57017%2Fmcp&scope=mail.read"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 743
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F31-persistence-and-limits.md",
+  "bullet": "Per-process tmux directory removed on stop (`F31.tmux-dir-cleanup`), known bug.",
+  "ids": [
+    "F31.tmux-dir-cleanup"
+  ],
+  "line": 709,
+  "script": "B=$(control-agent-server launch --new --name f31-tmux --env TMUX_TMPDIR= --print-run)\ntrap 'control-agent-server stop --run \"$B\" >/dev/null 2>&1 || true' EXIT\nPIDB=$(jq -r .pid \"$B/run.json\")\nTD=\"$(python3 -c 'import tempfile; print(tempfile.gettempdir())')/openhands-agent-server-$PIDB\"\ncontrol-agent-server logs --run \"$B\" --grep 'TMUX_TMPDIR not set' --expect-min 1\ntest -d \"$TD\"\ncontrol-agent-server stop --run \"$B\" | jq -e '.server == \"terminated\"'\ntrap 'rm -rf -- \"$TD\" || true' EXIT\ntest ! -e \"$TD\"  # bug\ntrap - EXIT\n",
+  "exit_code": 1,
+  "elapsed_ms": 23552,
+  "failed_line": 7,
+  "failed_command": "jq -e '.server == \"terminated\"'",
+  "stdout": "{\n  \"ok\": true,\n  \"log\": \"/workspace/verification-artifacts/runs/20261013-031125-da92-f31-tmux/private/server.log\",\n  \"lines\": [\n    \"[10/13/26 03:11:31] INFO     TMUX_TMPDIR not set; defaulting to       api.py:159\"\n  ],\n  \"total_matching\": 1\n}\nfalse\n",
+  "stderr": ""
+}

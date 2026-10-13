@@ -1,0 +1,53 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/bash/bash_events/search",
+    "query": [
+      [
+        "kind__eq",
+        "BashCommand"
+      ],
+      [
+        "sort_order",
+        "TIMESTAMP_DESC"
+      ],
+      [
+        "limit",
+        "2"
+      ]
+    ],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "416",
+      "content-type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "command": "echo QA_F13_PAGE_3",
+          "cwd": null,
+          "timeout": 300,
+          "id": "d64f1fb89803495ea3eea0e95ec7d0bc",
+          "timestamp": "2026-10-13T02:18:47.495003Z",
+          "kind": "BashCommand"
+        },
+        {
+          "command": "echo QA_F13_PAGE_2",
+          "cwd": null,
+          "timeout": 300,
+          "id": "7040d6a0305b4399a9cf557038429c85",
+          "timestamp": "2026-10-13T02:18:46.574676Z",
+          "kind": "BashCommand"
+        }
+      ],
+      "next_page_id": "20261013021845301604_BashCommand_26ffe13c99d5450ea62dcccd8a09709a"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 202
+}

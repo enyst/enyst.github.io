@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "<redacted:session-cookie>/f70da145-be30-46aa-9740-542847250712/condense",
+    "query": [],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-length": "442",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "Internal Server Error",
+      "exception": "Cannot condense conversation: No condenser configured. To enable manual condensation, configure an LLMSummarizingCondenser:\n\nfrom openhands.sdk.context.condenser import LLMSummarizingCondenser\nagent = Agent(\n    llm=your_llm,\n    condenser=LLMSummarizingCondenser(\n        llm=your_llm,\n        max_size=120,\n        keep_first=4\n    )\n)",
+      "error_id": "02c3cce98b7243ec9cc0c8421b9e495f"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 943
+}

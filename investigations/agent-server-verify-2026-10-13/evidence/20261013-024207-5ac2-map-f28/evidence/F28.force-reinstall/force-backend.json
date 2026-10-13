@@ -1,0 +1,80 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/canvas-extensions/install",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "source": "file:///workspace/verification-artifacts/runs/20261013-024207-5ac2-map-f28/fixtures/canvas/qa-backend",
+      "force": true
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "1280",
+      "content-type": "application/json"
+    },
+    "body": {
+      "name": "qa-backend",
+      "version": "0.1.0",
+      "description": "QA fixture Canvas app",
+      "enabled": false,
+      "source": "file:///workspace/verification-artifacts/runs/20261013-024207-5ac2-map-f28/fixtures/canvas/qa-backend",
+      "requested_ref": null,
+      "resolved_ref": "f3946ddff93a691d5cf27c3d02095311b16a572c",
+      "repo_path": null,
+      "installed_at": "2026-10-13T02:43:51.387203+00:00",
+      "install_path": "/workspace/verification-artifacts/runs/20261013-024207-5ac2-map-f28/home/.openhands/canvas-extensions/installed/qa-backend",
+      "manifest": {
+        "schema_version": 1,
+        "name": "qa-backend",
+        "display_name": "QA qa-backend",
+        "version": "0.1.0",
+        "description": "QA fixture Canvas app",
+        "entrypoint": "dist/index.js",
+        "contributes": {
+          "pages": [
+            {
+              "id": "main",
+              "title": "QA qa-backend",
+              "path": "/qa-backend"
+            }
+          ]
+        },
+        "backend": {
+          "schema_version": 1,
+          "artifacts": {
+            "linux-amd64": {
+              "path": "backend/linux.tar.gz",
+              "url": null,
+              "sha256": "39e8f5ed1afd16b7b618794bdd2a526ace8258b5cb804272ccebff4dea0e17cf",
+              "strip_components": 0
+            },
+            "linux-arm64": {
+              "path": "backend/linux.tar.gz",
+              "url": null,
+              "sha256": "39e8f5ed1afd16b7b618794bdd2a526ace8258b5cb804272ccebff4dea0e17cf",
+              "strip_components": 0
+            }
+          },
+          "argv": [
+            "{artifact_dir}/server.py",
+            "{port}",
+            "{data_dir}"
+          ],
+          "health": {
+            "path": "/health",
+            "timeout_seconds": 15.0,
+            "interval_seconds": 0.1
+          },
+          "inherit_environment": []
+        },
+        "icon": "assets/icon.svg"
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 397
+}

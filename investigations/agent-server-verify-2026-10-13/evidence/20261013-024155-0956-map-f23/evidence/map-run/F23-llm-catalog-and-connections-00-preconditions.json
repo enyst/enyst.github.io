@@ -1,0 +1,13 @@
+{
+  "file": "F23-llm-catalog-and-connections.md",
+  "bullet": "Preconditions",
+  "ids": [],
+  "line": 109,
+  "script": "F23=\"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f23\"\nmkdir -p \"$F23\"\nCF=\"$AGENT_SERVER_VERIFY_RUN/home/.openhands/provider-connections/provider_connections.json\"\ncat > \"$F23/ts_catalog.mjs\" <<'JS'\nimport assert from 'node:assert/strict';\nimport { resolve } from 'node:path';\nimport { pathToFileURL } from 'node:url';\n\nconst { LLMMetadataClient } = await import(pathToFileURL(resolve('clients/typescript/dist/clients.js')).href);\nconst client = new LLMMetadataClient({ host: process.env.AGENT_SERVER_URL, apiKey: process.env.SESSION_API_KEY });\nconst providers = await client.getProviders();\nassert.equal(providers.length, Number(process.env.QA_PROVIDERS));\nassert.ok(providers.includes('deepseek'));\nconst models = await client.getModels();\nassert.equal(models.length, Number(process.env.QA_MODELS));\nconst deepseek = await client.getModels('deepseek');\nassert.equal(deepseek.length, Number(process.env.QA_DEEPSEEK_MODELS));\nassert.ok(deepseek.includes('deepseek/deepseek-flash'));\nconst verified = await client.getVerifiedModels();\nassert.deepEqual(Object.keys(verified).sort(), process.env.QA_VERIFIED_KEYS.split(','));\nassert.ok(verified.deepseek.includes('deepseek-chat'));\nconst stranger = new LLMMetadataClient({ host: process.env.AGENT_SERVER_URL, apiKey: 'qa-f23-wrong-key' });\nawait assert.rejects(stranger.getProviders(), (err) => err.name === 'HttpError' && err.status === 401);\nconsole.log('QA_F23_TS_OK');\nJS\ncontrol-agent-server api GET /api/llm/provider-connections --expect 200 --check . len-eq 0\n",
+  "exit_code": 0,
+  "elapsed_ms": 378,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/llm/provider-connections\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"2\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": [],\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 60,\n  \"checks\": [\n    {\n      \"check\": \". len-eq 0\",\n      \"ok\": true,\n      \"actual\": \"[]\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

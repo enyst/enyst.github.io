@@ -1,0 +1,15 @@
+{
+  "file": "F21-agent-profiles.md",
+  "bullet": "ACP profile (`F21.acp-kind`).",
+  "ids": [
+    "F21.acp-kind"
+  ],
+  "line": 253,
+  "script": "control-agent-server api POST /api/agent-profiles/qa-f21-acp --expect 201 \\\n  --json '{\"agent_kind\": \"acp\", \"acp_server\": \"codex\", \"acp_model\": \"gpt-5.5\", \"secret_refs\": [\"OPENAI_API_KEY\"]}'\nACP=$(control-agent-server api GET /api/agent-profiles/qa-f21-acp --check profile.agent_kind eq acp \\\n  --check profile.acp_server eq codex --check profile.acp_model eq gpt-5.5 --check profile.acp_prompt_timeout eq 1800 \\\n  --check profile.acp_startup_timeout eq 90 --check profile.llm_profile_ref missing --check profile.secret_refs contains OPENAI_API_KEY \\\n  --check profile.revision eq 0 --save F21.acp-kind/get --field profile.id)\ncontrol-agent-server api GET /api/agent-profiles --field profiles \\\n  | jq -e --arg id \"$ACP\" 'map(select(.id == $id and .agent_kind == \"acp\" and .llm_profile_ref == null)) | length == 1'\n",
+  "exit_code": 0,
+  "elapsed_ms": 817,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 201,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/agent-profiles/qa-f21-acp\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"agent_kind\": \"acp\",\n      \"acp_server\": \"codex\",\n      \"acp_model\": \"gpt-5.5\",\n      \"secret_refs\": [\n        \"OPENAI_API_KEY\"\n      ]\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 201,\n    \"headers\": {\n      \"content-length\": \"66\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"name\": \"qa-f21-acp\",\n      \"message\": \"Agent profile 'qa-f21-acp' saved\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 46\n}\ntrue\n",
+  "stderr": ""
+}

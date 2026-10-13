@@ -1,0 +1,15 @@
+{
+  "file": "F16-workspace-serving-and-vscode.md",
+  "bullet": "Byte ranges (`F16.range`).",
+  "ids": [
+    "F16.range"
+  ],
+  "line": 185,
+  "script": "control-agent-server api GET \"<redacted:session-cookie>/$CID/workspace/sub/docs/notes.txt\" --header 'Range: bytes=0-5' --expect 206 \\\n  --check . eq qa-f16 --check-header content-range eq 'bytes 0-5/16' --save F16.range/first-six\n",
+  "exit_code": 0,
+  "elapsed_ms": 2086,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 206,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/e989ffd9-dd61-4c60-a155-c323de612e05/workspace/sub/docs/notes.txt\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 206,\n    \"headers\": {\n      \"content-type\": \"text/plain; charset=utf-8\",\n      \"content-length\": \"6\",\n      \"etag\": \"\\\"31503c96dfd684148067fb4d5b1a9717\\\"\"\n    },\n    \"body\": \"qa-f16\",\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 224,\n  \"checks\": [\n    {\n      \"check\": \". eq qa-f16\",\n      \"ok\": true,\n      \"actual\": \"qa-f16\"\n    },\n    {\n      \"check\": \"header content-range eq bytes 0-5/16\",\n      \"ok\": true,\n      \"actual\": \"bytes 0-5/16\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021937-8e5b-map-f16/evidence/F16.range/first-six.json\"\n}\n",
+  "stderr": ""
+}

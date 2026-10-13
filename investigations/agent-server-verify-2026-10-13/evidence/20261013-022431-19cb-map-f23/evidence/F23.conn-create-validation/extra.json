@@ -1,0 +1,40 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/llm/provider-connections",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "display_name": "qa-f23-bad",
+      "api_key": "<redacted:api_key>",
+      "extra_headers": {
+        "Authorization": "Bearer qa-f23"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "148",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "extra_forbidden",
+          "loc": [
+            "body",
+            "extra_headers"
+          ],
+          "msg": "Extra inputs are not permitted",
+          "input": {
+            "Authorization": "<redacted>"
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 518
+}

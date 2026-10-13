@@ -1,0 +1,53 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/bash/bash_events/search",
+    "query": [
+      [
+        "kind__eq",
+        "BashCommand"
+      ],
+      [
+        "sort_order",
+        "TIMESTAMP_DESC"
+      ],
+      [
+        "limit",
+        "2"
+      ]
+    ],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "635",
+      "content-type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "command": "echo qa-f33-async-bg; sleep 60; echo qa-f33-async-late",
+          "cwd": "/workspace/verification-artifacts/runs/20261013-021957-adb9-map-f33/fixtures/qa-f33/async",
+          "timeout": 120,
+          "id": "5c5d862b1c954be1a251e8c14d5772cf",
+          "timestamp": "2026-10-13T02:26:40.949157Z",
+          "kind": "BashCommand"
+        },
+        {
+          "command": "printf qa-f33-async; pwd >&2",
+          "cwd": "/workspace/verification-artifacts/runs/20261013-021957-adb9-map-f33/fixtures/qa-f33/async",
+          "timeout": 30,
+          "id": "cee4a66a00bb4cc2a828d00a86acd2ce",
+          "timestamp": "2026-10-13T02:26:39.880465Z",
+          "kind": "BashCommand"
+        }
+      ],
+      "next_page_id": "20261013022311731403_BashCommand_7dea3478c0c64377af5e4ed121ff5e33"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 1409
+}

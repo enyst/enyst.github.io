@@ -1,0 +1,46 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/test",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "name": "qa-http",
+      "server": {
+        "type": "http",
+        "url": "http://127.0.0.1:54269/mcp",
+        "auth": {
+          "strategy": "bearer",
+          "value": "qa-f19-bearer"
+        }
+      },
+      "timeout": 20,
+      "tool_call": {
+        "name": "read_subject",
+        "arguments": {
+          "subject": "hi"
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "97",
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": true,
+      "tools": [
+        "read_subject"
+      ],
+      "tool_result": {
+        "is_error": false,
+        "text": "QA_HTTP_SUBJECT:hi"
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 430
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F23-llm-catalog-and-connections.md",
+  "bullet": "TypeScript client (`F23.catalog-ts-client`).",
+  "ids": [
+    "F23.catalog-ts-client"
+  ],
+  "line": 239,
+  "script": "test -f clients/typescript/dist/clients.js || (cd clients/typescript && npm ci && npm run build)\nQA_PROVIDERS=$(control-agent-server api GET /api/llm/providers --field providers | jq length)\nQA_MODELS=$(control-agent-server api GET /api/llm/models --field models | jq length)\nQA_DEEPSEEK_MODELS=$(control-agent-server api GET /api/llm/models --query provider=deepseek --field models | jq length)\nQA_VERIFIED_KEYS=$(control-agent-server api GET /api/llm/models/verified --field models | jq -r 'keys | join(\",\")')\ncontrol-agent-server exec --timeout 120 --env \"QA_PROVIDERS=$QA_PROVIDERS\" --env \"QA_MODELS=$QA_MODELS\" \\\n  --env \"QA_DEEPSEEK_MODELS=$QA_DEEPSEEK_MODELS\" --env \"QA_VERIFIED_KEYS=$QA_VERIFIED_KEYS\" \\\n  --expect-output QA_F23_TS_OK --save F23.catalog-ts-client/program -- node \"$F23/ts_catalog.mjs\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 22096,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 1978,\n  \"stdout_tail\": \"QA_F23_TS_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022431-19cb-map-f23/evidence/F23.catalog-ts-client/program.json\"\n}\n",
+  "stderr": ""
+}

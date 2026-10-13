@@ -1,0 +1,15 @@
+{
+  "file": "F25-skills.md",
+  "bullet": "The real public repository (`F25.public-repo`).",
+  "ids": [
+    "F25.public-repo"
+  ],
+  "line": 180,
+  "script": "control-agent-server api POST /api/skills/sync --timeout 240 --expect 200 --check status eq success --save F25.public-repo/sync\ntest -d \"$PUB/.git\"\ntest -s \"$PUB/.plugin/marketplace.json\"\ncontrol-agent-server api POST /api/skills --json '{\"load_public\": true, \"load_user\": false, \"load_project\": false, \"load_org\": false}' \\\n  --timeout 240 --expect 200 --quiet --check sources.sdk_base ge 1 --check skills len-ge 1 \\\n  --check skills contains \"$PUB/skills/\" --save F25.public-repo/catalog\n",
+  "exit_code": 0,
+  "elapsed_ms": 3067,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/skills/sync\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"70\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"success\",\n      \"message\": \"Skills repository synced successfully\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1145,\n  \"checks\": [\n    {\n      \"check\": \"status eq success\",\n      \"ok\": true,\n      \"actual\": \"success\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.public-repo/sync.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/skills\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"546167\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1308,\n  \"checks\": [\n    {\n      \"check\": \"sources.sdk_base ge 1\",\n      \"ok\": true,\n      \"actual\": \"68\"\n    },\n    {\n      \"check\": \"skills len-ge 1\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"name\\\": \\\"add-javadoc\\\", \\\"type\\\": \\\"agentskills\\\", \\\"content\\\": \\\"Add comprehensive JavaDoc documentation to all public classes and methods.\\\\n\\\\n## Class-Level Documentation\\\\n\\\\nFor each public class:\\\\n- Add \\u2026\"\n    },\n    {\n      \"check\": \"skills contains /workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/home/.openhands/cache/skills/public-skills/skills/\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"name\\\": \\\"add-javadoc\\\", \\\"type\\\": \\\"agentskills\\\", \\\"content\\\": \\\"Add comprehensive JavaDoc documentation to all public classes and methods.\\\\n\\\\n## Class-Level Documentation\\\\n\\\\nFor each public class:\\\\n- Add \\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034422-49fa-map-f25/evidence/F25.public-repo/catalog.json\"\n}\n",
+  "stderr": ""
+}

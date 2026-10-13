@@ -1,0 +1,15 @@
+{
+  "file": "F19-mcp.md",
+  "bullet": "Handshake timeout (`F19.test-timeout`).",
+  "ids": [
+    "F19.test-timeout"
+  ],
+  "line": 409,
+  "script": "SLOW_BODY=$(jq -nc --arg py \"$PY\" --arg s \"$F19/qa_f19_tools.py\" '{name: \"qa-slow\", server: {command: $py, args: [$s, \"60\"]}, timeout: 3}')\nT0=$SECONDS\ncontrol-agent-server api POST /api/mcp/test --timeout 20 --expect 200 --expect-max-ms 12000 --save F19.test-timeout/slow-start --json \"$SLOW_BODY\" \\\n  --check ok eq false --check error_kind eq timeout --check error contains 'timed out after 3.0 seconds' &\nSLOW_REQ=$!\nfor i in $(seq 1 40); do pgrep -fx \"$PY $F19/qa_f19_tools.py 60\" >/dev/null && break; sleep 0.1; done\npgrep -fx \"$PY $F19/qa_f19_tools.py 60\"\nwait \"$SLOW_REQ\"\ntest $((SECONDS - T0)) -ge 3\nif pgrep -fx \"$PY $F19/qa_f19_tools.py 60\"; then echo 'the slow stdio child survived the timeout' >&2; false; fi\n",
+  "exit_code": 0,
+  "elapsed_ms": 6795,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "16448\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/mcp/test\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"name\": \"qa-slow\",\n      \"server\": {\n        \"command\": \"/workspace/agent-sdk-verify/.venv/bin/python\",\n        \"args\": [\n          \"/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/fixtures/f19/qa_f19_tools.py\",\n          \"60\"\n        ]\n      },\n      \"timeout\": 3\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"314\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"ok\": false,\n      \"error\": \"MCP tool listing timed out after 3.0 seconds.\\nMCP servers configured: qa-slow\\n\\nPossible solutions:\\n  1. Increase the timeout value (default is 30 seconds)\\n  2. Check if the MCP server is running and responding\\n  3. Verify network connectivity to the MCP server\\n\",\n      \"error_kind\": \"timeout\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 5405,\n  \"checks\": [\n    {\n      \"check\": \"ok eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"error_kind eq timeout\",\n      \"ok\": true,\n      \"actual\": \"timeout\"\n    },\n    {\n      \"check\": \"error contains timed out after 3.0 seconds\",\n      \"ok\": true,\n      \"actual\": \"MCP tool listing timed out after 3.0 seconds.\\nMCP servers configured: qa-slow\\n\\nPossible solutions:\\n  1. Increase the timeout value (default is 30 seconds)\\n  2. Check if the MCP server is running and r\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/F19.test-timeout/slow-start.json\"\n}\n",
+  "stderr": ""
+}

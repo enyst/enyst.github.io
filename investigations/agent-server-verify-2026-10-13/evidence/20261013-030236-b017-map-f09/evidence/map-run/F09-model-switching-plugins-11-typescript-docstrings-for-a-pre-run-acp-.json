@@ -1,0 +1,15 @@
+{
+  "file": "F09-model-switching-plugins.md",
+  "bullet": "TypeScript docstrings for a pre-run ACP switch (`F09.ts-client-acp-docs`), known bug.",
+  "ids": [
+    "F09.ts-client-acp-docs"
+  ],
+  "line": 607,
+  "script": "grep -n 'async switchAcpModel(' clients/typescript/src/client/conversation-client.ts\ngrep -n 'async switchAcpModel(' clients/typescript/src/conversation/remote-conversation.ts\nif grep -n 'returns 409 before the first message' clients/typescript/src/client/conversation-client.ts clients/typescript/src/conversation/remote-conversation.ts; then false; fi  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 59,
+  "failed_line": 3,
+  "failed_command": "false",
+  "stdout": "420:  async switchAcpModel(conversationId: string, model: string): Promise<void> {\n332:  async switchAcpModel(model: string): Promise<void> {\nclients/typescript/src/client/conversation-client.ts:417:   * the server returns 409 before the first message (set the default via\nclients/typescript/src/conversation/remote-conversation.ts:329:   * server returns 409 before the first message and 400 for non-ACP\n",
+  "stderr": ""
+}

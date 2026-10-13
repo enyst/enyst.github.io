@@ -1,0 +1,45 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/test",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "server": {
+        "command": "/workspace/agent-sdk-verify/.venv/bin/python",
+        "args": [
+          "/workspace/verification-artifacts/runs/20261013-030348-f557-map-f19/fixtures/f19/qa_f19_tools.py"
+        ]
+      },
+      "timeout": 3,
+      "tool_call": {
+        "name": "qa_sleep",
+        "arguments": {
+          "seconds": 30
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "141",
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": true,
+      "tools": [
+        "qa_env",
+        "qa_sleep",
+        "qa_fail"
+      ],
+      "tool_result": {
+        "is_error": true,
+        "text": "Tool 'qa_sleep' call timed out after 3.0 seconds"
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 5633
+}

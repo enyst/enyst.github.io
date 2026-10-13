@@ -1,0 +1,15 @@
+{
+  "file": "F20-llm-profiles.md",
+  "bullet": "Subscription without a login (`F20.validate-subscription-login`).",
+  "ids": [
+    "F20.validate-subscription-login"
+  ],
+  "line": 562,
+  "script": "control-agent-server api POST /api/profiles/qa-sub/validate --timeout 60 --expect 200 --expect-max-ms 10000 \\\n  --json '{\"llm\": {\"model\": \"openai/gpt-5-mini\", \"auth_type\": \"subscription\"}}' \\\n  --check valid eq false --check error.type eq ValueError --check error.message eq 'OpenAI subscription login is required' \\\n  --save F20.validate-subscription-login/no-login\ncontrol-agent-server api GET /api/profiles/qa-sub --expect 404\n",
+  "exit_code": 0,
+  "elapsed_ms": 8248,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/profiles/qa-sub/validate\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"llm\": {\n        \"model\": \"openai/gpt-5-mini\",\n        \"auth_type\": \"subscription\"\n      }\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"95\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"valid\": false,\n      \"error\": {\n        \"type\": \"ValueError\",\n        \"message\": \"OpenAI subscription login is required\"\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 355,\n  \"checks\": [\n    {\n      \"check\": \"valid eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"error.type eq ValueError\",\n      \"ok\": true,\n      \"actual\": \"ValueError\"\n    },\n    {\n      \"check\": \"error.message eq OpenAI subscription login is required\",\n      \"ok\": true,\n      \"actual\": \"OpenAI subscription login is required\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021919-4f6c-map-f20/evidence/F20.validate-subscription-login/no-login.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/profiles/qa-sub\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"39\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Profile 'qa-sub' not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1437\n}\n",
+  "stderr": ""
+}

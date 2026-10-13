@@ -1,0 +1,15 @@
+{
+  "file": "F34-typescript-client.md",
+  "bullet": "Short event kinds (`F34.events-search-kind`), known bug.",
+  "ids": [
+    "F34.events-search-kind"
+  ],
+  "line": 805,
+  "script": "cat > \"$F34/kind.mjs\" <<'JS'\nimport { writeFileSync } from 'node:fs';\nimport { m, host, apiKey, F34, assert } from './lib.mjs';\nconst events = new m.RemoteEventsList({ baseUrl: host, apiKey }, process.argv[2]);\nconst qualified = 'openhands.sdk.event.llm_convertible.message.MessageEvent';\nconst full = await events.search({ kind: qualified });\nassert.deepEqual(full.items.map((e) => [e.kind, e.source]), [['MessageEvent', 'user']]);\nassert.equal(await events.count({ kind: qualified }), 1);\nconst short = (await events.search({ kind: 'MessageEvent' })).items.map((e) => e.id);\nwriteFileSync(`${F34}/kind.json`, JSON.stringify({ full: full.items.map((e) => e.id), short,\n  short_count: await events.count({ kind: 'MessageEvent' }) }));\nconsole.log('QA_F34_KIND_READ');\nJS\ncontrol-agent-server exec --timeout 60 --expect-output QA_F34_KIND_READ --save F34.events-search-kind/program -- node \"$F34/kind.mjs\" \"$SCID\"\ncat \"$F34/kind.json\"\njq -e '.short == .full and .short_count == 1' \"$F34/kind.json\"  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 2560,
+  "failed_line": 16,
+  "failed_command": "jq -e '.short == .full and .short_count == 1' \"$F34/kind.json\"",
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 1789,\n  \"stdout_tail\": \"QA_F34_KIND_READ\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025335-6a42-map-f34/evidence/F34.events-search-kind/program.json\"\n}\n{\"full\":[\"2457d523-c785-4f9a-9924-42b784bd3f3e\"],\"short\":[],\"short_count\":0}false\n",
+  "stderr": ""
+}

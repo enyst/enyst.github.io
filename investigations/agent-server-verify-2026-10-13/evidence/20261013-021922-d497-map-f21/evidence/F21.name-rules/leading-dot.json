@@ -1,0 +1,37 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/agent-profiles/.qa-f21",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "llm_profile_ref": "deepseek-flash"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "213",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "string_pattern_mismatch",
+          "loc": [
+            "path",
+            "name"
+          ],
+          "msg": "String should match pattern '^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$'",
+          "input": ".qa-f21",
+          "ctx": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 597
+}

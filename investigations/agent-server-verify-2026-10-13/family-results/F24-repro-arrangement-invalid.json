@@ -1,0 +1,58 @@
+{
+  "ok": false,
+  "file": "F24-openai-subscription.md",
+  "summary": {
+    "pass": 1,
+    "fail": 2,
+    "xfail": 0,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 88,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3420,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034418-027f-map-f24/evidence/map-run/F24-openai-subscription-00-preconditions.json"
+    },
+    {
+      "bullet": "Status with an expired login offline (`F24.status-offline`), known bug.",
+      "ids": [
+        "F24.status-offline"
+      ],
+      "line": 459,
+      "status": "fail",
+      "exit_code": 127,
+      "elapsed_ms": 22761,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034418-027f-map-f24/evidence/map-run/F24-openai-subscription-01-status-with-an-expired-login-offline-f24.json",
+      "failed_line": 4,
+      "failed_command": "EXP5=$(bash \"$F24/write-login.sh\" \"$OFF\" 3600000)",
+      "stdout_tail": "{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/llm/subscription/openai/device/start\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"125\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 894,\n  \"hint\": \"expected 200, got 500\"\n}\n",
+      "stderr_tail": "bash: /write-login.sh: No such file or directory\n",
+      "hint": "no failure was confirmed at the `# bug` assertion; the bug was not reproduced"
+    },
+    {
+      "bullet": "Start and poll a login offline (`F24.device-start-offline`), known bug.",
+      "ids": [
+        "F24.device-start-offline"
+      ],
+      "line": 487,
+      "status": "fail",
+      "exit_code": 127,
+      "elapsed_ms": 5,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034418-027f-map-f24/evidence/map-run/F24-openai-subscription-02-start-and-poll-a-login-offline-f24-devic.json",
+      "failed_line": 2,
+      "failed_command": "GP=$(bash \"$F24/netgate.sh\" up 0)",
+      "stdout_tail": "",
+      "stderr_tail": "bash: /netgate.sh: No such file or directory\n",
+      "hint": "no failure was confirmed at the `# bug` assertion; the bug was not reproduced"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-034418-027f-map-f24",
+  "launch_flags": []
+}

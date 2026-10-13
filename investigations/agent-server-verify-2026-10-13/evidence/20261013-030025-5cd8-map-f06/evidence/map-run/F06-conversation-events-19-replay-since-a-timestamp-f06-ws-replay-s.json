@@ -1,0 +1,15 @@
+{
+  "file": "F06-conversation-events.md",
+  "bullet": "Replay since a timestamp (`F06.ws-replay-since`).",
+  "ids": [
+    "F06.ws-replay-since"
+  ],
+  "line": 445,
+  "script": "T2=$(control-agent-server api GET \"<redacted:session-cookie>/$CID/events/search\" --query body=QA_F06_SECOND --field items.0.timestamp)\nSINCE_IDS=$(control-agent-server api GET \"<redacted:session-cookie>/$CID/events/search\" --query timestamp__gte=\"$T2\" \\\n  --check items len-eq 2 --field items | jq -c '[.[].id]')\nSINCE=$(control-agent-server ws listen \"/sockets/events/$CID\" --query resend_mode=since --query after_timestamp=\"$T2\" \\\n  --duration 3 --save F06.ws-replay-since/since | jq -r .saved)\njq -e --argjson ids \"$SINCE_IDS\" '[.frames[] | select(.direction == \"received\") | .frame] | (.[0].key == \"full_state\") and ([.[1:][].id] == $ids)' \"$SINCE\"\ncontrol-agent-server ws listen \"/sockets/events/$CID\" --query resend_mode=since --duration 3 \\\n  --save F06.ws-replay-since/no-timestamp | jq -e '.frames == 1'\n",
+  "exit_code": 0,
+  "elapsed_ms": 10045,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "true\ntrue\n",
+  "stderr": ""
+}

@@ -1,0 +1,16 @@
+{
+  "command": [
+    "docker",
+    "--host=unix:///var/run/docker.sock",
+    "exec",
+    "qa-f27-browser-path-2",
+    "/agent-server/.venv/bin/python",
+    "-c",
+    "import os; from pathlib import Path; p=Path(os.environ[\"PLAYWRIGHT_BROWSERS_PATH\"]); assert (p/\"chromium-qa/chrome-linux64/chrome\").exists(); assert not Path(\"/usr/bin/chromium\").exists(); print(\"QA_BROWSER_PATH_EXISTS\")"
+  ],
+  "cwd": "/workspace/agent-sdk-verify",
+  "exit_code": 0,
+  "elapsed_ms": 112,
+  "stdout": "QA_BROWSER_PATH_EXISTS\n",
+  "stderr": ""
+}

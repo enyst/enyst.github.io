@@ -1,0 +1,15 @@
+{
+  "file": "F16-workspace-serving-and-vscode.md",
+  "bullet": "Folder with `&` and `#` (`F16.vscode-folder-encoding`), known bug.",
+  "ids": [
+    "F16.vscode-folder-encoding"
+  ],
+  "line": 433,
+  "script": "ROUNDTRIP='import sys, urllib.parse as u; p = u.urlsplit(sys.stdin.read().strip()); q = u.parse_qs(p.query); sys.exit(0 if q.get(\"folder\") == [sys.argv[1]] and not p.fragment else 1)'\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/vscode/url\" --expect 200 --field url | python3 -c \"$ROUNDTRIP\" \"$WS\"\nmkdir -p \"$F/qa f16&x=1#frag\"\nODD=$(control-agent-server conversation start --no-run --tools none --no-autotitle --workspace \"$F/qa f16&x=1#frag\" --print-id)\nOWS=$(control-agent-server api GET \"<redacted:session-cookie>/$ODD\" --field workspace.working_dir)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$ODD/vscode/url\" --expect 200 --save F16.vscode-folder-encoding/odd-folder\ncontrol-agent-server api GET \"<redacted:session-cookie>/$ODD/vscode/url\" --expect 200 --field url | python3 -c \"$ROUNDTRIP\" \"$OWS\"  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 15640,
+  "failed_line": 7,
+  "failed_command": "python3 -c \"$ROUNDTRIP\" \"$OWS\"",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/1879bcac-7b23-48e6-b974-228c9ed491a9/vscode/url\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"177\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"url\": \"http://localhost:50393/?tkn=<redacted:session-cookie>&folder=/workspace/verification-artifacts/runs/20261013-021937-8e5b-map-f16/fixtures/qa-f16/qa f16&x=1#frag\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 629,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021937-8e5b-map-f16/evidence/F16.vscode-folder-encoding/odd-folder.json\"\n}\n",
+  "stderr": ""
+}

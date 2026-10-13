@@ -1,0 +1,15 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "`initial_message.run: false` (`F04.create-initial-message-run-false`), known bug.",
+  "ids": [
+    "F04.create-initial-message-run-false"
+  ],
+  "line": 284,
+  "script": "YR=$(control-agent-server api POST <redacted:session-cookie> \\\n  --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $STUB_AGENT, \\\"autotitle\\\": false, \\\"initial_message\\\": {\\\"role\\\": \\\"user\\\", \\\"content\\\": [{\\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"QA F04 run true.\\\"}], \\\"run\\\": true}}\" \\\n  --expect 201 --field id)\ncontrol-agent-server conversation wait \"$YR\" --until finished --timeout 15\nNR=$(control-agent-server api POST <redacted:session-cookie> \\\n  --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $STUB_AGENT, \\\"autotitle\\\": false, \\\"initial_message\\\": {\\\"role\\\": \\\"user\\\", \\\"content\\\": [{\\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"QA F04 run false.\\\"}], \\\"run\\\": false}}\" \\\n  --expect 201 --save F04.create-initial-message-run-false/start --field id)\ncontrol-agent-server conversation events \"$NR\" --kinds MessageEvent --contains 'QA F04 run false.' --expect-count 1\nif control-agent-server conversation wait \"$NR\" --until running,finished,error,stuck --timeout 15; then false; fi  # bug\ncontrol-agent-server api GET \"<redacted:session-cookie>/$NR\" --check execution_status eq idle --save F04.create-initial-message-run-false/get\ncontrol-agent-server conversation events \"$NR\" --kinds ActionEvent --expect-count 0\n",
+  "exit_code": 1,
+  "elapsed_ms": 6178,
+  "failed_line": 9,
+  "failed_command": "false",
+  "stdout": "{\n  \"id\": \"540551e3-e508-4ae9-9bf6-fe360b95fef2\",\n  \"ok\": true,\n  \"status\": \"finished\",\n  \"transitions\": [\n    \"finished\"\n  ],\n  \"waited_ms\": 232\n}\n{\n  \"ok\": true,\n  \"id\": \"2697d2ec-3560-42cd-b6d1-590511bb0f5d\",\n  \"total\": 8,\n  \"kinds\": {\n    \"SystemPromptEvent\": 1,\n    \"MessageEvent\": 1,\n    \"ConversationStateUpdateEvent\": 4,\n    \"ActionEvent\": 1,\n    \"ObservationEvent\": 1\n  },\n  \"matching\": 1,\n  \"events\": [\n    {\n      \"id\": \"399a2585-ce0e-46f9-9cae-8d16ad023a19\",\n      \"kind\": \"MessageEvent\",\n      \"source\": \"user\",\n      \"timestamp\": \"2026-10-13T02:43:35.605668\",\n      \"llm_message\": \"{\\\"role\\\": \\\"user\\\", \\\"content\\\": [{\\\"cache_prompt\\\": false, \\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"QA F04 run false.\\\"}], \\\"thinking_blocks\\\": []}\"\n    }\n  ]\n}\n{\n  \"id\": \"2697d2ec-3560-42cd-b6d1-590511bb0f5d\",\n  \"ok\": true,\n  \"status\": \"finished\",\n  \"transitions\": [\n    \"finished\"\n  ],\n  \"waited_ms\": 105\n}\n",
+  "stderr": ""
+}

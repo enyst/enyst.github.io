@@ -1,0 +1,37 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/agent-profiles/qa-f21-nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "llm_profile_ref": "deepseek-flash"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "210",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "string_too_long",
+          "loc": [
+            "path",
+            "name"
+          ],
+          "msg": "String should have at most 64 characters",
+          "input": "qa-f21-nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+          "ctx": {
+            "max_length": 64
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 530
+}

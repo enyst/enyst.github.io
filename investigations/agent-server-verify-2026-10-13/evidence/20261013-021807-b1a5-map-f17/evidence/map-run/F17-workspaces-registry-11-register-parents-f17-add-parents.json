@@ -1,0 +1,15 @@
+{
+  "file": "F17-workspaces-registry.md",
+  "bullet": "Register parents (`F17.add-parents`).",
+  "ids": [
+    "F17.add-parents"
+  ],
+  "line": 354,
+  "script": "control-agent-server api POST /api/workspaces/parents --json-file \"$F17/parents.json\" --expect 200 \\\n  --check workspaceParents len-eq 2 --check workspaceParents.0.id eq \"$PARENT\" \\\n  --check workspaceParents.0.name eq qa-f17-parent --check workspaceParents.1.path eq /qa-f17/other-parent \\\n  --check workspaces len-eq 5 --save F17.add-parents/post\ncontrol-agent-server api POST /api/workspaces/parents --expect 200 --check workspaceParents len-eq 2 \\\n  --check workspaceParents.0.name eq qa-f17-parent \\\n  --json \"{\\\"parents\\\": [{\\\"id\\\": \\\"qa-f17-again\\\", \\\"name\\\": \\\"qa-f17-renamed\\\", \\\"path\\\": \\\"$PARENT\\\"}]}\"\ncontrol-agent-server api GET /api/workspaces --check workspaceParents len-eq 2 --check workspaces len-eq 5 \\\n  --check . not-contains qa-f17-parent-dup --save F17.add-parents/get\ncontrol-agent-server state cat home/.openhands/workspaces.json --check workspaceParents len-eq 2 \\\n  --check workspaceParents.0.path eq \"$PARENT\" --check workspaces len-eq 5\n",
+  "exit_code": 1,
+  "elapsed_ms": 974,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api POST /api/workspaces/parents --json-file \"$F17/parents.json\" --expect 200 --check workspaceParents len-eq 2 --check workspaceParents.0.id eq \"$PARENT\" --check workspaceParents.0.name eq qa-f17-parent --check workspaceParents.1.path eq /qa-f17/other-parent --check workspaces len-eq 5 --save F17.add-parents/post",
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6036, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6000, in main\n    result = func(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 1240, in cmd_api\n    body = read_body(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 1143, in read_body\n    return json.loads(Path(args.json_file).read_text())\n                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 548, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_abc.py\", line 632, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 539, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/parents.json'\n"
+}

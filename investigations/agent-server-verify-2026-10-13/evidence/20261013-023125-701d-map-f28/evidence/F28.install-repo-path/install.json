@@ -1,0 +1,72 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/canvas-extensions/install",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "source": "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/fixtures/f28",
+      "repo_path": "qa-f28-logs"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "1090",
+      "content-type": "application/json"
+    },
+    "body": {
+      "name": "qa-f28-logs",
+      "version": "0.1.0",
+      "description": "",
+      "enabled": false,
+      "source": "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/fixtures/f28",
+      "requested_ref": null,
+      "resolved_ref": null,
+      "repo_path": "qa-f28-logs",
+      "installed_at": "2026-10-13T02:35:11.159781+00:00",
+      "install_path": "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/home/.openhands/canvas-extensions/installed/qa-f28-logs",
+      "manifest": {
+        "schema_version": 1,
+        "name": "qa-f28-logs",
+        "display_name": "qa-f28-logs",
+        "version": "0.1.0",
+        "description": "",
+        "entrypoint": "dist/index.js",
+        "contributes": {
+          "pages": []
+        },
+        "backend": {
+          "schema_version": 1,
+          "artifacts": {
+            "linux-amd64": {
+              "path": "backend/linux.tar.gz",
+              "url": null,
+              "sha256": "8e0fe899c6660230cd2cefafc3c78c675f5ca842b05a494f20d94cb15414c581",
+              "strip_components": 0
+            },
+            "linux-arm64": {
+              "path": "backend/linux.tar.gz",
+              "url": null,
+              "sha256": "8e0fe899c6660230cd2cefafc3c78c675f5ca842b05a494f20d94cb15414c581",
+              "strip_components": 0
+            }
+          },
+          "argv": [
+            "{artifact_dir}/run.sh",
+            "{port}"
+          ],
+          "health": {
+            "path": "/health",
+            "timeout_seconds": 30.0,
+            "interval_seconds": 0.2
+          },
+          "inherit_environment": []
+        }
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 1895
+}

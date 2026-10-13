@@ -1,0 +1,391 @@
+{
+  "ok": false,
+  "file": "F05-run-pause-interrupt.md",
+  "summary": {
+    "pass": 27,
+    "fail": 2,
+    "xfail": 3,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 115,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 34673,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-00-preconditions.json"
+    },
+    {
+      "bullet": "Run queued input on a real model (`F05.run-queued`).",
+      "ids": [
+        "F05.run-queued"
+      ],
+      "line": 186,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 16608,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-01-run-queued-input-on-a-real-model-f05-run.json"
+    },
+    {
+      "bullet": "Run with nothing to do (`F05.run-finished-noop`).",
+      "ids": [
+        "F05.run-finished-noop"
+      ],
+      "line": 206,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 12495,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-02-run-with-nothing-to-do-f05-run-finished-.json"
+    },
+    {
+      "bullet": "New input after finishing (`F05.run-new-input`).",
+      "ids": [
+        "F05.run-new-input"
+      ],
+      "line": 222,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8841,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-03-new-input-after-finishing-f05-run-new-in.json"
+    },
+    {
+      "bullet": "Pause an idle conversation (`F05.pause-idle`).",
+      "ids": [
+        "F05.pause-idle"
+      ],
+      "line": 234,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 19057,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-04-pause-an-idle-conversation-f05-pause-idl.json"
+    },
+    {
+      "bullet": "Pause twice (`F05.pause-repeat`).",
+      "ids": [
+        "F05.pause-repeat"
+      ],
+      "line": 250,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5905,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-05-pause-twice-f05-pause-repeat.json"
+    },
+    {
+      "bullet": "Resume a paused conversation (`F05.run-resume-paused`).",
+      "ids": [
+        "F05.run-resume-paused"
+      ],
+      "line": 257,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13185,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-06-resume-a-paused-conversation-f05-run-res.json"
+    },
+    {
+      "bullet": "Interrupt with nothing running (`F05.interrupt-idle`).",
+      "ids": [
+        "F05.interrupt-idle"
+      ],
+      "line": 269,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3949,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-07-interrupt-with-nothing-running-f05-inter.json"
+    },
+    {
+      "bullet": "A run that fails (`F05.run-error`).",
+      "ids": [
+        "F05.run-error"
+      ],
+      "line": 279,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 17763,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-08-a-run-that-fails-f05-run-error.json"
+    },
+    {
+      "bullet": "Pause and interrupt a terminal conversation (`F05.pause-terminal`).",
+      "ids": [
+        "F05.pause-terminal"
+      ],
+      "line": 297,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8864,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-09-pause-and-interrupt-a-terminal-conversat.json"
+    },
+    {
+      "bullet": "Responsive while a run fails (`F05.run-error-responsive`), known bug.",
+      "ids": [
+        "F05.run-error-responsive"
+      ],
+      "line": 312,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 16663,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-10-responsive-while-a-run-fails-f05-run-err.json",
+      "failed_line": 20,
+      "failed_command": "test \"$SLOWEST\" -le 1500",
+      "stdout_tail": "20261013-025211-dd9d-map-f05/evidence/F05.run-error-responsive/alive-before.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/cc99e22f-5a87-44a7-ac9a-8e5fd06e4240/run\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 108\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/cc99e22f-5a87-44a7-ac9a-8e5fd06e4240\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"3456\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 123,\n  \"checks\": [\n    {\n      \"check\": \"execution_status eq error\",\n      \"ok\": true,\n      \"actual\": \"error\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/F05.run-error-responsive/after.json\"\n}\nslowest probe while the run failed: 6588 ms\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Run an unknown id (`F05.unknown-id-run`).",
+      "ids": [
+        "F05.unknown-id-run"
+      ],
+      "line": 350,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 522,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-11-run-an-unknown-id-f05-unknown-id-run.json"
+    },
+    {
+      "bullet": "Pause or interrupt an unknown id (`F05.unknown-id-pause`), known bug.",
+      "ids": [
+        "F05.unknown-id-pause"
+      ],
+      "line": 355,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 3085,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-12-pause-or-interrupt-an-unknown-id-f05-unk.json",
+      "failed_line": 5,
+      "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$NOPE/pause\" --expect 404 --save F05.unknown-id-pause/pause",
+      "stdout_tail": "nversation_id}/interrupt.post.responses.404 exists\",\n      \"ok\": true,\n      \"actual\": \"{\\\"description\\\": \\\"Item not found\\\"}\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/285be4a5-0734-4008-9c33-7dfb821455e1\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"22\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 46\n}\n{\n  \"ok\": false,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/285be4a5-0734-4008-9c33-7dfb821455e1/pause\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"24\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Bad Request\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 165,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/F05.unknown-id-pause/pause.json\",\n  \"hint\": \"expected 404, got 400\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Auth and malformed ids (`F05.control-errors`).",
+      "ids": [
+        "F05.control-errors"
+      ],
+      "line": 371,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 12367,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-13-auth-and-malformed-ids-f05-control-error.json"
+    },
+    {
+      "bullet": "Run while running (`F05.run-conflict`).",
+      "ids": [
+        "F05.run-conflict"
+      ],
+      "line": 393,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6828,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-14-run-while-running-f05-run-conflict.json"
+    },
+    {
+      "bullet": "Pause during a long model call (`F05.pause-running`).",
+      "ids": [
+        "F05.pause-running"
+      ],
+      "line": 408,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8325,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-15-pause-during-a-long-model-call-f05-pause.json"
+    },
+    {
+      "bullet": "GET after a mid-call pause (`F05.pause-running-get`), known bug.",
+      "ids": [
+        "F05.pause-running-get"
+      ],
+      "line": 422,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 2401,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-16-get-after-a-mid-call-pause-f05-pause-run.json",
+      "failed_line": 3,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$P\" --check execution_status eq paused --quiet --save F05.pause-running-get/get",
+      "stdout_tail": "    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 409,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/b0da03b9-0ed7-45f1-bdc1-9a6a8591e217/run\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 409,\n    \"headers\": {\n      \"content-length\": \"78\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Conversation already running. Wait for completion or pause first.\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 151\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/b0da03b9-0ed7-45f1-bdc1-9a6a8591e217\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"3453\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 132,\n  \"checks\": [\n    {\n      \"check\": \"execution_status eq paused\",\n      \"ok\": false,\n      \"actual\": \"running\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/F05.pause-running-get/get.json\",\n  \"hint\": \"failed check: execution_status eq paused\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Release a paused step with interrupt (`F05.pause-running-release`).",
+      "ids": [
+        "F05.pause-running-release"
+      ],
+      "line": 444,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 15423,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-17-release-a-paused-step-with-interrupt-f05.json"
+    },
+    {
+      "bullet": "Interrupt a running conversation (`F05.interrupt-running`).",
+      "ids": [
+        "F05.interrupt-running"
+      ],
+      "line": 460,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 25806,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-18-interrupt-a-running-conversation-f05-int.json"
+    },
+    {
+      "bullet": "Resume after an interrupt (`F05.run-after-interrupt`).",
+      "ids": [
+        "F05.run-after-interrupt"
+      ],
+      "line": 480,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 9070,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-19-resume-after-an-interrupt-f05-run-after-.json"
+    },
+    {
+      "bullet": "Pause during a tool call (`F05.pause-tool-step`).",
+      "ids": [
+        "F05.pause-tool-step"
+      ],
+      "line": 492,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 19138,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-20-pause-during-a-tool-call-f05-pause-tool-.json"
+    },
+    {
+      "bullet": "Interrupt during a tool call (`F05.interrupt-tool-call`).",
+      "ids": [
+        "F05.interrupt-tool-call"
+      ],
+      "line": 517,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8444,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-21-interrupt-during-a-tool-call-f05-interru.json"
+    },
+    {
+      "bullet": "Run capacity (`F05.run-capacity`).",
+      "ids": [
+        "F05.run-capacity"
+      ],
+      "line": 542,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10036,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-22-run-capacity-f05-run-capacity.json"
+    },
+    {
+      "bullet": "A run that loops ends `stuck` (`F05.stuck-detected`).",
+      "ids": [
+        "F05.stuck-detected"
+      ],
+      "line": 560,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 16196,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-23-a-run-that-loops-ends-stuck-f05-stuck-de.json"
+    },
+    {
+      "bullet": "Run a stuck conversation again (`F05.stuck-rerun`).",
+      "ids": [
+        "F05.stuck-rerun"
+      ],
+      "line": 584,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13315,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-24-run-a-stuck-conversation-again-f05-stuck.json"
+    },
+    {
+      "bullet": "New input un-sticks it (`F05.stuck-new-input`).",
+      "ids": [
+        "F05.stuck-new-input"
+      ],
+      "line": 599,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8029,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-25-new-input-un-sticks-it-f05-stuck-new-inp.json"
+    },
+    {
+      "bullet": "Iteration cap (`F05.max-iterations-stop`).",
+      "ids": [
+        "F05.max-iterations-stop"
+      ],
+      "line": 612,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 15882,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-26-iteration-cap-f05-max-iterations-stop.json"
+    },
+    {
+      "bullet": "Resume after the cap (`F05.max-iterations-resume`).",
+      "ids": [
+        "F05.max-iterations-resume"
+      ],
+      "line": 635,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 19863,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-27-resume-after-the-cap-f05-max-iterations-.json"
+    },
+    {
+      "bullet": "Graceful restart while running (`F05.restart-running-graceful`).",
+      "ids": [
+        "F05.restart-running-graceful"
+      ],
+      "line": 654,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 43404,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-28-graceful-restart-while-running-f05-resta.json"
+    },
+    {
+      "bullet": "Statuses survive the restart (`F05.restart-keeps-status`).",
+      "ids": [
+        "F05.restart-keeps-status"
+      ],
+      "line": 668,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 16810,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-29-statuses-survive-the-restart-f05-restart.json"
+    },
+    {
+      "bullet": "Crash while running (`F05.restart-hard-running`).",
+      "ids": [
+        "F05.restart-hard-running"
+      ],
+      "line": 685,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 16621,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-30-crash-while-running-f05-restart-hard-run.json",
+      "failed_line": 5,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$K\" --check execution_status eq error --save F05.restart-hard-running/get",
+      "stdout_tail": "    \"litellm_extra_body\": {},\n          \"is_subscription\": false\n        },\n        \"tools\": [],\n        \"mcp_config\": {},\n        \"filter_tools_regex\": null,\n        \"include_default_tools\": [\n          \"FinishTool\",\n          \"ThinkTool\"\n        ],\n        \"agent_context\": null,\n        \"system_prompt\": null,\n        \"system_prompt_filename\": \"system_prompt.j2\",\n        \"security_policy_filename\": \"security_policy.j2\",\n        \"system_prompt_kwargs\": {\n          \"llm_security_analyzer\": true\n        },\n        \"condenser\": null,\n        \"critic\": null,\n        \"tool_concurrency_limit\": 1,\n        \"persona\": null,\n        \"kind\": \"Agent\"\n      },\n      \"client_tools\": [],\n      \"tool_module_qualnames\": {},\n      \"runtime_info\": {\n        \"runtime_status\": \"available\",\n        \"can_resume\": true,\n        \"runtime_error\": null\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 67,\n  \"checks\": [\n    {\n      \"check\": \"execution_status eq error\",\n      \"ok\": false,\n      \"actual\": \"running\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/F05.restart-hard-running/get.json\",\n  \"hint\": \"failed check: execution_status eq error\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Crash after a mid-call pause (`F05.pause-running-crash`), known bug.",
+      "ids": [
+        "F05.pause-running-crash"
+      ],
+      "line": 705,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 2129,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/map-run/F05-run-pause-interrupt-31-crash-after-a-mid-call-pause-f05-pause-r.json",
+      "failed_line": 2,
+      "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$K/run\" --expect 200 --check success eq true",
+      "stdout_tail": "{\n  \"ok\": false,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/29a3432f-46a3-4eb5-b20a-edb5e22063f5/run\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"22\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 158,\n  \"checks\": [\n    {\n      \"check\": \"success eq true\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"hint\": \"expected 200, got 404\"\n}\n",
+      "stderr_tail": "",
+      "hint": "no failure was confirmed at the `# bug` assertion; the bug was not reproduced"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05",
+  "launch_flags": [
+    "--config-json",
+    "{\"max_concurrent_runs\": 1}"
+  ]
+}

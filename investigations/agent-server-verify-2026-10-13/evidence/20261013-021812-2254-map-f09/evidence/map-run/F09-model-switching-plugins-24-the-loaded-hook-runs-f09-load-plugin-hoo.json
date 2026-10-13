@@ -1,0 +1,15 @@
+{
+  "file": "F09-model-switching-plugins.md",
+  "bullet": "The loaded hook runs (`F09.load-plugin-hook-runs`).",
+  "ids": [
+    "F09.load-plugin-hook-runs"
+  ],
+  "line": 642,
+  "script": "control-agent-server conversation send \"$PID\" --text 'Reply with the single word: ok' --wait --until finished,error --timeout 240\ncontrol-agent-server api GET \"<redacted:session-cookie>/$PID\" --quiet --check execution_status eq finished\ncontrol-agent-server conversation events \"$PID\" --kinds HookExecutionEvent --contains '\"stdout\": \"QA_PLUGIN_HOOK' --expect-count 1 --save F09.load-plugin-hook-runs/hook-events\n",
+  "exit_code": 0,
+  "elapsed_ms": 8267,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"body\": {\n    \"success\": true\n  },\n  \"wait\": {\n    \"ok\": true,\n    \"status\": \"finished\",\n    \"transitions\": [\n      \"running\",\n      \"finished\"\n    ],\n    \"waited_ms\": 2894\n  }\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/5989da28-3e84-424c-ad5c-70d1dfddfd7b\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"6689\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 118,\n  \"checks\": [\n    {\n      \"check\": \"execution_status eq finished\",\n      \"ok\": true,\n      \"actual\": \"finished\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"id\": \"5989da28-3e84-424c-ad5c-70d1dfddfd7b\",\n  \"total\": 10,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 6,\n    \"SystemPromptEvent\": 1,\n    \"HookExecutionEvent\": 1,\n    \"MessageEvent\": 2\n  },\n  \"matching\": 1,\n  \"events\": [\n    {\n      \"id\": \"a2a4591d-507e-4d39-b43f-7200d99e98fc\",\n      \"kind\": \"HookExecutionEvent\",\n      \"source\": \"hook\",\n      \"timestamp\": \"2026-10-13T02:30:50.656324\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.load-plugin-hook-runs/hook-events.json\"\n}\n",
+  "stderr": ""
+}

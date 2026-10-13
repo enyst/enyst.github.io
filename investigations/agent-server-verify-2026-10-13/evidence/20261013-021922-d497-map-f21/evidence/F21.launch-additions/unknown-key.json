@@ -1,0 +1,41 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "<redacted:session-cookie>",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "workspace": {
+        "working_dir": "/workspace/verification-artifacts/runs/20261013-021922-d497-map-f21/fixtures/qa-f21-additions"
+      },
+      "agent_profile_id": "43d1859e-b706-4b51-a37d-2dfdcd9d3c3a",
+      "agent_launch_additions": {
+        "qa_unknown": "x"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "143",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "extra_forbidden",
+          "loc": [
+            "body",
+            "agent_launch_additions",
+            "qa_unknown"
+          ],
+          "msg": "Extra inputs are not permitted",
+          "input": "x"
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 462
+}

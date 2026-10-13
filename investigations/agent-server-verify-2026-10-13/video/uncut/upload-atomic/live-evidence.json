@@ -1,0 +1,45 @@
+[
+  {
+    "id": "F14.upload-atomic",
+    "command": [
+      "bash",
+      "/workspace/verification-artifacts/video-f14-atomic-live.sh"
+    ],
+    "started_at": 11.939043912000216,
+    "lines": [
+      {
+        "at": 52.90024923400006,
+        "text": "Positive controls: 900000-byte upload succeeds; original 10-byte file is intact.",
+        "signal": false
+      },
+      {
+        "at": 53.02655854600016,
+        "text": "Now overwrite it with 900000 bytes under a 500000-byte write limit.",
+        "signal": false
+      },
+      {
+        "at": 56.82607054900018,
+        "text": "HTTP 500 : 500: Failed to upload file: [Errno 27] File too large",
+        "signal": false
+      },
+      {
+        "at": 56.93050563399993,
+        "text": "Before: 10 bytes. Attempted: 900000 bytes. After failure: 500000 partial bytes.",
+        "signal": false
+      },
+      {
+        "at": 57.03877597200017,
+        "text": "Content comparison: original file lost; partial replacement persisted.",
+        "signal": false
+      },
+      {
+        "at": 57.14661791000026,
+        "text": "BUG_CONFIRMED: failed upload destroyed the previous file.",
+        "signal": true
+      }
+    ],
+    "exit_code": 0,
+    "confirmed_signal": true,
+    "ended_at": 74.0416661700001
+  }
+]

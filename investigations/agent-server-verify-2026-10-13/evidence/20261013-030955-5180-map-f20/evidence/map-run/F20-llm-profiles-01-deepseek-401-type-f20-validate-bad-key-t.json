@@ -1,0 +1,15 @@
+{
+  "file": "F20-llm-profiles.md",
+  "bullet": "DeepSeek 401 type (`F20.validate-bad-key-type`), known bug.",
+  "ids": [
+    "F20.validate-bad-key-type"
+  ],
+  "line": 504,
+  "script": "control-agent-server api POST /api/profiles/qa-draft/validate --timeout 120 --expect 200 \\\n  --json '{\"llm\": {\"model\": \"deepseek/deepseek-flash\", \"api_key\": \"<redacted:api_key>\", \"num_retries\": 0}}' \\\n  --check valid eq false --check error.message contains authentication_error --check error.message not-contains <redacted:api_key> \\\n  --save F20.validate-bad-key-type/deepseek-401 | tee \"$F20/bad-key.json\"\njq -e '.response.body.error.type == \"LLMAuthenticationError\"' \"$F20/bad-key.json\"  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 662,
+  "failed_line": 5,
+  "failed_command": "jq -e '.response.body.error.type == \"LLMAuthenticationError\"' \"$F20/bad-key.json\"",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/profiles/qa-draft/validate\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"llm\": {\n        \"model\": \"deepseek/deepseek-flash\",\n        \"api_key\": \"<redacted:api_key>\",\n        \"num_retries\": 0\n      }\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"331\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"valid\": false,\n      \"error\": {\n        \"type\": \"LLMBadRequestError\",\n        \"message\": \"litellm.BadRequestError: DeepseekException - {\\\"error\\\":{\\\"message\\\":\\\"Authentication Fails, Your api key: ****-key is invalid (request_id: 6232f1d8-4714-4eb2-82b3-61ba4b213c65)\\\",\\\"type\\\":\\\"authentication_error\\\",\\\"param\\\":null,\\\"code\\\":\\\"invalid_request_error\\\"}}\"\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 413,\n  \"checks\": [\n    {\n      \"check\": \"valid eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"error.message contains authentication_error\",\n      \"ok\": true,\n      \"actual\": \"litellm.BadRequestError: DeepseekException - {\\\"error\\\":{\\\"message\\\":\\\"Authentication Fails, Your api key: ****-key is invalid (request_id: 6232f1d8-4714-4eb2-82b3-61ba4b213c65)\\\",\\\"type\\\":\\\"authentication_err\\u2026\"\n    },\n    {\n      \"check\": \"error.message not-contains <redacted:api_key>\",\n      \"ok\": true,\n      \"actual\": \"litellm.BadRequestError: DeepseekException - {\\\"error\\\":{\\\"message\\\":\\\"Authentication Fails, Your api key: ****-key is invalid (request_id: 6232f1d8-4714-4eb2-82b3-61ba4b213c65)\\\",\\\"type\\\":\\\"authentication_err\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-030955-5180-map-f20/evidence/F20.validate-bad-key-type/deepseek-401.json\"\n}\nfalse\n",
+  "stderr": ""
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F05-run-pause-interrupt.md",
+  "bullet": "Crash after a mid-call pause (`F05.pause-running-crash`), known bug.",
+  "ids": [
+    "F05.pause-running-crash"
+  ],
+  "line": 705,
+  "script": "H=$(control-agent-server sink read --name qa-f05-hang | python3 -c 'import json, sys; print(json.load(sys.stdin)[\"requests\"])')\ncontrol-agent-server api POST \"<redacted:session-cookie>/$K/run\" --expect 200 --check success eq true\ncontrol-agent-server conversation wait \"$K\" --until running --timeout 60\ncontrol-agent-server sink read --name qa-f05-hang --expect-min $((H + 1)) --wait 30\ncontrol-agent-server api POST \"<redacted:session-cookie>/$K/pause\" --expect 200 --check success eq true --expect-max-ms 3000\ncontrol-agent-server api GET <redacted:session-cookie>/search --query status=paused --check items contains \"$K\"\ncontrol-agent-server api GET \"<redacted:session-cookie>/$K/events/count\" --query kind=$PAUSE_KIND --check . eq 2\ncontrol-agent-server restart --hard\ncontrol-agent-server api GET \"<redacted:session-cookie>/$K/events/count\" --query kind=$PAUSE_KIND --check . eq 2\ncontrol-agent-server api GET \"<redacted:session-cookie>/$K\" --check execution_status eq paused --quiet --save F05.pause-running-crash/get  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 875,
+  "failed_line": 2,
+  "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$K/run\" --expect 200 --check success eq true",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/51e0040b-d3a3-4b63-bdc8-e5fbbf2619c9/run\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"22\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 73,\n  \"checks\": [\n    {\n      \"check\": \"success eq true\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"hint\": \"expected 200, got 404\"\n}\n",
+  "stderr": ""
+}

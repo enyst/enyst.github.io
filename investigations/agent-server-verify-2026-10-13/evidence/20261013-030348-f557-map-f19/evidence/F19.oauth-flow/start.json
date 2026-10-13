@@ -1,0 +1,47 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/oauth/start",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "name": "qa-oauth",
+      "server": {
+        "type": "http",
+        "url": "http://127.0.0.1:37837/mcp",
+        "auth": {
+          "strategy": "oauth2",
+          "authentication": {
+            "type": "oauth",
+            "client_auth_method": "none",
+            "scopes": [
+              "mail.read"
+            ]
+          }
+        }
+      },
+      "timeout": 60,
+      "tool_call": {
+        "name": "read_subject",
+        "arguments": {
+          "subject": "hi"
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "429",
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": true,
+      "job_id": "4e7ef2d66ff648b2a6a9b36a893af45c",
+      "authorization_url": "http://127.0.0.1:37837/authorize?response_type=code&client_id=d37353b1-82ed-4b71-b6ae-7c2eb09e5a13&redirect_uri=http%3A%2F%2Flocalhost%3A60173%2Fcallback&state=q_XU-6Y_wr5C2cKVQJddO7hVXWXsuv_lNVyRs_r-8_s&code_challenge=98ZbgJTP8wz6unqt81G5FGG-XnMQJp4oLf4GPAeYCQ4&code_challenge_method=S256&resource=http%3A%2F%2F127.0.0.1%3A37837%2Fmcp&scope=mail.read"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 124
+}

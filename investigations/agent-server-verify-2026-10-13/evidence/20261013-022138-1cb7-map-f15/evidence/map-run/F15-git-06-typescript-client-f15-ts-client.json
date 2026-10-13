@@ -1,0 +1,15 @@
+{
+  "file": "F15-git.md",
+  "bullet": "TypeScript client (`F15.ts-client`).",
+  "ids": [
+    "F15.ts-client"
+  ],
+  "line": 612,
+  "script": "test -f clients/typescript/dist/clients.js || (cd clients/typescript && npm ci && npm run build)\ncat > \"$F/ts_git.mjs\" <<'JS'\nimport assert from 'node:assert/strict';\nimport { resolve } from 'node:path';\nimport { pathToFileURL } from 'node:url';\n\nconst dist = (name) => pathToFileURL(resolve('clients/typescript/dist', name)).href;\nconst { RemoteWorkspace } = await import(dist('index.js'));\nconst { GitClient } = await import(dist('clients.js'));\nconst [repo, cid, c1] = process.argv.slice(2);\nconst host = process.env.AGENT_SERVER_URL;\nconst apiKey = process.env.SESSION_API_KEY;\nfor (const conversationId of [undefined, cid]) {\n  const ws = new RemoteWorkspace({ host, apiKey, workingDir: repo, conversationId });\n  assert.deepEqual(await ws.gitChanges(repo), [\n    { status: 'UPDATED', path: 'README.md' },\n    { status: 'ADDED', path: 'notes.txt' },\n  ]);\n  assert.deepEqual(await ws.gitChanges(repo, { ref: c1 }), [\n    { status: 'UPDATED', path: 'README.md' },\n    { status: 'ADDED', path: 'notes.txt' },\n    { status: 'ADDED', path: 'src/util.py' },\n  ]);\n  const diff = await ws.gitDiff(`${repo}/README.md`);\n  assert.equal(diff.modified, '# QA fixture repo\\n\\nModified, not committed.');\n}\nconst scoped = new RemoteWorkspace({ host, apiKey, workingDir: repo, conversationId: cid });\nawait assert.rejects(scoped.gitChanges('/'), /422|inside the conversation workspace/);\nconst page = await new GitClient({ host, apiKey }).searchRepositories({ provider: 'github' });\nassert.deepEqual(page, { items: [], next_page_id: null, missing_token: true });\nconsole.log('TS_GIT_OK');\nJS\ncontrol-agent-server exec --expect-output TS_GIT_OK --save F15.ts-client/program -- node \"$F/ts_git.mjs\" \"$REPO\" \"$CID\" \"$C1\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 11521,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 8955,\n  \"stdout_tail\": \"TS_GIT_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022138-1cb7-map-f15/evidence/F15.ts-client/program.json\"\n}\n",
+  "stderr": ""
+}

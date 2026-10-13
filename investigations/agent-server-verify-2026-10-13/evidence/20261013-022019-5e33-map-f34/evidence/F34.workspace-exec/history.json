@@ -1,0 +1,61 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/bash/bash_events/search",
+    "query": [
+      [
+        "kind__eq",
+        "BashCommand"
+      ],
+      [
+        "sort_order",
+        "TIMESTAMP_DESC"
+      ],
+      [
+        "limit",
+        "3"
+      ]
+    ],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "783",
+      "content-type": "application/json"
+    },
+    "body": {
+      "items": [
+        {
+          "command": "sleep 5",
+          "cwd": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/work",
+          "timeout": 1,
+          "id": "f4ad9b44d5574fba89018a270480d27e",
+          "timestamp": "2026-10-13T02:22:07.371410Z",
+          "kind": "BashCommand"
+        },
+        {
+          "command": "exit 3",
+          "cwd": null,
+          "timeout": 30,
+          "id": "666a31203c654d619999251f85b0b61a",
+          "timestamp": "2026-10-13T02:22:07.279839Z",
+          "kind": "BashCommand"
+        },
+        {
+          "command": "echo qa-f34-out; echo qa-f34-err >&2; pwd; printf qa-f34-exec > qa-f34-exec.txt",
+          "cwd": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/work",
+          "timeout": 30,
+          "id": "a01b81cd7a06412c83563adb0b82b4ba",
+          "timestamp": "2026-10-13T02:22:07.169958Z",
+          "kind": "BashCommand"
+        }
+      ],
+      "next_page_id": "20261013022154952119_BashCommand_2e5b1cfacdfa4a2d84950d68547321b1"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 640
+}

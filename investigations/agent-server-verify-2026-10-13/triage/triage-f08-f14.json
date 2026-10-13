@@ -1,0 +1,1083 @@
+{
+  "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+  "families": [
+    "F08",
+    "F09",
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14"
+  ],
+  "confirmation_in_progress": false,
+  "confirmed_bugs": [
+    {
+      "id": "F08.secret-runtime-persistence",
+      "title": "Runtime secret updates are not saved",
+      "severity": "high",
+      "feature_ids": [
+        "F08.secrets-visible",
+        "F08.secrets-unsaved-restart"
+      ],
+      "expected": "GET immediately reflects an updated runtime secret and the secret survives restart.",
+      "actual": "GET omits the new secret until another state save; restart before that save loses the credential.",
+      "notes": "Merged: both observations originate from updating the secret registry without triggering a conversation state save. Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024737-a894-map-f08",
+        "/workspace/verification-artifacts/runs/20261013-025113-2057-map-f08"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024737-a894-map-f08/evidence/map-run/F08-confirmation-security-secrets-01-runtime-secret-visible-to-get-f08-secret.json",
+        "/workspace/verification-artifacts/runs/20261013-024737-a894-map-f08/evidence/F08.secrets-visible/get.json",
+        "/workspace/verification-artifacts/runs/20261013-024737-a894-map-f08/evidence/map-run/F08-confirmation-security-secrets-05-unsaved-secret-restart-f08-secrets-unsav.json",
+        "/workspace/verification-artifacts/runs/20261013-024737-a894-map-f08/evidence/F08.secrets-unsaved-restart/get.json",
+        "/workspace/verification-artifacts/runs/20261013-025113-2057-map-f08/evidence/map-run/F08-confirmation-security-secrets-01-runtime-secret-visible-to-get-f08-secret.json",
+        "/workspace/verification-artifacts/runs/20261013-025113-2057-map-f08/evidence/F08.secrets-visible/get.json",
+        "/workspace/verification-artifacts/runs/20261013-025113-2057-map-f08/evidence/map-run/F08-confirmation-security-secrets-05-unsaved-secret-restart-f08-secrets-unsav.json",
+        "/workspace/verification-artifacts/runs/20261013-025113-2057-map-f08/evidence/F08.secrets-unsaved-restart/get.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F08 --only F08.secrets-visible,F08.secrets-unsaved-restart --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F08.secrets-bad-value",
+      "title": "Non-string secret values return 500",
+      "severity": "low",
+      "feature_ids": [
+        "F08.secrets-bad-value"
+      ],
+      "expected": "Numbers, null and booleans are rejected with 422.",
+      "actual": "Number, null, and boolean secret values all return 500 instead of 422 in both additional fresh sibling runs.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned. Number-only original confirmations are supplemented with separate saved exchanges for all three input shapes; no extra defect group is counted.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024737-a894-map-f08",
+        "/workspace/verification-artifacts/runs/20261013-025113-2057-map-f08"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024737-a894-map-f08/evidence/map-run/F08-confirmation-security-secrets-02-non-string-secret-value-f08-secrets-bad-.json",
+        "/workspace/verification-artifacts/runs/20261013-024737-a894-map-f08/evidence/F08.secrets-bad-value/number.json",
+        "/workspace/verification-artifacts/runs/20261013-025113-2057-map-f08/evidence/map-run/F08-confirmation-security-secrets-02-non-string-secret-value-f08-secrets-bad-.json",
+        "/workspace/verification-artifacts/runs/20261013-025113-2057-map-f08/evidence/F08.secrets-bad-value/number.json",
+        "/workspace/verification-artifacts/runs/20261013-034151-6d5f-map-f08/evidence/map-run/F08-confirmation-security-secrets-01-non-string-secret-value-f08-secrets-bad-.json",
+        "/workspace/verification-artifacts/runs/20261013-034151-6d5f-map-f08/evidence/F08.secrets-bad-value/number.json",
+        "/workspace/verification-artifacts/runs/20261013-034151-6d5f-map-f08/evidence/F08.secrets-bad-value/null.json",
+        "/workspace/verification-artifacts/runs/20261013-034151-6d5f-map-f08/evidence/F08.secrets-bad-value/bool.json",
+        "/workspace/verification-artifacts/runs/20261013-034314-5b2d-map-f08/evidence/map-run/F08-confirmation-security-secrets-01-non-string-secret-value-f08-secrets-bad-.json",
+        "/workspace/verification-artifacts/runs/20261013-034314-5b2d-map-f08/evidence/F08.secrets-bad-value/number.json",
+        "/workspace/verification-artifacts/runs/20261013-034314-5b2d-map-f08/evidence/F08.secrets-bad-value/null.json",
+        "/workspace/verification-artifacts/runs/20261013-034314-5b2d-map-f08/evidence/F08.secrets-bad-value/bool.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F08 --only F08.secrets-bad-value --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F09.cached-switch",
+      "title": "Switch requests reuse stale registered LLM configuration",
+      "severity": "medium",
+      "feature_ids": [
+        "F09.switch-profile-edited",
+        "F09.switch-llm-registered-usage-id"
+      ],
+      "expected": "A switch installs posted or current profile configuration, or rejects the request.",
+      "actual": "A 200 success silently retains an older LLM when its usage_id was registered earlier; editing a saved profile is ignored on later switch.",
+      "notes": "Merged: both variants use the first-write-wins LLM registry and silently reuse the previous registration. Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/map-run/F09-model-switching-plugins-01-switch-to-an-edited-profile-f09-switch-p.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-profile-edited/get.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-profile-edited/switch-again.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/map-run/F09-model-switching-plugins-02-switch-onto-a-registered-usage-id-f09-sw.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-llm-registered-usage-id/get.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-llm-registered-usage-id/switch.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/map-run/F09-model-switching-plugins-01-switch-to-an-edited-profile-f09-switch-p.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-profile-edited/get.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-profile-edited/switch-again.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/map-run/F09-model-switching-plugins-02-switch-onto-a-registered-usage-id-f09-sw.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-llm-registered-usage-id/get.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-llm-registered-usage-id/switch.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F09 --only F09.switch-profile-edited,F09.switch-llm-registered-usage-id --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F09.switch-llm-before-first-run",
+      "title": "Switching before first run loses usage accounting",
+      "severity": "low",
+      "feature_ids": [
+        "F09.switch-llm-before-first-run"
+      ],
+      "expected": "The successful switched model call appears under its usage_id in stats.",
+      "actual": "The run finishes but switched usage has no token or cost entry.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/map-run/F09-model-switching-plugins-03-switch-before-the-first-run-f09-switch-l.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-llm-before-first-run/stats.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-llm-before-first-run/switch.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/map-run/F09-model-switching-plugins-03-switch-before-the-first-run-f09-switch-l.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-llm-before-first-run/stats.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-llm-before-first-run/switch.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F09 --only F09.switch-llm-before-first-run --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F09.switch-llm-mid-run-get",
+      "title": "GET omits an acknowledged mid-run model switch",
+      "severity": "medium",
+      "feature_ids": [
+        "F09.switch-llm-mid-run-get"
+      ],
+      "expected": "GET and persisted state reflect the acknowledged LLM switch.",
+      "actual": "The acknowledged switch appears immediately on the WebSocket, but GET still reports the previous default usage_id while the tool step is running, in both fresh repeats.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned. The following contemporaneous base_state assertion was not reached; persisted-state loss and loss on crash are not claimed.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/map-run/F09-model-switching-plugins-05-get-right-after-a-mid-run-switch-f09-swi.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-llm-mid-run-get/frames.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-llm-mid-run-get/get.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-llm-mid-run-get/switch.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/map-run/F09-model-switching-plugins-05-get-right-after-a-mid-run-switch-f09-swi.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-llm-mid-run-get/frames.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-llm-mid-run-get/get.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-llm-mid-run-get/switch.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F09 --only F09.switch-llm-mid-run-get --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F09.acp-model-blank",
+      "title": "Pre-run ACP model switch accepts whitespace",
+      "severity": "low",
+      "feature_ids": [
+        "F09.acp-model-blank"
+      ],
+      "expected": "Blank model ids are rejected and the prior model remains.",
+      "actual": "Whitespace is accepted with 200 before the ACP session exists.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/map-run/F09-model-switching-plugins-07-blank-acp-model-f09-acp-model-blank-know.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.acp-model-blank/blank.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/map-run/F09-model-switching-plugins-07-blank-acp-model-f09-acp-model-blank-know.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.acp-model-blank/blank.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F09 --only F09.acp-model-blank --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F09.switch-llm-acp-refused",
+      "title": "Native model switch endpoints alter ACP placeholder LLM",
+      "severity": "medium",
+      "feature_ids": [
+        "F09.switch-llm-acp-refused"
+      ],
+      "expected": "switch_llm and switch_profile reject ACP conversations and retain acp-managed config.",
+      "actual": "The endpoints accept and replace the ACP agent placeholder LLM.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/map-run/F09-model-switching-plugins-08-llm-switches-on-an-acp-conversation-f09-.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-llm-acp-refused/switch-llm.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.switch-llm-acp-refused/switch-profile.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/map-run/F09-model-switching-plugins-08-llm-switches-on-an-acp-conversation-f09-.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-llm-acp-refused/switch-llm.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.switch-llm-acp-refused/switch-profile.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F09 --only F09.switch-llm-acp-refused --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F09.acp-model-live-unknown",
+      "title": "Unsupported ACP model id returns 500",
+      "severity": "low",
+      "feature_ids": [
+        "F09.acp-model-live-unknown"
+      ],
+      "expected": "A model id absent from available_models is rejected with a client error.",
+      "actual": "The Claude ACP adapter model switch surfaces an internal 500.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/map-run/F09-model-switching-plugins-10-unknown-model-on-a-live-session-f09-acp-.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.acp-model-live-unknown/switch.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/map-run/F09-model-switching-plugins-10-unknown-model-on-a-live-session-f09-acp-.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.acp-model-live-unknown/switch.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F09 --only F09.acp-model-live-unknown --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F09.ts-client-acp-docs",
+      "title": "TypeScript ACP switch docs promise an absent 409",
+      "severity": "low",
+      "feature_ids": [
+        "F09.ts-client-acp-docs"
+      ],
+      "expected": "Docs explain that a pre-run switch is stored and returns 200.",
+      "actual": "Both switchAcpModel docstrings promise 409 before first message.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/map-run/F09-model-switching-plugins-11-typescript-docstrings-for-a-pre-run-acp-.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/map-run/F09-model-switching-plugins-11-typescript-docstrings-for-a-pre-run-acp-.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F09 --only F09.ts-client-acp-docs --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F09.load-plugin-twice",
+      "title": "Loading a plugin twice duplicates hook side effects",
+      "severity": "medium",
+      "feature_ids": [
+        "F09.load-plugin-twice"
+      ],
+      "expected": "Repeated plugin loading keeps one copy of its hooks.",
+      "actual": "Skills stay deduplicated but identical user_prompt_submit hooks are appended twice.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/map-run/F09-model-switching-plugins-14-load-the-same-plugin-twice-f09-load-plug.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.load-plugin-twice/get.json",
+        "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09/evidence/F09.load-plugin-twice/second-load.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/map-run/F09-model-switching-plugins-14-load-the-same-plugin-twice-f09-load-plug.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.load-plugin-twice/get.json",
+        "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09/evidence/F09.load-plugin-twice/second-load.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F09 --only F09.load-plugin-twice --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F10.fork-tags-consistent",
+      "title": "Fork tags differ between state and stored metadata",
+      "severity": "low",
+      "feature_ids": [
+        "F10.fork-tags-consistent"
+      ],
+      "expected": "GET and meta.json agree on inherited tags.",
+      "actual": "GET drops source qa=src while meta.json retains it.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-05-fork-tags-agree-with-the-stored-metadata.json",
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/F10.fork-tags-consistent/fork.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-05-fork-tags-agree-with-the-stored-metadata.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/F10.fork-tags-consistent/fork.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F10 --only F10.fork-tags-consistent --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F10.fork-credentials",
+      "title": "Fork drops model credentials and cannot continue",
+      "severity": "high",
+      "feature_ids": [
+        "F10.fork-keeps-credentials",
+        "F10.fork-run-memory"
+      ],
+      "expected": "The fork retains encrypted agent and condenser keys and can run with source history.",
+      "actual": "Fork base_state has no API key; continuing a DeepSeek fork fails authentication.",
+      "notes": "Merged: failed continuation follows from the same missing cipher when fork state is saved. Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-06-the-fork-keeps-the-model-keys-f10-fork-k.json",
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-07-a-fork-runs-with-the-source-s-memory-f10.json",
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/F10.fork-run-memory/auth-errors.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-06-the-fork-keeps-the-model-keys-f10-fork-k.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-07-a-fork-runs-with-the-source-s-memory-f10.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/F10.fork-run-memory/auth-errors.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F10 --only F10.fork-keeps-credentials,F10.fork-run-memory --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F10.navigate-final-response",
+      "title": "Final-response endpoint returns abandoned branch answer",
+      "severity": "medium",
+      "feature_ids": [
+        "F10.navigate-final-response"
+      ],
+      "expected": "Navigating HEAD before the answer makes the active-branch final response empty.",
+      "actual": "agent_final_response still returns the abandoned answer.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-09-final-response-after-navigating-back-f10.json",
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/F10.navigate-final-response/after-navigate.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-09-final-response-after-navigating-back-f10.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/F10.navigate-final-response/after-navigate.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F10 --only F10.navigate-final-response --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F10.condense-status",
+      "title": "Disabled condenser is reported as an internal server error",
+      "severity": "low",
+      "feature_ids": [
+        "F10.condense-status"
+      ],
+      "expected": "Missing or no-op condenser is a client configuration error.",
+      "actual": "The disabled condenser path returns an unhandled 500 with traceback in both fresh repeats.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned. The separate no-op condenser assertion was not reached after the disabled-case failure.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-10-refusal-status-f10-condense-status-known.json",
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/F10.condense-status/disabled.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-10-refusal-status-f10-condense-status-known.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/F10.condense-status/disabled.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F10 --only F10.condense-status --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F10.ask-agent-unknown",
+      "title": "Side question on unknown conversation returns 500",
+      "severity": "low",
+      "feature_ids": [
+        "F10.ask-agent-unknown"
+      ],
+      "expected": "Unknown conversation is documented 404.",
+      "actual": "ask_agent returns internal 500.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-11-unknown-conversation-f10-ask-agent-unkno.json",
+        "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/F10.ask-agent-unknown/unknown.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/map-run/F10-fork-navigate-condense-ask-11-unknown-conversation-f10-ask-agent-unkno.json",
+        "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10/evidence/F10.ask-agent-unknown/unknown.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F10 --only F10.ask-agent-unknown --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F11.goal-cap-overrun",
+      "title": "Goal resume runs beyond max_iterations",
+      "severity": "medium",
+      "feature_ids": [
+        "F11.goal-cap-overrun"
+      ],
+      "expected": "No goal status reports iteration above max_iterations.",
+      "actual": "Resuming after failed last judge reports capped 2 of 1 and performs another round.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-031634-2620-map-f11",
+        "/workspace/verification-artifacts/runs/20261013-031830-28b2-map-f11"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-031634-2620-map-f11/evidence/map-run/F11-goals-02-a-resume-after-a-failed-last-audit-overr.json",
+        "/workspace/verification-artifacts/runs/20261013-031634-2620-map-f11/evidence/F11.goal-cap-overrun/goal-events.json",
+        "/workspace/verification-artifacts/runs/20261013-031634-2620-map-f11/evidence/F11.goal-cap-overrun/resume.json",
+        "/workspace/verification-artifacts/runs/20261013-031830-28b2-map-f11/evidence/map-run/F11-goals-02-a-resume-after-a-failed-last-audit-overr.json",
+        "/workspace/verification-artifacts/runs/20261013-031830-28b2-map-f11/evidence/F11.goal-cap-overrun/goal-events.json",
+        "/workspace/verification-artifacts/runs/20261013-031830-28b2-map-f11/evidence/F11.goal-cap-overrun/resume.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F11 --only F11.goal-cap-overrun --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F11.goal-restart-active",
+      "title": "Restart leaves an inactive goal marked running",
+      "severity": "medium",
+      "feature_ids": [
+        "F11.goal-restart-active"
+      ],
+      "expected": "A loop cancelled by restart is reported interrupted and inactive.",
+      "actual": "Conversation restores paused but its latest goal status remains active/running.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-031634-2620-map-f11",
+        "/workspace/verification-artifacts/runs/20261013-031830-28b2-map-f11"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-031634-2620-map-f11/evidence/map-run/F11-goals-03-a-loop-active-at-a-restart-stays-running.json",
+        "/workspace/verification-artifacts/runs/20261013-031634-2620-map-f11/evidence/F11.goal-restart-active/after-restart.json",
+        "/workspace/verification-artifacts/runs/20261013-031634-2620-map-f11/evidence/F11.goal-restart-active/goal-events.json",
+        "/workspace/verification-artifacts/runs/20261013-031830-28b2-map-f11/evidence/map-run/F11-goals-03-a-loop-active-at-a-restart-stays-running.json",
+        "/workspace/verification-artifacts/runs/20261013-031830-28b2-map-f11/evidence/F11.goal-restart-active/after-restart.json",
+        "/workspace/verification-artifacts/runs/20261013-031830-28b2-map-f11/evidence/F11.goal-restart-active/goal-events.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F11 --only F11.goal-restart-active --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F12.sandbox-pause-websocket",
+      "title": "Sandbox pause leaves open conversation sockets silent",
+      "severity": "medium",
+      "feature_ids": [
+        "F12.sandbox-pause-websocket"
+      ],
+      "expected": "Existing sockets close or continue delivering rehydrated conversation events.",
+      "actual": "An open socket remains bound to the unloaded service and receives no later new events.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned. Both old events/session captures and their fresh controls were saved before the first failed assertion; both old streams lack the post-pause message and remote-close frame.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/map-run/F12-runtime-and-credentials-01-open-sockets-across-a-pause-f12-sandbox-.json",
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/F12.sandbox-pause-websocket/fresh-session-socket.json",
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/F12.sandbox-pause-websocket/fresh-socket.json",
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/F12.sandbox-pause-websocket/old-session-socket.json",
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/F12.sandbox-pause-websocket/old-socket.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/map-run/F12-runtime-and-credentials-01-open-sockets-across-a-pause-f12-sandbox-.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/F12.sandbox-pause-websocket/fresh-session-socket.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/F12.sandbox-pause-websocket/fresh-socket.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/F12.sandbox-pause-websocket/old-session-socket.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/F12.sandbox-pause-websocket/old-socket.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F12 --only F12.sandbox-pause-websocket --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F12.binding-native-cold",
+      "title": "Pending file-credential binding poisons a native conversation",
+      "severity": "medium",
+      "feature_ids": [
+        "F12.binding-native-cold"
+      ],
+      "expected": "A cold native conversation never acquires an ACP credential-binding requirement.",
+      "actual": "Binding while native conversation is unloaded creates a persistent requirement that blocks later loading after pause.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned. The post-pause API loading failure is proved; the later meta.json length assertion was not reached.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/map-run/F12-runtime-and-credentials-02-regular-conversation-not-loaded-f12-bind.json",
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/F12.binding-native-cold/events-after-pause.json",
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/F12.binding-native-cold/put.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/map-run/F12-runtime-and-credentials-02-regular-conversation-not-loaded-f12-bind.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/F12.binding-native-cold/events-after-pause.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/F12.binding-native-cold/put.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F12 --only F12.binding-native-cold --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F12.managed-key-switch",
+      "title": "Model switch loses managed API key refresh hook",
+      "severity": "medium",
+      "feature_ids": [
+        "F12.managed-key-switch"
+      ],
+      "expected": "An in-scope switched LLM retries a 401 after fetching managed key.",
+      "actual": "First run refreshes; after switch the 401 surfaces, no second fetch or retry, conversation errors.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned. The pre-assertion wait prints error after the switch in both repeats, while the source sink count stays 1; the final finished-state GET assertion was not reached.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/map-run/F12-runtime-and-credentials-05-refresh-after-a-model-switch-f12-managed.json",
+        "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12/evidence/F12.managed-key-switch/key-fetch.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/map-run/F12-runtime-and-credentials-05-refresh-after-a-model-switch-f12-managed.json",
+        "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12/evidence/F12.managed-key-switch/key-fetch.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F12 --only F12.managed-key-switch --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F13.timestamp-offset",
+      "title": "Bash timestamp filters compare local spelling rather than instant",
+      "severity": "medium",
+      "feature_ids": [
+        "F13.timestamp-offset"
+      ],
+      "expected": "Equivalent UTC and non-UTC offset timestamps select the same events.",
+      "actual": "UTC selects the command while equivalent +02:00 timestamp selects none.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/map-run/F13-bash-01-offset-timestamps-f13-timestamp-offset-k.json",
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/F13.timestamp-offset/plus-two.json",
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/F13.timestamp-offset/utc.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/map-run/F13-bash-01-offset-timestamps-f13-timestamp-offset-k.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.timestamp-offset/plus-two.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.timestamp-offset/utc.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F13 --only F13.timestamp-offset --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F13.order-gt-paging",
+      "title": "Bash output paging filters order after page limit",
+      "severity": "medium",
+      "feature_ids": [
+        "F13.order-gt-paging"
+      ],
+      "expected": "limit=1 with order__gt=0 returns the next output chunk.",
+      "actual": "The result is empty with a next_page_id; SDK pollers can miss later chunks and time out.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/map-run/F13-bash-03-order-filter-and-paging-f13-order-gt-pag.json",
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/F13.order-gt-paging/limit-1.json",
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/F13.order-gt-paging/limit-2.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/map-run/F13-bash-03-order-filter-and-paging-f13-order-gt-pag.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.order-gt-paging/limit-1.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.order-gt-paging/limit-2.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F13 --only F13.order-gt-paging --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F13.execute-large-output",
+      "title": "Synchronous bash execution truncates output above 1 MiB",
+      "severity": "medium",
+      "feature_ids": [
+        "F13.execute-large-output"
+      ],
+      "expected": "execute_bash_command returns all 1100012 stdout characters.",
+      "actual": "It returns only the final chunk, losing the first 1048576 characters.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/map-run/F13-bash-04-large-output-through-execute-f13-execute.json",
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/F13.execute-large-output/execute.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/map-run/F13-bash-04-large-output-through-execute-f13-execute.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.execute-large-output/execute.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F13 --only F13.execute-large-output --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F13.scoped-bad-id",
+      "title": "Malformed scoped bash conversation id produces 500",
+      "severity": "low",
+      "feature_ids": [
+        "F13.scoped-bad-id"
+      ],
+      "expected": "A non-UUID conversation id is rejected with 422.",
+      "actual": "The dependency reads unset runtime_event_service and produces 500.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/map-run/F13-bash-05-malformed-conversation-id-f13-scoped-bad.json",
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/F13.scoped-bad-id/execute.json",
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/F13.scoped-bad-id/search.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/map-run/F13-bash-05-malformed-conversation-id-f13-scoped-bad.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.scoped-bad-id/execute.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.scoped-bad-id/search.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F13 --only F13.scoped-bad-id --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F13.scoped-idle-eviction",
+      "title": "Idle eviction kills a running scoped bash command",
+      "severity": "high",
+      "feature_ids": [
+        "F13.scoped-idle-eviction"
+      ],
+      "expected": "Running scoped commands keep their conversation loaded and can be stopped normally.",
+      "actual": "Idle eviction kills the active scoped command and leaves the retained stream without any terminal BashOutput through shutdown 19\u201320 seconds after eviction. Consumers expecting an exit code may wait until their own timeout.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned. The independent terminal-event evidence checks both retained owned BashCommand streams. No actual client poller wait, rehydration, or later stop API was exercised. See f13-idle-eviction-terminal-evidence.json.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/map-run/F13-bash-06-idle-eviction-kills-a-running-command-f1.json",
+        "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/map-run/F13-bash-06-idle-eviction-kills-a-running-command-f1.json",
+        "/workspace/verification-artifacts/f13-idle-eviction-terminal-evidence.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F13 --only F13.scoped-idle-eviction --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F14.upload-onto-directory",
+      "title": "Invalid upload target is reported as server failure",
+      "severity": "low",
+      "feature_ids": [
+        "F14.upload-onto-directory"
+      ],
+      "expected": "Directory target or parent-file collision yields 4xx.",
+      "actual": "Upload maps both collisions to a masked 500.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned. Two additional fresh sibling runs save 500 responses for both existing-directory and parent-is-file collisions.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/map-run/F14-files-02-upload-onto-a-directory-f14-upload-onto-.json",
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/F14.upload-onto-directory/upload.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/map-run/F14-files-02-upload-onto-a-directory-f14-upload-onto-.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/F14.upload-onto-directory/upload.json",
+        "/workspace/verification-artifacts/runs/20261013-034147-e66e-map-f14/evidence/map-run/F14-files-01-upload-onto-a-directory-f14-upload-onto-.json",
+        "/workspace/verification-artifacts/runs/20261013-034147-e66e-map-f14/evidence/F14.upload-onto-directory/upload.json",
+        "/workspace/verification-artifacts/runs/20261013-034147-e66e-map-f14/evidence/F14.upload-onto-directory/parent-is-file.json",
+        "/workspace/verification-artifacts/runs/20261013-034324-233c-map-f14/evidence/map-run/F14-files-01-upload-onto-a-directory-f14-upload-onto-.json",
+        "/workspace/verification-artifacts/runs/20261013-034324-233c-map-f14/evidence/F14.upload-onto-directory/upload.json",
+        "/workspace/verification-artifacts/runs/20261013-034324-233c-map-f14/evidence/F14.upload-onto-directory/parent-is-file.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F14 --only F14.upload-onto-directory --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F14.upload-size",
+      "title": "Remote upload results omit file_size in Python and TypeScript",
+      "severity": "low",
+      "feature_ids": [
+        "F14.upload-size"
+      ],
+      "expected": "Both remote clients report the 70000-byte upload size, as LocalWorkspace does.",
+      "actual": "Bytes upload intact; Python returns None and TypeScript returns undefined for file_size.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/map-run/F14-files-03-upload-size-in-the-consumers-result-f14-.json",
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/F14.upload-size/rest.json",
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/F14.upload-size/sdk.json",
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/F14.upload-size/ts.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/map-run/F14-files-03-upload-size-in-the-consumers-result-f14-.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/F14.upload-size/rest.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/F14.upload-size/sdk.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/F14.upload-size/ts.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F14 --only F14.upload-size --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F14.upload-atomic",
+      "title": "Failed overwrite destroys the previous file",
+      "severity": "high",
+      "feature_ids": [
+        "F14.upload-atomic"
+      ],
+      "expected": "Mid-write EFBIG failure leaves the previous uploaded file intact.",
+      "actual": "The existing target is truncated and replaced by 500000 partial bytes despite 500.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/map-run/F14-files-04-failed-overwrite-f14-upload-atomic-known.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/map-run/F14-files-04-failed-overwrite-f14-upload-atomic-known.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F14 --only F14.upload-atomic --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F14.subdirs-case-pagination",
+      "title": "Case-only sibling directory names loop pagination",
+      "severity": "medium",
+      "feature_ids": [
+        "F14.subdirs-case-pagination"
+      ],
+      "expected": "Pagination over Foo and foo reaches both directories.",
+      "actual": "The lowercased cursor repeats the first page indefinitely.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/map-run/F14-files-05-paging-past-a-case-only-twin-f14-subdirs.json",
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/F14.subdirs-case-pagination/page-2.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/map-run/F14-files-05-paging-past-a-case-only-twin-f14-subdirs.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/F14.subdirs-case-pagination/page-2.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F14 --only F14.subdirs-case-pagination --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F14.archive-format-doc",
+      "title": "Archive format description omits nested-repository selection",
+      "severity": "low",
+      "feature_ids": [
+        "F14.archive-format-doc"
+      ],
+      "expected": "The OpenAPI format description matches archive contents.",
+      "actual": "It promises the entire directory but a single nested repository excludes adjacent top.txt.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/map-run/F14-files-06-what-format-promises-f14-archive-format-.json",
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/F14.archive-format-doc/tar.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/map-run/F14-files-06-what-format-promises-f14-archive-format-.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/F14.archive-format-doc/tar.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F14 --only F14.archive-format-doc --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F14.trajectory-concurrent",
+      "title": "Concurrent trajectory exports share and corrupt one temporary ZIP",
+      "severity": "medium",
+      "feature_ids": [
+        "F14.trajectory-concurrent"
+      ],
+      "expected": "All concurrent downloads return 200 and valid ZIP bytes.",
+      "actual": "Shared temporary path is overwritten/unlinked across handlers, causing broken downloads and 500s.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/map-run/F14-files-08-concurrent-trajectory-downloads-f14-traj.json",
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/F14.trajectory-concurrent/burst.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/map-run/F14-files-08-concurrent-trajectory-downloads-f14-traj.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/F14.trajectory-concurrent/burst.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F14 --only F14.trajectory-concurrent --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    },
+    {
+      "id": "F14.trajectory-init-path",
+      "title": "Trajectory export ignores init-time conversations_path",
+      "severity": "medium",
+      "feature_ids": [
+        "F14.trajectory-init-path"
+      ],
+      "expected": "Both trajectory routes export the conversation stored at the initialized path.",
+      "actual": "GET finds the conversation but trajectory export reads the launch-time default and returns 404.",
+      "notes": "Not filed by this worker: external reporting and publication remain parent-owned. Two additional fresh sibling runs save 404 responses from both the global and scoped export routes after custom init-time conversation storage was configured.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/map-run/F14-files-11-init-time-conversations-path-f14-traject.json",
+        "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/map-run/F14-files-11-init-time-conversations-path-f14-traject.json",
+        "/workspace/verification-artifacts/runs/20261013-034147-e66e-map-f14/evidence/map-run/F14-files-02-init-time-conversations-path-f14-traject.json",
+        "/workspace/verification-artifacts/runs/20261013-034241-a692-f14-init/evidence/F14.trajectory-init-path/global.json",
+        "/workspace/verification-artifacts/runs/20261013-034241-a692-f14-init/evidence/F14.trajectory-init-path/scoped.json",
+        "/workspace/verification-artifacts/runs/20261013-034324-233c-map-f14/evidence/map-run/F14-files-02-init-time-conversations-path-f14-traject.json",
+        "/workspace/verification-artifacts/runs/20261013-034407-9964-f14-init/evidence/F14.trajectory-init-path/global.json",
+        "/workspace/verification-artifacts/runs/20261013-034407-9964-f14-init/evidence/F14.trajectory-init-path/scoped.json"
+      ],
+      "repro_command": "PATH=/workspace/verification-artifacts/f08-f14-harness/.agents/skills/verify-agent-server/scripts:$PATH control-agent-server map run --file F14 --only F14.trajectory-init-path --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going"
+    }
+  ],
+  "counts": {
+    "high": 4,
+    "low": 12,
+    "medium": 16
+  },
+  "pending_confirmation": [],
+  "repeat_runs": [
+    "/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10",
+    "/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14",
+    "/workspace/verification-artifacts/runs/20261013-024315-4f15-map-f10",
+    "/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14",
+    "/workspace/verification-artifacts/runs/20261013-024737-a894-map-f08",
+    "/workspace/verification-artifacts/runs/20261013-025113-2057-map-f08",
+    "/workspace/verification-artifacts/runs/20261013-025756-a01d-map-f12",
+    "/workspace/verification-artifacts/runs/20261013-025803-aa01-map-f09",
+    "/workspace/verification-artifacts/runs/20261013-030236-b017-map-f09",
+    "/workspace/verification-artifacts/runs/20261013-030529-8df8-map-f12",
+    "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13",
+    "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13",
+    "/workspace/verification-artifacts/runs/20261013-031634-2620-map-f11",
+    "/workspace/verification-artifacts/runs/20261013-031830-28b2-map-f11"
+  ],
+  "harness_map_issues": [
+    {
+      "id": "cold-doctor-timeout",
+      "title": "Cold OpenAPI doctor probe times out under CPU contention",
+      "actual": "F08.secrets-restart, F10.restart-persist and F14 upload-atomic/restart stop at the required OpenAPI read while health/auth/SHA/socket checks pass.",
+      "adaptation": "Isolated map copies retry doctor once; original timeout evidence is preserved.",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F08-doctor-after-surprises.json"
+      ],
+      "notes": "Original doctor probes use http_client(10); no product code changed."
+    },
+    {
+      "id": "F09-subscription-race",
+      "title": "Mid-run recipes start before socket subscription",
+      "feature_ids": [
+        "F09.switch-llm-mid-run",
+        "F09.switch-llm-mid-run-get"
+      ],
+      "actual": "Primary capture contains the sleep observation but misses its earlier ActionEvent.",
+      "adaptation": "Create with --no-run, wait for socket full_state, then POST /run; same real DeepSeek prompt and assertions."
+    },
+    {
+      "id": "missing-selected-dependencies",
+      "title": "Selected restart recipes omit state-arranging dependencies",
+      "feature_ids": [
+        "F10.restart-persist",
+        "F14.restart"
+      ],
+      "adaptation": "Added F10.fork-independent/navigate-empty and F14.upload-download/scoped-transfer in isolated copies."
+    },
+    {
+      "id": "F12-blocked-label",
+      "title": "Docker recipe remains unconditionally blocked on a capable host",
+      "feature_ids": [
+        "F12.docker-runtime"
+      ],
+      "adaptation": "Removed blocked label only in isolated copy, selected frozen-source image, added own-container safe inspection and missing lifecycle assertions."
+    },
+    {
+      "id": "F12-no-daemon-precondition",
+      "title": "Docker error-path recipe assumes no daemon without arranging it",
+      "feature_ids": [
+        "F12.docker-runtime-contract"
+      ],
+      "adaptation": "Explicit missing DOCKER_HOST Unix socket ensures intended no-daemon path."
+    },
+    {
+      "id": "unknown-runtime-credential-redaction",
+      "severity": "high",
+      "confirmed": true,
+      "title": "Harness does not automatically redact newly issued container session credentials",
+      "actual": "Redactor recognizes run keys and selected env values, rather than the session_api_key response field.",
+      "adaptation": "Capture raw output directly, reveal only boolean presence proof, register key via recognized OPENHANDS_API_KEY env before recording exchanges.",
+      "notes": "Two fresh compatible-image observations safely printed only the boolean marker for an unmasked newly issued runtime key. The captured key was registered under OPENHANDS_API_KEY before evidence/attach. No credential value was printed or published. This is a harness gap, excluded from product-defect counts.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-035149-9cf7-map-f12",
+        "/workspace/verification-artifacts/runs/20261013-035150-c7fa-map-f12"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-035149-9cf7-map-f12/evidence/map-run/F12-runtime-and-credentials-01-docker-runtime-with-a-daemon-f12-docker-.json",
+        "/workspace/verification-artifacts/runs/20261013-035150-c7fa-map-f12/evidence/map-run/F12-runtime-and-credentials-01-docker-runtime-with-a-daemon-f12-docker-.json"
+      ]
+    },
+    {
+      "id": "disk-exhaustion",
+      "title": "Docker build filled 32GB overlay and aborted evidence writes",
+      "feature_ids": [
+        "F12.managed-key-refresh",
+        "F12.managed-key-scope",
+        "F12.managed-key-switch",
+        "F12.docker-runtime-contract",
+        "F14.trajectory-init-path"
+      ],
+      "actual": "ENOSPC left primary F12.json/F14.json empty, with 27/29 feature ledger rows intact.",
+      "recovery": "Root removed only owned disposable Docker build caches; 26GB free; affected tails replayed separately.",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F12-primary-aborted.json",
+        "/workspace/verification-artifacts/family-results/F14-primary-aborted.json"
+      ]
+    },
+    {
+      "id": "Docker-layout-and-owner-permissions",
+      "feature_ids": [
+        "F12.docker-runtime"
+      ],
+      "classification": "harness image setup",
+      "detail": "Earlier image stored source/venv under the runtime-mounted /workspace. Relocation fixed the vanished entrypoint, then copied mode 700 root-owned virtualenv bin blocked UID 1000. Both failure variants are preserved as harness evidence. Local-uid artifact relocates public source/deps and grants read/traverse permissions; actual UID 1000 plus empty-/workspace import proof passes.",
+      "evidence": [
+        "/workspace/verification-artifacts/docker/runtime-layout-permissions.txt",
+        "/workspace/verification-artifacts/docker/runtime-uid-imports-proof.json"
+      ]
+    },
+    {
+      "id": "Docker-vfs-transport-deadline",
+      "feature_ids": [
+        "F12.docker-runtime"
+      ],
+      "classification": "environment/harness timing",
+      "detail": "Two compatible-image creates returned 201 in 86,055 ms and 82,971 ms. CLI default 30-second transport deadline interrupted earlier local vfs provisioning. Create/reprovision now allow 180 seconds. The configured child health deadline remains unchanged."
+    },
+    {
+      "id": "Docker-persisted-history-route",
+      "feature_ids": [
+        "F12.docker-runtime"
+      ],
+      "classification": "map drift",
+      "detail": "Frozen registry deliberately mounts outer persisted event reads before the runtime proxy. Events/search with X-Expose-Secrets returns 200; the refusal guard belongs to proxy_http. Copied recipe records persisted-history200 and tests 422 on an actual proxied scoped bash read."
+    }
+  ],
+  "blocked": [
+    {
+      "title": "Running Codex ACP credential write-back",
+      "prerequisite": "Codex ACP binary plus OpenAI login not provided",
+      "route": "External credential source PUT with expected_version/value",
+      "notes": "F12 activation, scrubbing, binding scope and reload guard are driven; provider-driven credential refresh synchronization is not reached.",
+      "reason": "Codex ACP binary plus OpenAI login not provided",
+      "feature_ids": [
+        "F12.binding-live-acp"
+      ]
+    },
+    {
+      "id": "canonical-docker-packaging",
+      "feature_ids": [
+        "F12.docker-runtime"
+      ],
+      "route": "Canonical Dockerfile-built runtime image",
+      "reason": "Canonical build exhausted the 32 GB overlay and was aborted. The compatible local image uses frozen source plus the locked host virtualenv; local lifecycle coverage does not verify canonical packaging."
+    }
+  ],
+  "inconclusive": [],
+  "adaptations": "/workspace/verification-artifacts/f08-f14-harness/ADAPTATIONS.md",
+  "isolated_map_check": "/workspace/verification-artifacts/family-results/f08-f14-map-check.json",
+  "models": [
+    "deepseek/deepseek-flash",
+    "deepseek/deepseek-v4-pro",
+    "ACP sonnet/haiku via https://api.deepseek.com/anthropic"
+  ],
+  "cost_notes": "ACP label pricing may differ from actual DeepSeek provider billing; copied fork metrics must not be double-counted.",
+  "supplemental_results": [
+    "family-results/F08-siblings.json",
+    "family-results/F14-siblings.json"
+  ],
+  "status": "complete",
+  "coverage_summary": {
+    "distinct_feature_ids": 190,
+    "pass": 155,
+    "confirmed_failure_feature_ids": 35,
+    "pending_feature_ids": [],
+    "confirmed_grouped_bugs": 32
+  },
+  "not_run_client_entrypoints": [
+    {
+      "family": "F08",
+      "entrypoints": [
+        "RemoteConversation.set_confirmation_policy",
+        "RemoteConversation.set_security_analyzer",
+        "RemoteConversation.update_secrets (including callable and SecretSource serialization)",
+        "RemoteConversation.reject_pending_actions",
+        "RemoteConversation.run as the SDK confirmation-accept entry point",
+        "ConversationClient.setConfirmationPolicy",
+        "ConversationClient.setSecurityAnalyzer",
+        "ConversationClient.updateSecrets",
+        "ConversationClient.respondToConfirmation",
+        "RemoteConversation.setConfirmationPolicy",
+        "RemoteConversation.setSecurityAnalyzer",
+        "RemoteConversation.updateSecrets (including callable conversion to StaticSecret)",
+        "RemoteConversation.sendConfirmationResponse"
+      ],
+      "reason": "F08-confirmation-security-secrets.md:75-97 lists client surfaces and says recipes use direct REST/socket drivers; no Python or TypeScript client program appears in this family.",
+      "notes": "Direct REST/socket observations do not verify the uncalled wrappers."
+    },
+    {
+      "family": "F09",
+      "entrypoints": [
+        "RemoteConversation.switchProfile",
+        "RemoteConversation.switchLlm",
+        "RemoteConversation.switchAcpModel"
+      ],
+      "reason": "F09-model-switching-plugins.md:80-86 and dynamic program at 553-596 name only ConversationClient and ConversationManager. Python plugin program is at 726-744.",
+      "notes": "Direct REST/socket observations do not verify the uncalled wrappers."
+    },
+    {
+      "family": "F10",
+      "entrypoints": [
+        "RemoteConversation.fork",
+        "RemoteConversation.navigate_to (including cached-state refresh)",
+        "RemoteConversation.condense",
+        "RemoteConversation.ask_agent",
+        "ConversationClient.forkConversation",
+        "ConversationClient.navigateConversation",
+        "ConversationClient.condenseConversation",
+        "ConversationClient.askAgent",
+        "RemoteConversation.fork",
+        "RemoteConversation.navigateTo",
+        "RemoteConversation.condense",
+        "RemoteConversation.askAgent"
+      ],
+      "reason": "F10-fork-navigate-condense-ask.md:71-85 explicitly states every recipe drives REST directly.",
+      "notes": "Direct REST/socket observations do not verify the uncalled wrappers."
+    },
+    {
+      "family": "F11",
+      "entrypoints": [
+        "run_goal standalone synchronous driver",
+        "ConversationClient.startGoal",
+        "ConversationClient.stopGoal",
+        "ConversationClient.resumeGoal",
+        "RemoteConversation.startGoal",
+        "RemoteConversation.stopGoal",
+        "RemoteConversation.resumeGoal"
+      ],
+      "reason": "F11-goals.md:87-107 documents TypeScript goal wrappers and the separate synchronous Python run_goal driver; recipes drive REST and sockets directly.",
+      "notes": "Direct REST/socket observations do not verify the uncalled wrappers."
+    },
+    {
+      "family": "F12",
+      "entrypoints": [
+        "RemoteWorkspace.get_runtime_session_key",
+        "RemoteWorkspace.release_runtime",
+        "AsyncRemoteWorkspace.get_runtime_session_key",
+        "AsyncRemoteWorkspace.release_runtime"
+      ],
+      "reason": "F12-runtime-and-credentials.md:109-115 documents local TypeScript runtime methods and Python Docker lifecycle methods; the Node program at 243-266 checks local available state only.",
+      "notes": "Parent owns current Docker recovery and final evidence integration. Prior Docker artifacts and harness adaptations do not close this pending scope in this audit."
+    },
+    {
+      "family": "F13",
+      "entrypoints": [
+        "RemoteWorkspace.start_command as a standalone entry point",
+        "RemoteWorkspace.get_command_output as a standalone entry point",
+        "RemoteWorkspace.stop_command",
+        "AsyncRemoteWorkspace.execute_command",
+        "AsyncRemoteWorkspace.start_command",
+        "AsyncRemoteWorkspace.get_command_output",
+        "AsyncRemoteWorkspace.stop_command",
+        "BashClient.searchEvents",
+        "BashClient.getEvent",
+        "BashClient.getEvents",
+        "BashClient.batchGetEvents",
+        "BashClient.startCommand",
+        "BashClient.executeCommand",
+        "BashClient.clearEvents",
+        "BashClient.stopCommand",
+        "BashWebSocketClient (including query-key auth, replay, and reconnect)",
+        "RemoteWorkspace.executeCommand"
+      ],
+      "reason": "F13-bash.md:78-98 documents all wrapper surfaces but describes only two sync execute_command SDK programs plus raw REST/WebSocket drivers.",
+      "notes": "Direct REST/socket observations do not verify the uncalled wrappers."
+    },
+    {
+      "family": "F14",
+      "entrypoints": [
+        "AsyncRemoteWorkspace.file_upload (global and scoped)",
+        "AsyncRemoteWorkspace.file_download (global and scoped)",
+        "FileClient.uploadFile",
+        "FileClient.uploadTextFile",
+        "FileClient.downloadFile",
+        "FileClient.downloadTextFile",
+        "FileClient.downloadTrajectory",
+        "FileClient.getHome",
+        "FileClient.searchSubdirectories",
+        "RemoteConversation.downloadTrajectory",
+        "RemoteWorkspace.fileDownload",
+        "RemoteWorkspace.fileUpload string/File input branches",
+        "write_file tool consuming fileUpload.file_size"
+      ],
+      "reason": "F14-files.md:77-89 documents wrapper surfaces; upload-size at 210-261 exercises only TypeScript global Blob upload, and sdk-workspace at 776-809 exercises sync Python transfers in both scopes.",
+      "notes": "TypeScript RemoteWorkspace.fileUpload Blob program ran successfully. The final TypeScript reported-size shell assertion was skipped, while the output artifact exists. Direct server route coverage cannot establish the uncalled typed methods or async clients."
+    }
+  ],
+  "client_evidence_inventory": "/workspace/verification-artifacts/f08-f14-client-not-run-audit.json",
+  "evidence_audit": "/workspace/verification-artifacts/f08-f14-evidence-audit.json",
+  "docker_complete": {
+    "run": "/workspace/verification-artifacts/runs/20261013-040101-d29e-map-f12",
+    "result": "pass",
+    "image": "qa-agent-server:acca181a-local-uid",
+    "source_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+    "scope": "Local frozen-source/locked-host-venv runtime; canonical packaging remains blocked.",
+    "artifact": "family-results/F12-docker-complete.json"
+  }
+}

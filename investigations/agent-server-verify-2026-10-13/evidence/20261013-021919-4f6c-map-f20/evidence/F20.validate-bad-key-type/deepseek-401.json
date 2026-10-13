@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/profiles/qa-draft/validate",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "llm": {
+        "model": "deepseek/deepseek-flash",
+        "api_key": "<redacted:api_key>",
+        "num_retries": 0
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "331",
+      "content-type": "application/json"
+    },
+    "body": {
+      "valid": false,
+      "error": {
+        "type": "LLMBadRequestError",
+        "message": "litellm.BadRequestError: DeepseekException - {\"error\":{\"message\":\"Authentication Fails, Your api key: ****-key is invalid (request_id: 7056feac-94b3-4d24-9cf6-c8393ce2fd63)\",\"type\":\"authentication_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 964
+}

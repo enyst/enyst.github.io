@@ -1,0 +1,15 @@
+{
+  "file": "F24-openai-subscription.md",
+  "bullet": "TypeScript client (`F24.ts-client`).",
+  "ids": [
+    "F24.ts-client"
+  ],
+  "line": 402,
+  "script": "test -f clients/typescript/dist/clients.js || (cd clients/typescript && npm ci && npm run build)\ncontrol-agent-server exec --timeout 120 --expect-output QA_F24_TS_OK --save F24.ts-client/program -- node \"$F24/ts_subscription.mjs\" \"$EXPECTED_MODELS\"\ncontrol-agent-server api GET /api/llm/subscription/openai/status --expect 200 --check connected eq false\ncontrol-agent-server state ls 'home/.openhands/auth/*' --expect-count 0\n",
+  "exit_code": 0,
+  "elapsed_ms": 4273,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 1357,\n  \"stdout_tail\": \"QA_F24_TS_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/F24.ts-client/program.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/llm/subscription/openai/status\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"76\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"vendor\": \"openai\",\n      \"connected\": false,\n      \"account_email\": null,\n      \"expires_at\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 93,\n  \"checks\": [\n    {\n      \"check\": \"connected eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"pattern\": \"home/.openhands/auth/*\",\n  \"count\": 0,\n  \"files\": []\n}\n",
+  "stderr": ""
+}

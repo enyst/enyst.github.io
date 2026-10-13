@@ -1,0 +1,33 @@
+WEBVTT
+
+1
+00:00:00.705 --> 00:00:03.423
+One profile write is waiting for a file lock.
+
+2
+00:00:03.423 --> 00:00:05.537
+Other requests should keep moving.
+
+3
+00:00:05.537 --> 00:00:09.645
+We ask the heartbeat endpoint a very small question: are you alive?
+
+4
+00:01:21.698 --> 00:01:24.205
+The answer arrives after the lock timeout.
+
+5
+00:01:24.205 --> 00:01:28.143
+It is technically alive, and approximately one coffee break late.
+
+6
+00:01:28.143 --> 00:01:32.618
+A profile-store wait has paused unrelated requests on the same event loop.
+
+7
+00:01:34.441 --> 00:01:38.281
+This high severity service stall was confirmed twice in fresh servers.
+
+8
+00:01:38.281 --> 00:01:43.491
+Idle heartbeats stayed below one second; contended heartbeats took about twenty eight seconds.

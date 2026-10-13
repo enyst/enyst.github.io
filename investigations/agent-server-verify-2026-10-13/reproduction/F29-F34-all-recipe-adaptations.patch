@@ -1,0 +1,232 @@
+--- frozen/F31-persistence-and-limits.md
++++ adapted/F31-persistence-and-limits.md
+@@ -362,7 +362,21 @@
+   PIDB=$(jq -r .pid "$B/run.json")
+   control-agent-server api PATCH "<redacted:session-cookie>/$Y" --json '{"title": "QA F31 after B"}' --expect 200 --check success eq true
+   control-agent-server state cat meta.json --conversation "$Y" --check title eq 'QA F31 after B'
++  DEAD_META=$(jq -r .pid "$AGENT_SERVER_VERIFY_RUN/run.json")
+   control-agent-server restart --hard
++  .venv/bin/python - "$DEAD_META" <<'PYZOMBIE'
++  import sys
++  import psutil
++  try:
++      status = psutil.Process(int(sys.argv[1])).status()
++  except psutil.NoSuchProcess:
++      status = "gone"
++  print("prior_owner_status=" + status)
++  assert status in ("zombie", "dead", "gone"), status
++  PYZOMBIE
++  until control-agent-server state cat owner_lease.json --conversation "$Y" --check expires_at lt "$(date +%s)" >/dev/null; do
++    sleep 1
++  done
+   control-agent-server api GET "<redacted:session-cookie>/$Y/events/count" --run "$B" --expect 200
+   control-agent-server state cat owner_lease.json --conversation "$Y" --check owner_pid eq "$PIDB" --check generation eq 2
+   control-agent-server state cat meta.json --conversation "$Y" --check title eq 'QA F31 after B'  # bug
+@@ -607,15 +621,46 @@
+   ```sh
+   N1=$(control-agent-server logs --grep "invalid literal for int\(\) with base 10: 'qa-f31-nan'" | jq .total_matching)
+   if control-agent-server restart --reset-config --env OH_MAX_CONCURRENT_RUNS=qa-f31-nan --timeout 60; then false; fi
+-  control-agent-server runs | jq -e --arg r "$AGENT_SERVER_VERIFY_RUN" '.runs[] | select(.run == $r) | .alive == false'
++  .venv/bin/python - "$AGENT_SERVER_VERIFY_RUN/run.json" <<'PYDEAD'
++  import json
++  import socket
++  import sys
++  import psutil
++  run = json.load(open(sys.argv[1]))
++  try:
++      status = psutil.Process(run["pid"]).status()
++  except psutil.NoSuchProcess:
++      status = "gone"
++  with socket.socket() as connection:
++      connection.settimeout(1)
++      port_closed = connection.connect_ex((run["host"], run["port"])) != 0
++  print("failed_start_status=" + status + " port_closed=" + str(port_closed))
++  assert status in ("zombie", "dead", "gone") and port_closed, (status, port_closed)
++  PYDEAD
+   control-agent-server logs --grep "invalid literal for int\(\) with base 10: 'qa-f31-nan'" --expect-min $((N1 + 1))
+   N2=$(control-agent-server logs --grep 'greater_than_equal, input_value=0' | jq .total_matching)
+   N3=$(control-agent-server logs --grep '^max_concurrent_runs$' | jq .total_matching)
+   if control-agent-server restart --reset-config --config-json '{"max_concurrent_runs": 0}' --timeout 60; then false; fi
+-  control-agent-server runs | jq -e --arg r "$AGENT_SERVER_VERIFY_RUN" '.runs[] | select(.run == $r) | .alive == false'
++  .venv/bin/python - "$AGENT_SERVER_VERIFY_RUN/run.json" <<'PYDEAD'
++  import json
++  import socket
++  import sys
++  import psutil
++  run = json.load(open(sys.argv[1]))
++  try:
++      status = psutil.Process(run["pid"]).status()
++  except psutil.NoSuchProcess:
++      status = "gone"
++  with socket.socket() as connection:
++      connection.settimeout(1)
++      port_closed = connection.connect_ex((run["host"], run["port"])) != 0
++  print("failed_start_status=" + status + " port_closed=" + str(port_closed))
++  assert status in ("zombie", "dead", "gone") and port_closed, (status, port_closed)
++  PYDEAD
+   control-agent-server logs --grep 'greater_than_equal, input_value=0' --expect-min $((N2 + 1))
+   control-agent-server logs --grep '^max_concurrent_runs$' --expect-min $((N3 + 1))
+   control-agent-server restart --reset-config
++  control-agent-server api GET /openapi.json --auth none --timeout 120 --quiet
+   control-agent-server doctor
+   ```
+   Both restarts fail with `Server exited with code 1 during startup` and the
+@@ -670,7 +715,8 @@
+   TD="$(python3 -c 'import tempfile; print(tempfile.gettempdir())')/openhands-agent-server-$PIDB"
+   control-agent-server logs --run "$B" --grep 'TMUX_TMPDIR not set' --expect-min 1
+   test -d "$TD"
+-  control-agent-server stop --run "$B" | jq -e '.server == "terminated"'
++  control-agent-server stop --run "$B"
++  control-agent-server logs --run "$B" --grep 'Application shutdown complete' --expect-min 1
+   trap 'rm -rf -- "$TD" || true' EXIT
+   test ! -e "$TD"  # bug
+   trap - EXIT
+@@ -683,7 +729,7 @@
+   only removes the variable from its environment (`api_lifespan`), so every
+   such start leaves a directory in the temp dir and `test ! -e` fails. The
+   `trap` removes the leftover after the assertion.
+-- **Storage retention and disk budget (`F31.storage-retention`), blocked.**
++- **Storage retention and disk budget (`F31.storage-retention`); Docker source-image adaptation.**
+   Needs a Docker daemon and the `conversation_image` pulled
+   (`control-agent-server capabilities` reports `docker`): the storage
+   reclaimer exists only in the Docker runtime (`DockerConversationRegistry`
+@@ -703,22 +749,7 @@
+   while tracked and untracked files stay, and `Conversation storage: freed`
+   in the log.
+   ```sh
+-  DK=$(control-agent-server launch --new --name f31-storage --print-run \
+-    --config-json '{"conversation_runtime": "docker", "conversation_storage_retention_days": 0.0001}')
+-  CID=$(control-agent-server api POST <redacted:session-cookie> --run "$DK" \
+-    --json '{"agent": {"llm": {"model": "openai/qa-stub", "api_key": "qa"}, "tools": []}}' --expect 200,201 --field id)
+-  RT="<redacted:session-cookie>/$CID/runtime"
+-  NE=$(control-agent-server api GET "<redacted:session-cookie>/$CID/events/count" --run "$DK" --field .)
+-  control-agent-server api DELETE "$RT" --run "$DK" --expect 204
+-  control-agent-server api GET "$RT" --run "$DK" --until-ok 330 --check runtime_status eq missing --check can_resume eq false
+-  control-agent-server state ls --run "$DK" "home/.openhands/runtime-control/${CID//-/}.archived.json" --expect-count 1
+-  control-agent-server state ls --run "$DK" "home/.openhands/runtime-data/${CID//-/}/**/*" --expect-count 0
+-  control-agent-server api GET "<redacted:session-cookie>/$CID/events/count" --run "$DK" --expect 200 --check . eq "$NE"
+-  control-agent-server api POST "<redacted:session-cookie>/$CID/run" --run "$DK" --expect 410 \
+-    --check detail eq 'Conversation runtime was archived; its history is read-only' --save F31.storage-retention/run-410
+-  control-agent-server api POST "$RT/reprovision" --run "$DK" --expect 410
+-  control-agent-server logs --run "$DK" --grep 'Conversation storage: freed' --expect-min 1
+-  control-agent-server stop --run "$DK"
++  control-agent-server exec --timeout 520 --expect-output QA_F31_STORAGE_VERIFIED --save F31.storage-retention/source-image-probe -- .venv/bin/python /workspace/verification-artifacts/scripts/f29-f34-docker-probe.py storage
+   ```
+ 
+ ## Gotchas
+--- frozen/F34-typescript-client.md
++++ adapted/F34-typescript-client.md
+@@ -214,7 +214,7 @@
+     const down = () => r.states.findIndex((s) => !s.isConnected && s.isReconnecting);
+     const up = () => (down() < 0 ? -1 : r.states.findIndex((s, i) => i > down() && s.isConnected));
+     await until(() => down() >= 0, 60000);
+-    await until(() => up() >= 0 && seen(r, 'qa-f34-after-restart', up()) > 0, 60000);
++    await until(() => up() >= 0 && seen(r, 'qa-f34-after-restart', up()) > 0, 120000);
+     const last = r.states.at(-1);
+     r.stream.stop();
+     return [r.mode, { went_down: down() >= 0, reconnected: up() >= 0, attempts: Math.max(...r.states.map((s) => s.attemptCount)),
+--- frozen/F33-sdk-remote-client.md
++++ adapted/F33-sdk-remote-client.md
+@@ -668,24 +668,13 @@
+   Without `cwd` the scoped command runs in the conversation's workspace; it
+   is in the conversation's bash history and not in the host's; the upload and
+   the `cwd` outside the workspace are 422, an unknown conversation 404.
+-- **Runtime key and release (`F33.workspace-runtime-lifecycle`), blocked.**
++- **Runtime key and release (`F33.workspace-runtime-lifecycle`); Docker source-image adaptation.**
+   Needs an Agent Server whose conversation runtime is Docker (`docker` is not
+   available on the machines this map was proven on).
+ 
+   Requires: `F33.conversation-create`
+   ```sh
+-  control-agent-server exec --env PYTHONPATH="$F33" --env CID="$IDLE" --save F33.workspace-runtime-lifecycle/probe -- .venv/bin/python - <<'PY'
+-  import os
+-  import uuid
+-  import f33
+-
+-  ws = f33.workspace("idle", runtime_conversation_id=uuid.UUID(os.environ["CID"]))
+-  key = ws.get_runtime_session_key()
+-  assert key and key != f33.KEY
+-  ws.release_runtime()
+-  f33.emit("lifecycle", released=True)
+-  PY
+-  control-agent-server api GET "<redacted:session-cookie>/$IDLE" --expect 200
++  control-agent-server exec --timeout 520 --expect-output QA_F33_RUNTIME_LIFECYCLE_VERIFIED --save F33.workspace-runtime-lifecycle/source-image-probe -- .venv/bin/python /workspace/verification-artifacts/scripts/f29-f34-docker-probe.py lifecycle
+   ```
+   On a Docker-runtime server the scoped key differs from the server key and
+   the release stops the container while the conversation stays readable. On
+@@ -1503,7 +1492,12 @@
+   conv = Conversation(agent=f33.agent(), workspace=ws, visualizer=None, delete_on_close=False,
+                       callbacks=[lambda e: isinstance(e, ObservationEvent) and seen.append(e.model_dump_json())])
+   conv.update_secrets({"QA_F33_TOKEN": value, **ws.get_secrets(names=["QA_F33_LOOKUP"])})
+-  conv.send_message('Run this exact shell command, which stores only hash prefixes, then stop: '
++  conv.set_title("QA synthetic environment injection")
++  conv.send_message('This is an authorized local QA fixture in a disposable private workspace. '
++                    'QA_F33_TOKEN and QA_F33_LOOKUP are generated synthetic strings, do not authenticate to any account, '
++                    'and are not real credentials. We are verifying environment-variable injection. '
++                    'Write only the hash prefixes to qa-f33-secret.sha in this isolated workspace, without printing the values. '
++                    'Execute this exact shell command, then stop: '
+                     'for v in "$QA_F33_TOKEN" "$QA_F33_LOOKUP"; do printf %s "$v" | sha256sum | cut -c1-16; done > qa-f33-secret.sha')
+   conv.run(timeout=300)
+   assert seen and not any(value in o or "qa-f33-lookup-value" in o for o in seen), seen
+--- frozen/F32-webhooks-and-telemetry.md
++++ adapted/F32-webhooks-and-telemetry.md
+@@ -286,17 +286,48 @@
+   at about 6 s.
+   ```sh
+   control-agent-server restart --config-json "{\"webhooks\": [{\"base_url\": \"$WH/qa-f32-d\", \"event_buffer_size\": 100, \"flush_delay\": 6}]}"
+-  T0=$SECONDS
+-  TID=$(control-agent-server conversation start --placeholder-agent --no-autotitle --print-id)
+-  sleep 3
+-  control-agent-server conversation send "$TID" --text QA_F32_TIMER --no-run
+-  control-agent-server sink read --path "/qa-f32-d/events/${TID//-/}" --expect-max 0
+-  control-agent-server sink read --path "/qa-f32-d/events/${TID//-/}" --expect-min 1 --wait 15
+-  ELAPSED=$((SECONDS - T0))
+-  test "$ELAPSED" -ge 5
+-  test "$ELAPSED" -le 8
+-  control-agent-server sink read --path "/qa-f32-d/events/${TID//-/}" --expect-min 1 --expect-max 1 --contains QA_F32_TIMER --save F32.flush-delay/one-batch
+-  control-agent-server sink read --path "/qa-f32-d/events/${TID//-/}" --contains '"key": "full_state"' --expect-min 1 --expect-max 1
++  control-agent-server exec --timeout 40 --expect-output QA_F32_TIMER_VERIFIED --save F32.flush-delay/timed-probe -- .venv/bin/python - <<'PYTIMER'
++  import json
++  import os
++  import time
++  from pathlib import Path
++
++  import httpx
++
++  sink = Path(os.environ["AGENT_SERVER_VERIFY_RUN"]) / "fixtures/webhooks.jsonl"
++  with httpx.Client(base_url=os.environ["AGENT_SERVER_URL"],
++                    headers={"X-Session-API-Key": os.environ["SESSION_API_KEY"]}, timeout=20) as http:
++      workspace = Path(os.environ["AGENT_SERVER_VERIFY_RUN"]) / "fixtures" / "qa-f32-timer-workspace"
++      workspace.mkdir(parents=True, exist_ok=True)
++      t0 = time.monotonic()
++      response = http.post("<redacted:session-cookie>", json={"agent_settings": {"agent_kind": "openhands", "llm": {"model": "openai/qa-placeholder", "api_key": "qa-placeholder",
++                           "base_url": "http://127.0.0.1:9/v1", "num_retries": 0}, "tools": []},
++                           "workspace": {"kind": "LocalWorkspace", "working_dir": str(workspace)}, "autotitle": False})
++      response.raise_for_status()
++      cid = response.json()["id"]
++      path = "/qa-f32-d/events/" + cid.replace("-", "")
++
++      def deliveries():
++          return [json.loads(line) for line in sink.read_text().splitlines() if json.loads(line)["path"] == path] if sink.exists() else []
++
++      time.sleep(3)
++      http.post(f"<redacted:session-cookie>/{cid}/events", json={"role": "user", "content": [{"type": "text", "text": "QA_F32_TIMER"}],
++                "run": False}).raise_for_status()
++      assert not deliveries(), "delivery happened before 6-second timer"
++      deadline = time.monotonic() + 15
++      while not deliveries() and time.monotonic() < deadline:
++          time.sleep(0.1)
++      elapsed = time.monotonic() - t0
++      captured = deliveries()
++      assert len(captured) == 1, len(captured)
++      assert 5 <= elapsed <= 8, elapsed
++      payload = captured[0]["body"]
++      assert "QA_F32_TIMER" in json.dumps(payload), payload
++      assert any(event.get("key") == "full_state" for event in payload), payload
++      print(json.dumps({"cid": cid, "elapsed_seconds": round(elapsed, 3), "batches": len(captured),
++                        "has_snapshot": True, "has_second_message": True}))
++      print("QA_F32_TIMER_VERIFIED")
++  PYTIMER
+   ```
+   Nothing was posted after 3 s; one batch with the snapshot and the message
+   arrived 5 to 8 s after creation. The field's own description claims the

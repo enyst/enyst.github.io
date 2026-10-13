@@ -1,0 +1,15 @@
+{
+  "file": "F20-llm-profiles.md",
+  "bullet": "Unreachable endpoint is slow (`F20.validate-unreachable-bounded`), known bug.",
+  "ids": [
+    "F20.validate-unreachable-bounded"
+  ],
+  "line": 578,
+  "script": "control-agent-server api POST /api/profiles/qa-unreachable/validate --timeout 240 --expect 200 \\\n  --json '{\"llm\": {\"model\": \"openai/qa-unreachable\", \"base_url\": \"http://127.0.0.1:9/v1\", \"api_key\": \"<redacted:api_key>\"}}' \\\n  --check valid eq false --check error.type eq LLMServiceUnavailableError \\\n  --save F20.validate-unreachable-bounded/default-retries | tee \"$F20/unreachable.json\"\njq -e '.elapsed_ms <= 30000' \"$F20/unreachable.json\"  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 132210,
+  "failed_line": 5,
+  "failed_command": "jq -e '.elapsed_ms <= 30000' \"$F20/unreachable.json\"",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/profiles/qa-unreachable/validate\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"llm\": {\n        \"model\": \"openai/qa-unreachable\",\n        \"base_url\": \"http://127.0.0.1:9/v1\",\n        \"api_key\": \"<redacted:api_key>\"\n      }\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"159\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"valid\": false,\n      \"error\": {\n        \"type\": \"LLMServiceUnavailableError\",\n        \"message\": \"litellm.InternalServerError: InternalServerError: OpenAIException - Connection error.\"\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 123728,\n  \"checks\": [\n    {\n      \"check\": \"valid eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"error.type eq LLMServiceUnavailableError\",\n      \"ok\": true,\n      \"actual\": \"LLMServiceUnavailableError\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021919-4f6c-map-f20/evidence/F20.validate-unreachable-bounded/default-retries.json\"\n}\nfalse\n",
+  "stderr": ""
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F24-openai-subscription.md",
+  "bullet": "Pending logins and restarts (`F24.pending-lost-on-restart`).",
+  "ids": [
+    "F24.pending-lost-on-restart"
+  ],
+  "line": 389,
+  "script": "DC2=$(control-agent-server api POST /api/llm/subscription/openai/device/start --expect 200 --field device_code)\ncontrol-agent-server api POST /api/llm/subscription/openai/device/poll --json \"{\\\"device_code\\\": \\\"$DC2\\\"}\" --expect 200 \\\n  --check connected eq false\ncontrol-agent-server restart\ncontrol-agent-server api POST /api/llm/subscription/openai/device/poll --json \"{\\\"device_code\\\": \\\"$DC2\\\"}\" --expect 404 \\\n  --check detail eq 'Subscription device login not found or expired' --save F24.pending-lost-on-restart/poll-after-restart\n",
+  "exit_code": 0,
+  "elapsed_ms": 34618,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/llm/subscription/openai/device/poll\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"device_code\": \"<redacted:device_code>\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"76\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"vendor\": \"openai\",\n      \"connected\": false,\n      \"account_email\": null,\n      \"expires_at\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 279,\n  \"checks\": [\n    {\n      \"check\": \"connected eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24\",\n  \"url\": \"http://127.0.0.1:53673\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 13322,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/llm/subscription/openai/device/poll\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"device_code\": \"<redacted:device_code>\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"59\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Subscription device login not found or expired\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 379,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Subscription device login not found or expired\",\n      \"ok\": true,\n      \"actual\": \"Subscription device login not found or expired\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025101-09f6-map-f24/evidence/F24.pending-lost-on-restart/poll-after-restart.json\"\n}\n",
+  "stderr": ""
+}

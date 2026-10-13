@@ -1,0 +1,15 @@
+{
+  "file": "F34-typescript-client.md",
+  "bullet": "Unknown event id (`F34.events-unknown-id`), known bug.",
+  "ids": [
+    "F34.events-unknown-id"
+  ],
+  "line": 775,
+  "script": "cat > \"$F34/unknown-event.mjs\" <<'JS'\nimport { writeFileSync } from 'node:fs';\nimport { m, host, apiKey, F34, NOPE, assert } from './lib.mjs';\nconst events = new m.RemoteEventsList({ baseUrl: host, apiKey }, process.argv[2]);\nconst [first] = (await events.search({ limit: 1 })).items;\nassert.equal((await events.getEventById(first.id)).id, first.id);\nconst settle = (promise) => promise.then((value) => ({ value }),\n  (e) => ({ http_error: m.isHttpError(e), status: e.status, response: e.response }));\nconst single = await settle(events.getEventById(NOPE).then((e) => e.id));\nconst batch = await settle(events.getEventsById([first.id, NOPE]).then((list) => list.map((e) => e && e.id)));\nwriteFileSync(`${F34}/unknown-event.json`, JSON.stringify({ first: first.id, single, batch }));\nconsole.log('QA_F34_UNKNOWN_EVENT_READ');\nJS\ncontrol-agent-server exec --timeout 60 --expect-output QA_F34_UNKNOWN_EVENT_READ --save F34.events-unknown-id/program -- node \"$F34/unknown-event.mjs\" \"$SCID\"\ncat \"$F34/unknown-event.json\"\njq -e '.single.http_error and .single.status == 404' \"$F34/unknown-event.json\"  # bug\njq -e '.batch.value == [.first, null]' \"$F34/unknown-event.json\"  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 7279,
+  "failed_line": 16,
+  "failed_command": "jq -e '.single.http_error and .single.status == 404' \"$F34/unknown-event.json\"",
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 5740,\n  \"stdout_tail\": \"QA_F34_UNKNOWN_EVENT_READ\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024756-c705-map-f34/evidence/F34.events-unknown-id/program.json\"\n}\n{\"first\":\"70162ca0-d091-4686-987f-f784e7e53564\",\"single\":{\"http_error\":true,\"status\":500,\"response\":{\"detail\":\"Internal Server Error\",\"exception\":\"'Unknown event_id: 00000000-0000-0000-0000-000000000000'\",\"error_id\":\"6c284fb7f6ce46d3a80524fddd3084dd\"}},\"batch\":{\"http_error\":true,\"status\":500,\"response\":{\"detail\":\"Internal Server Error\",\"exception\":\"'Unknown event_id: 00000000-0000-0000-0000-000000000000'\",\"error_id\":\"0230e9e6da4b48748ceed81033d4370a\"}}}false\n",
+  "stderr": ""
+}

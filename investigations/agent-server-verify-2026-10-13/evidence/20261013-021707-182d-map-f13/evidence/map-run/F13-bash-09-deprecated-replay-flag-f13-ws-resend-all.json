@@ -1,0 +1,15 @@
+{
+  "file": "F13-bash.md",
+  "bullet": "Deprecated replay flag (`F13.ws-resend-all`).",
+  "ids": [
+    "F13.ws-resend-all"
+  ],
+  "line": 283,
+  "script": "NDEP=$(control-agent-server logs --grep 'resend_all is deprecated' | jq .total_matching)\ncontrol-agent-server ws listen /sockets/bash-events --query resend_all=true --until-kind BashOutput \\\n  --until command_id=\"$EXEC_CMD\" --duration 10 --show 0 --save F13.ws-resend-all/replay\ncontrol-agent-server logs --grep 'resend_all is deprecated' --expect-min $((NDEP + 1))\ncontrol-agent-server ws listen /sockets/bash-events --send '{\"command\": \"echo QA_F13_NO_REPLAY\"}' \\\n  --until-kind BashOutput --until exit_code=0 --expect-frames 2 --duration 15 --save F13.ws-resend-all/no-replay\n",
+  "exit_code": 0,
+  "elapsed_ms": 2913,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"path\": \"/sockets/bash-events\",\n  \"opened\": true,\n  \"frames\": 2,\n  \"kinds\": {\n    \"BashCommand\": 1,\n    \"BashOutput\": 1\n  },\n  \"stopped\": \"until-kind BashOutput\",\n  \"close\": null,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021707-182d-map-f13/evidence/F13.ws-resend-all/replay.json\",\n  \"first_frames\": []\n}\n{\n  \"ok\": true,\n  \"log\": \"/workspace/verification-artifacts/runs/20261013-021707-182d-map-f13/private/server.log\",\n  \"lines\": [\n    \"[10/13/26 02:18:26] WARNING  resend_all is deprecated, use        sockets.py:437\"\n  ],\n  \"total_matching\": 1\n}\n{\n  \"ok\": true,\n  \"path\": \"/sockets/bash-events\",\n  \"opened\": true,\n  \"frames\": 2,\n  \"kinds\": {\n    \"BashCommand\": 1,\n    \"BashOutput\": 1\n  },\n  \"stopped\": \"until-kind BashOutput\",\n  \"close\": null,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021707-182d-map-f13/evidence/F13.ws-resend-all/no-replay.json\",\n  \"first_frames\": [\n    {\n      \"kind\": \"BashCommand\",\n      \"frame\": {\n        \"command\": \"echo QA_F13_NO_REPLAY\",\n        \"cwd\": null,\n        \"timeout\": 300,\n        \"id\": \"63619c229866443fb60e920d6ec6a132\",\n        \"timestamp\": \"2026-10-13T02:18:28.379933Z\",\n        \"kind\": \"BashCommand\"\n      }\n    },\n    {\n      \"kind\": \"BashOutput\",\n      \"frame\": {\n        \"id\": \"9b0787fc8598405d9c325592a2d0a942\",\n        \"timestamp\": \"2026-10-13T02:18:28.387910Z\",\n        \"command_id\": \"63619c229866443fb60e920d6ec6a132\",\n        \"order\": 0,\n        \"exit_code\": 0,\n        \"stdout\": \"QA_F13_NO_REPLAY\\n\",\n        \"stderr\": null,\n        \"kind\": \"BashOutput\"\n      }\n    }\n  ]\n}\n",
+  "stderr": ""
+}

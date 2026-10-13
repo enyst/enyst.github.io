@@ -1,0 +1,15 @@
+{
+  "file": "F19-mcp.md",
+  "bullet": "Unknown jobs (`F19.oauth-unknown-job`).",
+  "ids": [
+    "F19.oauth-unknown-job"
+  ],
+  "line": 484,
+  "script": "control-agent-server api GET /api/mcp/oauth/status/qa-f19-nope --expect 404 --check detail eq 'MCP OAuth job not found' --save F19.oauth-unknown-job/status\ncontrol-agent-server api POST /api/mcp/oauth/callback/qa-f19-nope --json '{\"callback_url\":\"http://127.0.0.1:1/callback\"}' --expect 404 \\\n  --check detail eq 'MCP OAuth job not found'\ncontrol-agent-server api POST /api/mcp/oauth/callback/qa-f19-nope --json '{}' --expect 422\n",
+  "exit_code": 0,
+  "elapsed_ms": 8531,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/mcp/oauth/status/qa-f19-nope\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"36\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"MCP OAuth job not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 460,\n  \"checks\": [\n    {\n      \"check\": \"detail eq MCP OAuth job not found\",\n      \"ok\": true,\n      \"actual\": \"MCP OAuth job not found\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/F19.oauth-unknown-job/status.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/mcp/oauth/callback/qa-f19-nope\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"callback_url\": \"http://127.0.0.1:1/callback\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"36\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"MCP OAuth job not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 481,\n  \"checks\": [\n    {\n      \"check\": \"detail eq MCP OAuth job not found\",\n      \"ok\": true,\n      \"actual\": \"MCP OAuth job not found\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 422,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/mcp/oauth/callback/qa-f19-nope\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {},\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 422,\n    \"headers\": {\n      \"content-length\": \"95\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": [\n        {\n          \"type\": \"missing\",\n          \"loc\": [\n            \"body\",\n            \"callback_url\"\n          ],\n          \"msg\": \"Field required\",\n          \"input\": {}\n        }\n      ]\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 564\n}\n",
+  "stderr": ""
+}

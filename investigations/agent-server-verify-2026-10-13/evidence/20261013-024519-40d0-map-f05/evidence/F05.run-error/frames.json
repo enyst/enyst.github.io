@@ -1,0 +1,274 @@
+{
+  "capture": "f05-e-error",
+  "frames": [
+    {
+      "direction": "opened",
+      "at": "2026-10-13T02:46:30Z"
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:46:30Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "bce4a3f7-ebeb-4e8e-82ad-f7767a1888e6",
+        "timestamp": "2026-10-13T02:46:30.742567",
+        "source": "environment",
+        "key": "full_state",
+        "value": {
+          "id": "6b0fdf90-2643-4c0f-8e3d-249ba10155f3",
+          "agent": {
+            "llm": {
+              "model": "openai/qa-offline",
+              "api_key": "<redacted:api_key>",
+              "auth_type": "api_key",
+              "base_url": "http://127.0.0.1:9/v1",
+              "openrouter_site_url": "https://docs.all-hands.dev/",
+              "openrouter_app_name": "OpenHands",
+              "num_retries": 0,
+              "retry_multiplier": 8.0,
+              "retry_min_wait": 8,
+              "retry_max_wait": 64,
+              "timeout": 300,
+              "stream_idle_timeout": 300.0,
+              "max_message_chars": 30000,
+              "api_mode": "auto",
+              "capability_overrides": {},
+              "stream": false,
+              "drop_params": true,
+              "disable_stop_word": false,
+              "caching_prompt": true,
+              "log_completions": false,
+              "log_completions_folder": "logs/completions",
+              "native_tool_calling": true,
+              "reasoning_effort": "high",
+              "enable_encrypted_reasoning": true,
+              "prompt_cache_retention": "24h",
+              "extended_thinking_budget": 200000,
+              "usage_id": "default",
+              "litellm_extra_body": {},
+              "is_subscription": false
+            },
+            "tools": [],
+            "mcp_config": {},
+            "include_default_tools": [
+              "FinishTool",
+              "ThinkTool"
+            ],
+            "system_prompt_filename": "system_prompt.j2",
+            "security_policy_filename": "security_policy.j2",
+            "system_prompt_kwargs": {
+              "llm_security_analyzer": true
+            },
+            "tool_concurrency_limit": 1,
+            "kind": "Agent"
+          },
+          "workspace": {
+            "working_dir": "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/fixtures/workspaces/024611-563899",
+            "kind": "LocalWorkspace"
+          },
+          "persistence_dir": "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/server/workspace/conversations/6b0fdf9026434c0f8e3d249ba10155f3",
+          "max_iterations": 500,
+          "stuck_detection": true,
+          "execution_status": "idle",
+          "confirmation_policy": {
+            "kind": "NeverConfirm"
+          },
+          "activated_knowledge_skills": [],
+          "activated_path_rules": [],
+          "invoked_skills": [],
+          "blocked_actions": {},
+          "blocked_messages": {},
+          "last_user_message_id": "1b97a75f-3b75-453a-8a96-72cfc1293487",
+          "leaf_event_id": "1b97a75f-3b75-453a-8a96-72cfc1293487",
+          "head_is_empty": false,
+          "stats": {
+            "usage_to_metrics": {
+              "default": {
+                "model_name": "openai/qa-offline",
+                "accumulated_cost": 0.0,
+                "accumulated_token_usage": {
+                  "model": "openai/qa-offline",
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "context_window": 0,
+                  "per_turn_token": 0,
+                  "response_id": ""
+                },
+                "costs": [],
+                "response_latencies": [],
+                "token_usages": []
+              }
+            }
+          },
+          "secret_registry": {
+            "secret_sources": {}
+          },
+          "tags": {},
+          "agent_state": {}
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:46:32Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "02011bb7-c6a0-4225-bf54-e933e0295c97",
+        "timestamp": "2026-10-13T02:46:32.680481",
+        "source": "environment",
+        "parent_id": "1b97a75f-3b75-453a-8a96-72cfc1293487",
+        "key": "execution_status",
+        "value": "running",
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:46:42Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "3d7e5f17-6738-4caa-af8b-9771260438da",
+        "timestamp": "2026-10-13T02:46:34.059883",
+        "source": "environment",
+        "parent_id": "1b97a75f-3b75-453a-8a96-72cfc1293487",
+        "key": "execution_status",
+        "value": "error",
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:46:42Z",
+      "kind": "ConversationErrorEvent",
+      "frame": {
+        "id": "8b49fff6-3838-4b8d-8a32-d0092f33d9a6",
+        "timestamp": "2026-10-13T02:46:34.063165",
+        "source": "environment",
+        "parent_id": "1b97a75f-3b75-453a-8a96-72cfc1293487",
+        "code": "LLMServiceUnavailableError",
+        "detail": "litellm.InternalServerError: InternalServerError: OpenAIException - Connection error.",
+        "classification": {
+          "kind": "transient",
+          "retryable": true,
+          "user_action": "retry"
+        },
+        "kind": "ConversationErrorEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:46:42Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "96fd8818-7071-4991-a320-6c9559952a0c",
+        "timestamp": "2026-10-13T02:46:42.542954",
+        "source": "environment",
+        "key": "full_state",
+        "value": {
+          "id": "6b0fdf90-2643-4c0f-8e3d-249ba10155f3",
+          "agent": {
+            "llm": {
+              "model": "openai/qa-offline",
+              "api_key": "<redacted:api_key>",
+              "auth_type": "api_key",
+              "base_url": "http://127.0.0.1:9/v1",
+              "openrouter_site_url": "https://docs.all-hands.dev/",
+              "openrouter_app_name": "OpenHands",
+              "num_retries": 0,
+              "retry_multiplier": 8.0,
+              "retry_min_wait": 8,
+              "retry_max_wait": 64,
+              "timeout": 300,
+              "stream_idle_timeout": 300.0,
+              "max_message_chars": 30000,
+              "api_mode": "auto",
+              "capability_overrides": {},
+              "stream": false,
+              "drop_params": true,
+              "disable_stop_word": false,
+              "caching_prompt": true,
+              "log_completions": false,
+              "log_completions_folder": "logs/completions",
+              "native_tool_calling": true,
+              "reasoning_effort": "high",
+              "enable_encrypted_reasoning": true,
+              "prompt_cache_retention": "24h",
+              "extended_thinking_budget": 200000,
+              "usage_id": "default",
+              "litellm_extra_body": {},
+              "is_subscription": false
+            },
+            "tools": [],
+            "mcp_config": {},
+            "include_default_tools": [
+              "FinishTool",
+              "ThinkTool"
+            ],
+            "system_prompt_filename": "system_prompt.j2",
+            "security_policy_filename": "security_policy.j2",
+            "system_prompt_kwargs": {
+              "llm_security_analyzer": true
+            },
+            "tool_concurrency_limit": 1,
+            "kind": "Agent"
+          },
+          "workspace": {
+            "working_dir": "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/fixtures/workspaces/024611-563899",
+            "kind": "LocalWorkspace"
+          },
+          "persistence_dir": "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/server/workspace/conversations/6b0fdf9026434c0f8e3d249ba10155f3",
+          "max_iterations": 500,
+          "stuck_detection": true,
+          "execution_status": "error",
+          "confirmation_policy": {
+            "kind": "NeverConfirm"
+          },
+          "activated_knowledge_skills": [],
+          "activated_path_rules": [],
+          "invoked_skills": [],
+          "blocked_actions": {},
+          "blocked_messages": {},
+          "last_user_message_id": "1b97a75f-3b75-453a-8a96-72cfc1293487",
+          "leaf_event_id": "8b49fff6-3838-4b8d-8a32-d0092f33d9a6",
+          "head_is_empty": false,
+          "stats": {
+            "usage_to_metrics": {
+              "default": {
+                "model_name": "openai/qa-offline",
+                "accumulated_cost": 0.0,
+                "accumulated_token_usage": {
+                  "model": "openai/qa-offline",
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "context_window": 0,
+                  "per_turn_token": 0,
+                  "response_id": ""
+                },
+                "costs": [],
+                "response_latencies": [],
+                "token_usages": []
+              }
+            }
+          },
+          "secret_registry": {
+            "secret_sources": {}
+          },
+          "tags": {},
+          "agent_state": {}
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "stopped",
+      "at": "2026-10-13T02:46:45Z"
+    }
+  ]
+}

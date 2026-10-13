@@ -1,0 +1,74 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_deepseek-flash",
+      "messages": [
+        {
+          "role": "user",
+          "content": "QA_F30_STREAM_2: reply with one short word and use no tools."
+        }
+      ],
+      "stream": true
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "x-openhands-serverconversation-id": "8482ee3c-6d2a-4efd-8852-4c4f117808f9",
+      "content-type": "text/event-stream; charset=utf-8"
+    },
+    "body": {
+      "frames": [
+        {
+          "id": "chatcmpl-8091f997feca4cf38b4978e72eb830de",
+          "choices": [
+            {
+              "delta": {
+                "role": "assistant"
+              },
+              "index": 0
+            }
+          ],
+          "created": 1791857991,
+          "model": "openhands_deepseek-flash",
+          "object": "chat.completion.chunk"
+        },
+        {
+          "id": "chatcmpl-8091f997feca4cf38b4978e72eb830de",
+          "choices": [
+            {
+              "delta": {
+                "content": "Hello"
+              },
+              "index": 0
+            }
+          ],
+          "created": 1791857991,
+          "model": "openhands_deepseek-flash",
+          "object": "chat.completion.chunk"
+        },
+        {
+          "id": "chatcmpl-8091f997feca4cf38b4978e72eb830de",
+          "choices": [
+            {
+              "delta": {},
+              "finish_reason": "stop",
+              "index": 0
+            }
+          ],
+          "created": 1791857991,
+          "model": "openhands_deepseek-flash",
+          "object": "chat.completion.chunk"
+        },
+        "[DONE]"
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 2939
+}

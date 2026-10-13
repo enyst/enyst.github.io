@@ -1,0 +1,15 @@
+{
+  "file": "F02-auth-and-sessions.md",
+  "bullet": "Default bind address (`F02.default-bind`).",
+  "ids": [
+    "F02.default-bind"
+  ],
+  "line": 451,
+  "script": "QA_F02_PYTHON=\"$(jq -r .checkout \"$AGENT_SERVER_VERIFY_RUN/run.json\")/.venv/bin/python\"\ncontrol-agent-server exec --save F02.default-bind/no-key --expect-output 'Starting OpenHands Agent Server on 127.0.0.1:8000' \\\n  --expect-output 'listening on 127.0.0.1:8000' --reject-output 'Binding to all interfaces' -- \\\n  unshare -rn env -i PATH=\"$PATH\" QA_F02_PYTHON=\"$QA_F02_PYTHON\" bash \"$F02/bind.sh\" \"$F02/bind-no-key\"\ncontrol-agent-server exec --save F02.default-bind/with-key --expect-output 'Starting OpenHands Agent Server on 0.0.0.0:8000' \\\n  --expect-output 'listening on 0.0.0.0:8000' --reject-output 'Binding to all interfaces' -- \\\n  unshare -rn env -i PATH=\"$PATH\" QA_F02_PYTHON=\"$QA_F02_PYTHON\" OH_SESSION_API_KEYS_0=qa-f02-bind-key bash \"$F02/bind.sh\" \"$F02/bind-key\"\ncontrol-agent-server exec --save F02.default-bind/wildcard-no-key --expect-output 'listening on 0.0.0.0:8000' \\\n  --expect-output 'Binding to all interfaces (0.0.0.0) without a session API key' -- \\\n  unshare -rn env -i PATH=\"$PATH\" QA_F02_PYTHON=\"$QA_F02_PYTHON\" bash \"$F02/bind.sh\" \"$F02/bind-wildcard\" --host 0.0.0.0\n",
+  "exit_code": 1,
+  "elapsed_ms": 1494,
+  "failed_line": 2,
+  "failed_command": "control-agent-server exec --save F02.default-bind/no-key --expect-output 'Starting OpenHands Agent Server on 127.0.0.1:8000' --expect-output 'listening on 127.0.0.1:8000' --reject-output 'Binding to all interfaces' -- unshare -rn env -i PATH=\"$PATH\" QA_F02_PYTHON=\"$QA_F02_PYTHON\" bash \"$F02/bind.sh\" \"$F02/bind-no-key\"",
+  "stdout": "{\n  \"ok\": false,\n  \"exit_code\": 1,\n  \"elapsed_ms\": 25,\n  \"stdout_tail\": \"\",\n  \"stderr_tail\": \"unshare: cannot open /proc/self/uid_map: Read-only file system\\n\",\n  \"hint\": {\n    \"missing\": [\n      \"Starting OpenHands Agent Server on 127.0.0.1:8000\",\n      \"listening on 127.0.0.1:8000\"\n    ],\n    \"unexpected\": []\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024124-a231-map-f02/evidence/F02.default-bind/no-key.json\"\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F11-goals.md",
+  "bullet": "Goal status on the socket (`F11.goal-ws`).",
+  "ids": [
+    "F11.goal-ws"
+  ],
+  "line": 240,
+  "script": "control-agent-server ws read f11-g --kinds ConversationStateUpdateEvent --contains '\"key\": \"goal\", \"value\": {\"active\": true, \"status\": \"running\", \"iteration\": 0'\ncontrol-agent-server ws stop f11-g --kinds ConversationStateUpdateEvent --contains '\"key\": \"goal\", \"value\": {\"active\": false, \"status\": \"complete\"' --expect-min 1 --save F11.goal-ws/frames\n",
+  "exit_code": 0,
+  "elapsed_ms": 7392,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"capture\": \"f11-g\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-022002-af50-map-f11/captures/f11-g.jsonl\",\n  \"opened\": true,\n  \"stopped\": null,\n  \"frames\": 33,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 20,\n    \"SystemPromptEvent\": 1,\n    \"MessageEvent\": 2,\n    \"ActionEvent\": 5,\n    \"ObservationEvent\": 5\n  },\n  \"close\": null,\n  \"matching\": 1,\n  \"matching_kinds\": [\n    \"ConversationStateUpdateEvent\"\n  ],\n  \"frames_shown\": [\n    {\n      \"kind\": \"ConversationStateUpdateEvent\",\n      \"frame\": \"{\\\"id\\\": \\\"ab653781-b35f-4257-bd68-d36f7cb1392a\\\", \\\"timestamp\\\": \\\"2026-10-13T02:23:18.036979\\\", \\\"source\\\": \\\"environment\\\", \\\"key\\\": \\\"goal\\\", \\\"value\\\": {\\\"active\\\": true, \\\"status\\\": \\\"running\\\", \\\"iteration\\\": 0, \\\"max_iterations\\\": 3, \\\"objective\\\": \\\"Create a file named qa-goal.txt in the current directory containing exactly: hi. Then show its contents with cat.\\\", \\\"verdict\\\": null}, \\\"kind\\\": \\\"ConversationStateUpdateEvent\\\"\\u2026\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"capture\": \"f11-g\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-022002-af50-map-f11/captures/f11-g.jsonl\",\n  \"opened\": true,\n  \"stopped\": \"stopped\",\n  \"frames\": 33,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 20,\n    \"SystemPromptEvent\": 1,\n    \"MessageEvent\": 2,\n    \"ActionEvent\": 5,\n    \"ObservationEvent\": 5\n  },\n  \"close\": null,\n  \"matching\": 1,\n  \"matching_kinds\": [\n    \"ConversationStateUpdateEvent\"\n  ],\n  \"frames_shown\": [\n    {\n      \"kind\": \"ConversationStateUpdateEvent\",\n      \"frame\": \"{\\\"id\\\": \\\"70ec7c44-6788-4fb9-8cf5-7dd1b82d5bdc\\\", \\\"timestamp\\\": \\\"2026-10-13T02:23:51.242005\\\", \\\"source\\\": \\\"environment\\\", \\\"parent_id\\\": \\\"70d7d79f-2033-4371-afea-fa4db8cc2d2e\\\", \\\"key\\\": \\\"goal\\\", \\\"value\\\": {\\\"active\\\": false, \\\"status\\\": \\\"complete\\\", \\\"iteration\\\": 2, \\\"max_iterations\\\": 3, \\\"objective\\\": \\\"Create a file named qa-goal.txt in the current directory containing exactly: hi. Then show its contents with cat.\\\", \\\"\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022002-af50-map-f11/evidence/F11.goal-ws/frames.json\"\n}\n",
+  "stderr": ""
+}

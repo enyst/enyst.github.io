@@ -1,0 +1,15 @@
+{
+  "file": "F15-git.md",
+  "bullet": "Python SDK workspace (`F15.sdk-workspace`).",
+  "ids": [
+    "F15.sdk-workspace"
+  ],
+  "line": 576,
+  "script": "cat > \"$F/sdk_git.py\" <<'PY'\nimport os\nimport sys\nfrom uuid import UUID\n\nimport httpx\n\nfrom openhands.sdk.workspace.remote.base import RemoteWorkspace\n\nrepo, cid = sys.argv[1], sys.argv[2]\nhost, key = os.environ[\"AGENT_SERVER_URL\"], os.environ[\"SESSION_API_KEY\"]\nplain = RemoteWorkspace(host=host, api_key=key, working_dir=repo)\nscoped = RemoteWorkspace(host=host, api_key=key, working_dir=repo, runtime_conversation_id=UUID(cid))\nfor ws in (plain, scoped):\n    changes = [(c.status.value, c.path.as_posix()) for c in ws.git_changes(\".\")]\n    assert changes == [(\"UPDATED\", \"README.md\"), (\"ADDED\", \"notes.txt\")], changes\n    diff = ws.git_diff(\"README.md\")\n    assert diff.original == \"# QA fixture repo\\n\\nCreated by control-agent-server.\", diff\n    assert diff.modified == \"# QA fixture repo\\n\\nModified, not committed.\", diff\ntry:\n    scoped.git_changes(\"/\")\nexcept httpx.HTTPStatusError as e:\n    assert e.response.status_code == 422, e\nelse:\n    raise AssertionError(\"scoped git_changes('/') was not refused\")\nprint(\"SDK_GIT_OK\")\nPY\ncontrol-agent-server exec --expect-output SDK_GIT_OK --save F15.sdk-workspace/program -- uv run python \"$F/sdk_git.py\" \"$REPO\" \"$CID\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 21221,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 20276,\n  \"stdout_tail\": \"SDK_GIT_OK\\n\",\n  \"stderr_tail\": \"+----------------------------------------------------------------------+\\n|  OpenHands SDK v1.54.0                                               |\\n|                                                                      |\\n|  Report a bug: github.com/<redacted:unrelated-repository>/issues        |\\n|  Get help: openhands.dev/joinslack                                   |\\n|  Scale up: openhands.dev/product/sdk                                 |\\n|                                                                      |\\n|  Set OPENHANDS_SUPPRESS_BANNER=1 to hide this message                |\\n+----------------------------------------------------------------------+\\n\\n\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.sdk-workspace/program.json\"\n}\n",
+  "stderr": ""
+}

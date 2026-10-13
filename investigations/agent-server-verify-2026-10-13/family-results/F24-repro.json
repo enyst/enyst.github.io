@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "file": "F24-openai-subscription.md",
+  "summary": {
+    "pass": 1,
+    "fail": 0,
+    "xfail": 2,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 88,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 11984,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24/evidence/map-run/F24-openai-subscription-00-preconditions.json"
+    },
+    {
+      "bullet": "Status with an expired login offline (`F24.status-offline`), known bug.",
+      "ids": [
+        "F24.status-offline"
+      ],
+      "line": 459,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 30145,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24/evidence/map-run/F24-openai-subscription-01-status-with-an-expired-login-offline-f24.json",
+      "failed_line": 8,
+      "failed_command": "control-agent-server api GET /api/llm/subscription/openai/status --run \"$OFF\" --expect 200 --check connected eq false --save F24.status-offline/status",
+      "stdout_tail": "endor\": \"openai\",\n      \"connected\": true,\n      \"account_email\": null,\n      \"expires_at\": 1791866902000\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 879,\n  \"checks\": [\n    {\n      \"check\": \"connected eq true\",\n      \"ok\": true,\n      \"actual\": \"true\"\n    },\n    {\n      \"check\": \"expires_at eq 1791866902000\",\n      \"ok\": true,\n      \"actual\": \"1791866902000\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/llm/subscription/openai/status\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"125\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"All connection attempts failed\",\n      \"error_id\": \"d841b36733424f538517674fb4202af9\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1247,\n  \"checks\": [\n    {\n      \"check\": \"connected eq false\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034812-81fc-f24-offline/evidence/F24.status-offline/status.json\",\n  \"hint\": \"expected 200, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Start and poll a login offline (`F24.device-start-offline`), known bug.",
+      "ids": [
+        "F24.device-start-offline"
+      ],
+      "line": 487,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 35810,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24/evidence/map-run/F24-openai-subscription-02-start-and-poll-a-login-offline-f24-devic.json",
+      "failed_line": 9,
+      "failed_command": "control-agent-server api POST /api/llm/subscription/openai/device/start --run \"$OUTAGE\" --expect 502,503,504 --save F24.device-start-offline/start",
+      "stdout_tail": "65tHGuNejNVARFTTr8BHLegk\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"76\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"vendor\": \"openai\",\n      \"connected\": false,\n      \"account_email\": null,\n      \"expires_at\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 255,\n  \"checks\": [\n    {\n      \"check\": \"connected eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/llm/subscription/openai/device/start\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"125\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"All connection attempts failed\",\n      \"error_id\": \"4df92b1dbf2b4449b1280ec31f0ee79b\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 2256,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034843-3ace-f24-outage/evidence/F24.device-start-offline/start.json\",\n  \"hint\": \"expected 502,503,504, got 500\"\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-034748-623a-map-f24",
+  "launch_flags": []
+}

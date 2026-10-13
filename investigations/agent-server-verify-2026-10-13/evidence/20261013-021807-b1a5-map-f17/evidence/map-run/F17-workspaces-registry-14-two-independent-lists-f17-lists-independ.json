@@ -1,0 +1,15 @@
+{
+  "file": "F17-workspaces-registry.md",
+  "bullet": "Two independent lists (`F17.lists-independent`).",
+  "ids": [
+    "F17.lists-independent"
+  ],
+  "line": 402,
+  "script": "control-agent-server api POST /api/workspaces/parents --json-file \"$F17/plain-parent.json\" --expect 200 \\\n  --check workspaceParents len-eq 2 --check workspaceParents.1.path eq \"$PLAIN\" \\\n  --check workspaces len-eq 6 --check workspaces.1.path eq \"$PLAIN\"\ncontrol-agent-server api DELETE /api/workspaces/parents --query \"path=$REPO\" --expect 404 --check detail eq 'Workspace parent not found'\ncontrol-agent-server api DELETE /api/workspaces --query path=/qa-f17/other-parent --expect 404 --check detail eq 'Workspace not found'\ncontrol-agent-server api DELETE /api/workspaces --query \"path=$PLAIN\" --expect 200 --check deleted eq true\ncontrol-agent-server api GET /api/workspaces --check workspaces len-eq 5 --check workspaces not-contains \"$PLAIN\" \\\n  --check workspaceParents len-eq 2 --check workspaceParents.1.path eq \"$PLAIN\" --save F17.lists-independent/after\n",
+  "exit_code": 1,
+  "elapsed_ms": 1223,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api POST /api/workspaces/parents --json-file \"$F17/plain-parent.json\" --expect 200 --check workspaceParents len-eq 2 --check workspaceParents.1.path eq \"$PLAIN\" --check workspaces len-eq 6 --check workspaces.1.path eq \"$PLAIN\"",
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6036, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6000, in main\n    result = func(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 1240, in cmd_api\n    body = read_body(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 1143, in read_body\n    return json.loads(Path(args.json_file).read_text())\n                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 548, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_abc.py\", line 632, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 539, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/plain-parent.json'\n"
+}

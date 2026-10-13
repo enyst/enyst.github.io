@@ -1,0 +1,40 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/meta-profiles/qa-bad",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "classifier_model": "deepseek-flash",
+      "prompt_template": "Pick a model"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "332",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body"
+          ],
+          "msg": "Value error, Direct-routing meta-profiles must include {{ instance_text }} in prompt_template.",
+          "input": {
+            "classifier_model": "deepseek-flash",
+            "prompt_template": "Pick a model"
+          },
+          "ctx": {
+            "error": "Direct-routing meta-profiles must include {{ instance_text }} in prompt_template."
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 44
+}

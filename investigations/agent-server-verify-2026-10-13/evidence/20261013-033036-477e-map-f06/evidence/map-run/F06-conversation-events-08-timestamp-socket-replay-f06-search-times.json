@@ -1,0 +1,15 @@
+{
+  "file": "F06-conversation-events.md",
+  "bullet": "Timestamp socket replay (`F06.search-timestamp-replay`), known bug.",
+  "ids": [
+    "F06.search-timestamp-replay"
+  ],
+  "line": 709,
+  "script": "OBS_ID=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" --query kind=openhands.sdk.event.llm_convertible.observation.ObservationEvent --check items len-ge 1 --field items.0.id)\nOBS_T=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/$OBS_ID\" --check id eq \"$OBS_ID\" --field timestamp)\nFROM_OBS=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" --field items | jq -e --arg id \"$OBS_ID\" '[.[].id] | length - index($id)')\ntest \"$FROM_OBS\" -ge 2\ncontrol-agent-server ws listen \"/sockets/events/$LIVE\" --query resend_mode=since --query after_timestamp=\"$OBS_T\" --duration 3 --save F06.search-timestamp-replay/socket | jq -e --argjson n \"$FROM_OBS\" '.frames - 1 >= $n'  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 4486,
+  "failed_line": 5,
+  "failed_command": "jq -e --argjson n \"$FROM_OBS\" '.frames - 1 >= $n'",
+  "stdout": "false\n",
+  "stderr": ""
+}

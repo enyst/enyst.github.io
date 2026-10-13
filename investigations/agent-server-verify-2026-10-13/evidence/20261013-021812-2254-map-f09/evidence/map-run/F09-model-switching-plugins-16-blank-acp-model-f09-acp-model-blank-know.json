@@ -1,0 +1,15 @@
+{
+  "file": "F09-model-switching-plugins.md",
+  "bullet": "Blank ACP model (`F09.acp-model-blank`), known bug.",
+  "ids": [
+    "F09.acp-model-blank"
+  ],
+  "line": 428,
+  "script": "AID2=$(control-agent-server conversation start --no-autotitle --body-json '{\"agent_settings\": {\"agent_kind\": \"acp\", \"acp_server\": \"claude-code\", \"acp_model\": \"sonnet\"}}' --print-id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$AID2\" --quiet --check agent.kind eq ACPAgent --check agent.acp_model eq sonnet --check execution_status eq idle\ncontrol-agent-server api POST \"<redacted:session-cookie>/$AID2/switch_acp_model\" --json '{\"model\": \"   \"}' --expect 400,422 --save F09.acp-model-blank/blank  # bug\ncontrol-agent-server api GET \"<redacted:session-cookie>/$AID2\" --quiet --check agent.acp_model eq sonnet --check current_model_id eq sonnet  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 7244,
+  "failed_line": 3,
+  "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$AID2/switch_acp_model\" --json '{\"model\": \"   \"}' --expect 400,422 --save F09.acp-model-blank/blank",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/930ba4d8-21a1-4c95-b4c7-af5e2ac401ab\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"3927\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 637,\n  \"checks\": [\n    {\n      \"check\": \"agent.kind eq ACPAgent\",\n      \"ok\": true,\n      \"actual\": \"ACPAgent\"\n    },\n    {\n      \"check\": \"agent.acp_model eq sonnet\",\n      \"ok\": true,\n      \"actual\": \"sonnet\"\n    },\n    {\n      \"check\": \"execution_status eq idle\",\n      \"ok\": true,\n      \"actual\": \"idle\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/930ba4d8-21a1-4c95-b4c7-af5e2ac401ab/switch_acp_model\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"model\": \"   \"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 390,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.acp-model-blank/blank.json\",\n  \"hint\": \"expected 400,422, got 200\"\n}\n",
+  "stderr": ""
+}

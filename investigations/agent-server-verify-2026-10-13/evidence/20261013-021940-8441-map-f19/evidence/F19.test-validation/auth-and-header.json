@@ -1,0 +1,58 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/test",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "server": {
+        "type": "http",
+        "url": "http://127.0.0.1:9/mcp",
+        "headers": {
+          "Authorization": "Bearer a"
+        },
+        "auth": {
+          "strategy": "bearer",
+          "value": "b"
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "468",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body",
+            "server",
+            "http"
+          ],
+          "msg": "Value error, 'auth' cannot be combined with an explicit top-level 'Authorization' header; use auth.strategy='header' instead.",
+          "input": {
+            "type": "http",
+            "url": "http://127.0.0.1:9/mcp",
+            "headers": {
+              "Authorization": "<redacted>"
+            },
+            "auth": {
+              "strategy": "bearer",
+              "value": "b"
+            }
+          },
+          "ctx": {
+            "error": "'auth' cannot be combined with an explicit top-level 'Authorization' header; use auth.strategy='header' instead."
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 453
+}

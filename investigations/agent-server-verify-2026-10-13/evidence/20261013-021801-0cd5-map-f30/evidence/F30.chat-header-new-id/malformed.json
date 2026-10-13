@@ -1,0 +1,43 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_deepseek-flash",
+      "messages": [
+        {
+          "role": "user",
+          "content": "QA_F30_BAD_ID: reply with one short word and use no tools."
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "234",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "uuid_parsing",
+          "loc": [
+            "header",
+            "X-OpenHands-ServerConversation-ID"
+          ],
+          "msg": "Input should be a valid UUID, invalid character: found `n` at 1",
+          "input": "not-a-uuid",
+          "ctx": {
+            "error": "invalid character: found `n` at 1"
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 557
+}

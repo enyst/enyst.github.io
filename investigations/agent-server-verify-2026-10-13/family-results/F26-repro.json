@@ -1,0 +1,86 @@
+{
+  "ok": true,
+  "file": "F26-plugins.md",
+  "summary": {
+    "pass": 1,
+    "fail": 0,
+    "xfail": 4,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 96,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6011,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-00-preconditions.json"
+    },
+    {
+      "bullet": "Repository root name (`F26.install-repo-root-name`), known bug.",
+      "ids": [
+        "F26.install-repo-root-name"
+      ],
+      "line": 297,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1044,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-01-repository-root-name-f26-install-repo-ro.json",
+      "failed_line": 5,
+      "failed_command": "test \"$N\" = qa-f26-src",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"DELETE\",\n    \"path\": \"/api/plugins/installed/qa-f26-src-a3a5839c96034e90\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"62\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"message\": \"Plugin 'qa-f26-src-a3a5839c96034e90' uninstalled\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 60\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/plugins/installed/qa-f26-src-a3a5839c96034e90\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"66\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Plugin 'qa-f26-src-a3a5839c96034e90' is not installed\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 64\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Documented install source (`F26.install-documented-source`), known bug.",
+      "ids": [
+        "F26.install-documented-source"
+      ],
+      "line": 379,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 2410,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-02-documented-install-source-f26-install-do.json",
+      "failed_line": 7,
+      "failed_command": "control-agent-server api POST /api/plugins/install --json '{\"source\": \"github:<redacted:unrelated-repository>/plugins/city-weather\"}' --timeout 240 --expect 200 --check name eq city-weather --save F26.install-documented-source/documented",
+      "stdout_tail": "  \"path\": \"/api/plugins/installed/city-weather\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"47\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"message\": \"Plugin 'city-weather' uninstalled\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 75\n}\n{\n  \"ok\": false,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/plugins/install\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"source\": \"github:<redacted:unrelated-repository>/plugins/city-weather\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"75\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Failed to fetch plugin source. Check that the source is valid.\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 50,\n  \"checks\": [\n    {\n      \"check\": \"name eq city-weather\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/F26.install-documented-source/documented.json\",\n  \"hint\": \"expected 200, got 400\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Unfetchable refresh (`F26.refresh-unfetchable`), known bug.",
+      "ids": [
+        "F26.refresh-unfetchable"
+      ],
+      "line": 517,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 2443,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-03-unfetchable-refresh-f26-refresh-unfetcha.json",
+      "failed_line": 11,
+      "failed_command": "control-agent-server api POST /api/plugins/installed/qa-f26-gone/refresh --expect 400,422 --save F26.refresh-unfetchable/vanished",
+      "stdout_tail": "ello from the QA plugin\"\n        }\n      ],\n      \"files\": [\n        \".plugin/plugin.json\",\n        \"commands/qa-hello.md\",\n        \"hooks/hooks.json\",\n        \"skills/qa-f26-adopted-skill/SKILL.md\"\n      ]\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 59,\n  \"checks\": [\n    {\n      \"check\": \"source eq local\",\n      \"ok\": true,\n      \"actual\": \"local\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/plugins/installed/qa-f26-gone/refresh\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"231\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"Local extension path does not exist: /workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/fixtures/qa-f26/tmp/qa-f26-gone\",\n      \"error_id\": \"7e37f5123501497d929558e282d7cb18\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 479,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/F26.refresh-unfetchable/vanished.json\",\n  \"hint\": \"expected 400,422, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Resume after disabling (`F26.conversation-resume-disabled`), known bug.",
+      "ids": [
+        "F26.conversation-resume-disabled"
+      ],
+      "line": 632,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 41130,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/map-run/F26-plugins-04-resume-after-disabling-f26-conversation-.json",
+      "failed_line": 12,
+      "failed_command": "control-agent-server ws stop qa-f26-resume --kinds MessageEvent --contains '\"activated_skills\": [\"qa-f26-inst:qa-hello\"]' --expect-none --save F26.conversation-resume-disabled/frames",
+      "stdout_tail": "ose\": null,\n  \"matching\": 0,\n  \"matching_kinds\": [],\n  \"frames_shown\": []\n}\n{\n  \"ok\": false,\n  \"capture\": \"qa-f26-resume\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/captures/qa-f26-resume.jsonl\",\n  \"opened\": true,\n  \"stopped\": \"stopped\",\n  \"frames\": 17,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 9,\n    \"HookExecutionEvent\": 4,\n    \"MessageEvent\": 2,\n    \"ActionEvent\": 1,\n    \"ObservationEvent\": 1\n  },\n  \"close\": null,\n  \"matching\": 1,\n  \"matching_kinds\": [\n    \"MessageEvent\"\n  ],\n  \"frames_shown\": [\n    {\n      \"kind\": \"MessageEvent\",\n      \"frame\": \"{\\\"id\\\": \\\"4a45c910-1435-4481-9709-c697389f7c87\\\", \\\"timestamp\\\": \\\"2026-10-13T03:45:57.168738\\\", \\\"source\\\": \\\"user\\\", \\\"parent_id\\\": \\\"cc435d32-e4e3-4316-bdc6-2fbd9238fc46\\\", \\\"llm_message\\\": {\\\"role\\\": \\\"user\\\", \\\"content\\\": [{\\\"cache_prompt\\\": false, \\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"/qa-f26-inst:qa-hello\\\"}], \\\"thinking_blocks\\\": []}, \\\"activated_skills\\\": [\\\"qa-f26-inst:qa-hello\\\"], \\\"extended_content\\\": [{\\\"cache_prompt\\\": false, \\\"type\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26/evidence/F26.conversation-resume-disabled/frames.json\"\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-034505-0581-map-f26",
+  "launch_flags": []
+}

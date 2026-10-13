@@ -1,0 +1,809 @@
+{
+  "complete": true,
+  "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+  "server_version": "1.54.0",
+  "confirmed_bugs": [
+    {
+      "id": "F02.workspace-cookie-root-path",
+      "title": "Workspace session cookie drops the server URL prefix",
+      "severity": "medium",
+      "feature_ids": [
+        "F02.workspace-cookie-root-path"
+      ],
+      "expected": "A cookie minted through a prefixed server URL authenticates the prefixed workspace file URL.",
+      "actual": "Cookie Path is <redacted:session-cookie> regardless of root_path. The browser-like cookie jar gets 401 at /qa-f02-prefix<redacted:session-cookie>/{id}/workspace/qa-f02.html; the same valid cookie gets 200 at the unprefixed URL.",
+      "repro_command": "control-agent-server map run --file F02 --only F02.workspace-cookie-root-path,F02.workspace-session-ipv6-loopback --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022326-2081-map-f02",
+        "/workspace/verification-artifacts/runs/20261013-022650-a777-map-f02"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-022430-59fc-f02-prefix/evidence/F02.workspace-cookie-root-path/mint.json",
+        "/workspace/verification-artifacts/runs/20261013-022430-59fc-f02-prefix/evidence/F02.workspace-cookie-root-path/file-with-cookie.json",
+        "/workspace/verification-artifacts/runs/20261013-022749-a380-f02-prefix/evidence/F02.workspace-cookie-root-path/mint.json",
+        "/workspace/verification-artifacts/runs/20261013-022749-a380-f02-prefix/evidence/F02.workspace-cookie-root-path/file-with-cookie.json"
+      ],
+      "notes": "Known map bug reproduced at the marked assertion in both fresh attempts. Header-authenticated prefixed URL and cookie-authenticated unprefixed URL are successful controls. No model needed. Source: auth_router.py cookie Path ignores root_path."
+    },
+    {
+      "id": "F02.workspace-session-ipv6-loopback",
+      "title": "IPv6 loopback workspace cookies omit Secure and Partitioned",
+      "severity": "medium",
+      "feature_ids": [
+        "F02.workspace-session-ipv6-loopback"
+      ],
+      "expected": "Host [::1]:8000 receives SameSite=none; Secure; Partitioned, matching localhost and 127.0.0.1.",
+      "actual": "The IPv6 Host request returns 204 with SameSite=none but omits Secure and Partitioned, so browsers reject the cookie. The two IPv4/localhost controls include both flags.",
+      "repro_command": "control-agent-server map run --file F02 --only F02.workspace-cookie-root-path,F02.workspace-session-ipv6-loopback --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022326-2081-map-f02",
+        "/workspace/verification-artifacts/runs/20261013-022650-a777-map-f02"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-022326-2081-map-f02/evidence/F02.workspace-session-ipv6-loopback/ipv6-host.json",
+        "/workspace/verification-artifacts/runs/20261013-022650-a777-map-f02/evidence/F02.workspace-session-ipv6-loopback/ipv6-host.json"
+      ],
+      "notes": "Known map bug reproduced twice. The test changes the HTTP Host header to IPv6 loopback while reaching the same loopback server; it does not claim an IPv6 network bind test. Source: auth_router.py:42-65 splits request.url.hostname on ':' before loopback matching."
+    },
+    {
+      "id": "F03.init-delivered-cors-origins",
+      "title": "Deferred init accepts CORS origins but leaves the boot allowlist unchanged",
+      "severity": "medium",
+      "feature_ids": [
+        "F03.init-delivered-cors-origins"
+      ],
+      "expected": "The allow_cors_origins delivered by successful POST /api/init authorizes that origin on a CORS preflight.",
+      "actual": "The delivered https://qa-f03.example gets 400 Disallowed CORS origin and no Access-Control-Allow-Origin. Localhost control gets200; an undelivered origin also gets400.",
+      "repro_command": "control-agent-server map run --file F03 --only F03.init-success,F03.init-delivered-cors-origins --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-023017-4c4d-map-f03",
+        "/workspace/verification-artifacts/runs/20261013-023328-d486-map-f03"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-023017-4c4d-map-f03/evidence/F03.init-delivered-cors-origins/preflight.json",
+        "/workspace/verification-artifacts/runs/20261013-023328-d486-map-f03/evidence/F03.init-delivered-cors-origins/preflight.json"
+      ],
+      "notes": "Known map bug at marked assertion in both fresh attempts. CORSDispatcher captures config.allow_cors_origins when create_app runs; successful init updates the config but does not rebuild middleware."
+    },
+    {
+      "id": "F04.create-initial-message-run-false",
+      "title": "Conversation create executes an initial message with run=false",
+      "severity": "medium",
+      "feature_ids": [
+        "F04.create-initial-message-run-false"
+      ],
+      "expected": "Persist the initial message and remain idle with no model run when initial_message.run is false.",
+      "actual": "The false request runs to finished on the controlled provider just like the true control.",
+      "repro_command": "control-agent-server map run --file F04 --only F04.create-initial-message-run-false,F04.create-secrets-get,F04.create-secrets-plain,F04.batch-get-limit,F04.patch-whitespace-title,F04.patch-unknown-id,F04.delete-unknown-id --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/F04.create-initial-message-run-false/start.json",
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/map-run/F04-conversation-lifecycle-02-initial-message-run-false-f04-create-ini.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/F04.create-initial-message-run-false/start.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/map-run/F04-conversation-lifecycle-02-initial-message-run-false-f04-create-ini.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.create-initial-message-run-false/observed-actions.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.create-initial-message-run-false/observed-status.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.create-initial-message-run-false/supplement-actions.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.create-initial-message-run-false/supplement-get.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.create-initial-message-run-false/supplement-message.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.create-initial-message-run-false/supplement-start.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/map-run/F04-conversation-lifecycle-04-run-false-final-status-f04-create-initia.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/map-run/F04-conversation-lifecycle-05-run-false-action-count-f04-create-initia.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.create-initial-message-run-false/observed-actions.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.create-initial-message-run-false/observed-status.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.create-initial-message-run-false/supplement-actions.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.create-initial-message-run-false/supplement-get.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.create-initial-message-run-false/supplement-message.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.create-initial-message-run-false/supplement-start.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/map-run/F04-conversation-lifecycle-04-run-false-final-status-f04-create-initia.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/map-run/F04-conversation-lifecycle-05-run-false-action-count-f04-create-initia.json"
+      ],
+      "notes": "The live recipe checks the persisted user message, then observes execution starting/finishing. The create schema advertises run=false, but _start_conversation unconditionally calls run(). Supplemental GET reports finished and exactly one ActionEvent on both fresh attempts.",
+      "supplemental_runs": [
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04"
+      ],
+      "supplemental_commands": [
+        "python3 /workspace/verification-artifacts/adapted-f04-supplement/run-adapted-f04-supplement.py map run --file F04 --fresh --repeat 2 --record --keep-going --timeout 420"
+      ]
+    },
+    {
+      "id": "F04.create-secrets-get",
+      "title": "Start-time secrets disappear from the immediate conversation GET",
+      "severity": "medium",
+      "feature_ids": [
+        "F04.create-secrets-get"
+      ],
+      "expected": "GET immediately lists the start-time StaticSecret that the create response lists, masked.",
+      "actual": "Create lists QA_F 04_TOKEN; the immediate GET returns an empty secret_sources map.",
+      "repro_command": "control-agent-server map run --file F04 --only F04.create-initial-message-run-false,F04.create-secrets-get,F04.create-secrets-plain,F04.batch-get-limit,F04.patch-whitespace-title,F04.patch-unknown-id,F04.delete-unknown-id --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/F04.create-secrets-get/get.json",
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/map-run/F04-conversation-lifecycle-06-start-time-secret-visible-to-get-f04-cre.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/F04.create-secrets-get/get.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/map-run/F04-conversation-lifecycle-06-start-time-secret-visible-to-get-f04-cre.json"
+      ],
+      "notes": "The secret exists in live memory but is absent from the autosaved base_state snapshot until a later state save."
+    },
+    {
+      "id": "F04.create-secrets-plain",
+      "title": "Plain-string create secrets cause an unhandled server error",
+      "severity": "low",
+      "feature_ids": [
+        "F04.create-secrets-plain"
+      ],
+      "expected": "Accept the plain-string secret like the secrets update route, or reject it with 422.",
+      "actual": "POST <redacted:session-cookie> returns 500: 'str' object has no attribute 'pop'.",
+      "repro_command": "control-agent-server map run --file F04 --only F04.create-initial-message-run-false,F04.create-secrets-get,F04.create-secrets-plain,F04.batch-get-limit,F04.patch-whitespace-title,F04.patch-unknown-id,F04.delete-unknown-id --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/F04.create-secrets-plain/start.json",
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/map-run/F04-conversation-lifecycle-07-plain-string-secret-value-f04-create-sec.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/F04.create-secrets-plain/start.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/map-run/F04-conversation-lifecycle-07-plain-string-secret-value-f04-create-sec.json"
+      ],
+      "notes": "This is a malformed-input/status-only defect. Synthetic QA values are used; no real secret is posted in the negative test."
+    },
+    {
+      "id": "F04.batch-get-limit",
+      "title": "A conversation batch of 100 IDs returns 500 instead of a client error",
+      "severity": "low",
+      "feature_ids": [
+        "F04.batch-get-limit"
+      ],
+      "expected": "Refuse 100 IDs with 400/422 naming the limit.",
+      "actual": "A batch of 100 well-formed UUIDs returns 500 with an empty exception string.",
+      "repro_command": "control-agent-server map run --file F04 --only F04.create-initial-message-run-false,F04.create-secrets-get,F04.create-secrets-plain,F04.batch-get-limit,F04.patch-whitespace-title,F04.patch-unknown-id,F04.delete-unknown-id --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/F04.batch-get-limit/hundred.json",
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/map-run/F04-conversation-lifecycle-08-100-ids-in-one-batch-f04-batch-get-limit.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/F04.batch-get-limit/hundred.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/map-run/F04-conversation-lifecycle-08-100-ids-in-one-batch-f04-batch-get-limit.json"
+      ],
+      "notes": "batch_get_conversations uses assert len(ids)<100 instead of request validation; the ordinary 99-ID control is covered by the primary full family."
+    },
+    {
+      "id": "F04.patch-whitespace-title",
+      "title": "Whitespace title passes validation and erases the title",
+      "severity": "low",
+      "feature_ids": [
+        "F04.patch-whitespace-title"
+      ],
+      "expected": "Reject a whitespace-only title with 422 and retain the existing title.",
+      "actual": "PATCH with a whitespace-only title returns 200; a subsequent GET reports title=\"\" on two fresh supplemental runs.",
+      "repro_command": "control-agent-server map run --file F04 --only F04.create-initial-message-run-false,F04.create-secrets-get,F04.create-secrets-plain,F04.batch-get-limit,F04.patch-whitespace-title,F04.patch-unknown-id,F04.delete-unknown-id --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/F04.patch-whitespace-title/patch.json",
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/map-run/F04-conversation-lifecycle-09-whitespace-only-title-f04-patch-whitespa.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/F04.patch-whitespace-title/patch.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/map-run/F04-conversation-lifecycle-09-whitespace-only-title-f04-patch-whitespa.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.patch-whitespace-title/accepted-whitespace.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.patch-whitespace-title/before.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.patch-whitespace-title/get-after-whitespace.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/map-run/F04-conversation-lifecycle-02-whitespace-title-persisted-get-f04-patch.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.patch-whitespace-title/accepted-whitespace.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.patch-whitespace-title/before.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.patch-whitespace-title/get-after-whitespace.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/map-run/F04-conversation-lifecycle-02-whitespace-title-persisted-get-f04-patch.json"
+      ],
+      "notes": "Metadata defect: validation checks min_length before stripping. Acceptance and persisted title erasure are both independently proven twice.",
+      "supplemental_runs": [
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04"
+      ],
+      "supplemental_commands": [
+        "python3 /workspace/verification-artifacts/adapted-f04-supplement/run-adapted-f04-supplement.py map run --file F04 --fresh --repeat 2 --record --keep-going --timeout 420"
+      ]
+    },
+    {
+      "id": "F04.patch-unknown-id",
+      "title": "PATCH on a missing conversation contradicts its documented 404",
+      "severity": "low",
+      "feature_ids": [
+        "F04.patch-unknown-id"
+      ],
+      "expected": "PATCH returns 404 for the same missing ID that GET returns 404 for.",
+      "actual": "PATCH returns 200 with success=false despite the OpenAPI 404 response declaration.",
+      "repro_command": "control-agent-server map run --file F04 --only F04.create-initial-message-run-false,F04.create-secrets-get,F04.create-secrets-plain,F04.batch-get-limit,F04.patch-whitespace-title,F04.patch-unknown-id,F04.delete-unknown-id --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/F04.patch-unknown-id/unknown.json",
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/map-run/F04-conversation-lifecycle-10-patch-on-an-unknown-id-f04-patch-unknown.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/F04.patch-unknown-id/unknown.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/map-run/F04-conversation-lifecycle-10-patch-on-an-unknown-id-f04-patch-unknown.json"
+      ],
+      "notes": "Status-contract defect; the source test currently locks the 200 behavior."
+    },
+    {
+      "id": "F04.delete-unknown-id",
+      "title": "DELETE on a missing conversation contradicts its documented 404",
+      "severity": "low",
+      "feature_ids": [
+        "F04.delete-unknown-id"
+      ],
+      "expected": "DELETE returns 404 for a missing or already-deleted conversation.",
+      "actual": "DELETE on an absent ID returns 400, and a second DELETE after successful deletion also returns 400, despite the documented 404.",
+      "repro_command": "control-agent-server map run --file F04 --only F04.create-initial-message-run-false,F04.create-secrets-get,F04.create-secrets-plain,F04.batch-get-limit,F04.patch-whitespace-title,F04.patch-unknown-id,F04.delete-unknown-id --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/F04.delete-unknown-id/unknown.json",
+        "/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/map-run/F04-conversation-lifecycle-12-delete-on-an-unknown-id-f04-delete-unkno.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/F04.delete-unknown-id/unknown.json",
+        "/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/map-run/F04-conversation-lifecycle-12-delete-on-an-unknown-id-f04-delete-unkno.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.delete-unknown-id/first-delete.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.delete-unknown-id/get-deleted.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.delete-unknown-id/repeat.json",
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/map-run/F04-conversation-lifecycle-03-repeated-delete-f04-delete-unknown-id-re.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.delete-unknown-id/first-delete.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.delete-unknown-id/get-deleted.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.delete-unknown-id/repeat.json",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/map-run/F04-conversation-lifecycle-03-repeated-delete-f04-delete-unknown-id-re.json"
+      ],
+      "notes": "Both the never-created and already-deleted branches reproduced twice.",
+      "supplemental_runs": [
+        "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04",
+        "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04"
+      ],
+      "supplemental_commands": [
+        "python3 /workspace/verification-artifacts/adapted-f04-supplement/run-adapted-f04-supplement.py map run --file F04 --fresh --repeat 2 --record --keep-going --timeout 420"
+      ]
+    },
+    {
+      "id": "F05.run-error-responsive",
+      "title": "Rich exception rendering stalls the entire agent server",
+      "severity": "high",
+      "feature_ids": [
+        "F05.run-error-responsive"
+      ],
+      "expected": "Health and event-count probes remain below 1.5 seconds while a model-provider failure is handled.",
+      "actual": "A positive-control /alive request took 67 ms; a failure-time probe took 4,512 ms. The second fresh attempt recorded 10,909 ms, while the request before the failure met the 1.5-second threshold.",
+      "repro_command": "control-agent-server map run --file F05 --only F05.run-error,F05.run-error-responsive,F05.unknown-id-pause,F05.run-conflict,F05.pause-running,F05.pause-running-get,F05.pause-running-release,F05.restart-running-graceful,F05.restart-hard-running,F05.pause-running-crash --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/evidence/F05.run-error-responsive/after.json",
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/evidence/F05.run-error-responsive/alive-before.json",
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/evidence/map-run/F05-run-pause-interrupt-02-responsive-while-a-run-fails-f05-run-err.json",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05/evidence/F05.run-error-responsive/after.json",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05/evidence/F05.run-error-responsive/alive-before.json",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05/evidence/map-run/F05-run-pause-interrupt-02-responsive-while-a-run-fails-f05-run-err.json"
+      ],
+      "notes": "Default console logger.exception renders a large Rich traceback synchronously on the event loop. LOG_JSON=true or LOG_RICH_TRACEBACKS=false is the documented workaround; production Docker uses JSON logging."
+    },
+    {
+      "id": "F05.unknown-id-pause",
+      "title": "Pause/interrupt on an unknown conversation use undocumented 400",
+      "severity": "low",
+      "feature_ids": [
+        "F05.unknown-id-pause"
+      ],
+      "expected": "Both pause and interrupt return their documented 404 for a missing conversation.",
+      "actual": "Both pause and interrupt return 400 for an absent valid UUID, despite GET returning 404 and both OpenAPI routes documenting 404.",
+      "repro_command": "control-agent-server map run --file F05 --only F05.run-error,F05.run-error-responsive,F05.unknown-id-pause,F05.run-conflict,F05.pause-running,F05.pause-running-get,F05.pause-running-release,F05.restart-running-graceful,F05.restart-hard-running,F05.pause-running-crash --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/evidence/F05.unknown-id-pause/pause.json",
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/evidence/map-run/F05-run-pause-interrupt-03-pause-or-interrupt-an-unknown-id-f05-unk.json",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05/evidence/F05.unknown-id-pause/pause.json",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05/evidence/map-run/F05-run-pause-interrupt-03-pause-or-interrupt-an-unknown-id-f05-unk.json",
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05/evidence/F05.unknown-id-interrupt/get-control.json",
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05/evidence/F05.unknown-id-interrupt/interrupt.json",
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05/evidence/F05.unknown-id-interrupt/openapi.json",
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05/evidence/map-run/F05-run-pause-interrupt-01-unknown-interrupt-f05-unknown-id-interru.json",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05/evidence/F05.unknown-id-interrupt/get-control.json",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05/evidence/F05.unknown-id-interrupt/interrupt.json",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05/evidence/F05.unknown-id-interrupt/openapi.json",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05/evidence/map-run/F05-run-pause-interrupt-01-unknown-interrupt-f05-unknown-id-interru.json"
+      ],
+      "notes": "Each method reproduced twice. Status-only defect.",
+      "supplemental_runs": [
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05"
+      ],
+      "supplemental_commands": [
+        ".venv/bin/python /workspace/verification-artifacts/adapted-f05-secondary/run-adapted-f05-secondary.py map run --file F05 --fresh --repeat 2 --record --keep-going --timeout 120"
+      ]
+    },
+    {
+      "id": "pause-state-snapshot-stale",
+      "title": "A mid-call pause is invisible to GET and lost on crash recovery",
+      "severity": "medium",
+      "feature_ids": [
+        "F05.pause-running-get",
+        "F05.pause-running-crash"
+      ],
+      "expected": "GET agrees with the accepted paused state; after SIGKILL/restart the accepted pause remains paused.",
+      "actual": "During an accepted mid-call pause, status search and PauseEvent say paused, but GET and base_state.json say running. After SIGKILL, lease expiry, and restart, both PauseEvents remain but GET reports error.",
+      "repro_command": "control-agent-server map run --file F05 --only F05.run-error,F05.run-error-responsive,F05.unknown-id-pause,F05.run-conflict,F05.pause-running,F05.pause-running-get,F05.pause-running-release,F05.restart-running-graceful,F05.restart-hard-running,F05.pause-running-crash --fresh --repeat 2 --record --keep-going --timeout 420\n.venv/bin/python /workspace/verification-artifacts/adapted-f05/run-adapted-f05.py map run --file F05 --only F05.restart-running-graceful,F05.restart-hard-running,F05.pause-running-crash --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05",
+        "/workspace/verification-artifacts/runs/20261013-032311-dcf8-map-f05",
+        "/workspace/verification-artifacts/runs/20261013-032700-5284-map-f05"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/evidence/F05.pause-running-get/get.json",
+        "/workspace/verification-artifacts/runs/20261013-024519-40d0-map-f05/evidence/map-run/F05-run-pause-interrupt-06-get-after-a-mid-call-pause-f05-pause-run.json",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05/evidence/F05.pause-running-get/get.json",
+        "/workspace/verification-artifacts/runs/20261013-024951-9459-map-f05/evidence/map-run/F05-run-pause-interrupt-06-get-after-a-mid-call-pause-f05-pause-run.json",
+        "/workspace/verification-artifacts/runs/20261013-032311-dcf8-map-f05/evidence/F05.pause-running-crash/get.json",
+        "/workspace/verification-artifacts/runs/20261013-032311-dcf8-map-f05/evidence/F05.pause-running-crash/lease-expiry.json",
+        "/workspace/verification-artifacts/runs/20261013-032311-dcf8-map-f05/evidence/map-run/F05-run-pause-interrupt-03-crash-after-a-mid-call-pause-f05-pause-r.json",
+        "/workspace/verification-artifacts/runs/20261013-032700-5284-map-f05/evidence/F05.pause-running-crash/get.json",
+        "/workspace/verification-artifacts/runs/20261013-032700-5284-map-f05/evidence/F05.pause-running-crash/lease-expiry.json",
+        "/workspace/verification-artifacts/runs/20261013-032700-5284-map-f05/evidence/map-run/F05-run-pause-interrupt-03-crash-after-a-mid-call-pause-f05-pause-r.json",
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05/evidence/F05.pause-running-base-state/accepted.json",
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05/evidence/F05.pause-running-base-state/pause-count.json",
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05/evidence/F05.pause-running-base-state/search-control.json",
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05/evidence/map-run/F05-run-pause-interrupt-03-paused-base-snapshot-f05-pause-running-b.json",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05/evidence/F05.pause-running-base-state/accepted.json",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05/evidence/F05.pause-running-base-state/pause-count.json",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05/evidence/F05.pause-running-base-state/search-control.json",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05/evidence/map-run/F05-run-pause-interrupt-03-paused-base-snapshot-f05-pause-running-b.json"
+      ],
+      "notes": "One root cause across GET, disk snapshot, and crash recovery: autosave is deferred while model I/O holds save_depth open. In this PID-1 container the killed owner remains a zombie; the adaptation verifies that state, records the remaining owner-lease TTL, waits for expiry, and restarts before the target assertion. Instantaneous dead-owner recovery is not certified.",
+      "supplemental_runs": [
+        "/workspace/verification-artifacts/runs/20261013-033533-16b0-map-f05",
+        "/workspace/verification-artifacts/runs/20261013-033615-9b59-map-f05"
+      ],
+      "supplemental_commands": [
+        ".venv/bin/python /workspace/verification-artifacts/adapted-f05-secondary/run-adapted-f05-secondary.py map run --file F05 --fresh --repeat 2 --record --keep-going --timeout 120"
+      ]
+    },
+    {
+      "id": "F06.search-kind-short",
+      "title": "Documented short event kinds silently return empty results",
+      "severity": "medium",
+      "feature_ids": [
+        "F06.search-kind-short"
+      ],
+      "expected": "kind=MessageEvent returns the two user messages, matching their wire kind and the TypeScript client contract.",
+      "actual": "The fully qualified MessageEvent filter finds two messages; the documented short kind returns an empty search and count 0. Both routes independently reproduce twice.",
+      "repro_command": "control-agent-server map run --file F06 --only F06.send-no-run,F06.search-kind-short,F06.get-one,F06.unknown-event,F06.send-non-user-role,F06.ws-delete-close,F06.search-timestamp-order --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/F06.search-kind-short/short-name.json",
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/map-run/F06-conversation-events-02-short-kind-names-f06-search-kind-short-k.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/F06.search-kind-short/short-name.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/map-run/F06-conversation-events-02-short-kind-names-f06-search-kind-short-k.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.search-kind-short-count/fqn-control.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.search-kind-short-count/short-count.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/map-run/F06-conversation-events-04-short-kind-count-f06-search-kind-short-c.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.search-kind-short-count/fqn-control.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.search-kind-short-count/short-count.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/map-run/F06-conversation-events-04-short-kind-count-f06-search-kind-short-c.json"
+      ],
+      "notes": "The service compares module.ClassName rather than the documented wire kind; TypeScript clients following the documentation silently lose history.",
+      "supplemental_runs": [
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06"
+      ],
+      "supplemental_commands": [
+        ".venv/bin/python /workspace/verification-artifacts/adapted-f06-supplement/run-adapted-f06.py map run --file F06 --only F06.send-no-run,F06.get-one,F06.send-run,F06.search-kind-short-count,F06.unknown-event-batch,F06.send-non-user-role-empty,F06.send-non-user-role-empty-mutation,F06.search-timestamp-replay,F06.search-timestamp-order-sorted --fresh --repeat 2 --record --keep-going --timeout 420"
+      ]
+    },
+    {
+      "id": "F06.unknown-event",
+      "title": "One absent event crashes get-one and batch history reads",
+      "severity": "medium",
+      "feature_ids": [
+        "F06.unknown-event"
+      ],
+      "expected": "Get-one returns 404 for a missing ID; a mixed batch preserves known events and returns null for the missing slot.",
+      "actual": "Get-one returns 500 for an absent event ID; a batch containing one valid event and one absent event also returns 500 instead of [event, null]. Both branches reproduce twice.",
+      "repro_command": "control-agent-server map run --file F06 --only F06.send-no-run,F06.search-kind-short,F06.get-one,F06.unknown-event,F06.send-non-user-role,F06.ws-delete-close,F06.search-timestamp-order --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/F06.unknown-event/get-one.json",
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/map-run/F06-conversation-events-04-unknown-event-id-f06-unknown-event-known.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/F06.unknown-event/get-one.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/map-run/F06-conversation-events-04-unknown-event-id-f06-unknown-event-known.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.unknown-event-batch/known-control.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.unknown-event-batch/mixed.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/map-run/F06-conversation-events-05-mixed-batch-f06-unknown-event-batch-know.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.unknown-event-batch/known-control.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.unknown-event-batch/mixed.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/map-run/F06-conversation-events-05-mixed-batch-f06-unknown-event-batch-know.json"
+      ],
+      "notes": "EventLog.get_index raises KeyError before the router can return 404/null; an absent item aborts the whole batch.",
+      "supplemental_runs": [
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06"
+      ],
+      "supplemental_commands": [
+        ".venv/bin/python /workspace/verification-artifacts/adapted-f06-supplement/run-adapted-f06.py map run --file F06 --only F06.send-no-run,F06.get-one,F06.send-run,F06.search-kind-short-count,F06.unknown-event-batch,F06.send-non-user-role-empty,F06.send-non-user-role-empty-mutation,F06.search-timestamp-replay,F06.search-timestamp-order-sorted --fresh --repeat 2 --record --keep-going --timeout 420"
+      ]
+    },
+    {
+      "id": "F06.send-non-user-role",
+      "title": "A schema-valid non-user message causes 500",
+      "severity": "low",
+      "feature_ids": [
+        "F06.send-non-user-role"
+      ],
+      "expected": "Reject assistant-role input with 4xx and append no events, including on an empty log.",
+      "actual": "An assistant-role POST returns 500 on both initialized and empty logs. The rejected POST to an empty log also persists a SystemPromptEvent, leaving count 1 instead of 0.",
+      "repro_command": "control-agent-server map run --file F06 --only F06.send-no-run,F06.search-kind-short,F06.get-one,F06.unknown-event,F06.send-non-user-role,F06.ws-delete-close,F06.search-timestamp-order --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/F06.send-non-user-role/assistant.json",
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/map-run/F06-conversation-events-05-non-user-role-f06-send-non-user-role-kno.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/F06.send-non-user-role/assistant.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/map-run/F06-conversation-events-05-non-user-role-f06-send-non-user-role-kno.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.send-non-user-role-empty-mutation/after.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.send-non-user-role-empty-mutation/before.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.send-non-user-role-empty-mutation/events.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.send-non-user-role-empty-mutation/rejected.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.send-non-user-role-empty/before.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.send-non-user-role-empty/post.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/map-run/F06-conversation-events-06-non-user-empty-log-f06-send-non-user-rol.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/map-run/F06-conversation-events-07-non-user-empty-log-mutation-f06-send-non.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.send-non-user-role-empty-mutation/after.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.send-non-user-role-empty-mutation/before.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.send-non-user-role-empty-mutation/events.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.send-non-user-role-empty-mutation/rejected.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.send-non-user-role-empty/before.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.send-non-user-role-empty/post.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/map-run/F06-conversation-events-06-non-user-empty-log-f06-send-non-user-rol.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/map-run/F06-conversation-events-07-non-user-empty-log-mutation-f06-send-non.json"
+      ],
+      "notes": "Role is schema-valid but LocalConversation asserts user. Both response and empty-log mutation branches reproduced twice. Count remains one low-severity malformed-input bug.",
+      "supplemental_runs": [
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06"
+      ],
+      "supplemental_commands": [
+        ".venv/bin/python /workspace/verification-artifacts/adapted-f06-supplement/run-adapted-f06.py map run --file F06 --only F06.send-no-run,F06.get-one,F06.send-run,F06.search-kind-short-count,F06.unknown-event-batch,F06.send-non-user-role-empty,F06.send-non-user-role-empty-mutation,F06.search-timestamp-replay,F06.search-timestamp-order-sorted --fresh --repeat 2 --record --keep-going --timeout 420"
+      ]
+    },
+    {
+      "id": "F06.search-timestamp-order",
+      "title": "Timestamp-based event resume skips delayed stats updates",
+      "severity": "medium",
+      "feature_ids": [
+        "F06.search-timestamp-order"
+      ],
+      "expected": "A timestamp cut at an observation keeps that observation and every later-listed event in REST and WebSocket replay.",
+      "actual": "The marked REST count is lower than the number of events listed from the observation onward.",
+      "repro_command": "control-agent-server map run --file F06 --only F06.send-no-run,F06.search-kind-short,F06.get-one,F06.unknown-event,F06.send-non-user-role,F06.ws-delete-close,F06.search-timestamp-order --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/F06.search-timestamp-order/count-since-observation.json",
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/map-run/F06-conversation-events-08-log-order-is-timestamp-order-f06-search-.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/F06.search-timestamp-order/count-since-observation.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/map-run/F06-conversation-events-08-log-order-is-timestamp-order-f06-search-.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.search-timestamp-order-sorted/all.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.search-timestamp-replay/socket.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/map-run/F06-conversation-events-08-timestamp-socket-replay-f06-search-times.json",
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/map-run/F06-conversation-events-09-ascending-timestamps-f06-search-timestam.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.search-timestamp-order-sorted/all.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.search-timestamp-replay/socket.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/map-run/F06-conversation-events-08-timestamp-socket-replay-f06-search-times.json",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/map-run/F06-conversation-events-09-ascending-timestamps-f06-search-timestam.json"
+      ],
+      "notes": "Stats updates are timestamped at model response time, then appended after tool observations; both REST count and legacy socket replay skip a subsequently appended stats event. Replay and unsorted-timestamp assertions separately reproduced twice using real DeepSeek file-editor turns.",
+      "supplemental_runs": [
+        "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06"
+      ],
+      "supplemental_commands": [
+        ".venv/bin/python /workspace/verification-artifacts/adapted-f06-supplement/run-adapted-f06.py map run --file F06 --only F06.send-no-run,F06.get-one,F06.send-run,F06.search-kind-short-count,F06.unknown-event-batch,F06.send-non-user-role-empty,F06.send-non-user-role-empty-mutation,F06.search-timestamp-replay,F06.search-timestamp-order-sorted --fresh --repeat 2 --record --keep-going --timeout 420"
+      ]
+    },
+    {
+      "id": "conversation-deletion-leaves-sockets-open",
+      "title": "Deleting a conversation leaves its event/session sockets open",
+      "severity": "medium",
+      "feature_ids": [
+        "F06.ws-delete-close",
+        "F07.deleted-close"
+      ],
+      "expected": "DELETE closes already subscribed sockets before answering; subsequent reads are 404 and new sockets 4004.",
+      "actual": "DELETE succeeds, REST returns 404 and a new socket 4004, but the existing capture remains open with close=null.",
+      "repro_command": "control-agent-server map run --file F06 --only F06.send-no-run,F06.search-kind-short,F06.get-one,F06.unknown-event,F06.send-non-user-role,F06.ws-delete-close,F06.search-timestamp-order --fresh --repeat 2 --record --keep-going --timeout 420\ncontrol-agent-server map run --file F07 --only F07.live-order,F07.deleted-close --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06",
+        "/workspace/verification-artifacts/runs/20261013-025721-700e-map-f07",
+        "/workspace/verification-artifacts/runs/20261013-025834-053c-map-f07"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/F06.ws-delete-close/delete.json",
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/F06.ws-delete-close/socket.json",
+        "/workspace/verification-artifacts/runs/20261013-025406-9fbb-map-f06/evidence/map-run/F06-conversation-events-06-deleting-a-conversation-closes-its-socke.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/F06.ws-delete-close/delete.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/F06.ws-delete-close/socket.json",
+        "/workspace/verification-artifacts/runs/20261013-025528-20b8-map-f06/evidence/map-run/F06-conversation-events-06-deleting-a-conversation-closes-its-socke.json",
+        "/workspace/verification-artifacts/runs/20261013-025721-700e-map-f07/evidence/F07.deleted-close/delete-5b5a3419-e47a-4af2-979e-a7365d32f6f5.json",
+        "/workspace/verification-artifacts/runs/20261013-025721-700e-map-f07/evidence/F07.deleted-close/socket-5b5a3419-e47a-4af2-979e-a7365d32f6f5.json",
+        "/workspace/verification-artifacts/runs/20261013-025721-700e-map-f07/evidence/map-run/F07-session-socket-02-deleting-closes-the-socket-f07-deleted-c.json",
+        "/workspace/verification-artifacts/runs/20261013-025834-053c-map-f07/evidence/F07.deleted-close/delete-96a192c6-60d8-4692-b733-7a3c14b0d646.json",
+        "/workspace/verification-artifacts/runs/20261013-025834-053c-map-f07/evidence/F07.deleted-close/socket-96a192c6-60d8-4692-b733-7a3c14b0d646.json",
+        "/workspace/verification-artifacts/runs/20261013-025834-053c-map-f07/evidence/map-run/F07-session-socket-02-deleting-closes-the-socket-f07-deleted-c.json"
+      ],
+      "notes": "The legacy events and session protocols reproduce independently twice. Subscriber.close does not close the WebSocket, leaving connected clients waiting after successful DELETE. This is a socket/task leak; no OS process orphan is claimed."
+    },
+    {
+      "id": "F07.live-order",
+      "title": "Out-of-order durable frames can make a session cursor lose a message",
+      "severity": "high",
+      "feature_ids": [
+        "F07.live-order"
+      ],
+      "expected": "The first user message yields durable seq 0,1,2 in order, matching persisted log order.",
+      "actual": "The live socket emits 0,2,1: last_user_message_id is published before the user message at seq 1.",
+      "repro_command": "control-agent-server map run --file F07 --only F07.live-order,F07.deleted-close --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025721-700e-map-f07",
+        "/workspace/verification-artifacts/runs/20261013-025834-053c-map-f07"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025721-700e-map-f07/evidence/F07.live-order/order-4b477523-fc4b-41e1-bd20-141a666eb5ce.json",
+        "/workspace/verification-artifacts/runs/20261013-025721-700e-map-f07/evidence/map-run/F07-session-socket-01-live-frames-in-seq-order-f07-live-order-.json",
+        "/workspace/verification-artifacts/runs/20261013-025834-053c-map-f07/evidence/F07.live-order/order-d06266ef-6639-4e3d-82e9-708fd2dd8bc7.json",
+        "/workspace/verification-artifacts/runs/20261013-025834-053c-map-f07/evidence/map-run/F07-session-socket-01-live-frames-in-seq-order-f07-live-order-.json"
+      ],
+      "notes": "A client saving the highest sequence and disconnecting after 2 resumes past the missing message. Replay itself is ordered; the message remains on disk."
+    }
+  ],
+  "harness_map_issues": [
+    {
+      "title": "Some F05/F06 isolated recipe selections omit state prerequisites",
+      "actual": "Requires clauses omit earlier recipes whose variables or conversation state are consumed. Repro selections explicitly include the prerequisite IDs; shared files were not changed."
+    },
+    {
+      "title": "Cold OpenAPI generation exceeded doctor timeout under concurrent load",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F02-repro-doctor.json",
+        "/workspace/verification-artifacts/family-results/F02-repro-doctor-retry.json"
+      ],
+      "actual": "The first doctor had only the OpenAPI check fail with ReadTimeout. After cache warmup the identical doctor was clean, with health/auth/build checks and no log tracebacks. Treat as transient timing; not counted as a product bug."
+    },
+    {
+      "title": "Shared overlay filled during verification",
+      "actual": "ENOSPC interrupted first primary F02 and first F04 repro save_evidence; empty F04-F07 repro summaries followed. Existing F01, F02-repro and F03-repro summaries were valid. After space restoration the incomplete families were restarted, preserving prior evidence. No bug conclusion uses ENOSPC attempts.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022642-a649-map-f02",
+        "/workspace/verification-artifacts/runs/20261013-023639-adff-map-f04"
+      ]
+    },
+    {
+      "title": "Hard-restart lease checks encounter unreaped PID-1 zombies",
+      "feature_ids": [
+        "F05.restart-hard-running",
+        "F05.pause-running-crash"
+      ],
+      "actual": "Original crash recipes fail before the target pause assertion because os.kill(owner_pid, 0) still succeeds for the killed zombie process. The recipe copy waits the recorded lease TTL and restarts; ordinary running recovery then passes and pause-loss reproduces.",
+      "adaptation": "/workspace/verification-artifacts/adapted-f05/feature-map/F05-run-pause-interrupt.md",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F05-lease-adapted-repro.json"
+      ]
+    }
+  ],
+  "blocked": [
+    {
+      "feature_ids": [
+        "F02.default-bind"
+      ],
+      "prerequisite": "Writable /proc/self/uid_map and unprivileged user/network namespaces for unshare -rn",
+      "attempted": "python -m openhands.agent_server default host inside a private namespace",
+      "actual": "unshare: cannot open /proc/self/uid_map: Read-only file system. It failed before launching the server.",
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024124-a231-map-f02/evidence/F02.default-bind/no-key.json"
+      ],
+      "notes": "This is blocked by the execution environment, not an agent-server bug. The primary JSON retains the raw fail; the evidence ledger has a later blocked judgment."
+    },
+    {
+      "feature_ids": [
+        "F05.restart-hard-running"
+      ],
+      "prerequisite": "A host that reaps the killed server PID before the immediate recovery assertion",
+      "attempted": "Original immediate SIGKILL/restart dead-owner takeover recipe",
+      "actual": "The container leaves the owner PID as a zombie and os.kill(pid, 0) treats it as alive. Recovery after recorded lease expiry and a further restart is proven twice; instantaneous takeover is not proven.",
+      "evidence": [
+        "/workspace/verification-artifacts/family-results/F05-repro.json",
+        "/workspace/verification-artifacts/family-results/F05-lease-adapted-repro.json"
+      ]
+    }
+  ],
+  "inconclusive": [],
+  "coverage": [
+    {
+      "family": "F01",
+      "run": "/workspace/verification-artifacts/runs/20261013-021702-46e6-map-f01",
+      "feature_counts": {
+        "pass": 11
+      },
+      "raw_summary": {
+        "pass": 12,
+        "fail": 0,
+        "xfail": 0,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      }
+    },
+    {
+      "family": "F02",
+      "run": "/workspace/verification-artifacts/runs/20261013-024124-a231-map-f02",
+      "feature_counts": {
+        "blocked": 1,
+        "pass": 18,
+        "xfail": 2
+      },
+      "raw_summary": {
+        "pass": 19,
+        "fail": 1,
+        "xfail": 2,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      }
+    },
+    {
+      "family": "F03",
+      "run": "/workspace/verification-artifacts/runs/20261013-024346-99e7-map-f03",
+      "feature_counts": {
+        "pass": 22,
+        "xfail": 1
+      },
+      "raw_summary": {
+        "pass": 23,
+        "fail": 0,
+        "xfail": 1,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      }
+    },
+    {
+      "family": "F04",
+      "run": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04",
+      "feature_counts": {
+        "pass": 25,
+        "xfail": 7
+      },
+      "raw_summary": {
+        "pass": 26,
+        "fail": 0,
+        "xfail": 7,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      }
+    },
+    {
+      "family": "F05",
+      "run": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05",
+      "feature_counts": {
+        "fail": 2,
+        "pass": 26,
+        "xfail": 3
+      },
+      "raw_summary": {
+        "pass": 27,
+        "fail": 2,
+        "xfail": 3,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      },
+      "judgments": {
+        "F05.restart-hard-running": "blocked: immediate recovery on unreaped zombie owner",
+        "F05.pause-running-crash": "confirmed expected failure after documented lease adaptation"
+      },
+      "supplemental_replay": "/workspace/verification-artifacts/family-results/F05-lease-adapted-repro.json",
+      "judged_feature_counts": {
+        "pass": 26,
+        "xfail": 4,
+        "blocked": 1
+      }
+    },
+    {
+      "family": "F06",
+      "run": "/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06",
+      "feature_counts": {
+        "pass": 23,
+        "xfail": 5
+      },
+      "raw_summary": {
+        "pass": 23,
+        "fail": 0,
+        "xfail": 5,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      }
+    },
+    {
+      "family": "F07",
+      "run": "/workspace/verification-artifacts/runs/20261013-024935-e05c-map-f07",
+      "feature_counts": {
+        "pass": 22,
+        "xfail": 2
+      },
+      "raw_summary": {
+        "pass": 23,
+        "fail": 0,
+        "xfail": 2,
+        "xpass": 0,
+        "blocked": 0,
+        "skipped": 0,
+        "no-commands": 0
+      }
+    }
+  ],
+  "severity_counts": {
+    "high": 2,
+    "medium": 10,
+    "low": 7
+  },
+  "date_utc": "2026-10-13",
+  "outcome": "blocked/partial: full F01\u2013F07 primary pass completed; two environment-limited branches retained",
+  "deliberately_not_covered": [
+    "Immediate dead-owner lease takeover on a host that reaps SIGKILLed children",
+    "F02.default-bind unprivileged network namespace recipe; environment refuses uid_map writes"
+  ],
+  "cleanup": {
+    "audit": "/workspace/verification-artifacts/family-results/F01-F07-final-evidence-cleanup-audit.json",
+    "own_supplemental_runs": 8,
+    "all_ports_closed": true,
+    "evidence_preserved": true,
+    "private_state_preserved_for_reproduction": true
+  },
+  "primary_feature_counts": {
+    "total": 170,
+    "pass": 147,
+    "confirmed_expected_failure_features": 21,
+    "blocked": 2,
+    "distinct_confirmed_bugs": 19,
+    "note": "Supplemental branch IDs extend existing bugs and are excluded from the 170 primary IDs. Raw primary F05 results remain preserved; its two setup failures are judged using the recorded zombie-owner lease adaptation."
+  }
+}

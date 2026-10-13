@@ -1,0 +1,15 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "`initial_message.run: false` (`F04.create-initial-message-run-false`), known bug.",
+  "ids": [
+    "F04.create-initial-message-run-false"
+  ],
+  "line": 284,
+  "script": "YR=$(control-agent-server api POST <redacted:session-cookie> \\\n  --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $STUB_AGENT, \\\"autotitle\\\": false, \\\"initial_message\\\": {\\\"role\\\": \\\"user\\\", \\\"content\\\": [{\\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"QA F04 run true.\\\"}], \\\"run\\\": true}}\" \\\n  --expect 201 --field id)\ncontrol-agent-server conversation wait \"$YR\" --until finished --timeout 15\nNR=$(control-agent-server api POST <redacted:session-cookie> \\\n  --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $STUB_AGENT, \\\"autotitle\\\": false, \\\"initial_message\\\": {\\\"role\\\": \\\"user\\\", \\\"content\\\": [{\\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"QA F04 run false.\\\"}], \\\"run\\\": false}}\" \\\n  --expect 201 --save F04.create-initial-message-run-false/start --field id)\ncontrol-agent-server conversation events \"$NR\" --kinds MessageEvent --contains 'QA F04 run false.' --expect-count 1\nif control-agent-server conversation wait \"$NR\" --until running,finished,error,stuck --timeout 15; then false; fi  # bug\ncontrol-agent-server api GET \"<redacted:session-cookie>/$NR\" --check execution_status eq idle --save F04.create-initial-message-run-false/get\ncontrol-agent-server conversation events \"$NR\" --kinds ActionEvent --expect-count 0\n",
+  "exit_code": 1,
+  "elapsed_ms": 8385,
+  "failed_line": 3,
+  "failed_command": "YR=$(control-agent-server api POST <redacted:session-cookie> --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $STUB_AGENT, \\\"autotitle\\\": false, \\\"initial_message\\\": {\\\"role\\\": \\\"user\\\", \\\"content\\\": [{\\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"QA F04 run true.\\\"}], \\\"run\\\": true}}\" --expect 201 --field id)",
+  "stdout": "",
+  "stderr": ""
+}

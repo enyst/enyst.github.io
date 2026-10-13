@@ -1,0 +1,49 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "<redacted:session-cookie>",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "workspace": {
+        "working_dir": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/fixtures/qa-f04-ws"
+      },
+      "agent": {
+        "llm": {
+          "model": "openai/qa-offline",
+          "api_key": "<redacted:api_key>",
+          "base_url": "http://127.0.0.1:9/v1",
+          "num_retries": 0
+        },
+        "tools": [],
+        "agent_context": {
+          "skills": [
+            {
+              "name": "qa-f04-skill",
+              "content": "Answer briefly."
+            }
+          ]
+        }
+      },
+      "autotitle": false,
+      "secrets": {
+        "QA_F04_PLAIN": "qa-f04-plain-value"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-length": "130",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "Internal Server Error",
+      "exception": "'str' object has no attribute 'pop'",
+      "error_id": "070dc096d3d7449d8cd70e4414e15159"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 505
+}

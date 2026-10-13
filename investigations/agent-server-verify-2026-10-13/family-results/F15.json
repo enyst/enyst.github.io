@@ -1,0 +1,366 @@
+{
+  "ok": false,
+  "file": "F15-git.md",
+  "summary": {
+    "pass": 19,
+    "fail": 4,
+    "xfail": 5,
+    "xpass": 0,
+    "blocked": 1,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 96,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2210,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-00-preconditions.json"
+    },
+    {
+      "bullet": "Session key required (`F15.auth`).",
+      "ids": [
+        "F15.auth"
+      ],
+      "line": 133,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3537,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-01-session-key-required-f15-auth.json"
+    },
+    {
+      "bullet": "Working-tree changes (`F15.changes`).",
+      "ids": [
+        "F15.changes"
+      ],
+      "line": 151,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 367,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-02-working-tree-changes-f15-changes.json"
+    },
+    {
+      "bullet": "Staged deletions, additions and renames (`F15.changes-statuses`).",
+      "ids": [
+        "F15.changes-statuses"
+      ],
+      "line": 163,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 306,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-03-staged-deletions-additions-and-renames-f.json"
+    },
+    {
+      "bullet": "Default display base (`F15.changes-base`).",
+      "ids": [
+        "F15.changes-base"
+      ],
+      "line": 180,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1378,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-04-default-display-base-f15-changes-base.json"
+    },
+    {
+      "bullet": "Explicit base and its errors (`F15.changes-ref`).",
+      "ids": [
+        "F15.changes-ref"
+      ],
+      "line": 211,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1712,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-05-explicit-base-and-its-errors-f15-changes.json"
+    },
+    {
+      "bullet": "Nested repository (`F15.changes-nested-repo`).",
+      "ids": [
+        "F15.changes-nested-repo"
+      ],
+      "line": 228,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 615,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-06-nested-repository-f15-changes-nested-rep.json"
+    },
+    {
+      "bullet": "Repository below the requested directory (`F15.changes-repo-below-path`), known bug.",
+      "ids": [
+        "F15.changes-repo-below-path"
+      ],
+      "line": 246,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 565,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-07-repository-below-the-requested-directory.json",
+      "failed_line": 6,
+      "failed_command": "control-agent-server api GET /api/git/changes --query path=\"$F/ws\" --expect 200 --check . len-eq 2 --check 0.path eq proj/README.md --check 1.path eq proj/notes.txt --save F15.changes-repo-below-path/ws",
+      "stdout_tail": " \"0.path eq README.md\",\n      \"ok\": true,\n      \"actual\": \"README.md\"\n    },\n    {\n      \"check\": \"1.path eq notes.txt\",\n      \"ok\": true,\n      \"actual\": \"notes.txt\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/git/changes\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15/ws\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"2\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": [],\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 51,\n  \"checks\": [\n    {\n      \"check\": \". len-eq 2\",\n      \"ok\": false,\n      \"actual\": \"[]\"\n    },\n    {\n      \"check\": \"0.path eq proj/README.md\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    },\n    {\n      \"check\": \"1.path eq proj/notes.txt\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.changes-repo-below-path/ws.json\",\n  \"hint\": \"failed check: . len-eq 2; 0.path eq proj/README.md; 1.path eq proj/notes.txt\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "File names with a space or non-ASCII characters (`F15.changes-special-names`), known bug.",
+      "ids": [
+        "F15.changes-special-names"
+      ],
+      "line": 266,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 619,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-08-file-names-with-a-space-or-non-ascii-cha.json",
+      "failed_line": 12,
+      "failed_command": "control-agent-server api GET /api/git/changes --query path=\"$F/names\" --expect 200 --check . len-eq 1 --check 0.status eq UPDATED --check 0.path eq 'my notes.md' --save F15.changes-special-names/space",
+      "stdout_tail": ": \"0.path eq untracked note.md\",\n      \"ok\": true,\n      \"actual\": \"untracked note.md\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/git/changes\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15/names\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"62\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Unexpected git diff output format: M\\tmy notes.md\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 76,\n  \"checks\": [\n    {\n      \"check\": \". len-eq 1\",\n      \"ok\": true,\n      \"actual\": \"{\\\"detail\\\": \\\"Unexpected git diff output format: M\\\\tmy notes.md\\\"}\"\n    },\n    {\n      \"check\": \"0.status eq UPDATED\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    },\n    {\n      \"check\": \"0.path eq my notes.md\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.changes-special-names/space.json\",\n  \"hint\": \"expected 200, got 400\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Subdirectory of a repository (`F15.changes-subdir-paths`), known bug.",
+      "ids": [
+        "F15.changes-subdir-paths"
+      ],
+      "line": 298,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 725,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-09-subdirectory-of-a-repository-f15-changes.json",
+      "failed_line": 8,
+      "failed_command": "python3 - \"$F/subdir.json\" \"$F/subdir/src\" \"$F/subdir\" <<'PY'\nimport json, os, sys\nchanges = json.load(open(sys.argv[1]))\npaths = [c[\"path\"] for c in changes if c[\"status\"] != \"DELETED\"]\nbases = [b for b in sys.argv[2:] if all(os.path.exists(os.path.join(b, p)) for p in paths)]\nassert paths and bases, f\"no single base resolves every path: {changes}\"\nPY",
+      "stdout_tail": ": \"notes.txt\"\n    },\n    {\n      \"check\": \"2.path eq src/app.py\",\n      \"ok\": true,\n      \"actual\": \"src/app.py\"\n    },\n    {\n      \"check\": \"3.path eq src/new.py\",\n      \"ok\": true,\n      \"actual\": \"src/new.py\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/git/changes\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15/subdir/src\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"117\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": [\n      {\n        \"status\": \"UPDATED\",\n        \"path\": \"README.md\"\n      },\n      {\n        \"status\": \"ADDED\",\n        \"path\": \"new.py\"\n      },\n      {\n        \"status\": \"UPDATED\",\n        \"path\": \"src/app.py\"\n      }\n    ],\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 70,\n  \"raw_out\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15/subdir.json\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.changes-subdir-paths/src.json\"\n}\n",
+      "stderr_tail": "Traceback (most recent call last):\n  File \"<stdin>\", line 5, in <module>\nAssertionError: no single base resolves every path: [{'status': 'UPDATED', 'path': 'README.md'}, {'status': 'ADDED', 'path': 'new.py'}, {'status': 'UPDATED', 'path': 'src/app.py'}]\n"
+    },
+    {
+      "bullet": "Not a repository, or no commits yet (`F15.non-repo`).",
+      "ids": [
+        "F15.non-repo"
+      ],
+      "line": 326,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2467,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-10-not-a-repository-or-no-commits-yet-f15-n.json"
+    },
+    {
+      "bullet": "Per-file diff (`F15.diff`).",
+      "ids": [
+        "F15.diff"
+      ],
+      "line": 350,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1282,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-11-per-file-diff-f15-diff.json"
+    },
+    {
+      "bullet": "Diff of one commit (`F15.diff-commit`).",
+      "ids": [
+        "F15.diff-commit"
+      ],
+      "line": 369,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1188,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-12-diff-of-one-commit-f15-diff-commit.json"
+    },
+    {
+      "bullet": "Diff errors (`F15.diff-errors`).",
+      "ids": [
+        "F15.diff-errors"
+      ],
+      "line": 391,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2388,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-13-diff-errors-f15-diff-errors.json"
+    },
+    {
+      "bullet": "Phantom whitespace diff (`F15.diff-whitespace`), known bug.",
+      "ids": [
+        "F15.diff-whitespace"
+      ],
+      "line": 410,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 937,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-14-phantom-whitespace-diff-f15-diff-whitesp.json",
+      "failed_line": 13,
+      "failed_command": "python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); assert d[\"original\"] == d[\"modified\"], d' \"$F/ws-$name.json\"",
+      "stdout_tail": "uns/20261013-021709-764e-map-f15/fixtures/qa-f15/ws-crlf.json\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.diff-whitespace/crlf.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/git/diff\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15/ws-files/lead.txt\"\n      ],\n      [\n        \"ref\",\n        \"HEAD\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"69\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"modified\": \"  indented line\\nbody\",\n      \"original\": \"indented line\\nbody\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 52,\n  \"checks\": [\n    {\n      \"check\": \"modified len-ge 1\",\n      \"ok\": true,\n      \"actual\": \"  indented line\\nbody\"\n    }\n  ],\n  \"raw_out\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15/ws-lead.json\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.diff-whitespace/lead.json\"\n}\n",
+      "stderr_tail": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nAssertionError: {'modified': '  indented line\\nbody', 'original': 'indented line\\nbody'}\n"
+    },
+    {
+      "bullet": "Diff of a deleted file (`F15.diff-deleted-file`), known bug.",
+      "ids": [
+        "F15.diff-deleted-file"
+      ],
+      "line": 437,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 583,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-15-diff-of-a-deleted-file-f15-diff-deleted-.json",
+      "failed_line": 5,
+      "failed_command": "control-agent-server api GET /api/git/diff --query path=\"$F/deleted/src/util.py\" --expect 200 --check original eq \"$(git -C \"$REPO\" show HEAD:src/util.py)\" --check modified eq '' --save F15.diff-deleted-file/diff",
+      "stdout_tail": "\": true,\n      \"actual\": \"DELETED\"\n    },\n    {\n      \"check\": \"2.path eq src/util.py\",\n      \"ok\": true,\n      \"actual\": \"src/util.py\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/git/diff\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15/deleted/src/util.py\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"137\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"File does not exist: /workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15/deleted/src/util.py\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 45,\n  \"checks\": [\n    {\n      \"check\": \"original eq def add(a, b):\\n    return a + b\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    },\n    {\n      \"check\": \"modified eq \",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.diff-deleted-file/diff.json\",\n  \"hint\": \"expected 200, got 400\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Commit history (`F15.commits`).",
+      "ids": [
+        "F15.commits"
+      ],
+      "line": 455,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 295,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-16-commit-history-f15-commits.json",
+      "failed_line": 1,
+      "failed_command": "control-agent-server api GET /api/git/commits --query path=\"$REPO\" --expect 200 --check commits len-eq 2 --check has_more eq false --check commits.0.sha eq \"$C2\" --check commits.0.subject eq 'Add util' --check commits.0.short_sha eq \"$(git -C \"$REPO\" log -1 --format=%h)\" --check commits.0.author eq 'QA Verify' --check commits.0.timestamp matches '^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d[+-]\\d\\d:\\d\\d$' --check commits.1.sha eq \"$C1\" --check commits.1.subject eq 'Initial commit' --save F15.commits/all",
+      "stdout_tail": "al\": \"false\"\n    },\n    {\n      \"check\": \"commits.0.sha eq dc6229eb1a87e4b57578335a665ab05f1feaa545\",\n      \"ok\": true,\n      \"actual\": \"dc6229eb1a87e4b57578335a665ab05f1feaa545\"\n    },\n    {\n      \"check\": \"commits.0.subject eq Add util\",\n      \"ok\": true,\n      \"actual\": \"Add util\"\n    },\n    {\n      \"check\": \"commits.0.short_sha eq dc6229e\",\n      \"ok\": true,\n      \"actual\": \"dc6229e\"\n    },\n    {\n      \"check\": \"commits.0.author eq QA Verify\",\n      \"ok\": true,\n      \"actual\": \"QA Verify\"\n    },\n    {\n      \"check\": \"commits.0.timestamp matches ^\\\\d{4}-\\\\d\\\\d-\\\\d\\\\dT\\\\d\\\\d:\\\\d\\\\d:\\\\d\\\\d[+-]\\\\d\\\\d:\\\\d\\\\d$\",\n      \"ok\": false,\n      \"actual\": \"2026-10-13T02:17:17Z\"\n    },\n    {\n      \"check\": \"commits.1.sha eq 28af91cef6f2d1be2b7052ef2e1685494d297ab5\",\n      \"ok\": true,\n      \"actual\": \"28af91cef6f2d1be2b7052ef2e1685494d297ab5\"\n    },\n    {\n      \"check\": \"commits.1.subject eq Initial commit\",\n      \"ok\": true,\n      \"actual\": \"Initial commit\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.commits/all.json\",\n  \"hint\": \"failed check: commits.0.timestamp matches ^\\\\d{4}-\\\\d\\\\d-\\\\d\\\\dT\\\\d\\\\d:\\\\d\\\\d:\\\\d\\\\d[+-]\\\\d\\\\d:\\\\d\\\\d$\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Files of one commit (`F15.commit-changes`).",
+      "ids": [
+        "F15.commit-changes"
+      ],
+      "line": 475,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2286,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-17-files-of-one-commit-f15-commit-changes.json"
+    },
+    {
+      "bullet": "Conversation-scoped views (`F15.scoped`).",
+      "ids": [
+        "F15.scoped"
+      ],
+      "line": 498,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2685,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-18-conversation-scoped-views-f15-scoped.json"
+    },
+    {
+      "bullet": "Workspace guard (`F15.scoped-guard`).",
+      "ids": [
+        "F15.scoped-guard"
+      ],
+      "line": 520,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7870,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-19-workspace-guard-f15-scoped-guard.json"
+    },
+    {
+      "bullet": "After a restart (`F15.scoped-restart`).",
+      "ids": [
+        "F15.scoped-restart"
+      ],
+      "line": 565,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 39022,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-20-after-a-restart-f15-scoped-restart.json"
+    },
+    {
+      "bullet": "Python SDK workspace (`F15.sdk-workspace`).",
+      "ids": [
+        "F15.sdk-workspace"
+      ],
+      "line": 576,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 21221,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-21-python-sdk-workspace-f15-sdk-workspace.json"
+    },
+    {
+      "bullet": "TypeScript client (`F15.ts-client`).",
+      "ids": [
+        "F15.ts-client"
+      ],
+      "line": 612,
+      "status": "fail",
+      "exit_code": 254,
+      "elapsed_ms": 9519,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-22-typescript-client-f15-ts-client.json",
+      "failed_line": 1,
+      "failed_command": "( cd clients/typescript && npm ci && npm run build )",
+      "stdout_tail": "",
+      "stderr_tail": "warn tar TAR_ENTRY_ERROR ENOENT: no such file or directory, open '/workspace/agent-sdk-verify/clients/typescript/node_modules/@vitest/coverage-v8/node_modules/@bcoe/v8-coverage/README.md'\nnpm warn tar TAR_ENTRY_ERROR ENOENT: no such file or directory, lstat '/workspace/agent-sdk-verify/clients/typescript/node_modules/@typescript-eslint/scope-manager/dist'\nnpm warn tar TAR_ENTRY_ERROR ENOENT: no such file or directory, open '/workspace/agent-sdk-verify/clients/typescript/node_modules/@vitest/mocker/README.md'\nnpm error code ENOENT\nnpm error syscall mkdir\nnpm error path /home/agent/.npm/_cacache\nnpm error errno -2\nnpm error enoent ENOENT: no such file or directory, mkdir '/home/agent/.npm/_cacache'\nnpm error enoent This is related to npm not being able to find a file.\nnpm error enoent\nnpm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0\nnpm notice To update run: npm install -g npm@12.2.0\nnpm notice\nnpm error Log files were not written due to an error writing to the directory: /home/agent/.npm/_logs\nnpm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal\n"
+    },
+    {
+      "bullet": "What the agent changed (`F15.agent-changes`).",
+      "ids": [
+        "F15.agent-changes"
+      ],
+      "line": 657,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10394,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-23-what-the-agent-changed-f15-agent-changes.json"
+    },
+    {
+      "bullet": "Token lookup (`F15.repo-search-token`).",
+      "ids": [
+        "F15.repo-search-token"
+      ],
+      "line": 673,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10978,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-24-token-lookup-f15-repo-search-token.json"
+    },
+    {
+      "bullet": "Provider and parameter validation (`F15.repo-search-errors`).",
+      "ids": [
+        "F15.repo-search-errors"
+      ],
+      "line": 697,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 9380,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-25-provider-and-parameter-validation-f15-re.json"
+    },
+    {
+      "bullet": "GitHub unreachable (`F15.repo-search-unreachable`).",
+      "ids": [
+        "F15.repo-search-unreachable"
+      ],
+      "line": 709,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 136869,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-26-github-unreachable-f15-repo-search-unrea.json",
+      "failed_line": 10,
+      "failed_command": "control-agent-server doctor",
+      "stdout_tail": "tool_set\",\n          \"edit\",\n          \"list_directory\",\n          \"read_file\",\n          \"write_file\",\n          \"glob\",\n          \"grep\",\n          \"planning_file_editor\"\n        ]\n      }\n    },\n    {\n      \"name\": \"auth-rejects-missing-key\",\n      \"ok\": true,\n      \"required\": true,\n      \"detail\": 401\n    },\n    {\n      \"name\": \"auth-accepts-key\",\n      \"ok\": true,\n      \"required\": true,\n      \"detail\": {\n        \"status\": 200,\n        \"dormant\": false\n      }\n    },\n    {\n      \"name\": \"openapi\",\n      \"ok\": false,\n      \"required\": true,\n      \"detail\": \"ReadTimeout: timed out\"\n    },\n    {\n      \"name\": \"ws-rejects-bad-key\",\n      \"ok\": true,\n      \"required\": true,\n      \"detail\": {\n        \"path\": \"/sockets/bash-events\",\n        \"auth\": \"bad\",\n        \"open\": false,\n        \"close_code\": 4001\n      }\n    },\n    {\n      \"name\": \"ws-accepts-first-frame-auth\",\n      \"ok\": true,\n      \"required\": true,\n      \"detail\": null\n    },\n    {\n      \"name\": \"log-tracebacks\",\n      \"ok\": true,\n      \"required\": false,\n      \"detail\": {\n        \"count\": 0\n      }\n    }\n  ],\n  \"hint\": \"Fix the failing check before driving; `control-agent-server logs --tail 80` shows the server log.\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "GitHub timeout (`F15.repo-search-timeout`).",
+      "ids": [
+        "F15.repo-search-timeout"
+      ],
+      "line": 729,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 90776,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/map-run/F15-git-27-github-timeout-f15-repo-search-timeout.json",
+      "failed_line": 9,
+      "failed_command": "control-agent-server api GET /api/git/repositories/search --query provider=github --expect 504 --expect-max-ms 30000 --check detail eq 'Internal Server Error' --check exception eq '504: GitHub repository search timed out' --check . not-contains qa-f15-not-a-real-token --save F15.repo-search-timeout/silent-proxy",
+      "stdout_tail": "status\": 502,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/git/repositories/search\",\n    \"query\": [\n      [\n        \"provider\",\n        \"github\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 502,\n    \"headers\": {\n      \"content-length\": \"85\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"502: GitHub repository search failed\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 15556,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Internal Server Error\",\n      \"ok\": true,\n      \"actual\": \"Internal Server Error\"\n    },\n    {\n      \"check\": \"exception eq 504: GitHub repository search timed out\",\n      \"ok\": false,\n      \"actual\": \"502: GitHub repository search failed\"\n    },\n    {\n      \"check\": \". not-contains qa-f15-not-a-real-token\",\n      \"ok\": true,\n      \"actual\": \"{\\\"detail\\\": \\\"Internal Server Error\\\", \\\"exception\\\": \\\"502: GitHub repository search failed\\\"}\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.repo-search-timeout/silent-proxy.json\",\n  \"hint\": \"expected 504, got 502\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Live GitHub listing (`F15.repo-search-github`), blocked.",
+      "ids": [
+        "F15.repo-search-github"
+      ],
+      "status": "blocked"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15",
+  "launch_flags": []
+}

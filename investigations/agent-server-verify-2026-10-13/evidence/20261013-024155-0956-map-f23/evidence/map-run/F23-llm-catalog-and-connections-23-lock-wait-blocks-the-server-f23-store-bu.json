@@ -1,0 +1,15 @@
+{
+  "file": "F23-llm-catalog-and-connections.md",
+  "bullet": "Lock wait blocks the server (`F23.store-busy-responsive`), known bug.",
+  "ids": [
+    "F23.store-busy-responsive"
+  ],
+  "line": 614,
+  "script": "control-agent-server api GET /alive --auth none --expect 200 --expect-max-ms 3000\nHELD=\"$F23/lock-held-2\"\nrm -f \"$HELD\"\nLISTER=\"\"\nflock -x \"$(dirname \"$CF\")/.provider-connections.lock\" sh -c \"touch '$HELD'; sleep 16\" &\nLOCKER=$!\ntrap 'wait $LISTER $LOCKER > /dev/null 2>&1 || true' EXIT\nfor i in $(seq 100); do test -e \"$HELD\" && break; sleep 0.1; done\ntest -e \"$HELD\"\nT0=$SECONDS\ncontrol-agent-server api GET /api/llm/provider-connections --timeout 60 --expect 200 --quiet --save F23.store-busy-responsive/list > /dev/null &\nLISTER=$!\nsleep 5\ncontrol-agent-server api GET /alive --auth none --expect 200 --expect-max-ms 3000 --timeout 60 --save F23.store-busy-responsive/alive  # bug\nwait \"$LISTER\"\ntest $((SECONDS - T0)) -ge 10\nwait \"$LOCKER\"\n",
+  "exit_code": 1,
+  "elapsed_ms": 16683,
+  "failed_line": 14,
+  "failed_command": "control-agent-server api GET /alive --auth none --expect 200 --expect-max-ms 3000 --timeout 60 --save F23.store-busy-responsive/alive",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 91\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 10676,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.store-busy-responsive/alive.json\",\n  \"hint\": \"took 10676 ms, limit 3000 ms\"\n}\n",
+  "stderr": ""
+}

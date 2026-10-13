@@ -1,0 +1,15 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "Whitespace-only title (`F04.patch-whitespace-title`), known bug.",
+  "ids": [
+    "F04.patch-whitespace-title"
+  ],
+  "line": 609,
+  "script": "control-agent-server api PATCH \"<redacted:session-cookie>/$CHILD\" --json '{\"title\": \"QA F04 child\"}' --check success eq true\ncontrol-agent-server api PATCH \"<redacted:session-cookie>/$CHILD\" --json '{\"title\": \"   \"}' --expect 422 --save F04.patch-whitespace-title/patch  # bug\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CHILD\" --check title eq 'QA F04 child'\n",
+  "exit_code": 1,
+  "elapsed_ms": 757,
+  "failed_line": 2,
+  "failed_command": "control-agent-server api PATCH \"<redacted:session-cookie>/$CHILD\" --json '{\"title\": \"   \"}' --expect 422 --save F04.patch-whitespace-title/patch",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"PATCH\",\n    \"path\": \"<redacted:session-cookie>/bc92b71a-9bbf-4458-8df0-b429a187f25c\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"title\": \"QA F04 child\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 75,\n  \"checks\": [\n    {\n      \"check\": \"success eq true\",\n      \"ok\": true,\n      \"actual\": \"true\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"PATCH\",\n    \"path\": \"<redacted:session-cookie>/bc92b71a-9bbf-4458-8df0-b429a187f25c\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"title\": \"   \"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 64,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024143-6004-map-f04/evidence/F04.patch-whitespace-title/patch.json\",\n  \"hint\": \"expected 422, got 200\"\n}\n",
+  "stderr": ""
+}

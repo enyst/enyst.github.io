@@ -1,0 +1,435 @@
+{
+  "ok": true,
+  "file": "F20-llm-profiles.md",
+  "summary": {
+    "pass": 30,
+    "fail": 0,
+    "xfail": 6,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 104,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7930,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-00-preconditions.json"
+    },
+    {
+      "bullet": "Key required (`F20.auth-required`).",
+      "ids": [
+        "F20.auth-required"
+      ],
+      "line": 236,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 17013,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-01-key-required-f20-auth-required.json"
+    },
+    {
+      "bullet": "Save (`F20.save`).",
+      "ids": [
+        "F20.save"
+      ],
+      "line": 250,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3972,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-02-save-f20-save.json"
+    },
+    {
+      "bullet": "Encrypted at rest (`F20.key-encrypted-at-rest`).",
+      "ids": [
+        "F20.key-encrypted-at-rest"
+      ],
+      "line": 265,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1557,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-03-encrypted-at-rest-f20-key-encrypted-at-r.json"
+    },
+    {
+      "bullet": "Reading the key (`F20.get-secrets`).",
+      "ids": [
+        "F20.get-secrets"
+      ],
+      "line": 278,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4899,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-04-reading-the-key-f20-get-secrets.json"
+    },
+    {
+      "bullet": "Encrypted round trip (`F20.save-encrypted-roundtrip`).",
+      "ids": [
+        "F20.save-encrypted-roundtrip"
+      ],
+      "line": 293,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5313,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-05-encrypted-round-trip-f20-save-encrypted-.json"
+    },
+    {
+      "bullet": "Save without secrets (`F20.save-without-secrets`).",
+      "ids": [
+        "F20.save-without-secrets"
+      ],
+      "line": 306,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2953,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-06-save-without-secrets-f20-save-without-se.json"
+    },
+    {
+      "bullet": "Unknown names (`F20.not-found`).",
+      "ids": [
+        "F20.not-found"
+      ],
+      "line": 321,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2705,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-07-unknown-names-f20-not-found.json"
+    },
+    {
+      "bullet": "Name rules (`F20.name-rules`).",
+      "ids": [
+        "F20.name-rules"
+      ],
+      "line": 332,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6137,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-08-name-rules-f20-name-rules.json"
+    },
+    {
+      "bullet": "Corrupted files (`F20.corrupt-files`).",
+      "ids": [
+        "F20.corrupt-files"
+      ],
+      "line": 358,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5138,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-09-corrupted-files-f20-corrupt-files.json"
+    },
+    {
+      "bullet": "Store busy (`F20.store-busy`).",
+      "ids": [
+        "F20.store-busy"
+      ],
+      "line": 390,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 36079,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-10-store-busy-f20-store-busy.json"
+    },
+    {
+      "bullet": "Lock wait blocks the server (`F20.store-busy-responsive`), known bug.",
+      "ids": [
+        "F20.store-busy-responsive"
+      ],
+      "line": 417,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 37690,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-11-lock-wait-blocks-the-server-f20-store-bu.json",
+      "failed_line": 16,
+      "failed_command": "jq -e '.elapsed_ms <= 3000' \"$F20/busy-alive.json\"",
+      "stdout_tail": ",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 44\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 23523,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/F20.store-busy-responsive/alive.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/profiles/qa-busy\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"40\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Profile 'qa-busy' not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 418\n}\nfalse\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Profile limit (`F20.profile-limit`).",
+      "ids": [
+        "F20.profile-limit"
+      ],
+      "line": 451,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 101194,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-12-profile-limit-f20-profile-limit.json"
+    },
+    {
+      "bullet": "Validate a working config (`F20.validate-live`).",
+      "ids": [
+        "F20.validate-live"
+      ],
+      "line": 473,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6312,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-13-validate-a-working-config-f20-validate-l.json"
+    },
+    {
+      "bullet": "Validate rejects (`F20.validate-rejects`).",
+      "ids": [
+        "F20.validate-rejects"
+      ],
+      "line": 490,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3491,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-14-validate-rejects-f20-validate-rejects.json"
+    },
+    {
+      "bullet": "DeepSeek 401 type (`F20.validate-bad-key-type`), known bug.",
+      "ids": [
+        "F20.validate-bad-key-type"
+      ],
+      "line": 504,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1496,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-15-deepseek-401-type-f20-validate-bad-key-t.json",
+      "failed_line": 5,
+      "failed_command": "jq -e '.response.body.error.type == \"LLMAuthenticationError\"' \"$F20/bad-key.json\"",
+      "stdout_tail": "tion - {\\\"error\\\":{\\\"message\\\":\\\"Authentication Fails, Your api key: ****-key is invalid (request_id: d7963bda-f4e6-4a21-ad73-381c9f4a4514)\\\",\\\"type\\\":\\\"authentication_error\\\",\\\"param\\\":null,\\\"code\\\":\\\"invalid_request_error\\\"}}\"\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 734,\n  \"checks\": [\n    {\n      \"check\": \"valid eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"error.message contains authentication_error\",\n      \"ok\": true,\n      \"actual\": \"litellm.BadRequestError: DeepseekException - {\\\"error\\\":{\\\"message\\\":\\\"Authentication Fails, Your api key: ****-key is invalid (request_id: d7963bda-f4e6-4a21-ad73-381c9f4a4514)\\\",\\\"type\\\":\\\"authentication_err\\u2026\"\n    },\n    {\n      \"check\": \"error.message not-contains <redacted:api_key>\",\n      \"ok\": true,\n      \"actual\": \"litellm.BadRequestError: DeepseekException - {\\\"error\\\":{\\\"message\\\":\\\"Authentication Fails, Your api key: ****-key is invalid (request_id: d7963bda-f4e6-4a21-ad73-381c9f4a4514)\\\",\\\"type\\\":\\\"authentication_err\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/F20.validate-bad-key-type/deepseek-401.json\"\n}\nfalse\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Provider failures (`F20.validate-provider-errors`).",
+      "ids": [
+        "F20.validate-provider-errors"
+      ],
+      "line": 524,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 16046,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-16-provider-failures-f20-validate-provider-.json"
+    },
+    {
+      "bullet": "Subscription without a login (`F20.validate-subscription-login`).",
+      "ids": [
+        "F20.validate-subscription-login"
+      ],
+      "line": 562,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3261,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-17-subscription-without-a-login-f20-validat.json"
+    },
+    {
+      "bullet": "Unreachable endpoint is slow (`F20.validate-unreachable-bounded`), known bug.",
+      "ids": [
+        "F20.validate-unreachable-bounded"
+      ],
+      "line": 578,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 121955,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-18-unreachable-endpoint-is-slow-f20-validat.json",
+      "failed_line": 5,
+      "failed_command": "jq -e '.elapsed_ms <= 30000' \"$F20/unreachable.json\"",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/profiles/qa-unreachable/validate\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"llm\": {\n        \"model\": \"openai/qa-unreachable\",\n        \"base_url\": \"http://127.0.0.1:9/v1\",\n        \"api_key\": \"<redacted:api_key>\"\n      }\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"159\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"valid\": false,\n      \"error\": {\n        \"type\": \"LLMServiceUnavailableError\",\n        \"message\": \"litellm.InternalServerError: InternalServerError: OpenAIException - Connection error.\"\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 120766,\n  \"checks\": [\n    {\n      \"check\": \"valid eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"error.type eq LLMServiceUnavailableError\",\n      \"ok\": true,\n      \"actual\": \"LLMServiceUnavailableError\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/F20.validate-unreachable-bounded/default-retries.json\"\n}\nfalse\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Hanging provider is slower (`F20.validate-hang-bounded`), known bug.",
+      "ids": [
+        "F20.validate-hang-bounded"
+      ],
+      "line": 597,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 61800,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-19-hanging-provider-is-slower-f20-validate-.json",
+      "failed_line": 11,
+      "failed_command": "test \"$RC\" = 0",
+      "stdout_tail": "e\": \"deepseek-flash\",\n          \"model\": \"deepseek/deepseek-flash\",\n          \"base_url\": null,\n          \"provider_connection_id\": null,\n          \"provider_connection_broken\": false,\n          \"api_key_set\": true\n        },\n        {\n          \"name\": \"deepseek-pro\",\n          \"model\": \"deepseek/deepseek-v4-pro\",\n          \"base_url\": null,\n          \"provider_connection_id\": null,\n          \"provider_connection_broken\": false,\n          \"api_key_set\": true\n        },\n        {\n          \"name\": \"qa-flash\",\n          \"model\": \"deepseek/deepseek-flash\",\n          \"base_url\": null,\n          \"provider_connection_id\": null,\n          \"provider_connection_broken\": false,\n          \"api_key_set\": true\n        },\n        {\n          \"name\": \"qa-nokey\",\n          \"model\": \"openai/qa-nokey\",\n          \"base_url\": null,\n          \"provider_connection_id\": null,\n          \"provider_connection_broken\": false,\n          \"api_key_set\": false\n        }\n      ],\n      \"active_profile\": \"deepseek-flash\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 138,\n  \"checks\": [\n    {\n      \"check\": \"active_profile eq deepseek-flash\",\n      \"ok\": true,\n      \"actual\": \"deepseek-flash\"\n    }\n  ]\n}\ntrue\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Activate (`F20.activate`).",
+      "ids": [
+        "F20.activate"
+      ],
+      "line": 629,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4211,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-20-activate-f20-activate.json"
+    },
+    {
+      "bullet": "Activation drives conversations (`F20.activate-conversation`).",
+      "ids": [
+        "F20.activate-conversation"
+      ],
+      "line": 645,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7006,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-21-activation-drives-conversations-f20-acti.json"
+    },
+    {
+      "bullet": "ACP settings (`F20.activate-acp`).",
+      "ids": [
+        "F20.activate-acp"
+      ],
+      "line": 658,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 9961,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-22-acp-settings-f20-activate-acp.json"
+    },
+    {
+      "bullet": "SDK consumer (`F20.sdk-get-llm`).",
+      "ids": [
+        "F20.sdk-get-llm"
+      ],
+      "line": 676,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 19136,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-23-sdk-consumer-f20-sdk-get-llm.json"
+    },
+    {
+      "bullet": "TypeScript client (`F20.ts-client`).",
+      "ids": [
+        "F20.ts-client"
+      ],
+      "line": 687,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2294,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-24-typescript-client-f20-ts-client.json"
+    },
+    {
+      "bullet": "Dangling provider link (`F20.activate-dangling-provider`).",
+      "ids": [
+        "F20.activate-dangling-provider"
+      ],
+      "line": 701,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8573,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-25-dangling-provider-link-f20-activate-dang.json"
+    },
+    {
+      "bullet": "Linked provider (`F20.activate-linked-provider`).",
+      "ids": [
+        "F20.activate-linked-provider"
+      ],
+      "line": 726,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10347,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-26-linked-provider-f20-activate-linked-prov.json"
+    },
+    {
+      "bullet": "SDK on a linked profile (`F20.sdk-get-llm-linked`).",
+      "ids": [
+        "F20.sdk-get-llm-linked"
+      ],
+      "line": 758,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 27180,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-27-sdk-on-a-linked-profile-f20-sdk-get-llm-.json"
+    },
+    {
+      "bullet": "No cipher (`F20.no-cipher`).",
+      "ids": [
+        "F20.no-cipher"
+      ],
+      "line": 779,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 40584,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-28-no-cipher-f20-no-cipher.json"
+    },
+    {
+      "bullet": "Restart (`F20.persist-restart`).",
+      "ids": [
+        "F20.persist-restart"
+      ],
+      "line": 803,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 51574,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-29-restart-f20-persist-restart.json"
+    },
+    {
+      "bullet": "Rename (`F20.rename`).",
+      "ids": [
+        "F20.rename"
+      ],
+      "line": 819,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6382,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-30-rename-f20-rename.json"
+    },
+    {
+      "bullet": "Rename errors (`F20.rename-errors`).",
+      "ids": [
+        "F20.rename-errors"
+      ],
+      "line": 837,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7562,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-31-rename-errors-f20-rename-errors.json"
+    },
+    {
+      "bullet": "Guarded delete (`F20.delete-guarded`).",
+      "ids": [
+        "F20.delete-guarded"
+      ],
+      "line": 851,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3432,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-32-guarded-delete-f20-delete-guarded.json"
+    },
+    {
+      "bullet": "Delete (`F20.delete`).",
+      "ids": [
+        "F20.delete"
+      ],
+      "line": 862,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2649,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-33-delete-f20-delete.json"
+    },
+    {
+      "bullet": "Delete through the `.json` alias (`F20.json-alias-guard`), known bug.",
+      "ids": [
+        "F20.json-alias-guard"
+      ],
+      "line": 880,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 4921,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-34-delete-through-the-json-alias-f20-json-a.json",
+      "failed_line": 11,
+      "failed_command": "jq -e '.status == 409' \"$F20/alias-delete.json\"",
+      "stdout_tail": "   {\n          \"name\": \"deepseek-flash\",\n          \"model\": \"deepseek/deepseek-flash\",\n          \"base_url\": null,\n          \"provider_connection_id\": null,\n          \"provider_connection_broken\": false,\n          \"api_key_set\": true\n        },\n        {\n          \"name\": \"deepseek-pro\",\n          \"model\": \"deepseek/deepseek-v4-pro\",\n          \"base_url\": null,\n          \"provider_connection_id\": null,\n          \"provider_connection_broken\": false,\n          \"api_key_set\": true\n        },\n        {\n          \"name\": \"qa-nokey\",\n          \"model\": \"openai/qa-nokey\",\n          \"base_url\": null,\n          \"provider_connection_id\": null,\n          \"provider_connection_broken\": false,\n          \"api_key_set\": false\n        }\n      ],\n      \"active_profile\": \"deepseek-flash\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 55,\n  \"checks\": [\n    {\n      \"check\": \"profiles not-contains \\\"name\\\": \\\"qa-alias\\\"\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"name\\\": \\\"deepseek-flash\\\", \\\"model\\\": \\\"deepseek/deepseek-flash\\\", \\\"base_url\\\": null, \\\"provider_connection_id\\\": null, \\\"provider_connection_broken\\\": false, \\\"api_key_set\\\": true}, {\\\"name\\\": \\\"deepseek-pro\\\", \\\"m\\u2026\"\n    }\n  ]\n}\nfalse\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Secret key rotation (`F20.secret-key-rotation`), known bug.",
+      "ids": [
+        "F20.secret-key-rotation"
+      ],
+      "line": 915,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 31593,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-35-secret-key-rotation-f20-secret-key-rotat.json",
+      "failed_line": 8,
+      "failed_command": "control-agent-server api POST /api/profiles/qa-rotate/activate --expect 4xx --save F20.secret-key-rotation/activate",
+      "stdout_tail": " \"api_key_set\": false\n        },\n        {\n          \"name\": \"qa-rotate\",\n          \"model\": \"openai/qa-rotate\",\n          \"base_url\": null,\n          \"provider_connection_id\": null,\n          \"provider_connection_broken\": false,\n          \"api_key_set\": true\n        }\n      ],\n      \"active_profile\": \"deepseek-flash\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 132,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/F20.secret-key-rotation/list.json\"\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/profiles/qa-rotate/activate\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"113\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"name\": \"qa-rotate\",\n      \"message\": \"Profile 'qa-rotate' activated and applied to current settings\",\n      \"llm_applied\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 119,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20/evidence/F20.secret-key-rotation/activate.json\",\n  \"hint\": \"expected 4xx, got 200\"\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20",
+  "launch_flags": []
+}

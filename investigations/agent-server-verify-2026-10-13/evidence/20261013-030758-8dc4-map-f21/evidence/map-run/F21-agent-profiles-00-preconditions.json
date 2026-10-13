@@ -1,0 +1,13 @@
+{
+  "file": "F21-agent-profiles.md",
+  "bullet": "Preconditions",
+  "ids": [],
+  "line": 110,
+  "script": "control-agent-server llm preset deepseek\ncontrol-agent-server state ls 'home/.openhands/agent-profiles/*.json' --expect-count 0\nmkdir -p \"$AGENT_SERVER_VERIFY_RUN/home/.agents/skills/qa-f21-skill\"\nprintf -- '---\\nname: qa-f21-skill\\ndescription: QA F21 user skill\\n---\\nQA_F21_SKILL_BODY\\n' \\\n  > \"$AGENT_SERVER_VERIFY_RUN/home/.agents/skills/qa-f21-skill/SKILL.md\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 1877,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"profiles\": [\n    {\n      \"profile\": \"deepseek-flash\",\n      \"model\": \"deepseek/deepseek-flash\",\n      \"validate\": {\n        \"status\": 200,\n        \"body\": {\n          \"valid\": true,\n          \"error\": null\n        }\n      },\n      \"saved\": 201,\n      \"activated\": 200\n    },\n    {\n      \"profile\": \"deepseek-pro\",\n      \"model\": \"deepseek/deepseek-v4-pro\",\n      \"saved\": 201\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"pattern\": \"home/.openhands/agent-profiles/*.json\",\n  \"count\": 0,\n  \"files\": []\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,51 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "<redacted:session-cookie>",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "workspace": {
+        "working_dir": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/fixtures/qa-f04-ws"
+      },
+      "agent": {
+        "llm": {
+          "model": "openai/qa-offline",
+          "api_key": "<redacted:api_key>",
+          "base_url": "http://127.0.0.1:9/v1",
+          "num_retries": 0
+        },
+        "tools": [],
+        "agent_context": {
+          "skills": [
+            {
+              "name": "qa-f04-skill",
+              "content": "Answer briefly."
+            }
+          ]
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "325",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [],
+          "msg": "Value error, Observability span name exceeds maximum length of 128 characters",
+          "input": "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+          "url": "https://errors.pydantic.dev/2.13/v/value_error"
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 138
+}

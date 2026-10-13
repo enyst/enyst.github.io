@@ -1,0 +1,15 @@
+{
+  "file": "F32-webhooks-and-telemetry.md",
+  "bullet": "Telemetry is off by default (`F32.telemetry-off-by-default`).",
+  "ids": [
+    "F32.telemetry-off-by-default"
+  ],
+  "line": 459,
+  "script": "TS=$(control-agent-server fixture http-sink --name qa-f32-telemetry --print-path)\ncontrol-agent-server restart --reset-config --env \"OH_TELEMETRY_HTTP_ENDPOINT=$TS/v1/events\" --env OH_TELEMETRY_FLUSH_DELAY=1 --env OH_TELEMETRY_CONSENT=granted\ncontrol-agent-server conversation start --placeholder-agent --no-run --prompt QA_F32_OFF --body-json '{\"user_id\": \"qa-f32-off\"}' --no-autotitle\ncontrol-agent-server restart --env OH_TELEMETRY_EXPORTER=http --env OH_TELEMETRY_CONSENT=\ncontrol-agent-server logs --grep 'enabled=False \\(default\\)' --expect-min 1\ncontrol-agent-server conversation start --placeholder-agent --no-run --prompt QA_F32_OFF --body-json '{\"user_id\": \"qa-f32-off\"}' --no-autotitle\ncontrol-agent-server restart\ncontrol-agent-server sink read --name qa-f32-telemetry --expect-max 0 --save F32.telemetry-off-by-default/nothing\n",
+  "exit_code": 0,
+  "elapsed_ms": 65767,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-031700-aa28-map-f32\",\n  \"url\": \"http://127.0.0.1:44899\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 7170,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"id\": \"40b329df-ce4a-4954-829a-60854401a959\",\n  \"status\": 201,\n  \"execution_status\": \"idle\",\n  \"workspace\": \"/workspace/verification-artifacts/runs/20261013-031700-aa28-map-f32/fixtures/workspaces/031900-366883\"\n}\n{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-031700-aa28-map-f32\",\n  \"url\": \"http://127.0.0.1:44899\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 5079,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"log\": \"/workspace/verification-artifacts/runs/20261013-031700-aa28-map-f32/private/server.log\",\n  \"lines\": [\n    \"                             enabled=False (default)                            \"\n  ],\n  \"total_matching\": 1\n}\n{\n  \"ok\": true,\n  \"id\": \"2bde4d14-5cc5-4fcb-bbf6-03564e3e8d71\",\n  \"status\": 201,\n  \"execution_status\": \"idle\",\n  \"workspace\": \"/workspace/verification-artifacts/runs/20261013-031700-aa28-map-f32/fixtures/workspaces/031921-500405\"\n}\n{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-031700-aa28-map-f32\",\n  \"url\": \"http://127.0.0.1:44899\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 5335,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"requests\": 0,\n  \"paths\": {},\n  \"last\": [],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-031700-aa28-map-f32/evidence/F32.telemetry-off-by-default/nothing.json\"\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F02-auth-and-sessions.md",
+  "bullet": "Keys stay out of commands (`F02.keys-hidden-from-commands`).",
+  "ids": [
+    "F02.keys-hidden-from-commands"
+  ],
+  "line": 346,
+  "script": "KEY=$(cat \"$AGENT_SERVER_VERIFY_RUN/private/session_api_key\")\nSECRET=$(cat \"$AGENT_SERVER_VERIFY_RUN/private/secret_key\")\ncontrol-agent-server api POST /api/bash/execute_bash_command --json '{\"command\":\"env\"}' --expect 200 \\\n  --check exit_code eq 0 --check stdout contains PATH= \\\n  --check stdout not-contains OH_SESSION_API_KEYS --check stdout not-contains SESSION_API_KEY \\\n  --check stdout not-contains OH_SECRET_KEY --check stdout not-contains <redacted:session_api_key> \\\n  --check stdout not-contains \"$KEY\" --check stdout not-contains \"$SECRET\" --save F02.keys-hidden-from-commands/env\nunset KEY SECRET\n",
+  "exit_code": 2,
+  "elapsed_ms": 2625,
+  "failed_line": 3,
+  "failed_command": "control-agent-server api POST /api/bash/execute_bash_command --json '{\"command\":\"env\"}' --expect 200 --check exit_code eq 0 --check stdout contains PATH= --check stdout not-contains OH_SESSION_API_KEYS --check stdout not-contains SESSION_API_KEY --check stdout not-contains OH_SECRET_KEY --check stdout not-contains <redacted:session_api_key> --check stdout not-contains \"$KEY\" --check stdout not-contains \"$SECRET\" --save F02.keys-hidden-from-commands/env",
+  "stdout": "",
+  "stderr": "usage: control-agent-server [-h] <command> ...\ncontrol-agent-server: error: unrecognized arguments: <redacted:generated-session_api_key>\n"
+}

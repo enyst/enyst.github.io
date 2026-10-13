@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "file": "F31-persistence-and-limits.md",
+  "summary": {
+    "pass": 0,
+    "fail": 0,
+    "xfail": 0,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "script": "control-agent-server llm preset deepseek\nexport QA_F31_STORED=qa-f31-stored-secret-8c41\nexport QA_F31_CONV=qa-f31-conversation-secret-5e07\nACTION_KIND=openhands.sdk.event.llm_convertible.action.ActionEvent\nOBSERVATION_KIND=openhands.sdk.event.llm_convertible.observation.ObservationEvent\nAGENT_ERROR_KIND=openhands.sdk.event.llm_convertible.observation.AgentErrorEvent\nTOOL=$(control-agent-server fixture llm-stub --name qa-f31-tool --step 'tool:terminal:{\"command\":\"sleep 300\"}' --print-path)\nTOOL_AGENT=\"{\\\"llm\\\": {\\\"model\\\": \\\"openai/qa-stub\\\", \\\"api_key\\\": \\\"<redacted:api_key>\\\", \\\"base_url\\\": \\\"$TOOL/v1\\\", \\\"num_retries\\\": 0}, \\\"tools\\\": [{\\\"name\\\": \\\"terminal\\\"}]}\"\nHANG=$(control-agent-server fixture llm-stub --name qa-f31-hang --step hang:600 --print-path)\nHANG_AGENT=\"{\\\"llm\\\": {\\\"model\\\": \\\"openai/qa-stub\\\", \\\"api_key\\\": \\\"<redacted:api_key>\\\", \\\"base_url\\\": \\\"$HANG/v1\\\", \\\"num_retries\\\": 0}, \\\"tools\\\": []}\"\nQA_WS=\"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f31-workspace\"\nmkdir -p \"$QA_WS\"\nT=$(control-agent-server conversation start --body-json \"{\\\"agent\\\": $TOOL_AGENT}\" --no-autotitle --print-id)\n"
+    },
+    {
+      "bullet": "Takeover keeps newer metadata (`F31.takeover-keeps-metadata`), known bug.",
+      "ids": [
+        "F31.takeover-keeps-metadata"
+      ],
+      "script": "Y=$(control-agent-server conversation start --tools none --no-autotitle --title 'QA F31 before B' --no-run --print-id)\nB=$(control-agent-server launch --new --name f31-meta --share-conversations-from \"$AGENT_SERVER_VERIFY_RUN\" --print-run)\ntrap 'control-agent-server stop --run \"$B\" >/dev/null 2>&1 || true' EXIT\nPIDB=$(jq -r .pid \"$B/run.json\")\ncontrol-agent-server api PATCH \"<redacted:session-cookie>/$Y\" --json '{\"title\": \"QA F31 after B\"}' --expect 200 --check success eq true\ncontrol-agent-server state cat meta.json --conversation \"$Y\" --check title eq 'QA F31 after B'\nDEAD_META=$(jq -r .pid \"$AGENT_SERVER_VERIFY_RUN/run.json\")\ncontrol-agent-server restart --hard\n.venv/bin/python - \"$DEAD_META\" <<'PYZOMBIE'\nimport sys\nimport psutil\ntry:\n    status = psutil.Process(int(sys.argv[1])).status()\nexcept psutil.NoSuchProcess:\n    status = \"gone\"\nprint(\"prior_owner_status=\" + status)\nassert status in (\"zombie\", \"dead\", \"gone\"), status\nPYZOMBIE\nuntil control-agent-server state cat owner_lease.json --conversation \"$Y\" --check expires_at lt \"$(date +%s)\" >/dev/null; do\n  sleep 1\ndone\ncontrol-agent-server api GET \"<redacted:session-cookie>/$Y/events/count\" --run \"$B\" --expect 200\ncontrol-agent-server state cat owner_lease.json --conversation \"$Y\" --check owner_pid eq \"$PIDB\" --check generation eq 2\ncontrol-agent-server state cat meta.json --conversation \"$Y\" --check title eq 'QA F31 after B'  # bug\ncontrol-agent-server api GET \"<redacted:session-cookie>/$Y\" --run \"$B\" --check title eq 'QA F31 after B' --save F31.takeover-keeps-metadata/get-after-takeover  # bug\n"
+    }
+  ]
+}

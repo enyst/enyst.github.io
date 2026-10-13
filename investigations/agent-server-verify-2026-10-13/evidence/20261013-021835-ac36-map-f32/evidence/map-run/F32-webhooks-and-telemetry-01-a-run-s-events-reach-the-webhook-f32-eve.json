@@ -1,0 +1,15 @@
+{
+  "file": "F32-webhooks-and-telemetry.md",
+  "bullet": "A run's events reach the webhook (`F32.events-post`).",
+  "ids": [
+    "F32.events-post"
+  ],
+  "line": 119,
+  "script": "CID=$(control-agent-server conversation start --tools none --no-autotitle --prompt 'Reply with exactly: ok' --wait --print-id)\nHEX=${CID//-/}\ncontrol-agent-server sink read --path \"/events/$HEX\" --contains '\"key\": \"execution_status\", \"value\": \"finished\"' --expect-min 1 --wait 15 --save F32.events-post/finished\nMID=$(control-agent-server api GET \"<redacted:session-cookie>/$CID/events/search\" --query source=agent --query sort_order=TIMESTAMP_DESC --query limit=1 --field items.0.id)\ntest -n \"$MID\"\ncontrol-agent-server sink read --path \"/events/$HEX\" --contains \"\\\"id\\\": \\\"$MID\\\"\" --expect-min 1 --expect-max 1\ncontrol-agent-server sink read --path \"/events/$HEX\" --contains '\"body\": {' --expect-max 0\ncontrol-agent-server sink read --path \"/events/$CID\" --expect-max 0\n",
+  "exit_code": 0,
+  "elapsed_ms": 6334,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"requests\": 1,\n  \"paths\": {\n    \"/events/cadd3f78589044a3b1cfa6fae6ca10cb\": 1\n  },\n  \"last\": [\n    \"{\\\"at\\\": \\\"2026-10-13T02:19:01Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/events/cadd3f78589044a3b1cfa6fae6ca10cb\\\", \\\"headers\\\": {\\\"Host\\\": \\\"127.0.0.1:37449\\\", \\\"Accept\\\": \\\"*/*\\\", \\\"Accept-Encoding\\\": \\\"gzip, deflate\\\", \\\"Connection\\\": \\\"keep-alive\\\", \\\"User-Agent\\\": \\\"python-httpx/0.28.1\\\", \\\"X-Session-API-Key\\\": \\\"<redacted:session-cookie>\\\", \\\"Content-Length\\\": \\\"6145\\\", \\\"Content-Type\\\": \\\"application/json\\\"}, \\\"body\\\": [{\\\"id\\\": \\\"e4497\\u2026\"\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/F32.events-post/finished.json\"\n}\n{\n  \"ok\": true,\n  \"requests\": 1,\n  \"paths\": {\n    \"/events/cadd3f78589044a3b1cfa6fae6ca10cb\": 1\n  },\n  \"last\": [\n    \"{\\\"at\\\": \\\"2026-10-13T02:19:01Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/events/cadd3f78589044a3b1cfa6fae6ca10cb\\\", \\\"headers\\\": {\\\"Host\\\": \\\"127.0.0.1:37449\\\", \\\"Accept\\\": \\\"*/*\\\", \\\"Accept-Encoding\\\": \\\"gzip, deflate\\\", \\\"Connection\\\": \\\"keep-alive\\\", \\\"User-Agent\\\": \\\"python-httpx/0.28.1\\\", \\\"X-Session-API-Key\\\": \\\"<redacted:session-cookie>\\\", \\\"Content-Length\\\": \\\"6145\\\", \\\"Content-Type\\\": \\\"application/json\\\"}, \\\"body\\\": [{\\\"id\\\": \\\"e4497\\u2026\"\n  ]\n}\n{\n  \"ok\": true,\n  \"requests\": 0,\n  \"paths\": {},\n  \"last\": []\n}\n{\n  \"ok\": true,\n  \"requests\": 0,\n  \"paths\": {},\n  \"last\": []\n}\n",
+  "stderr": ""
+}

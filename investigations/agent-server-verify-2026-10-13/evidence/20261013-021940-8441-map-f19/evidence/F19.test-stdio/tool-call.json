@@ -1,0 +1,45 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/test",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "name": "qa-f19",
+      "server": {
+        "command": "/workspace/agent-sdk-verify/.venv/bin/python",
+        "args": [
+          "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/fixtures/mcp/qa-f19.py"
+        ],
+        "type": "stdio"
+      },
+      "timeout": 30,
+      "tool_call": {
+        "name": "qa_echo",
+        "arguments": {
+          "text": "hi"
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "88",
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": true,
+      "tools": [
+        "qa_echo"
+      ],
+      "tool_result": {
+        "is_error": false,
+        "text": "QA_MCP_ECHO:hi"
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 4645
+}

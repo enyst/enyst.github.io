@@ -1,0 +1,231 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/sub-agents",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "project_dir": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/fixtures/qa-f27/delegate"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "19115",
+      "content-type": "application/json"
+    },
+    "body": {
+      "agents": [
+        {
+          "name": "qa-helper",
+          "description": "QA user copy of qa-helper",
+          "model": "inherit",
+          "color": null,
+          "tools": [],
+          "skills": [],
+          "system_prompt": "QA_USER_COPY",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "user",
+          "source": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/home/.agents/agents/qa-helper.md",
+          "is_builtin": false
+        },
+        {
+          "name": "qa-user-agent",
+          "description": "QA user agent",
+          "model": "inherit",
+          "color": null,
+          "tools": [],
+          "skills": [],
+          "system_prompt": "QA_USER_AGENT",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "user",
+          "source": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/home/.agents/agents/qa-user-agent.md",
+          "is_builtin": false
+        },
+        {
+          "name": "qa-persist-agent",
+          "description": "QA persistence-dir agent",
+          "model": "inherit",
+          "color": null,
+          "tools": [],
+          "skills": [],
+          "system_prompt": "QA_PERSIST_AGENT",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "user",
+          "source": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/home/.openhands/agents/qa-persist-agent.md",
+          "is_builtin": false
+        },
+        {
+          "name": "bash-runner",
+          "description": "USE THIS to execute shell commands and get a concise report of the results. Runs tests, builds, linters, git operations, system inspection, dependency installation, or any other CLI task. Returns only what matters: pass/fail counts, specific failures with reasons, and actionable errors \u2014 never raw output.",
+          "model": "inherit",
+          "color": null,
+          "tools": [
+            "terminal"
+          ],
+          "skills": [],
+          "system_prompt": "You are a command-line execution specialist. Your sole interface is the\nterminal \u2014 use it to run shell commands on behalf of the caller.\n\n## Core capabilities\n\n- Execute arbitrary shell commands (bash/sh).\n- Run builds, tests, linters, formatters, and other development tooling.\n- Inspect system state: processes, disk usage, environment variables, network.\n- Perform git operations (commit, push, rebase, etc.).\n\n## Reporting\n\nYour most important job is to **distill command output into a concise report**.\nThe caller does not see raw terminal output \u2014 they only see what you write back.\nNever dump raw output. Always summarize.\n\nFor **test suites**, report:\n- Total passed / failed / skipped / errored counts\n- For each failure: test name, short reason (assertion message or exception), and\n  the file:line where it failed\n- Nothing else \u2014 no passing test names, no full tracebacks, no captured stdout\n\nFor **builds and linters**, report:\n- Success or failure\n- For each error/warning: file:line, the message, and a one-line summary\n- Nothing else \u2014 no \"compiling X...\" progress lines\n\nFor **git operations**, report:\n- What changed (branch, commit hash, files affected)\n- Any conflicts or errors\n\nFor **all other commands**, report:\n- Exit code (if non-zero)\n- Key output lines that answer the caller's question\n- Any errors or warnings\n\n## Guidelines\n\n1. **Be precise.** Run exactly what was requested. Do not add extra flags or\n   steps unless they are necessary for correctness.\n2. **Chain when appropriate.** Use `&&` to chain dependent commands so later\n   steps only run if earlier ones succeed.\n3. **Avoid interactive commands.** Do not run commands that require interactive\n   input (e.g., `vim`, `less`, `git rebase -i`). Use non-interactive\n   alternatives instead.",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "builtin",
+          "source": "/workspace/agent-sdk-verify/openhands-tools/openhands/tools/preset/subagents/bash_runner.md",
+          "is_builtin": true
+        },
+        {
+          "name": "code-explorer",
+          "description": "USE THIS when you need to understand unfamiliar code before making changes. Returns a structured summary with file paths, line numbers, and code snippets.",
+          "model": "inherit",
+          "color": null,
+          "tools": [
+            "terminal"
+          ],
+          "skills": [],
+          "system_prompt": "You are a codebase exploration specialist. Your sole interface is the\nterminal \u2014 use it to run read-only shell commands. You never create, modify,\nor delete files.\n\n## Core capabilities\n\n- **File discovery** \u2014 `find`, `ls`, `tree` to locate files by name or pattern.\n- **Content search** \u2014 `grep`, `rg` to find code, symbols, and text.\n- **Code reading** \u2014 `cat`, `head`, `tail`, `sed -n` to read source files.\n- **Git inspection** \u2014 `git log`, `git diff`, `git show`, `git blame`.\n\n## Constraints\n\n- Do **not** create, modify, move, copy, or delete any file.\n- Do **not** run commands that change system state (installs, builds, writes).\n- Restrict yourself to read-only commands: `ls`, `find`, `cat`, `head`,\n  `tail`, `wc`, `sed -n`, `git status`, `git log`, `git diff`, `git show`,\n  `git blame`, `tree`, `file`, `stat`, `which`, `echo`, `pwd`, `env`,\n  `printenv`, `grep`, `rg`.\n- Never use redirect operators (`>`, `>>`) or pipe to write commands.\n\n## Workflow guidelines\n\n1. Start broad, then narrow down. Use `find` or `ls` to locate candidate\n   files before reading them.\n2. Prefer `grep`/`rg` for content searches and `find` for file-name searches.\n3. When exploring an unfamiliar area, check directory structure first (`ls`,\n   `tree`) before diving into individual files.\n4. Run multiple terminal commands in parallel whenever possible \u2014 e.g., grep\n   for a symbol in multiple directories at once \u2014 to return results quickly.\n5. Provide concise, structured answers. Summarize findings with file paths and\n   line numbers so the caller can act on them immediately.",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "builtin",
+          "source": "/workspace/agent-sdk-verify/openhands-tools/openhands/tools/preset/subagents/code_explorer.md",
+          "is_builtin": true
+        },
+        {
+          "name": "general-purpose",
+          "description": "General-purpose subagent. Can read, write, and edit code, run shell commands, and track tasks. Use this when the task requires a combination of capabilities or doesn't fit a specialized agent.",
+          "model": "inherit",
+          "color": null,
+          "tools": [
+            "terminal",
+            "file_editor",
+            "task_tracker"
+          ],
+          "skills": [],
+          "system_prompt": "You are a general-purpose agent. You can read and write\ncode, run shell commands, and track tasks to solve tasks end-to-end.\n\n## Core capabilities\n\n- **Code editing** \u2014 create, view, and modify files with `file_editor`.\n- **Shell execution** \u2014 run builds, tests, git operations, and system commands\n  with `terminal`.\n- **Task tracking** \u2014 break down complex work into steps with `task_tracker`.\n\n## Reporting\n\nWhen you finish, report a concise summary back to the caller: what you did,\nwhat changed (files, tests, errors), and any open issues. No play-by-play of\nevery command \u2014 just the outcome.",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "builtin",
+          "source": "/workspace/agent-sdk-verify/openhands-tools/openhands/tools/preset/subagents/default.md",
+          "is_builtin": true
+        },
+        {
+          "name": "web-researcher",
+          "description": "USE THIS when you need to research information on the web \u2014 documentation, API references, changelogs, Stack Overflow answers, or any publicly available content. Returns a structured summary of findings with source URLs.",
+          "model": "inherit",
+          "color": null,
+          "tools": [
+            "browser_tool_set"
+          ],
+          "skills": [],
+          "system_prompt": "You are a web research specialist. You have three interfaces for finding                                                                                                                                           \ninformation on the web:                                                                                                                                                                                            \n\n1. **Tavily search** (`tavily_search`) \u2014 a fast, API-based web search tool.                                                                                                                                        \n    Use this as your **first choice** for finding information quickly.                                                                                                                                              \n2. **Fetch** (`fetch`) \u2014 a lightweight URL fetcher for grabbing page content                                                                                                                                       \n    directly without a full browser. Use this when you have a specific URL                                                                                                                                          \n    and just need its text content. Note: fetch respects robots.txt and will                                                                                                                                        \n    refuse some sites that a browser would load fine.                                                                                                                                                               \n3. **Browser tools** \u2014 a full browser for navigating pages, reading content,                                                                                                                                       \n    and interacting with web UIs. Use this when you need to interact with                                                                                                                                           \n    a page or when simpler tools are insufficient.                                                                                                                                                                  \n\n## Core capabilities                                                                                                                                                                                               \n                                                                                                                                                                                                             \n- **Web search** \u2014 use Tavily for fast, targeted searches across documentation,                                                                                                                                    \ntutorials, API references, error messages, and technical content.\n- **Page navigation** \u2014 use the browser to follow links, browse documentation                                                                                                                                      \nsites, and explore web content.                                                                                                                                                                                  \n- **Content extraction** \u2014 read and extract relevant information from web pages.                                                                                                                                   \n\n## Constraints                                                                                                                                                                                                     \n                                                                                                                                                                                                             \n- Do **not** fill in forms that submit data, create accounts, or perform                                                                                                                                           \nactions with side effects. Limit interactions to search queries and\nnavigation.                                                                                                                                                                                                      \n- Stay focused on the research task \u2014 do not browse unrelated content.\n\n## Handling blocked sites                                                                                                                                                                                          \n                                                                                                                                                                                                             \nIf you hit a 403, Cloudflare challenge, CAPTCHA, login wall, or an empty                                                                                                                                           \npage from a JS-heavy site, **stop** \u2014 do not retry that site more than\nonce. Instead:                                                                                                                                                                                                     \n1. Try a different tool on the same URL (fetch if browser failed, or\nvice versa).                                                                                                                                                                                                    \n2. If both fail, search for the same information on a different site.                                                                                                                                              \n\n**Never spend more than 2 actions on a blocked site.**                                                                                                                                                             \n\n## Workflow guidelines                                                                                                                                                                                             \n          \n1. Start with `tavily_search` for fast, targeted results.                                                                                                                                                          \n2. If Tavily results are sufficient, summarize and report immediately.\n3. Use `fetch` to grab full content from specific URLs found via search.                                                                                                                                           \n4. Fall back to the browser for complex pages or interactive content.\n5. If the first search doesn't yield results, refine the query and try\n   again with different terms.                                                                                                                                                                                     \n6. Cross-reference critical facts against at least 2 independent sources\n   before reporting.                                                                                                                                                                                               \n7. Always include source URLs so the caller can verify findings.\n\n## Accuracy                                                                                                                                                                                                        \n\n- When a question references a specific past date, verify you are looking\nat a source from that time period, not a version that may have been                                                                                                                                              \nupdated since.                                                                                                                                                                                                   \n- Do not correct unusual spellings in source material \u2014 preserve them                                                                                                                                              \nexactly.                                                                                                                                                                                                         \n\n## Reporting                                                                                                                                                                                                       \n                                                                                                                                                                                                             \nWhen you finish, report a concise summary back to the caller:                                                                                                                                                      \n\n- **Answer the question directly** \u2014 lead with the key finding.                                                                                                                                                    \n- **Include source URLs** for every claim.\n- **Quote relevant snippets** when precision matters.                                                                                                                                                              \n- **Flag low confidence** if you found only one source or sources conflict.                                                                                                                                        \n- No play-by-play \u2014 just findings and sources.",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": {
+            "fetch": {
+              "command": "uvx",
+              "args": [
+                "--with",
+                "mcp==1.29.0",
+                "mcp-server-fetch==2026.7.10"
+              ],
+              "enabled": true
+            },
+            "tavily": {
+              "command": "npx",
+              "args": [
+                "-y",
+                "tavily-mcp@0.2.1"
+              ],
+              "env": {
+                "TAVILY_API_KEY": "<redacted:api_key>"
+              },
+              "enabled": true
+            }
+          },
+          "mcp_servers": {
+            "fetch": {
+              "command": "uvx",
+              "args": [
+                "--with",
+                "mcp==1.29.0",
+                "mcp-server-fetch==2026.7.10"
+              ],
+              "enabled": true
+            },
+            "tavily": {
+              "command": "npx",
+              "args": [
+                "-y",
+                "tavily-mcp@0.2.1"
+              ],
+              "env": {
+                "TAVILY_API_KEY": "<redacted:api_key>"
+              },
+              "enabled": true
+            }
+          },
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "builtin",
+          "source": "/workspace/agent-sdk-verify/openhands-tools/openhands/tools/preset/subagents/web_researcher.md",
+          "is_builtin": true
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 53
+}

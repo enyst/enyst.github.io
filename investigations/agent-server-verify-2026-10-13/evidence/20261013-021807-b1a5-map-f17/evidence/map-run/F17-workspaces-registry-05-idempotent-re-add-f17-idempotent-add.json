@@ -1,0 +1,15 @@
+{
+  "file": "F17-workspaces-registry.md",
+  "bullet": "Idempotent re-add (`F17.idempotent-add`).",
+  "ids": [
+    "F17.idempotent-add"
+  ],
+  "line": 221,
+  "script": "control-agent-server api POST /api/workspaces --json-file \"$F17/readd.json\" --expect 200 \\\n  --check workspaces len-eq 6 --check workspaces.0.id eq \"$REPO\" --check workspaces.0.name eq qa-f17-repo \\\n  --check workspaces.5.id eq /qa-f17/dup --check workspaces.5.name eq qa-f17-dup-first --save F17.idempotent-add/first\ncontrol-agent-server api POST /api/workspaces --json-file \"$F17/readd.json\" --expect 200 --check workspaces len-eq 6\ncontrol-agent-server api GET /api/workspaces --check workspaces len-eq 6 \\\n  --check . not-contains qa-f17-renamed --check . not-contains qa-f17-dup-second --save F17.idempotent-add/get\n",
+  "exit_code": 1,
+  "elapsed_ms": 1658,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api POST /api/workspaces --json-file \"$F17/readd.json\" --expect 200 --check workspaces len-eq 6 --check workspaces.0.id eq \"$REPO\" --check workspaces.0.name eq qa-f17-repo --check workspaces.5.id eq /qa-f17/dup --check workspaces.5.name eq qa-f17-dup-first --save F17.idempotent-add/first",
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6036, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6000, in main\n    result = func(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 1240, in cmd_api\n    body = read_body(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 1143, in read_body\n    return json.loads(Path(args.json_file).read_text())\n                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 548, in read_text\n    return PathBase.read_text(self, encoding, errors, newline)\n           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_abc.py\", line 632, in read_text\n    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 539, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/readd.json'\n"
+}

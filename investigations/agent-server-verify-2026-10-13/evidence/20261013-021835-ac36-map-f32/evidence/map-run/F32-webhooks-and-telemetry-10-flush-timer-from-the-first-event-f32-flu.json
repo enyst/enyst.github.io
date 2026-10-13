@@ -1,0 +1,15 @@
+{
+  "file": "F32-webhooks-and-telemetry.md",
+  "bullet": "Flush timer from the first event (`F32.flush-delay`).",
+  "ids": [
+    "F32.flush-delay"
+  ],
+  "line": 283,
+  "script": "control-agent-server restart --config-json \"{\\\"webhooks\\\": [{\\\"base_url\\\": \\\"$WH/qa-f32-d\\\", \\\"event_buffer_size\\\": 100, \\\"flush_delay\\\": 6}]}\"\nT0=$SECONDS\nTID=$(control-agent-server conversation start --placeholder-agent --no-autotitle --print-id)\nsleep 3\ncontrol-agent-server conversation send \"$TID\" --text QA_F32_TIMER --no-run\ncontrol-agent-server sink read --path \"/qa-f32-d/events/${TID//-/}\" --expect-max 0\ncontrol-agent-server sink read --path \"/qa-f32-d/events/${TID//-/}\" --expect-min 1 --wait 15\nELAPSED=$((SECONDS - T0))\ntest \"$ELAPSED\" -ge 5\ntest \"$ELAPSED\" -le 8\ncontrol-agent-server sink read --path \"/qa-f32-d/events/${TID//-/}\" --expect-min 1 --expect-max 1 --contains QA_F32_TIMER --save F32.flush-delay/one-batch\ncontrol-agent-server sink read --path \"/qa-f32-d/events/${TID//-/}\" --contains '\"key\": \"full_state\"' --expect-min 1 --expect-max 1\n",
+  "exit_code": 1,
+  "elapsed_ms": 88294,
+  "failed_line": 6,
+  "failed_command": "control-agent-server sink read --path \"/qa-f32-d/events/${TID//-/}\" --expect-max 0",
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32\",\n  \"url\": \"http://127.0.0.1:53245\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 57761,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"body\": {\n    \"success\": true\n  }\n}\n{\n  \"ok\": false,\n  \"requests\": 1,\n  \"paths\": {\n    \"/qa-f32-d/events/e1bd1e3fd791438d8a04eade276efd7d\": 1\n  },\n  \"last\": [\n    \"{\\\"at\\\": \\\"2026-10-13T02:26:21Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/qa-f32-d/events/e1bd1e3fd791438d8a04eade276efd7d\\\", \\\"headers\\\": {\\\"Host\\\": \\\"127.0.0.1:37449\\\", \\\"Accept\\\": \\\"*/*\\\", \\\"Accept-Encoding\\\": \\\"gzip, deflate\\\", \\\"Connection\\\": \\\"keep-alive\\\", \\\"User-Agent\\\": \\\"python-httpx/0.28.1\\\", \\\"X-Session-API-Key\\\": \\\"<redacted:session-cookie>\\\", \\\"Content-Length\\\": \\\"3169\\\", \\\"Content-Type\\\": \\\"application/json\\\"}, \\\"body\\\": [{\\\"id\\u2026\"\n  ]\n}\n",
+  "stderr": ""
+}

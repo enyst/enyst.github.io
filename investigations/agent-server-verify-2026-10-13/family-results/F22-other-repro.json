@@ -1,0 +1,108 @@
+{
+  "ok": true,
+  "file": "F22-meta-profiles.md",
+  "summary": {
+    "pass": 3,
+    "fail": 0,
+    "xfail": 4,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 92,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3865,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-00-preconditions.json"
+    },
+    {
+      "bullet": "Save in classes mode (`F22.save-classes`).",
+      "ids": [
+        "F22.save-classes"
+      ],
+      "line": 173,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1079,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-01-save-in-classes-mode-f22-save-classes.json"
+    },
+    {
+      "bullet": "Save in direct mode (`F22.save-direct`).",
+      "ids": [
+        "F22.save-direct"
+      ],
+      "line": 190,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 916,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-02-save-in-direct-mode-f22-save-direct.json"
+    },
+    {
+      "bullet": "Router with no route (`F22.empty-router`), known bug.",
+      "ids": [
+        "F22.empty-router"
+      ],
+      "line": 217,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 987,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-03-router-with-no-route-f22-empty-router-kn.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server api POST /api/meta-profiles/qa-empty --json '{\"classifier_model\": \"deepseek-flash\"}' --expect 422 --save F22.empty-router/save",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles/qa-empty\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"46\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Meta-profile 'qa-empty' not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 77\n}\n{\n  \"ok\": false,\n  \"status\": 201,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/meta-profiles/qa-empty\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"classifier_model\": \"deepseek-flash\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 201,\n    \"headers\": {\n      \"content-length\": \"61\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"name\": \"qa-empty\",\n      \"message\": \"Meta-profile 'qa-empty' saved\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 47,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/F22.empty-router/save.json\",\n  \"hint\": \"expected 422, got 201\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Activation on ACP settings (`F22.activate-acp`), known bug.",
+      "ids": [
+        "F22.activate-acp"
+      ],
+      "line": 454,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 3384,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-04-activation-on-acp-settings-f22-activate-.json",
+      "failed_line": 17,
+      "failed_command": "jq -e '.status >= 400 and .status < 500' \"$F22/acp-activate.json\"",
+      "stdout_tail": " \"hard_context_reset_context_scaling\": 0.8\n        },\n        \"verification\": {\n          \"critic_enabled\": false,\n          \"critic_mode\": \"finish_and_message\",\n          \"enable_iterative_refinement\": false,\n          \"critic_threshold\": 0.6,\n          \"max_refinement_iterations\": 3,\n          \"critic_server_url\": null,\n          \"critic_model_name\": null,\n          \"critic_api_key\": null\n        }\n      },\n      \"conversation_settings\": {\n        \"schema_version\": 1,\n        \"max_iterations\": 500,\n        \"confirmation_mode\": false,\n        \"security_analyzer\": \"llm\"\n      },\n      \"llm_api_key_is_set\": true,\n      \"active_profile\": \"deepseek-flash\",\n      \"active_agent_profile_id\": null,\n      \"active_meta_profile\": \"qa-direct\",\n      \"misc_settings\": {}\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 71,\n  \"checks\": [\n    {\n      \"check\": \"active_meta_profile eq qa-direct\",\n      \"ok\": true,\n      \"actual\": \"qa-direct\"\n    },\n    {\n      \"check\": \"agent_settings.agent_kind eq openhands\",\n      \"ok\": true,\n      \"actual\": \"openhands\"\n    },\n    {\n      \"check\": \"agent_settings.enable_classify_and_switch_llm_tool eq true\",\n      \"ok\": true,\n      \"actual\": \"true\"\n    }\n  ]\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Unreadable settings (`F22.corrupt-settings`), known bug.",
+      "ids": [
+        "F22.corrupt-settings"
+      ],
+      "line": 515,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1864,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-05-unreadable-settings-f22-corrupt-settings.json",
+      "failed_line": 15,
+      "failed_command": "jq -e '.status == 409' \"$F22/corrupt-settings-activate.json\"",
+      "stdout_tail": "n. File may be corrupted or encrypted with a different key. Refusing to overwrite with defaults to prevent data loss.\",\n      \"error_id\": \"d0b09b67976442cc9edf9719638860c4\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 359,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/F22.corrupt-settings/activate.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"199\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"meta_profiles\": [\n        {\n          \"name\": \"qa-direct\",\n          \"classifier_model\": \"deepseek-flash\",\n          \"num_classes\": 0\n        },\n        {\n          \"name\": \"qa-router\",\n          \"classifier_model\": \"deepseek-flash\",\n          \"num_classes\": 2\n        }\n      ],\n      \"active_meta_profile\": \"qa-direct\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 78,\n  \"checks\": [\n    {\n      \"check\": \"active_meta_profile eq qa-direct\",\n      \"ok\": true,\n      \"actual\": \"qa-direct\"\n    }\n  ]\n}\nfalse\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Persistence directory with `~` (`F22.persistence-dir`), known bug.",
+      "ids": [
+        "F22.persistence-dir"
+      ],
+      "line": 657,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 23392,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22/evidence/map-run/F22-meta-profiles-06-persistence-directory-with-f22-persisten.json",
+      "failed_line": 9,
+      "failed_command": "control-agent-server state ls 'home/qa-f22-tilde/meta-profiles/qa-tilde.json' --run \"$T\" --expect-count 1",
+      "stdout_tail": "1\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"124\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"meta_profiles\": [\n        {\n          \"name\": \"qa-tilde\",\n          \"classifier_model\": \"deepseek-flash\",\n          \"num_classes\": 1\n        }\n      ],\n      \"active_meta_profile\": \"qa-tilde\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 69,\n  \"checks\": [\n    {\n      \"check\": \"meta_profiles len-eq 1\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"name\\\": \\\"qa-tilde\\\", \\\"classifier_model\\\": \\\"deepseek-flash\\\", \\\"num_classes\\\": 1}]\"\n    },\n    {\n      \"check\": \"active_meta_profile eq qa-tilde\",\n      \"ok\": true,\n      \"actual\": \"qa-tilde\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"pattern\": \"home/qa-f22-tilde/settings.json\",\n  \"count\": 1,\n  \"files\": [\n    {\n      \"path\": \"home/qa-f22-tilde/settings.json\",\n      \"bytes\": 3743,\n      \"mode\": \"0o600\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"pattern\": \"home/qa-f22-tilde/meta-profiles/qa-tilde.json\",\n  \"count\": 0,\n  \"files\": []\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-034317-5724-map-f22",
+  "launch_flags": []
+}

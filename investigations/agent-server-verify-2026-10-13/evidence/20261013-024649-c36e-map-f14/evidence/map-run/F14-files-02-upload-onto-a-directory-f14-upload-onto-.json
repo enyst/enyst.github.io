@@ -1,0 +1,15 @@
+{
+  "file": "F14-files.md",
+  "bullet": "Upload onto a directory (`F14.upload-onto-directory`), known bug.",
+  "ids": [
+    "F14.upload-onto-directory"
+  ],
+  "line": 189,
+  "script": "mkdir -p \"$F/xfer/is-a-dir\"\ncontrol-agent-server api POST /api/file/create_directory --query path=\"$F/v2.txt/child\" --expect 400 \\\n  --check detail eq 'Path exists and is not a directory'\ncontrol-agent-server api POST /api/file/upload --query path=\"$F/xfer/is-a-dir\" --file file=\"$F/v2.txt\" \\\n  --expect 4xx --save F14.upload-onto-directory/upload  # bug\ncontrol-agent-server api POST /api/file/upload --query path=\"$F/v2.txt/child\" --file file=\"$F/v2.txt\" \\\n  --expect 4xx --save F14.upload-onto-directory/parent-is-file  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 2741,
+  "failed_line": 4,
+  "failed_command": "control-agent-server api POST /api/file/upload --query path=\"$F/xfer/is-a-dir\" --file file=\"$F/v2.txt\" --expect 4xx --save F14.upload-onto-directory/upload",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/file/create_directory\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/fixtures/qa-f14/v2.txt/child\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"47\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Path exists and is not a directory\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 260,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Path exists and is not a directory\",\n      \"ok\": true,\n      \"actual\": \"Path exists and is not a directory\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/file/upload\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/fixtures/qa-f14/xfer/is-a-dir\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": [\n      \"file\"\n    ]\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"203\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"500: Failed to upload file: [Errno 21] Is a directory: '/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/fixtures/qa-f14/xfer/is-a-dir'\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 260,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/F14.upload-onto-directory/upload.json\",\n  \"hint\": \"expected 4xx, got 500\"\n}\n",
+  "stderr": ""
+}

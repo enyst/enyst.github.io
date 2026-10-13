@@ -1,0 +1,15 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "PATCH on an unknown id (`F04.patch-unknown-id`), known bug.",
+  "ids": [
+    "F04.patch-unknown-id"
+  ],
+  "line": 621,
+  "script": "control-agent-server api GET /openapi.json --check 'paths.<redacted:session-cookie>/{conversation_id}.patch.responses.404' exists --quiet\ncontrol-agent-server api GET \"<redacted:session-cookie>/$NOPE\" --expect 404\ncontrol-agent-server api PATCH \"<redacted:session-cookie>/$NOPE\" --json '{\"title\": \"QA nobody\"}' --expect 404 --save F04.patch-unknown-id/unknown  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 7047,
+  "failed_line": 3,
+  "failed_command": "control-agent-server api PATCH \"<redacted:session-cookie>/$NOPE\" --json '{\"title\": \"QA nobody\"}' --expect 404 --save F04.patch-unknown-id/unknown",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/openapi.json\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"648994\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 5012,\n  \"checks\": [\n    {\n      \"check\": \"paths.<redacted:session-cookie>/{conversation_id}.patch.responses.404 exists\",\n      \"ok\": true,\n      \"actual\": \"{\\\"description\\\": \\\"Item not found\\\"}\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/4782919f-825e-4db1-9052-24e57a0bbe67\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"22\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 128\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"PATCH\",\n    \"path\": \"<redacted:session-cookie>/4782919f-825e-4db1-9052-24e57a0bbe67\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"title\": \"QA nobody\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"17\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": false\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 110,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/F04.patch-unknown-id/unknown.json\",\n  \"hint\": \"expected 404, got 200\"\n}\n",
+  "stderr": ""
+}

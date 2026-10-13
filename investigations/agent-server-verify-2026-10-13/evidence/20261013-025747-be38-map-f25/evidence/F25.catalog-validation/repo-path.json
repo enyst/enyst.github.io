@@ -1,0 +1,46 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/skills",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "load_public": false,
+      "registered_marketplaces": [
+        {
+          "name": "qa",
+          "source": "/x",
+          "repo_path": "../up"
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "235",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body",
+            "registered_marketplaces",
+            0,
+            "repo_path"
+          ],
+          "msg": "Value error, repo_path cannot contain '..' path traversal",
+          "input": "../up",
+          "ctx": {
+            "error": "repo_path cannot contain '..' path traversal"
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 341
+}

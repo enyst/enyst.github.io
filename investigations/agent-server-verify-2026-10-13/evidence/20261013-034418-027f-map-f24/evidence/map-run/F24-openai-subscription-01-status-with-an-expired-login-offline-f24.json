@@ -1,0 +1,15 @@
+{
+  "file": "F24-openai-subscription.md",
+  "bullet": "Status with an expired login offline (`F24.status-offline`), known bug.",
+  "ids": [
+    "F24.status-offline"
+  ],
+  "line": 459,
+  "script": "OFF=$(control-agent-server launch --new --name f24-offline --env HTTPS_PROXY=http://127.0.0.1:9 --env https_proxy=http://127.0.0.1:9 --print-run)\ntrap 'control-agent-server stop --run \"$OFF\" >/dev/null' EXIT\nif control-agent-server api POST /api/llm/subscription/openai/device/start --run \"$OFF\" --expect 200 --quiet; then false; fi\nEXP5=$(bash \"$F24/write-login.sh\" \"$OFF\" 3600000)\ncontrol-agent-server api GET /api/llm/subscription/openai/status --run \"$OFF\" --expect 200 --check connected eq true \\\n  --check expires_at eq \"$EXP5\"\nbash \"$F24/write-login.sh\" \"$OFF\" -1000 >/dev/null\ncontrol-agent-server api GET /api/llm/subscription/openai/status --run \"$OFF\" --expect 200 --check connected eq false \\\n  --save F24.status-offline/status  # bug\ncontrol-agent-server logs --run \"$OFF\" --grep 'Refreshing OpenAI access token' --expect-min 1\ncontrol-agent-server logs --run \"$OFF\" --grep 'Unhandled exception on GET' --expect-none\n",
+  "exit_code": 127,
+  "elapsed_ms": 22761,
+  "failed_line": 4,
+  "failed_command": "EXP5=$(bash \"$F24/write-login.sh\" \"$OFF\" 3600000)",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/llm/subscription/openai/device/start\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"125\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 894,\n  \"hint\": \"expected 200, got 500\"\n}\n",
+  "stderr": "bash: /write-login.sh: No such file or directory\n"
+}

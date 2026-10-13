@@ -1,0 +1,80 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/responses",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_deepseek-flash",
+      "input": "QA_F30_RESP: reply with one short word and use no tools.",
+      "instructions": "QA_F30_INSTR: answer in plain text.",
+      "metadata": {
+        "qa": "f30"
+      },
+      "store": false,
+      "tools": [
+        {
+          "type": "function",
+          "name": "qa_f30_client_tool",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      ],
+      "temperature": 0
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "679",
+      "content-type": "application/json",
+      "x-openhands-serverconversation-id": "bd97ebef-9fd1-41d0-a4f5-e0398f81806f"
+    },
+    "body": {
+      "id": "resp_339c7cf68ab74da19d0a4e5c841e18ba",
+      "created_at": 1791862393.5559804,
+      "completed_at": 1791862395.5231974,
+      "instructions": "QA_F30_INSTR: answer in plain text.",
+      "metadata": {
+        "qa": "f30"
+      },
+      "model": "openhands_deepseek-flash",
+      "object": "response",
+      "output": [
+        {
+          "id": "msg_9556724d9c1240e9a87cdc2e432b4de0",
+          "content": [
+            {
+              "annotations": [],
+              "text": "Acknowledged.",
+              "type": "output_text"
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message"
+        }
+      ],
+      "parallel_tool_calls": false,
+      "status": "completed",
+      "tool_choice": "none",
+      "tools": [],
+      "usage": {
+        "input_tokens": 11286,
+        "input_tokens_details": {
+          "cached_tokens": 3328
+        },
+        "output_tokens": 17,
+        "output_tokens_details": {
+          "reasoning_tokens": 12
+        },
+        "total_tokens": 11303
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 2089
+}

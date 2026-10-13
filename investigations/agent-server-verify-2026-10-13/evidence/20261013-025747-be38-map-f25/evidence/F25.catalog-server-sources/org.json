@@ -1,0 +1,61 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/skills",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "load_public": false,
+      "load_user": false,
+      "load_project": false,
+      "load_org": true,
+      "org_configs": [
+        {
+          "repository": "qa/org",
+          "provider": "github",
+          "org_repo_url": "file:///workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/git/qa-f25-src",
+          "org_name": "qa-f25-org"
+        },
+        {
+          "repository": "qa/gone",
+          "provider": "github",
+          "org_repo_url": "file:///nonexistent/qa-f25-gone",
+          "org_name": "qa-f25-gone"
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "543",
+      "content-type": "application/json"
+    },
+    "body": {
+      "skills": [
+        {
+          "name": "qa-f25-src-skill",
+          "type": "agentskills",
+          "content": "# qa-f25-src-skill\n\nWhen this skill is active, include the exact phrase QA_SKILL_MARKER.",
+          "triggers": [
+            "qa-f25-src-skill"
+          ],
+          "source": "/tmp/openhands_org_skills_qa-f25-org__p9mlafc/skills/qa-f25-src-skill/SKILL.md",
+          "description": "QA fixture skill qa-f25-src-skill; mention QA_SKILL_MARKER when asked about qa-f25-src-skill.",
+          "is_agentskills_format": true,
+          "disable_model_invocation": false
+        }
+      ],
+      "sources": {
+        "sandbox": 0,
+        "registered_marketplaces": 0,
+        "sdk_base": 0,
+        "org": 1,
+        "project": 0
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 80
+}

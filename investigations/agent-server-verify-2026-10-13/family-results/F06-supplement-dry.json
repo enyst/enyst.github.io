@@ -1,0 +1,84 @@
+{
+  "ok": true,
+  "file": "F06-conversation-events.md",
+  "summary": {
+    "pass": 0,
+    "fail": 0,
+    "xfail": 0,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "script": "control-agent-server doctor\ncontrol-agent-server llm preset deepseek --no-validate\nCID=$(control-agent-server conversation start --no-autotitle --tools none --print-id)\nQA_UNKNOWN=00000000-0000-4000-8000-0000000000f6\n"
+    },
+    {
+      "bullet": "Append a message without running (`F06.send-no-run`).",
+      "ids": [
+        "F06.send-no-run"
+      ],
+      "script": "control-agent-server api GET \"<redacted:session-cookie>/$CID/events/search\" --expect 200 \\\n  --check items len-eq 0 --check next_page_id missing\ncontrol-agent-server api POST \"<redacted:session-cookie>/$CID/events\" \\\n  --json '{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"QA_F06_FIRST hello\"}],\"run\":false}' \\\n  --expect 200 --check success eq true --save F06.send-no-run/post\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/search\" --expect 200 \\\n  --check items len-eq 3 --check items.0.kind eq SystemPromptEvent --check items.0.source eq agent \\\n  --check items.1.kind eq MessageEvent --check items.1.source eq user \\\n  --check items.1.llm_message.content.0.text eq 'QA_F06_FIRST hello' \\\n  --check items.2.kind eq ConversationStateUpdateEvent --check items.2.key eq last_user_message_id \\\n  --save F06.send-no-run/search\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID\" --check execution_status eq idle\ncontrol-agent-server api POST \"<redacted:session-cookie>/$CID/events\" \\\n  --json '{\"content\":[{\"type\":\"text\",\"text\":\"QA_F06_SECOND again\"}]}' --expect 200\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --check . eq 5\n"
+    },
+    {
+      "bullet": "Get one event (`F06.get-one`).",
+      "ids": [
+        "F06.get-one"
+      ],
+      "script": "E2=$(control-agent-server api GET \"<redacted:session-cookie>/$CID/events/search\" --query body=QA_F06_SECOND --field items.0.id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/$E2\" --expect 200 --check id eq \"$E2\" \\\n  --check kind eq MessageEvent --check source eq user --check llm_message.content.0.text eq 'QA_F06_SECOND again' \\\n  --save F06.get-one/get\ncontrol-agent-server state cat \"server/workspace/conversations/${CID//-/}/events/event-00003-$E2.json\" \\\n  --check id eq \"$E2\" --check kind eq MessageEvent\n"
+    },
+    {
+      "bullet": "Run a turn and watch it live (`F06.send-run`, `F06.ws-live`).",
+      "ids": [
+        "F06.send-run",
+        "F06.ws-live"
+      ],
+      "script": "LIVE=$(control-agent-server conversation start --no-autotitle --tools file_editor --print-id)\ncontrol-agent-server ws start \"/sockets/events/$LIVE\" --name f06-live\ncontrol-agent-server api POST \"<redacted:session-cookie>/$LIVE/events\" \\\n  --json '{\"content\":[{\"type\":\"text\",\"text\":\"Create qa.txt containing exactly: QA_F06_LIVE\"}],\"run\":true}' \\\n  --expect 200 --check success eq true --save F06.send-run/post\ncontrol-agent-server conversation wait \"$LIVE\" --until finished --timeout 240\ncontrol-agent-server ws stop f06-live --wait 30 \\\n  --kinds ConversationStateUpdateEvent --contains '\"key\": \"full_state\"' --expect-min 2 --save F06.ws-live/frames\ncontrol-agent-server ws read f06-live --kinds ActionEvent --expect-min 1\nLIVE_IDS=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" --field items | jq -c '[.[].id]')\ncontrol-agent-server ws read f06-live --kinds MessageEvent --contains QA_F06_LIVE\ncontrol-agent-server ws read f06-live --kinds ConversationStateUpdateEvent --contains '\"value\": \"running\"'\ncontrol-agent-server ws read f06-live --kinds ObservationEvent --contains '\"tool_name\": \"file_editor\"'\ncontrol-agent-server ws read f06-live --kinds ConversationStateUpdateEvent --contains '\"value\": \"finished\"'\nLIVE_FRAMES=$(control-agent-server ws read f06-live --save F06.ws-live/all-frames | jq -r .saved)\njq -e --argjson ids \"$LIVE_IDS\" '[.frames[] | select(.direction == \"received\") | .frame | select(.key != \"full_state\") | .id] | (length > 0) and (. - $ids == [])' \"$LIVE_FRAMES\"\ncontrol-agent-server conversation events \"$LIVE\" --kinds ObservationEvent --contains file_editor --save F06.send-run/observations\ncontrol-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/count\" \\\n  --query kind=openhands.sdk.event.llm_convertible.action.ActionEvent --check . ge 1\ncontrol-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/count\" \\\n  --query kind=openhands.sdk.event.llm_convertible.observation.ObservationEvent --check . ge 1\ncontrol-agent-server conversation events \"$LIVE\" --key stats --expect-min 1\nLIVE_WS=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE\" --field workspace.working_dir)\ngrep -q QA_F06_LIVE \"$LIVE_WS/qa.txt\"\n"
+    },
+    {
+      "bullet": "Short-kind count (`F06.search-kind-short-count`), known bug.",
+      "ids": [
+        "F06.search-kind-short-count"
+      ],
+      "script": "control-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --query kind=openhands.sdk.event.llm_convertible.message.MessageEvent --check . eq 2 --save F06.search-kind-short-count/fqn-control\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --query kind=MessageEvent --check . eq 2 --save F06.search-kind-short-count/short-count  # bug\n"
+    },
+    {
+      "bullet": "Mixed batch (`F06.unknown-event-batch`), known bug.",
+      "ids": [
+        "F06.unknown-event-batch"
+      ],
+      "script": "control-agent-server api GET \"<redacted:session-cookie>/$CID/events\" --json \"[\\\"$E2\\\"]\" --expect 200 --check . len-eq 1 --check 0.id eq \"$E2\" --save F06.unknown-event-batch/known-control\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events\" --json \"[\\\"$E2\\\",\\\"qa-missing-event\\\"]\" --expect 200 --check . len-eq 2 --check 0.id eq \"$E2\" --check 1 missing --save F06.unknown-event-batch/mixed  # bug\n"
+    },
+    {
+      "bullet": "Non-user empty log (`F06.send-non-user-role-empty`), known bug.",
+      "ids": [
+        "F06.send-non-user-role-empty"
+      ],
+      "script": "EMPTY_ROLE=$(control-agent-server conversation start --no-autotitle --tools none --print-id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$EMPTY_ROLE/events/count\" --check . eq 0 --save F06.send-non-user-role-empty/before\ncontrol-agent-server api POST \"<redacted:session-cookie>/$EMPTY_ROLE/events\" --json '{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"QA_F06_ASSISTANT_EMPTY\"}]}' --expect 4xx --save F06.send-non-user-role-empty/post  # bug\n"
+    },
+    {
+      "bullet": "Non-user empty-log mutation (`F06.send-non-user-role-empty-mutation`), known bug.",
+      "ids": [
+        "F06.send-non-user-role-empty-mutation"
+      ],
+      "script": "MUT_ROLE=$(control-agent-server conversation start --no-autotitle --tools none --print-id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$MUT_ROLE/events/count\" --check . eq 0 --save F06.send-non-user-role-empty-mutation/before\ncontrol-agent-server api POST \"<redacted:session-cookie>/$MUT_ROLE/events\" --json '{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"QA_F06_ASSISTANT_EMPTY_MUTATION\"}]}' --expect 500 --check exception contains 'Only user messages' --save F06.send-non-user-role-empty-mutation/rejected\ncontrol-agent-server api GET \"<redacted:session-cookie>/$MUT_ROLE/events/search\" --save F06.send-non-user-role-empty-mutation/events\ncontrol-agent-server api GET \"<redacted:session-cookie>/$MUT_ROLE/events/count\" --check . eq 0 --save F06.send-non-user-role-empty-mutation/after  # bug\n"
+    },
+    {
+      "bullet": "Timestamp socket replay (`F06.search-timestamp-replay`), known bug.",
+      "ids": [
+        "F06.search-timestamp-replay"
+      ],
+      "script": "OBS_ID=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" --query kind=openhands.sdk.event.llm_convertible.observation.ObservationEvent --check items len-ge 1 --field items.0.id)\nOBS_T=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/$OBS_ID\" --check id eq \"$OBS_ID\" --field timestamp)\nFROM_OBS=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" --field items | jq -e --arg id \"$OBS_ID\" '[.[].id] | length - index($id)')\ntest \"$FROM_OBS\" -ge 2\ncontrol-agent-server ws listen \"/sockets/events/$LIVE\" --query resend_mode=since --query after_timestamp=\"$OBS_T\" --duration 3 --save F06.search-timestamp-replay/socket | jq -e --argjson n \"$FROM_OBS\" '.frames - 1 >= $n'  # bug\n"
+    },
+    {
+      "bullet": "Ascending timestamps (`F06.search-timestamp-order-sorted`), known bug.",
+      "ids": [
+        "F06.search-timestamp-order-sorted"
+      ],
+      "script": "control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" --expect 200 --save F06.search-timestamp-order-sorted/all --field items | jq -e '[.[].timestamp] | . == sort'  # bug\n"
+    }
+  ]
+}

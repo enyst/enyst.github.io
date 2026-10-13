@@ -1,0 +1,15 @@
+{
+  "file": "F01-server-status.md",
+  "bullet": "Readiness (`F01.ready`).",
+  "ids": [
+    "F01.ready"
+  ],
+  "line": 81,
+  "script": "control-agent-server api GET /ready --auth none --expect 200 --check status eq ready --save F01.ready/ready\n",
+  "exit_code": 0,
+  "elapsed_ms": 272,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/ready\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"18\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ready\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 41,\n  \"checks\": [\n    {\n      \"check\": \"status eq ready\",\n      \"ok\": true,\n      \"actual\": \"ready\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021702-46e6-map-f01/evidence/F01.ready/ready.json\"\n}\n",
+  "stderr": ""
+}

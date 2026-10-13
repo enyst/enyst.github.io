@@ -1,0 +1,15 @@
+{
+  "file": "F10-fork-navigate-condense-ask.md",
+  "bullet": "Refusal status (`F10.condense-status`), known bug.",
+  "ids": [
+    "F10.condense-status"
+  ],
+  "line": 414,
+  "script": "control-agent-server api GET \"<redacted:session-cookie>/$NC\" --quiet --check execution_status eq idle\ncontrol-agent-server api POST \"<redacted:session-cookie>/$NC/condense\" --expect 4xx --save F10.condense-status/disabled  # bug\ncontrol-agent-server api POST \"<redacted:session-cookie>/$NOOP/condense\" --expect 4xx --save F10.condense-status/no-op  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 24008,
+  "failed_line": 2,
+  "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$NC/condense\" --expect 4xx --save F10.condense-status/disabled",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/bbc958e8-fcf0-4a42-9e1a-0e75ada915bd\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"3781\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 699,\n  \"checks\": [\n    {\n      \"check\": \"execution_status eq idle\",\n      \"ok\": true,\n      \"actual\": \"idle\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/bbc958e8-fcf0-4a42-9e1a-0e75ada915bd/condense\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"442\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"Cannot condense conversation: No condenser configured. To enable manual condensation, configure an LLMSummarizingCondenser:\\n\\nfrom openhands.sdk.context.condenser import LLMSummarizingCondenser\\nagent = Agent(\\n    llm=your_llm,\\n    condenser=LLMSummarizingCondenser(\\n        llm=your_llm,\\n        max_size=120,\\n        keep_first=4\\n    )\\n)\",\n      \"error_id\": \"f7ec34e994cf4d85be674baa13543ff6\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 17157,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021915-949e-map-f10/evidence/F10.condense-status/disabled.json\",\n  \"hint\": \"expected 4xx, got 500\"\n}\n",
+  "stderr": ""
+}

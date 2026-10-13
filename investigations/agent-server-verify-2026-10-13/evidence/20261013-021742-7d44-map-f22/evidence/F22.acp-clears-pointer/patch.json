@@ -1,0 +1,87 @@
+{
+  "request": {
+    "method": "PATCH",
+    "path": "/api/settings",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "agent_settings_diff": {
+        "agent_kind": "acp"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "1232",
+      "content-type": "application/json"
+    },
+    "body": {
+      "agent_settings": {
+        "schema_version": 8,
+        "agent_kind": "acp",
+        "acp_server": "claude-code",
+        "acp_command": [],
+        "acp_args": [],
+        "acp_model": null,
+        "acp_session_mode": null,
+        "acp_prompt_timeout": 1800.0,
+        "acp_startup_timeout": 90.0,
+        "mcp_config": {},
+        "acp_isolate_data_dir": false,
+        "acp_file_secrets": [
+          {
+            "secret_name": "CODEX_AUTH_JSON",
+            "filename": "auth.json",
+            "env_var": "CODEX_HOME",
+            "subdir": "codex",
+            "env_points_to": "dir",
+            "warn_if_unset": []
+          },
+          {
+            "secret_name": "GOOGLE_APPLICATION_CREDENTIALS_JSON",
+            "filename": "gcloud-credentials.json",
+            "env_var": "GOOGLE_APPLICATION_CREDENTIALS",
+            "subdir": "gemini-cli",
+            "env_points_to": "file",
+            "warn_if_unset": [
+              "GOOGLE_CLOUD_PROJECT",
+              "GOOGLE_CLOUD_LOCATION"
+            ]
+          },
+          {
+            "secret_name": "KIMI_CODE_CONFIG_TOML",
+            "filename": "config.toml",
+            "env_var": "KIMI_CODE_HOME",
+            "subdir": "kimi-code",
+            "env_points_to": "dir",
+            "warn_if_unset": []
+          },
+          {
+            "secret_name": "PI_AUTH_JSON",
+            "filename": "auth.json",
+            "env_var": "PI_CODING_AGENT_DIR",
+            "subdir": "pi",
+            "env_points_to": "dir",
+            "warn_if_unset": []
+          }
+        ],
+        "agent_context": null
+      },
+      "conversation_settings": {
+        "schema_version": 1,
+        "max_iterations": 500,
+        "confirmation_mode": false,
+        "security_analyzer": "llm"
+      },
+      "llm_api_key_is_set": false,
+      "active_profile": "deepseek-flash",
+      "active_agent_profile_id": null,
+      "active_meta_profile": null,
+      "misc_settings": {}
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 274
+}

@@ -1,0 +1,83 @@
+--- .agents/skills/verify-agent-server/references/feature-map/F31-persistence-and-limits.md	2026-10-13 02:14:19.957463966 +0000
++++ /workspace/verification-artifacts/harness-f29-f34/.agents/skills/verify-agent-server/references/feature-map/F31-persistence-and-limits.md	2026-10-13 03:02:57.059011580 +0000
+@@ -362,7 +362,21 @@
+   PIDB=$(jq -r .pid "$B/run.json")
+   control-agent-server api PATCH "<redacted:session-cookie>/$Y" --json '{"title": "QA F31 after B"}' --expect 200 --check success eq true
+   control-agent-server state cat meta.json --conversation "$Y" --check title eq 'QA F31 after B'
++  DEAD_META=$(jq -r .pid "$AGENT_SERVER_VERIFY_RUN/run.json")
+   control-agent-server restart --hard
++  .venv/bin/python - "$DEAD_META" <<'PYZOMBIE'
++  import sys
++  import psutil
++  try:
++      status = psutil.Process(int(sys.argv[1])).status()
++  except psutil.NoSuchProcess:
++      status = "gone"
++  print("prior_owner_status=" + status)
++  assert status in ("zombie", "dead", "gone"), status
++  PYZOMBIE
++  until control-agent-server state cat owner_lease.json --conversation "$Y" --check expires_at lt "$(date +%s)" >/dev/null; do
++    sleep 1
++  done
+   control-agent-server api GET "<redacted:session-cookie>/$Y/events/count" --run "$B" --expect 200
+   control-agent-server state cat owner_lease.json --conversation "$Y" --check owner_pid eq "$PIDB" --check generation eq 2
+   control-agent-server state cat meta.json --conversation "$Y" --check title eq 'QA F31 after B'  # bug
+@@ -607,15 +621,46 @@
+   ```sh
+   N1=$(control-agent-server logs --grep "invalid literal for int\(\) with base 10: 'qa-f31-nan'" | jq .total_matching)
+   if control-agent-server restart --reset-config --env OH_MAX_CONCURRENT_RUNS=qa-f31-nan --timeout 60; then false; fi
+-  control-agent-server runs | jq -e --arg r "$AGENT_SERVER_VERIFY_RUN" '.runs[] | select(.run == $r) | .alive == false'
++  .venv/bin/python - "$AGENT_SERVER_VERIFY_RUN/run.json" <<'PYDEAD'
++  import json
++  import socket
++  import sys
++  import psutil
++  run = json.load(open(sys.argv[1]))
++  try:
++      status = psutil.Process(run["pid"]).status()
++  except psutil.NoSuchProcess:
++      status = "gone"
++  with socket.socket() as connection:
++      connection.settimeout(1)
++      port_closed = connection.connect_ex((run["host"], run["port"])) != 0
++  print("failed_start_status=" + status + " port_closed=" + str(port_closed))
++  assert status in ("zombie", "dead", "gone") and port_closed, (status, port_closed)
++  PYDEAD
+   control-agent-server logs --grep "invalid literal for int\(\) with base 10: 'qa-f31-nan'" --expect-min $((N1 + 1))
+   N2=$(control-agent-server logs --grep 'greater_than_equal, input_value=0' | jq .total_matching)
+   N3=$(control-agent-server logs --grep '^max_concurrent_runs$' | jq .total_matching)
+   if control-agent-server restart --reset-config --config-json '{"max_concurrent_runs": 0}' --timeout 60; then false; fi
+-  control-agent-server runs | jq -e --arg r "$AGENT_SERVER_VERIFY_RUN" '.runs[] | select(.run == $r) | .alive == false'
++  .venv/bin/python - "$AGENT_SERVER_VERIFY_RUN/run.json" <<'PYDEAD'
++  import json
++  import socket
++  import sys
++  import psutil
++  run = json.load(open(sys.argv[1]))
++  try:
++      status = psutil.Process(run["pid"]).status()
++  except psutil.NoSuchProcess:
++      status = "gone"
++  with socket.socket() as connection:
++      connection.settimeout(1)
++      port_closed = connection.connect_ex((run["host"], run["port"])) != 0
++  print("failed_start_status=" + status + " port_closed=" + str(port_closed))
++  assert status in ("zombie", "dead", "gone") and port_closed, (status, port_closed)
++  PYDEAD
+   control-agent-server logs --grep 'greater_than_equal, input_value=0' --expect-min $((N2 + 1))
+   control-agent-server logs --grep '^max_concurrent_runs$' --expect-min $((N3 + 1))
+   control-agent-server restart --reset-config
++  control-agent-server api GET /openapi.json --auth none --timeout 120 --quiet
+   control-agent-server doctor
+   ```
+   Both restarts fail with `Server exited with code 1 during startup` and the
+@@ -670,7 +715,8 @@
+   TD="$(python3 -c 'import tempfile; print(tempfile.gettempdir())')/openhands-agent-server-$PIDB"
+   control-agent-server logs --run "$B" --grep 'TMUX_TMPDIR not set' --expect-min 1
+   test -d "$TD"
+-  control-agent-server stop --run "$B" | jq -e '.server == "terminated"'
++  control-agent-server stop --run "$B"
++  control-agent-server logs --run "$B" --grep 'Application shutdown complete' --expect-min 1
+   trap 'rm -rf -- "$TD" || true' EXIT
+   test ! -e "$TD"  # bug
+   trap - EXIT

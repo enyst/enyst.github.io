@@ -1,0 +1,15 @@
+{
+  "file": "F32-webhooks-and-telemetry.md",
+  "bullet": "Telemetry is off by default (`F32.telemetry-off-by-default`).",
+  "ids": [
+    "F32.telemetry-off-by-default"
+  ],
+  "line": 431,
+  "script": "TS=$(control-agent-server fixture http-sink --name qa-f32-telemetry --print-path)\ncontrol-agent-server restart --reset-config --env \"OH_TELEMETRY_HTTP_ENDPOINT=$TS/v1/events\" --env OH_TELEMETRY_FLUSH_DELAY=1 --env OH_TELEMETRY_CONSENT=granted\ncontrol-agent-server conversation start --placeholder-agent --no-run --prompt QA_F32_OFF --body-json '{\"user_id\": \"qa-f32-off\"}' --no-autotitle\ncontrol-agent-server restart --env OH_TELEMETRY_EXPORTER=http --env OH_TELEMETRY_CONSENT=\ncontrol-agent-server logs --grep 'enabled=False \\(default\\)' --expect-min 1\ncontrol-agent-server conversation start --placeholder-agent --no-run --prompt QA_F32_OFF --body-json '{\"user_id\": \"qa-f32-off\"}' --no-autotitle\ncontrol-agent-server restart\ncontrol-agent-server sink read --name qa-f32-telemetry --expect-max 0 --save F32.telemetry-off-by-default/nothing\n",
+  "exit_code": 1,
+  "elapsed_ms": 78270,
+  "failed_line": 3,
+  "failed_command": "control-agent-server conversation start --placeholder-agent --no-run --prompt QA_F32_OFF --body-json '{\"user_id\": \"qa-f32-off\"}' --no-autotitle",
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32\",\n  \"url\": \"http://127.0.0.1:53245\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 53827,\n  \"ready_path\": \"/ready\"\n}\n",
+  "stderr": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6036, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6000, in main\n    result = func(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 2105, in cmd_conversation_start\n    body = build_start_body(run, args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 2053, in build_start_body\n    working_dir.mkdir(parents=True)\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 724, in mkdir\n    os.mkdir(self, mode)\n    ~~~~~~~~^^^^^^^^^^^^\nOSError: [Errno 28] No space left on device: '/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/fixtures/workspaces/023819-441052'\n"
+}

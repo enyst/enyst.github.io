@@ -1,0 +1,72 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "<redacted:session-cookie>/46cf2c65-195f-427f-8688-95e7bf0384b2/events",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "content": [
+        {
+          "type": "image"
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "397",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "literal_error",
+          "loc": [
+            "body",
+            "content",
+            0,
+            "TextContent",
+            "type"
+          ],
+          "msg": "Input should be 'text'",
+          "input": "image",
+          "ctx": {
+            "expected": "'text'"
+          }
+        },
+        {
+          "type": "missing",
+          "loc": [
+            "body",
+            "content",
+            0,
+            "TextContent",
+            "text"
+          ],
+          "msg": "Field required",
+          "input": {
+            "type": "image"
+          }
+        },
+        {
+          "type": "missing",
+          "loc": [
+            "body",
+            "content",
+            0,
+            "ImageContent",
+            "image_urls"
+          ],
+          "msg": "Field required",
+          "input": {
+            "type": "image"
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 144
+}
