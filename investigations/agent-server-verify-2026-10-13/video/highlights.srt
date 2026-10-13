@@ -1,163 +1,163 @@
 1
-00:00:00,705 --> 00:00:03,423
+00:00:00,705 --> 00:00:03,548
 One profile write is waiting for a file lock.
 
 2
-00:00:03,423 --> 00:00:05,537
+00:00:03,548 --> 00:00:05,760
 Other requests should keep moving.
 
 3
-00:00:05,537 --> 00:00:09,645
+00:00:05,760 --> 00:00:10,057
 We ask the heartbeat endpoint a very small question: are you alive?
 
 4
-00:00:43,918 --> 00:00:46,425
+00:00:43,918 --> 00:00:46,615
 The answer arrives after the lock timeout.
 
 5
-00:00:46,425 --> 00:00:50,363
+00:00:46,615 --> 00:00:50,852
 It is technically alive, and approximately one coffee break late.
 
 6
-00:00:50,363 --> 00:00:54,838
+00:00:50,852 --> 00:00:55,667
 A profile-store wait has paused unrelated requests on the same event loop.
 
 7
-00:00:57,186 --> 00:01:00,129
+00:00:57,186 --> 00:01:00,427
 An overwrite can fail when a write limit is reached.
 
 8
-00:01:00,129 --> 00:01:02,846
+00:01:00,427 --> 00:01:03,419
 A safe upload should leave the old file intact.
 
 9
-00:01:02,846 --> 00:01:04,657
+00:01:03,419 --> 00:01:05,414
 Our tiny original is ten bytes.
 
 10
-00:01:04,657 --> 00:01:07,601
+00:01:05,414 --> 00:01:08,655
 The attempted replacement is nine hundred thousand.
 
 11
-00:01:15,143 --> 00:01:17,351
+00:01:15,143 --> 00:01:17,457
 The server reports file too large.
 
 12
-00:01:17,351 --> 00:01:21,117
+00:01:17,457 --> 00:01:21,405
 The original is replaced by half a million partial bytes.
 
 13
-00:01:21,117 --> 00:01:22,092
+00:01:21,405 --> 00:01:22,426
 Upload failed.
 
 14
-00:01:22,092 --> 00:01:25,338
+00:01:22,426 --> 00:01:25,829
 Unfortunately, the old file failed to remain old.
 
 15
-00:01:28,007 --> 00:01:29,691
+00:01:28,007 --> 00:01:29,802
 A fake credential is saved.
 
 16
-00:01:29,691 --> 00:01:33,372
+00:01:29,802 --> 00:01:33,724
 We temporarily change the encryption key, then restore it.
 
 17
-00:01:33,372 --> 00:01:36,054
+00:01:33,724 --> 00:01:36,583
 The first control recovers the credential.
 
 18
-00:01:36,054 --> 00:01:40,047
+00:01:36,583 --> 00:01:40,838
 Now repeat the key change, and write one unrelated fake secret.
 
 19
-00:01:48,861 --> 00:01:51,115
+00:01:48,861 --> 00:01:51,269
 The unrelated write returns success.
 
 20
-00:01:51,115 --> 00:01:55,434
+00:01:51,269 --> 00:01:55,883
 Restore the original encryption key, and our old credential is gone.
 
 21
-00:01:55,434 --> 00:01:57,062
+00:01:55,883 --> 00:01:57,622
 The stored value is null.
 
 22
-00:01:57,062 --> 00:01:59,941
+00:01:57,622 --> 00:02:00,698
 A side character has erased the hero's lines.
 
 23
-00:02:02,467 --> 00:02:06,107
+00:02:02,467 --> 00:02:06,280
 Our first character is a filename with one ordinary space.
 
 24
-00:02:06,107 --> 00:02:07,112
+00:02:06,280 --> 00:02:07,331
 Git accepts it.
 
 25
-00:02:07,112 --> 00:02:11,442
+00:02:07,331 --> 00:02:11,867
 We edit the file, then ask the Agent Server for the list of changes.
 
 26
-00:02:21,338 --> 00:02:24,278
+00:02:21,338 --> 00:02:24,540
 A single space produces a four hundred error.
 
 27
-00:02:24,278 --> 00:02:27,152
+00:02:24,540 --> 00:02:27,671
 The response contains no changed-file list.
 
 28
-00:02:27,152 --> 00:02:28,655
+00:02:27,671 --> 00:02:29,307
 One space, zero lists.
 
 29
-00:02:28,655 --> 00:02:32,378
+00:02:29,307 --> 00:02:33,363
 Whitespace has unexpectedly been promoted to lead actor.
 
 30
-00:02:34,984 --> 00:02:37,136
+00:02:34,984 --> 00:02:37,381
 Five bytes enter the download path.
 
 31
-00:02:37,136 --> 00:02:40,825
+00:02:37,381 --> 00:02:41,492
 The careful courier, File Client, brings back exactly five.
 
 32
-00:02:40,825 --> 00:02:43,839
+00:02:41,492 --> 00:02:44,849
 Now Remote Workspace handles the very same file.
 
 33
-00:02:47,722 --> 00:02:50,258
+00:02:47,722 --> 00:02:50,190
 Remote Workspace returns eleven bytes.
 
 34
-00:02:50,258 --> 00:02:54,262
+00:02:50,190 --> 00:02:54,086
 Three original bytes put on replacement-character costumes.
 
 35
-00:02:54,262 --> 00:02:55,796
+00:02:54,086 --> 00:02:55,580
 The parcel got bigger.
 
 36
-00:02:55,796 --> 00:02:57,732
+00:02:55,580 --> 00:02:57,464
 The information got smaller.
 
 37
-00:02:59,880 --> 00:03:03,222
+00:02:59,880 --> 00:03:03,375
 The film shows five defects: three high and two medium.
 
 38
-00:03:03,222 --> 00:03:09,542
+00:03:03,375 --> 00:03:09,985
 The full report confirms one hundred thirty groups: twelve high, sixty nine medium, and forty nine low.
 
 39
-00:03:09,542 --> 00:03:12,094
+00:03:09,985 --> 00:03:12,654
 Every low severity case is in the report.
 
 40
-00:03:12,094 --> 00:03:18,717
+00:03:12,654 --> 00:03:19,582
 The map contains nine hundred thirty four active checks across thirty four families, plus one retired entry.
 
 41
-00:03:18,717 --> 00:03:21,695
+00:03:19,582 --> 00:03:22,696
 Three proven cross-family duplicates are merged.

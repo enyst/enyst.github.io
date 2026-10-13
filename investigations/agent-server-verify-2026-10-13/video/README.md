@@ -7,7 +7,7 @@ finding must be independently confirmed and must produce the expected signal
 during recording; otherwise production stops without claiming confirmation.
 
 The visual design uses an original dark mathematical canvas, blue contract
-diagrams, and yellow observed failures. Audio uses offline libflite narration,
+diagrams, and yellow observed failures. Current MP4 audio uses local Kokoro-82M v1.0 af_heart neural narration (the original capture used libflite),
 an original quiet D-minor/suspended score, and a three-note ascending cue when
 the confirmed failure first appears. An English subtitle track and standalone
 SRT and WebVTT accompany each final MP4. Narration is synthesized, not a human voice.
@@ -29,3 +29,5 @@ Each final film directory includes:
 
 The `workflow-validation-only` and `workflow-smoke` directories are recording
 pipeline checks. They are excluded from the actual bug report and its counts.
+
+The neural narration upgrade is documented in [voice-upgrade/README.md](voice-upgrade/README.md). The original video streams and raw browser recordings are preserved.

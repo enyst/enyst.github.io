@@ -1,20 +1,20 @@
-Agent Server verification · original narrated screenplay
+Agent Server verification · neural narrated screenplay
 Actual recorded reproductions. Setup/cleanup edits are labeled.
 
-[00:00:00.000 · A store lock pauses the heartbeat]
+[0.000 sec · A store lock pauses the heartbeat]
 NARRATOR: One profile write is waiting for a file lock. Other requests should keep moving. We ask the heartbeat endpoint a very small question: are you alive? The answer arrives after the lock timeout. It is technically alive, and approximately one coffee break late. A profile-store wait has paused unrelated requests on the same event loop.
 
-[00:00:56.360 · A failed overwrite destroys the old file]
+[56.360 sec · A failed overwrite destroys the old file]
 NARRATOR: An overwrite can fail when a write limit is reached. A safe upload should leave the old file intact. Our tiny original is ten bytes. The attempted replacement is nine hundred thousand. The server reports file too large. The original is replaced by half a million partial bytes. Upload failed. Unfortunately, the old file failed to remain old.
 
-[00:01:26.880 · An unrelated secret update erases the old credential]
+[86.880 sec · An unrelated secret update erases the old credential]
 NARRATOR: A fake credential is saved. We temporarily change the encryption key, then restore it. The first control recovers the credential. Now repeat the key change, and write one unrelated fake secret. The unrelated write returns success. Restore the original encryption key, and our old credential is gone. The stored value is null. A side character has erased the hero's lines.
 
-[00:02:01.480 · One space breaks the Git changes API]
+[121.480 sec · One space breaks the Git changes API]
 NARRATOR: Our first character is a filename with one ordinary space. Git accepts it. We edit the file, then ask the Agent Server for the list of changes. A single space produces a four hundred error. The response contains no changed-file list. One space, zero lists. Whitespace has unexpectedly been promoted to lead actor.
 
-[00:02:33.960 · Five binary bytes become eleven replacement bytes]
+[153.960 sec · Five binary bytes become eleven replacement bytes]
 NARRATOR: Five bytes enter the download path. The careful courier, File Client, brings back exactly five. Now Remote Workspace handles the very same file. Remote Workspace returns eleven bytes. Three original bytes put on replacement-character costumes. The parcel got bigger. The information got smaller.
 
-[00:02:59.280 · Complete report counts]
+[179.280 sec · Complete report counts]
 NARRATOR: The film shows five defects: three high and two medium. The full report confirms one hundred thirty groups: twelve high, sixty nine medium, and forty nine low. Every low severity case is in the report. The map contains nine hundred thirty four active checks across thirty four families, plus one retired entry. Three proven cross-family duplicates are merged.
