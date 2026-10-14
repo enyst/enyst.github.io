@@ -19,7 +19,7 @@ header > p:not(.eyebrow):not(.lead) { margin: 18px 0; }
 .topics a { text-decoration: none; font-size: .85rem; }
 .topics span { color: var(--muted); font-family: var(--mono); font-size: .7rem; margin-left: 4px; }
 .controls { background: var(--bg); padding: 18px 0; }
-#filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, .65fr) auto; gap: 16px; align-items: end; }
+#filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(160px, .65fr) minmax(160px, .65fr) auto; gap: 16px; align-items: end; }
 label { display: block; font-family: var(--mono); font-size: .72rem; color: var(--muted); margin-bottom: 6px; }
 input, select, button { min-height: 44px; font: inherit; background: var(--card); color: var(--ink); border: 1px solid #514d45; border-radius: 4px; padding: 9px 12px; }
 input, select { width: 100%; min-width: 0; }
@@ -46,3 +46,16 @@ code { overflow-wrap: anywhere; font-size: .8em; }
 #empty { padding: 32px 0; color: var(--muted); }
 @media(max-width: 600px) { .fleet-shell { padding: 32px 20px 60px; } #filters { grid-template-columns: minmax(0, 1fr); gap: 12px; } .pr { grid-template-columns: minmax(0, 1fr); gap: 6px; } h1.hero { font-size: 3.7rem; } .snapshot { gap: 18px; } }
 @media(prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } h1.hero { animation: none; } }
+
+.status-legend { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: 30px; }
+.status { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: .7rem; line-height: 1.5; }
+.status svg { flex: 0 0 16px; }
+.status-count { color: var(--ink); }
+.status-merged { color: #c7a1ef; }
+.status-approved, .status-open { color: var(--green); }
+.status-changes-requested { color: #f4b16b; }
+.status-draft { color: var(--muted); }
+.status-closed { color: #ef9696; }
+.pr-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; margin-bottom: 8px; }
+.pr-heading h3 { margin-bottom: 0; }
+@media (min-width: 601px) and (max-width: 850px) { #filters { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
