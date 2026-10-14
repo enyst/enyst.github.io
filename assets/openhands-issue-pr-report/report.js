@@ -1,7 +1,7 @@
 (() => {
   const openForm = document.getElementById('open-filters');
   const weekForm = document.getElementById('week-filters');
-  const openRows = [...document.querySelectorAll('.issue-card')];
+  const openRows = [...document.querySelectorAll('#open-issues .issue-card')];
   const weekRows = [...document.querySelectorAll('.closure-row')];
   const openSearch = document.getElementById('open-search');
   const openAuthor = document.getElementById('open-author');

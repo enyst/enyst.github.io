@@ -32,3 +32,23 @@ run `python scripts/build-verification-findings.py` to rebuild the page. Keep th
 original 68, follow-up findings, and draft Agent Server API map findings labeled
 separately; retain image provenance and distinguish reported evidence from fresh
 verification. The renderer does not fetch statuses or advance the snapshot date.
+
+The [maintainer PR queue](investigations/openhands-pr-keep-close.html) and
+[Monday issue inventory](investigations/openhands-issues-since-monday.html)
+follow frozen cohorts. Refresh GitHub metadata with
+`python scripts/refresh-maintainer-triage.py` and
+`python scripts/refresh-monday-issue-inventory.py --refresh-weekly`, then render
+with `python scripts/build-maintainer-reports.py` and
+`python scripts/build-monday-issue-inventory.py`. The collectors use the inherited
+proxy and `GITHUB_TOKEN_ENYST` or `GITHUB_TOKEN` and perform no GitHub writes.
+They retain the original 53 reviewed PRs, 118 Monday-inventory issues, and
+106 issues created in the October 4–11 window. Review newly discovered fixing
+references and the ambiguous-reference audit before publishing; preserve
+classified exclusions and original review evidence. A changed PR head does not
+inherit a fresh code or runtime verdict. Update the homepage counts together
+with the rendered reports.
+
+The [earlier issue/PR survey](investigations/openhands-issue-pr-report.html)
+keeps its original October 4–11 closure tally. Refresh current statuses in
+`assets/openhands-issue-pr-report/data.json`, retaining removed open-list entries
+in its refresh audit, then run `python scripts/build-issue-pr-report.py`.
