@@ -1,0 +1,123 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content=width=device-width,initial-scale=1><title>The path to a software factory — Graham Neubig's plan</title><meta name=description content="Graham Neubig's plan for turning OpenHands OSS work into an autonomous software factory: profile-scoped Docker workers, four independent automations, and complete setup through Canvas. Mirrored and annotated."><style>:root{--fg:#1a1a1a;--muted:#5a5a5a;--subtle:#8a8a82;--bg:#fdfdfb;--card:#fff;--elev:#f7f6f1;--accent:#2b4eaa;--soft:#e6ecfa;--rule:#e2e2dc;--code:#f3f1ec;--warn:#b25b0e;--ok:#2f7a3a;--crit:#a02020;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:-apple-system,BlinkMacSystemFont,Segoe UI,Inter,Helvetica,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--sans)}.wrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:46px;max-width:1180px;margin:0 auto;padding:32px 28px 90px}nav{position:sticky;top:24px;align-self:start;font-size:13px}nav h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}nav ol{list-style:none;padding:0;margin:0;counter-reset:toc}nav li{counter-increment:toc;margin:5px 0}nav li:before{content:counter(toc) ". ";color:var(--muted)}a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}nav a{color:var(--fg);border:0}header{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:28px}.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}h1{font-size:34px;line-height:1.15;margin:6px 0 8px;letter-spacing:-.01em}.sub{color:var(--muted);max-width:820px}h2{font-size:22px;margin:44px 0 10px}.num{color:var(--muted);font-weight:500;margin-right:8px}h3{font-size:16px;margin:22px 0 8px}code,.mono{font-family:var(--mono);font-size:.88em}code{background:var(--code);padding:1px 5px;border-radius:3px}.toplink{display:inline-block;margin-top:12px;padding:7px 10px;background:var(--soft);border:1px solid var(--accent);border-radius:6px;font-size:13px}.callout{border-left:3px solid var(--accent);background:var(--soft);padding:11px 14px;margin:14px 0;border-radius:0 5px 5px 0;font-size:14.5px}.warn{border-color:var(--warn);background:#fbf1e6}.ok{border-color:var(--ok);background:#eef6ef}.note{border-color:var(--muted);background:var(--code)}table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}th,td{text-align:left;vertical-align:top;padding:8px 9px;border-bottom:1px solid var(--rule)}th{background:var(--code);font-weight:650}td.pr{white-space:nowrap;font-family:var(--mono);font-size:.9em}.pill{display:inline-block;font:11px var(--mono);padding:2px 7px;border-radius:999px;border:1px solid var(--rule);background:var(--elev);white-space:nowrap}.ok-pill{color:var(--ok);border-color:var(--ok);background:#eef6ef}.mini{font-size:12.5px;color:var(--muted)}ul{padding-left:20px}li{margin:4px 0}@media(max-width:820px){.wrap{grid-template-columns:1fr}}</style></head><body><div class=wrap>
+<nav><a class=toplink href=../index.html>&larr; Home</a><h2>Contents</h2><ol>
+<li><a href=#outcome>Required outcome</a></li>
+<li><a href=#machinery>Existing machinery</a></li>
+<li><a href=#changes>Required changes</a></li>
+<li><a href=#order>Review and release order</a></li>
+<li><a href=#validation>Validation and acceptance</a></li>
+</ol></nav>
+<main>
+<header>
+<div class=eyebrow>plan &middot; Graham Neubig &rarr; OpenHands</div>
+<h1>The path to a software factory</h1>
+<p class=sub><strong>Graham Neubig's plan</strong> for turning OpenHands OSS work into an autonomous &ldquo;software factory&rdquo;: profile-scoped Docker workers, four independent automations (triage &rarr; develop &rarr; review &rarr; watchdog-merge), and complete setup and operation through Agent Canvas. This page mirrors and lightly formats that document so it is easier to peruse.</p>
+<p class=mini>Source doc updated <strong>2026-09-14 15:27 UTC</strong>. 13 PRs remain to ship the factory described below; SDK #4931 and #4966 and Extensions #581 have merged. Companion note on this site: <a href=pstack-software-factory.html>What we take from pstack</a>, which maps verification-as-infrastructure onto Graham's four factory bottlenecks.</p>
+</header>
+
+<div class=callout note>&#9432; <strong>Attribution.</strong> This is <strong>Graham Neubig's</strong> plan for a software factory in OpenHands. The text below is a faithful mirror of his Google&nbsp;Doc &ldquo;The path to a software factory&rdquo;, reproduced here for easier reading and reference. Links point at the original PRs, issues, and evidence; internal <code>factory-state</code> links resolve only inside the working deployment.</div>
+
+<section id=outcome><h2><span class=num>1</span>Required outcome</h2>
+<p>A user starts with a fresh Agent Canvas, configures an LM and credentials through the UI, and adds four separate automations. Opening an application issue then starts this cycle:</p>
+<div class=callout><strong>Triage and acceptance criteria &rarr; ready-for-dev &rarr; implementation PR &rarr; independent review and tests &rarr; guarded automatic merge.</strong></div>
+<p>The implementation must satisfy these requirements:</p>
+<ul>
+<li>Each automation uses a saved agent profile to select its model, tools, and allowed secrets.</li>
+<li>The same automation bundle works in local and Docker workspaces. The factory runs its workers in separate Docker sandboxes with bounded resources.</li>
+<li>Factory dispatch and Docker workspace operations use the SDK and TypeScript runtime clients.</li>
+<li>The reviewer can read code and publish findings/statuses without pushing code. The watchdog uses the developer token, as requested, and merges only accepted, tested, current heads.</li>
+<li>The operator only opens application issues; automations implement, review, test, revise, and merge the application code.</li>
+</ul>
+<p>A PR is included below when removing its capability blocks setup or operation of this factory in the current implementation. Broader architecture follow-ups remain tracked in a separate classification record; they do not block factory delivery. Inclusion does not mean every line of that PR is indispensable. The running demo uses integrated preview builds; these changes still need upstream releases for a normal fresh install.</p>
+</section>
+
+<section id=machinery><h2><span class=num>2</span>Existing machinery</h2>
+<p>The SDK already provides agents, conversations, workspaces, profiles, secret storage, and clients. Automation already provides schedules, triggers, dispatch, run history, and timeout recovery. Extensions already provides implementation, review, and QA workflows. Canvas already provides model configuration, the profile library, and the automation catalog. The required changes connect and extend that machinery.</p>
+<div class=callout ok><strong>Merged foundations.</strong> <a href=https://github.com/OpenHands/software-agent-sdk/pull/4931>SDK #4931</a> adds profile <code>secret_refs</code> and captures the allowed names for new conversations, enforcing that scope during launch, credential updates, and resume. <a href=https://github.com/OpenHands/software-agent-sdk/pull/4966>SDK #4966</a> reuses the existing runtime service routers under conversation-scoped paths, adds the common lifecycle contract, and lets the existing TypeScript runtime clients select a <code>conversationId</code>. Both are in SDK main; downstream releases still need to include them. <a href=https://github.com/OpenHands/extensions/pull/581>Extensions #581</a> extracts the request, pagination, repository, and per-repository execution code already shared by GitHub workflows.</div>
+</section>
+
+<section id=changes><h2><span class=num>3</span>Required changes</h2>
+
+<h3>A. Profile-scoped workers and Docker isolation</h3>
+<p>The server must resolve the selected profile, retain its secret boundary, and run each worker through a conversation-scoped workspace. Shared contracts precede the Docker implementation.</p>
+<table>
+<tr><th>PR</th><th>Why it is required</th></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/software-agent-sdk/pull/5017>SDK #5017</a></td><td>Delivers only selected secrets to the worker and shell entrypoint, reusing the secret registry and masking. Without it, script-based automations cannot reliably receive their profile-selected GitHub token.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/software-agent-sdk/pull/3403>SDK #3403</a></td><td>Implements the Docker runtime: provisioning, scoped credentials, forwarding, recovery, and cleanup. It provides the bounded-resource sandbox isolation the factory workers run inside.</td></tr>
+</table>
+<p>Profiles select repository-scoped fine-grained PATs. Triage updates issues; developers publish code; reviewers read code and publish reviews/acceptance statuses; the watchdog shares the developer PAT for guarded merges. The merge gate reads Actions and commit statuses. Any required external Check Runs must be enforced by GitHub protection without a watchdog bypass.</p>
+<p class=mini>Older conversations without a captured secret scope retain legacy behavior; the new boundary applies to newly launched scoped conversations and their subsequent updates/resumes.</p>
+
+<h3>B. Four independent automations</h3>
+<p>Automation owns profile selection and dispatch. The four extensions own GitHub workflow decisions and reuse the canonical implementation, review, and QA machinery. Workers attach to the conversation provided by the service through the SDK.</p>
+<table>
+<tr><th>PR</th><th>Why it is required</th></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/software-agent-sdk/pull/5010>SDK #5010</a></td><td>Completes the Python <code>RemoteWorkspace</code> support omitted when #4966 added scoped routes and TypeScript routing. It also adds explicit profile-based conversation creation and read-only attachment, durable command start/poll, restricted runtime credential retrieval, and cleanup through the existing conversation and workspace classes.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/automation/pull/449>Automation #449</a></td><td>Dispatches bundles through the shared conversation runtime, admits bounded concurrent workers, detects completion, and releases resources. It provides the common local/Docker execution path.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/automation/pull/453>Automation #453</a></td><td>Saves each automation's selected profile and snapshots it on queued runs. Without it, the four roles cannot reliably select different capabilities and credentials through profiles.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/extensions/pull/570>Extensions #570</a></td><td>Adds only independent triage: acceptance criteria, priority, dependency checks, readiness, and suppression of repeated unchanged triage.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/extensions/pull/571>Extensions #571</a></td><td>Adapts canonical issue-to-PR delivery to the provided conversation, developer lanes, review feedback, and base updates. It implements ready issues and revises submitted PRs.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/extensions/pull/572>Extensions #572</a></td><td>Extends only the existing reviewer to run readable review, independent tests, and canonical QA, then publishes acceptance for the exact tested commit. Its linked review and QA resources use the existing skill installer; it adds no catalog tooling.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/extensions/pull/573>Extensions #573</a></td><td>Adds only the periodic watchdog that merges current, independently accepted heads with passing required statuses and Actions. It closes the issue-to-merge loop.</td></tr>
+</table>
+<p>Canvas packs each automation from the generated catalog's embedded file contents, including the shared GitHub helper and reviewer QA resources. These files travel with each bundle; workers need no external helper directory or extension-side profile loader.</p>
+<p>SDK #5010 extends the existing conversation and workspace classes. Conversation creation and attachment are explicit methods: <code>create</code> submits a typed request; <code>attach</code> reads an existing conversation and fails if it is missing. They share the existing connection/event machinery. The constructor continues to require an agent. Automation, extensions, and docs have been migrated.</p>
+
+<h3>C. Complete setup and operation through Canvas</h3>
+<p>The UI must save profile selections, accept the canonical reviewer bundle, and address Docker conversations for files, commands, Git, and logs.</p>
+<table>
+<tr><th>PR</th><th>Why it is required</th></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/OpenHands/pull/17237>Canvas #17237</a></td><td>Adds the profile secret-scope picker, gated by SDK enforcement support. It lets the user configure role-specific secret access entirely through the UI, including credentials entered while creating an ACP profile.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/OpenHands/pull/17396>Canvas #17396</a></td><td>Adds profile selection to automation creation/editing and preserves it in requests. It also requires a profile for bundles that need one, preventing a saved automation that cannot attach to its conversation.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/OpenHands/pull/17403>Canvas #17403</a></td><td>Accepts the extensions plugin-resource contract. Without it, the canonical reviewer bundle cannot open its direct setup form.</td></tr>
+<tr><td class=pr><a href=https://github.com/OpenHands/OpenHands/pull/17387>Canvas #17387</a></td><td>Uses SDK runtime clients and the server's single <code>conversation_runtime</code> signal for files, commands, Git, and logs. This directs Canvas operations to the selected Docker conversation rather than the host workspace.</td></tr>
+</table>
+<p class=mini>The completed split audit records the cleanup and validation: runtime routing belongs in #4966, Docker compatibility belongs in #3403, and merged profile definitions are no longer repeated in #5017. The four catalogs require a profile and carry their own workflow resources.</p>
+</section>
+
+<section id=order><h2><span class=num>4</span>Review and release order</h2>
+<p>Start with independent SDK roots <strong>#5010 and #5017</strong>. SDK #4931 and #4966 are already merged. Then follow the native stacks:</p>
+<table>
+<tr><th>Stack</th><th>Review order</th></tr>
+<tr><td>SDK</td><td><strong>#5017 &rarr; #3403</strong>; both now include merged <strong>#4931 and #4966</strong></td></tr>
+<tr><td>Automation</td><td><strong>#449 &rarr; #453</strong></td></tr>
+<tr><td>Extensions</td><td>Shared foundation <strong>#581 is merged</strong>. The former GitHub stack has been unstacked; <strong>#570, #571, #572, #573 are independent <code>main</code>-based PRs</strong> and can be reviewed or merged in any order.</td></tr>
+</table>
+<div class=callout warn>&#9888; <strong>A main-based PR is not necessarily independent.</strong> These prerequisites are not represented by native stack ancestry. Review can proceed now; merge or release must respect the gate below.</div>
+<table>
+<tr><th>Consumer PR</th><th>Prerequisite outside its native stack</th><th>Gate and reason</th></tr>
+<tr><td class=pr>SDK #5010</td><td>SDK #4966 release</td><td>Additive client code can be reviewed/merged separately; the merged runtime contract must also be included in the supported server release before these methods ship to consumers.</td></tr>
+<tr><td class=pr>Automation #449</td><td><strong>SDK #5010 merged &amp; released, with the #4966 contract</strong></td><td>Its integration pin follows the current #5010 head and must become a released SDK dependency before merge. Docker operation additionally requires #3403; scoped factory credentials require #4931/#5017.</td></tr>
+<tr><td class=pr>Automation #453</td><td>SDK #5010 release; #4931/#5017 for scoped credentials</td><td>Inherits #449's merge/release gates. Selecting a profile does not itself enforce its secret boundary.</td></tr>
+<tr><td class=pr>Extensions #570&ndash;#573</td><td><strong>No cross-repository merge prerequisite</strong></td><td>They can merge independently now. Activating the three agent-backed workers needs Automation dispatch and SDK #5010. Running all four with the intended credential boundary additionally needs Automation #453, SDK #4931/#5017, Canvas #17396; Docker isolation needs #3403.</td></tr>
+<tr><td class=pr>Canvas #17396</td><td><strong>Automation #453 merged &amp; available first</strong></td><td>UI profile selection needs the backend to persist and dispatch <code>agent_profile_id</code>.</td></tr>
+<tr><td class=pr>Canvas #17387</td><td><strong>Merged SDK #4966 TS client released &amp; pinned first</strong></td><td>Uses the conversation-scoped runtime operations. Actual Docker workspace operation additionally requires SDK #3403.</td></tr>
+<tr><td class=pr>Canvas #17237</td><td>SDK #4931 to enable the feature</td><td><strong>Can merge first:</strong> the picker is capability-gated; unavailable until the server supports profile secret enforcement; shell delivery also needs #5017.</td></tr>
+<tr><td class=pr>Canvas #17403</td><td>Extensions #572 for the factory reviewer use case</td><td><strong>Can merge first:</strong> a backward-compatible validator expansion. The reviewer bundle needs it installed, rather than the validator needing the reviewer merged first.</td></tr>
+</table>
+<p>Release the Python SDK and TypeScript client capabilities before deploying the Automation and Canvas consumers that call them. The four Extensions roles can merge independently; enable their profile-backed catalog entries only on a compatible runtime. Replace temporary SDK source pins and update the Canvas package pins to those releases. <strong>SDK #3403 remains last in its stack:</strong> Docker implements the runtime and secret contracts established by its predecessors.</p>
+
+<h3>Current review state</h3>
+<ul>
+<li><strong>Extensions #570&ndash;#573:</strong> all four target <code>main</code>, have clean CI, and have exact-head <code>all-hands-bot</code> approvals. They are the closest remaining PRs to merge.</li>
+<li><strong>SDK #5010 and #5017:</strong> CI is clean; both remain draft and require approval. <strong>SDK #3403</strong> is clean and approved, but remains stacked on #5017.</li>
+<li><strong>Automation #449 and #453:</strong> both approved, but their stack is behind current <code>main</code>. Refreshing it must also reconcile the profile migration with <code>024_add_run_sandbox_cleanup_due_at.py</code>, which landed after the stack was created.</li>
+<li><strong>Canvas #17403:</strong> CI clean but remains draft and requires approval. <strong>Canvas #17237 and #17396</strong> still fail the PR-description gate because their HUMAN testing notes are empty. <strong>Canvas #17387</strong> additionally waits for a released TypeScript client containing #4966 before its build can pass.</li>
+</ul>
+</section>
+
+<section id=validation><h2><span class=num>5</span>Validation and remaining acceptance</h2>
+<p>The operator only opened application issues. Automations wrote, reviewed, tested, revised, accepted, and merged the application code.</p>
+<table>
+<tr><th>Validation</th><th>Evidence and limit</th></tr>
+<tr><td><strong>Box clone</strong></td><td><a href=https://github.com/neubig/box-clone/pull/8>Final acceptance PR #8</a> merged after independent review and QA. Four application PRs completed. <span class="pill ok-pill">Box acceptance complete</span></td></tr>
+<tr><td><strong>Airbnb clone</strong></td><td><strong>28 application PRs merged; final acceptance complete and repeatedly validated after the four-extension split.</strong> Independent QA found a blank-amenities crash in <a href=https://github.com/neubig/airbnb-clone/pull/50>PR #50</a>; the developer fixed it and the watchdog merged the corrected head. The first clean post-refactor run triaged <a href=https://github.com/neubig/airbnb-clone/issues/51>issue #51</a>, delivered <a href=https://github.com/neubig/airbnb-clone/pull/52>PR #52</a>, and auto-merged commit <code>15b7a1e</code>. A later run on current independent Extensions heads triaged <a href=https://github.com/neubig/airbnb-clone/issues/55>issue #55</a>, delivered <a href=https://github.com/neubig/airbnb-clone/pull/56>PR #56</a>, published a <a href=https://github.com/neubig/airbnb-clone/pull/56#pullrequestreview-5199150189>readable exact-head review</a> and <a href=https://github.com/neubig/airbnb-clone/pull/56#pullrequestreview-5199232890>before/after browser QA</a>, set both factory statuses to success, and watchdog-merged commit <code>a2f66a9</code> as <code>66b1ce5</code>.</td></tr>
+<tr><td><strong>UI-only configuration</strong></td><td>An empty isolated Canvas was configured through the UI with an LM, secrets, four profiles, and four automations (animated setup walkthrough and individual screenshots in the working deployment's evidence store).</td></tr>
+<tr><td><strong>Setup regressions</strong></td><td><a href=https://github.com/OpenHands/OpenHands/blob/e895bb22ac84cb1ddb2f3ba26d3237b3a5f40e97/.pr/factory-split-setup/README.md>Fresh before/after Canvas recordings</a> demonstrate a new ACP credential remaining selectable after deselection and retaining exactly its selected profile grant, and a profile-required automation rejecting an empty selection then saving the selected profile. Triage opens directly from the catalog with no GitHub MCP configured. Covers configuration/persistence; makes no new model-execution claim.</td></tr>
+<tr><td><strong>Workspace parity</strong></td><td>The <a href=https://github.com/OpenHands/software-agent-sdk/blob/55a1618ca622276e753c63322ebf81caf78ffac7/.pr/sdk5010-explicit/README.md>same bundle completed real model tasks locally and in Docker through explicit create/attach</a> (<a href=https://raw.githubusercontent.com/OpenHands/software-agent-sdk/55a1618ca622276e753c63322ebf81caf78ffac7/.pr/sdk5010-explicit/functional-demo.gif>30-second GIF</a>). Missing attachment returns 404 without creating a conversation. Scoped file/Git operations, detached commands and automatic release passed.</td></tr>
+<tr><td><strong>Credential-scope correction</strong></td><td><a href=https://github.com/OpenHands/software-agent-sdk/blob/d0df30dfa6987dcce9d994c057b1bc77f8108d0d/.pr/acp-profile-scope/README.md>Live Canvas before/after recording</a> proves excluded credentials are blocked on local ACP launch/resume, using a disclosed deterministic ACP subprocess. Explicit updates and Docker transport have separate regression coverage.</td></tr>
+</table>
+<p>The active UI-created factory runs at <code>http://127.0.0.1:9104</code>, with four separate schedules targeting Airbnb. Admission is limited to three Docker workers, each bounded to 2&nbsp;GB RAM, one CPU, and 256 processes. The host memory guard pauses scheduling and stops workers below 2&nbsp;GiB available memory. Automation serializes ticks from the same definition, so a long reviewer run does not create overlapping reviewers.</p>
+<div class=callout note>&#9432; The PR #56 cycle used bundles matching the exact current heads of Extensions #570&ndash;#573. The surrounding Canvas, Automation, and SDK services still use an integrated preview build, so the demonstrations do not establish that an isolated build of every remaining PR together has been tested. Upstream PR updates are not automatically deployed.</div>
+<p class=mini>Mirror of Graham Neubig's document, reproduced for reference. Some links (evidence indexes, deployment records, <code>factory-state</code> paths) resolve only inside the working deployment and are described in text here rather than linked.</p>
+</section>
+</main></div></body></html>

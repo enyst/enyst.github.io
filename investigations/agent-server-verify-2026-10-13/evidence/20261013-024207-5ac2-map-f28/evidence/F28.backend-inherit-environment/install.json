@@ -1,0 +1,75 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/canvas-extensions/install",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "source": "/workspace/verification-artifacts/runs/20261013-024207-5ac2-map-f28/fixtures/f28/qa-f28-env"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "1106",
+      "content-type": "application/json"
+    },
+    "body": {
+      "name": "qa-f28-env",
+      "version": "0.1.0",
+      "description": "",
+      "enabled": false,
+      "source": "/workspace/verification-artifacts/runs/20261013-024207-5ac2-map-f28/fixtures/f28/qa-f28-env",
+      "requested_ref": null,
+      "resolved_ref": null,
+      "repo_path": null,
+      "installed_at": "2026-10-13T02:44:59.452296+00:00",
+      "install_path": "/workspace/verification-artifacts/runs/20261013-024207-5ac2-map-f28/home/.openhands/canvas-extensions/installed/qa-f28-env",
+      "manifest": {
+        "schema_version": 1,
+        "name": "qa-f28-env",
+        "display_name": "qa-f28-env",
+        "version": "0.1.0",
+        "description": "",
+        "entrypoint": "dist/index.js",
+        "contributes": {
+          "pages": []
+        },
+        "backend": {
+          "schema_version": 1,
+          "artifacts": {
+            "linux-amd64": {
+              "path": "backend/linux.tar.gz",
+              "url": null,
+              "sha256": "bac43a7bae84843a737ef61286215b930795867fd094c16ea0c0f540865e6444",
+              "strip_components": 0
+            },
+            "linux-arm64": {
+              "path": "backend/linux.tar.gz",
+              "url": null,
+              "sha256": "bac43a7bae84843a737ef61286215b930795867fd094c16ea0c0f540865e6444",
+              "strip_components": 0
+            }
+          },
+          "argv": [
+            "{artifact_dir}/run.py",
+            "{port}"
+          ],
+          "health": {
+            "path": "/health",
+            "timeout_seconds": 30.0,
+            "interval_seconds": 0.2
+          },
+          "inherit_environment": [
+            "PATH",
+            "TZ",
+            "LANG"
+          ]
+        }
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 57
+}

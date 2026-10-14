@@ -1,0 +1,417 @@
+{
+  "ok": true,
+  "file": "F25-skills.md",
+  "summary": {
+    "pass": 27,
+    "fail": 0,
+    "xfail": 7,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 108,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8857,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-00-preconditions.json"
+    },
+    {
+      "bullet": "Session key required (`F25.auth`).",
+      "ids": [
+        "F25.auth"
+      ],
+      "line": 165,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6789,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-01-session-key-required-f25-auth.json"
+    },
+    {
+      "bullet": "The real public repository (`F25.public-repo`).",
+      "ids": [
+        "F25.public-repo"
+      ],
+      "line": 180,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2535,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-02-the-real-public-repository-f25-public-re.json"
+    },
+    {
+      "bullet": "Public marketplace catalog (`F25.marketplace-public`), known bug.",
+      "ids": [
+        "F25.marketplace-public"
+      ],
+      "line": 198,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 947,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-03-public-marketplace-catalog-f25-marketpla.json",
+      "failed_line": 1,
+      "failed_command": "control-agent-server api GET /api/skills/marketplace --timeout 180 --expect 200 --check skills len-ge 1 --save F25.marketplace-public/catalog",
+      "stdout_tail": "{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/skills/marketplace\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"13\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"skills\": []\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 425,\n  \"checks\": [\n    {\n      \"check\": \"skills len-ge 1\",\n      \"ok\": false,\n      \"actual\": \"[]\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.marketplace-public/catalog.json\",\n  \"hint\": \"failed check: skills len-ge 1\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Project skills (`F25.catalog-project`).",
+      "ids": [
+        "F25.catalog-project"
+      ],
+      "line": 213,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 440,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-04-project-skills-f25-catalog-project.json"
+    },
+    {
+      "bullet": "User skills and precedence (`F25.catalog-user-precedence`).",
+      "ids": [
+        "F25.catalog-user-precedence"
+      ],
+      "line": 229,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2212,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-05-user-skills-and-precedence-f25-catalog-u.json"
+    },
+    {
+      "bullet": "Sandbox and organization sources (`F25.catalog-server-sources`).",
+      "ids": [
+        "F25.catalog-server-sources"
+      ],
+      "line": 246,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1659,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-06-sandbox-and-organization-sources-f25-cat.json"
+    },
+    {
+      "bullet": "Request validation (`F25.catalog-validation`).",
+      "ids": [
+        "F25.catalog-validation"
+      ],
+      "line": 265,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4345,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-07-request-validation-f25-catalog-validatio.json"
+    },
+    {
+      "bullet": "Install from a local directory (`F25.install-local`).",
+      "ids": [
+        "F25.install-local"
+      ],
+      "line": 274,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5172,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-08-install-from-a-local-directory-f25-insta.json"
+    },
+    {
+      "bullet": "Disable and enable (`F25.enable-disable`).",
+      "ids": [
+        "F25.enable-disable"
+      ],
+      "line": 291,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5601,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-09-disable-and-enable-f25-enable-disable.json"
+    },
+    {
+      "bullet": "Already installed (`F25.install-conflict`).",
+      "ids": [
+        "F25.install-conflict"
+      ],
+      "line": 308,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3953,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-10-already-installed-f25-install-conflict.json"
+    },
+    {
+      "bullet": "Install errors (`F25.install-errors`).",
+      "ids": [
+        "F25.install-errors"
+      ],
+      "line": 323,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 9418,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-11-install-errors-f25-install-errors.json"
+    },
+    {
+      "bullet": "Malformed frontmatter (`F25.install-bad-frontmatter`), known bug.",
+      "ids": [
+        "F25.install-bad-frontmatter"
+      ],
+      "line": 340,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 3321,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-12-malformed-frontmatter-f25-install-bad-fr.json",
+      "failed_line": 1,
+      "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$F/qa-f25-badyaml\"'\"}' --expect 422 --save F25.install-bad-frontmatter/install",
+      "stdout_tail": "{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/skills/install\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"source\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/qa-f25/qa-f25-badyaml\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"249\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"while parsing a flow sequence\\n  in \\\"<unicode string>\\\", line 3, column 14\\ndid not find expected ',' or ']'\\n  in \\\"<unicode string>\\\", line 4, column 1\",\n      \"error_id\": \"9a61d1f61c024385a85539cbf327d187\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 2471,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.install-bad-frontmatter/install.json\",\n  \"hint\": \"expected 422, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Install from a git source (`F25.install-git`).",
+      "ids": [
+        "F25.install-git"
+      ],
+      "line": 351,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3388,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-13-install-from-a-git-source-f25-install-gi.json"
+    },
+    {
+      "bullet": "SDK consumer (`F25.sdk-load-skills`).",
+      "ids": [
+        "F25.sdk-load-skills"
+      ],
+      "line": 364,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10773,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-14-sdk-consumer-f25-sdk-load-skills.json"
+    },
+    {
+      "bullet": "Install from GitHub (`F25.install-github`).",
+      "ids": [
+        "F25.install-github"
+      ],
+      "line": 398,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5826,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-15-install-from-github-f25-install-github.json"
+    },
+    {
+      "bullet": "Documented install sources (`F25.install-documented-sources`), known bug.",
+      "ids": [
+        "F25.install-documented-sources"
+      ],
+      "line": 417,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 2394,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-16-documented-install-sources-f25-install-d.json",
+      "failed_line": 5,
+      "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$SRC\"'\"}' --timeout 240 --expect 200 --check name eq github --save F25.install-documented-sources/documented",
+      "stdout_tail": "{\n  \"ok\": false,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/skills/install\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"source\": \"github:<redacted:unrelated-repository>/skills/github\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"74\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Failed to fetch skill source. Check that the source is valid.\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 60,\n  \"checks\": [\n    {\n      \"check\": \"name eq github\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.install-documented-sources/documented.json\",\n  \"hint\": \"expected 200, got 400\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Refresh from the source (`F25.refresh`).",
+      "ids": [
+        "F25.refresh"
+      ],
+      "line": 441,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3641,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-17-refresh-from-the-source-f25-refresh.json"
+    },
+    {
+      "bullet": "Install at a ref (`F25.install-ref`).",
+      "ids": [
+        "F25.install-ref"
+      ],
+      "line": 466,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3495,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-18-install-at-a-ref-f25-install-ref.json"
+    },
+    {
+      "bullet": "Unknown ref (`F25.install-unknown-ref`), known bug.",
+      "ids": [
+        "F25.install-unknown-ref"
+      ],
+      "line": 485,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 3235,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-19-unknown-ref-f25-install-unknown-ref-know.json",
+      "failed_line": 7,
+      "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"file://'\"$G\"'\", \"repo_path\": \"skills/qa-f25-src-skill\", \"ref\": \"qa-f25-no-such-ref\", \"force\": true}' --expect 400 --save F25.install-unknown-ref/cached",
+      "stdout_tail": "ation-artifacts/runs/20261013-025747-be38-map-f25/fixtures/git/qa-f25-src\",\n      \"repo_path\": \"skills/qa-f25-src-skill\",\n      \"ref\": \"qa-f25-no-such-ref\",\n      \"force\": true\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"561\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"name\": \"qa-f25-src-skill\",\n      \"version\": \"1.0.0\",\n      \"description\": \"QA fixture skill qa-f25-src-skill; mention QA_SKILL_MARKER when asked about qa-f25-src-skill.\",\n      \"enabled\": true,\n      \"source\": \"file:///workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/git/qa-f25-src\",\n      \"resolved_ref\": \"85439e5d678379453aa37a3e0a4f1aec0b0c4e82\",\n      \"repo_path\": \"skills/qa-f25-src-skill\",\n      \"installed_at\": \"2026-10-13T02:59:38.682828+00:00\",\n      \"install_path\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/home/.openhands/skills/installed/qa-f25-src-skill\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 168,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.install-unknown-ref/cached.json\",\n  \"hint\": \"expected 400, got 200\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Refresh of a vanished source (`F25.refresh-unfetchable`), known bug.",
+      "ids": [
+        "F25.refresh-unfetchable"
+      ],
+      "line": 511,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1902,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-20-refresh-of-a-vanished-source-f25-refresh.json",
+      "failed_line": 6,
+      "failed_command": "control-agent-server api POST /api/skills/installed/qa-f25-gone/refresh --expect 400,422 --save F25.refresh-unfetchable/refresh",
+      "stdout_tail": " \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Failed to fetch skill source. Check that the source is valid.\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 65,\n  \"checks\": [\n    {\n      \"check\": \"detail contains Failed to fetch\",\n      \"ok\": true,\n      \"actual\": \"Failed to fetch skill source. Check that the source is valid.\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/skills/installed/qa-f25-gone/refresh\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"231\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"Local extension path does not exist: /workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/qa-f25/tmp/qa-f25-gone\",\n      \"error_id\": \"3132c74c4cb745509fd6b185e18f055d\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 670,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.refresh-unfetchable/refresh.json\",\n  \"hint\": \"expected 400,422, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Unknown and invalid names (`F25.name-errors`).",
+      "ids": [
+        "F25.name-errors"
+      ],
+      "line": 529,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8651,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-21-unknown-and-invalid-names-f25-name-error.json"
+    },
+    {
+      "bullet": "Hand-copied and hand-deleted directories (`F25.self-heal`).",
+      "ids": [
+        "F25.self-heal"
+      ],
+      "line": 543,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3254,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-22-hand-copied-and-hand-deleted-directories.json"
+    },
+    {
+      "bullet": "Sync the public repository (`F25.sync`).",
+      "ids": [
+        "F25.sync"
+      ],
+      "line": 559,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4741,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-23-sync-the-public-repository-f25-sync.json"
+    },
+    {
+      "bullet": "Sync without a reachable origin (`F25.sync-offline`), known bug.",
+      "ids": [
+        "F25.sync-offline"
+      ],
+      "line": 586,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1470,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-24-sync-without-a-reachable-origin-f25-sync.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server api POST /api/skills/sync --expect 200 --check status eq error --save F25.sync-offline/sync",
+      "stdout_tail": "{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/skills/sync\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"70\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"success\",\n      \"message\": \"Skills repository synced successfully\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 113,\n  \"checks\": [\n    {\n      \"check\": \"status eq error\",\n      \"ok\": false,\n      \"actual\": \"success\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.sync-offline/sync.json\",\n  \"hint\": \"failed check: status eq error\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Registered marketplace skills (`F25.catalog-registered-marketplace`).",
+      "ids": [
+        "F25.catalog-registered-marketplace"
+      ],
+      "line": 603,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4710,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-25-registered-marketplace-skills-f25-catalo.json"
+    },
+    {
+      "bullet": "Installed skill in a conversation (`F25.conversation-activation`).",
+      "ids": [
+        "F25.conversation-activation"
+      ],
+      "line": 625,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 15275,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-26-installed-skill-in-a-conversation-f25-co.json"
+    },
+    {
+      "bullet": "Skill invoked through `invoke_skill` (`F25.invoke-skill`).",
+      "ids": [
+        "F25.invoke-skill"
+      ],
+      "line": 649,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 29967,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-27-skill-invoked-through-invoke-skill-f25-i.json"
+    },
+    {
+      "bullet": "Restart (`F25.restart-persist`).",
+      "ids": [
+        "F25.restart-persist"
+      ],
+      "line": 684,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 42924,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-28-restart-f25-restart-persist.json"
+    },
+    {
+      "bullet": "Server-default marketplaces (`F25.catalog-server-marketplaces`).",
+      "ids": [
+        "F25.catalog-server-marketplaces"
+      ],
+      "line": 702,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 95466,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-29-server-default-marketplaces-f25-catalog-.json"
+    },
+    {
+      "bullet": "Marketplace catalog (`F25.marketplace-catalog`).",
+      "ids": [
+        "F25.marketplace-catalog"
+      ],
+      "line": 727,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5208,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-30-marketplace-catalog-f25-marketplace-cata.json"
+    },
+    {
+      "bullet": "TypeScript client (`F25.ts-client`).",
+      "ids": [
+        "F25.ts-client"
+      ],
+      "line": 743,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6338,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-31-typescript-client-f25-ts-client.json"
+    },
+    {
+      "bullet": "Catalog after a sync (`F25.marketplace-stale-cache`), known bug.",
+      "ids": [
+        "F25.marketplace-stale-cache"
+      ],
+      "line": 801,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 3400,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-32-catalog-after-a-sync-f25-marketplace-sta.json",
+      "failed_line": 11,
+      "failed_command": "control-agent-server api GET /api/skills/marketplace --expect 200 --check skills contains '\"name\": \"qa-f25-pub-extra\"' --save F25.marketplace-stale-cache/after-sync",
+      "stdout_tail": "\": \"GET\",\n    \"path\": \"/api/skills/marketplace\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"232\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"skills\": [\n        {\n          \"name\": \"qa-f25-pub\",\n          \"description\": \"QA public stand-in skill\",\n          \"source\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/home/.openhands/cache/skills/public-skills/skills/qa-f25-pub\",\n          \"installed\": true\n        }\n      ]\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 103,\n  \"checks\": [\n    {\n      \"check\": \"skills contains \\\"name\\\": \\\"qa-f25-pub-extra\\\"\",\n      \"ok\": false,\n      \"actual\": \"[{\\\"name\\\": \\\"qa-f25-pub\\\", \\\"description\\\": \\\"QA public stand-in skill\\\", \\\"source\\\": \\\"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/home/.openhands/cache/skills/public-skills/skills/qa-f\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.marketplace-stale-cache/after-sync.json\",\n  \"hint\": \"failed check: skills contains \\\"name\\\": \\\"qa-f25-pub-extra\\\"\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Uninstall (`F25.uninstall`).",
+      "ids": [
+        "F25.uninstall"
+      ],
+      "line": 824,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5713,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/map-run/F25-skills-33-uninstall-f25-uninstall.json"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25",
+  "launch_flags": []
+}

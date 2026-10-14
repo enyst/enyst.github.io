@@ -1,0 +1,225 @@
+{
+  "created_at": "2026-10-13T03:58:31.277438+00:00",
+  "feature_id": "F13.scoped-idle-eviction",
+  "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+  "inspection_scope": "Read only the two owned EV run manifests, selected saved recipe transcripts, and scoped bash-event directories, plus frozen lifecycle source. No API/server/map jobs, process inspection, or credential-file contents. Referenced private server.log files were not opened; filtered eviction lines were extracted only from the already saved recipe transcripts.",
+  "verdict": "Sufficient independent persisted evidence supports no terminal BashOutput in both fresh EV runs. Together with saved active-process disappearance and eviction timing, the lifecycle defect is confirmed beyond the original skipped output assertions.",
+  "recommended_claim": "Idle eviction kills an active scoped bash command and leaves its retained event stream without a terminal BashOutput. Consumers that require exit_code cannot learn completion from that stream and may wait until their own timeout.",
+  "severity_assessment": "Existing high severity can be retained on active-work termination plus missing terminal completion signal. Describe poller timeout as a source-supported consequence; no actual poller hang was dynamically observed here.",
+  "cases": [
+    {
+      "parent_run": "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13",
+      "child_run": "/workspace/verification-artifacts/runs/20261013-031049-0416-f13-evict",
+      "child_manifest": "/workspace/verification-artifacts/runs/20261013-031049-0416-f13-evict/run.json",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "conversation_id": "f29237207ca44514b2aa72e5709c6f22",
+      "saved_recipe_transcript": "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/map-run/F13-bash-06-idle-eviction-kills-a-running-command-f1.json",
+      "recipe_ledger_at": "2026-10-13T03:12:13Z",
+      "recipe_exit_code": 1,
+      "recipe_failed_command": "pgrep -f \"$EV_MARK\"",
+      "recipe_elapsed_ms": 84962,
+      "command_id": "4e3d36a297014adca3a9d918dd1d4936",
+      "command": "sleep 600 with unique owned QA marker",
+      "command_timeout_seconds": 300,
+      "bash_event_directory": "/workspace/verification-artifacts/runs/20261013-031049-0416-f13-evict/server/workspace/conversations/f29237207ca44514b2aa72e5709c6f22/bash_events",
+      "directory_entries": [
+        "20261013031054765004_BashCommand_4e3d36a297014adca3a9d918dd1d4936"
+      ],
+      "persisted_events": [
+        {
+          "path": "/workspace/verification-artifacts/runs/20261013-031049-0416-f13-evict/server/workspace/conversations/f29237207ca44514b2aa72e5709c6f22/bash_events/20261013031054765004_BashCommand_4e3d36a297014adca3a9d918dd1d4936",
+          "bytes": 297,
+          "kind": "BashCommand",
+          "id": "4e3d36a297014adca3a9d918dd1d4936",
+          "command_id": null,
+          "timestamp": "2026-10-13T03:10:54.765004Z",
+          "exit_code": null
+        }
+      ],
+      "BashOutput_count": 0,
+      "terminal_BashOutput_count": 0,
+      "saved_idle_lease_control": [
+        {
+          "pattern": "owner_lease.json",
+          "count": 1,
+          "paths": [
+            "server/workspace/conversations/d228253819684fb399d1d9d5924d7c6a/owner_lease.json"
+          ]
+        }
+      ],
+      "saved_filtered_eviction_log_observations": [
+        {
+          "source_log_path_referenced_by_saved_transcript": "/workspace/verification-artifacts/runs/20261013-031049-0416-f13-evict/private/server.log",
+          "lines": [],
+          "total_matching": 0
+        },
+        {
+          "source_log_path_referenced_by_saved_transcript": "/workspace/verification-artifacts/runs/20261013-031049-0416-f13-evict/private/server.log",
+          "lines": [
+            "[10/13/26 03:11:54] INFO     Evicted idle           conversation_service.py:2140",
+            "[10/13/26 03:11:54] INFO     Evicted idle           conversation_service.py:2140"
+          ],
+          "total_matching": 2
+        }
+      ],
+      "timing": {
+        "command_timestamp": "2026-10-13T03:10:54.765004Z",
+        "eviction_log_timestamp_utc_second_precision": "2026-10-13T03:11:54+00:00",
+        "recorded_harness_stopped_at": "2026-10-13T03:12:13Z",
+        "command_to_eviction_seconds_using_log_second": 59.234996,
+        "eviction_log_to_recorded_stop_seconds": 19.0,
+        "command_to_recorded_stop_seconds": 78.234996
+      },
+      "observation": "The matching BashCommand is the sole retained event; no BashOutput or terminal exit_code event is persisted in the owned conversation stream at inspection."
+    },
+    {
+      "parent_run": "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13",
+      "child_run": "/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict",
+      "child_manifest": "/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict/run.json",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "conversation_id": "084812b621884c4480b0ef2b85127007",
+      "saved_recipe_transcript": "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/map-run/F13-bash-06-idle-eviction-kills-a-running-command-f1.json",
+      "recipe_ledger_at": "2026-10-13T03:14:18Z",
+      "recipe_exit_code": 1,
+      "recipe_failed_command": "pgrep -f \"$EV_MARK\"",
+      "recipe_elapsed_ms": 88202,
+      "command_id": "3ae234f61ebf46c1a01b0841223b3b53",
+      "command": "sleep 600 with unique owned QA marker",
+      "command_timeout_seconds": 300,
+      "bash_event_directory": "/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict/server/workspace/conversations/084812b621884c4480b0ef2b85127007/bash_events",
+      "directory_entries": [
+        "20261013031259484660_BashCommand_3ae234f61ebf46c1a01b0841223b3b53"
+      ],
+      "persisted_events": [
+        {
+          "path": "/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict/server/workspace/conversations/084812b621884c4480b0ef2b85127007/bash_events/20261013031259484660_BashCommand_3ae234f61ebf46c1a01b0841223b3b53",
+          "bytes": 298,
+          "kind": "BashCommand",
+          "id": "3ae234f61ebf46c1a01b0841223b3b53",
+          "command_id": null,
+          "timestamp": "2026-10-13T03:12:59.484660Z",
+          "exit_code": null
+        }
+      ],
+      "BashOutput_count": 0,
+      "terminal_BashOutput_count": 0,
+      "saved_idle_lease_control": [
+        {
+          "pattern": "owner_lease.json",
+          "count": 1,
+          "paths": [
+            "server/workspace/conversations/2d1196f23bb646c686a0cfa7b043b729/owner_lease.json"
+          ]
+        }
+      ],
+      "saved_filtered_eviction_log_observations": [
+        {
+          "source_log_path_referenced_by_saved_transcript": "/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict/private/server.log",
+          "lines": [],
+          "total_matching": 0
+        },
+        {
+          "source_log_path_referenced_by_saved_transcript": "/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict/private/server.log",
+          "lines": [
+            "[10/13/26 03:13:58] INFO     Evicted idle           conversation_service.py:2140",
+            "[10/13/26 03:13:58] INFO     Evicted idle           conversation_service.py:2140"
+          ],
+          "total_matching": 2
+        }
+      ],
+      "timing": {
+        "command_timestamp": "2026-10-13T03:12:59.484660Z",
+        "eviction_log_timestamp_utc_second_precision": "2026-10-13T03:13:58+00:00",
+        "recorded_harness_stopped_at": "2026-10-13T03:14:18Z",
+        "command_to_eviction_seconds_using_log_second": 58.51534,
+        "eviction_log_to_recorded_stop_seconds": 20.0,
+        "command_to_recorded_stop_seconds": 78.51534
+      },
+      "observation": "The matching BashCommand is the sole retained event; no BashOutput or terminal exit_code event is persisted in the owned conversation stream at inspection."
+    }
+  ],
+  "source_explanation": [
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/conversation_service.py",
+      "line": 2084,
+      "finding": "Idle sweep interval is max(60, TTL/2); TTL=5 therefore sweeps about once per minute."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/event_service.py",
+      "line": 2287,
+      "finding": "Idle eligibility excludes active run/goal/rerun and external subscribers, but does not inspect bash tasks."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/conversation_service.py",
+      "line": 2102,
+      "finding": "Eviction removes eligible event service and awaits its __aexit__ without clearing stored conversation history."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/event_service.py",
+      "line": 2061,
+      "finding": "EventService.close invokes scoped BashEventService.close."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/bash_service.py",
+      "line": 574,
+      "finding": "Bash close cancels tracked tasks and gathers them; it does not clear persisted event files."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/bash_service.py",
+      "line": 376,
+      "finding": "CancelledError kills the command process group, awaits process exit, then re-raises."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/bash_service.py",
+      "line": 408,
+      "finding": "Terminal BashOutput construction and persistence occur after the cancellation handler; cancellation skips them."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/bash_service.py",
+      "line": 419,
+      "finding": "The Exception error-output fallback does not catch asyncio.CancelledError."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/dependencies.py",
+      "line": 74,
+      "finding": "Recreated scoped bash service uses the same <conversation_dir>/bash_events directory."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/bash_service.py",
+      "line": 172,
+      "finding": "Search reads stored bash events; command_id filtering matches output records, not the BashCommand id field."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-sdk/openhands/sdk/workspace/remote/remote_workspace_mixin.py",
+      "line": 241,
+      "finding": "SDK execute poller recognizes command completion only when an output has exit_code, otherwise it polls until its own timeout."
+    },
+    {
+      "path": "/workspace/agent-sdk-verify/openhands-sdk/openhands/sdk/workspace/remote/remote_workspace_mixin.py",
+      "line": 252,
+      "finding": "A missing exit_code at client timeout produces the client timeout result; no terminal event means completion cannot be learned from this stored stream."
+    }
+  ],
+  "limitations": [
+    "No dynamic post-eviction API search, stop request, SDK/TypeScript poller, or rehydration was run. The original recipe still stops at the vanished-process assertion.",
+    "Absence is established in archived owned event directories at this inspection. Both recorded shutdown times occur 19\u201320 seconds after the second-precision eviction logs and well before the configured 300-second command timeout. This does not measure an indefinite wait.",
+    "Both idle eviction and shutdown use bash-task cancellation; attribution to eviction uses the saved two Evicted idle log entries, idle-lease control, and vanished owned process before the EXIT cleanup trap. The filtered log text truncates conversation IDs, so it does not itself name each evicted conversation.",
+    "The two independent bash directories contain only the matching command and no outputs of any kind. No event deletion or clear command appears in these recipes, and BashEventService.close does not clear persisted files.",
+    "Retained source explains the missing terminal signal; it does not turn uncalled typed client methods into dynamically verified coverage."
+  ],
+  "inputs_sha256": {
+    "/workspace/verification-artifacts/runs/20261013-031049-0416-f13-evict/run.json": "0c582d30260004d14cb25e18e54280bf9a70799da416ea3d4bf1887007c3ed66",
+    "/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/map-run/F13-bash-06-idle-eviction-kills-a-running-command-f1.json": "4a7ef0f1ca21310d24e719fd8832032aab7483369d6ec2aecf9338218e07bac1",
+    "/workspace/verification-artifacts/runs/20261013-031049-0416-f13-evict/server/workspace/conversations/f29237207ca44514b2aa72e5709c6f22/bash_events/20261013031054765004_BashCommand_4e3d36a297014adca3a9d918dd1d4936": "35c0e6bccc0ab70f108e7f2e6889c52fad3b428e8e44262e1b8775f6b3fe457a",
+    "/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict/run.json": "1253b891ab2857d59b016d5ba220a73cc43768ff25734716124d9fc2b8d7a3b2",
+    "/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/map-run/F13-bash-06-idle-eviction-kills-a-running-command-f1.json": "10d3efa024675cec51f344255a278b6fd6cd601d5c7a24dba450bf0898363247",
+    "/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict/server/workspace/conversations/084812b621884c4480b0ef2b85127007/bash_events/20261013031259484660_BashCommand_3ae234f61ebf46c1a01b0841223b3b53": "bf1aa7629a5642cff68d2e5bd6363aed662196be9e67fbfda11038e96f75efee",
+    "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/conversation_service.py": "107947039def39bcfc416b66a0659eba15494bbc6dba9fc248ebbfb7e2d2bbc7",
+    "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/event_service.py": "e27f06977e79e3bd3d15f592e3436eac8b857ac71d58fe066c20b2d46921095e",
+    "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/bash_service.py": "a09f4c24a8475f4efea8ef0b2284a6474e9dcce3b761d53ca35343f661c3e7c5",
+    "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/dependencies.py": "2bf1483569a3837365c4a1f332de3cf707cf9afd21c46686d64c5f008ccace3f",
+    "/workspace/agent-sdk-verify/openhands-sdk/openhands/sdk/workspace/remote/remote_workspace_mixin.py": "0e55f7ab273c4a52df2d7ce17fcec39d88481a521f14f17daaf21a30df1ada8c"
+  },
+  "shared_triage_edited": false,
+  "new_jobs_run": false
+}

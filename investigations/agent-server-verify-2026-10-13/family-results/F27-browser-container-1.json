@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "file": "F27-browser-container.md",
+  "summary": {
+    "pass": 2,
+    "fail": 0,
+    "xfail": 1,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 3,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3157,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-00-preconditions.json"
+    },
+    {
+      "bullet": "Home-cache positive control (`F27.browser-probe`).",
+      "ids": [
+        "F27.browser-probe"
+      ],
+      "line": 10,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8101,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-01-home-cache-positive-control-f27-browser-.json"
+    },
+    {
+      "bullet": "Playwright override (`F27.browser-playwright-path`), known bug.",
+      "ids": [
+        "F27.browser-playwright-path"
+      ],
+      "line": 19,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 9452,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-02-playwright-override-f27-browser-playwrig.json",
+      "failed_line": 6,
+      "failed_command": "control-agent-server api GET /api/tools/catalog --quiet --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": true' --save F27.browser-playwright-path/catalog",
+      "stdout_tail": ", \\\"usable\\\": true, \\\"description\\\": \\\"\\\", \\\"in_default_set\\\": false}, {\\\"name\\\": \\\"ask_oracle\\\", \\\"user_selectable\\\": false, \\\"usable\\\": true, \\\"description\\\": \\u2026\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/tools/catalog\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"2218\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 45,\n  \"checks\": [\n    {\n      \"check\": \"tools contains {\\\"name\\\": \\\"browser_tool_set\\\", \\\"user_selectable\\\": true, \\\"usable\\\": true\",\n      \"ok\": false,\n      \"actual\": \"[{\\\"name\\\": \\\"route_task_to_model\\\", \\\"user_selectable\\\": false, \\\"usable\\\": true, \\\"description\\\": \\\"\\\", \\\"in_default_set\\\": false}, {\\\"name\\\": \\\"ask_oracle\\\", \\\"user_selectable\\\": false, \\\"usable\\\": true, \\\"description\\\": \\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-040445-9999-qa-f27-browser-path-1/evidence/F27.browser-playwright-path/catalog.json\",\n  \"hint\": \"failed check: tools contains {\\\"name\\\": \\\"browser_tool_set\\\", \\\"user_selectable\\\": true, \\\"usable\\\": true\"\n}\n",
+      "stderr_tail": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F34-typescript-client.md",
+  "bullet": "Reconnect on Node's own WebSocket (`F34.event-stream-reconnect-native`), known bug.",
+  "ids": [
+    "F34.event-stream-reconnect-native"
+  ],
+  "line": 1327,
+  "script": "RNID=$(control-agent-server conversation start --no-run --placeholder-agent --tools none --no-autotitle --workspace \"$F34/scoped\" \\\n  --prompt 'qa-f34-reconnect: never run' --print-id)\nrm -f \"$F34/reconnect-ready\"\ncontrol-agent-server exec --timeout 300 --expect-output QA_F34_RECONNECT_WATCHED --save F34.event-stream-reconnect-native/program \\\n  -- node \"$F34/reconnect.mjs\" \"$RNID\" \"$F34/reconnect-native.json\" ws native &\nRPID=$!\nfor _ in $(seq 150); do if [ -e \"$F34/reconnect-ready\" ]; then break; fi; sleep 0.2; done\ntest -e \"$F34/reconnect-ready\"\ncontrol-agent-server restart\ncontrol-agent-server api POST \"<redacted:session-cookie>/$RNID/events\" \\\n  --json '{\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"qa-f34-after-restart\"}], \"run\": false}' --expect 200\nwait \"$RPID\"\ncat \"$F34/reconnect-native.json\"\njq -e '.ws.reconnected and .ws.sent_after >= 1 and .native.went_down' \"$F34/reconnect-native.json\"\njq -e '.native.reconnected and .native.sent_after >= 1' \"$F34/reconnect-native.json\"  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 8999,
+  "failed_line": 2,
+  "failed_command": "RNID=$(control-agent-server conversation start --no-run --placeholder-agent --tools none --no-autotitle --workspace \"$F34/scoped\" --prompt 'qa-f34-reconnect: never run' --print-id)",
+  "stdout": "",
+  "stderr": ""
+}

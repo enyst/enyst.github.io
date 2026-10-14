@@ -1,0 +1,49 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "<redacted:session-cookie>",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "workspace": {
+        "working_dir": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/fixtures/qa-f27/clienttool"
+      },
+      "agent": {
+        "llm": {
+          "model": "openai/qa-f27-offline",
+          "api_key": "<redacted:api_key>",
+          "base_url": "http://127.0.0.1:9/v1",
+          "num_retries": 0
+        },
+        "tools": []
+      },
+      "client_tools": [
+        {
+          "name": "qa_f27_call_tool",
+          "description": "QA",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "other": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "173",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "Client tool 'qa_f27_call_tool' is already registered with a different parameters schema. Client tool names must map to a single, stable schema within a process."
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 46
+}

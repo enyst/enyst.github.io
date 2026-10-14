@@ -1,0 +1,50 @@
+[
+  {
+    "id": "F18.secret-key-rotation",
+    "command": [
+      "bash",
+      "/workspace/verification-artifacts/video/scripts/repro_secret_loss.sh"
+    ],
+    "started_at": 13.845585767000102,
+    "lines": [
+      {
+        "at": 13.848208562999844,
+        "text": "Launching an isolated server. All credentials in this scene are synthetic.",
+        "signal": false
+      },
+      {
+        "at": 51.83202075500003,
+        "text": "A fake HERO_TOKEN is saved and readable. No real account is involved.",
+        "signal": false
+      },
+      {
+        "at": 120.16798833899975,
+        "text": "Positive control: rotate away, rotate back, original credential survives.",
+        "signal": false
+      },
+      {
+        "at": 156.4050285200001,
+        "text": "Rotate away again. Save an unrelated fake SIDE_TOKEN: HTTP 200.",
+        "signal": false
+      },
+      {
+        "at": 193.92492027399976,
+        "text": "Expected after restoring original encryption key: HERO_TOKEN survives.",
+        "signal": false
+      },
+      {
+        "at": 194.1131685549999,
+        "text": "Actual: HTTP 404. Persisted HERO_TOKEN.secret = null.",
+        "signal": false
+      },
+      {
+        "at": 194.30894230600006,
+        "text": "BUG_CONFIRMED: an unrelated write under another cipher key erased a saved secret.",
+        "signal": true
+      }
+    ],
+    "exit_code": 0,
+    "confirmed_signal": true,
+    "ended_at": 210.207178097
+  }
+]

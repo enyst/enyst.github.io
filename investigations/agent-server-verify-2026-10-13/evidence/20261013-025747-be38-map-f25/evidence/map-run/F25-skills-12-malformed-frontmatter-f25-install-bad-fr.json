@@ -1,0 +1,15 @@
+{
+  "file": "F25-skills.md",
+  "bullet": "Malformed frontmatter (`F25.install-bad-frontmatter`), known bug.",
+  "ids": [
+    "F25.install-bad-frontmatter"
+  ],
+  "line": 340,
+  "script": "control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$F/qa-f25-badyaml\"'\"}' --expect 422 \\\n  --save F25.install-bad-frontmatter/install  # bug\ntest ! -e \"$I/qa-f25-badyaml\"\n",
+  "exit_code": 1,
+  "elapsed_ms": 3321,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api POST /api/skills/install --json '{\"source\": \"'\"$F/qa-f25-badyaml\"'\"}' --expect 422 --save F25.install-bad-frontmatter/install",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/skills/install\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"source\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/qa-f25/qa-f25-badyaml\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"249\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"while parsing a flow sequence\\n  in \\\"<unicode string>\\\", line 3, column 14\\ndid not find expected ',' or ']'\\n  in \\\"<unicode string>\\\", line 4, column 1\",\n      \"error_id\": \"9a61d1f61c024385a85539cbf327d187\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 2471,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.install-bad-frontmatter/install.json\",\n  \"hint\": \"expected 422, got 500\"\n}\n",
+  "stderr": ""
+}

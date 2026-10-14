@@ -1,0 +1,44 @@
+{
+  "ok": false,
+  "file": "F15-git.md",
+  "summary": {
+    "pass": 1,
+    "fail": 1,
+    "xfail": 0,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 96,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2647,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/map-run/F15-git-00-preconditions.json"
+    },
+    {
+      "bullet": "Live GitHub listing (`F15.repo-search-github`).",
+      "ids": [
+        "F15.repo-search-github"
+      ],
+      "line": 755,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 7854,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/map-run/F15-git-01-live-github-listing-f15-repo-search-gith.json",
+      "failed_line": 10,
+      "failed_command": "control-agent-server api GET /api/git/repositories/search --query provider=github --expect 401 --check detail eq 'GitHub repository search failed' --save F15.repo-search-github/bad-token",
+      "stdout_tail": "         \"full_name\": \"<redacted:unrelated-repository>\",\n          \"git_provider\": \"github\",\n          \"is_public\": true,\n          \"stargazers_count\": 0,\n          \"pushed_at\": \"2026-02-13T21:42:13Z\",\n          \"main_branch\": \"main\"\n        },\n        {\n          \"id\": \"773132275\",\n          \"full_name\": \"<redacted:unrelated-repository>\",\n          \"git_provider\": \"github\",\n          \"is_public\": true,\n          \"stargazers_count\": 0,\n          \"pushed_at\": \"2026-02-07T13:31:54Z\",\n          \"main_branch\": \"main\"\n        },\n        {\n          \"id\": \"1146723278\",\n          \"full_name\": \"<redacted:unrelated-repository>\",\n          \"git_provider\": \"github\",\n          \"is_public\": true,\n          \"stargazers_count\": 0,\n          \"pushed_at\": \"2026-01-31T15:19:50Z\",\n          \"main_branch\": \"main\"\n        }\n      ],\n      \"next_page_id\": \"2\",\n      \"missing_token\": false\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1168,\n  \"checks\": [\n    {\n      \"check\": \"detail eq GitHub repository search failed\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/bad-token.json\",\n  \"hint\": \"expected 401, got 200\"\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15",
+  "launch_flags": [
+    "--checkout",
+    "/workspace/agent-sdk-verify"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/workspaces",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "workspaces": [
+        {
+          "id": "/qa-f17/batch-valid",
+          "name": "qa-f17-batch-valid",
+          "path": "/qa-f17/batch-valid"
+        },
+        {
+          "id": "",
+          "name": "qa-f17-empty-id",
+          "path": "/qa-f17/empty-id"
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "157",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "string_too_short",
+          "loc": [
+            "body",
+            "workspaces",
+            1,
+            "id"
+          ],
+          "msg": "String should have at least 1 character",
+          "input": "",
+          "ctx": {
+            "min_length": 1
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 290
+}

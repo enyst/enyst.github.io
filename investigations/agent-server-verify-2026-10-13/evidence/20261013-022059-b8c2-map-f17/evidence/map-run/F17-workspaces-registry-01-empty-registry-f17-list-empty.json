@@ -1,0 +1,15 @@
+{
+  "file": "F17-workspaces-registry.md",
+  "bullet": "Empty registry (`F17.list-empty`).",
+  "ids": [
+    "F17.list-empty"
+  ],
+  "line": 162,
+  "script": "control-agent-server api GET /api/workspaces --expect 200 \\\n  --check workspaces len-eq 0 --check workspaceParents len-eq 0 --save F17.list-empty/list\ncontrol-agent-server state ls home/.openhands/workspaces.json --expect-count 0\n",
+  "exit_code": 0,
+  "elapsed_ms": 4983,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/workspaces\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"39\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"workspaces\": [],\n      \"workspaceParents\": []\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 482,\n  \"checks\": [\n    {\n      \"check\": \"workspaces len-eq 0\",\n      \"ok\": true,\n      \"actual\": \"[]\"\n    },\n    {\n      \"check\": \"workspaceParents len-eq 0\",\n      \"ok\": true,\n      \"actual\": \"[]\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/F17.list-empty/list.json\"\n}\n{\n  \"ok\": true,\n  \"pattern\": \"home/.openhands/workspaces.json\",\n  \"count\": 0,\n  \"files\": []\n}\n",
+  "stderr": ""
+}

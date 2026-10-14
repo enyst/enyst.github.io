@@ -1,74 +1,83 @@
 # OpenHands architecture-page status
 
-This file is an explicit maintenance follow-up for published OpenHands/SmolPaws architecture pages. The repository has GitHub Issues disabled, so documentation drift is recorded here until the pages themselves are revised.
+Audited 2026-09-14 against SmolPaws #170 (`c344f79`) and SDK #28 (`369b9c5`).
+LLM accounting notes updated 2026-09-15 after SDK #35 (`a983e4c`) and server #184 (`28106cd`)
+merged and were verified on the shared and canary product hosts. Earlier unrecorded usage remains unknown.
+Beads owns task status; the site explains dated architecture, decisions and plans. It is not runtime telemetry.
 
-## Current sources of truth
+## Insider Voice integration
 
-- SDK transpilation policy: [`enyst/openhands-agent/docs/TRANSPILE_CONTRACT.md`](https://github.com/enyst/openhands-agent/blob/main/docs/TRANSPILE_CONTRACT.md)
-- Drift control plane and oracle design: [`enyst/openhands-agent/docs/DRIFT_TOOLING.md`](https://github.com/enyst/openhands-agent/blob/main/docs/DRIFT_TOOLING.md)
-- Canonical upstream manifest: [`enyst/openhands-agent/transpile/upstream.json`](https://github.com/enyst/openhands-agent/blob/main/transpile/upstream.json)
-- Agent-server transpilation policy: [`enyst/smolpaws/packages/openhands-agent-server/TRANSPILE_RULES.md`](https://github.com/enyst/smolpaws/blob/main/packages/openhands-agent-server/TRANSPILE_RULES.md)
-- Agent-server package: [`enyst/smolpaws/packages/openhands-agent-server/README.md`](https://github.com/enyst/smolpaws/blob/main/packages/openhands-agent-server/README.md)
-- Durable Message Relay: [`enyst/smolpaws/src/coordinator/DESIGN.md`](https://github.com/enyst/smolpaws/blob/main/src/coordinator/DESIGN.md)
-- Slack Message Relay operations: [`enyst/smolpaws/docs/slack/instructions.md`](https://github.com/enyst/smolpaws/blob/main/docs/slack/instructions.md)
+The 5 October 2026 maintenance pass follows SDK [#5180](https://github.com/OpenHands/software-agent-sdk/pull/5180),
+Canvas [#17558](https://github.com/OpenHands/OpenHands/pull/17558), and Insider [#2](https://github.com/enyst/insider/pull/2).
+[SDK issue #5515](https://github.com/OpenHands/software-agent-sdk/issues/5515) tracks the shared acceptance criteria;
+[Canvas issue #17557](https://github.com/OpenHands/OpenHands/issues/17557) tracks host behavior.
+[The Insider page](arch/insider-cat.html#october-validation) separates the fresh validation from September's provider observations.
+The linked issues and PRs own current CI/test status; physical-device audio remains a separate validation task.
 
-Public pages are explanatory snapshots. They must not become a hand-maintained live parity ledger.
+## Current explanations
 
-## Maintenance machinery now implemented
+- [Checking the Agent SDK from outside](arch/agent-sdk-external-contract.html):
+  9 October 2026 snapshot of the merged external verifier, the confirmed manual
+  Cloud run, and the controls needed before periodic checks. The Cloud
+  automation is disabled. The [testing strategy](arch/openhands-sdk-architecture-testing.html)
+  remains the broader plan. The [merged evaluation](https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud)
+  owns the dated evidence; this page does not report live run status.
+- [Insider Cat](arch/insider-cat.html): September 20 App behavior, Cat interface,
+  conversation continuity, and normal OpenHands tools and skills. The
+  [Voice implementation note](arch/insider-cat-codex-voice.html) records a real
+  spoken request invoking the API skill and querying the owning backend through
+  the terminal, then returning the saved answer as speech. Dedicated inventory
+  tools are optional; this flow needs the normal skills and accurate runtime
+  context. Physical iPad audio and worker-mutation flows remain separate checks.
+- [How SmolPaws resets its context](arch/smolpaws-agent-reset.html): 5 October 2026 implementation guide covering voluntary reset, warnings, the separate emergency summarizer, configuration and durable events. It links checked source revisions; it does not assert a live deployment state. The [September proposal](arch/agent-triggered-condensation.html) is retained as design history.
+- [Reviewing the reviewer](arch/openhands-review-auditor.html): September 16 investigation,
+  chosen actual Astra model and exasperated robot babysitter voice, event-driven implementation draft,
+  a supervised pilot with four reviews published and one withheld after the PR changed,
+  and explicitly unresolved Cloud deployment prerequisites.
+  Subsequent manual publishing uses `enyst`; the continuous-automation draft stays dry-run and recurring reviews stay off.
+  The four `smolpaws` pilot publications remain historical. Continuous Cloud automation remains undeployed.
+  Corrected detector replay reopened selection; four new manual reviews are verified as published by `enyst`:
+  one approval and three requests for changes. Failed and stale attempts remain historical evidence, without a public verdict.
+  September 17: four of eight fresh candidates qualified for a bounded local OpenHands Automation trial.
+  The first local Automation trial failed before publication, posted zero reviews and is verified disabled.
+  The bounded retry completed with four requests for changes published as `enyst`; both local trial
+  definitions are verified disabled, and the Cloud Roasted reviewer stays paused. SDK #4862 received a
+  verified editorial correction withdrawing one finding with unproven dependency-path reachability;
+  its supported request for changes and all eleven historical scores remain unchanged. Original evidence
+  remains immutable. All twelve completed PRs are retired; unattended review quality remains unvalidated.
+  Literal-false event filters and absent schedules prevent recurring triggers.
+  Its persistent host checkpoints remain separate from the unresolved Cloud KV and native-event prerequisites.
+- [OpenHands Automations operations](arch/openhands-automation-operations.html): September 15 deployment snapshot,
+  permitted effects, recent results, and pending location/target decisions. Distinguishes live registrations
+  from authored definitions, paused history, and future plans.
+- [WhatsApp readiness](arch/whatsapp-readiness.html): controlled text-canary gates, permanent-cutover gates,
+  source evidence, provider accounting rollout and Beads owners. Companion: `smolpaws/smolpaws/docs/whatsapp/READINESS.md`.
+- [Bridge topology](arch/smolpaws-bridges-topology.html): shared relay, lane identity, launch additions,
+  startup coordination and current implementation versus dated deployment observations.
+- [Transpile maintenance](arch/openhands-transpile-maintenance.html): bounded review, DELEGATED server units,
+  re-vendoring, TypeScript-owned provider compatibility, and durable accounting with explicit coverage.
+- [Slack](smolpaws-slack.html): current relay ownership and extraction policy; August transport proof is historical.
+- [Message Work ADR](arch/smolpaws-message-work-adr.html): accepted decision, original proposal retained with
+  a dated implementation note for deterministic event append and final/mid-turn delivery.
 
-The SDK fork owns one canonical upstream manifest, deterministic `scan` / `prepare` / `check` tooling, synthetic-git tests, CI coverage, and a weekly drift workflow. The server fork consumes the same manifest from its vendored SDK and validates that provenance before running package CI.
+## Historical pages retained with current links
 
-Generated Python OpenAPI evidence, SDK wire-oracle infrastructure, and deterministic Python/TypeScript server checks now exist. Mutable drift and parity counts remain generated evidence rather than prose on this site.
+`arch/agent-triggered-condensation.html`, `arch/whatsapp-as-bridge.html`, `arch/openhands-agent-server-parity.html`,
+`arch/smolpaws-sdk-swap.html`, `arch/smolpaws-sdk-swap-board.html`, `arch/sdk-swap-surface.html`,
+`smolpaws-whatsapp.html`, `smolpaws-discord.html`, `smolpaws-github.html`.
+Their old proposals, runtime observations and source revisions remain historical evidence. Updating a banner
+is not a fresh validation of every old gap. The homepage points to the current readiness plan.
 
-## Message Relay rollout now implemented
+## Sources of truth
 
-The durable external-message subsystem is no longer intake-only scaffolding:
+- SDK: `smolpaws/openhands-agent`, `docs/TRANSPILE_CONTRACT.md`, `docs/LLM_PROVIDERS.md`,
+  `docs/LLM_METRICS.md`, `transpile/llm-metrics.md`, `docs/DRIFT_TOOLING.md`,
+  `docs/DRIFT_AUTOMATION.md`, `transpile/upstream.json`.
+- Server: `smolpaws/smolpaws/packages/openhands-agent-server`, `TRANSPILE_RULES.md`,
+  `docs/REVENDOR_AUTOMATION.md`, generated oracles, tests and review records.
+- Relay and bridges: `smolpaws/smolpaws`, `src/coordinator/DESIGN.md`, `docs/bridges.md`,
+  `docs/whatsapp/README.md`, `docs/whatsapp/READINESS.md`, `docs/slack/instructions.md`.
+- Work: Beads `smolpaws-zlo`, `smolpaws-kxa`, `kxa.2`, `kxa.4`–`kxa.9`, `39y`, `b1r.24`, `via`.
 
-- `MessageRelay` owns lane binding, durable intake, agent-server integration, and `syncDeliveryOutbox()`;
-- `OutboundRelay` catches agent events up into the durable delivery outbox and coordinates bounded dispatch;
-- `DeliveryDispatcher` owns claim → send fence → delivery target → settlement;
-- Slack has a greenfield `SlackBridge`, `SlackRelayRuntime`, and `SlackDeliveryTarget`, with no legacy `/turns` fallback;
-- deterministic tests cover SQLite durability, the real TypeScript agent-server, the real agent loop with a deterministic LLM, outbox synchronization, dispatch settlement, and Slack-target routing.
-
-An isolated, self-expiring live canary also completed the full Liberty Labs Socket Mode path on 2026-08-16 at fork commit `a69456fc6f818f23ecb6e2e064f3e03fceeafaf4`. The exact observed reply was `RELAY-LIVE-a69456fc6f81`, produced after Slack ingress, durable Message Relay intake, the real TypeScript agent-server/agent loop, terminal `finish`, `syncDeliveryOutbox()`, `DeliveryDispatcher`, and `SlackDeliveryTarget`.
-
-That proves the real Slack transport and complete durable architecture with a deterministic test LLM. The remaining operational boundary is narrower: restart the normal host so it releases the obsolete Slack Socket Mode connection, then soak standalone `paws` on port 8790 with the configured real LLM profile. A response containing the legacy `Done — nothing to report back` fallback still proves that an older `/turns` process handled that particular event.
-
-## Known pages needing status treatment
-
-### `arch/sdk-swap-surface.html`
-
-Historical pre-swap symbol inventory. It still presents early package versions, missing symbols, and undecided differences as current work.
-
-Action: retain the analysis, but add a prominent **historical / superseded** banner linking to the current SDK contract, server contract, canonical manifest, and drift tooling.
-
-### `arch/smolpaws-sdk-swap.html`
-
-Historical migration plan. It still says the new SDK has no TypeScript server and frames `/turns` versus `/events + /run` as an unresolved architecture question.
-
-Action: mark superseded by the implemented TypeScript agent-server package and external durable Message Relay. Preserve it as migration history.
-
-### `arch/smolpaws-message-work-adr.html`
-
-The decision remains current, but the wording and diagram still use the overloaded term `projector` and its header understates the implementation status.
-
-Action: update status to **accepted / isolated Slack live proof complete / production soak pending**. Replace the user-facing component vocabulary with:
-
-- **delivery outbox sync** / `syncDeliveryOutbox()` for agent EventLog → durable delivery work;
-- **Message Relay** for the complete durable external-message subsystem;
-- **Outbound Relay** for EventLog catch-up and bounded outbound orchestration;
-- **Delivery Dispatcher** for durable delivery work → platform side effect.
-
-Preserve `delivery_unknown` and the existing crash analysis; those semantics remain current.
-
-### Slack architecture page
-
-Action: ensure the Slack page describes Socket Mode → Message Relay → TypeScript agent-server → `syncDeliveryOutbox()` → Delivery Dispatcher → Slack, records the isolated Liberty Labs proof, and clearly distinguishes it from the still-pending normal-process real-provider soak.
-
-### `index.html`
-
-Action: update card descriptions/status labels for the pages above so the home page does not present historical plans as current implementation state.
-
-## Completion rule
-
-After the page banners/status labels and Slack/ADR terminology are updated, delete this file or replace it with a terse pointer explaining that historical banners are intentional. Do not copy weekly drift counts or current parity totals into the public site.
+Do not copy weekly drift counts or parity totals into the public site. Automation runbooks do not prove
+that external schedules are active. Local paths, credentials, chat content and private state stay private.

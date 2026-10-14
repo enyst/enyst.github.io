@@ -1,0 +1,15 @@
+{
+  "file": "F23-llm-catalog-and-connections.md",
+  "bullet": "All models (`F23.models`).",
+  "ids": [
+    "F23.models"
+  ],
+  "line": 186,
+  "script": "control-agent-server api GET /api/llm/models --expect 200 --quiet --check models len-ge 1000 --save F23.models/all\ncontrol-agent-server api GET /api/llm/models --field models \\\n  | jq -e '. == unique and all(.[]; startswith(\"bedrock\") | not) and any(.[]; . == \"deepseek/deepseek-flash\")'\n",
+  "exit_code": 0,
+  "elapsed_ms": 660,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/llm/models\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"140346\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 56,\n  \"checks\": [\n    {\n      \"check\": \"models len-ge 1000\",\n      \"ok\": true,\n      \"actual\": \"[\\\"1024-x-1024/50-steps/bedrock/amazon.nova-canvas-v1:0\\\", \\\"1024-x-1024/50-steps/stability.stable-diffusion-xl-v1\\\", \\\"1024-x-1024/gpt-image-1.5\\\", \\\"1024-x-1024/gpt-image-1.5-2025-12-16\\\", \\\"1024-x-1024/max-\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.models/all.json\"\n}\ntrue\n",
+  "stderr": ""
+}

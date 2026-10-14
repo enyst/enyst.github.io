@@ -1,0 +1,15 @@
+{
+  "file": "F03-deferred-init.md",
+  "bullet": "Dormant sockets (`F03.dormant-gates-sockets`).",
+  "ids": [
+    "F03.dormant-gates-sockets"
+  ],
+  "line": 176,
+  "script": "F03_ZERO=00000000-0000-0000-0000-0000000000f3\ncontrol-agent-server ws listen /sockets/bash-events --auth none --duration 5 --expect-reject 403 \\\n  --save F03.dormant-gates-sockets/bash-events\ncontrol-agent-server ws listen \"/sockets/events/$F03_ZERO\" --auth none --duration 5 --expect-reject 403 \\\n  --save F03.dormant-gates-sockets/events\ncontrol-agent-server ws listen \"/sockets/session/$F03_ZERO\" --auth none --duration 5 --expect-reject 403\ncontrol-agent-server api GET /api/init --auth none --check state eq dormant\n",
+  "exit_code": 0,
+  "elapsed_ms": 10994,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"path\": \"/sockets/bash-events\",\n  \"opened\": false,\n  \"frames\": 0,\n  \"kinds\": {},\n  \"stopped\": \"error\",\n  \"close\": {\n    \"error\": \"InvalidStatus: server rejected WebSocket connection: HTTP 403\",\n    \"http_status\": 403\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-023206-998c-map-f03/evidence/F03.dormant-gates-sockets/bash-events.json\",\n  \"first_frames\": []\n}\n{\n  \"ok\": true,\n  \"path\": \"/sockets/events/00000000-0000-0000-0000-0000000000f3\",\n  \"opened\": false,\n  \"frames\": 0,\n  \"kinds\": {},\n  \"stopped\": \"error\",\n  \"close\": {\n    \"error\": \"InvalidStatus: server rejected WebSocket connection: HTTP 403\",\n    \"http_status\": 403\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-023206-998c-map-f03/evidence/F03.dormant-gates-sockets/events.json\",\n  \"first_frames\": []\n}\n{\n  \"ok\": true,\n  \"path\": \"/sockets/session/00000000-0000-0000-0000-0000000000f3\",\n  \"opened\": false,\n  \"frames\": 0,\n  \"kinds\": {},\n  \"stopped\": \"error\",\n  \"close\": {\n    \"error\": \"InvalidStatus: server rejected WebSocket connection: HTTP 403\",\n    \"http_status\": 403\n  },\n  \"first_frames\": []\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/init\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"32\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"state\": \"dormant\",\n      \"error\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 394,\n  \"checks\": [\n    {\n      \"check\": \"state eq dormant\",\n      \"ok\": true,\n      \"actual\": \"dormant\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

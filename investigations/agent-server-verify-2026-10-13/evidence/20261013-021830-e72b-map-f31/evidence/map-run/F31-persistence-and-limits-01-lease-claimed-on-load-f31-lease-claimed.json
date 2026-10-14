@@ -1,0 +1,15 @@
+{
+  "file": "F31-persistence-and-limits.md",
+  "bullet": "Lease claimed on load (`F31.lease-claimed`).",
+  "ids": [
+    "F31.lease-claimed"
+  ],
+  "line": 124,
+  "script": "L=$(control-agent-server conversation start --tools none --no-autotitle --print-id)\nNOW=$(date +%s)\nPID=$(jq -r .pid \"$AGENT_SERVER_VERIFY_RUN/run.json\")\ncontrol-agent-server state cat owner_lease.json --conversation \"$L\" --check generation eq 1 --check owner_pid eq \"$PID\" \\\n  --check owner_host eq \"$(hostname)\" --check owner_instance_id matches '^[0-9a-f]{32}$' \\\n  --check expires_at gt \"$((NOW + 40))\" --check expires_at le \"$((NOW + 46))\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 1299,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"path\": \"owner_lease.json\",\n  \"bytes\": 156,\n  \"mode\": \"0o600\",\n  \"content\": {\n    \"owner_instance_id\": \"0d65c7356b514837a0477691738806c4\",\n    \"generation\": 1,\n    \"expires_at\": 1791857990.968995,\n    \"owner_host\": \"e7ee1a756865\",\n    \"owner_pid\": 5424\n  },\n  \"checks\": [\n    {\n      \"check\": \"generation eq 1\",\n      \"ok\": true,\n      \"actual\": \"1\"\n    },\n    {\n      \"check\": \"owner_pid eq 5424\",\n      \"ok\": true,\n      \"actual\": \"5424\"\n    },\n    {\n      \"check\": \"owner_host eq e7ee1a756865\",\n      \"ok\": true,\n      \"actual\": \"e7ee1a756865\"\n    },\n    {\n      \"check\": \"owner_instance_id matches ^[0-9a-f]{32}$\",\n      \"ok\": true,\n      \"actual\": \"0d65c7356b514837a0477691738806c4\"\n    },\n    {\n      \"check\": \"expires_at gt 1791857986\",\n      \"ok\": true,\n      \"actual\": \"1791857990.968995\"\n    },\n    {\n      \"check\": \"expires_at le 1791857992\",\n      \"ok\": true,\n      \"actual\": \"1791857990.968995\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

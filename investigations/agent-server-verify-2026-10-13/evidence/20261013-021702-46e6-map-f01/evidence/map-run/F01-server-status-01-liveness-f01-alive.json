@@ -1,0 +1,15 @@
+{
+  "file": "F01-server-status.md",
+  "bullet": "Liveness (`F01.alive`).",
+  "ids": [
+    "F01.alive"
+  ],
+  "line": 68,
+  "script": "control-agent-server api GET <redacted:session-cookie>/count --auth none --expect 401\ncontrol-agent-server api GET /alive --auth none --expect 200 --check status eq ok --save F01.alive/alive\n",
+  "exit_code": 0,
+  "elapsed_ms": 610,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 401,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/count\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 401,\n    \"headers\": {\n      \"content-length\": \"25\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Unauthorized\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 69\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 41,\n  \"checks\": [\n    {\n      \"check\": \"status eq ok\",\n      \"ok\": true,\n      \"actual\": \"ok\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021702-46e6-map-f01/evidence/F01.alive/alive.json\"\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How SmolPaws resets its context — Engel's notebook</title>
+  <meta name="description" content="How SmolPaws warns the agent, lets it save notes and call condense, then rebuilds its active context. Includes the separate emergency summarizer and configuration.">
+  <meta property="og:title" content="How SmolPaws resets its context">
+  <meta property="og:description" content="The agent chooses when to reset. Follow the warning, notes, tool call and new context, with a separate sequence for emergency recovery.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/smolpaws-agent-reset.html">
+  <link rel="canonical" href="https://enyst.github.io/arch/smolpaws-agent-reset.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    html { font-size: 18px; color-scheme: dark; scroll-padding-top: 24px; }
+    body { font-size: 18px; }
+    .shell { max-width: 1040px; padding-top: 42px; }
+    header, .prose { max-width: 68ch; margin-inline: auto; }
+    h1 { font-size: clamp(2.7rem, 6vw, 4.4rem); line-height: 1.06; margin: 32px 0 24px; text-wrap: balance; }
+    h2, h3 { font-family: var(--sans); text-transform: none; letter-spacing: -.01em; }
+    h2 { font-size: 1.55rem; margin: 64px 0 18px; padding-bottom: 12px; scroll-margin-top: 24px; }
+    h3 { font-size: 1.1rem; color: var(--ink); margin: 30px 0 12px; }
+    p, li { font-size: 1rem; }
+    .lead { font-size: 1.22rem; line-height: 1.65; }
+    .meta, .small, figcaption { font-family: var(--sans); color: #aaa296; font-size: .875rem; }
+    .meta { margin: 20px 0 24px; }
+    .back, .foot-nav a { font-family: var(--sans); font-size: .875rem; color: #aaa296; }
+    a { color: var(--teal); text-underline-offset: .2em; overflow-wrap: anywhere; }
+    a:hover { color: var(--ink); }
+    a:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+    ::selection { color: var(--bg); background: var(--accent); }
+    .contents { display: flex; flex-wrap: wrap; gap: 8px 24px; padding: 20px 0; border-block: 1px solid var(--border); font-size: .94rem; }
+    .contents a { padding: 3px 0; }
+    .heading-link { color: inherit; text-decoration: none; border: 0 !important; }
+    .heading-link:hover { color: var(--teal); }
+    .heading-link::after { content: ' #'; color: var(--accent); opacity: 0; }
+    .heading-link:hover::after, .heading-link:focus-visible::after { opacity: 1; }
+    .diagram { margin: 28px 0 36px; }
+    .diagram-scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); scrollbar-color: var(--muted) var(--card); }
+    .diagram img { display: block; width: 100%; min-width: 900px; height: auto; padding: 18px; }
+    figcaption { max-width: 70ch; margin: 12px auto 0; line-height: 1.6; }
+    .scroll-hint { display: none; }
+    .history { list-style: none; padding: 0; margin: 24px 0; border-block: 1px solid var(--border); }
+    .history li { display: grid; grid-template-columns: 115px minmax(0, 1fr); gap: 18px; margin: 0; padding: 15px 0; border-bottom: 1px solid var(--border); }
+    .history li:last-child { border: 0; }
+    .history .role { color: var(--accent); font-size: .875rem; }
+    .history p { margin: 0; }
+    code { font-size: .86em; overflow-wrap: anywhere; }
+    pre.code { font-size: .84rem; line-height: 1.75; padding: 20px; tab-size: 2; scrollbar-color: var(--muted) var(--card); }
+    pre.code code { border: 0; padding: 0; background: transparent; font-size: inherit; overflow-wrap: normal; }
+    blockquote { margin: 24px 0; padding: 20px 24px; border-block: 1px solid var(--border); color: var(--ink); }
+    blockquote p { margin: 0; }
+    table { font-size: .94rem; font-variant-numeric: tabular-nums; }
+    th { font: 500 .94rem var(--sans); text-transform: none; letter-spacing: 0; color: var(--ink); }
+    th, td { padding: 10px 14px; }
+    details { margin: 20px 0; padding: 16px 0; border-block: 1px solid var(--border); }
+    summary { cursor: pointer; color: var(--teal); padding: 2px 0; }
+    details p { margin: 16px 0 4px; }
+    .sources { padding-left: 22px; }
+    .sources li { margin-bottom: 15px; }
+    footer { max-width: 70ch; margin-inline: auto; font-family: var(--sans); font-size: .875rem; }
+    @media (max-width: 740px) {
+      .shell { padding: 28px 20px 60px; }
+      h1 { margin-top: 26px; }
+      h2 { margin-top: 48px; }
+      .lead { font-size: 1.1rem; }
+      .scroll-hint { display: inline; }
+      .history li { grid-template-columns: 1fr; gap: 5px; }
+      pre.code { padding: 16px; font-size: .78rem; }
+      th, td { padding: 10px; }
+    }
+    @media print {
+      html { color-scheme: light; }
+      body { background: white; color: #111; font-size: 11pt; }
+      .shell { max-width: none; padding: 0; }
+      h1, h2, h3, p, a, .history .role { color: #111; }
+      .meta, .small, figcaption, footer { color: #555; }
+      .contents, .back { display: none; }
+      .diagram, pre, .history { break-inside: avoid; }
+      .diagram img { min-width: 0; }
+      pre.code { color: #111; background: #eee; white-space: pre-wrap; overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header>
+    <a class="back" href="../index.html">← Engel's code design notebook</a>
+    <h1>How SmolPaws resets its context</h1>
+    <p class="lead">The agent chooses when to start with a fresh context. SmolPaws warns it as the context fills, then lets it save notes and call <code>condense</code>. A separate summarizer handles emergencies when the model provider refuses an oversized request.</p>
+    <p class="meta">Implementation guide · <time datetime="2026-10-05">5 October 2026</time><br>SmolPaws TypeScript SDK and Agent Server · <a href="#sources">Source revisions</a></p>
+    <nav class="contents" aria-label="On this page">
+      <a href="#reset">Agent reset</a><a href="#context">New context</a><a href="#warnings">Warnings</a><a href="#emergency">Emergency recovery</a><a href="#configuration">Configuration</a><a href="#events">Events and restore</a>
+    </nav>
+  </header>
+
+  <section id="reset">
+    <div class="prose">
+      <h2><a class="heading-link" href="#reset">The agent prepares its own return</a></h2>
+      <p>An LLM can only receive a limited amount of context in each request. In <code>agent_reset</code> mode, the agent decides what to save before removing earlier conversation history from that context.</p>
+      <p>It writes notes with its existing tools, waits for those writes to succeed, then calls <code>condense</code>. The tool can carry a message to its future self. This path makes no summarizer call: the agent chooses the handoff itself.</p>
+      <pre class="code" aria-label="Example agent tool call"><code>condense({
+  message_to_future_self:
+    "Read notes/release.md. Tests passed; next, review the diff."
+})</code></pre>
+      <p>The message is optional, preserved verbatim and limited to 16,384 UTF-16 code units. The tool neither writes notes nor checks that they are complete. It must be the only tool call in that response, so a reset cannot split a batch of actions.</p>
+    </div>
+    <figure class="diagram">
+      <div class="diagram-scroll" tabindex="0" role="region" aria-label="Agent reset sequence diagram, scroll horizontally on small screens">
+        <img src="../assets/agent-reset/voluntary.svg" width="991" height="665" alt="The SDK warns the agent. The agent saves notes and calls condense. The SDK saves the tool exchange and commits a reset. The agent receives the new context, reads its notes and continues.">
+      </div>
+      <figcaption>The reset takes effect after its records are durable. Earlier events remain in the stored history. <span class="scroll-hint">Swipe or scroll sideways to see the full diagram.</span></figcaption>
+    </figure>
+    <div class="prose">
+      <p>The conversation keeps its identity, files, saved notes and usage accounting. Only the active history sent to the model changes. Old messages remain available in the event log.</p>
+    </div>
+  </section>
+
+  <section id="context" class="prose">
+    <h2><a class="heading-link" href="#context">What the agent sees after a reset</a></h2>
+    <p>The next request still includes the normal system prompt, configured memory snapshot, runtime information, skills and tool definitions. Its conversation history then starts in this order:</p>
+    <ol class="history" aria-label="Model-visible history after an agent reset">
+      <li><span class="role">User role</span><p>“The agent triggered context condensation.” This message comes from the environment, not the human.</p></li>
+      <li><span class="role">Assistant</span><p>The agent's actual <code>condense</code> call, with its original arguments and tool-call ID.</p></li>
+      <li><span class="role">Tool result</span><p>The matching result, with recovery instructions and the optional message from its past self.</p></li>
+      <li><span class="role">Pending input</span><p>Genuine user messages that arrived after the request which produced the tool call, kept in order.</p></li>
+    </ol>
+    <p>There is no generated summary or retained prefix of the old history. The tool result tells the agent to take a deep breath, read its notes and continue the user's work. It also reminds the agent that the user may not know a reset happened.</p>
+    <p>Saved notes need to be read again. SmolPaws keeps a fixed memory snapshot for the conversation; resetting context does not automatically refresh that snapshot from files.</p>
+    <p>A message received while the agent is resetting remains pending until a later model request consumes it. It must not disappear with the history that the agent chose to clear.</p>
+  </section>
+
+  <section id="warnings" class="prose">
+    <h2><a class="heading-link" href="#warnings">Warnings leave the decision with the agent</a></h2>
+    <p>The default warning levels are 75%, 80%, 85% and 90% of the main model's input budget. If its active LLM profile sets <code>maxInputTokens</code>, that value defines the budget. Otherwise, the SDK uses resolved model metadata when available.</p>
+    <p>After a successful model request, the SDK uses the provider's input-token count for the next warning check. That count includes cached input. It excludes output tokens, cumulative usage and calls to other profiles.</p>
+    <p>This measurement is one successful request behind. Before the first success in a reset cycle, the SDK estimates the input from the assembled prompt and tool definitions. If it cannot establish usage or a budget, it does not invent a percentage.</p>
+    <table>
+      <caption class="small">Example: a main profile with a 400,000-token input budget</caption>
+      <thead><tr><th scope="col">Warning level</th><th scope="col">Input tokens</th></tr></thead>
+      <tbody><tr><td>75%</td><td>300,000</td></tr><tr><td>80%</td><td>320,000</td></tr><tr><td>85%</td><td>340,000</td></tr><tr><td>90%</td><td>360,000</td></tr></tbody>
+    </table>
+    <p>Each stage is delivered once per reset cycle. A jump from 74% to 87% produces one 85% warning. A failed model request leaves its warning pending; a successful request consumes it. A committed reset rearms the stages.</p>
+    <p>Warnings are advisory. Neither a high estimate, an event count nor ignored warnings trigger an automatic reset. The agent can call <code>condense</code> earlier, or continue working after a warning.</p>
+  </section>
+
+  <section id="emergency">
+    <div class="prose">
+      <h2><a class="heading-link" href="#emergency">Emergency recovery uses a separate condenser</a></h2>
+      <p>If the main provider returns a recognized context-window error, the SDK can invoke a configured <code>hard_condenser</code>. This is the emergency path. It is independent of the warning levels and does not wait for an agent-authored tool call.</p>
+      <p>The hard condenser uses its own LLM profile to summarize the eligible active history. Pending user input is protected separately. On success, the SDK replaces that history with an environment notice followed by a <code>CondensationSummaryEvent</code>, rendered as a user-role message.</p>
+    </div>
+    <figure class="diagram">
+      <div class="diagram-scroll" tabindex="0" role="region" aria-label="Emergency recovery sequence diagram, scroll horizontally on small screens">
+        <img src="../assets/agent-reset/emergency.svg" width="1009" height="580" alt="The main model rejects a request with a context-window error. The SDK protects pending input and asks the hard condenser for a summary. After committing the reset, it retries the main model with an emergency notice, the summary and pending input.">
+      </div>
+      <figcaption>This sequence requires a configured hard condenser and a successful summary. Fixed system context remains present in the retried request. <span class="scroll-hint">Swipe or scroll sideways to see the full diagram.</span></figcaption>
+    </figure>
+    <div class="prose">
+      <p>The emergency notice begins:</p>
+      <blockquote><p>“The environment triggered emergency context condensation after the model provider returned a context-window error.”</p></blockquote>
+      <p>That notice belongs only to a committed emergency recovery. An ordinary agent reset uses the shorter notice shown above. The emergency path has no <code>condense</code> tool exchange, because the agent did not call the tool.</p>
+      <p>Hard condensation summarizes the whole eligible view at offset zero. It does not preserve a <code>keep_first</code> prefix or a recent-history tail. “Whole view” describes the selected events: the summarizer receives event previews, which can omit detail.</p>
+      <p>Summary attempts are bounded. The defaults allow 5 attempts and shorten event previews by a factor of 0.8 on retries. If the fallback is missing or fails, the run stops with a recoverable error and retains its source history.</p>
+      <details>
+        <summary>Why recovery cannot keep looping</summary>
+        <p>Another automatic hard reset is blocked until a later main-model response completes successfully. New input or a server restart does not lift that block. This prevents repeated paid summary calls when recovery cannot make the request fit.</p>
+        <p>Authentication failures, rate limits, transport errors and malformed message history do not select this path. Dropping conversation history also cannot fix an oversized system prompt or tool set.</p>
+      </details>
+    </div>
+  </section>
+
+  <section id="configuration" class="prose">
+    <h2><a class="heading-link" href="#configuration">Configure the reset and its fallback separately</a></h2>
+    <p>The agent-reset condenser needs warning thresholds. The hard condenser needs a saved LLM profile of its own. A profile's presence in the catalog does not enable emergency recovery.</p>
+    <pre class="code" aria-label="Agent settings example"><code>{
+  "llm_profile_ref": "main",
+  "condenser": {
+    "condenser_kind": "agent_reset",
+    "warning_thresholds": [0.75, 0.80, 0.85, 0.90]
+  },
+  "hard_condenser": {
+    "condenser_kind": "llm_summarizing",
+    "llm_profile_ref": "summary",
+    "hard_context_reset_max_retries": 5,
+    "hard_context_reset_context_scaling": 0.8
+  }
+}</code></pre>
+    <p class="small">Agent settings excerpt: merge these fields into existing <code>agent_settings</code> rather than replacing unrelated options. The names <code>main</code> and <code>summary</code> stand for existing saved profiles. Set <code>maxInputTokens</code> on the main LLM profile to choose the warning budget; it does not impose a provider request limit.</p>
+    <p>Omitting <code>hard_condenser</code> or setting it to <code>null</code> leaves agent reset available but disables automatic summary recovery. After a provider overflow, that configuration stops the run with an error.</p>
+    <p>In the server's <code>state.json</code>, these options live under <code>settings.agent_settings</code>, while saved profiles live under <code>llmProfiles</code>. The separate <code>models.json</code> selects profile names for roles and scopes.</p>
+    <p>The server saves resolved profile bindings with the conversation. Catalog edits alone do not refresh those captured profiles. The hard-condenser binding also survives main-profile changes.</p>
+    <p>The manual <code>/condense</code> route is not a shortcut into this mode. For an agent-reset conversation, the server returns <code>409 agent_controlled_condensation</code>. Ask the agent to save its notes and use its tool instead. Existing summarizing condensers keep their own manual-command behavior.</p>
+  </section>
+
+  <section id="events" class="prose">
+    <h2><a class="heading-link" href="#events">The event log records what actually happened</a></h2>
+    <p>The tool uses typed <code>CondenseAction</code> and <code>CondenseObservation</code> payloads inside the existing <code>ActionEvent</code> and <code>ObservationEvent</code> envelopes. There are no separate top-level action or observation event kinds for this tool.</p>
+    <p>A <code>CondensationRequest</code> records intent and the input boundary. The durable <code>Condensation</code> record commits the reset. The SDK validates their references before rebuilding the active view from them.</p>
+    <p>On restore, the SDK reconstructs that view from the stored records. It does not run the tool again or erase the original log. The voluntary view retains the genuine tool exchange; emergency recovery retains a generated summary and its different notice.</p>
+    <p>This is a deliberate SmolPaws extension to the Python OpenHands SDK. The emergency summarization algorithm comes from Python's <code>hard_context_reset()</code>. The agent-controlled tool, advisory warnings and recovery notices are defined in the TypeScript transpilation contract.</p>
+  </section>
+
+  <section id="sources" class="prose">
+    <h2><a class="heading-link" href="#sources">Sources and design history</a></h2>
+    <p>This guide describes checked source behavior, not the live settings of any particular conversation. The <a href="agent-triggered-condensation.html">September proposal</a> records the original design discussion.</p>
+    <ul class="sources">
+      <li><a href="https://github.com/smolpaws/openhands-agent/blob/7972e074c4487b58c31910842c03039d9f31a970/docs/TRANSPILE_CONTRACT.md#dev-sdk-012--opt-in-agent-controlled-context-reset">SDK transpilation contract</a>: the agent-reset policy and its relationship to Python.</li>
+      <li><a href="https://github.com/smolpaws/openhands-agent/blob/7972e074c4487b58c31910842c03039d9f31a970/src/tool/condense.ts">Condense tool</a>, <a href="https://github.com/smolpaws/openhands-agent/blob/7972e074c4487b58c31910842c03039d9f31a970/src/agent/context-reset.ts">reset lifecycle</a> and <a href="https://github.com/smolpaws/openhands-agent/blob/7972e074c4487b58c31910842c03039d9f31a970/src/context/view.ts">active-view projection</a>.</li>
+      <li><a href="https://github.com/smolpaws/openhands-agent/blob/7972e074c4487b58c31910842c03039d9f31a970/src/context/context-warnings.ts">Warning stages</a>, <a href="https://github.com/smolpaws/openhands-agent/blob/7972e074c4487b58c31910842c03039d9f31a970/src/context/reset-notices.ts">exact notice text</a> and <a href="https://github.com/smolpaws/openhands-agent/blob/7972e074c4487b58c31910842c03039d9f31a970/src/settings/condenser-settings.ts">settings schemas</a>.</li>
+      <li><a href="https://github.com/smolpaws/smolpaws/blob/65c87d41d6bc688aac957eefc0551f5d2597814b/packages/openhands-agent-server/TRANSPILE_RULES.md">Agent Server transpilation rules</a> and <a href="https://github.com/smolpaws/smolpaws/blob/65c87d41d6bc688aac957eefc0551f5d2597814b/packages/openhands-agent-server/src/hardCondenserBinding.ts">hard-condenser binding</a>: profile resolution, stored bindings and host behavior.</li>
+    </ul>
+  </section>
+  <footer class="foot-nav"><a href="../index.html">← Back to the notebook</a> · <a href="agent-triggered-condensation.html">Original proposal</a> · <a href="llm-profiles.html">LLM profiles</a></footer>
+</main>
+</body>
+</html>

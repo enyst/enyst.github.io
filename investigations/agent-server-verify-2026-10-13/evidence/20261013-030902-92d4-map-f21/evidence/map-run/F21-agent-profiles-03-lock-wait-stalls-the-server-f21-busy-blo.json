@@ -1,0 +1,15 @@
+{
+  "file": "F21-agent-profiles.md",
+  "bullet": "Lock wait stalls the server (`F21.busy-blocks-server`), known bug.",
+  "ids": [
+    "F21.busy-blocks-server"
+  ],
+  "line": 862,
+  "script": "control-agent-server api GET /alive --auth none --expect 200 --expect-max-ms 2000\nLOCK=\"$AGENT_SERVER_VERIFY_RUN/home/.openhands/agent-profiles/.agent-profiles.lock\"\nexec 9>>\"$LOCK\"\nflock -w 5 9\n(exec 9>&- >/dev/null 2>&1; control-agent-server api GET /api/agent-profiles/qa-f21-coder --timeout 90 --quiet) &\nsleep 5\ncontrol-agent-server api GET /alive --auth none --expect 200 --timeout 60 --expect-max-ms 2000 --save F21.busy-blocks-server/alive  # bug\nflock -u 9\nwait\n",
+  "exit_code": 1,
+  "elapsed_ms": 30617,
+  "failed_line": 7,
+  "failed_command": "control-agent-server api GET /alive --auth none --expect 200 --timeout 60 --expect-max-ms 2000 --save F21.busy-blocks-server/alive",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 43\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 25063,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-030902-92d4-map-f21/evidence/F21.busy-blocks-server/alive.json\",\n  \"hint\": \"took 25063 ms, limit 2000 ms\"\n}\n",
+  "stderr": ""
+}

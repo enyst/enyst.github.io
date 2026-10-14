@@ -1,0 +1,15 @@
+{
+  "file": "F28-canvas-extensions.md",
+  "bullet": "Failed starts (`F28.backend-start-fails`).",
+  "ids": [
+    "F28.backend-start-fails"
+  ],
+  "line": 764,
+  "script": "control-agent-server api POST /api/canvas-extensions/install --json \"{\\\"source\\\": \\\"$UX\\\"}\" --expect 200 --quiet\ncontrol-agent-server api POST /api/canvas-extensions/install --json \"{\\\"source\\\": \\\"$EX\\\"}\" --expect 200 --quiet\nHREV=$(control-agent-server api GET /api/canvas-extensions/installed/qa-unhealthy/backend --field revision)\nXREV=$(control-agent-server api GET /api/canvas-extensions/installed/qa-exit/backend --field revision)\ncontrol-agent-server api POST /api/canvas-extensions/installed/qa-unhealthy/backend/prepare --json \"{\\\"revision\\\": \\\"$HREV\\\"}\" --expect 200 --quiet\ncontrol-agent-server api POST /api/canvas-extensions/installed/qa-exit/backend/prepare --json \"{\\\"revision\\\": \\\"$XREV\\\"}\" --expect 200 --quiet\nT0=$SECONDS\ncontrol-agent-server api POST /api/canvas-extensions/installed/qa-unhealthy/backend/start --json \"{\\\"revision\\\": \\\"$HREV\\\"}\" \\\n  --expect 200 --check state eq unhealthy --check detail eq 'backend health check timed out' --check pid eq null \\\n  --expect-max-ms 25000 --save F28.backend-start-fails/timeout\ntest $((SECONDS - T0)) -ge 14\ncontrol-agent-server api GET /api/canvas-extensions/installed/qa-unhealthy/backend --check state eq unhealthy --check pid eq null\nif pgrep -f \"$BK/artifacts/qa-unhealthy/\"; then false; fi\ncontrol-agent-server api POST /api/canvas-extensions/installed/qa-exit/backend/start --json \"{\\\"revision\\\": \\\"$XREV\\\"}\" \\\n  --expect 200 --check state eq unhealthy --check detail eq 'backend exited with code 3' --check pid eq null \\\n  --save F28.backend-start-fails/exit\ncontrol-agent-server api GET /api/canvas-extensions/installed/qa-exit/backend --check state eq unhealthy \\\n  --check detail eq 'backend exited with code 3'\nif pgrep -f \"$BK/artifacts/qa-exit/\"; then false; fi\ncontrol-agent-server api DELETE /api/canvas-extensions/installed/qa-unhealthy/backend/data --expect 200 --check state eq unhealthy\ntest ! -e \"$BK/data/qa-unhealthy\"\n",
+  "exit_code": 1,
+  "elapsed_ms": 2003,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api POST /api/canvas-extensions/install --json \"{\\\"source\\\": \\\"$UX\\\"}\" --expect 200 --quiet",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 422,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/canvas-extensions/install\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 422,\n    \"headers\": {\n      \"content-length\": \"74\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 228,\n  \"hint\": \"expected 200, got 422\"\n}\n",
+  "stderr": ""
+}

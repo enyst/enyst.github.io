@@ -1,0 +1,15 @@
+{
+  "file": "F32-webhooks-and-telemetry.md",
+  "bullet": "Events stranded behind an in-flight batch (`F32.buffer-stranded`), known bug.",
+  "ids": [
+    "F32.buffer-stranded"
+  ],
+  "line": 237,
+  "script": "control-agent-server conversation events \"$BID\" --kinds MessageEvent --contains QA_F32_BUFFER --expect-count 1\ncontrol-agent-server conversation events \"$BID\" --key last_user_message_id --expect-count 1\ncontrol-agent-server sink read --path \"/qa-f32-b/events/${BID//-/}\" --expect-min 1 --expect-max 1\ncontrol-agent-server sink read --path \"/qa-f32-b/events/${BID//-/}\" --contains QA_F32_BUFFER --expect-min 1 --wait 10 --save F32.buffer-stranded/after-wait  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 11191,
+  "failed_line": 4,
+  "failed_command": "control-agent-server sink read --path \"/qa-f32-b/events/${BID//-/}\" --contains QA_F32_BUFFER --expect-min 1 --wait 10 --save F32.buffer-stranded/after-wait",
+  "stdout": "{\n  \"ok\": true,\n  \"id\": \"3b2914da-f074-4441-b4c0-df8f00906c14\",\n  \"total\": 3,\n  \"kinds\": {\n    \"SystemPromptEvent\": 1,\n    \"MessageEvent\": 1,\n    \"ConversationStateUpdateEvent\": 1\n  },\n  \"matching\": 1,\n  \"events\": [\n    {\n      \"id\": \"bafa840a-5ab8-49bd-a695-76860e44434c\",\n      \"kind\": \"MessageEvent\",\n      \"source\": \"user\",\n      \"timestamp\": \"2026-10-13T03:25:58.526200\",\n      \"llm_message\": \"{\\\"role\\\": \\\"user\\\", \\\"content\\\": [{\\\"cache_prompt\\\": false, \\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"QA_F32_BUFFER\\\"}], \\\"thinking_blocks\\\": []}\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"id\": \"3b2914da-f074-4441-b4c0-df8f00906c14\",\n  \"total\": 3,\n  \"kinds\": {\n    \"SystemPromptEvent\": 1,\n    \"MessageEvent\": 1,\n    \"ConversationStateUpdateEvent\": 1\n  },\n  \"matching\": 1,\n  \"events\": [\n    {\n      \"id\": \"44effbc6-9994-4523-a425-0e1bf71e1ef2\",\n      \"kind\": \"ConversationStateUpdateEvent\",\n      \"source\": \"environment\",\n      \"timestamp\": \"2026-10-13T03:25:58.528380\",\n      \"key\": \"last_user_message_id\",\n      \"value\": \"bafa840a-5ab8-49bd-a695-76860e44434c\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"requests\": 1,\n  \"paths\": {\n    \"/qa-f32-b/events/3b2914daf0744441b4c0df8f00906c14\": 1\n  },\n  \"last\": [\n    \"{\\\"at\\\": \\\"2026-10-13T03:25:58Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/qa-f32-b/events/3b2914daf0744441b4c0df8f00906c14\\\", \\\"headers\\\": {\\\"Host\\\": \\\"127.0.0.1:33677\\\", \\\"Accept\\\": \\\"*/*\\\", \\\"Accept-Encoding\\\": \\\"gzip, deflate\\\", \\\"Connection\\\": \\\"keep-alive\\\", \\\"User-Agent\\\": \\\"python-httpx/0.28.1\\\", \\\"X-QA-F32\\\": \\\"qa-f32-header\\\", \\\"X-Session-API-Key\\\": \\\"<redacted:session-cookie>\\\", \\\"Content-Length\\\": \\\"21691\\\", \\\"Content-Type\\\": \\\"app\\u2026\"\n  ]\n}\n{\n  \"ok\": false,\n  \"requests\": 0,\n  \"paths\": {},\n  \"last\": [],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-032530-35b4-map-f32/evidence/F32.buffer-stranded/after-wait.json\"\n}\n",
+  "stderr": ""
+}

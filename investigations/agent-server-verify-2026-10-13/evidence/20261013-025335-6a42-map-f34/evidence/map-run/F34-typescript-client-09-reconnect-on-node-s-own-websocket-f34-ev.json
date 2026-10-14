@@ -1,0 +1,15 @@
+{
+  "file": "F34-typescript-client.md",
+  "bullet": "Reconnect on Node's own WebSocket (`F34.event-stream-reconnect-native`), known bug.",
+  "ids": [
+    "F34.event-stream-reconnect-native"
+  ],
+  "line": 1327,
+  "script": "RNID=$(control-agent-server conversation start --no-run --placeholder-agent --tools none --no-autotitle --workspace \"$F34/scoped\" \\\n  --prompt 'qa-f34-reconnect: never run' --print-id)\nrm -f \"$F34/reconnect-ready\"\ncontrol-agent-server exec --timeout 300 --expect-output QA_F34_RECONNECT_WATCHED --save F34.event-stream-reconnect-native/program \\\n  -- node \"$F34/reconnect.mjs\" \"$RNID\" \"$F34/reconnect-native.json\" ws native &\nRPID=$!\nfor _ in $(seq 150); do if [ -e \"$F34/reconnect-ready\" ]; then break; fi; sleep 0.2; done\ntest -e \"$F34/reconnect-ready\"\ncontrol-agent-server restart\ncontrol-agent-server api POST \"<redacted:session-cookie>/$RNID/events\" \\\n  --json '{\"role\": \"user\", \"content\": [{\"type\": \"text\", \"text\": \"qa-f34-after-restart\"}], \"run\": false}' --expect 200\nwait \"$RPID\"\ncat \"$F34/reconnect-native.json\"\njq -e '.ws.reconnected and .ws.sent_after >= 1 and .native.went_down' \"$F34/reconnect-native.json\"\njq -e '.native.reconnected and .native.sent_after >= 1' \"$F34/reconnect-native.json\"  # bug\n",
+  "exit_code": 0,
+  "elapsed_ms": 46121,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-025335-6a42-map-f34\",\n  \"url\": \"http://127.0.0.1:43783\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 11480,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/10e2f4a2-c149-48e4-bb33-0f8a859dc81d/events\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"qa-f34-after-restart\"\n        }\n      ],\n      \"run\": false\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 493\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 42104,\n  \"stdout_tail\": \"QA_F34_RECONNECT_WATCHED\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025335-6a42-map-f34/evidence/F34.event-stream-reconnect-native/program.json\"\n}\n{\"ws\":{\"went_down\":true,\"reconnected\":true,\"attempts\":5,\"replayed_after\":1,\"sent_after\":1,\"last_state\":{\"isConnected\":true,\"isReconnecting\":false,\"attemptCount\":0,\"error\":null}},\"native\":{\"went_down\":true,\"reconnected\":true,\"attempts\":5,\"replayed_after\":1,\"sent_after\":1,\"last_state\":{\"isConnected\":true,\"isReconnecting\":false,\"attemptCount\":0,\"error\":null}}}true\ntrue\n",
+  "stderr": ""
+}

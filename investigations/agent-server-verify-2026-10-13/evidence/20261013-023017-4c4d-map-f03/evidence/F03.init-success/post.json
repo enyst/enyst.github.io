@@ -1,0 +1,48 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/init",
+    "query": [],
+    "auth": "none",
+    "body": {
+      "session_api_keys": [
+        "qa-user-key"
+      ],
+      "secret_key": "qa-f03-delivered-secret",
+      "conversations_path": "/workspace/verification-artifacts/runs/20261013-023017-4c4d-map-f03/fixtures/conv",
+      "bash_events_dir": "/workspace/verification-artifacts/runs/20261013-023017-4c4d-map-f03/fixtures/bash",
+      "conversation_worktree_root": "/workspace/verification-artifacts/runs/20261013-023017-4c4d-map-f03/fixtures/qa-f03-worktrees",
+      "webhooks": [
+        {
+          "base_url": "http://127.0.0.1:50087",
+          "headers": {
+            "X-QA-F03": "delivered-hook"
+          },
+          "flush_delay": 1
+        }
+      ],
+      "web_url": "http://qa-f03.invalid/rt/qa-f03",
+      "allow_cors_origins": [
+        "https://qa-f03.example"
+      ],
+      "max_concurrent_runs": 1,
+      "env": {
+        "PROBE_VAR": "qa-hello"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "30",
+      "content-type": "application/json"
+    },
+    "body": {
+      "state": "ready",
+      "error": null
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 2463
+}

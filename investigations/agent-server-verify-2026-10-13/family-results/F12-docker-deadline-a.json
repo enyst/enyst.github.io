@@ -1,0 +1,44 @@
+{
+  "ok": false,
+  "file": "F12-runtime-and-credentials.md",
+  "summary": {
+    "pass": 1,
+    "fail": 1,
+    "xfail": 0,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 144,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 12525,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-035149-9cf7-map-f12/evidence/map-run/F12-runtime-and-credentials-00-preconditions.json"
+    },
+    {
+      "bullet": "Docker runtime with a daemon (`F12.docker-runtime`).",
+      "ids": [
+        "F12.docker-runtime"
+      ],
+      "line": 833,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 119274,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-035149-9cf7-map-f12/evidence/map-run/F12-runtime-and-credentials-01-docker-runtime-with-a-daemon-f12-docker-.json",
+      "failed_line": 45,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$CID/events/search\" --run \"$DK\" --header 'X-Expose-Secrets: plaintext' --expect 422 --check detail eq 'Runtime secret exposure is unsupported' --save F12.docker-runtime/exposure-refused",
+      "stdout_tail": "      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 75,\n  \"checks\": [\n    {\n      \"check\": \"launched_agent_profile.agent_profile_id eq 0d69d436-15b3-462b-809d-ecae0eab092b\",\n      \"ok\": true,\n      \"actual\": \"0d69d436-15b3-462b-809d-ecae0eab092b\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-035210-af96-f12-docker-live/evidence/F12.docker-runtime/launched-profile.json\"\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/1f4194e3-2d7a-4893-aa63-668b4ee792db/events/search\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"32\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"items\": [],\n      \"next_page_id\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 80,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Runtime secret exposure is unsupported\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-035210-af96-f12-docker-live/evidence/F12.docker-runtime/exposure-refused.json\",\n  \"hint\": \"expected 422, got 200\"\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-035149-9cf7-map-f12",
+  "launch_flags": [
+    "--checkout",
+    "/workspace/agent-sdk-verify"
+  ]
+}

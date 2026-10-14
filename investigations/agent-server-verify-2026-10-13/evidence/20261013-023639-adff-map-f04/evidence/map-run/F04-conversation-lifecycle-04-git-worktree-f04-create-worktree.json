@@ -1,0 +1,15 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "Git worktree (`F04.create-worktree`).",
+  "ids": [
+    "F04.create-worktree"
+  ],
+  "line": 322,
+  "script": "WT=$(control-agent-server api POST <redacted:session-cookie> \\\n  --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$REPO\\\"}, \\\"agent\\\": $OFFLINE_AGENT, \\\"autotitle\\\": false, \\\"worktree\\\": true}\" \\\n  --expect 201 --check workspace.working_dir ne \"$REPO\" --field id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$WT\" \\\n  --check workspace.working_dir eq \"$AGENT_SERVER_VERIFY_RUN/worktrees/$WT/qa-f04-repo\" --save F04.create-worktree/get\ntest -n \"$(git -C \"$REPO\" branch --list \"openhands/$WT\")\"\ngit -C \"$REPO\" worktree list | grep -q \"$AGENT_SERVER_VERIFY_RUN/worktrees/$WT/qa-f04-repo\"\ntest \"$(git -C \"$AGENT_SERVER_VERIFY_RUN/worktrees/$WT/qa-f04-repo\" rev-parse HEAD)\" = \"$(git -C \"$REPO\" rev-parse HEAD)\"\n",
+  "exit_code": 1,
+  "elapsed_ms": 7156,
+  "failed_line": 3,
+  "failed_command": "WT=$(control-agent-server api POST <redacted:session-cookie> --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$REPO\\\"}, \\\"agent\\\": $OFFLINE_AGENT, \\\"autotitle\\\": false, \\\"worktree\\\": true}\" --expect 201 --check workspace.working_dir ne \"$REPO\" --field id)",
+  "stdout": "",
+  "stderr": ""
+}

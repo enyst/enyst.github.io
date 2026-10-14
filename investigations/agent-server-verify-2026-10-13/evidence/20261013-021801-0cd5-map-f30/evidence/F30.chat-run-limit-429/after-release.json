@@ -1,0 +1,49 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_deepseek-flash",
+      "messages": [
+        {
+          "role": "user",
+          "content": "QA_F30_429: reply with one short word and use no tools."
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "305",
+      "content-type": "application/json",
+      "x-openhands-serverconversation-id": "b14b956b-06fd-4295-8866-7e5d6c25ec18"
+    },
+    "body": {
+      "id": "chatcmpl-ec1724519f0d4ba2a1846a030f666cfb",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "content": "Okay.",
+            "role": "assistant"
+          }
+        }
+      ],
+      "created": 1791858645,
+      "model": "openhands_deepseek-flash",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 14,
+        "prompt_tokens": 11290,
+        "total_tokens": 11304
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 5793
+}

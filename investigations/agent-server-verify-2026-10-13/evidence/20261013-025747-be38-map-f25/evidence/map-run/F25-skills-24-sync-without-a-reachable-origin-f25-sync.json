@@ -1,0 +1,15 @@
+{
+  "file": "F25-skills.md",
+  "bullet": "Sync without a reachable origin (`F25.sync-offline`), known bug.",
+  "ids": [
+    "F25.sync-offline"
+  ],
+  "line": 586,
+  "script": "trap 'git -C \"$PUB\" remote set-url origin \"$E\"' EXIT\ngit -C \"$PUB\" remote set-url origin \"$F/qa-f25-unreachable\"\nif git -C \"$PUB\" fetch -q origin 2>/dev/null; then false; fi\ncontrol-agent-server api POST /api/skills/sync --expect 200 --check status eq error --save F25.sync-offline/sync  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 1470,
+  "failed_line": 4,
+  "failed_command": "control-agent-server api POST /api/skills/sync --expect 200 --check status eq error --save F25.sync-offline/sync",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/skills/sync\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"70\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"success\",\n      \"message\": \"Skills repository synced successfully\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 113,\n  \"checks\": [\n    {\n      \"check\": \"status eq error\",\n      \"ok\": false,\n      \"actual\": \"success\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/evidence/F25.sync-offline/sync.json\",\n  \"hint\": \"failed check: status eq error\"\n}\n",
+  "stderr": ""
+}

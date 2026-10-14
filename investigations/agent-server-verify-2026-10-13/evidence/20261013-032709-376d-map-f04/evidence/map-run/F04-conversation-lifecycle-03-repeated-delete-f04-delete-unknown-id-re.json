@@ -1,0 +1,15 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "Repeated DELETE (`F04.delete-unknown-id-repeat`), known bug.",
+  "ids": [
+    "F04.delete-unknown-id-repeat"
+  ],
+  "line": 62,
+  "script": "control-agent-server api GET /openapi.json --check 'paths.<redacted:session-cookie>/{conversation_id}.delete.responses.404' exists --quiet\ncontrol-agent-server api DELETE \"<redacted:session-cookie>/$DEL\" --expect 404 --save F04.delete-unknown-id/repeat  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 1282,
+  "failed_line": 2,
+  "failed_command": "control-agent-server api DELETE \"<redacted:session-cookie>/$DEL\" --expect 404 --save F04.delete-unknown-id/repeat",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/openapi.json\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"646319\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 60,\n  \"checks\": [\n    {\n      \"check\": \"paths.<redacted:session-cookie>/{conversation_id}.delete.responses.404 exists\",\n      \"ok\": true,\n      \"actual\": \"{\\\"description\\\": \\\"Item not found\\\"}\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"DELETE\",\n    \"path\": \"<redacted:session-cookie>/8851f180-350b-4fa2-b07d-d3ae13597886\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"24\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Bad Request\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 126,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.delete-unknown-id/repeat.json\",\n  \"hint\": \"expected 404, got 400\"\n}\n",
+  "stderr": ""
+}

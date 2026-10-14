@@ -1,0 +1,52 @@
+{
+  "ok": false,
+  "file": "F28-core-supplement.md",
+  "summary": {
+    "pass": 2,
+    "fail": 1,
+    "xfail": 0,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 3,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8020,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-035325-feed-map-f28/evidence/map-run/F28-core-supplement-00-preconditions.json"
+    },
+    {
+      "bullet": "Persistence (`F28.restart-persistence`).",
+      "ids": [
+        "F28.restart-persistence"
+      ],
+      "line": 12,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 27547,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-035325-feed-map-f28/evidence/map-run/F28-core-supplement-01-persistence-f28-restart-persistence.json"
+    },
+    {
+      "bullet": "Uninstall (`F28.uninstall`).",
+      "ids": [
+        "F28.uninstall"
+      ],
+      "line": 23,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 3113,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-035325-feed-map-f28/evidence/map-run/F28-core-supplement-02-uninstall-f28-uninstall.json",
+      "failed_line": 7,
+      "failed_command": "control-agent-server state ls home/.openhands/canvas-extensions/backends/data/qa-f28-core/home --expect-count 1",
+      "stdout_tail": "ensions/installed/qa-f28-core/backend\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"239\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"name\": \"qa-f28-core\",\n      \"state\": \"missing\",\n      \"revision\": null,\n      \"prepared_revision\": \"sha256:2383c7ef50ee0b186665fc98c0cedca3a410d5335bb35d2e6685c9dbdddca15e\",\n      \"pid\": null,\n      \"port\": null,\n      \"detail\": \"Canvas App is not installed or its manifest is invalid\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 48,\n  \"checks\": [\n    {\n      \"check\": \"state eq missing\",\n      \"ok\": true,\n      \"actual\": \"missing\"\n    },\n    {\n      \"check\": \"prepared_revision eq sha256:2383c7ef50ee0b186665fc98c0cedca3a410d5335bb35d2e6685c9dbdddca15e\",\n      \"ok\": true,\n      \"actual\": \"sha256:2383c7ef50ee0b186665fc98c0cedca3a410d5335bb35d2e6685c9dbdddca15e\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-035325-feed-map-f28/evidence/F28.uninstall/backend.json\"\n}\n{\n  \"ok\": false,\n  \"pattern\": \"home/.openhands/canvas-extensions/backends/data/qa-f28-core/home\",\n  \"count\": 0,\n  \"files\": []\n}\n",
+      "stderr_tail": ""
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-035325-feed-map-f28",
+  "launch_flags": []
+}

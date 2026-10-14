@@ -1,152 +1,435 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The insider cat — SmolPaws living inside OpenHands</title>
-<meta name="description" content="Implementation record: a SmolPaws that runs inside the OpenHands UI (odie) — a three-pose avatar driven off live agent status, a 'call the cat' button that opens a smolpaws-tagged conversation, and a local-environment identity injected via the agent-server system suffix." />
-<meta property="og:title" content="The insider cat — SmolPaws inside OpenHands" />
-<meta property="og:description" content="A cat that lives inside the OpenHands UI: three-pose avatar off live agent status, a call-the-cat button, and a local-environment identity. What shipped, where it lives, and how big it is." />
-<meta property="og:type" content="article" />
-<style>
-  :root{
-    --fg:#1a1a1a; --muted:#5a5a5a; --subtle:#8a8a82;
-    --bg:#fdfdfb; --card:#ffffff; --elevated:#f7f6f1;
-    --accent:#2b4eaa; --accent-soft:#e6ecfa;
-    --rule:#e2e2dc; --rule-strong:#bdbcb4;
-    --code-bg:#f3f1ec; --warn:#b25b0e; --ok:#2f7a3a; --crit:#a02020;
-    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
-  }
-  *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
-  body{line-height:1.6;font-size:16px}
-  .wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding:32px 28px 96px}
-  nav.toc{position:sticky;top:24px;align-self:start;font-size:13px}
-  nav.toc h2{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
-  nav.toc ol{list-style:none;padding:0;margin:0;counter-reset:toc}
-  nav.toc li{counter-increment:toc;margin:4px 0}
-  nav.toc li::before{content:counter(toc) ". ";color:var(--muted)}
-  nav.toc a{color:var(--fg);text-decoration:none} nav.toc a:hover{color:var(--accent)}
-  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:28px}
-  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
-  header.title h1{font-size:32px;margin:6px 0 4px;letter-spacing:-.01em}
-  header.title .sub{color:var(--muted);max-width:820px}
-  h2{font-size:22px;margin:44px 0 10px} h2 .num{color:var(--muted);font-weight:500;margin-right:8px}
-  h3{font-size:16px;margin:22px 0 8px}
-  code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
-  pre{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;border:1px solid var(--rule)}
-  pre code{background:transparent;padding:0}
-  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
-  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:top}
-  th{font-weight:600;background:var(--code-bg)}
-  td.sym code{background:transparent;padding:0;color:var(--accent);font-weight:600}
-  .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;margin:14px 0;border-radius:0 4px 4px 0;font-size:14.5px}
-  .callout.warn{border-color:var(--warn);background:#fbf1e6} .callout.note{border-color:var(--muted);background:#f3f1ec}
-  .callout.ok{border-color:var(--ok);background:#eef6ef}
-  figure.shot{margin:18px 0 22px}
-  figure.shot img{display:block;max-width:100%;height:auto;border:1px solid var(--rule);border-radius:8px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
-  figure.shot figcaption{font-size:13px;color:var(--muted);margin-top:8px;text-align:center}
-  .poses{display:flex;gap:22px;flex-wrap:wrap;margin:14px 0 8px}
-  .pose{text-align:center;font-size:12px;color:var(--muted)}
-  .pose svg{width:72px;height:72px;display:block;margin:0 auto 6px;background:#fff;border:1px solid var(--rule);border-radius:10px;padding:6px}
-  .pose b{color:var(--fg);font-weight:600}
-  a.src{font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
-  .pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:10px;border:1px solid var(--rule-strong);color:var(--muted);white-space:nowrap}
-  .pill.ok{color:var(--ok);border-color:var(--ok);background:#eef6ef}
-  .toplink{display:inline-block;margin-top:10px;padding:7px 10px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;color:var(--accent);text-decoration:none;font-size:13px}
-  .status{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--ok);color:var(--ok);background:#eef6ef}
-  .mono{font-family:var(--mono)}
-  @media(max-width:760px){.wrap{grid-template-columns:1fr}}
-</style></head><body>
-<div class="wrap">
-  <nav class="toc"><h2>Contents</h2><ol>
-    <li><a href="#what">What it is</a></li>
-    <li><a href="#poses">Three poses</a></li>
-    <li><a href="#call">Call the cat</a></li>
-    <li><a href="#identity">A local identity</a></li>
-    <li><a href="#where">Where it lives &amp; size</a></li>
-    <li><a href="#decisions">Decisions on record</a></li>
-    <li><a href="#next">What's left</a></li>
-  </ol>
-  <a class="toplink" href="../index.html">← Notebook</a>
-  <div style="margin-top:10px"><a class="src" href="insider-cat-stories.html">Behavior in user stories →</a></div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Insider Cat — one OpenHands agent, text and Voice</title>
+  <meta name="description" content="Insider Cat's current Canvas interface, saved OpenHands identity, Voice handoff, and the tools it actually needs to coordinate conversations.">
+  <meta property="og:title" content="Insider Cat — one OpenHands agent, text and Voice">
+  <meta property="og:description" content="The Cat's current look, durable conversations, and the distinction between Voice transport and agent capabilities.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/insider-cat.html">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    :root { --muted:#b0aaa0; }
+    .shell { max-width:1120px; padding-top:32px; }
+    .layout { display:grid; grid-template-columns:200px minmax(0,1fr); gap:42px; }
+    .toc { position:sticky; top:24px; align-self:start; font-size:14px; }
+    .toc ol { padding-left:20px; } .toc li { margin:9px 0; }
+    a { color:var(--teal); text-underline-offset:3px; overflow-wrap:anywhere; }
+    p, li { font-size:1rem; line-height:1.75; }
+    h1 { font-size:clamp(2.3rem,5vw,3.6rem); } h2 { scroll-margin-top:20px; }
+    h3 { font-size:1rem; text-transform:none; letter-spacing:0; }
+    main { min-width:0; } .meta,.source { font-size:14px; color:var(--muted); }
+    .eyebrow { color:var(--accent); font-family:var(--mono); font-size:14px; }
+    .status { display:inline-block; border:1px solid var(--accent); border-radius:4px; padding:4px 9px; color:var(--accent); }
+    .callout p { font-size:1rem; } .table-wrap { overflow-x:auto; margin:20px 0; }
+    table { margin:0; font-size:14px; } th { font-size:14px; text-transform:none; letter-spacing:0; }
+    td,th { vertical-align:top; } code { overflow-wrap:anywhere; }
+    .flow { display:grid; gap:12px; padding:22px; border:1px solid var(--border); border-left:3px solid var(--teal); background:var(--card); margin:24px 0; }
+    .flow p { margin:0; }
+    figure { margin:24px 0; } figcaption { font-size:14px; color:var(--muted); line-height:1.6; margin-top:12px; }
+    .poses { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; padding:18px; border:1px solid #42443f; border-radius:22px; background:#20211f; }
+    .pose { text-align:center; color:#efeee7; font-size:13px; }
+    .pose .insider-cat-avatar { width:100%; max-width:160px; }
+    .poses .insider-cat-avatar * { animation:none!important; transition:none!important; }
+    .skip { position:absolute; top:-100px; } .skip:focus { top:8px; background:var(--bg); padding:12px; z-index:2; }
+    :focus-visible { outline:2px solid var(--teal); outline-offset:4px; }
+    @media(max-width:800px) { .layout { grid-template-columns:1fr; gap:14px; } .toc { position:static; } .toc ol { display:flex; flex-wrap:wrap; gap:8px 24px; } .toc li { margin:0; } .shell { padding:24px 18px 64px; } }
+    @media(max-width:460px) { .poses { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    /* App artwork, copied from the source revision cited below. */
+
+.insider-cat-avatar{--cat-fur:#d5c9ac;--cat-fur-light:#eee3cc;--cat-ink:#424b43;--cat-sage:#a9ba9c;display:inline-flex;width:var(--insider-cat-avatar-size,144px);max-width:100%;aspect-ratio:4/3;flex:none;align-items:center;justify-content:center;pointer-events:none;user-select:none}
+.insider-cat-avatar svg{display:block;width:100%;height:auto;overflow:visible}
+.insider-cat-avatar .cat-avatar-rest{fill:#29322f;opacity:.7}
+.insider-cat-avatar .cat-avatar-shadow{fill:#101915;opacity:.3}
+.insider-cat-avatar .cat-avatar-fur{fill:var(--cat-fur)}
+.insider-cat-avatar .cat-avatar-cheek,.insider-cat-avatar .cat-avatar-paw{fill:var(--cat-fur-light)}
+.insider-cat-avatar .cat-avatar-ear-inner{fill:#b99786}
+.insider-cat-avatar .cat-avatar-haunch{fill:none;stroke:#b3aa8f;stroke-width:2;stroke-linecap:round}
+.insider-cat-avatar .cat-avatar-stripe{fill:none;stroke:#aa9f82;stroke-width:3;stroke-linecap:round;opacity:.6}
+.insider-cat-avatar .cat-avatar-ink{fill:none;stroke:var(--cat-ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.insider-cat-avatar .cat-avatar-eye,.insider-cat-avatar .cat-avatar-mouth-speaking{fill:var(--cat-ink)}
+.insider-cat-avatar .cat-avatar-glint{fill:var(--cat-fur-light)}
+.insider-cat-avatar .cat-avatar-nose{fill:#a77f70}
+.insider-cat-avatar .cat-avatar-whiskers{opacity:.55;stroke-width:1.1}
+.insider-cat-avatar .cat-avatar-tail{fill:none;stroke:#bdb495;stroke-width:11;stroke-linecap:round;stroke-linejoin:round;transform-origin:120px 73px}
+.insider-cat-avatar .cat-avatar-body{transform-origin:82px 98px}
+.insider-cat-avatar .cat-avatar-head{transform-origin:57px 78px;transform:translateY(7px) rotate(-8deg);transition:transform .55s ease}
+.insider-cat-avatar .cat-avatar-ear-left{transform-origin:41px 49px;transform:rotate(-10deg)}
+.insider-cat-avatar .cat-avatar-ear-right{transform-origin:72px 49px;transform:rotate(12deg)}
+.insider-cat-avatar .cat-avatar-ear{transition:transform .55s ease}
+.insider-cat-avatar .cat-avatar-eyes-awake,.insider-cat-avatar .cat-avatar-mouth-speaking,.insider-cat-avatar .cat-avatar-brows,.insider-cat-avatar .cat-avatar-listening,.insider-cat-avatar .cat-avatar-working,.insider-cat-avatar .cat-avatar-attention{opacity:0}
+.insider-cat-avatar .cat-avatar-listening{stroke:var(--cat-sage);stroke-width:2}
+.insider-cat-avatar .cat-avatar-working{fill:var(--cat-sage)}
+.insider-cat-avatar .cat-avatar-attention{fill:#d6af73}
+.insider-cat-avatar[data-pose="sleeping"] .cat-avatar-body{animation:insider-cat-breathe 4.8s ease-in-out infinite}
+.insider-cat-avatar[data-pose="waking"] .cat-avatar-head,.insider-cat-avatar[data-pose="listening"] .cat-avatar-head,.insider-cat-avatar[data-pose="speaking"] .cat-avatar-head,.insider-cat-avatar[data-pose="working"] .cat-avatar-head,.insider-cat-avatar[data-pose="attention"] .cat-avatar-head{transform:translateY(-2px)}
+.insider-cat-avatar:not([data-pose="sleeping"]) .cat-avatar-ear{transform:rotate(0deg)}
+.insider-cat-avatar:not([data-pose="sleeping"]) .cat-avatar-eyes-sleep{opacity:0}
+.insider-cat-avatar:not([data-pose="sleeping"]) .cat-avatar-eyes-awake{opacity:1}
+.insider-cat-avatar[data-pose="listening"] .cat-avatar-head{transform:translateY(-2px) rotate(5deg)}
+.insider-cat-avatar[data-pose="listening"] .cat-avatar-listening{opacity:.8;animation:insider-cat-listen 2.8s ease-in-out infinite}
+.insider-cat-avatar[data-pose="speaking"] .cat-avatar-mouth{opacity:0}
+.insider-cat-avatar[data-pose="speaking"] .cat-avatar-mouth-speaking{opacity:1;transform-origin:56px 74px;animation:insider-cat-speak .75s ease-in-out infinite}
+.insider-cat-avatar[data-pose="speaking"] .cat-avatar-head{animation:insider-cat-talk 2.4s ease-in-out infinite}
+.insider-cat-avatar[data-pose="working"] .cat-avatar-brows,.insider-cat-avatar[data-pose="working"] .cat-avatar-working{opacity:1}
+.insider-cat-avatar[data-pose="working"] .cat-avatar-tail{animation:insider-cat-tail 3.6s ease-in-out infinite}
+.insider-cat-avatar[data-pose="working"] .cat-avatar-working circle{animation:insider-cat-think 2.1s ease-in-out infinite}
+.insider-cat-avatar[data-pose="working"] .cat-avatar-working circle:nth-child(2){animation-delay:.2s}
+.insider-cat-avatar[data-pose="working"] .cat-avatar-working circle:nth-child(3){animation-delay:.4s}
+.insider-cat-avatar[data-pose="attention"] .cat-avatar-attention{opacity:1}
+.insider-cat-avatar[data-pose="attention"] .cat-avatar-head{transform:translateY(-4px) rotate(-4deg)}
+@keyframes insider-cat-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.025)}}
+@keyframes insider-cat-listen{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes insider-cat-speak{0%,100%{transform:scaleY(.6)}50%{transform:scaleY(1.1)}}
+@keyframes insider-cat-talk{0%,100%{transform:translateY(-2px)}50%{transform:translateY(-3px) rotate(-2deg)}}
+@keyframes insider-cat-tail{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-3deg)}}
+@keyframes insider-cat-think{0%,70%,100%{opacity:.4}35%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.insider-cat-avatar *{animation:none!important;transition:none!important}}
+
+  </style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to article</a>
+<div class="shell layout">
+  <nav class="toc" aria-label="On this page">
+    <a href="../index.html">← Code Design Notebook</a>
+    <ol>
+      <li><a href="#what">The companion</a></li>
+      <li><a href="#look">The current look</a></li>
+      <li><a href="#conversations">One saved identity</a></li>
+      <li><a href="#tools">What the Cat can do</a></li>
+      <li><a href="#voice">Voice → OpenHands</a></li>
+      <li><a href="#apps">Install and configure</a></li>
+      <li><a href="#usability">Usability priorities</a></li>
+      <li><a href="#sources">Evidence and limits</a></li>
+    </ol>
+    <p><a href="insider-cat-stories.html">User scenarios →</a></p>
   </nav>
+  <main id="content">
+    <header>
+      <p class="eyebrow">Agent Canvas · Apps · behavior and architecture</p>
+      <h1>Insider Cat</h1>
+      <p>A sibling of SmolPaws inside Agent Canvas: one saved OpenHands agent, with a Cat-shaped place to talk, type, and find your work.</p>
+      <p class="meta">Updated <time datetime="2026-10-05">5 October 2026</time>. <span class="status">Development implementation · review pending</span></p>
+    </header>
+    <div class="callout"><p><strong>Voice is a way to reach the Cat. OpenHands does the work.</strong> The selected Cat has a durable conversation, agent configuration, tools, and approval policy on Agent Server. The Voice connection carries requests and speaks saved results; it does not replace that agent or grant it access to every conversation in Canvas.</p></div>
 
-  <main>
-  <header class="title">
-    <div class="eyebrow">SmolPaws · implementation record</div>
-    <h1>The insider cat</h1>
-    <p class="sub">A SmolPaws that runs <em>inside</em> the OpenHands UI. It sits in the corner, changes pose with the agent's live status, and — when you call it — opens its own conversation with an identity that knows it is running on a local agent-server. This is what shipped in v1, where it lives, and how big it is.</p>
-    <p style="margin-top:12px"><span class="status">STATUS: v1 SHIPPED</span> &nbsp; <span class="pill">epic smolpaws-08f</span> &nbsp; <span class="pill">odie · feat/insider-cat</span> &nbsp; <span class="pill">HEAD fd6679a1c</span></p>
-  </header>
+    <h2 id="what">A sibling with its own place</h2>
+    <p>The standalone <a href="https://github.com/enyst/insider">Insider App</a> contributes the <strong>Projects</strong> page and, on a compatible Canvas host, a travelling companion. The Cat has its own identity and history. The compatibility tag <code>smolpaws: insider</code> does not give it SmolPaws’ credentials, memories, channels, or permissions.</p>
+    <p>Canvas owns navigation and the visible controls. Agent Server owns the saved conversation and execution. The chosen OpenHands agent profile supplies the model and actual tools. Selecting an LLM profile or switching models alone does not add tools. The App adds its <a href="#skill">Insider instructions</a> when creating a Cat; instructions explain the role but cannot manufacture missing capabilities.</p>
 
-  <h2 id="what"><span class="num">1</span>What it is</h2>
-  <p>Every other SmolPaws face lives <em>outside</em> the tools it helps with — WhatsApp, GitHub, Slack. The insider cat is the opposite: it lives inside <code>odie</code>, the OpenHands web UI itself. It is the same cat, wearing the UI as a body. It knows the OpenHands stack — the UI, the agent-server, the extensions and automation repos, the TypeScript client — well enough to answer questions about your other conversations and act on them.</p>
-  <figure class="shot">
-    <img src="../assets/insider-cat-inline.jpeg" alt="The insider cat rendered as a small avatar centered above the agent status pill inside an OpenHands conversation.">
-    <figcaption>The cat inline in a conversation — a 48px avatar centered above the “Thinking” pill, alive with the agent's status.</figcaption>
-  </figure>
-  <p>Two placements, both riding odie's existing rails: a launcher in the corner of the home screen, and — once you are in a conversation — a small avatar sitting right above the agent-status row, so the cat is present while it works.</p>
+    <h2 id="look">The Cat comes first</h2>
+    <p>The September 19 interface puts a warm cream SVG Cat, its status, and <strong>Talk</strong> beside the conversation. The saved-Cat picker and <strong>New Cat</strong> sit with that conversation; <strong>Your work</strong> holds the conversation browser. On narrower screens the work list moves below the Cat. The page has one set of Voice controls.</p>
+    <figure>
+      <div class="poses"><div class="pose"><div class="insider-cat-avatar" data-pose="sleeping"><svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <ellipse class="cat-avatar-rest" cx="81" cy="100" rx="64" ry="10"/>
+  <ellipse class="cat-avatar-shadow" cx="82" cy="97" rx="48" ry="5"/>
+  <g class="cat-avatar-body">
+    <path class="cat-avatar-fur" d="M32 79C28 60 43 47 66 47C84 40 111 43 124 59C136 73 134 89 122 95C105 103 48 100 37 92C34 90 32 85 32 79Z"/>
+    <path class="cat-avatar-haunch" d="M100 57C120 57 129 72 123 85C120 91 114 92 109 91"/>
+    <path class="cat-avatar-stripe" d="M87 47L88 57M99 49L101 58M110 53L111 61"/>
+  </g>
+  <g class="cat-avatar-head">
+    <g class="cat-avatar-ear cat-avatar-ear-left">
+      <path class="cat-avatar-fur" d="M32 54L31 31Q31 27 35 29L51 43Z"/>
+      <path class="cat-avatar-ear-inner" d="M36 46L35 35L45 43Z"/>
+    </g>
+    <g class="cat-avatar-ear cat-avatar-ear-right">
+      <path class="cat-avatar-fur" d="M64 42L78 28Q82 25 82 31L79 55Z"/>
+      <path class="cat-avatar-ear-inner" d="M70 43L78 34L77 47Z"/>
+    </g>
+    <path class="cat-avatar-fur" d="M31 55C32 44 43 38 55 39C69 37 81 45 82 58C83 73 72 84 56 84C40 84 29 73 31 55Z"/>
+    <path class="cat-avatar-cheek" d="M36 64C40 59 48 60 55 64C62 60 72 60 77 65C74 77 66 80 56 80C45 80 38 74 36 64Z"/>
+    <path class="cat-avatar-stripe" d="M51 40L53 48M61 40L59 48"/>
+    <g class="cat-avatar-eyes-sleep cat-avatar-ink">
+      <path d="M38 61Q43 66 48 61M63 61Q68 66 73 61"/>
+    </g>
+    <g class="cat-avatar-eyes-awake">
+      <ellipse class="cat-avatar-eye" cx="44" cy="60" rx="2.8" ry="4"/>
+      <ellipse class="cat-avatar-eye" cx="68" cy="60" rx="2.8" ry="4"/>
+      <circle class="cat-avatar-glint" cx="45" cy="59" r=".8"/>
+      <circle class="cat-avatar-glint" cx="69" cy="59" r=".8"/>
+    </g>
+    <path class="cat-avatar-brows cat-avatar-ink" d="M39 53L47 55M64 55L72 53"/>
+    <path class="cat-avatar-nose" d="M52 67Q56 65 60 67L56 70Z"/>
+    <path class="cat-avatar-mouth cat-avatar-ink" d="M56 70V72M50 72Q53 75 56 72Q59 75 62 72"/>
+    <ellipse class="cat-avatar-mouth-speaking" cx="56" cy="74" rx="3" ry="2.4"/>
+    <path class="cat-avatar-whiskers cat-avatar-ink" d="M41 69L26 66M40 73L25 74M71 69L86 66M72 73L87 74"/>
+  </g>
+  <g class="cat-avatar-paws">
+    <path class="cat-avatar-paw" d="M48 86C45 82 38 83 36 88C34 93 38 96 47 95H60C63 90 57 85 48 86Z"/>
+    <path class="cat-avatar-toes cat-avatar-ink" d="M41 90V93M46 90V93"/>
+  </g>
+  <path class="cat-avatar-tail" d="M120 72C138 75 138 96 116 99C101 101 82 98 74 95C69 93 72 87 78 88L102 91"/>
+  <g class="cat-avatar-listening cat-avatar-ink">
+    <path d="M100 29Q107 34 104 42M108 23Q120 32 114 47"/>
+  </g>
+  <g class="cat-avatar-working">
+    <circle cx="108" cy="32" r="2"/><circle cx="118" cy="30" r="2"/><circle cx="128" cy="32" r="2"/>
+  </g>
+  <g class="cat-avatar-attention">
+    <path d="M115 20L123 28L115 36L107 28Z"/>
+    <path class="cat-avatar-ink" d="M115 24V29M115 32V32.1"/>
+  </g>
+</svg></div><div>Resting</div></div>
+<div class="pose"><div class="insider-cat-avatar" data-pose="listening"><svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <ellipse class="cat-avatar-rest" cx="81" cy="100" rx="64" ry="10"/>
+  <ellipse class="cat-avatar-shadow" cx="82" cy="97" rx="48" ry="5"/>
+  <g class="cat-avatar-body">
+    <path class="cat-avatar-fur" d="M32 79C28 60 43 47 66 47C84 40 111 43 124 59C136 73 134 89 122 95C105 103 48 100 37 92C34 90 32 85 32 79Z"/>
+    <path class="cat-avatar-haunch" d="M100 57C120 57 129 72 123 85C120 91 114 92 109 91"/>
+    <path class="cat-avatar-stripe" d="M87 47L88 57M99 49L101 58M110 53L111 61"/>
+  </g>
+  <g class="cat-avatar-head">
+    <g class="cat-avatar-ear cat-avatar-ear-left">
+      <path class="cat-avatar-fur" d="M32 54L31 31Q31 27 35 29L51 43Z"/>
+      <path class="cat-avatar-ear-inner" d="M36 46L35 35L45 43Z"/>
+    </g>
+    <g class="cat-avatar-ear cat-avatar-ear-right">
+      <path class="cat-avatar-fur" d="M64 42L78 28Q82 25 82 31L79 55Z"/>
+      <path class="cat-avatar-ear-inner" d="M70 43L78 34L77 47Z"/>
+    </g>
+    <path class="cat-avatar-fur" d="M31 55C32 44 43 38 55 39C69 37 81 45 82 58C83 73 72 84 56 84C40 84 29 73 31 55Z"/>
+    <path class="cat-avatar-cheek" d="M36 64C40 59 48 60 55 64C62 60 72 60 77 65C74 77 66 80 56 80C45 80 38 74 36 64Z"/>
+    <path class="cat-avatar-stripe" d="M51 40L53 48M61 40L59 48"/>
+    <g class="cat-avatar-eyes-sleep cat-avatar-ink">
+      <path d="M38 61Q43 66 48 61M63 61Q68 66 73 61"/>
+    </g>
+    <g class="cat-avatar-eyes-awake">
+      <ellipse class="cat-avatar-eye" cx="44" cy="60" rx="2.8" ry="4"/>
+      <ellipse class="cat-avatar-eye" cx="68" cy="60" rx="2.8" ry="4"/>
+      <circle class="cat-avatar-glint" cx="45" cy="59" r=".8"/>
+      <circle class="cat-avatar-glint" cx="69" cy="59" r=".8"/>
+    </g>
+    <path class="cat-avatar-brows cat-avatar-ink" d="M39 53L47 55M64 55L72 53"/>
+    <path class="cat-avatar-nose" d="M52 67Q56 65 60 67L56 70Z"/>
+    <path class="cat-avatar-mouth cat-avatar-ink" d="M56 70V72M50 72Q53 75 56 72Q59 75 62 72"/>
+    <ellipse class="cat-avatar-mouth-speaking" cx="56" cy="74" rx="3" ry="2.4"/>
+    <path class="cat-avatar-whiskers cat-avatar-ink" d="M41 69L26 66M40 73L25 74M71 69L86 66M72 73L87 74"/>
+  </g>
+  <g class="cat-avatar-paws">
+    <path class="cat-avatar-paw" d="M48 86C45 82 38 83 36 88C34 93 38 96 47 95H60C63 90 57 85 48 86Z"/>
+    <path class="cat-avatar-toes cat-avatar-ink" d="M41 90V93M46 90V93"/>
+  </g>
+  <path class="cat-avatar-tail" d="M120 72C138 75 138 96 116 99C101 101 82 98 74 95C69 93 72 87 78 88L102 91"/>
+  <g class="cat-avatar-listening cat-avatar-ink">
+    <path d="M100 29Q107 34 104 42M108 23Q120 32 114 47"/>
+  </g>
+  <g class="cat-avatar-working">
+    <circle cx="108" cy="32" r="2"/><circle cx="118" cy="30" r="2"/><circle cx="128" cy="32" r="2"/>
+  </g>
+  <g class="cat-avatar-attention">
+    <path d="M115 20L123 28L115 36L107 28Z"/>
+    <path class="cat-avatar-ink" d="M115 24V29M115 32V32.1"/>
+  </g>
+</svg></div><div>Listening</div></div>
+<div class="pose"><div class="insider-cat-avatar" data-pose="speaking"><svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <ellipse class="cat-avatar-rest" cx="81" cy="100" rx="64" ry="10"/>
+  <ellipse class="cat-avatar-shadow" cx="82" cy="97" rx="48" ry="5"/>
+  <g class="cat-avatar-body">
+    <path class="cat-avatar-fur" d="M32 79C28 60 43 47 66 47C84 40 111 43 124 59C136 73 134 89 122 95C105 103 48 100 37 92C34 90 32 85 32 79Z"/>
+    <path class="cat-avatar-haunch" d="M100 57C120 57 129 72 123 85C120 91 114 92 109 91"/>
+    <path class="cat-avatar-stripe" d="M87 47L88 57M99 49L101 58M110 53L111 61"/>
+  </g>
+  <g class="cat-avatar-head">
+    <g class="cat-avatar-ear cat-avatar-ear-left">
+      <path class="cat-avatar-fur" d="M32 54L31 31Q31 27 35 29L51 43Z"/>
+      <path class="cat-avatar-ear-inner" d="M36 46L35 35L45 43Z"/>
+    </g>
+    <g class="cat-avatar-ear cat-avatar-ear-right">
+      <path class="cat-avatar-fur" d="M64 42L78 28Q82 25 82 31L79 55Z"/>
+      <path class="cat-avatar-ear-inner" d="M70 43L78 34L77 47Z"/>
+    </g>
+    <path class="cat-avatar-fur" d="M31 55C32 44 43 38 55 39C69 37 81 45 82 58C83 73 72 84 56 84C40 84 29 73 31 55Z"/>
+    <path class="cat-avatar-cheek" d="M36 64C40 59 48 60 55 64C62 60 72 60 77 65C74 77 66 80 56 80C45 80 38 74 36 64Z"/>
+    <path class="cat-avatar-stripe" d="M51 40L53 48M61 40L59 48"/>
+    <g class="cat-avatar-eyes-sleep cat-avatar-ink">
+      <path d="M38 61Q43 66 48 61M63 61Q68 66 73 61"/>
+    </g>
+    <g class="cat-avatar-eyes-awake">
+      <ellipse class="cat-avatar-eye" cx="44" cy="60" rx="2.8" ry="4"/>
+      <ellipse class="cat-avatar-eye" cx="68" cy="60" rx="2.8" ry="4"/>
+      <circle class="cat-avatar-glint" cx="45" cy="59" r=".8"/>
+      <circle class="cat-avatar-glint" cx="69" cy="59" r=".8"/>
+    </g>
+    <path class="cat-avatar-brows cat-avatar-ink" d="M39 53L47 55M64 55L72 53"/>
+    <path class="cat-avatar-nose" d="M52 67Q56 65 60 67L56 70Z"/>
+    <path class="cat-avatar-mouth cat-avatar-ink" d="M56 70V72M50 72Q53 75 56 72Q59 75 62 72"/>
+    <ellipse class="cat-avatar-mouth-speaking" cx="56" cy="74" rx="3" ry="2.4"/>
+    <path class="cat-avatar-whiskers cat-avatar-ink" d="M41 69L26 66M40 73L25 74M71 69L86 66M72 73L87 74"/>
+  </g>
+  <g class="cat-avatar-paws">
+    <path class="cat-avatar-paw" d="M48 86C45 82 38 83 36 88C34 93 38 96 47 95H60C63 90 57 85 48 86Z"/>
+    <path class="cat-avatar-toes cat-avatar-ink" d="M41 90V93M46 90V93"/>
+  </g>
+  <path class="cat-avatar-tail" d="M120 72C138 75 138 96 116 99C101 101 82 98 74 95C69 93 72 87 78 88L102 91"/>
+  <g class="cat-avatar-listening cat-avatar-ink">
+    <path d="M100 29Q107 34 104 42M108 23Q120 32 114 47"/>
+  </g>
+  <g class="cat-avatar-working">
+    <circle cx="108" cy="32" r="2"/><circle cx="118" cy="30" r="2"/><circle cx="128" cy="32" r="2"/>
+  </g>
+  <g class="cat-avatar-attention">
+    <path d="M115 20L123 28L115 36L107 28Z"/>
+    <path class="cat-avatar-ink" d="M115 24V29M115 32V32.1"/>
+  </g>
+</svg></div><div>Speaking</div></div>
+<div class="pose"><div class="insider-cat-avatar" data-pose="working"><svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <ellipse class="cat-avatar-rest" cx="81" cy="100" rx="64" ry="10"/>
+  <ellipse class="cat-avatar-shadow" cx="82" cy="97" rx="48" ry="5"/>
+  <g class="cat-avatar-body">
+    <path class="cat-avatar-fur" d="M32 79C28 60 43 47 66 47C84 40 111 43 124 59C136 73 134 89 122 95C105 103 48 100 37 92C34 90 32 85 32 79Z"/>
+    <path class="cat-avatar-haunch" d="M100 57C120 57 129 72 123 85C120 91 114 92 109 91"/>
+    <path class="cat-avatar-stripe" d="M87 47L88 57M99 49L101 58M110 53L111 61"/>
+  </g>
+  <g class="cat-avatar-head">
+    <g class="cat-avatar-ear cat-avatar-ear-left">
+      <path class="cat-avatar-fur" d="M32 54L31 31Q31 27 35 29L51 43Z"/>
+      <path class="cat-avatar-ear-inner" d="M36 46L35 35L45 43Z"/>
+    </g>
+    <g class="cat-avatar-ear cat-avatar-ear-right">
+      <path class="cat-avatar-fur" d="M64 42L78 28Q82 25 82 31L79 55Z"/>
+      <path class="cat-avatar-ear-inner" d="M70 43L78 34L77 47Z"/>
+    </g>
+    <path class="cat-avatar-fur" d="M31 55C32 44 43 38 55 39C69 37 81 45 82 58C83 73 72 84 56 84C40 84 29 73 31 55Z"/>
+    <path class="cat-avatar-cheek" d="M36 64C40 59 48 60 55 64C62 60 72 60 77 65C74 77 66 80 56 80C45 80 38 74 36 64Z"/>
+    <path class="cat-avatar-stripe" d="M51 40L53 48M61 40L59 48"/>
+    <g class="cat-avatar-eyes-sleep cat-avatar-ink">
+      <path d="M38 61Q43 66 48 61M63 61Q68 66 73 61"/>
+    </g>
+    <g class="cat-avatar-eyes-awake">
+      <ellipse class="cat-avatar-eye" cx="44" cy="60" rx="2.8" ry="4"/>
+      <ellipse class="cat-avatar-eye" cx="68" cy="60" rx="2.8" ry="4"/>
+      <circle class="cat-avatar-glint" cx="45" cy="59" r=".8"/>
+      <circle class="cat-avatar-glint" cx="69" cy="59" r=".8"/>
+    </g>
+    <path class="cat-avatar-brows cat-avatar-ink" d="M39 53L47 55M64 55L72 53"/>
+    <path class="cat-avatar-nose" d="M52 67Q56 65 60 67L56 70Z"/>
+    <path class="cat-avatar-mouth cat-avatar-ink" d="M56 70V72M50 72Q53 75 56 72Q59 75 62 72"/>
+    <ellipse class="cat-avatar-mouth-speaking" cx="56" cy="74" rx="3" ry="2.4"/>
+    <path class="cat-avatar-whiskers cat-avatar-ink" d="M41 69L26 66M40 73L25 74M71 69L86 66M72 73L87 74"/>
+  </g>
+  <g class="cat-avatar-paws">
+    <path class="cat-avatar-paw" d="M48 86C45 82 38 83 36 88C34 93 38 96 47 95H60C63 90 57 85 48 86Z"/>
+    <path class="cat-avatar-toes cat-avatar-ink" d="M41 90V93M46 90V93"/>
+  </g>
+  <path class="cat-avatar-tail" d="M120 72C138 75 138 96 116 99C101 101 82 98 74 95C69 93 72 87 78 88L102 91"/>
+  <g class="cat-avatar-listening cat-avatar-ink">
+    <path d="M100 29Q107 34 104 42M108 23Q120 32 114 47"/>
+  </g>
+  <g class="cat-avatar-working">
+    <circle cx="108" cy="32" r="2"/><circle cx="118" cy="30" r="2"/><circle cx="128" cy="32" r="2"/>
+  </g>
+  <g class="cat-avatar-attention">
+    <path d="M115 20L123 28L115 36L107 28Z"/>
+    <path class="cat-avatar-ink" d="M115 24V29M115 32V32.1"/>
+  </g>
+</svg></div><div>Working</div></div></div>
+      <figcaption>Actual Cat artwork from the App, shown here as static state illustrations, not a browser screenshot. Adjacent text and controls carry the status; color and animation are supplementary.</figcaption>
+    </figure>
+    <p>The Cat sleeps when idle, perks up while connecting, listens when the microphone is active, and stays awake while speaking or working. Pending agent work takes precedence over a listening pose. Mute removes the active-listening cue; it does not imply the agent stopped. Errors, unknown state, paused work, and approval requests stay visible instead of looking like a peaceful idle Cat. Reduced-motion preferences disable the decorative animation.</p>
+    <p>Before a Cat is selected, <strong>Talk</strong> is visible but disabled, with an explanation. Choose a saved Cat, or select New Cat and send the first typed message. Away from Projects, a compact companion keeps the same call and Cat available in the Canvas layout. It occupies space below the main content instead of covering the chat composer. Returning to Projects restores the main view without creating another connection.</p>
+    <p class="source">UI and artwork: <a href="https://github.com/enyst/insider/blob/7efa337366e411127ce9e65063fe67ef217cb927/src/cat-view.js">shared Cat view</a> and <a href="https://github.com/enyst/insider/blob/7efa337366e411127ce9e65063fe67ef217cb927/src/cat-avatar.js">pose mapping and SVG</a>.</p>
 
-  <h2 id="poses"><span class="num">2</span>Three poses, one live signal</h2>
-  <p>The avatar is not decorative. It is driven off odie's existing websocket <code>execution_status</code> — no new backend, no polling. One small pure function maps the live agent state to a pose, so the cat's body language <em>is</em> the agent's state.</p>
-  <div class="poses">
-    <div class="pose">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SmolPaws cat, neutral"><defs><radialGradient id="fur-n" cx="50%" cy="38%" r="65%"><stop offset="0%" stop-color="#dfe3ea"/><stop offset="100%" stop-color="#aab2c0"/></radialGradient></defs><path d="M16 22 L14 6 L28 16 Z" fill="url(#fur-n)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><path d="M48 22 L50 6 L36 16 Z" fill="url(#fur-n)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 18 L17 10 L24 16 Z" fill="#f2b8c6"/><path d="M46 18 L47 10 L40 16 Z" fill="#f2b8c6"/><ellipse cx="32" cy="34" rx="21" ry="19" fill="url(#fur-n)" stroke="#8b93a3" stroke-width="1.5"/><ellipse cx="24" cy="33" rx="3.4" ry="4.2" fill="#2b2f38"/><ellipse cx="40" cy="33" rx="3.4" ry="4.2" fill="#2b2f38"/><circle cx="25.1" cy="31.4" r="1.1" fill="#fff"/><circle cx="41.1" cy="31.4" r="1.1" fill="#fff"/><path d="M32 38 l-2.2 -1.6 h4.4 Z" fill="#f2b8c6"/><path d="M32 38 v2.4 M32 40.4 q-3 2 -6 0 M32 40.4 q3 2 6 0" fill="none" stroke="#8b93a3" stroke-width="1.2" stroke-linecap="round"/><path d="M18 36 h-9 M19 40 l-8 2 M46 36 h9 M45 40 l8 2" stroke="#c4cad4" stroke-width="1" stroke-linecap="round"/></svg>
-      <b>Normal</b><br>idle / neutral
+    <h2 id="conversations">One saved Cat, across views and calls</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Action</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td>Choose a saved Cat</td><td>Reload that controller by its full ID on its owning backend. The App discovers controllers across list pages; multiple Cats require a deliberate choice unless a remembered choice is verified.</td></tr>
+        <tr><td>Open the full conversation</td><td>Continue the same ID in ordinary Canvas chat, including its tools and approval controls. Its Insider badge and return link distinguish it from a worker. Navigation preserves the active call.</td></tr>
+        <tr><td>New Cat or <code>/new</code></td><td>Prepare a fresh Cat. Its first typed send creates a different controller, using the then-active OpenHands profile and chosen workspace. This does not clear the old Cat or clone its whole history.</td></tr>
+        <tr><td><code>/condense</code></td><td>Condense the selected Cat without changing its ID or starting another agent turn. End its Voice session first; a new call loads the updated context. The saved event record remains inspectable.</td></tr>
+        <tr><td>Select a worker</td><td>Attach the full worker ID and current metadata to the next typed Cat request, while preserving the draft. Selection alone does not send the worker anything.</td></tr>
+        <tr><td>End call</td><td>Release the microphone and close Voice. Work already accepted by OpenHands continues; its result remains in the saved conversation.</td></tr>
+      </tbody>
+    </table></div>
+    <p>Cat selection is scoped to the backend and organization, and revalidated after loading. Changing Cat or backend, disabling the App, or requesting condensation ends the old call. A regular conversation you open elsewhere in Canvas does not silently become the Voice target. Draft text survives navigation within the active App, but is not persisted across reloads or backend changes.</p>
+    <p>The App shows text from recent saved events and a link to the full conversation. Live captions are transient. Saved delegated requests and OpenHands answers are the task record; exact audio and every word spoken by the Voice model are not a second complete transcript.</p>
+
+    <h2 id="tools">Use the normal OpenHands tools and skills</h2>
+    <p>The Cat can inspect and coordinate conversations through the existing Agent Server API using its normal terminal tool. The OpenHands API skill provides instructions; the runtime must identify the actual backend URL, authentication source, and relevant state or workspace. A dedicated conversation-listing tool is an optional convenience, not a prerequisite.</p>
+    <p>The Projects page’s JavaScript methods are not automatically model tools, but that does not prevent a normally configured OpenHands agent from making the same supported API requests through its terminal. Skills explain how to use existing capabilities; they do not independently grant network access, credentials, or permissions. Selecting an LLM profile also does not change the saved agent’s tool configuration.</p>
+    <p>A September 20 inspection found that the reported Cat was an earlier bare fixture: its configured tool list was empty and it had no client tools. The remaining reasoning and finish tools did not include terminal access. The reported parallel entry was not a registered native SDK tool in that configuration. This was an incomplete agent configuration, not evidence that OpenHands needs a new inventory-tool implementation.</p>
+    <p>The same Cat was repaired by adding the standard workspace tools without rewriting its history or changing its ID, model, or approvals. A <a href="insider-cat-codex-voice.html#current-verification">real Voice test executed a terminal calculation and spoke its saved result</a>. A subsequent check restored the default OpenHands skills and supplied accurate backend context: the same Cat loaded <code>openhands-api</code>, discovered the count endpoint from OpenAPI, and called it through the terminal. Its saved count matched an independent API check and returned through Voice. No bespoke inventory tool was added.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Layer</th><th>Responsibility</th><th>Boundary</th></tr></thead>
+      <tbody>
+        <tr><td>Projects UI</td><td>List, filter, page through and open conversations; select a target; send to the Cat.</td><td>A loaded page is not the complete server inventory.</td></tr>
+        <tr><td>Saved OpenHands Cat</td><td>Use its configured tools, including terminal, under its approval and security policy.</td><td>Older saved Cats retain their actual configuration; a new model does not repair missing tools or context.</td></tr>
+        <tr><td>OpenHands skills and runtime context</td><td>Explain the APIs and identify the correct backend, authentication source, workspace, and state.</td><td>Instructions are not permissions. Use available authorized access without exposing credentials or guessing another backend.</td></tr>
+        <tr><td>Voice bridge</td><td>Bind a spoken request to that Cat and return its verified result.</td><td>The OpenHands agent remains the execution owner, whether it uses a terminal API request or another tool.</td></tr>
+        <tr><td>Optional focused tools</td><td>Wrap list/count/read/wait or create/send requests with typed inputs and convenient results.</td><td>They may improve ergonomics and validation; they are not required for API access through the terminal.</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>For a conversation count, prefer <code>GET /api/conversations/count</code> on the owning Agent Server.</strong> It is the authoritative API count for that backend and query. For titles, statuses, or per-conversation detail, follow the relevant list/search pagination and state any filters or incomplete coverage. Count conversations, not messages, events, or files.</p>
+    <p>A filesystem check is useful only when the runtime confirms the current local backend’s persistence directory and the agent has access to it. Count distinct conversation records there, not every JSON file or an old checkout’s state. For a remote backend, local files are not its inventory. Use the live API when possible and explain any narrower fallback scope.</p>
+    <p>The <a href="https://github.com/OpenHands/extensions/blob/main/skills/openhands-api/SKILL.md">OpenHands API skill</a> already documents terminal-based local and Cloud workflows. It is default-enabled for new workspaces in the registry; existing saved skill selections still need to be checked. Confirm the actual URL and authentication source rather than copying example defaults. Keep credentials out of tool output, chat, and notes. For an uncertain write, inspect the saved conversation before retrying.</p>
+    <p>A name such as <code>ask_agent</code> can describe asking the real agent to investigate. It is not an implemented Codex tool in this path. The SDK’s existing <code>/ask_agent</code> endpoint answers a stateless, one-off question; it does not run the saved Cat with its tools. The current <code>send_message(run=True)</code> handoff preserves that saved execution owner.</p>
+
+    <h2 id="voice">Two Voice transports, the same execution owner</h2>
+    <div class="flow" aria-label="Voice to the saved OpenHands agent">
+      <p><strong>1. The person speaks</strong> after explicitly choosing Talk and granting microphone access.</p>
+      <p><strong>2. The selected Voice transport hands off a request</strong> to one bound Cat conversation.</p>
+      <p><strong>3. OpenHands saves and runs it</strong> with that Cat’s own model, tools, workspace, and approval policy.</p>
+      <p><strong>4. The bridge waits for the whole run to settle</strong>, including stop hooks, and retrieves the new saved answer.</p>
+      <p><strong>5. Voice speaks that answer or a labelled excerpt.</strong> The full result stays in the same conversation.</p>
     </div>
-    <div class="pose">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SmolPaws cat, perked and working"><defs><radialGradient id="fur-u" cx="50%" cy="38%" r="65%"><stop offset="0%" stop-color="#e6ecfa"/><stop offset="100%" stop-color="#9fb0d6"/></radialGradient></defs><path d="M15 20 L12 2 L29 15 Z" fill="url(#fur-u)" stroke="#5f6f96" stroke-width="1.5" stroke-linejoin="round"/><path d="M49 20 L52 2 L35 15 Z" fill="url(#fur-u)" stroke="#5f6f96" stroke-width="1.5" stroke-linejoin="round"/><path d="M17 16 L15 6 L24 14 Z" fill="#f2b8c6"/><path d="M47 16 L49 6 L40 14 Z" fill="#f2b8c6"/><ellipse cx="32" cy="35" rx="21" ry="19" fill="url(#fur-u)" stroke="#5f6f96" stroke-width="1.5"/><circle cx="24" cy="33" r="5" fill="#fff" stroke="#5f6f96" stroke-width="0.8"/><circle cx="40" cy="33" r="5" fill="#fff" stroke="#5f6f96" stroke-width="0.8"/><circle cx="24.6" cy="33.4" r="3" fill="#2b2f38"/><circle cx="40.6" cy="33.4" r="3" fill="#2b2f38"/><circle cx="25.7" cy="32.1" r="1.1" fill="#fff"/><circle cx="41.7" cy="32.1" r="1.1" fill="#fff"/><path d="M32 39 l-2.2 -1.6 h4.4 Z" fill="#f2b8c6"/><path d="M32 39 v2.2 M32 41.2 q-3 2 -6 0 M32 41.2 q3 2 6 0" fill="none" stroke="#5f6f96" stroke-width="1.2" stroke-linecap="round"/><path d="M18 37 h-9 M19 41 l-8 2 M46 37 h9 M45 41 l8 2" stroke="#c4cad4" stroke-width="1" stroke-linecap="round"/></svg>
-      <b>Ears-up</b><br>working / just pinged
-    </div>
-    <div class="pose">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SmolPaws cat, sleeping"><defs><radialGradient id="fur-s" cx="50%" cy="42%" r="65%"><stop offset="0%" stop-color="#d7dbe2"/><stop offset="100%" stop-color="#a2aab8"/></radialGradient></defs><path d="M14 24 L8 12 L27 18 Z" fill="url(#fur-s)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><path d="M50 24 L56 12 L37 18 Z" fill="url(#fur-s)" stroke="#8b93a3" stroke-width="1.5" stroke-linejoin="round"/><ellipse cx="32" cy="37" rx="21" ry="18" fill="url(#fur-s)" stroke="#8b93a3" stroke-width="1.5"/><path d="M19 35 q5 4 10 0" fill="none" stroke="#2b2f38" stroke-width="1.8" stroke-linecap="round"/><path d="M35 35 q5 4 10 0" fill="none" stroke="#2b2f38" stroke-width="1.8" stroke-linecap="round"/><path d="M32 41 l-2 -1.4 h4 Z" fill="#f2b8c6"/><path d="M32 41 v2 M32 43 q-2.5 1.6 -5 0 M32 43 q2.5 1.6 5 0" fill="none" stroke="#8b93a3" stroke-width="1.1" stroke-linecap="round"/><path d="M18 39 h-9 M19 43 l-8 2 M46 39 h9 M45 43 l8 2" stroke="#c4cad4" stroke-width="1" stroke-linecap="round"/><path d="M50 16 h6 l-6 6 h6" fill="none" stroke="#8b93a3" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 8 h4 l-4 4 h4" fill="none" stroke="#aab2c0" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <b>Sleeping</b><br>idle / asleep
-    </div>
-  </div>
-  <p class="mono" style="font-size:12.5px;color:var(--muted)">These are the actual production SVGs, inlined. They are three tiny files, ~1.3&nbsp;KB each, transparent, in SmolPaws' silver/paws palette.</p>
+    <h3>Codex: direct server handoff</h3>
+    <p>In the current experimental Codex path, Agent Server consumes <code>thread/realtime/itemAdded</code> items of type <code>handoff_request</code>. It validates the explicit <code>input_transcript</code>, admits each <code>handoff_id</code> at most once within that call, and sends it directly to the bound OpenHands conversation. The saved result returns through <code>thread/realtime/appendSpeech</code>.</p>
+    <p>The Codex background thread exposes <code>dynamicTools: []</code> with its other tool access restricted. The pinned app-server may still start a background turn, but that turn neither dispatches the request nor supplies the saved Cat’s answer. The browser does not also forward Codex transcripts. This replaces the older model-chosen <code>send_to_insider</code> relay, which could receive a handoff and finish without calling the Cat.</p>
+    <p>Live still has to emit a handoff. A sentence spoken directly by the Voice model is not evidence that OpenHands received or saved a request. A new Codex call starts from a bounded snapshot of the saved Cat; the Projects page’s selected worker is not included in that session. The <a href="insider-cat-codex-voice.html#direct-handoff">Codex implementation note</a> records protocol, configuration, history, and live evidence.</p>
+    <h3>OpenAI API: browser tool bridge</h3>
+    <p>The separate public Realtime API path uses <code>gpt-realtime-2.1</code> and a server-held OpenAI API key. Its Voice model calls <code>send_to_insider</code>; the App forwards that request through the Cat’s normal conversation API and waits for confirmed run completion. This tool belongs to the Voice bridge, not the Cat’s own toolbox. This transport retains fixture coverage; it needs its own live provider validation.</p>
+    <p>The server selects the transport. Codex uses its dedicated, tested sign-in/configuration path; an OpenAI API key belongs to the public API path. Neither substitutes the other’s credential automatically. No provider credential is sent to the browser.</p>
+    <h3>Controls and failures</h3>
+    <p>Both transports offer Mute and End call. The API transport also exposes Stop speaking; the Codex App hides that action because its inspected app-server protocol has no verified speech-only interruption operation. Ending speech is separate from stopping agent work.</p>
+    <p><code>request_not_sent</code> means the bridge rejected the request before admission. <code>relay_failed</code> means the saved outcome needs inspection, and must not encourage a blind retry. <code>connection_failed</code> reports a connection or protocol problem. A busy Cat can reject a new spoken request while an earlier accepted request continues.</p>
 
-  <h2 id="call"><span class="num">3</span>Call the cat</h2>
-  <p>The v1 trigger is a plain button (voice-wake comes with the realtime-voice spike, epic <span class="pill">smolpaws-3e1</span>). Pressing it uses odie's existing <code>createConversation</code> path, then routes to it with react-router. The one new thing it carries: a tag.</p>
-  <pre><code>tags = { smolpaws: "insider", clientsource: "agentcanvas" }</code></pre>
-  <p>The <code>smolpaws</code> tag is the convention that marks a conversation as <em>this cat's</em>. The value is the face — <code>insider</code> now, with room for <code>whatsapp</code> and others later. That is how every smolpaws conversation, across faces, can eventually be found and share one memory.</p>
+    <h2 id="apps">Install the matching components</h2>
+    <p>The package is an ordinary Canvas App with a prepared, self-contained browser bundle. It replaces the historical Secretary skin server, iframe bridge, fixed browser ports, and page-owned credentials. The enhanced companion and Voice paths require matching Canvas and Agent Server changes; choosing an App ref alone cannot add missing host or backend capabilities.</p>
+    <ol>
+      <li>Use a local Agent Server connection with Apps, agent profiles and launch additions. The inspected Apps host does not support the cloud backend.</li>
+      <li>Open <strong>Customize → Apps</strong>. Use Source <code>github:enyst/insider</code> and a reviewed Ref; leave Repository path empty. For a local source, use the package directory on the server machine and leave both other fields empty.</li>
+      <li>Configure the active OpenHands agent profile in Canvas settings, enable the installed App, and open Projects. Choose a real workspace for a new Cat. Check that it has the normal tools, enabled OpenHands skills, and accurate backend connection context.</li>
+      <li>Configure the selected Voice transport on Agent Server. The availability check runs before requesting the microphone. Typed chat remains usable without Voice.</li>
+    </ol>
+    <p>The server copies <code>extension.js</code>; it does not build source. Rebuild and reinstall after source, translation, or skill changes. The <a href="https://github.com/enyst/insider#readme">App README</a> contains setup details; the <a href="insider-cat-codex-voice.html#direct-handoff">Codex note</a> distinguishes the current transport from earlier experiments.</p>
+    <h3 id="skill">An Insider skill explains the role</h3>
+    <p>The standalone package owns <code>skills/insider-cat/SKILL.md</code>. The build embeds its body and appends it through <code>agent_launch_additions.system_message_suffix_append</code> when creating a controller. This preserves the profile’s existing instructions and policies and works independently of the Cat’s working directory. It complements the normal OpenHands skills. It does not install tools or rewrite an already saved Cat’s configuration.</p>
+    <p>The skill distinguishes the Cat from selected workers, requires actual evidence for actions, and separates acceptance from completion. It grants no shared SmolPaws memory, scheduler, or automatic monitoring. The Odie-local skill and old skin remain part of the development history.</p>
+    <p>New Cat launches also read the owning backend’s advertised <code>runtime_services</code> and include validated agent-side URLs and authentication environment-variable names. Credential values are not included. The host must actually provide those references to the agent. The September 20 direct-Vite fix restores this metadata on that development path; missing metadata is omitted rather than replaced with a guessed backend.</p>
 
-  <h2 id="identity"><span class="num">4</span>A local identity, injected the right way</h2>
-  <p>The cat needs to know who and where it is: SmolPaws, an OpenHands-born agent, running on a <strong>local</strong> agent-server (not the Cloud), sharing memory with its other faces, able to orient via the OpenHands skills. The interesting design choice is <em>how</em> that identity reaches the model.</p>
-  <table>
-    <tr><th>Option</th><th>Effect</th><th>Verdict</th></tr>
-    <tr><td class="sym"><code>conversationInstructions</code></td><td>Becomes a visible, auto-running <em>user</em> message.</td><td>Rejected — it would speak for the user and fire a turn on its own.</td></tr>
-    <tr><td class="sym"><code>system_message_suffix</code></td><td>Appends to the <em>system</em> prompt. Silent, no auto-run.</td><td class="mono" style="color:var(--ok)">Chosen.</td></tr>
-  </table>
-  <p>The identity text is injected through <code>AgentContext.system_message_suffix</code>, gated on <code>tags.smolpaws === "insider"</code>, and it preserves any existing suffix rather than clobbering it. It tells the cat to invoke the relevant OpenHands skills by name to orient itself.</p>
+    <h2 id="usability">Make capability and continuity easy to see</h2>
+    <ol>
+      <li><strong>Keep the Cat, status, and Talk together.</strong> An idle Cat rests; connecting, work, approvals, and errors remain legible in words. Avoid duplicate controls when the page and companion share a call.</li>
+      <li><strong>Show what this Cat can actually do.</strong> Check the agent’s normal tools, enabled skills, and actual backend context. Terminal API access is a valid way to inspect conversations; do not mistake the absence of a dedicated wrapper tool for inability.</li>
+      <li><strong>Keep one visible target.</strong> The controller, selected worker, and merely viewed conversation are separate identities. Confirm ambiguous names and use full IDs for actions.</li>
+      <li><strong>Make coverage explicit.</strong> Your work filters the loaded pages, and Load more expands them. Agent answers about all conversations require complete server data or an honest partial count.</li>
+      <li><strong>Keep receipts with results.</strong> Voice should speak saved outcomes; the full conversation shows tools and approvals. An acknowledgment is not completion, and silence is not evidence that work stopped.</li>
+    </ol>
+    <h3 id="next">Configure and verify the existing capability first</h3>
+    <p>Use the normal OpenHands toolset and enabled skills with accurate runtime context. Verify a read-only count or list on the intended backend, then read and follow up on an explicitly chosen worker under the existing permissions and approval policy. Focused conversation tools can be added later for convenience. Scheduled “keep me updated” work needs a durable Automation service and its normal API or skills; an open Voice connection is not a scheduler.</p>
+    <h3 id="puck">Design references</h3>
+    <p>The earlier exploration drew on Amp’s <a href="https://ampcode.com/docs/puck">Puck</a> for the distinction between a companion conversation and worker threads, and <a href="https://ampcode.com/news/talk-to-puck">Talk to Puck</a> for Voice handing work to a real agent. ElevenLabs remains an alternative to evaluate later. Neither is a dependency of the current App. Provider comparisons in the <a href="../voice-landscape.html">voice landscape</a> are dated research, not current installation guarantees.</p>
 
-  <h2 id="where"><span class="num">5</span>Where it lives &amp; how big it is</h2>
-  <p>All of the feature lives in one directory in odie, plus a handful of small integration edits. This is the durable size record.</p>
-  <table>
-    <tr><th>Location</th><th>What</th><th>Size</th></tr>
-    <tr><td class="sym"><code>src/components/features/insider-cat/</code></td><td>Avatar, pose mapping, call-the-cat hook, overlay, identity text, 3 avatar SVGs, and their tests.</td><td>646 LOC total<br>(343 source · 227 test · 3 SVGs)</td></tr>
-    <tr><td class="sym"><code>src/api/agent-server-adapter.ts</code></td><td>Thread <code>extraTags</code> through create; add the insider system suffix.</td><td>+52</td></tr>
-    <tr><td class="sym"><code>src/api/agent-server-config.ts</code></td><td>Config plumbing for the insider path.</td><td>+57</td></tr>
-    <tr><td class="sym"><code>…/agent-server-conversation-service.api.ts</code></td><td>Carry <code>extraTags</code> on the wire.</td><td>+31</td></tr>
-    <tr><td class="sym"><code>src/components/features/chat/chat-interface.tsx</code></td><td>Inline mount above the status row.</td><td>+5</td></tr>
-    <tr><td class="sym"><code>src/root.tsx</code></td><td>Corner launcher mount.</td><td>+2</td></tr>
-  </table>
-  <p>Whole change: <strong>24 files, +953 / −12</strong>. Tests: 40 focused specs (adapter + insider) on top of the wider suite; typecheck, lint, and build all green. Commits <code>97e5be3..fd6679a1</code> on branch <code>feat/insider-cat</code>.</p>
-  <div class="callout ok">Verified live on a Tailscale-served dev stack with <code>deepseek-v4-flash</code>: the cat renders, the button creates a correctly-tagged conversation, and the cat correctly reached for <code>/api/conversations/count</code> to answer a question about the user's other conversations.</div>
-
-  <h2 id="decisions"><span class="num">6</span>Decisions on record</h2>
-  <ul>
-    <li><strong>Identity via system suffix, not instructions.</strong> Silent, no auto-run turn. <span class="pill">chosen</span></li>
-    <li><strong>Tags merged under reserved keys.</strong> Caller <code>extraTags</code> merge <em>beneath</em> <code>clientsource</code> / <code>acpserver</code> so a caller cannot spoof reserved tags. A real bug found and fixed here — the adapter previously hardcoded the tag set and dropped caller tags.</li>
-    <li><strong>Pose off live status, no new backend.</strong> Reuse odie's websocket <code>execution_status</code>; a pure mapping function does the rest.</li>
-    <li><strong>Skills invoked by name, not force-loaded.</strong> The prompt names the skills to invoke. Force-loading would mean a shipped agent profile with <code>agent_context.skills</code> — a deliberate later refinement.</li>
-    <li><strong>Button first, voice later.</strong> v1 wake is a click; voice-wake is scoped to the realtime-voice epic.</li>
-  </ul>
-
-  <h2 id="next"><span class="num">7</span>What's left</h2>
-  <p>The insider cat's body and identity are done. One child of the epic stays open, on purpose:</p>
-  <table>
-    <tr><td><span class="pill">smolpaws-08f.2</span> Shared memory store</td><td>A shared <code>~/.openhands/smolpaws/memory/</code> (durable <code>MEMORY.md</code> + daily files), inside the OpenHands config dir because it ships to all users — read/written by every smolpaws face, so the insider cat and the WhatsApp cat remember the same things. Not built yet.</td></tr>
-  </table>
-  <div class="callout note">This page is a record, not a proposal — the v1 is merged on its branch. The two threads it hands off to are the <strong>shared memory</strong> store above and <strong>realtime voice</strong> (<span class="pill">smolpaws-3e1</span>), which will give the insider cat its first voice.</div>
-
+    <h2 id="sources">Evidence, history, and limits</h2>
+    <h3 id="october-validation">5 October: integration maintenance</h3>
+    <p>The feature is split across three implementation PRs: Agent Server owns Voice and saved work, Canvas owns the companion surface, and the Insider App owns its controls and audio. <a href="https://github.com/OpenHands/software-agent-sdk/issues/5515">The integration issue</a> records acceptance criteria and current verification; <a href="https://github.com/OpenHands/OpenHands/issues/17557">the Canvas issue</a> tracks host behavior. The App and notebook repositories have issues disabled, so their PRs link back to those issues.</p>
+    <p>The failed Agent Server macOS job stopped while downloading a dependency from PyPI, before building or running tests. It was a connection timeout, not a demonstrated Voice failure. A fresh rerun and cross-repository checks are recorded on the linked issues and PRs; the September provider observations below remain historical evidence.</p>
+    <p id="implementation-status"><strong>September 19–20 direct-handoff checks:</strong> generated speech reached the real saved OpenHands Cat and returned its saved answer as audio. A fresh call then recalled the saved test word, saving its new question and answer in that same Cat. These checks used the real provider and existing Codex sign-in, with generated input rather than a physical microphone. They establish those observed requests, not universal delegation or account eligibility. On September 20, a further natural spoken request also verified skill-guided API use: the Cat independently discovered and queried the conversation-count endpoint, saved the correct result, and returned matching speech. The request did not supply an endpoint or command.</p>
+    <p>Physical iPad microphone, speaker, interruption, approval, and repeated-use behavior still needs device verification. The public API transport’s provider speech remains unverified. No fresh page screenshot is claimed here; the artwork is copied from the App source.</p>
+    <ul>
+      <li><a href="https://github.com/enyst/insider/pull/2">App interface and Voice update</a>: current artwork, shared controls, conversation behavior, and translated failures.</li>
+      <li><a href="https://github.com/OpenHands/OpenHands/pull/17558">Canvas companion and Insider identity</a>: persistent dock, new/resume and condensation integration.</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5180">Agent Server Voice implementation</a>: broker, scoped calls, direct Codex handoff, and safe run settlement.</li>
+      <li><a href="insider-cat-codex-voice.html">Codex Voice research and dated verification</a> · <a href="insider-cat-stories.html">User scenarios</a>.</li>
+    </ul>
+    <p id="behavior">The <a href="secretary-cat.html">Secretary proposal</a> documents the earlier skin. Its authentication, proxy, memory, and dispatch assumptions should not be read as the current App contract. The September 15 fixture and September 16 model-driven relay trials remain historical evidence in the Codex note.</p>
+    <p id="status" class="source">Reviewed against App <code>7efa337</code>, published SDK <code>02a51ae46</code> (the equivalent tested worktree change is <code>957c1c584</code>), and the Canvas draft. These pages describe development revisions, not a release announcement or live service-status monitor. Beads owns follow-up status.</p>
+    <footer>Engel’s Code Design Notebook · Insider Cat · September 2026</footer>
   </main>
 </div>
-</body></html>
+</body>
+</html>

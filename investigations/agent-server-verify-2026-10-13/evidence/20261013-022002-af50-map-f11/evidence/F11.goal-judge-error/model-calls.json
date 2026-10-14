@@ -1,0 +1,36 @@
+{
+  "requests": [
+    {
+      "at": "2026-10-13T02:31:39Z",
+      "method": "POST",
+      "path": "/v1/chat/completions",
+      "call": 1,
+      "step": {
+        "status": 500
+      },
+      "body": {
+        "messages": [
+          {
+            "content": [
+              {
+                "type": "text",
+                "text": "You are auditing whether a long-running GOAL has been COMPLETED by an AI software agent.\n\nDerive the concrete requirements implied by the objective. For EACH requirement,\nlook for authoritative evidence in the transcript: file contents, command\noutput, or test results produced by the agent. Treat missing, uncertain, or\nmerely-claimed-but-unverified evidence as NOT satisfied.\n\nRespond with STRICT JSONand nothing else, in exactly this shape:\n{\"score\": <float 0.0-1.0, probability the FULL objective is provably done>, \"complete\": <true|false>, \"missing\": \"<concise description of what remains, or an empty string if complete>\"}"
+              }
+            ],
+            "role": "system"
+          },
+          {
+            "content": [
+              {
+                "type": "text",
+                "text": "<objective>\nQA_F11 judge objective\n</objective>\n\n<transcript>\nuser: QA_F11 judge objective\n\nassistant: QA_F11_ROUND_DONE\n</transcript>"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "model": "qa-stub"
+      }
+    }
+  ]
+}

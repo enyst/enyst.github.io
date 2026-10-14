@@ -1,0 +1,89 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_deepseek-flash",
+      "messages": [
+        {
+          "role": "user",
+          "content": "QA_F30_STREAM: reply with one short word and use no tools."
+        }
+      ],
+      "stream": true,
+      "stream_options": {
+        "include_usage": true
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "x-openhands-serverconversation-id": "7ff5eda9-b9d7-4e50-8695-daa7e5d9f24c",
+      "content-type": "text/event-stream; charset=utf-8"
+    },
+    "body": {
+      "frames": [
+        {
+          "id": "chatcmpl-308340a249144225ac6cc834d4eb31ea",
+          "choices": [
+            {
+              "delta": {
+                "role": "assistant"
+              },
+              "index": 0
+            }
+          ],
+          "created": 1791857984,
+          "model": "openhands_deepseek-flash",
+          "object": "chat.completion.chunk"
+        },
+        {
+          "id": "chatcmpl-308340a249144225ac6cc834d4eb31ea",
+          "choices": [
+            {
+              "delta": {
+                "content": "Ok."
+              },
+              "index": 0
+            }
+          ],
+          "created": 1791857984,
+          "model": "openhands_deepseek-flash",
+          "object": "chat.completion.chunk"
+        },
+        {
+          "id": "chatcmpl-308340a249144225ac6cc834d4eb31ea",
+          "choices": [
+            {
+              "delta": {},
+              "finish_reason": "stop",
+              "index": 0
+            }
+          ],
+          "created": 1791857984,
+          "model": "openhands_deepseek-flash",
+          "object": "chat.completion.chunk"
+        },
+        {
+          "id": "chatcmpl-308340a249144225ac6cc834d4eb31ea",
+          "choices": [],
+          "created": 1791857984,
+          "model": "openhands_deepseek-flash",
+          "object": "chat.completion.chunk",
+          "usage": {
+            "completion_tokens": 17,
+            "prompt_tokens": 11242,
+            "total_tokens": 11259
+          }
+        },
+        "[DONE]"
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 3326
+}

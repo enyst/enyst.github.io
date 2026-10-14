@@ -1,0 +1,15 @@
+{
+  "file": "F27-browser-container.md",
+  "bullet": "Playwright override (`F27.browser-playwright-path`), known bug.",
+  "ids": [
+    "F27.browser-playwright-path"
+  ],
+  "line": 19,
+  "script": "control-agent-server exec --expect-output QA_HOME_CACHE_REMOVED -- docker --host=unix:///var/run/docker.sock exec \"$QA_CONTAINER\" /agent-server/.venv/bin/python -c 'from pathlib import Path; Path(\"/tmp/qa-browser-home/.cache/ms-playwright\").unlink(); print(\"QA_HOME_CACHE_REMOVED\")'\ncontrol-agent-server exec --timeout 90 --expect-output \"$QA_CONTAINER\" -- docker --host=unix:///var/run/docker.sock restart \"$QA_CONTAINER\"\nfor _ in $(seq 90); do if control-agent-server api GET /alive --expect 200 --quiet >/dev/null; then break; fi; sleep 1; done\ncontrol-agent-server api GET /alive --expect 200 --quiet\ncontrol-agent-server api GET /api/tools/catalog --quiet --check tools contains '{\"name\": \"terminal\", \"user_selectable\": true, \"usable\": true'\ncontrol-agent-server api GET /api/tools/catalog --quiet --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": true' --save F27.browser-playwright-path/catalog  # bug\n",
+  "exit_code": 3,
+  "elapsed_ms": 132153,
+  "failed_line": 4,
+  "failed_command": "control-agent-server api GET /alive --expect 200 --quiet",
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 432,\n  \"stdout_tail\": \"QA_HOME_CACHE_REMOVED\\n\",\n  \"stderr_tail\": \"\"\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 3415,\n  \"stdout_tail\": \"qa-f27-browser-path-1\\n\",\n  \"stderr_tail\": \"\"\n}\n{\n  \"ok\": false,\n  \"exit\": 3,\n  \"error\": \"ConnectError: [Errno 111] Connection refused\",\n  \"hint\": \"Is the server up? `control-agent-server doctor`\"\n}\n",
+  "stderr": ""
+}

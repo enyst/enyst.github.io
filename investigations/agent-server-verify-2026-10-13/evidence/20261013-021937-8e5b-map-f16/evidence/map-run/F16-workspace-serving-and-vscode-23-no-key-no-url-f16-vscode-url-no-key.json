@@ -1,0 +1,15 @@
+{
+  "file": "F16-workspace-serving-and-vscode.md",
+  "bullet": "No key, no URL (`F16.vscode-url-no-key`).",
+  "ids": [
+    "F16.vscode-url-no-key"
+  ],
+  "line": 451,
+  "script": "NK=$(control-agent-server launch --new --no-auth --vscode --name f16-nokey --config-json '{\"vscode_port\": '\"$VPORT\"'}' --print-run)\ntrap 'control-agent-server stop --run \"$NK\" >/dev/null' EXIT\nmkdir -p \"$NK/fixtures/qa-f16-ws\"\nNC=$(control-agent-server conversation start --run \"$NK\" --no-run --tools none --no-autotitle --workspace \"$NK/fixtures/qa-f16-ws\" --print-id)\ncontrol-agent-server api GET /api/vscode/status --run \"$NK\" --auth none --expect 200 --check enabled eq true --check running eq false\ncontrol-agent-server api GET /api/vscode/url --run \"$NK\" --auth none --expect 200 --check . eq '{\"url\": null}' --save F16.vscode-url-no-key/global\ncontrol-agent-server api GET \"<redacted:session-cookie>/$NC/vscode/url\" --run \"$NK\" --auth none --expect 200 --check . eq '{\"url\": null}'\ncontrol-agent-server stop --run \"$NK\"\n",
+  "exit_code": 2,
+  "elapsed_ms": 2128,
+  "failed_line": 1,
+  "failed_command": "NK=$(control-agent-server launch --new --no-auth --vscode --name f16-nokey --config-json '{\"vscode_port\": '\"$VPORT\"'}' --print-run)",
+  "stdout": "",
+  "stderr": ""
+}

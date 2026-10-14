@@ -1,0 +1,125 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/agent-profiles/qa-f21-dangling/materialize",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "profile": {
+        "llm_profile_ref": "deepseek-flash",
+        "tools": [
+          {
+            "name": "qa_no_such_tool"
+          }
+        ],
+        "mcp_server_refs": []
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "1750",
+      "content-type": "application/json"
+    },
+    "body": {
+      "agent_kind": "openhands",
+      "valid": false,
+      "errors": [
+        "Tool(s) this server cannot run: qa_no_such_tool"
+      ],
+      "unusable_tools": [
+        "qa_no_such_tool"
+      ],
+      "llm_profile_ref": "deepseek-flash",
+      "llm_profile_resolved": true,
+      "llm_api_key_set": true,
+      "mcp_server_refs": [],
+      "resolved_mcp_config_keys": [],
+      "dangling_mcp_server_refs": [],
+      "disabled_skills": [],
+      "resolved_skills": [
+        "add-javadoc",
+        "add-skill",
+        "agent-canvas-environment",
+        "agent-creator",
+        "agent-memory",
+        "agent-sdk-builder",
+        "azure-devops",
+        "bitbucket",
+        "bitbucket-cloud",
+        "bitbucket-data-center",
+        "canvas-extension-api",
+        "code-review",
+        "code-simplifier",
+        "datadog",
+        "deno",
+        "discord",
+        "docker",
+        "evidence-based-citations",
+        "flarglebargle",
+        "frontend-design",
+        "github",
+        "github-actions",
+        "github-agents-md-maintainer",
+        "github-delivery-watchdog",
+        "github-issue-to-pr",
+        "github-issue-triage",
+        "github-pr-review",
+        "github-pr-reviewer",
+        "github-repo-monitor",
+        "github-stale-ci-pr-closer",
+        "gitlab",
+        "gitlab-issue-to-mr",
+        "incident-retrospective",
+        "iterate",
+        "jira-issue-to-pr",
+        "jupyter",
+        "kubernetes",
+        "learn-from-code-review",
+        "linear",
+        "linear-triage",
+        "news-digest",
+        "notion",
+        "npm",
+        "openhands-api",
+        "openhands-automation",
+        "openhands-enterprise-troubleshooting",
+        "openhands-sdk",
+        "pdflatex",
+        "plain-english-content",
+        "prd",
+        "qa-changes",
+        "release-notes",
+        "research-brief",
+        "security",
+        "simplified-technical-english",
+        "skill-creator",
+        "slack-channel-monitor",
+        "slack-standup-digest",
+        "spark-version-upgrade",
+        "ssh",
+        "swift-linux",
+        "technical-writing",
+        "theme-factory",
+        "ticket-to-code-change",
+        "upstream-fork-sync",
+        "use-jev",
+        "uv",
+        "vercel",
+        "qa-f21-skill"
+      ],
+      "secret_refs": null,
+      "acp_api_key_secret_name": null,
+      "acp_base_url_secret_name": null,
+      "acp_file_secret_names": [],
+      "meta_profile_ref": null,
+      "dangling_meta_profile_ref": null,
+      "dangling_meta_profile_llm_refs": [],
+      "resolved_settings": null
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 136
+}

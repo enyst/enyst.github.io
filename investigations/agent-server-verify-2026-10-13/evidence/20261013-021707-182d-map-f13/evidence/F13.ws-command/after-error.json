@@ -1,0 +1,80 @@
+{
+  "summary": {
+    "opened": true,
+    "frames": 3,
+    "kinds": {
+      "BashError": 1,
+      "BashCommand": 1,
+      "BashOutput": 1
+    },
+    "stopped": "until-kind BashOutput",
+    "close": null
+  },
+  "frames": [
+    {
+      "direction": "opened",
+      "at": "2026-10-13T02:18:24Z"
+    },
+    {
+      "direction": "sent",
+      "at": "2026-10-13T02:18:24Z",
+      "frame": {
+        "cmd": "echo nope"
+      }
+    },
+    {
+      "direction": "sent",
+      "at": "2026-10-13T02:18:24Z",
+      "frame": {
+        "command": "echo QA_F13_WS_CMD",
+        "timeout": 30
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:18:24Z",
+      "kind": "BashError",
+      "frame": {
+        "id": "ffc0fa23aed34b46a5286cb731bdb177",
+        "timestamp": "2026-10-13T02:18:24.893818Z",
+        "code": "ValidationError",
+        "detail": "1 validation error for ExecuteBashRequest\ncommand\n  Field required [type=missing, input_value={'cmd': 'echo nope'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/missing",
+        "kind": "BashError"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:18:24Z",
+      "kind": "BashCommand",
+      "frame": {
+        "command": "echo QA_F13_WS_CMD",
+        "cwd": null,
+        "timeout": 30,
+        "id": "9c54f469dba94fc483f7e5e87953658b",
+        "timestamp": "2026-10-13T02:18:24.896056Z",
+        "kind": "BashCommand"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:18:24Z",
+      "kind": "BashOutput",
+      "frame": {
+        "id": "29485e4f403d4ccdb2b3f1619f7ba735",
+        "timestamp": "2026-10-13T02:18:24.928483Z",
+        "command_id": "9c54f469dba94fc483f7e5e87953658b",
+        "order": 0,
+        "exit_code": 0,
+        "stdout": "QA_F13_WS_CMD\n",
+        "stderr": null,
+        "kind": "BashOutput"
+      }
+    },
+    {
+      "direction": "ended",
+      "at": "2026-10-13T02:18:24Z",
+      "stopped": "until-kind BashOutput",
+      "close": null
+    }
+  ]
+}

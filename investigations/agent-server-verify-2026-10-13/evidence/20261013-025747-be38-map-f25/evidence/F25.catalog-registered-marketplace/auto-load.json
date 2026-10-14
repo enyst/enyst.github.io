@@ -1,0 +1,88 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/skills",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "load_public": true,
+      "load_user": false,
+      "load_project": false,
+      "load_org": false,
+      "registered_marketplaces": [
+        {
+          "name": "qa-f25-mk",
+          "source": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/marketplaces/qa-f25-mk",
+          "auto_load": true
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "1940",
+      "content-type": "application/json"
+    },
+    "body": {
+      "skills": [
+        {
+          "name": "qa-f25-mk-skill",
+          "type": "agentskills",
+          "content": "# qa-f25-mk-skill\n\nWhen this skill is active, include the exact phrase QA_SKILL_MARKER.",
+          "triggers": [
+            "qa-f25-mk-skill"
+          ],
+          "source": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/marketplaces/qa-f25-mk/skills/qa-f25-mk-skill/SKILL.md",
+          "description": "QA fixture skill qa-f25-mk-skill; mention QA_SKILL_MARKER when asked about qa-f25-mk-skill.",
+          "is_agentskills_format": true,
+          "disable_model_invocation": false
+        },
+        {
+          "name": "qa-f25-mk-plugin-skill",
+          "type": "agentskills",
+          "content": "# qa-f25-mk-plugin-skill\n\nWhen this skill is active, include the exact phrase QA_SKILL_MARKER.",
+          "triggers": [
+            "qa-f25-mk-plugin-skill"
+          ],
+          "source": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/marketplaces/qa-f25-mk/plugins/qa-f25-mk-plugin/skills/qa-f25-mk-plugin-skill/SKILL.md",
+          "description": "QA fixture skill qa-f25-mk-plugin-skill; mention QA_SKILL_MARKER when asked about qa-f25-mk-plugin-skill.",
+          "is_agentskills_format": true,
+          "disable_model_invocation": false
+        },
+        {
+          "name": "qa-f25-mk-plugin:qa-hello",
+          "type": "knowledge",
+          "content": "## qa-hello\n\nSay hello from the QA plugin\n\n\nReply with QA_PLUGIN_HELLO.",
+          "triggers": [
+            "/qa-f25-mk-plugin:qa-hello"
+          ],
+          "source": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/fixtures/marketplaces/qa-f25-mk/plugins/qa-f25-mk-plugin/commands/qa-hello.md",
+          "description": "Say hello from the QA plugin",
+          "is_agentskills_format": false,
+          "disable_model_invocation": false
+        },
+        {
+          "name": "qa-f25-pub",
+          "type": "agentskills",
+          "content": "QA_PUBLIC_BODY",
+          "triggers": [],
+          "source": "/workspace/verification-artifacts/runs/20261013-025747-be38-map-f25/home/.openhands/cache/skills/public-skills/skills/qa-f25-pub/SKILL.md",
+          "description": "QA public stand-in skill",
+          "is_agentskills_format": true,
+          "disable_model_invocation": false
+        }
+      ],
+      "sources": {
+        "sandbox": 0,
+        "registered_marketplaces": 3,
+        "sdk_base": 1,
+        "org": 0,
+        "project": 0
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 482
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F06-conversation-events.md",
+  "bullet": "Ascending timestamps (`F06.search-timestamp-order-sorted`), known bug.",
+  "ids": [
+    "F06.search-timestamp-order-sorted"
+  ],
+  "line": 718,
+  "script": "control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" --expect 200 --save F06.search-timestamp-order-sorted/all --field items | jq -e '[.[].timestamp] | . == sort'  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 447,
+  "failed_line": 1,
+  "failed_command": "jq -e '[.[].timestamp] | . == sort'",
+  "stdout": "false\n",
+  "stderr": ""
+}

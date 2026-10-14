@@ -1,0 +1,43 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "<redacted:session-cookie>/d97a4857-6ca9-4dd3-b375-45fbd47f2623/events",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "role": "qa-invalid",
+      "content": [
+        {
+          "type": "text",
+          "text": "QA_F06_BADROLE"
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "205",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "literal_error",
+          "loc": [
+            "body",
+            "role"
+          ],
+          "msg": "Input should be 'user', 'system', 'assistant' or 'tool'",
+          "input": "qa-invalid",
+          "ctx": {
+            "expected": "'user', 'system', 'assistant' or 'tool'"
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 349
+}

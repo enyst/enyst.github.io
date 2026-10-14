@@ -1,0 +1,15 @@
+{
+  "file": "F13-bash.md",
+  "bullet": "Output chunks (`F13.output-chunks`).",
+  "ids": [
+    "F13.output-chunks"
+  ],
+  "line": 441,
+  "script": "BIG_CMD=$(control-agent-server api POST /api/bash/execute_bash_command \\\n  --json '{\"command\": \"yes a | head -c 1100000; echo QA_F13_TAIL\", \"timeout\": 60}' \\\n  --expect 200 --check exit_code eq 0 --field command_id)\ncontrol-agent-server api GET /api/bash/bash_events/search --query command_id__eq=\"$BIG_CMD\" \\\n  --check items len-eq 2 --check items.0.order eq 0 --check items.0.stdout len-eq 1048576 \\\n  --check items.0.exit_code missing --check items.1.order eq 1 --check items.1.stdout len-eq 51436 \\\n  --check items.1.exit_code eq 0 --field items.1.order\ncontrol-agent-server api GET /api/bash/bash_events/search --query command_id__eq=\"$BIG_CMD\" \\\n  --query order__gt=0 --check items len-eq 1 --check items.0.order eq 1 \\\n  --check items.0.stdout contains QA_F13_TAIL --save F13.output-chunks/order-gt-0 --field items.0.order\ncat > \"$AGENT_SERVER_VERIFY_RUN/fixtures/qa_f13_sdk_big.py\" <<'PY'\nimport os\nfrom openhands.sdk.workspace import RemoteWorkspace\nws = RemoteWorkspace(host=os.environ[\"AGENT_SERVER_URL\"], api_key=os.environ[\"SESSION_API_KEY\"], working_dir=os.environ[\"AGENT_SERVER_VERIFY_RUN\"])\nr = ws.execute_command(\"yes a | head -c 1100000; echo QA_F13_TAIL\", timeout=60)\nassert r.exit_code == 0 and len(r.stdout) == 1100012 and r.stdout.endswith(\"a\\nQA_F13_TAIL\\n\"), (r.exit_code, len(r.stdout))\nprint(\"QA_F13_SDK_BIG_OK\", len(r.stdout))\nPY\ncontrol-agent-server exec --expect-output QA_F13_SDK_BIG_OK --save F13.output-chunks/sdk -- \\\n  .venv/bin/python \"$AGENT_SERVER_VERIFY_RUN/fixtures/qa_f13_sdk_big.py\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 5859,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "1\n1\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 4597,\n  \"stdout_tail\": \"QA_F13_SDK_BIG_OK 1100012\\n\",\n  \"stderr_tail\": \"+----------------------------------------------------------------------+\\n|  OpenHands SDK v1.54.0                                               |\\n|                                                                      |\\n|  Report a bug: github.com/<redacted:unrelated-repository>/issues        |\\n|  Get help: openhands.dev/joinslack                                   |\\n|  Scale up: openhands.dev/product/sdk                                 |\\n|                                                                      |\\n|  Set OPENHANDS_SUPPRESS_BANNER=1 to hide this message                |\\n+----------------------------------------------------------------------+\\n\\n\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.output-chunks/sdk.json\"\n}\n",
+  "stderr": ""
+}

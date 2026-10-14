@@ -1,0 +1,15 @@
+{
+  "file": "F07-session-socket.md",
+  "bullet": "Subscriber cap (`F07.subscriber-limit`).",
+  "ids": [
+    "F07.subscriber-limit"
+  ],
+  "line": 579,
+  "script": "LIM=$(control-agent-server conversation start --tools none --no-autotitle --print-id)\nmkdir -p \"$AGENT_SERVER_VERIFY_RUN/fixtures\"\ncat > \"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f07-many-sockets.py\" <<'EOF'\nimport asyncio, json, os, sys\nfrom websockets.asyncio.client import connect\nfrom websockets.exceptions import ConnectionClosed\n\nurl = os.environ[\"AGENT_SERVER_URL\"].replace(\"http\", \"ws\", 1) + \"/sockets/session/\" + sys.argv[1]\ncount = int(sys.argv[2])\nauth = json.dumps({\"type\": \"auth\", \"session_api_key\": os.environ[\"SESSION_API_KEY\"]})\n\nasync def attach(results, held):\n    ws = await connect(url)\n    await ws.send(auth)\n    try:\n        frame = json.loads(await asyncio.wait_for(ws.recv(), 15))\n        results.append((\"open\", frame[\"type\"]))\n        held.append(ws)\n    except ConnectionClosed as exc:\n        results.append((\"closed\", exc.rcvd.code if exc.rcvd else None, exc.rcvd.reason if exc.rcvd else None))\n\nasync def main():\n    results, held = [], []\n    await asyncio.gather(*(attach(results, held) for _ in range(count)))\n    opened = [r for r in results if r[0] == \"open\"]\n    refused = [r for r in results if r[0] == \"closed\"]\n    print(f\"opened={len(opened)} refused={len(refused)} {sorted(set(refused))}\")\n    assert {r[1] for r in opened} == {\"sync\"}, opened\n    assert 40 <= len(opened) <= 50 and len(opened) + len(refused) == count\n    assert set(refused) == {(\"closed\", 1013, \"Too many connections for this conversation\")}, refused\n    for ws in held:\n        await ws.close()\n    for _ in range(20):  # the server unsubscribes as each close lands\n        async with connect(url) as ws:\n            await ws.send(auth)\n            try:\n                if json.loads(await asyncio.wait_for(ws.recv(), 15))[\"type\"] == \"sync\":\n                    print(\"QA_OK slot freed\")\n                    return\n            except ConnectionClosed:\n                await asyncio.sleep(0.5)\n    raise SystemExit(\"no slot freed\")\n\nasyncio.run(main())\nEOF\ncontrol-agent-server exec --timeout 120 --expect-output 'QA_OK slot freed' --save \"F07.subscriber-limit/many-$LIM\" -- .venv/bin/python \"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f07-many-sockets.py\" \"$LIM\" 55\n",
+  "exit_code": 0,
+  "elapsed_ms": 6830,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 2839,\n  \"stdout_tail\": \"opened=49 refused=6 [('closed', 1013, 'Too many connections for this conversation')]\\nQA_OK slot freed\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024935-e05c-map-f07/evidence/F07.subscriber-limit/many-1e3abfe0-45ec-49d3-b88a-0c41660860c0.json\"\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F28-canvas-extensions.md",
+  "bullet": "Backend status (`F28.backend-status`).",
+  "ids": [
+    "F28.backend-status"
+  ],
+  "line": 466,
+  "script": "control-agent-server api GET /api/canvas-extensions/installed/qa-ghost/backend --expect 200 --check state eq missing \\\n  --check revision eq null --check detail contains 'not installed' --save F28.backend-status/missing\ncontrol-agent-server api GET /api/canvas-extensions/installed/qa-canvas/backend --expect 200 --check state eq unsupported \\\n  --check revision matches '^sha256:[0-9a-f]{64}$' --check detail contains 'does not declare a backend' \\\n  --save F28.backend-status/unsupported\ncontrol-agent-server api GET /api/canvas-extensions/installed/qa-backend/backend --expect 200 --check state eq stopped \\\n  --check revision eq \"$BHEAD\" --check prepared_revision eq null --check pid eq null --check port eq null \\\n  --save F28.backend-status/stopped\n",
+  "exit_code": 1,
+  "elapsed_ms": 3270,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api GET /api/canvas-extensions/installed/qa-ghost/backend --expect 200 --check state eq missing --check revision eq null --check detail contains 'not installed' --save F28.backend-status/missing",
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6036, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6000, in main\n    result = func(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 1358, in cmd_api\n    result[\"saved\"] = str(save_evidence(run, args.save, exchange))\n                          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 394, in save_evidence\n    folder.mkdir(parents=True, exist_ok=True)\n    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 724, in mkdir\n    os.mkdir(self, mode)\n    ~~~~~~~~^^^^^^^^^^^^\nOSError: [Errno 28] No space left on device: '/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/evidence/F28.backend-status'\n"
+}

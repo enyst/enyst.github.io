@@ -1,0 +1,38 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/test",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "server": {
+        "command": "/workspace/agent-sdk-verify/.venv/bin/python",
+        "args": [
+          "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/fixtures/f19/qa_f19_tools.py"
+        ]
+      },
+      "timeout": 3,
+      "tool_call": {
+        "name": "qa_sleep",
+        "arguments": {
+          "seconds": 30
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "318",
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": false,
+      "error": "MCP tool listing timed out after 3.0 seconds.\nMCP servers configured: test-server\n\nPossible solutions:\n  1. Increase the timeout value (default is 30 seconds)\n  2. Check if the MCP server is running and responding\n  3. Verify network connectivity to the MCP server\n",
+      "error_kind": "timeout"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 3874
+}

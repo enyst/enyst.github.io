@@ -1,0 +1,89 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/responses",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_deepseek-flash",
+      "input": [
+        {
+          "role": "developer",
+          "content": "QA_F30_R_DEV: answer in plain text and use no tools."
+        },
+        {
+          "role": "user",
+          "content": "QA_F30_R1: remember the word apple."
+        },
+        {
+          "type": "message",
+          "role": "assistant",
+          "content": [
+            {
+              "type": "output_text",
+              "text": "QA_F30_R_PREV",
+              "annotations": []
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "input_text",
+              "text": "QA_F30_R2: reply with one short word."
+            }
+          ]
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "594",
+      "content-type": "application/json",
+      "x-openhands-serverconversation-id": "f00607d2-5294-4515-914e-566d8236a295"
+    },
+    "body": {
+      "id": "resp_61b3eab11553483b9f094ddf2380c2ed",
+      "created_at": 1791862397.6896698,
+      "completed_at": 1791862399.3637953,
+      "model": "openhands_deepseek-flash",
+      "object": "response",
+      "output": [
+        {
+          "id": "msg_6587a965ab7b4265afdfb070b043994a",
+          "content": [
+            {
+              "annotations": [],
+              "text": "apple",
+              "type": "output_text"
+            }
+          ],
+          "role": "assistant",
+          "status": "completed",
+          "type": "message"
+        }
+      ],
+      "parallel_tool_calls": false,
+      "status": "completed",
+      "tool_choice": "none",
+      "tools": [],
+      "usage": {
+        "input_tokens": 11329,
+        "input_tokens_details": {
+          "cached_tokens": 3328
+        },
+        "output_tokens": 56,
+        "output_tokens_details": {
+          "reasoning_tokens": 54
+        },
+        "total_tokens": 11385
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 1801
+}

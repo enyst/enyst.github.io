@@ -1,0 +1,124 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/sub-agents",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "load_user": false,
+      "load_builtin": false,
+      "project_dir": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/fixtures/projects/qa-f27-proj"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "2387",
+      "content-type": "application/json"
+    },
+    "body": {
+      "agents": [
+        {
+          "name": "general-purpose",
+          "description": "QA override of a built-in",
+          "model": "inherit",
+          "color": null,
+          "tools": [],
+          "skills": [],
+          "system_prompt": "QA_OVERRIDE_BODY",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "project",
+          "source": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/fixtures/projects/qa-f27-proj/.agents/agents/general-purpose.md",
+          "is_builtin": false
+        },
+        {
+          "name": "qa-helper",
+          "description": "QA fixture sub-agent that answers briefly.",
+          "model": "inherit",
+          "color": null,
+          "tools": [],
+          "skills": [],
+          "system_prompt": "You are a QA helper. Reply with QA_SUBAGENT.",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "project",
+          "source": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/fixtures/projects/qa-f27-proj/.agents/agents/qa-helper.md",
+          "is_builtin": false
+        },
+        {
+          "name": "qa-reviewer",
+          "description": "QA reviewer. <example>review the qa fixture</example>",
+          "model": "inherit",
+          "color": "purple",
+          "tools": [
+            "terminal",
+            "file_editor"
+          ],
+          "skills": [
+            "qa-f27-proj-skill"
+          ],
+          "system_prompt": "You are the QA reviewer. Say QA_REVIEWER_MARKER.",
+          "when_to_use_examples": [
+            "review the qa fixture"
+          ],
+          "permission_mode": "never_confirm",
+          "max_iteration_per_run": 5,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {
+            "qa_extra": "QA_META"
+          },
+          "level": "project",
+          "source": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/fixtures/projects/qa-f27-proj/.agents/agents/qa-reviewer.md",
+          "is_builtin": false
+        },
+        {
+          "name": "qa-legacy-agent",
+          "description": "QA legacy project agent",
+          "model": "inherit",
+          "color": null,
+          "tools": [],
+          "skills": [],
+          "system_prompt": "QA_LEGACY_AGENT",
+          "when_to_use_examples": [],
+          "permission_mode": null,
+          "max_iteration_per_run": null,
+          "max_budget_per_run": null,
+          "mcp_config": null,
+          "mcp_servers": null,
+          "profile_store_dir": null,
+          "hooks": null,
+          "condenser": null,
+          "metadata": {},
+          "level": "project",
+          "source": "/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/fixtures/projects/qa-f27-proj/.openhands/agents/qa-legacy-agent.md",
+          "is_builtin": false
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 113
+}

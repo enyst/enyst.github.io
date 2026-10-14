@@ -1,0 +1,130 @@
+{
+  "complete": true,
+  "new_bug_count": 0,
+  "existing_bug_ids": [
+    "F04.patch-whitespace-title",
+    "F04.delete-unknown-id",
+    "F04.create-initial-message-run-false"
+  ],
+  "repro_command": "python3 /workspace/verification-artifacts/adapted-f04-supplement/run-adapted-f04-supplement.py map run --file F04 --fresh --repeat 2 --record --keep-going --timeout 420",
+  "adaptation_directory": "/workspace/verification-artifacts/adapted-f04-supplement",
+  "map_check": "/workspace/verification-artifacts/family-results/F04-supplement-map-check.json",
+  "attempts": [
+    {
+      "run": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "created_at": "2026-10-13T03:27:09Z",
+      "doctor": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.supplement/doctor.json",
+      "branches": [
+        {
+          "id": "F04.patch-whitespace-title-persisted",
+          "transcript": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/map-run/F04-conversation-lifecycle-02-whitespace-title-persisted-get-f04-patch.json",
+          "failed_line": 1,
+          "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$TITLEID\" --expect 200 --check title eq 'QA F04 preserved title' --save F04.patch-whitespace-title/get-after-whitespace"
+        },
+        {
+          "id": "F04.delete-unknown-id-repeat",
+          "transcript": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/map-run/F04-conversation-lifecycle-03-repeated-delete-f04-delete-unknown-id-re.json",
+          "failed_line": 2,
+          "failed_command": "control-agent-server api DELETE \"<redacted:session-cookie>/$DEL\" --expect 404 --save F04.delete-unknown-id/repeat"
+        },
+        {
+          "id": "F04.create-initial-message-run-false-status",
+          "transcript": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/map-run/F04-conversation-lifecycle-04-run-false-final-status-f04-create-initia.json",
+          "failed_line": 1,
+          "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$NR\" --expect 200 --check execution_status eq idle --save F04.create-initial-message-run-false/supplement-get"
+        },
+        {
+          "id": "F04.create-initial-message-run-false-actions",
+          "transcript": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/map-run/F04-conversation-lifecycle-05-run-false-action-count-f04-create-initia.json",
+          "failed_line": 1,
+          "failed_command": "control-agent-server conversation events \"$NR\" --kinds ActionEvent --expect-count 0 --save F04.create-initial-message-run-false/supplement-actions"
+        }
+      ],
+      "observations": {
+        "get-after-whitespace": {
+          "evidence": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.patch-whitespace-title/get-after-whitespace.json",
+          "status": 200,
+          "title": "",
+          "execution_status": "idle"
+        },
+        "repeat": {
+          "evidence": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.delete-unknown-id/repeat.json",
+          "status": 400,
+          "detail": "Bad Request"
+        },
+        "supplement-get": {
+          "evidence": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.create-initial-message-run-false/supplement-get.json",
+          "status": 200,
+          "title": null,
+          "execution_status": "finished"
+        },
+        "supplement-actions": {
+          "evidence": "/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.create-initial-message-run-false/supplement-actions.json",
+          "action_count": 1,
+          "kinds": [
+            "ActionEvent"
+          ]
+        }
+      }
+    },
+    {
+      "run": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "created_at": "2026-10-13T03:27:56Z",
+      "doctor": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.supplement/doctor.json",
+      "branches": [
+        {
+          "id": "F04.patch-whitespace-title-persisted",
+          "transcript": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/map-run/F04-conversation-lifecycle-02-whitespace-title-persisted-get-f04-patch.json",
+          "failed_line": 1,
+          "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$TITLEID\" --expect 200 --check title eq 'QA F04 preserved title' --save F04.patch-whitespace-title/get-after-whitespace"
+        },
+        {
+          "id": "F04.delete-unknown-id-repeat",
+          "transcript": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/map-run/F04-conversation-lifecycle-03-repeated-delete-f04-delete-unknown-id-re.json",
+          "failed_line": 2,
+          "failed_command": "control-agent-server api DELETE \"<redacted:session-cookie>/$DEL\" --expect 404 --save F04.delete-unknown-id/repeat"
+        },
+        {
+          "id": "F04.create-initial-message-run-false-status",
+          "transcript": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/map-run/F04-conversation-lifecycle-04-run-false-final-status-f04-create-initia.json",
+          "failed_line": 1,
+          "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$NR\" --expect 200 --check execution_status eq idle --save F04.create-initial-message-run-false/supplement-get"
+        },
+        {
+          "id": "F04.create-initial-message-run-false-actions",
+          "transcript": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/map-run/F04-conversation-lifecycle-05-run-false-action-count-f04-create-initia.json",
+          "failed_line": 1,
+          "failed_command": "control-agent-server conversation events \"$NR\" --kinds ActionEvent --expect-count 0 --save F04.create-initial-message-run-false/supplement-actions"
+        }
+      ],
+      "observations": {
+        "get-after-whitespace": {
+          "evidence": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.patch-whitespace-title/get-after-whitespace.json",
+          "status": 200,
+          "title": "",
+          "execution_status": "idle"
+        },
+        "repeat": {
+          "evidence": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.delete-unknown-id/repeat.json",
+          "status": 400,
+          "detail": "Bad Request"
+        },
+        "supplement-get": {
+          "evidence": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.create-initial-message-run-false/supplement-get.json",
+          "status": 200,
+          "title": null,
+          "execution_status": "finished"
+        },
+        "supplement-actions": {
+          "evidence": "/workspace/verification-artifacts/runs/20261013-032756-3c22-map-f04/evidence/F04.create-initial-message-run-false/supplement-actions.json",
+          "action_count": 1,
+          "kinds": [
+            "ActionEvent"
+          ]
+        }
+      }
+    }
+  ]
+}

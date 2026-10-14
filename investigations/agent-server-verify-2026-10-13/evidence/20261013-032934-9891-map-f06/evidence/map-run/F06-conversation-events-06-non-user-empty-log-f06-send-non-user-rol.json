@@ -1,0 +1,15 @@
+{
+  "file": "F06-conversation-events.md",
+  "bullet": "Non-user empty log (`F06.send-non-user-role-empty`), known bug.",
+  "ids": [
+    "F06.send-non-user-role-empty"
+  ],
+  "line": 695,
+  "script": "EMPTY_ROLE=$(control-agent-server conversation start --no-autotitle --tools none --print-id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$EMPTY_ROLE/events/count\" --check . eq 0 --save F06.send-non-user-role-empty/before\ncontrol-agent-server api POST \"<redacted:session-cookie>/$EMPTY_ROLE/events\" --json '{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"QA_F06_ASSISTANT_EMPTY\"}]}' --expect 4xx --save F06.send-non-user-role-empty/post  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 1589,
+  "failed_line": 3,
+  "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$EMPTY_ROLE/events\" --json '{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"QA_F06_ASSISTANT_EMPTY\"}]}' --expect 4xx --save F06.send-non-user-role-empty/post",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/71180570-969f-4d91-81d5-15e8f671c75a/events/count\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 0,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 72,\n  \"checks\": [\n    {\n      \"check\": \". eq 0\",\n      \"ok\": true,\n      \"actual\": \"0\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.send-non-user-role-empty/before.json\"\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/71180570-969f-4d91-81d5-15e8f671c75a/events\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"role\": \"assistant\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"QA_F06_ASSISTANT_EMPTY\"\n        }\n      ]\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"150\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"Only user messages are allowed to be sent to the agent.\",\n      \"error_id\": \"436f99b61ce549d5aa68b0dca45f07af\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 456,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/evidence/F06.send-non-user-role-empty/post.json\",\n  \"hint\": \"expected 4xx, got 500\"\n}\n",
+  "stderr": ""
+}

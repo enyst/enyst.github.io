@@ -1,0 +1,41 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/profiles/qa-bad-body",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "llm": {
+        "api_key": "<redacted:api_key>"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "190",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body",
+            "llm"
+          ],
+          "msg": "Value error, model must be specified in LLM",
+          "input": {
+            "api_key": "<redacted>"
+          },
+          "ctx": {
+            "error": "model must be specified in LLM"
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 445
+}

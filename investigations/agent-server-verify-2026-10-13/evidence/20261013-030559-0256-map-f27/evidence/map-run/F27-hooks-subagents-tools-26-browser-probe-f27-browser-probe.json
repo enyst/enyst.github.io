@@ -1,0 +1,15 @@
+{
+  "file": "F27-hooks-subagents-tools.md",
+  "bullet": "Browser probe (`F27.browser-probe`).",
+  "ids": [
+    "F27.browser-probe"
+  ],
+  "line": 772,
+  "script": "control-agent-server restart --reset-config\ncontrol-agent-server api GET /api/tools/catalog --expect 200 --quiet \\\n  --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": false' \\\n  --save F27.browser-probe/catalog-before\ncontrol-agent-server api GET /server_info --auth none --expect 200 --check usable_tools contains terminal \\\n  --check usable_tools not-contains browser_tool_set\nmkdir -p \"$H/.cache\"\nln -sfn \"$PW\" \"$H/.cache/ms-playwright\"\ncontrol-agent-server restart\ncontrol-agent-server api GET /api/tools/catalog --expect 200 --quiet \\\n  --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": true' \\\n  --save F27.browser-probe/catalog\ncontrol-agent-server api GET /server_info --auth none --expect 200 --check usable_tools contains browser_tool_set \\\n  --save F27.browser-probe/server-info\n",
+  "exit_code": 1,
+  "elapsed_ms": 21232,
+  "failed_line": 2,
+  "failed_command": "control-agent-server api GET /api/tools/catalog --expect 200 --quiet --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": false' --save F27.browser-probe/catalog-before",
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27\",\n  \"url\": \"http://127.0.0.1:41579\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 5637,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/tools/catalog\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"2217\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 49,\n  \"checks\": [\n    {\n      \"check\": \"tools contains {\\\"name\\\": \\\"browser_tool_set\\\", \\\"user_selectable\\\": true, \\\"usable\\\": false\",\n      \"ok\": false,\n      \"actual\": \"[{\\\"name\\\": \\\"route_task_to_model\\\", \\\"user_selectable\\\": false, \\\"usable\\\": true, \\\"description\\\": \\\"\\\", \\\"in_default_set\\\": false}, {\\\"name\\\": \\\"ask_oracle\\\", \\\"user_selectable\\\": false, \\\"usable\\\": true, \\\"description\\\": \\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-030559-0256-map-f27/evidence/F27.browser-probe/catalog-before.json\",\n  \"hint\": \"failed check: tools contains {\\\"name\\\": \\\"browser_tool_set\\\", \\\"user_selectable\\\": true, \\\"usable\\\": false\"\n}\n",
+  "stderr": ""
+}

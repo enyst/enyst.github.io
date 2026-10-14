@@ -1,0 +1,772 @@
+{
+  "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+  "status": "complete",
+  "confirmed_bugs": [
+    {
+      "id": "git-parent-changes",
+      "title": "Changes misses a repository below the requested workspace directory",
+      "severity": "medium",
+      "feature_ids": [
+        "F15.changes-repo-below-path"
+      ],
+      "expected": "A plain workspace directory containing one repository returns its two changes prefixed with proj/.",
+      "actual": "HTTP 200 [] although GET for the nested repository returns UPDATED README.md and ADDED notes.txt.",
+      "repro_command": "control-agent-server map run --file F15 --only F15.changes-repo-below-path --fresh --repeat 2 --record --keep-going",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022138-1cb7-map-f15",
+        "/workspace/verification-artifacts/runs/20261013-022337-0fbc-map-f15"
+      ],
+      "evidence": [
+        "20261013-022138-1cb7-map-f15/evidence/F15.changes-repo-below-path/ws.json",
+        "20261013-022337-0fbc-map-f15/evidence/F15.changes-repo-below-path/ws.json"
+      ],
+      "notes": "Known map bug, independently reproduced twice. Typical repository-backed workspace layout."
+    },
+    {
+      "id": "git-filename-space",
+      "title": "Changes rejects tracked filenames with spaces and mangles non-ASCII filenames",
+      "severity": "medium",
+      "feature_ids": [
+        "F15.changes-special-names"
+      ],
+      "expected": "HTTP 200 [{status: UPDATED, path: my notes.md}] with the real filename.",
+      "actual": "A modified tracked my notes.md makes the entire Changes response HTTP400: Unexpected git diff output format: M\\tmy notes.md. In both supplemental fresh runs a modified caf\u00e9.txt is returned as the quoted/mangled path \"caf/303/251.txt\" instead of its real filename.",
+      "repro_command": "control-agent-server map run --file F15 --only F15.changes-special-names --fresh --repeat 2 --record --keep-going",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022138-1cb7-map-f15",
+        "/workspace/verification-artifacts/runs/20261013-022337-0fbc-map-f15"
+      ],
+      "evidence": [
+        "20261013-022138-1cb7-map-f15/evidence/F15.changes-special-names/space.json",
+        "20261013-022337-0fbc-map-f15/evidence/F15.changes-special-names/space.json",
+        "20261013-031006-7188-map-f15/evidence/F15.changes-special-names/non-ascii.json",
+        "20261013-031237-2ccf-map-f15/evidence/F15.changes-special-names/non-ascii.json"
+      ],
+      "notes": "The original space case is confirmed twice. Copied recipes preserve the same assertions while continuing through sibling cases, and two further fresh runs independently prove the non-ASCII branch. Supplemental command and adaptations: F15-recipe-adaptation.md; family-results/F15-supplemental.json."
+    },
+    {
+      "id": "git-subdirectory-paths",
+      "title": "Changes returns tracked and untracked paths on inconsistent bases when querying a repository subdirectory",
+      "severity": "medium",
+      "feature_ids": [
+        "F15.changes-subdir-paths"
+      ],
+      "expected": "Every returned path resolves against one consistent base (requested src directory or repository root).",
+      "actual": "HTTP 200 [UPDATED README.md, ADDED new.py, UPDATED src/app.py]; no single base resolves all returned paths, and README.md is outside the requested src directory.",
+      "repro_command": "control-agent-server map run --file F15 --only F15.changes-subdir-paths --fresh --repeat 2 --record --keep-going",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022138-1cb7-map-f15",
+        "/workspace/verification-artifacts/runs/20261013-022337-0fbc-map-f15"
+      ],
+      "evidence": [
+        "20261013-022138-1cb7-map-f15/evidence/F15.changes-subdir-paths/src.json",
+        "20261013-022337-0fbc-map-f15/evidence/F15.changes-subdir-paths/src.json"
+      ],
+      "notes": "Known map bug. Fixture repository-root positive control returns all four changes with consistent paths."
+    },
+    {
+      "id": "git-whitespace-diff",
+      "title": "An unchanged indented file has a phantom diff because original text loses indentation",
+      "severity": "medium",
+      "feature_ids": [
+        "F15.diff-whitespace"
+      ],
+      "expected": "An unchanged file has identical original and modified text.",
+      "actual": "An unchanged indented file returns original indented line\\nbody without its two leading spaces, while modified retains them. Both supplemental fresh runs also return original body and modified body followed by two newlines for the unchanged trailing-blank-line file. Changes lists neither unchanged file.",
+      "repro_command": "control-agent-server map run --file F15 --only F15.diff-whitespace --fresh --repeat 2 --record --keep-going",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022138-1cb7-map-f15",
+        "/workspace/verification-artifacts/runs/20261013-022337-0fbc-map-f15"
+      ],
+      "evidence": [
+        "20261013-022138-1cb7-map-f15/evidence/F15.diff-whitespace/lead.json",
+        "20261013-022337-0fbc-map-f15/evidence/F15.diff-whitespace/lead.json",
+        "20261013-031006-7188-map-f15/evidence/F15.diff-whitespace/trail.json",
+        "20261013-031237-2ccf-map-f15/evidence/F15.diff-whitespace/trail.json"
+      ],
+      "notes": "Leading-indentation failure confirmed twice in the original recipe. CRLF positive controls pass. Copied recipe continues after the indentation assertion and independently proves trailing-blank-line loss in two further fresh runs."
+    },
+    {
+      "id": "git-deleted-diff",
+      "title": "Diff cannot read a working-tree file that Changes correctly lists as deleted",
+      "severity": "medium",
+      "feature_ids": [
+        "F15.diff-deleted-file"
+      ],
+      "expected": "HTTP 200 original from HEAD and modified empty string for a tracked deleted file.",
+      "actual": "Changes lists DELETED src/util.py, but Diff answers HTTP 400 'File does not exist: .../src/util.py'.",
+      "repro_command": "control-agent-server map run --file F15 --only F15.diff-deleted-file --fresh --repeat 2 --record --keep-going",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022138-1cb7-map-f15",
+        "/workspace/verification-artifacts/runs/20261013-022337-0fbc-map-f15"
+      ],
+      "evidence": [
+        "20261013-022138-1cb7-map-f15/evidence/F15.diff-deleted-file/diff.json",
+        "20261013-022337-0fbc-map-f15/evidence/F15.diff-deleted-file/diff.json"
+      ],
+      "notes": "Known map bug. Deletion-list positive control reaches the file before diff failure."
+    },
+    {
+      "id": "llm-profile-store-stalls-server",
+      "title": "Waiting for the LLM profile store lock stalls unrelated server requests",
+      "severity": "high",
+      "feature_ids": [
+        "F20.store-busy-responsive"
+      ],
+      "expected": "GET /alive must answer within 3000ms while a profile save waits for the store lock, as it does with no lock.",
+      "actual": "GET /alive returned 200 only after 25,771ms in the initial run and 23,523ms in the clean run. In both runs the waiting save returned 503 after approximately 30 seconds, no profile was created, and the exact timing assertion failed.",
+      "repro_command": "control-agent-server map run --file F20 --only F20.store-busy-responsive --fresh --repeat 2 --record --keep-going --checkout /workspace/agent-sdk-verify",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-021919-4f6c-map-f20",
+        "/workspace/verification-artifacts/runs/20261013-024525-b13b-map-f20"
+      ],
+      "evidence": [
+        "20261013-021919-4f6c-map-f20/evidence/F20.store-busy-responsive/alive.json",
+        "20261013-021919-4f6c-map-f20/fixtures/qa-f20/busy-save.json",
+        "20261013-021919-4f6c-map-f20/evidence/map-run/F20-llm-profiles-11-lock-wait-blocks-the-server-f20-store-bu.json",
+        "20261013-024525-b13b-map-f20/evidence/F20.store-busy-responsive/alive.json",
+        "20261013-024525-b13b-map-f20/fixtures/qa-f20/busy-save.json",
+        "20261013-024525-b13b-map-f20/evidence/map-run/F20-llm-profiles-11-lock-wait-blocks-the-server-f20-store-bu.json"
+      ],
+      "notes": "Already independently confirmed twice and present in triage-f15-f21.json. Initial evidence occurred before the later ENOSPC interruption and has matching saved controls and failed assertion. Related F21 busy-lock case is listed separately pending its own repeated confirmation. No rerun or shared triage mutation was performed during extraction.",
+      "status": "confirmed"
+    },
+    {
+      "id": "F18-dangling-profile-pointers",
+      "title": "Settings PATCH accepts nonexistent agent and meta profile targets",
+      "severity": "medium",
+      "feature_ids": [
+        "F18.dangling-pointers"
+      ],
+      "expected": "PATCH /api/settings must reject nonexistent active_agent_profile_id and active_meta_profile targets with 404, as their dedicated activate routes do, without enabling a switch tool for a nonexistent meta-profile.",
+      "actual": "In both runs each dedicated activate route returned 404, but PATCH returned 200 with the nonexistent agent UUID or meta-profile name in the active pointer. The meta-profile PATCH also returned enable_classify_and_switch_llm_tool=true.",
+      "repro_command": "control-agent-server map run --file F18 --only F18.dangling-pointers --fresh --repeat 2 --record --checkout /workspace/agent-sdk-verify",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024700-3f62-map-f18",
+        "/workspace/verification-artifacts/runs/20261013-025117-43f0-map-f18"
+      ],
+      "evidence": [
+        "20261013-024700-3f62-map-f18/evidence/F18.dangling-pointers/activate-agent-profile.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.dangling-pointers/agent-profile-id.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.dangling-pointers/activate-meta-profile.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.dangling-pointers/meta-profile.json",
+        "20261013-024700-3f62-map-f18/evidence/map-run/F18-settings-and-secrets-02-dangling-agent-profile-pointer-f18-dangl.json",
+        "20261013-024700-3f62-map-f18/evidence/map-run/F18-settings-and-secrets-03-dangling-meta-profile-pointer-f18-dangli.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.dangling-pointers/activate-agent-profile.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.dangling-pointers/agent-profile-id.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.dangling-pointers/activate-meta-profile.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.dangling-pointers/meta-profile.json",
+        "20261013-025117-43f0-map-f18/evidence/map-run/F18-settings-and-secrets-02-dangling-agent-profile-pointer-f18-dangl.json",
+        "20261013-025117-43f0-map-f18/evidence/map-run/F18-settings-and-secrets-03-dangling-meta-profile-pointer-f18-dangli.json"
+      ],
+      "notes": "Grouped the agent and meta variants under the same feature ID and missing-target validation symptom. The saved response confirms acceptance and returned state; the map-described lazy default-profile suppression was not separately exercised in these focused repeats. Not filed: this task is read-only saved-evidence extraction; no issue lookup or external action was performed. Both fresh runs used checkout SHA acca181af1f353975965bcf6486e1d0a58f444c0. Reproduction commands are provided for review and were not rerun during extraction."
+    },
+    {
+      "id": "F18-scoped-secrets-profile-errors",
+      "title": "Scoped secret listing returns unhandled 500 for agent profile store errors",
+      "severity": "medium",
+      "feature_ids": [
+        "F18.secret-scope-profile-errors"
+      ],
+      "expected": "GET /api/settings/secrets?agent_profile_id= must map malformed agent-profile data to 400 and a busy profile-store lock to 503, matching the agent-profile routes.",
+      "actual": "In both runs the malformed profile control returned 400, while scoped secret listing returned 500 with the validation exception. With the lock held, the profile route returned 503 after about 30 seconds, while scoped secret listing returned 500 with Agent profile store lock acquisition timed out after 30.0s (about 32.6 seconds).",
+      "repro_command": "control-agent-server map run --file F18 --only F18.secret-scope-profile-errors --fresh --repeat 2 --record --checkout /workspace/agent-sdk-verify",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024700-3f62-map-f18",
+        "/workspace/verification-artifacts/runs/20261013-025117-43f0-map-f18"
+      ],
+      "evidence": [
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-scope-profile-errors/agent-profile-route.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-scope-profile-errors/unloadable.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-scope-profile-errors/agent-profile-busy.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-scope-profile-errors/secrets-busy.json",
+        "20261013-024700-3f62-map-f18/evidence/map-run/F18-settings-and-secrets-04-agent-profile-that-no-longer-loads-f18-s.json",
+        "20261013-024700-3f62-map-f18/evidence/map-run/F18-settings-and-secrets-05-agent-profile-store-busy-f18-secret-scop.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-scope-profile-errors/agent-profile-route.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-scope-profile-errors/unloadable.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-scope-profile-errors/agent-profile-busy.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-scope-profile-errors/secrets-busy.json",
+        "20261013-025117-43f0-map-f18/evidence/map-run/F18-settings-and-secrets-04-agent-profile-that-no-longer-loads-f18-s.json",
+        "20261013-025117-43f0-map-f18/evidence/map-run/F18-settings-and-secrets-05-agent-profile-store-busy-f18-secret-scop.json"
+      ],
+      "notes": "Grouped malformed-data and busy-lock cases because they exercise the same scoped-list entry point and absent profile-store error mapping, with both control/target pairs independently saved in each run. Not filed: this task is read-only saved-evidence extraction; no issue lookup or external action was performed. Both fresh runs used checkout SHA acca181af1f353975965bcf6486e1d0a58f444c0. Reproduction commands are provided for review and were not rerun during extraction."
+    },
+    {
+      "id": "F18-invalid-name-openapi-status",
+      "title": "Secret GET OpenAPI promises the wrong invalid-name status",
+      "severity": "low",
+      "feature_ids": [
+        "F18.secret-name-contract"
+      ],
+      "expected": "The published GET /api/settings/secrets/{name} invalid-name status must match the live route response (422), or the route must return its published 400.",
+      "actual": "Both saved OpenAPI documents say 400 if name format is invalid for GET; GET /api/settings/secrets/1bad returned 422 in both runs, failing the assertion derived from that published description.",
+      "repro_command": "control-agent-server map run --file F18 --only F18.secret-name-contract --fresh --repeat 2 --record --checkout /workspace/agent-sdk-verify",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024700-3f62-map-f18",
+        "/workspace/verification-artifacts/runs/20261013-025117-43f0-map-f18"
+      ],
+      "evidence": [
+        "20261013-024700-3f62-map-f18/fixtures/qa-f18/openapi.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-name-contract/invalid-name.json",
+        "20261013-024700-3f62-map-f18/evidence/map-run/F18-settings-and-secrets-06-documented-status-for-an-invalid-name-f1.json",
+        "20261013-025117-43f0-map-f18/fixtures/qa-f18/openapi.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-name-contract/invalid-name.json",
+        "20261013-025117-43f0-map-f18/evidence/map-run/F18-settings-and-secrets-06-documented-status-for-an-invalid-name-f1.json"
+      ],
+      "notes": "The saved DELETE description also says 400, but DELETE was not driven by these focused repeats. PUT already documents 422 in both saved OpenAPI documents; the frozen recipe prose claiming PUT also says 400 is stale and is excluded from this confirmed bug. Not filed: this task is read-only saved-evidence extraction; no issue lookup or external action was performed. Both fresh runs used checkout SHA acca181af1f353975965bcf6486e1d0a58f444c0. Reproduction commands are provided for review and were not rerun during extraction."
+    },
+    {
+      "id": "F18-secret-key-rotation-data-loss",
+      "title": "An unrelated secret write after cipher rotation destroys existing secret ciphertext",
+      "severity": "high",
+      "feature_ids": [
+        "F18.secret-key-rotation"
+      ],
+      "expected": "When ciphertext cannot be decrypted with the current cipher key, a write must reject the operation or preserve the old ciphertext so restoring the old key recovers the existing values.",
+      "actual": "In both runs rotating the cipher key and restoring it without a write recovered the original secret and LLM key. After another rotation, PUT of an unrelated secret returned 200 and an unrelated misc-settings PATCH also returned 200. Once the original key was restored, the saved state assertion showed custom_secrets.QA_F18_TOKEN.secret=null instead of its previous Fernet ciphertext.",
+      "repro_command": "control-agent-server map run --file F18 --only F18.secret-key-rotation --fresh --repeat 2 --record --checkout /workspace/agent-sdk-verify",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024700-3f62-map-f18",
+        "/workspace/verification-artifacts/runs/20261013-025117-43f0-map-f18"
+      ],
+      "evidence": [
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-key-rotation/read-under-new-key.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-key-rotation/settings-under-new-key.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-key-rotation/control-rotated-back.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-key-rotation/put-under-new-key.json",
+        "20261013-024700-3f62-map-f18/evidence/F18.secret-key-rotation/patch-under-new-key.json",
+        "20261013-024700-3f62-map-f18/evidence/map-run/F18-settings-and-secrets-07-cipher-key-rotation-f18-secret-key-rotat.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-key-rotation/read-under-new-key.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-key-rotation/settings-under-new-key.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-key-rotation/control-rotated-back.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-key-rotation/put-under-new-key.json",
+        "20261013-025117-43f0-map-f18/evidence/F18.secret-key-rotation/patch-under-new-key.json",
+        "20261013-025117-43f0-map-f18/evidence/map-run/F18-settings-and-secrets-07-cipher-key-rotation-f18-secret-key-rotat.json"
+      ],
+      "notes": "The decisive post-restore persisted-null assertion is inside the map-run transcript, not a separate HTTP exchange. Each recipe stops at that first failing secrets.json assertion. The later settings.json ciphertext assertion and final post-restore GET checks were not executed, so permanent LLM-key loss and final HTTP reads are not claimed as independently confirmed here. Not filed: this task is read-only saved-evidence extraction; no issue lookup or external action was performed. Both fresh runs used checkout SHA acca181af1f353975965bcf6486e1d0a58f444c0. Reproduction commands are provided for review and were not rerun during extraction."
+    },
+    {
+      "id": "F17-workspace-registry-noop-writes",
+      "title": "Workspace registry no-op mutations unnecessarily create or rewrite the persistence file",
+      "severity": "low",
+      "feature_ids": [
+        "F17.noop-delete-no-file",
+        "F17.noop-write-untouched"
+      ],
+      "expected": "A refused DELETE on a fresh directory must leave workspaces.json absent; re-posting identical registered workspaces must preserve the existing file inode and modification time, as GET does.",
+      "actual": "Both runs begin with no workspaces.json, return 404 for the two unknown-path deletes, keep both lists empty, then find a newly created file. Later an identical re-add returns 200 with the same registry body as before, but the inode/modification-time equality assertion fails; the preceding GET leaves that equality intact.",
+      "repro_command": "control-agent-server map run --file F17 --only F17.noop-delete-no-file,F17.add-workspaces,F17.wire-format,F17.idempotent-add,F17.delete-workspace,F17.noop-write-untouched --fresh --repeat 2 --record --keep-going --checkout /workspace/agent-sdk-verify",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025957-13e4-map-f17",
+        "/workspace/verification-artifacts/runs/20261013-030107-4090-map-f17"
+      ],
+      "evidence": [
+        "20261013-025957-13e4-map-f17/evidence/F17.noop-delete-no-file/delete.json",
+        "20261013-025957-13e4-map-f17/evidence/map-run/F17-workspaces-registry-01-a-refused-delete-on-a-fresh-directory-f1.json",
+        "20261013-025957-13e4-map-f17/evidence/F17.delete-workspace/get.json",
+        "20261013-025957-13e4-map-f17/evidence/F17.noop-write-untouched/readd.json",
+        "20261013-025957-13e4-map-f17/evidence/map-run/F17-workspaces-registry-06-no-op-writes-leave-the-file-alone-f17-no.json",
+        "20261013-030107-4090-map-f17/evidence/F17.noop-delete-no-file/delete.json",
+        "20261013-030107-4090-map-f17/evidence/map-run/F17-workspaces-registry-01-a-refused-delete-on-a-fresh-directory-f1.json",
+        "20261013-030107-4090-map-f17/evidence/F17.delete-workspace/get.json",
+        "20261013-030107-4090-map-f17/evidence/F17.noop-write-untouched/readd.json",
+        "20261013-030107-4090-map-f17/evidence/map-run/F17-workspaces-registry-06-no-op-writes-leave-the-file-alone-f17-no.json"
+      ],
+      "notes": "Grouped file creation and identical-content replacement as one persistence no-op defect. The re-add branch stops at its first failed stamp comparison; subsequent unknown workspace/parent DELETE stamp checks are not reached. F17.noop-write-readonly is blocked by missing chattr and is not included as a verified symptom. Explicit arrange IDs are included because F17 recipes lack Requires declarations. Confirmed on two fresh runs at checkout SHA acca181af1f353975965bcf6486e1d0a58f444c0. Not filed: read-only saved-evidence extraction performed no issue lookup, rerun, or external action."
+    },
+    {
+      "id": "F19-empty-mcp-server-accepted",
+      "title": "MCP settings accept a server with neither command nor URL",
+      "severity": "low",
+      "feature_ids": [
+        "F19.settings-empty-server"
+      ],
+      "expected": "POST /api/settings/mcp/qa-empty with {} must return 422 and leave no stored server.",
+      "actual": "Both fresh runs confirm the key is initially absent, then POST {} returns 201 with qa-empty={enabled:true} in the returned MCP settings. The recipe removes the accepted entry and fails its explicit false guard.",
+      "repro_command": "control-agent-server map run --file F19 --only F19.settings-empty-server --fresh --repeat 2 --record --keep-going --checkout /workspace/agent-sdk-verify",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030153-d95d-map-f19",
+        "/workspace/verification-artifacts/runs/20261013-030348-f557-map-f19"
+      ],
+      "evidence": [
+        "20261013-030153-d95d-map-f19/evidence/F19.settings-empty-server/create.json",
+        "20261013-030153-d95d-map-f19/evidence/map-run/F19-mcp-01-server-with-neither-command-nor-url-f19-.json",
+        "20261013-030348-f557-map-f19/evidence/F19.settings-empty-server/create.json",
+        "20261013-030348-f557-map-f19/evidence/map-run/F19-mcp-01-server-with-neither-command-nor-url-f19-.json"
+      ],
+      "notes": "Only malformed configuration acceptance is proved. The frozen prose claims this can remove all MCP tools from future conversations, but these focused repeats do not independently drive that downstream behavior; no tool-loss severity claim is made. Confirmed on two fresh runs at checkout SHA acca181af1f353975965bcf6486e1d0a58f444c0. Not filed: read-only saved-evidence extraction performed no issue lookup, rerun, or external action."
+    },
+    {
+      "id": "F19-oauth-callback-replay-500",
+      "title": "Replaying a completed MCP OAuth callback returns an unhandled server error",
+      "severity": "low",
+      "feature_ids": [
+        "F19.oauth-callback-replay"
+      ],
+      "expected": "Submitting the callback again for a succeeded local OAuth job must return a handled result (200 or a 4xx such as 409).",
+      "actual": "Both runs complete the local OAuth flow and show the job succeeded/callback_ready=true immediately before replay. The repeated callback POST returns 500 with exception All connection attempts failed.",
+      "repro_command": "control-agent-server map run --file F19 --only F19.oauth-callback-replay --fresh --repeat 2 --record --keep-going --checkout /workspace/agent-sdk-verify",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030153-d95d-map-f19",
+        "/workspace/verification-artifacts/runs/20261013-030348-f557-map-f19"
+      ],
+      "evidence": [
+        "20261013-030153-d95d-map-f19/evidence/F19.oauth-flow/succeeded.json",
+        "20261013-030153-d95d-map-f19/evidence/F19.oauth-callback-replay/replay.json",
+        "20261013-030153-d95d-map-f19/evidence/map-run/F19-mcp-04-replayed-callback-f19-oauth-callback-rep.json",
+        "20261013-030348-f557-map-f19/evidence/F19.oauth-flow/succeeded.json",
+        "20261013-030348-f557-map-f19/evidence/F19.oauth-callback-replay/replay.json",
+        "20261013-030348-f557-map-f19/evidence/map-run/F19-mcp-04-replayed-callback-f19-oauth-callback-rep.json"
+      ],
+      "notes": "The assertion stops at the replay response; the later status-unchanged GET is not reached. The frozen map claim about callbacks after consent timeout is not independently exercised. Only the local saved OAuth fixture was involved. Confirmed on two fresh runs at checkout SHA acca181af1f353975965bcf6486e1d0a58f444c0. Not filed: read-only saved-evidence extraction performed no issue lookup, rerun, or external action."
+    },
+    {
+      "id": "F19-oauth-callback-port-out-of-range-500",
+      "title": "An out-of-range OAuth callback port returns 500 instead of a validation error",
+      "severity": "low",
+      "feature_ids": [
+        "F19.oauth-callback-bad-port"
+      ],
+      "expected": "A callback URL with port 99999 must return 400, as an incorrect in-range port does.",
+      "actual": "Both runs arrange a local OAuth job awaiting consent, accept the ready-state check, and return 400 Unexpected OAuth callback URL for port 1. Posting port 99999 returns 500 with exception Port out of range 0-65535.",
+      "repro_command": "control-agent-server map run --file F19 --only F19.oauth-callback-bad-port --fresh --repeat 2 --record --keep-going --checkout /workspace/agent-sdk-verify",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030153-d95d-map-f19",
+        "/workspace/verification-artifacts/runs/20261013-030348-f557-map-f19"
+      ],
+      "evidence": [
+        "20261013-030153-d95d-map-f19/evidence/F19.oauth-callback-bad-port/port-99999.json",
+        "20261013-030153-d95d-map-f19/evidence/map-run/F19-mcp-05-port-out-of-range-f19-oauth-callback-bad.json",
+        "20261013-030348-f557-map-f19/evidence/F19.oauth-callback-bad-port/port-99999.json",
+        "20261013-030348-f557-map-f19/evidence/map-run/F19-mcp-05-port-out-of-range-f19-oauth-callback-bad.json"
+      ],
+      "notes": "The recipe stops at the port-99999 failure. The subsequent nonnumeric port abc and final still-authorizing check are not reached, so neither is claimed as confirmed. Confirmed on two fresh runs at checkout SHA acca181af1f353975965bcf6486e1d0a58f444c0. Not filed: read-only saved-evidence extraction performed no issue lookup, rerun, or external action."
+    },
+    {
+      "id": "F16-stopped-vscode-url",
+      "title": "A stopped VS Code editor is still advertised with a usable-looking URL",
+      "severity": "low",
+      "feature_ids": [
+        "F16.vscode-url-not-running"
+      ],
+      "expected": "With enabled=true and running=false, both URL routes return url=null.",
+      "actual": "Both fresh keyed servers report running=false but the global URL returns a localhost editor URL carrying the redacted session token. The scoped URL-shape controls also return editor URLs.",
+      "repro_command": "control-agent-server map run --file F16 --only F16.vscode-enabled-status,F16.vscode-url-shape,F16.vscode-url-not-running --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025955-5a37-map-f16",
+        "/workspace/verification-artifacts/runs/20261013-030422-3050-map-f16"
+      ],
+      "evidence": [
+        "20261013-025955-5a37-map-f16/evidence/map-run/F16-workspace-serving-and-vscode-03-not-running-still-advertised-f16-vscode-.json",
+        "20261013-025955-5a37-map-f16/evidence/F16.vscode-url-not-running/global.json",
+        "20261013-030422-3050-map-f16/evidence/map-run/F16-workspace-serving-and-vscode-03-not-running-still-advertised-f16-vscode-.json",
+        "20261013-030422-3050-map-f16/evidence/F16.vscode-url-not-running/global.json"
+      ],
+      "notes": "The keyless and deferred-init controls return null in both fresh runs. This is a dead-link/metadata defect; the caller already holds the token. The dedicated scoped null assertion follows the failed global assertion and is not reached. Not filed: parent owns external reporting; no issue was filed by this worker."
+    },
+    {
+      "id": "F16-vscode-folder-url-encoding",
+      "title": "VS Code URLs do not encode folder names containing ampersand or hash",
+      "severity": "medium",
+      "feature_ids": [
+        "F16.vscode-folder-encoding"
+      ],
+      "expected": "Parsing the URL yields exactly the requested folder and no fragment.",
+      "actual": "The saved scoped URL pastes qa f16&x=1#frag literally: a URL parser reads a truncated folder, an extra x parameter, and a fragment. The normal-folder control passes in both runs.",
+      "repro_command": "control-agent-server map run --file F16 --only F16.vscode-enabled-status,F16.vscode-url-shape,F16.vscode-folder-encoding --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025955-5a37-map-f16",
+        "/workspace/verification-artifacts/runs/20261013-030422-3050-map-f16"
+      ],
+      "evidence": [
+        "20261013-025955-5a37-map-f16/evidence/map-run/F16-workspace-serving-and-vscode-04-folder-with-and-f16-vscode-folder-encodi.json",
+        "20261013-025955-5a37-map-f16/evidence/F16.vscode-folder-encoding/odd-folder.json",
+        "20261013-030422-3050-map-f16/evidence/map-run/F16-workspace-serving-and-vscode-04-folder-with-and-f16-vscode-folder-encodi.json",
+        "20261013-030422-3050-map-f16/evidence/F16.vscode-folder-encoding/odd-folder.json"
+      ],
+      "notes": "No editor binary is installed. This confirms the URL returned by the real API and its browser parsing, not opening the editor. The URL is observable through the separately confirmed stopped-editor advertisement defect. Not filed: parent owns external reporting; no issue was filed by this worker."
+    },
+    {
+      "id": "F16-docker-slashless-workspace-cookie",
+      "title": "Cookie authentication fails on the slashless Docker workspace root",
+      "severity": "medium",
+      "feature_ids": [
+        "F16.docker-root-cookie"
+      ],
+      "expected": "With the workspace-session cookie, slash and slashless routes both reach the conversation lookup (404 for the chosen unknown UUID).",
+      "actual": "In both fresh Docker-mode subprocesses the slashed route returns 404 with the cookie, but the slashless route returns 401 Unauthorized. Header-auth controls reach the conversation lookup for both forms.",
+      "repro_command": "control-agent-server map run --file F16 --only F16.docker-root-cookie --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025955-5a37-map-f16",
+        "/workspace/verification-artifacts/runs/20261013-030422-3050-map-f16"
+      ],
+      "evidence": [
+        "20261013-025955-5a37-map-f16/evidence/map-run/F16-workspace-serving-and-vscode-07-docker-mode-root-and-the-cookie-f16-dock.json",
+        "20261013-030329-0721-f16-docker/evidence/F16.docker-root-cookie/slash.json",
+        "20261013-030329-0721-f16-docker/evidence/F16.docker-root-cookie/slashless.json",
+        "20261013-030422-3050-map-f16/evidence/map-run/F16-workspace-serving-and-vscode-07-docker-mode-root-and-the-cookie-f16-dock.json",
+        "20261013-030655-92b6-f16-docker/evidence/F16.docker-root-cookie/slash.json",
+        "20261013-030655-92b6-f16-docker/evidence/F16.docker-root-cookie/slashless.json"
+      ],
+      "notes": "This proves startup route/auth dispatch with OH_CONVERSATION_RUNTIME=docker; a Docker conversation/container is not used. The fresh parent map runs each launch and stop their own isolated Docker-mode server. Not filed: parent owns external reporting; no issue was filed by this worker."
+    },
+    {
+      "id": "F21-agent-profile-store-stalls-server",
+      "title": "Waiting for the agent-profile store lock stalls unrelated server requests",
+      "severity": "high",
+      "feature_ids": [
+        "F21.busy-blocks-server"
+      ],
+      "expected": "GET /alive must answer within 2000ms while an agent-profile request waits for the store lock.",
+      "actual": "No-lock /alive controls pass, but while the profile request waits for its store lock, /alive returns 200 only after 25,097ms and 25,063ms in the two fresh targeted runs.",
+      "repro_command": "control-agent-server map run --file F21 --only F21.save-create,F21.acp-kind,F21.busy-blocks-server --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030758-8dc4-map-f21",
+        "/workspace/verification-artifacts/runs/20261013-030902-92d4-map-f21"
+      ],
+      "evidence": [
+        "20261013-030758-8dc4-map-f21/evidence/map-run/F21-agent-profiles-03-lock-wait-stalls-the-server-f21-busy-blo.json",
+        "20261013-030758-8dc4-map-f21/evidence/F21.busy-blocks-server/alive.json",
+        "20261013-030902-92d4-map-f21/evidence/map-run/F21-agent-profiles-03-lock-wait-stalls-the-server-f21-busy-blo.json",
+        "20261013-030902-92d4-map-f21/evidence/F21.busy-blocks-server/alive.json"
+      ],
+      "notes": "This matches the already-confirmed F20 LLM-profile-store stall family, but this agent-profile variant currently has only one clean-run proof. The recipe stops at the timing assertion; shell exit releases the held lock. Two further fresh targeted confirmations now reproduce the exact marked failures. Not filed: read-only evidence extraction performed no issue lookup or external action."
+    },
+    {
+      "id": "F21-typescript-agent-profile-payload-types",
+      "title": "Exported TypeScript agent-profile types reject live server payload fields",
+      "severity": "medium",
+      "feature_ids": [
+        "F21.ts-payload-types"
+      ],
+      "expected": "The exported OpenHandsAgentProfile, ACPAgentProfile, and AgentProfileDiagnostics types must accept all fields of live payloads accepted by the generated server contract.",
+      "actual": "The generated-contract shape file type-checked. The exported shape file failed tsc with TS2353 for disabled_skills on OpenHandsAgentProfile, acp_startup_timeout on ACPAgentProfile, and resolved_mcp_config_keys on AgentProfileDiagnostics; the summary type produced no error. Both cited fresh targeted repeats reproduce this outcome; the exact per-attempt values are in the saved exchanges/transcripts.",
+      "repro_command": "control-agent-server map run --file F21 --only F21.save-create,F21.acp-kind,F21.ts-payload-types --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030758-8dc4-map-f21",
+        "/workspace/verification-artifacts/runs/20261013-030902-92d4-map-f21"
+      ],
+      "evidence": [
+        "20261013-030758-8dc4-map-f21/evidence/map-run/F21-agent-profiles-04-typescript-payload-types-f21-ts-payload-.json",
+        "20261013-030902-92d4-map-f21/evidence/map-run/F21-agent-profiles-04-typescript-payload-types-f21-ts-payload-.json"
+      ],
+      "notes": "Use the full-family command to ensure qa-f21-coder and qa-f21-acp fixture profiles exist; the selected recipe has no Requires declarations for those arrange steps. The compiler errors and payload snapshots are local saved evidence; no rebuild or network operation was performed during extraction. Two further fresh targeted confirmations now reproduce the exact marked failures. Not filed: read-only evidence extraction performed no issue lookup or external action."
+    },
+    {
+      "id": "F21-json-suffix-overwrite-identity",
+      "title": "Overwriting an agent profile whose name ends in .json changes its identity",
+      "severity": "medium",
+      "feature_ids": [
+        "F21.json-suffix-identity"
+      ],
+      "expected": "A repeated save of the same accepted name must retain the original profile id and increment revision to 1, or the .json-suffixed name must be rejected with 422 and nothing stored.",
+      "actual": "The accepted profile was activated under id 25f93991-4f33-4a2d-a179-bcff203c003b. A second save updated the LLM reference to deepseek-pro but returned a profile with different id be7b87d6-80df-4dd7-9f2c-62d429d7224e and revision 0. The saved identity/revision assertion failed. Both cited fresh targeted repeats reproduce this outcome; the exact per-attempt values are in the saved exchanges/transcripts.",
+      "repro_command": "control-agent-server map run --file F21 --only F21.save-create,F21.acp-kind,F21.json-suffix-identity --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030758-8dc4-map-f21",
+        "/workspace/verification-artifacts/runs/20261013-030902-92d4-map-f21"
+      ],
+      "evidence": [
+        "20261013-030758-8dc4-map-f21/evidence/map-run/F21-agent-profiles-05-json-names-lose-their-identity-f21-json-.json",
+        "20261013-030758-8dc4-map-f21/evidence/F21.json-suffix-identity/after-overwrite.json",
+        "20261013-030902-92d4-map-f21/evidence/map-run/F21-agent-profiles-05-json-names-lose-their-identity-f21-json-.json",
+        "20261013-030902-92d4-map-f21/evidence/F21.json-suffix-identity/after-overwrite.json"
+      ],
+      "notes": "The recipe stops at its first identity/revision failure. The later DELETE and GET /api/settings pointer-clear assertion were not reached, so delete behavior and the final active pointer are not independently claimed. The original id is proven by the saved activation exchange inside the transcript. Two further fresh targeted confirmations now reproduce the exact marked failures. Not filed: read-only evidence extraction performed no issue lookup or external action."
+    },
+    {
+      "id": "F20-deepseek-auth-error-type",
+      "title": "DeepSeek authentication failure is classified as a bad request",
+      "severity": "low",
+      "feature_ids": [
+        "F20.validate-bad-key-type"
+      ],
+      "expected": "A provider authentication_error should be reported as LLMAuthenticationError.",
+      "actual": "POST /api/profiles/qa-draft/validate returned 200 valid=false with error.type=LLMBadRequestError, although its redacted provider message contains authentication_error. The saved jq assertion expecting LLMAuthenticationError failed. Both cited fresh targeted repeats reproduce this outcome; the exact per-attempt values are in the saved exchanges/transcripts.",
+      "repro_command": "control-agent-server map run --file F20 --only F20.validate-bad-key-type --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030609-7ab0-map-f20",
+        "/workspace/verification-artifacts/runs/20261013-030955-5180-map-f20"
+      ],
+      "evidence": [
+        "20261013-030609-7ab0-map-f20/evidence/map-run/F20-llm-profiles-01-deepseek-401-type-f20-validate-bad-key-t.json",
+        "20261013-030609-7ab0-map-f20/evidence/F20.validate-bad-key-type/deepseek-401.json",
+        "20261013-030955-5180-map-f20/evidence/map-run/F20-llm-profiles-01-deepseek-401-type-f20-validate-bad-key-t.json",
+        "20261013-030955-5180-map-f20/evidence/F20.validate-bad-key-type/deepseek-401.json"
+      ],
+      "notes": "The observed failure is error classification; validation honestly returns valid=false and the posted credential is absent from the provider message. The saved exchange does not include a separate upstream HTTP-status capture. Two further fresh targeted confirmations now reproduce the exact marked failures. Not filed: read-only evidence extraction performed no issue lookup or external action."
+    },
+    {
+      "id": "F20-validation-defaults-exceed-bound",
+      "title": "Profile validation with default retries and timeout exceeds its 30-second bound",
+      "severity": "medium",
+      "feature_ids": [
+        "F20.validate-unreachable-bounded",
+        "F20.validate-hang-bounded"
+      ],
+      "expected": "Validation should return a verdict within 30 seconds for a refused connection or a provider that never responds, with the default retry and timeout settings.",
+      "actual": "A refused localhost connection returned valid=false/LLMServiceUnavailableError after 120,553ms and 120,482ms. In both fresh runs the hanging fixture received the provider request, the CLI reached its30-second ReadTimeout, /alive stayed responsive, and a hard restart cancelled the in-flight validation. The exact marked bound assertions failed.",
+      "repro_command": "control-agent-server map run --file F20 --only F20.validate-unreachable-bounded,F20.validate-hang-bounded --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030609-7ab0-map-f20",
+        "/workspace/verification-artifacts/runs/20261013-030955-5180-map-f20"
+      ],
+      "evidence": [
+        "20261013-030609-7ab0-map-f20/evidence/map-run/F20-llm-profiles-02-unreachable-endpoint-is-slow-f20-validat.json",
+        "20261013-030609-7ab0-map-f20/evidence/F20.validate-unreachable-bounded/default-retries.json",
+        "20261013-030609-7ab0-map-f20/evidence/map-run/F20-llm-profiles-03-hanging-provider-is-slower-f20-validate-.json",
+        "20261013-030609-7ab0-map-f20/evidence/F20.validate-hang-bounded/stub-request.json",
+        "20261013-030955-5180-map-f20/evidence/map-run/F20-llm-profiles-02-unreachable-endpoint-is-slow-f20-validat.json",
+        "20261013-030955-5180-map-f20/evidence/F20.validate-unreachable-bounded/default-retries.json",
+        "20261013-030955-5180-map-f20/evidence/map-run/F20-llm-profiles-03-hanging-provider-is-slower-f20-validate-.json",
+        "20261013-030955-5180-map-f20/evidence/F20.validate-hang-bounded/stub-request.json"
+      ],
+      "notes": "Grouped the two variants because profile validation inherits the LLM default retry/timeout policy without a bounded preflight budget. No 27-minute terminal duration or eventual hanging-provider verdict is claimed: the focused recipe intentionally cancels it after proving the 30-second timeout. Two further fresh targeted confirmations now reproduce the exact marked failures. Not filed: read-only evidence extraction performed no issue lookup or external action."
+    },
+    {
+      "id": "F20-json-alias-reference-guard",
+      "title": "Deleting an LLM profile through its .json alias bypasses the reference guard",
+      "severity": "medium",
+      "feature_ids": [
+        "F20.json-alias-guard"
+      ],
+      "expected": "Deleting the .json alias of a referenced profile must return 409 and preserve the profile, as deleting the plain name does.",
+      "actual": "The plain-name DELETE returned 409 naming the agent referrer and GET through the alias read the profile. Alias DELETE returned 200; the following plain-name GET returned 404 while the referencing agent profile still existed. Cleanup completed before the saved 409 assertion failed. Both cited fresh targeted repeats reproduce this outcome; the exact per-attempt values are in the saved exchanges/transcripts.",
+      "repro_command": "control-agent-server map run --file F20 --only F20.json-alias-guard --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030609-7ab0-map-f20",
+        "/workspace/verification-artifacts/runs/20261013-030955-5180-map-f20"
+      ],
+      "evidence": [
+        "20261013-030609-7ab0-map-f20/evidence/map-run/F20-llm-profiles-04-delete-through-the-json-alias-f20-json-a.json",
+        "20261013-030609-7ab0-map-f20/evidence/F20.json-alias-guard/delete.json",
+        "20261013-030609-7ab0-map-f20/evidence/F20.json-alias-guard/after.json",
+        "20261013-030955-5180-map-f20/evidence/map-run/F20-llm-profiles-04-delete-through-the-json-alias-f20-json-a.json",
+        "20261013-030955-5180-map-f20/evidence/F20.json-alias-guard/delete.json",
+        "20261013-030955-5180-map-f20/evidence/F20.json-alias-guard/after.json"
+      ],
+      "notes": "Alias rename and active-profile pointer aftermath mentioned in frozen prose were not independently driven by this recipe and are excluded. Two further fresh targeted confirmations now reproduce the exact marked failures. Not filed: read-only evidence extraction performed no issue lookup or external action."
+    },
+    {
+      "id": "F20-keyless-profile-activation-after-rotation",
+      "title": "Profile activation accepts an undecryptable stored key after cipher rotation",
+      "severity": "medium",
+      "feature_ids": [
+        "F20.secret-key-rotation"
+      ],
+      "expected": "Activation must refuse a profile whose encrypted key cannot be decrypted, preserving the previous active profile and settings ciphertext.",
+      "actual": "After rotation the profile file retained Fernet ciphertext, profile detail returned config.api_key=null/api_key_set=false, while the list reported api_key_set=true. Activation returned 200 and llm_applied=true instead of 4xx, failing the exact activation assertion. Both cited fresh targeted repeats reproduce this outcome; the exact per-attempt values are in the saved exchanges/transcripts.",
+      "repro_command": "control-agent-server map run --file F20 --only F20.secret-key-rotation --checkout /workspace/agent-sdk-verify --fresh --repeat 2 --record --keep-going --timeout 420",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-030609-7ab0-map-f20",
+        "/workspace/verification-artifacts/runs/20261013-030955-5180-map-f20"
+      ],
+      "evidence": [
+        "20261013-030609-7ab0-map-f20/evidence/map-run/F20-llm-profiles-05-secret-key-rotation-f20-secret-key-rotat.json",
+        "20261013-030609-7ab0-map-f20/evidence/F20.secret-key-rotation/detail.json",
+        "20261013-030609-7ab0-map-f20/evidence/F20.secret-key-rotation/list.json",
+        "20261013-030609-7ab0-map-f20/evidence/F20.secret-key-rotation/activate.json",
+        "20261013-030955-5180-map-f20/evidence/map-run/F20-llm-profiles-05-secret-key-rotation-f20-secret-key-rotat.json",
+        "20261013-030955-5180-map-f20/evidence/F20.secret-key-rotation/detail.json",
+        "20261013-030955-5180-map-f20/evidence/F20.secret-key-rotation/list.json",
+        "20261013-030955-5180-map-f20/evidence/F20.secret-key-rotation/activate.json"
+      ],
+      "notes": "The recipe stops at activation. Later GET /api/settings and settings.json ciphertext checks were not reached; persisted settings destruction, a changed active pointer, and a subsequent conversation failure are not independently confirmed by this saved attempt. Two further fresh targeted confirmations now reproduce the exact marked failures. Not filed: read-only evidence extraction performed no issue lookup or external action."
+    }
+  ],
+  "harness_map_issues": [
+    {
+      "feature_ids": [
+        "F15.commits"
+      ],
+      "classification": "map drift",
+      "detail": "Copied recipe now accepts valid ISO 8601 UTC Z timestamps and declares Requires: F15.changes-base for the feature-branch fixture. The first supplemental selective history attempt lacked that fixture and is discarded as a harness failure. Two further fresh corrected history attempts pass every assertion. Product checkout unchanged."
+    },
+    {
+      "feature_ids": [
+        "F15.ts-client",
+        "F17"
+      ],
+      "classification": "environment and shared build race",
+      "detail": "Initial npm cache/build race attempts discarded. Parent centrally rebuilt TypeScript. F15.ts-client passes in both fresh bug-reproduction runs; clean F17 full map has22 passes,2 expected failures and one chattr environment failure."
+    },
+    {
+      "feature_ids": [
+        "F15.repo-search-unreachable",
+        "F16.vscode-enabled-status"
+      ],
+      "classification": "load transient/harness cascading state",
+      "detail": "Initial cold OpenAPI doctor exceeded its fixed10-second timeout under shared load. Fresh F16 enabled-status/doctor and dependent URL-shape/no-key/deferred-init controls pass twice. F15 recovery warms OpenAPI before the unchanged doctor in a copied recipe."
+    },
+    {
+      "feature_ids": [
+        "F17.noop-write-untouched"
+      ],
+      "classification": "missing Requires",
+      "detail": "Selective reproduction must explicitly include add-workspaces, wire-format, idempotent-add, delete-workspace prerequisites because family contains no Requires declarations."
+    },
+    {
+      "feature_ids": [
+        "F20.sdk-get-llm-linked",
+        "F20.no-cipher",
+        "F21.ts-client"
+      ],
+      "classification": "environment ENOSPC",
+      "detail": "ENOSPC interrupted initial runs at02:39. Evidence preserved. Fresh complete replacement F20 has30 pass/6 xfail and F21 has29 pass/4 xfail. No disk-incident failure is counted as a product defect."
+    },
+    {
+      "feature_ids": [
+        "F21.dangling-llm-report"
+      ],
+      "classification": "source/map documentation drift",
+      "status": "excluded-from-product-bugs",
+      "expected": "The private seed-helper prose should describe materialize diagnostics using the publicly declared llm_profile_ref and llm_profile_resolved fields.",
+      "actual": "The saved materialize body conforms to the public response model: valid=false, llm_profile_ref=qa-f21-missing, llm_profile_resolved=false, and an errors entry naming the missing profile. It has no dangling_llm_profile_ref field, and the public AgentProfileDiagnostics model and generated schema do not declare that field. The private seed helper docstring alone promises it; the recipe conditionally asserts it after grepping that docstring.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024523-a1a8-map-f21"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-024523-a1a8-map-f21/evidence/F21.dangling-llm-report/materialize.json",
+        "/workspace/verification-artifacts/runs/20261013-024523-a1a8-map-f21/evidence/map-run/F21-agent-profiles-30-how-a-dangling-llm-reference-is-reported.json"
+      ],
+      "source_references": [
+        "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/agent_profiles_router.py:181",
+        "/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/agent_profiles_router.py:545",
+        "/workspace/agent-sdk-verify/openhands-sdk/openhands/sdk/profiles/resolver.py:86",
+        "/workspace/agent-sdk-verify/clients/typescript/src/generated/agent-server-schema.ts:1975"
+      ],
+      "notes": "No missing public-contract field or dishonest diagnostics response is established. Fix the seed docstring/map expectation rather than require a new redundant response field; no shared source or map was changed during extraction."
+    },
+    {
+      "feature_ids": [
+        "F18.secret-name-contract"
+      ],
+      "classification": "map drift",
+      "detail": "Frozen prose says PUT documents400, but saved OpenAPI already documents422 for PUT. Only GET documentation/status mismatch is confirmed; DELETE branch was not reached."
+    },
+    {
+      "feature_ids": [
+        "F15.repo-search-github"
+      ],
+      "classification": "Old capability blocker removed; live positive checks verified; negative control limited by environment",
+      "detail": "An isolated frozen skill copy removes only the predeclared blocked marker. QA_GITHUB_TOKEN is privately assigned from the supplied credential and registered as OPENHANDS_API_KEY for CLI redaction. Product source remains unchanged. Only the public target identity should remain in exported repository names and URLs.",
+      "evidence": [
+        "/workspace/verification-artifacts/F15-github-live-adaptation.md",
+        "/workspace/verification-artifacts/F15-github-live-adaptation.patch"
+      ],
+      "harness_copy": "/workspace/verification-artifacts/github-live-harness"
+    }
+  ],
+  "blocked": [
+    {
+      "feature_ids": [
+        "F16.vscode-running"
+      ],
+      "reason": "No installed OpenVSCode Server binary; map hardcoded blocked."
+    },
+    {
+      "feature_ids": [
+        "F17.noop-write-readonly"
+      ],
+      "reason": "chattr executable missing (exit127); immutable-attribute capability and filesystem support also unproven. API assertions were not reached."
+    },
+    {
+      "feature_ids": [
+        "F15.repo-search-github"
+      ],
+      "route": "Invalid-token 401 branch only",
+      "reason": "Live GitHub listing returned 200; pagination and case-insensitive AGENT-SDK search passed. The 401 negative control branch is inconclusive because api.github.com/user/repos itself returns 200 for the same fake token through the inherited egress/proxy environment. The local persisted token equals the fake fixture, so no backend token-selection/cache defect is established.",
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/bad-token.json",
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/direct-negative-control.json"
+      ],
+      "positive_branch_evidence": [
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/page-1.json",
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/page-2.json",
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/map-run/F15-git-01-live-github-listing-f15-repo-search-gith.json"
+      ],
+      "harness_copy": "/workspace/verification-artifacts/github-live-harness/.agents/skills/verify-agent-server/references/feature-map/F15-git.md"
+    }
+  ],
+  "inconclusive": [
+    {
+      "feature_ids": [
+        "F15.repo-search-github"
+      ],
+      "expectation": "A deliberately invalid GitHub token should produce401.",
+      "actual": "Both the Agent Server route and direct api.github.com negative control return 200. The local store contains the fake fixture token. Egress authentication or response handling prevents an unauthenticated upstream control.",
+      "classification": "Environment negative control limitation; no product bug",
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/bad-token.json",
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/direct-negative-control.json"
+      ]
+    }
+  ],
+  "not_run_client_entrypoints": [
+    {
+      "family": "F16",
+      "entrypoints": [
+        "RemoteWorkspace.startWorkspaceSession/deleteWorkspaceSession",
+        "VSCodeClient.getUrl/getStatus"
+      ],
+      "reason": "Map describes the wrappers but executes no TypeScript program for them; REST cookie/status/URL proof does not verify these wrappers."
+    },
+    {
+      "family": "F19",
+      "entrypoints": [
+        "MCPClient.testServer/startOAuth/getOAuthStatus/submitOAuthCallback",
+        "SettingsClient.createMcpServer/patchMcpServer/deleteMcpServer"
+      ],
+      "reason": "Map explicitly states these TypeScript calls are not driven; only REST lane and Python get_mcp_config are driven."
+    }
+  ],
+  "verified_reruns": [
+    {
+      "feature_ids": [
+        "F19.test-tool-errors"
+      ],
+      "result": "pass twice fresh",
+      "source": "family-results/F19-repro.json"
+    },
+    {
+      "feature_ids": [
+        "F16.vscode-enabled-status",
+        "F16.vscode-url-shape",
+        "F16.vscode-url-no-key",
+        "F16.vscode-url-after-init"
+      ],
+      "result": "pass twice fresh",
+      "source": "family-results/F16-repro.json"
+    },
+    {
+      "feature_ids": [
+        "F15.commits"
+      ],
+      "result": "pass twice fresh with recipe timestamp/prerequisite corrections",
+      "source": "family-results/F15-history.json"
+    },
+    {
+      "feature_ids": [
+        "F15.repo-search-unreachable",
+        "F15.repo-search-timeout"
+      ],
+      "result": "pass twice fresh with owned/longer-lived local fixture and warm doctor",
+      "source": "family-results/F15-supplemental.json"
+    },
+    {
+      "feature_ids": [
+        "F15.repo-search-github"
+      ],
+      "result": "Live listing, pagination, and search passed; the 401 branch is separately inconclusive because direct upstream also returns 200 for the fake token.",
+      "source": "family-results/F15-github-live-supplement.json",
+      "adjudication": "family-results/F15-github-live-adjudication.json",
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/page-1.json",
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/page-2.json",
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/map-run/F15-git-01-live-github-listing-f15-repo-search-gith.json",
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/bad-token.json",
+        "/workspace/verification-artifacts/runs/20261013-041559-37e6-map-f15/evidence/F15.repo-search-github/direct-negative-control.json"
+      ]
+    }
+  ]
+}

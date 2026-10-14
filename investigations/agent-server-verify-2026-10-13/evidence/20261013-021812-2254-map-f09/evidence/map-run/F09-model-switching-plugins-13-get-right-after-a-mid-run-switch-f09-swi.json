@@ -1,0 +1,15 @@
+{
+  "file": "F09-model-switching-plugins.md",
+  "bullet": "GET right after a mid-run switch (`F09.switch-llm-mid-run-get`), known bug.",
+  "ids": [
+    "F09.switch-llm-mid-run-get"
+  ],
+  "line": 367,
+  "script": "GID=$(control-agent-server conversation start --tools terminal --no-autotitle --prompt 'Run this exact shell command and nothing else: sleep 20' --print-id)\ntrap 'control-agent-server conversation wait \"$GID\" --until finished,error --timeout 240 >/dev/null 2>&1 || true; control-agent-server ws stop qa-f09-midget >/dev/null 2>&1 || true' EXIT\ncontrol-agent-server ws start \"/sockets/events/$GID\" --name qa-f09-midget --duration 150\ncontrol-agent-server ws read qa-f09-midget --kinds ActionEvent --contains 'sleep 20' --expect-min 1 --wait 120\ncontrol-agent-server api POST \"<redacted:session-cookie>/$GID/switch_llm\" \\\n  --json \"{\\\"llm\\\": {\\\"model\\\": \\\"deepseek/deepseek-flash\\\", \\\"api_key\\\": \\\"$ENC\\\", \\\"usage_id\\\": \\\"qa-f09-midget\\\", \\\"num_retries\\\": 0}}\" \\\n  --expect 200 --save F09.switch-llm-mid-run-get/switch\ncontrol-agent-server ws read qa-f09-midget --kinds ConversationStateUpdateEvent --contains '\"usage_id\": \"qa-f09-midget\"' --expect-min 1 --wait 10 --save F09.switch-llm-mid-run-get/frames\ncontrol-agent-server api GET \"<redacted:session-cookie>/$GID\" --quiet --check execution_status eq running\ncontrol-agent-server api GET \"<redacted:session-cookie>/$GID\" --quiet --check agent.llm.usage_id eq qa-f09-midget --save F09.switch-llm-mid-run-get/get  # bug\ncontrol-agent-server state cat \"server/workspace/conversations/${GID//-/}/base_state.json\" --max-chars 200 --check agent.llm.usage_id eq qa-f09-midget  # bug\ncontrol-agent-server conversation wait \"$GID\" --until finished,error --timeout 240\ncontrol-agent-server api GET \"<redacted:session-cookie>/$GID\" --quiet --check execution_status eq finished --check agent.llm.usage_id eq qa-f09-midget\n",
+  "exit_code": 1,
+  "elapsed_ms": 139846,
+  "failed_line": 4,
+  "failed_command": "control-agent-server ws read qa-f09-midget --kinds ActionEvent --contains 'sleep 20' --expect-min 1 --wait 120",
+  "stdout": "{\n  \"ok\": true,\n  \"capture\": \"qa-f09-midget\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/captures/qa-f09-midget.jsonl\",\n  \"hint\": \"`control-agent-server ws stop qa-f09-midget` (or `ws read qa-f09-midget`) after triggering the action\"\n}\n{\n  \"ok\": false,\n  \"capture\": \"qa-f09-midget\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/captures/qa-f09-midget.jsonl\",\n  \"opened\": true,\n  \"stopped\": null,\n  \"frames\": 7,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 5,\n    \"ObservationEvent\": 1,\n    \"MessageEvent\": 1\n  },\n  \"close\": null,\n  \"matching\": 0,\n  \"matching_kinds\": [],\n  \"frames_shown\": []\n}\n",
+  "stderr": ""
+}

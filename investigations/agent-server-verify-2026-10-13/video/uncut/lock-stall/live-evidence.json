@@ -1,0 +1,55 @@
+[
+  {
+    "id": "F22.store-busy-responsive",
+    "command": [
+      "bash",
+      "/tmp/verification-videos/repro_lock_stall.sh"
+    ],
+    "started_at": 10.051853158999847,
+    "lines": [
+      {
+        "at": 10.05801534699981,
+        "text": "Launching an isolated Agent Server for the lock/heartbeat reproduction.",
+        "signal": false
+      },
+      {
+        "at": 21.272398759999987,
+        "text": "Positive control: /alive -> HTTP 200 in 226 ms (budget: 3000 ms).",
+        "signal": false
+      },
+      {
+        "at": 21.37997531299993,
+        "text": "An unrelated profile save is waiting on its file lock.",
+        "signal": false
+      },
+      {
+        "at": 23.38317548399982,
+        "text": "Live request #1: GET /alive. Waiting for the actual response...",
+        "signal": false
+      },
+      {
+        "at": 51.962874635999924,
+        "text": "Actual response: HTTP 200, latency 28173 ms; allowed latency: 3000 ms.",
+        "signal": false
+      },
+      {
+        "at": 52.086058932000014,
+        "text": "Profile save: HTTP 503 after lock timeout; idle control was 226 ms.",
+        "signal": false
+      },
+      {
+        "at": 52.191196781999906,
+        "text": "BUG_CONFIRMED: an unrelated profile-store lock stalls /alive for 28173 ms.",
+        "signal": true
+      },
+      {
+        "at": 65.62046848299997,
+        "text": "Recovery control: lock released, doctor passes, busy profile was not saved.",
+        "signal": false
+      }
+    ],
+    "exit_code": 0,
+    "confirmed_signal": true,
+    "ended_at": 81.394223087
+  }
+]

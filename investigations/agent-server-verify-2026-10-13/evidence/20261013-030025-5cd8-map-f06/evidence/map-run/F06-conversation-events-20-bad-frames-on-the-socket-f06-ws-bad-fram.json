@@ -1,0 +1,15 @@
+{
+  "file": "F06-conversation-events.md",
+  "bullet": "Bad frames on the socket (`F06.ws-bad-frame`).",
+  "ids": [
+    "F06.ws-bad-frame"
+  ],
+  "line": 460,
+  "script": "BAD=$(control-agent-server ws listen \"/sockets/events/$CID\" \\\n  --send '{\"kind\":\"MessageEvent\",\"text\":\"QA_F06_BAD\"}' \\\n  --send '{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"QA_F06_BAD\"}]}' \\\n  --send '{\"type\":\"auth\",\"session_api_key\":\"<redacted:session_api_key>\"}' \\\n  --send 'qa-f06-not-json' \\\n  --duration 4 --expect-open --save F06.ws-bad-frame/frames | jq -r .saved)\njq -e '[.frames[] | select(.direction == \"received\") | .frame | select(.kind == \"ServerErrorEvent\") | .code] == [\"ValidationError\", \"AssertionError\", \"JSONDecodeError\"]' \"$BAD\"\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --query body=QA_F06_BAD --check . eq 0\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --check . eq 5\n",
+  "exit_code": 0,
+  "elapsed_ms": 6110,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "true\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/d97a4857-6ca9-4dd3-b375-45fbd47f2623/events/count\",\n    \"query\": [\n      [\n        \"body\",\n        \"QA_F06_BAD\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 0,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 143,\n  \"checks\": [\n    {\n      \"check\": \". eq 0\",\n      \"ok\": true,\n      \"actual\": \"0\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/d97a4857-6ca9-4dd3-b375-45fbd47f2623/events/count\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 5,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 52,\n  \"checks\": [\n    {\n      \"check\": \". eq 5\",\n      \"ok\": true,\n      \"actual\": \"5\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

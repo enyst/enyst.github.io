@@ -1,0 +1,343 @@
+{
+  "ok": true,
+  "file": "F23-llm-catalog-and-connections.md",
+  "summary": {
+    "pass": 23,
+    "fail": 0,
+    "xfail": 5,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 109,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 378,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-00-preconditions.json"
+    },
+    {
+      "bullet": "Key required (`F23.auth-required`).",
+      "ids": [
+        "F23.auth-required"
+      ],
+      "line": 162,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2930,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-01-key-required-f23-auth-required.json"
+    },
+    {
+      "bullet": "Providers (`F23.providers`).",
+      "ids": [
+        "F23.providers"
+      ],
+      "line": 178,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 759,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-02-providers-f23-providers.json"
+    },
+    {
+      "bullet": "All models (`F23.models`).",
+      "ids": [
+        "F23.models"
+      ],
+      "line": 186,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 660,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-03-all-models-f23-models.json"
+    },
+    {
+      "bullet": "Provider filter (`F23.models-filter`).",
+      "ids": [
+        "F23.models-filter"
+      ],
+      "line": 194,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1552,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-04-provider-filter-f23-models-filter.json"
+    },
+    {
+      "bullet": "No Bedrock ids under a provider (`F23.models-no-bedrock`), known bug.",
+      "ids": [
+        "F23.models-no-bedrock"
+      ],
+      "line": 208,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1799,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-05-no-bedrock-ids-under-a-provider-f23-mode.json",
+      "failed_line": 5,
+      "failed_command": "jq -e 'map(select(test(\"^deepseek\\\\.\"))) | debug | length == 0'",
+      "stdout_tail": "eepseek-v4-flash\\\", \\\"deepseek-v4-flash-vision-exp\\\", \\\"deepseek-v4-pro\\\", \\\"deepseek.r1-v1:0\\\", \\\"deepseek.v3-v1:0\\\", \\\"deepseek.v3.2\\\", \\\"deepseek/deepseek-chat\\\", \\\"deepseek/deepseek-coder\\\", \\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.models-no-bedrock/deepseek.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/llm/models\",\n    \"query\": [\n      [\n        \"provider\",\n        \"anthropic\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1152\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 80,\n  \"checks\": [\n    {\n      \"check\": \"models len-ge 1\",\n      \"ok\": true,\n      \"actual\": \"[\\\"anthropic.claude-3-5-haiku-20241022-v1:0\\\", \\\"anthropic.claude-3-5-sonnet-20240620-v1:0\\\", \\\"anthropic.claude-3-5-sonnet-20241022-v2:0\\\", \\\"anthropic.claude-3-7-sonnet-20240620-v1:0\\\", \\\"anthropic.claude-3-\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.models-no-bedrock/anthropic.json\"\n}\ntrue\nfalse\n",
+      "stderr_tail": "[\"DEBUG:\",[\"deepseek.r1-v1:0\",\"deepseek.v3-v1:0\",\"deepseek.v3.2\"]]\n"
+    },
+    {
+      "bullet": "Verified models (`F23.verified-models`).",
+      "ids": [
+        "F23.verified-models"
+      ],
+      "line": 229,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1048,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-06-verified-models-f23-verified-models.json"
+    },
+    {
+      "bullet": "TypeScript client (`F23.catalog-ts-client`).",
+      "ids": [
+        "F23.catalog-ts-client"
+      ],
+      "line": 239,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2841,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-07-typescript-client-f23-catalog-ts-client.json"
+    },
+    {
+      "bullet": "Create (`F23.conn-create`).",
+      "ids": [
+        "F23.conn-create"
+      ],
+      "line": 254,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3019,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-08-create-f23-conn-create.json"
+    },
+    {
+      "bullet": "Key hidden and encrypted (`F23.conn-key-encrypted`).",
+      "ids": [
+        "F23.conn-key-encrypted"
+      ],
+      "line": 271,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2913,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-09-key-hidden-and-encrypted-f23-conn-key-en.json"
+    },
+    {
+      "bullet": "No cipher (`F23.no-cipher`).",
+      "ids": [
+        "F23.no-cipher"
+      ],
+      "line": 289,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 26921,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-10-no-cipher-f23-no-cipher.json"
+    },
+    {
+      "bullet": "Create validation (`F23.conn-create-validation`).",
+      "ids": [
+        "F23.conn-create-validation"
+      ],
+      "line": 313,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4226,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-11-create-validation-f23-conn-create-valida.json"
+    },
+    {
+      "bullet": "Blank keys on create (`F23.conn-create-blank-key`), known bug.",
+      "ids": [
+        "F23.conn-create-blank-key"
+      ],
+      "line": 336,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 2504,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-12-blank-keys-on-create-f23-conn-create-bla.json",
+      "failed_line": 12,
+      "failed_command": "test \"$S_SPACE $S_MASK\" = '422 422'",
+      "stdout_tail": ": \"qa-f23-deepseek\",\n        \"provider\": \"deepseek\",\n        \"base_url\": null,\n        \"created_at\": 1791859334,\n        \"updated_at\": 1791859334,\n        \"api_key_set\": true\n      },\n      {\n        \"id\": \"d91bced5bd6c478b9262fa67483b7876\",\n        \"display_name\": \"qa-f23-default\",\n        \"provider\": \"custom\",\n        \"base_url\": null,\n        \"created_at\": 1791859334,\n        \"updated_at\": 1791859334,\n        \"api_key_set\": true\n      },\n      {\n        \"id\": \"cff43cee95a540c488b99c1eec1d52c8\",\n        \"display_name\": \"qa-f23-blank-space\",\n        \"provider\": \"custom\",\n        \"base_url\": null,\n        \"created_at\": 1791859371,\n        \"updated_at\": 1791859371,\n        \"api_key_set\": false\n      },\n      {\n        \"id\": \"aa7d296967bd42a69dee7be98c40c559\",\n        \"display_name\": \"qa-f23-blank-mask\",\n        \"provider\": \"custom\",\n        \"base_url\": null,\n        \"created_at\": 1791859371,\n        \"updated_at\": 1791859371,\n        \"api_key_set\": false\n      }\n    ],\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 57,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.conn-create-blank-key/list.json\"\n}\nwhitespace key: 201, placeholder key: 201\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Linked profile runs on the connection (`F23.linked-run`).",
+      "ids": [
+        "F23.linked-run"
+      ],
+      "line": 362,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5920,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-13-linked-profile-runs-on-the-connection-f2.json"
+    },
+    {
+      "bullet": "Update (`F23.conn-update`).",
+      "ids": [
+        "F23.conn-update"
+      ],
+      "line": 390,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5905,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-14-update-f23-conn-update.json"
+    },
+    {
+      "bullet": "Update validation (`F23.conn-update-validation`).",
+      "ids": [
+        "F23.conn-update-validation"
+      ],
+      "line": 415,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8593,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-15-update-validation-f23-conn-update-valida.json"
+    },
+    {
+      "bullet": "Blank keys on update (`F23.conn-patch-blank-key`), known bug.",
+      "ids": [
+        "F23.conn-patch-blank-key"
+      ],
+      "line": 437,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 23900,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-16-blank-keys-on-update-f23-conn-patch-blan.json",
+      "failed_line": 21,
+      "failed_command": "test \"$APPLIED\" = '[sk-qa-f23-default][sk-qa-f23-default][sk-qa-f23-default]'",
+      "stdout_tail": "\": 5,\n          \"hard_context_reset_context_scaling\": 0.8\n        },\n        \"verification\": {\n          \"critic_enabled\": false,\n          \"critic_mode\": \"finish_and_message\",\n          \"enable_iterative_refinement\": false,\n          \"critic_threshold\": 0.6,\n          \"max_refinement_iterations\": 3,\n          \"critic_server_url\": null,\n          \"critic_model_name\": null,\n          \"critic_api_key\": null\n        }\n      },\n      \"conversation_settings\": {\n        \"schema_version\": 1,\n        \"max_iterations\": 500,\n        \"confirmation_mode\": false,\n        \"security_analyzer\": \"llm\"\n      },\n      \"llm_api_key_is_set\": true,\n      \"active_profile\": \"qa-f23-probe\",\n      \"active_agent_profile_id\": null,\n      \"active_meta_profile\": null,\n      \"misc_settings\": {}\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 181,\n  \"checks\": [\n    {\n      \"check\": \"agent_settings.llm.api_key eq sk-qa-f23-default\",\n      \"ok\": true,\n      \"actual\": \"sk-qa-f23-default\"\n    },\n    {\n      \"check\": \"agent_settings.llm.provider_connection_id eq d91bced5bd6c478b9262fa67483b7876\",\n      \"ok\": true,\n      \"actual\": \"d91bced5bd6c478b9262fa67483b7876\"\n    }\n  ]\n}\napplied keys: [null][null][<redacted:api_key>]\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Rotate the key (`F23.conn-rotate-key`).",
+      "ids": [
+        "F23.conn-rotate-key"
+      ],
+      "line": 480,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 21719,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-17-rotate-the-key-f23-conn-rotate-key.json"
+    },
+    {
+      "bullet": "Validate a linked draft (`F23.validate-linked-draft`), known bug.",
+      "ids": [
+        "F23.validate-linked-draft"
+      ],
+      "line": 508,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 3287,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-18-validate-a-linked-draft-f23-validate-lin.json",
+      "failed_line": 3,
+      "failed_command": "control-agent-server api POST /api/profiles/qa-f23-draft/validate --timeout 120 --expect 200 --json \"{\\\"llm\\\": {\\\"model\\\": \\\"deepseek/deepseek-flash\\\", \\\"provider_connection_id\\\": \\\"$CONN\\\", \\\"num_retries\\\": 0}}\" --save F23.validate-linked-draft/linked --check valid eq true --check error eq null",
+      "stdout_tail": "validate\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"llm\": {\n        \"model\": \"deepseek/deepseek-flash\",\n        \"provider_connection_id\": \"60e5410bc7854d5fba0fa8ddea14dd05\",\n        \"num_retries\": 0\n      }\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"171\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"valid\": false,\n      \"error\": {\n        \"type\": \"LLMAuthenticationError\",\n        \"message\": \"litellm.AuthenticationError: AuthenticationError: DeepseekException - Authentication Fails (governor)\"\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 498,\n  \"checks\": [\n    {\n      \"check\": \"valid eq true\",\n      \"ok\": false,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"error eq null\",\n      \"ok\": false,\n      \"actual\": \"{\\\"type\\\": \\\"LLMAuthenticationError\\\", \\\"message\\\": \\\"litellm.AuthenticationError: AuthenticationError: DeepseekException - Authentication Fails (governor)\\\"}\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.validate-linked-draft/linked.json\",\n  \"hint\": \"failed check: valid eq true; error eq null\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Restart (`F23.persist-restart`).",
+      "ids": [
+        "F23.persist-restart"
+      ],
+      "line": 527,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 48163,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-19-restart-f23-persist-restart.json"
+    },
+    {
+      "bullet": "Secret key changed (`F23.strict-decrypt`).",
+      "ids": [
+        "F23.strict-decrypt"
+      ],
+      "line": 543,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 81157,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-20-secret-key-changed-f23-strict-decrypt.json"
+    },
+    {
+      "bullet": "Corrupted file (`F23.corrupt-file`).",
+      "ids": [
+        "F23.corrupt-file"
+      ],
+      "line": 570,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6381,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-21-corrupted-file-f23-corrupt-file.json"
+    },
+    {
+      "bullet": "Store busy (`F23.store-busy`).",
+      "ids": [
+        "F23.store-busy"
+      ],
+      "line": 592,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 34483,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-22-store-busy-f23-store-busy.json"
+    },
+    {
+      "bullet": "Lock wait blocks the server (`F23.store-busy-responsive`), known bug.",
+      "ids": [
+        "F23.store-busy-responsive"
+      ],
+      "line": 614,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 16683,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-23-lock-wait-blocks-the-server-f23-store-bu.json",
+      "failed_line": 14,
+      "failed_command": "control-agent-server api GET /alive --auth none --expect 200 --expect-max-ms 3000 --timeout 60 --save F23.store-busy-responsive/alive",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 91\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 10676,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/F23.store-busy-responsive/alive.json\",\n  \"hint\": \"took 10676 ms, limit 3000 ms\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Delete guard (`F23.delete-guard`).",
+      "ids": [
+        "F23.delete-guard"
+      ],
+      "line": 653,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6890,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-24-delete-guard-f23-delete-guard.json"
+    },
+    {
+      "bullet": "Delete (`F23.conn-delete`).",
+      "ids": [
+        "F23.conn-delete"
+      ],
+      "line": 677,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2299,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-25-delete-f23-conn-delete.json"
+    },
+    {
+      "bullet": "Limit (`F23.conn-limit`).",
+      "ids": [
+        "F23.conn-limit"
+      ],
+      "line": 694,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 11295,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-26-limit-f23-conn-limit.json"
+    },
+    {
+      "bullet": "ACP discovery errors (`F23.acp-discovery-errors`).",
+      "ids": [
+        "F23.acp-discovery-errors"
+      ],
+      "line": 719,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8383,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23/evidence/map-run/F23-llm-catalog-and-connections-27-acp-discovery-errors-f23-acp-discovery-e.json"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-024155-0956-map-f23",
+  "launch_flags": []
+}

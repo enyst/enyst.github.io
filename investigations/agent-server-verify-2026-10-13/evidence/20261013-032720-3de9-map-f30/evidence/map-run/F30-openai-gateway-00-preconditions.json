@@ -1,0 +1,13 @@
+{
+  "file": "F30-openai-gateway.md",
+  "bullet": "Preconditions",
+  "ids": [],
+  "line": 88,
+  "script": "control-agent-server llm preset deepseek\nF30=\"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f30\"\nmkdir -p \"$F30\"\ncontrol-agent-server api GET /api/settings --check conversation_settings.confirmation_mode eq false \\\n  --check conversation_settings.security_analyzer eq llm --quiet\n",
+  "exit_code": 0,
+  "elapsed_ms": 2302,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"profiles\": [\n    {\n      \"profile\": \"deepseek-flash\",\n      \"model\": \"deepseek/deepseek-flash\",\n      \"validate\": {\n        \"status\": 200,\n        \"body\": {\n          \"valid\": true,\n          \"error\": null\n        }\n      },\n      \"saved\": 201,\n      \"activated\": 200\n    },\n    {\n      \"profile\": \"deepseek-pro\",\n      \"model\": \"deepseek/deepseek-v4-pro\",\n      \"saved\": 201\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/settings\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"2716\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 62,\n  \"checks\": [\n    {\n      \"check\": \"conversation_settings.confirmation_mode eq false\",\n      \"ok\": true,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"conversation_settings.security_analyzer eq llm\",\n      \"ok\": true,\n      \"actual\": \"llm\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

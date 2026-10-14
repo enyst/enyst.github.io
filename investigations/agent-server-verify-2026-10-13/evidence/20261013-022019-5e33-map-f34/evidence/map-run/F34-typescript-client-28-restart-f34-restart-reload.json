@@ -1,0 +1,15 @@
+{
+  "file": "F34-typescript-client.md",
+  "bullet": "Restart (`F34.restart-reload`).",
+  "ids": [
+    "F34.restart-reload"
+  ],
+  "line": 1271,
+  "script": "TOTAL=$(control-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --field .)\ncontrol-agent-server restart\ncat > \"$F34/restart.mjs\" <<'JS'\nimport { m, host, apiKey, F34, assert } from './lib.mjs';\nconst [cid, total] = process.argv.slice(2);\nconst manager = new m.ConversationManager({ host, apiKey });\nconst conversation = await manager.loadConversation(cid);\nassert.equal(await conversation.state.getExecutionStatus(), 'finished');\nassert.equal((await manager.getConversation(cid)).title, 'qa-f34-title');\nassert.equal(await conversation.state.events.count(), Number(total));\nassert.equal((await conversation.getHookConfig()).pre_tool_use[0].hooks[0].command, 'echo qa-f34-hook');\nassert.equal((await conversation.workspace.downloadAsText(`${F34}/work/qa-f34.txt`)).trim(), 'hi');\nconsole.log('QA_F34_RESTART_OK');\nJS\ncontrol-agent-server exec --timeout 60 --expect-output QA_F34_RESTART_OK --save F34.restart-reload/program -- node \"$F34/restart.mjs\" \"$CID\" \"$TOTAL\"\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --check . eq \"$TOTAL\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 95854,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34\",\n  \"url\": \"http://127.0.0.1:59687\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 59004,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 11251,\n  \"stdout_tail\": \"QA_F34_RESTART_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.restart-reload/program.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/49709e75-5cbf-4e9c-a626-98f997236636/events/count\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"2\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 30,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 534,\n  \"checks\": [\n    {\n      \"check\": \". eq 30\",\n      \"ok\": true,\n      \"actual\": \"30\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,13 @@
+{
+  "file": "F09-model-switching-plugins.md",
+  "bullet": "Preconditions",
+  "ids": [],
+  "line": 92,
+  "script": "control-agent-server llm preset deepseek\nENC=$(control-agent-server api GET /api/profiles/deepseek-flash --header 'X-Expose-Secrets: encrypted' --field config.api_key --unsafe-unredacted)\ntest \"${ENC#gAAAAA}\" != \"$ENC\"\nMKT=$(control-agent-server fixture marketplace --name qa-f09-mkt --print-path)\nCID=$(control-agent-server conversation start --tools none --no-autotitle --print-id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID\" --check agent.llm.model eq deepseek/deepseek-flash --check agent.llm.usage_id eq default --quiet\n",
+  "exit_code": 0,
+  "elapsed_ms": 3889,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"profiles\": [\n    {\n      \"profile\": \"deepseek-flash\",\n      \"model\": \"deepseek/deepseek-flash\",\n      \"validate\": {\n        \"status\": 200,\n        \"body\": {\n          \"valid\": true,\n          \"error\": null\n        }\n      },\n      \"saved\": 201,\n      \"activated\": 200\n    },\n    {\n      \"profile\": \"deepseek-pro\",\n      \"model\": \"deepseek/deepseek-v4-pro\",\n      \"saved\": 201\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/a0f650af-be4f-442d-88a7-230e214ae20b\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"4902\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 79,\n  \"checks\": [\n    {\n      \"check\": \"agent.llm.model eq deepseek/deepseek-flash\",\n      \"ok\": true,\n      \"actual\": \"deepseek/deepseek-flash\"\n    },\n    {\n      \"check\": \"agent.llm.usage_id eq default\",\n      \"ok\": true,\n      \"actual\": \"default\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

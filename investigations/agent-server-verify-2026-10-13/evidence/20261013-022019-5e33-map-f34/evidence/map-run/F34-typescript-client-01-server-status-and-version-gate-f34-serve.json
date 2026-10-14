@@ -1,0 +1,15 @@
+{
+  "file": "F34-typescript-client.md",
+  "bullet": "Server status and version gate (`F34.server-client`).",
+  "ids": [
+    "F34.server-client"
+  ],
+  "line": 234,
+  "script": "VERSION=$(control-agent-server api GET /server_info --auth none --field version)\ncat > \"$F34/server.mjs\" <<'JS'\nimport { m, c, host, apiKey, assert } from './lib.mjs';\nconst version = process.argv[2];\nconst anonymous = new c.ServerClient({ host });\nassert.deepEqual(await anonymous.getAlive(), { status: 'ok' });\nassert.deepEqual(await anonymous.getHealth(), { status: 'ok' });\nassert.deepEqual(await anonymous.getReady(), { status: 'ready' });\nassert.equal((await anonymous.getRoot()).version, version);\nconst manager = new m.ConversationManager({ host, apiKey });\nconst info = await manager.server.getServerInfo();\nassert.equal(info.version, version);\nassert.ok(info.capabilities.includes('conversation_runtime_routes_v1'));\nassert.ok(info.usable_tools.includes('file_editor'));\nconst aggregate = new c.AgentServerClient({ host, apiKey });\nassert.deepEqual(await aggregate.server.getHealth(), { status: 'ok' });\nconsole.log('QA_F34_SERVER_OK');\nJS\ncontrol-agent-server exec --timeout 60 --expect-output QA_F34_SERVER_OK --save F34.server-client/program -- node \"$F34/server.mjs\" \"$VERSION\"\nN=$(control-agent-server api GET /api/workspaces --field workspaces | jq length)\ncat > \"$F34/gate.mjs\" <<'JS'\nimport { m, host, apiKey, assert } from './lib.mjs';\nconst [version, count] = process.argv.slice(2);\nconst http = new m.HttpClient({ baseUrl: host, apiKey });\nfor (const requirement of Object.values(m.AgentServerFeatureRequirements)) {\n  assert.equal((await m.assertAgentServerSupports(http, requirement)).version, version);\n  assert.ok(m.compareAgentServerVersions(version, requirement.minVersion) >= 0);\n}\nassert.equal(await m.getCachedAgentServerInfo(http), await m.getCachedAgentServerInfo(http));\nconst listed = await new m.WorkspacesClient({ host, apiKey }).listWorkspaces();\nassert.equal(listed.workspaces.length, Number(count));\nassert.ok(Array.isArray(listed.workspaceParents));\nassert.deepEqual(await new m.HooksClient({ host, apiKey }).loadHooks({ project_dir: '/qa-f34-no-project' }), { hook_config: null });\nconsole.log('QA_F34_GATE_OK');\nJS\ncontrol-agent-server exec --timeout 60 --expect-output QA_F34_GATE_OK --save F34.server-client/gate -- node \"$F34/gate.mjs\" \"$VERSION\" \"$N\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 30636,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 9712,\n  \"stdout_tail\": \"QA_F34_SERVER_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.server-client/program.json\"\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 11885,\n  \"stdout_tail\": \"QA_F34_GATE_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.server-client/gate.json\"\n}\n",
+  "stderr": ""
+}

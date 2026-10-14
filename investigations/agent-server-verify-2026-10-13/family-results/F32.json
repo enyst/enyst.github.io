@@ -1,0 +1,256 @@
+{
+  "ok": false,
+  "file": "F32-webhooks-and-telemetry.md",
+  "summary": {
+    "pass": 13,
+    "fail": 2,
+    "xfail": 3,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 97,
+      "exit_code": 0,
+      "elapsed_ms": 4161,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-00-preconditions.json"
+    },
+    {
+      "bullet": "A run's events reach the webhook (`F32.events-post`).",
+      "ids": [
+        "F32.events-post"
+      ],
+      "line": 119,
+      "exit_code": 0,
+      "elapsed_ms": 6334,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-01-a-run-s-events-reach-the-webhook-f32-eve.json"
+    },
+    {
+      "bullet": "Session key and content type on every request (`F32.events-session-key`).",
+      "ids": [
+        "F32.events-session-key"
+      ],
+      "line": 136,
+      "exit_code": 0,
+      "elapsed_ms": 1488,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-02-session-key-and-content-type-on-every-re.json"
+    },
+    {
+      "bullet": "Conversation created (`F32.conversation-created`).",
+      "ids": [
+        "F32.conversation-created"
+      ],
+      "line": 148,
+      "exit_code": 0,
+      "elapsed_ms": 2595,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-03-conversation-created-f32-conversation-cr.json"
+    },
+    {
+      "bullet": "Full-state snapshot on every attach (`F32.events-full-state`).",
+      "ids": [
+        "F32.events-full-state"
+      ],
+      "line": 160,
+      "exit_code": 0,
+      "elapsed_ms": 49586,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-04-full-state-snapshot-on-every-attach-f32-.json"
+    },
+    {
+      "bullet": "Conversation lifecycle posts (`F32.conversation-lifecycle`).",
+      "ids": [
+        "F32.conversation-lifecycle"
+      ],
+      "line": 181,
+      "exit_code": 0,
+      "elapsed_ms": 28379,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-05-conversation-lifecycle-posts-f32-convers.json"
+    },
+    {
+      "bullet": "No streaming deltas on webhooks (`F32.events-no-deltas`).",
+      "ids": [
+        "F32.events-no-deltas"
+      ],
+      "line": 204,
+      "exit_code": 0,
+      "elapsed_ms": 22694,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-06-no-streaming-deltas-on-webhooks-f32-even.json"
+    },
+    {
+      "bullet": "Custom headers, path prefix and buffer size (`F32.custom-headers`, `F32.buffer-size`).",
+      "ids": [
+        "F32.custom-headers",
+        "F32.buffer-size"
+      ],
+      "line": 217,
+      "exit_code": 0,
+      "elapsed_ms": 80019,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-07-custom-headers-path-prefix-and-buffer-si.json"
+    },
+    {
+      "bullet": "Events stranded behind an in-flight batch (`F32.buffer-stranded`), known bug.",
+      "ids": [
+        "F32.buffer-stranded"
+      ],
+      "line": 237,
+      "exit_code": 1,
+      "elapsed_ms": 19295,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-08-events-stranded-behind-an-in-flight-batc.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server sink read --path \"/qa-f32-b/events/${BID//-/}\" --contains QA_F32_BUFFER --expect-min 1 --wait 10 --save F32.buffer-stranded/after-wait",
+      "stdout_tail": "  \"kinds\": {\n    \"SystemPromptEvent\": 1,\n    \"MessageEvent\": 1,\n    \"ConversationStateUpdateEvent\": 1\n  },\n  \"matching\": 1,\n  \"events\": [\n    {\n      \"id\": \"531943ce-e850-448b-90f2-217a87d77ca1\",\n      \"kind\": \"ConversationStateUpdateEvent\",\n      \"source\": \"environment\",\n      \"timestamp\": \"2026-10-13T02:21:57.781320\",\n      \"key\": \"last_user_message_id\",\n      \"value\": \"e0866194-e2ec-4f5c-bdfc-897a1cdd80c7\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"requests\": 1,\n  \"paths\": {\n    \"/qa-f32-b/events/758c37ead33e47b69137ee1fa828581e\": 1\n  },\n  \"last\": [\n    \"{\\\"at\\\": \\\"2026-10-13T02:21:57Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/qa-f32-b/events/758c37ead33e47b69137ee1fa828581e\\\", \\\"headers\\\": {\\\"Host\\\": \\\"127.0.0.1:37449\\\", \\\"Accept\\\": \\\"*/*\\\", \\\"Accept-Encoding\\\": \\\"gzip, deflate\\\", \\\"Connection\\\": \\\"keep-alive\\\", \\\"User-Agent\\\": \\\"python-httpx/0.28.1\\\", \\\"X-QA-F32\\\": \\\"qa-f32-header\\\", \\\"X-Session-API-Key\\\": \\\"<redacted:session-cookie>\\\", \\\"Content-Length\\\": \\\"21691\\\", \\\"Content-Type\\\": \\\"app\\u2026\"\n  ]\n}\n{\n  \"ok\": false,\n  \"requests\": 0,\n  \"paths\": {},\n  \"last\": [],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/F32.buffer-stranded/after-wait.json\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Flush on delete and on shutdown (`F32.flush-on-close`).",
+      "ids": [
+        "F32.flush-on-close"
+      ],
+      "line": 255,
+      "exit_code": 0,
+      "elapsed_ms": 147277,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-09-flush-on-delete-and-on-shutdown-f32-flus.json"
+    },
+    {
+      "bullet": "Flush timer from the first event (`F32.flush-delay`).",
+      "ids": [
+        "F32.flush-delay"
+      ],
+      "line": 283,
+      "exit_code": 1,
+      "elapsed_ms": 88294,
+      "status": "fail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-10-flush-timer-from-the-first-event-f32-flu.json",
+      "failed_line": 6,
+      "failed_command": "control-agent-server sink read --path \"/qa-f32-d/events/${TID//-/}\" --expect-max 0",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32\",\n  \"url\": \"http://127.0.0.1:53245\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 57761,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"body\": {\n    \"success\": true\n  }\n}\n{\n  \"ok\": false,\n  \"requests\": 1,\n  \"paths\": {\n    \"/qa-f32-d/events/e1bd1e3fd791438d8a04eade276efd7d\": 1\n  },\n  \"last\": [\n    \"{\\\"at\\\": \\\"2026-10-13T02:26:21Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/qa-f32-d/events/e1bd1e3fd791438d8a04eade276efd7d\\\", \\\"headers\\\": {\\\"Host\\\": \\\"127.0.0.1:37449\\\", \\\"Accept\\\": \\\"*/*\\\", \\\"Accept-Encoding\\\": \\\"gzip, deflate\\\", \\\"Connection\\\": \\\"keep-alive\\\", \\\"User-Agent\\\": \\\"python-httpx/0.28.1\\\", \\\"X-Session-API-Key\\\": \\\"<redacted:session-cookie>\\\", \\\"Content-Length\\\": \\\"3169\\\", \\\"Content-Type\\\": \\\"application/json\\\"}, \\\"body\\\": [{\\\"id\\u2026\"\n  ]\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Webhook field descriptions (`F32.webhook-spec-docs`), known bug.",
+      "ids": [
+        "F32.webhook-spec-docs"
+      ],
+      "line": 304,
+      "exit_code": 1,
+      "elapsed_ms": 16936,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-11-webhook-field-descriptions-f32-webhook-s.json",
+      "failed_line": 2,
+      "failed_command": "control-agent-server api GET /openapi.json --auth none --quiet --check components.schemas.WebhookSpec.properties.flush_delay.description not-contains 'Timer is reset on each new event'",
+      "stdout_tail": "ent to {base_url}/events and conversation info to {base_url}/conversations\"\n    },\n    {\n      \"check\": \"components.schemas.WebhookSpec.properties.flush_delay.description exists\",\n      \"ok\": true,\n      \"actual\": \"The delay in seconds after which buffered events will be flushed to the webhook, even if the buffer is not full. Timer is reset on each new event.\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/openapi.json\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"646319\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 715,\n  \"checks\": [\n    {\n      \"check\": \"components.schemas.WebhookSpec.properties.flush_delay.description not-contains Timer is reset on each new event\",\n      \"ok\": false,\n      \"actual\": \"The delay in seconds after which buffered events will be flushed to the webhook, even if the buffer is not full. Timer is reset on each new event.\"\n    }\n  ],\n  \"hint\": \"failed check: components.schemas.WebhookSpec.properties.flush_delay.description not-contains Timer is reset on each new event\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Batch and queue limits (`F32.backpressure`).",
+      "ids": [
+        "F32.backpressure"
+      ],
+      "line": 320,
+      "exit_code": 0,
+      "elapsed_ms": 110444,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-12-batch-and-queue-limits-f32-backpressure.json"
+    },
+    {
+      "bullet": "Retries against a failing receiver (`F32.retry`).",
+      "ids": [
+        "F32.retry"
+      ],
+      "line": 354,
+      "exit_code": 0,
+      "elapsed_ms": 130797,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-13-retries-against-a-failing-receiver-f32-r.json"
+    },
+    {
+      "bullet": "Failed batches are requeued (`F32.requeue`).",
+      "ids": [
+        "F32.requeue"
+      ],
+      "line": 369,
+      "exit_code": 0,
+      "elapsed_ms": 136105,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-14-failed-batches-are-requeued-f32-requeue.json"
+    },
+    {
+      "bullet": "A slow receiver blocks the next run (`F32.slow-receiver`), known bug.",
+      "ids": [
+        "F32.slow-receiver"
+      ],
+      "line": 384,
+      "exit_code": 1,
+      "elapsed_ms": 165807,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-15-a-slow-receiver-blocks-the-next-run-f32-.json",
+      "failed_line": 10,
+      "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$WCID/run\" --expect 200 --save F32.slow-receiver/run-after-finished",
+      "stdout_tail": "agent\\\": {\\\"llm\\\": {\\\"model\\\": \\\"deepseek/deepsee\\u2026\",\n    \"{\\\"at\\\": \\\"2026-10-13T02:35:28Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/events/30daf9097ef5424f92f96208e41a845d\\\", \\\"call\\\": 8, \\\"step\\\": {\\\"hang\\\": 15.0}, \\\"body\\\": [{\\\"id\\\": \\\"9e42ff42-27c7-4df0-9763-e22fbc4d9f7e\\\", \\\"timestamp\\\": \\\"2026-10-13T02:35:28.794179\\\", \\\"source\\\": \\\"agent\\\", \\\"parent_id\\\": null, \\\"system_prompt\\\": {\\\"cache_prompt\\\": false, \\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"<SOUL>\\\\nYou are OpenHands agent, a helpful AI assistant that \\u2026\"\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 409,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/30daf909-7ef5-424f-92f9-6208e41a845d/run\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 409,\n    \"headers\": {\n      \"content-length\": \"78\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Conversation already running. Wait for completion or pause first.\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 572,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/F32.slow-receiver/run-after-finished.json\",\n  \"hint\": \"expected 200, got 409\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Webhooks from the environment (`F32.env-config`).",
+      "ids": [
+        "F32.env-config"
+      ],
+      "line": 412,
+      "exit_code": 0,
+      "elapsed_ms": 76997,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-16-webhooks-from-the-environment-f32-env-co.json"
+    },
+    {
+      "bullet": "Telemetry is off by default (`F32.telemetry-off-by-default`).",
+      "ids": [
+        "F32.telemetry-off-by-default"
+      ],
+      "line": 431,
+      "exit_code": 1,
+      "elapsed_ms": 78270,
+      "status": "fail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-17-telemetry-is-off-by-default-f32-telemetr.json",
+      "failed_line": 3,
+      "failed_command": "control-agent-server conversation start --placeholder-agent --no-run --prompt QA_F32_OFF --body-json '{\"user_id\": \"qa-f32-off\"}' --no-autotitle",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32\",\n  \"url\": \"http://127.0.0.1:53245\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 53827,\n  \"ready_path\": \"/ready\"\n}\n",
+      "stderr_tail": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6036, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6000, in main\n    result = func(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 2105, in cmd_conversation_start\n    body = build_start_body(run, args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 2053, in build_start_body\n    working_dir.mkdir(parents=True)\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 724, in mkdir\n    os.mkdir(self, mode)\n    ~~~~~~~~^^^^^^^^^^^^\nOSError: [Errno 28] No space left on device: '/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/fixtures/workspaces/023819-441052'\n"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32",
+  "launch_flags": [
+    "--webhook-sink"
+  ],
+  "reconstructed_from_saved_transcripts": true,
+  "incomplete": true,
+  "missing_features_due_to_environment_incident": [
+    "F32.telemetry-lifecycle",
+    "F32.telemetry-conversation",
+    "F32.telemetry-request-failed",
+    "F32.telemetry-conversation-failed",
+    "F32.telemetry-usage-buckets",
+    "F32.telemetry-consent-settings",
+    "F32.telemetry-env-override",
+    "F32.telemetry-kill-switch",
+    "F32.telemetry-salt-and-kind",
+    "F32.telemetry-salt-docs",
+    "F32.deferred-init",
+    "F32.deferred-init-flag"
+  ],
+  "corrupt_transcripts_preserved": [
+    "/workspace/verification-artifacts/runs/20261013-021835-ac36-map-f32/evidence/map-run/F32-webhooks-and-telemetry-18-server-lifecycle-events-f32-telemetry-li.json"
+  ],
+  "reconstruction_reason": "Original map aborted while saving evidence during ENOSPC. Only saved original ledger results are reconstructed; remaining features were not completed. Supplementary runs will complete them."
+}

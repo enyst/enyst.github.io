@@ -1,0 +1,15 @@
+{
+  "file": "F28-canvas-extensions.md",
+  "bullet": "Prepare (`F28.backend-prepare`).",
+  "ids": [
+    "F28.backend-prepare"
+  ],
+  "line": 518,
+  "script": "control-agent-server api POST /api/canvas-extensions/installed/qa-backend/backend/prepare --json \"{\\\"revision\\\": \\\"$BHEAD\\\"}\" \\\n  --expect 200 --check state eq stopped --check prepared_revision eq \"$BHEAD\" --save F28.backend-prepare/prepare\ncontrol-agent-server api GET /api/canvas-extensions/installed/qa-backend/backend --check prepared_revision eq \"$BHEAD\"\ncontrol-agent-server state cat home/.openhands/canvas-extensions/backends/approvals/qa-backend.json \\\n  --check revision eq \"$BHEAD\" --check artifact_sha256 eq \"$BSHA\" --check platform matches '^linux-(amd64|arm64)$' \\\n  --check artifact_dir eq \"$BK/artifacts/qa-backend/$BSHA\"\ncontrol-agent-server state cat \"home/.openhands/canvas-extensions/backends/artifacts/qa-backend/$BSHA/server.py\" \\\n  --mode 555 --contains 'web.run_app' --max-chars 80\ntest \"$(stat -c %a \"$BK/artifacts/qa-backend/$BSHA\")\" = 555\ncontrol-agent-server api POST /api/canvas-extensions/installed/qa-backend/backend/prepare --json \"{\\\"revision\\\": \\\"$BHEAD\\\"}\" \\\n  --expect 200 --check prepared_revision eq \"$BHEAD\" --expect-max-ms 3000\ncontrol-agent-server state ls 'home/.openhands/canvas-extensions/backends/artifacts/**' --expect-count 1\n",
+  "exit_code": 1,
+  "elapsed_ms": 5632,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api POST /api/canvas-extensions/installed/qa-backend/backend/prepare --json \"{\\\"revision\\\": \\\"$BHEAD\\\"}\" --expect 200 --check state eq stopped --check prepared_revision eq \"$BHEAD\" --save F28.backend-prepare/prepare",
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6036, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6000, in main\n    result = func(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 1358, in cmd_api\n    result[\"saved\"] = str(save_evidence(run, args.save, exchange))\n                          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 394, in save_evidence\n    folder.mkdir(parents=True, exist_ok=True)\n    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 724, in mkdir\n    os.mkdir(self, mode)\n    ~~~~~~~~^^^^^^^^^^^^\nOSError: [Errno 28] No space left on device: '/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/evidence/F28.backend-prepare'\n"
+}

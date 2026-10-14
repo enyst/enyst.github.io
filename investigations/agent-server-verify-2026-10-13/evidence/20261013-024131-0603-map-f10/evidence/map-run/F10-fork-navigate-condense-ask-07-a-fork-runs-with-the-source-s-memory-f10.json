@@ -1,0 +1,15 @@
+{
+  "file": "F10-fork-navigate-condense-ask.md",
+  "bullet": "A fork runs with the source's memory (`F10.fork-run-memory`), known bug.",
+  "ids": [
+    "F10.fork-run-memory"
+  ],
+  "line": 273,
+  "script": "N_A_MSG=$(control-agent-server api GET \"<redacted:session-cookie>/$A/events/count\" --query kind=$MSG --field .)\nAF=$(control-agent-server api POST \"<redacted:session-cookie>/$A/fork\" --json '{\"title\": \"QA F10 memory fork\"}' --expect 201 --field id)\ncontrol-agent-server conversation send \"$AF\" --text 'What is the project codename I told you? Answer with the codename only.' --wait --until finished,error --timeout 180\ncontrol-agent-server conversation events \"$AF\" --kinds ConversationErrorEvent --contains LLMAuthenticationError --expect-count 0 --save F10.fork-run-memory/auth-errors  # bug\ncontrol-agent-server api GET \"<redacted:session-cookie>/$AF\" --quiet --check execution_status eq finished --save F10.fork-run-memory/status\ncontrol-agent-server api GET \"<redacted:session-cookie>/$AF/agent_final_response\" --check response matches '(?i)pelican' --save F10.fork-run-memory/final\ncontrol-agent-server api GET \"<redacted:session-cookie>/$A/events/count\" --query kind=$MSG --check . eq \"$N_A_MSG\"\n",
+  "exit_code": 1,
+  "elapsed_ms": 4335,
+  "failed_line": 4,
+  "failed_command": "control-agent-server conversation events \"$AF\" --kinds ConversationErrorEvent --contains LLMAuthenticationError --expect-count 0 --save F10.fork-run-memory/auth-errors",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"body\": {\n    \"success\": true\n  },\n  \"wait\": {\n    \"ok\": true,\n    \"status\": \"error\",\n    \"transitions\": [\n      \"running\",\n      \"error\"\n    ],\n    \"waited_ms\": 2942\n  }\n}\n{\n  \"ok\": false,\n  \"id\": \"9586dbdb-0ee3-4410-a148-20a63246585e\",\n  \"total\": 12,\n  \"kinds\": {\n    \"SystemPromptEvent\": 1,\n    \"MessageEvent\": 3,\n    \"ConversationStateUpdateEvent\": 7,\n    \"ConversationErrorEvent\": 1\n  },\n  \"matching\": 1,\n  \"events\": [\n    {\n      \"id\": \"39614142-4fdb-4982-aa0c-afd4d0b1eaa8\",\n      \"kind\": \"ConversationErrorEvent\",\n      \"source\": \"environment\",\n      \"timestamp\": \"2026-10-13T02:42:07.808822\",\n      \"code\": \"LLMAuthenticationError\",\n      \"detail\": \"Your LLM API key appears to be invalid or has expired.\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/F10.fork-run-memory/auth-errors.json\"\n}\n",
+  "stderr": ""
+}

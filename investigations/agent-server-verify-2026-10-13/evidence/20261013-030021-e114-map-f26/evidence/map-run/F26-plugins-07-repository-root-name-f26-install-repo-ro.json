@@ -1,0 +1,15 @@
+{
+  "file": "F26-plugins.md",
+  "bullet": "Repository root name (`F26.install-repo-root-name`), known bug.",
+  "ids": [
+    "F26.install-repo-root-name"
+  ],
+  "line": 296,
+  "script": "N=$(control-agent-server api POST /api/plugins/install --json '{\"source\": \"file://'\"$G\"'\"}' --expect 200 \\\n  --check resolved_ref eq \"$H1\" --save F26.install-repo-root-name/install --field name)\ncontrol-agent-server api DELETE \"/api/plugins/installed/$N\" --expect 200\ncontrol-agent-server api GET \"/api/plugins/installed/$N\" --expect 404\ntest \"$N\" = qa-f26-src  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 3151,
+  "failed_line": 5,
+  "failed_command": "test \"$N\" = qa-f26-src",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"DELETE\",\n    \"path\": \"/api/plugins/installed/qa-f26-src-a7b02d31fa6d2927\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"62\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"message\": \"Plugin 'qa-f26-src-a7b02d31fa6d2927' uninstalled\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 237\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/plugins/installed/qa-f26-src-a7b02d31fa6d2927\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"66\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Plugin 'qa-f26-src-a7b02d31fa6d2927' is not installed\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 170\n}\n",
+  "stderr": ""
+}

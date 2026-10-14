@@ -1,0 +1,64 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_deepseek-flash",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Use the terminal to run exactly: echo QA_F30_TOOL_RAN > qa_f30_tool.txt  Then reply DONE."
+        }
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "qa_f30_client_tool",
+            "description": "QA client tool",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      ],
+      "tool_choice": "required",
+      "parallel_tool_calls": false
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "305",
+      "content-type": "application/json",
+      "x-openhands-serverconversation-id": "3975f013-f1db-4af2-9ee0-e9d3444e730b"
+    },
+    "body": {
+      "id": "chatcmpl-82a067580aba4f4c9ef1f21a0c197254",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "content": "DONE",
+            "role": "assistant"
+          }
+        }
+      ],
+      "created": 1791858208,
+      "model": "openhands_deepseek-flash",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 120,
+        "prompt_tokens": 22749,
+        "total_tokens": 22869
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 6529
+}

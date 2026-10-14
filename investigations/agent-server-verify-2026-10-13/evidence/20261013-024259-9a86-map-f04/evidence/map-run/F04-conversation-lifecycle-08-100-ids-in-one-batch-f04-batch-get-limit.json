@@ -1,0 +1,15 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "100 ids in one batch (`F04.batch-get-limit`), known bug.",
+  "ids": [
+    "F04.batch-get-limit"
+  ],
+  "line": 511,
+  "script": "IDS100=$(python3 -c 'import uuid; print(\",\".join(str(uuid.uuid4()) for _ in range(100)))')\ncontrol-agent-server exec --expect-output QA_BATCH_OK --save F04.batch-get-limit/hundred -- python3 \"$F/qa-f04-batch.py\" \"$IDS100\" 400,422  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 3156,
+  "failed_line": 2,
+  "failed_command": "control-agent-server exec --expect-output QA_BATCH_OK --save F04.batch-get-limit/hundred -- python3 \"$F/qa-f04-batch.py\" \"$IDS100\" 400,422",
+  "stdout": "{\n  \"ok\": false,\n  \"exit_code\": 1,\n  \"elapsed_ms\": 2085,\n  \"stdout_tail\": \"{\\\"sent\\\": 100, \\\"status\\\": 500, \\\"body\\\": {\\\"detail\\\": \\\"Internal Server Error\\\", \\\"exception\\\": \\\"\\\", \\\"error_id\\\": \\\"3979b69e2032493989bdf62ae213b25e\\\"}}\\nQA_BATCH_MISMATCH\\n\",\n  \"stderr_tail\": \"\",\n  \"hint\": {\n    \"missing\": [\n      \"QA_BATCH_OK\"\n    ],\n    \"unexpected\": []\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024259-9a86-map-f04/evidence/F04.batch-get-limit/hundred.json\"\n}\n",
+  "stderr": ""
+}

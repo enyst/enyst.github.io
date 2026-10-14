@@ -1,0 +1,15 @@
+{
+  "file": "F06-conversation-events.md",
+  "bullet": "Short-kind count (`F06.search-kind-short-count`), known bug.",
+  "ids": [
+    "F06.search-kind-short-count"
+  ],
+  "line": 683,
+  "script": "control-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --query kind=openhands.sdk.event.llm_convertible.message.MessageEvent --check . eq 2 --save F06.search-kind-short-count/fqn-control\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --query kind=MessageEvent --check . eq 2 --save F06.search-kind-short-count/short-count  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 865,
+  "failed_line": 2,
+  "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --query kind=MessageEvent --check . eq 2 --save F06.search-kind-short-count/short-count",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/85348f10-391c-4492-bc76-26a3ecf79c0c/events/count\",\n    \"query\": [\n      [\n        \"kind\",\n        \"openhands.sdk.event.llm_convertible.message.MessageEvent\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 2,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 62,\n  \"checks\": [\n    {\n      \"check\": \". eq 2\",\n      \"ok\": true,\n      \"actual\": \"2\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.search-kind-short-count/fqn-control.json\"\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/85348f10-391c-4492-bc76-26a3ecf79c0c/events/count\",\n    \"query\": [\n      [\n        \"kind\",\n        \"MessageEvent\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 0,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 48,\n  \"checks\": [\n    {\n      \"check\": \". eq 2\",\n      \"ok\": false,\n      \"actual\": \"0\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-033036-477e-map-f06/evidence/F06.search-kind-short-count/short-count.json\",\n  \"hint\": \"failed check: . eq 2\"\n}\n",
+  "stderr": ""
+}

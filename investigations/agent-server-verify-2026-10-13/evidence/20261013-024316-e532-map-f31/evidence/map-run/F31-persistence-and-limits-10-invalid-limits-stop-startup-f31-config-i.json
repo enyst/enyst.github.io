@@ -1,0 +1,15 @@
+{
+  "file": "F31-persistence-and-limits.md",
+  "bullet": "Invalid limits stop startup (`F31.config-invalid-fails-fast`).",
+  "ids": [
+    "F31.config-invalid-fails-fast"
+  ],
+  "line": 618,
+  "script": "N1=$(control-agent-server logs --grep \"invalid literal for int\\(\\) with base 10: 'qa-f31-nan'\" | jq .total_matching)\nif control-agent-server restart --reset-config --env OH_MAX_CONCURRENT_RUNS=qa-f31-nan --timeout 60; then false; fi\ncontrol-agent-server runs | jq -e --arg r \"$AGENT_SERVER_VERIFY_RUN\" '.runs[] | select(.run == $r) | .alive == false'\ncontrol-agent-server logs --grep \"invalid literal for int\\(\\) with base 10: 'qa-f31-nan'\" --expect-min $((N1 + 1))\nN2=$(control-agent-server logs --grep 'greater_than_equal, input_value=0' | jq .total_matching)\nN3=$(control-agent-server logs --grep '^max_concurrent_runs$' | jq .total_matching)\nif control-agent-server restart --reset-config --config-json '{\"max_concurrent_runs\": 0}' --timeout 60; then false; fi\ncontrol-agent-server runs | jq -e --arg r \"$AGENT_SERVER_VERIFY_RUN\" '.runs[] | select(.run == $r) | .alive == false'\ncontrol-agent-server logs --grep 'greater_than_equal, input_value=0' --expect-min $((N2 + 1))\ncontrol-agent-server logs --grep '^max_concurrent_runs$' --expect-min $((N3 + 1))\ncontrol-agent-server restart --reset-config\ncontrol-agent-server doctor\n",
+  "exit_code": 5,
+  "elapsed_ms": 40827,
+  "failed_line": 3,
+  "failed_command": "jq -e --arg r \"$AGENT_SERVER_VERIFY_RUN\" '.runs[] | select(.run == $r) | .alive == false'",
+  "stdout": "{\n  \"ok\": false,\n  \"exit\": 3,\n  \"error\": \"Server exited with code 1 during startup.\",\n  \"hint\": \"Read the log: `control-agent-server logs --tail 80` (a port another process took first shows as `address already in use`).\",\n  \"log\": \"/workspace/verification-artifacts/runs/20261013-024316-e532-map-f31/private/server.log\"\n}\n",
+  "stderr": "jq: error (at <stdin>:5): Cannot iterate over null (null)\n"
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "Run=false action count (`F04.create-initial-message-run-false-actions`), known bug.",
+  "ids": [
+    "F04.create-initial-message-run-false-actions"
+  ],
+  "line": 77,
+  "script": "control-agent-server conversation events \"$NR\" --kinds ActionEvent --expect-count 0 --save F04.create-initial-message-run-false/supplement-actions  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 315,
+  "failed_line": 1,
+  "failed_command": "control-agent-server conversation events \"$NR\" --kinds ActionEvent --expect-count 0 --save F04.create-initial-message-run-false/supplement-actions",
+  "stdout": "{\n  \"ok\": false,\n  \"id\": \"f6fb33ab-b8ff-4fef-9dcc-d08169c94675\",\n  \"total\": 8,\n  \"kinds\": {\n    \"SystemPromptEvent\": 1,\n    \"MessageEvent\": 1,\n    \"ConversationStateUpdateEvent\": 4,\n    \"ActionEvent\": 1,\n    \"ObservationEvent\": 1\n  },\n  \"matching\": 1,\n  \"events\": [\n    {\n      \"id\": \"2cf80734-b531-47c4-9fa0-efe2dd3a2d62\",\n      \"kind\": \"ActionEvent\",\n      \"source\": \"agent\",\n      \"timestamp\": \"2026-10-13T03:27:30.409761\",\n      \"tool_name\": \"finish\",\n      \"action\": \"{\\\"message\\\": \\\"QA_F04_SUPPLEMENT_DONE\\\", \\\"kind\\\": \\\"FinishAction\\\"}\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-032709-376d-map-f04/evidence/F04.create-initial-message-run-false/supplement-actions.json\"\n}\n",
+  "stderr": ""
+}

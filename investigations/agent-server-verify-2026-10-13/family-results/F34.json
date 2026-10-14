@@ -1,0 +1,428 @@
+{
+  "ok": false,
+  "file": "F34-typescript-client.md",
+  "summary": {
+    "pass": 21,
+    "fail": 4,
+    "xfail": 8,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 124,
+      "exit_code": 0,
+      "elapsed_ms": 11871,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-00-preconditions.json"
+    },
+    {
+      "bullet": "Server status and version gate (`F34.server-client`).",
+      "ids": [
+        "F34.server-client"
+      ],
+      "line": 234,
+      "exit_code": 0,
+      "elapsed_ms": 30636,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-01-server-status-and-version-gate-f34-serve.json"
+    },
+    {
+      "bullet": "Errors (`F34.http-errors`).",
+      "ids": [
+        "F34.http-errors"
+      ],
+      "line": 282,
+      "exit_code": 0,
+      "elapsed_ms": 12751,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-02-errors-f34-http-errors.json"
+    },
+    {
+      "bullet": "Workspace commands (`F34.workspace-exec`).",
+      "ids": [
+        "F34.workspace-exec"
+      ],
+      "line": 321,
+      "exit_code": 0,
+      "elapsed_ms": 14177,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-03-workspace-commands-f34-workspace-exec.json"
+    },
+    {
+      "bullet": "Workspace files (`F34.workspace-files`).",
+      "ids": [
+        "F34.workspace-files"
+      ],
+      "line": 350,
+      "exit_code": 0,
+      "elapsed_ms": 12841,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-04-workspace-files-f34-workspace-files.json"
+    },
+    {
+      "bullet": "Binary download through RemoteWorkspace (`F34.workspace-binary-download`), known bug.",
+      "ids": [
+        "F34.workspace-binary-download"
+      ],
+      "line": 380,
+      "exit_code": 1,
+      "elapsed_ms": 11131,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-05-binary-download-through-remoteworkspace-.json",
+      "failed_line": 16,
+      "failed_command": "jq -e '.blob == [255, 0, 128, 254, 65] and .file_size == 5' \"$F34/binary.json\"",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 8923,\n  \"stdout_tail\": \"QA_F34_BINARY_READ\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.workspace-binary-download/program.json\"\n}\n{\"blob\":[239,191,189,0,239,191,189,239,191,189,65],\"file_size\":11}false\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Conversation-scoped workspace (`F34.workspace-scoped`).",
+      "ids": [
+        "F34.workspace-scoped"
+      ],
+      "line": 409,
+      "exit_code": 0,
+      "elapsed_ms": 12968,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-06-conversation-scoped-workspace-f34-worksp.json"
+    },
+    {
+      "bullet": "Git through RemoteWorkspace (`F34.workspace-git`).",
+      "ids": [
+        "F34.workspace-git"
+      ],
+      "line": 439,
+      "exit_code": 0,
+      "elapsed_ms": 21733,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-07-git-through-remoteworkspace-f34-workspac.json"
+    },
+    {
+      "bullet": "Git status type (`F34.workspace-git-types`), known bug.",
+      "ids": [
+        "F34.workspace-git-types"
+      ],
+      "line": 477,
+      "exit_code": 2,
+      "elapsed_ms": 19582,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-08-git-status-type-f34-workspace-git-types-.json",
+      "failed_line": 22,
+      "failed_command": "$TSC \"$F34/git-types.mts\"",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 5546,\n  \"stdout_tail\": \"QA_F34_GIT_TYPES_WRITTEN\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.workspace-git-types/program.json\"\n}\n../verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/git-types.mts(2,54): error TS2322: Type '\"UPDATED\"' is not assignable to type '\"added\" | \"modified\" | \"deleted\" | \"renamed\"'.\n../verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/git-types.mts(2,64): error TS2820: Type '\"ADDED\"' is not assignable to type '\"added\" | \"modified\" | \"deleted\" | \"renamed\"'. Did you mean '\"added\"'?\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Bash client (`F34.bash-client`).",
+      "ids": [
+        "F34.bash-client"
+      ],
+      "line": 515,
+      "exit_code": 0,
+      "elapsed_ms": 34694,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-09-bash-client-f34-bash-client.json"
+    },
+    {
+      "bullet": "Bash events socket from Node (`F34.bash-websocket`), known bug.",
+      "ids": [
+        "F34.bash-websocket"
+      ],
+      "line": 564,
+      "exit_code": 1,
+      "elapsed_ms": 30451,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-10-bash-events-socket-from-node-f34-bash-we.json",
+      "failed_line": 22,
+      "failed_command": "jq -e '.saw_output and .errors == []' \"$F34/bash-ws.json\"",
+      "stdout_tail": "4/captures/qa-f34-bash-ws.jsonl\",\n  \"opened\": true,\n  \"stopped\": \"stopped\",\n  \"frames\": 2,\n  \"kinds\": {\n    \"BashCommand\": 1,\n    \"BashOutput\": 1\n  },\n  \"close\": null,\n  \"matching\": 1,\n  \"matching_kinds\": [\n    \"BashOutput\"\n  ],\n  \"frames_shown\": [\n    {\n      \"kind\": \"BashOutput\",\n      \"frame\": {\n        \"id\": \"51f36e89e9db42aab91c9d0de6166e20\",\n        \"timestamp\": \"2026-10-13T02:24:07.687886Z\",\n        \"command_id\": \"67515b00319c49d2937e398ed8912a79\",\n        \"order\": 0,\n        \"exit_code\": 0,\n        \"stdout\": \"qa-f34-bash-ws\\n\",\n        \"stderr\": null,\n        \"kind\": \"BashOutput\"\n      }\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.bash-websocket/cli.json\"\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 16335,\n  \"stdout_tail\": \"QA_F34_BASH_WS_DONE\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.bash-websocket/program.json\"\n}\n{\"saw_output\":false,\"frames\":0,\"errors\":[\"Failed to create bash WebSocket connection: WebSocket implementation not available. Install the `ws` package, or run in an environment with a global WebSocket constructor.\"]}false\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Workspace session (`F34.workspace-session`).",
+      "ids": [
+        "F34.workspace-session"
+      ],
+      "line": 601,
+      "exit_code": 0,
+      "elapsed_ms": 16090,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-11-workspace-session-f34-workspace-session.json"
+    },
+    {
+      "bullet": "Create a conversation (`F34.conversation-create`).",
+      "ids": [
+        "F34.conversation-create"
+      ],
+      "line": 630,
+      "exit_code": 0,
+      "elapsed_ms": 30729,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-12-create-a-conversation-f34-conversation-c.json"
+    },
+    {
+      "bullet": "Send and run (`F34.conversation-run`).",
+      "ids": [
+        "F34.conversation-run"
+      ],
+      "line": 661,
+      "exit_code": 0,
+      "elapsed_ms": 59641,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-13-send-and-run-f34-conversation-run.json"
+    },
+    {
+      "bullet": "Events list (`F34.events-list`).",
+      "ids": [
+        "F34.events-list"
+      ],
+      "line": 738,
+      "exit_code": 0,
+      "elapsed_ms": 20223,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-14-events-list-f34-events-list.json"
+    },
+    {
+      "bullet": "Unknown event id (`F34.events-unknown-id`), known bug.",
+      "ids": [
+        "F34.events-unknown-id"
+      ],
+      "line": 775,
+      "exit_code": 1,
+      "elapsed_ms": 30791,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-15-unknown-event-id-f34-events-unknown-id-k.json",
+      "failed_line": 16,
+      "failed_command": "jq -e '.single.http_error and .single.status == 404' \"$F34/unknown-event.json\"",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 28747,\n  \"stdout_tail\": \"QA_F34_UNKNOWN_EVENT_READ\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.events-unknown-id/program.json\"\n}\n{\"first\":\"6946d06d-b0ce-4c32-b2df-39a01a941252\",\"single\":{\"http_error\":true,\"status\":500,\"response\":{\"detail\":\"Internal Server Error\",\"exception\":\"'Unknown event_id: 00000000-0000-0000-0000-000000000000'\",\"error_id\":\"d790d7ce0269498f9d23a786fbabc470\"}},\"batch\":{\"http_error\":true,\"status\":500,\"response\":{\"detail\":\"Internal Server Error\",\"exception\":\"'Unknown event_id: 00000000-0000-0000-0000-000000000000'\",\"error_id\":\"a28d92568c7c46ff8f0a8bedddf9d2c8\"}}}false\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Short event kinds (`F34.events-search-kind`), known bug.",
+      "ids": [
+        "F34.events-search-kind"
+      ],
+      "line": 805,
+      "exit_code": 1,
+      "elapsed_ms": 11292,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-16-short-event-kinds-f34-events-search-kind.json",
+      "failed_line": 16,
+      "failed_command": "jq -e '.short == .full and .short_count == 1' \"$F34/kind.json\"",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 9351,\n  \"stdout_tail\": \"QA_F34_KIND_READ\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.events-search-kind/program.json\"\n}\n{\"full\":[\"9ab9cff7-24a2-4a55-bd87-a4971d5c83b0\"],\"short\":[],\"short_count\":0}false\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Event stream on Node's WebSocket (`F34.event-stream`).",
+      "ids": [
+        "F34.event-stream"
+      ],
+      "line": 834,
+      "exit_code": 0,
+      "elapsed_ms": 25277,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-17-event-stream-on-node-s-websocket-f34-eve.json"
+    },
+    {
+      "bullet": "Conversation callback socket from Node (`F34.ws-callback-client`), known bug.",
+      "ids": [
+        "F34.ws-callback-client"
+      ],
+      "line": 888,
+      "exit_code": 1,
+      "elapsed_ms": 32262,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-18-conversation-callback-socket-from-node-f.json",
+      "failed_line": 20,
+      "failed_command": "jq -e '(.kinds | index(\"ConversationStateUpdateEvent\")) != null and .errors == []' \"$F34/callback.json\"",
+      "stdout_tail": "\n  \"frames\": 1,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 1\n  },\n  \"stopped\": \"duration\",\n  \"close\": null,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.ws-callback-client/cli.json\",\n  \"first_frames\": [\n    {\n      \"kind\": \"ConversationStateUpdateEvent\",\n      \"frame\": \"{\\\"id\\\": \\\"d2295011-4321-4e69-a09d-a1008d4c91a1\\\", \\\"timestamp\\\": \\\"2026-10-13T02:27:52.603127\\\", \\\"source\\\": \\\"environment\\\", \\\"key\\\": \\\"full_state\\\", \\\"value\\\": {\\\"id\\\": \\\"36b83fb6-9423-4b08-86a5-f40bd9c94132\\\", \\\"agent\\\": {\\\"llm\\\": {\\\"model\\\": \\\"openai/qa-placeholder\\\", \\\"api_key\\\": \\\"<redacted:api_key>\\\", \\\"auth_type\\\": \\\"api_key\\\", \\\"base_url\\\": \\\"http://127.0.0.1:9/v1\\\", \\\"openrouter_site_url\\\": \\\"https://docs.all-hands.dev/\\\", \\\"openrouter_app_\\u2026\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 23257,\n  \"stdout_tail\": \"QA_F34_CALLBACK_DONE\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.ws-callback-client/program.json\"\n}\n{\"kinds\":[],\"errors\":[\"WebSocket implementation not available. Install the `ws` package, or run in an environment with a global WebSocket constructor.\"]}false\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Title and confirmation policy (`F34.conversation-controls`).",
+      "ids": [
+        "F34.conversation-controls"
+      ],
+      "line": 922,
+      "exit_code": 0,
+      "elapsed_ms": 28220,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-19-title-and-confirmation-policy-f34-conver.json"
+    },
+    {
+      "bullet": "Conversation manager (`F34.manager`).",
+      "ids": [
+        "F34.manager"
+      ],
+      "line": 945,
+      "exit_code": 0,
+      "elapsed_ms": 36132,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-20-conversation-manager-f34-manager.json"
+    },
+    {
+      "bullet": "Update result (`F34.manager-update-result`), known bug.",
+      "ids": [
+        "F34.manager-update-result"
+      ],
+      "line": 986,
+      "exit_code": 1,
+      "elapsed_ms": 18899,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-21-update-result-f34-manager-update-result-.json",
+      "failed_line": 14,
+      "failed_command": "jq -e --arg id \"$SCID\" '.id == $id and .title == \"qa-f34-renamed\"' \"$F34/update.json\"",
+      "stdout_tail": "ll,\n            \"inline_image_urls\": null,\n            \"reasoning_effort\": \"high\",\n            \"reasoning_summary\": null,\n            \"enable_encrypted_reasoning\": true,\n            \"prompt_cache_retention\": \"24h\",\n            \"extended_thinking_budget\": 200000,\n            \"seed\": null,\n            \"usage_id\": \"condenser\",\n            \"litellm_extra_body\": {},\n            \"is_subscription\": false\n          },\n          \"max_size\": 240,\n          \"max_tokens\": null,\n          \"keep_first\": 2,\n          \"minimum_progress\": 0.1,\n          \"hard_context_reset_max_retries\": 5,\n          \"hard_context_reset_context_scaling\": 0.8,\n          \"kind\": \"LLMSummarizingCondenser\"\n        },\n        \"critic\": null,\n        \"tool_concurrency_limit\": 1,\n        \"persona\": null,\n        \"kind\": \"Agent\"\n      },\n      \"client_tools\": [],\n      \"tool_module_qualnames\": {},\n      \"runtime_info\": {\n        \"runtime_status\": \"available\",\n        \"can_resume\": true,\n        \"runtime_error\": null\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 560,\n  \"checks\": [\n    {\n      \"check\": \"title eq qa-f34-renamed\",\n      \"ok\": true,\n      \"actual\": \"qa-f34-renamed\"\n    }\n  ]\n}\n{\"success\":true}false\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Create options (`F34.manager-create-options`), known bug.",
+      "ids": [
+        "F34.manager-create-options"
+      ],
+      "line": 1013,
+      "exit_code": 1,
+      "elapsed_ms": 30746,
+      "status": "xfail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-22-create-options-f34-manager-create-option.json",
+      "failed_line": 21,
+      "failed_command": "jq -e '.max_iterations == 7 and .stuck_detection == false' \"$F34/create-options.json\"",
+      "stdout_tail": "TIONS_READ\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.manager-create-options/program.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/4c4caf3b-7333-4782-b48e-c12de16769e8\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"22\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1123\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/eaaa3986-dcdc-4f39-a2a1-8371a106b8f3\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"22\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 940\n}\n{\"ids\":[\"4c4caf3b-7333-4782-b48e-c12de16769e8\",\"eaaa3986-dcdc-4f39-a2a1-8371a106b8f3\"],\"max_iterations\":500,\"stuck_detection\":true}false\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "ACP conversations (`F34.manager-acp`).",
+      "ids": [
+        "F34.manager-acp"
+      ],
+      "line": 1050,
+      "exit_code": 0,
+      "elapsed_ms": 36283,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-23-acp-conversations-f34-manager-acp.json"
+    },
+    {
+      "bullet": "Fork, navigate and ask (`F34.conversation-branching`).",
+      "ids": [
+        "F34.conversation-branching"
+      ],
+      "line": 1086,
+      "exit_code": 0,
+      "elapsed_ms": 44580,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-24-fork-navigate-and-ask-f34-conversation-b.json"
+    },
+    {
+      "bullet": "Confirmation and secrets (`F34.conversation-confirm`).",
+      "ids": [
+        "F34.conversation-confirm"
+      ],
+      "line": 1132,
+      "exit_code": 0,
+      "elapsed_ms": 88280,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-25-confirmation-and-secrets-f34-conversatio.json"
+    },
+    {
+      "bullet": "Hooks (`F34.hooks-client`).",
+      "ids": [
+        "F34.hooks-client"
+      ],
+      "line": 1215,
+      "exit_code": 0,
+      "elapsed_ms": 32377,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-26-hooks-f34-hooks-client.json"
+    },
+    {
+      "bullet": "MCP test (`F34.mcp-client`).",
+      "ids": [
+        "F34.mcp-client"
+      ],
+      "line": 1243,
+      "exit_code": 0,
+      "elapsed_ms": 88172,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-27-mcp-test-f34-mcp-client.json"
+    },
+    {
+      "bullet": "Restart (`F34.restart-reload`).",
+      "ids": [
+        "F34.restart-reload"
+      ],
+      "line": 1271,
+      "exit_code": 0,
+      "elapsed_ms": 95854,
+      "status": "pass",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-28-restart-f34-restart-reload.json"
+    },
+    {
+      "bullet": "Event stream reconnect (`F34.event-stream-reconnect`).",
+      "ids": [
+        "F34.event-stream-reconnect"
+      ],
+      "line": 1294,
+      "exit_code": 1,
+      "elapsed_ms": 89485,
+      "status": "fail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-29-event-stream-reconnect-f34-event-stream-.json",
+      "failed_line": 14,
+      "failed_command": "jq -e '.ws | .went_down and .attempts >= 1 and .reconnected and .replayed_after >= 1 and .sent_after >= 1' \"$F34/reconnect-ws.json\"",
+      "stdout_tail": "tifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.event-stream-reconnect/program.json\"\n}\n{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34\",\n  \"url\": \"http://127.0.0.1:59687\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 51601,\n  \"ready_path\": \"/ready\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/3e88e183-9561-41f1-89bf-63b077acaa78/events\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"qa-f34-after-restart\"\n        }\n      ],\n      \"run\": false\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1124\n}\n{\"ws\":{\"went_down\":true,\"reconnected\":false,\"attempts\":6,\"replayed_after\":0,\"sent_after\":0,\"last_state\":{\"isConnected\":false,\"isReconnecting\":true,\"attemptCount\":6,\"error\":\"WebSocket closed with code 1006: Connection closed unexpectedly\"}}}false\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Reconnect on Node's own WebSocket (`F34.event-stream-reconnect-native`), known bug.",
+      "ids": [
+        "F34.event-stream-reconnect-native"
+      ],
+      "line": 1327,
+      "exit_code": 1,
+      "elapsed_ms": 8999,
+      "status": "fail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-30-reconnect-on-node-s-own-websocket-f34-ev.json",
+      "failed_line": 2,
+      "failed_command": "RNID=$(control-agent-server conversation start --no-run --placeholder-agent --tools none --no-autotitle --workspace \"$F34/scoped\" --prompt 'qa-f34-reconnect: never run' --print-id)",
+      "stdout_tail": "",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Endpoint audit against this checkout (`F34.endpoint-audit`).",
+      "ids": [
+        "F34.endpoint-audit"
+      ],
+      "line": 1358,
+      "exit_code": 1,
+      "elapsed_ms": 41,
+      "status": "fail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-31-endpoint-audit-against-this-checkout-f34.json",
+      "failed_line": 2,
+      "failed_command": "mkdir -p \"$A/home\"",
+      "stdout_tail": "",
+      "stderr_tail": "mkdir: cannot create directory \u2018/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/audit\u2019: No space left on device\n"
+    },
+    {
+      "bullet": "Old server version (`F34.version-gate-old`).",
+      "ids": [
+        "F34.version-gate-old"
+      ],
+      "line": 1396,
+      "exit_code": 1,
+      "elapsed_ms": 38,
+      "status": "fail",
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/map-run/F34-typescript-client-32-old-server-version-f34-version-gate-old.json",
+      "failed_line": 2,
+      "failed_command": "mkdir -p \"$OLD/home\" \"$OLD/persist\"",
+      "stdout_tail": "",
+      "stderr_tail": "mkdir: cannot create directory \u2018/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/old-server\u2019: No space left on device\nmkdir: cannot create directory \u2018/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/old-server\u2019: No space left on device\n"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34",
+  "launch_flags": [],
+  "reconstructed_from_saved_transcripts": true,
+  "reconstruction_reason": "Original map finished all32 features; final JSON output failed with ENOSPC. Statuses are original ledger results, with original transcript paths. No result was reclassified."
+}

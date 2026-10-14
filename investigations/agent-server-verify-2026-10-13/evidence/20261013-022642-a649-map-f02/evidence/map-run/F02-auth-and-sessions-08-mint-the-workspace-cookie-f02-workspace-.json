@@ -1,0 +1,15 @@
+{
+  "file": "F02-auth-and-sessions.md",
+  "bullet": "Mint the workspace cookie (`F02.workspace-session-mint`).",
+  "ids": [
+    "F02.workspace-session-mint"
+  ],
+  "line": 265,
+  "script": "control-agent-server api POST /api/auth/workspace-session --expect 204 --save F02.workspace-session-mint/loopback \\\n  | jq -e '.response.headers[\"set-cookie\"] | startswith(\"oh_workspace_session_key=\") and contains(\"HttpOnly\") and contains(\"Max-Age=315360000\") and contains(\"Path=<redacted:session-cookie>\") and contains(\"SameSite=none\") and contains(\"Secure\") and contains(\"Partitioned\")'\ncontrol-agent-server api POST /api/auth/workspace-session --auth none --expect 401 --check detail eq Unauthorized --save F02.workspace-session-mint/no-key \\\n  | jq -e '.response.headers[\"set-cookie\"] == null'\ncontrol-agent-server api POST /api/auth/workspace-session --auth bad --expect 401 --check detail eq Unauthorized | jq -e '.response.headers[\"set-cookie\"] == null'\nKEY=$(cat \"$AGENT_SERVER_VERIFY_RUN/private/session_api_key\")\ncontrol-agent-server api POST /api/auth/workspace-session --auth none --cookie \"oh_workspace_session_key=$KEY\" --expect 401 --save F02.workspace-session-mint/cookie-only\nunset KEY\ncontrol-agent-server api POST /api/auth/workspace-session --json '{\"ignored\": true}' --expect 204\n",
+  "exit_code": 0,
+  "elapsed_ms": 15446,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "true\ntrue\ntrue\n{\n  \"ok\": true,\n  \"status\": 401,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/auth/workspace-session\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 401,\n    \"headers\": {\n      \"content-length\": \"25\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Unauthorized\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 441,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022642-a649-map-f02/evidence/F02.workspace-session-mint/cookie-only.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 204,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/auth/workspace-session\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"ignored\": true\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 204,\n    \"headers\": {\n      \"set-cookie\": \"oh_workspace_session_key=<redacted:session-cookie>; HttpOnly; Max-Age=315360000; Path=<redacted:session-cookie>; SameSite=none; Secure; Partitioned\"\n    },\n    \"body\": \"\",\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 434\n}\n",
+  "stderr": ""
+}

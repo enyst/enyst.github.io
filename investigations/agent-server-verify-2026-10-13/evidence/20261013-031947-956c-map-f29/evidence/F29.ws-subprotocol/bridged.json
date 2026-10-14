@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/workspace/agent-sdk-verify/.venv/bin/python",
+    "-c",
+    "import sys; from websockets.sync.client import connect; ws = connect(sys.argv[1], subprotocols=[\"qa.v1\"], origin=sys.argv[2], additional_headers={\"Cookie\": \"oh_app_backend_session=\" + sys.argv[3]}, proxy=None); print(\"subprotocol=\" + str(ws.subprotocol)); ws.send(\"qa-f29-proto\"); print(ws.recv(timeout=10)); ws.close()",
+    "ws://127.0.0.1:45633/app-backends/qa-headers/ws",
+    "http://127.0.0.1:45633",
+    "D25WY9c358Szjwdqtz6oaYpRcPB-qcqiWHm5iga0NFc"
+  ],
+  "cwd": "/workspace/agent-sdk-verify",
+  "exit_code": 0,
+  "elapsed_ms": 106,
+  "stdout": "subprotocol=None\n{\"kind\": \"qa_ws_echo\", \"echo\": \"qa-f29-proto\", \"protocol\": \"none\", \"cookie\": \"absent\", \"origin\": \"absent\", \"session_key\": \"absent\", \"query\": \"none\"}\n",
+  "stderr": ""
+}

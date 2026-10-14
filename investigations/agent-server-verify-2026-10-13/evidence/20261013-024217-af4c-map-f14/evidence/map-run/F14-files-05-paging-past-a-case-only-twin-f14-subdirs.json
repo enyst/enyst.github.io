@@ -1,0 +1,15 @@
+{
+  "file": "F14-files.md",
+  "bullet": "Paging past a case-only twin (`F14.subdirs-case-pagination`), known bug.",
+  "ids": [
+    "F14.subdirs-case-pagination"
+  ],
+  "line": 387,
+  "script": "CASE_DIR=\"$F/case\"\nmkdir -p \"$CASE_DIR/Foo\" \"$CASE_DIR/foo\"\nCASE_FIRST=$(control-agent-server api GET /api/file/search_subdirs --query path=\"$CASE_DIR\" --query limit=1 \\\n  --expect 200 --check items len-eq 1 --field items.0.name)\nCASE_NEXT=$(control-agent-server api GET /api/file/search_subdirs --query path=\"$CASE_DIR\" --query limit=1 \\\n  --expect 200 --check next_page_id exists --field next_page_id)\nif test \"$CASE_FIRST\" = Foo; then CASE_OTHER=foo; else CASE_OTHER=Foo; fi\ntest \"$CASE_FIRST\" = Foo -o \"$CASE_FIRST\" = foo\ncontrol-agent-server api GET /api/file/search_subdirs --query path=\"$CASE_DIR\" --query limit=1 --query page_id=\"$CASE_NEXT\" \\\n  --expect 200 --check items len-eq 1 --check items.0.name eq \"$CASE_OTHER\" --check next_page_id missing \\\n  --save F14.subdirs-case-pagination/page-2  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 3202,
+  "failed_line": 9,
+  "failed_command": "control-agent-server api GET /api/file/search_subdirs --query path=\"$CASE_DIR\" --query limit=1 --query page_id=\"$CASE_NEXT\" --expect 200 --check items len-eq 1 --check items.0.name eq \"$CASE_OTHER\" --check next_page_id missing --save F14.subdirs-case-pagination/page-2",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/file/search_subdirs\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/fixtures/qa-f14/case\"\n      ],\n      [\n        \"limit\",\n        \"1\"\n      ],\n      [\n        \"page_id\",\n        \"foo\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"149\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"items\": [\n        {\n          \"name\": \"Foo\",\n          \"path\": \"/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/fixtures/qa-f14/case/Foo\"\n        }\n      ],\n      \"next_page_id\": \"foo\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 181,\n  \"checks\": [\n    {\n      \"check\": \"items len-eq 1\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"name\\\": \\\"Foo\\\", \\\"path\\\": \\\"/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/fixtures/qa-f14/case/Foo\\\"}]\"\n    },\n    {\n      \"check\": \"items.0.name eq foo\",\n      \"ok\": false,\n      \"actual\": \"Foo\"\n    },\n    {\n      \"check\": \"next_page_id missing\",\n      \"ok\": false,\n      \"actual\": \"foo\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/F14.subdirs-case-pagination/page-2.json\",\n  \"hint\": \"failed check: items.0.name eq foo; next_page_id missing\"\n}\n",
+  "stderr": ""
+}

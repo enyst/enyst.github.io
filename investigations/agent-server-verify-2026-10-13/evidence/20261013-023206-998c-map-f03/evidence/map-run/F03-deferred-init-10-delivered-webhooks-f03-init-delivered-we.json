@@ -1,0 +1,15 @@
+{
+  "file": "F03-deferred-init.md",
+  "bullet": "Delivered webhooks (`F03.init-delivered-webhooks`).",
+  "ids": [
+    "F03.init-delivered-webhooks"
+  ],
+  "line": 272,
+  "script": "if grep -q webhooks \"$AGENT_SERVER_VERIFY_RUN/private/config.json\"; then false; fi\ncontrol-agent-server sink read --name qa-f03-hooks --path /conversations --contains \"\\\"id\\\": \\\"$F03_CID\\\"\" --expect-min 1 --wait 15 \\\n  --save F03.init-delivered-webhooks/conversation-created\ncontrol-agent-server sink read --name qa-f03-hooks --path /conversations --contains '\"X-QA-F03\": \"delivered-hook\"' --expect-min 1\ncontrol-agent-server sink read --name qa-f03-hooks --path /conversations --contains '\"X-Session-API-Key\": \"qa-user-key\"' --expect-min 1\n",
+  "exit_code": 0,
+  "elapsed_ms": 6560,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"requests\": 1,\n  \"paths\": {\n    \"/conversations\": 1\n  },\n  \"last\": [\n    \"{\\\"at\\\": \\\"2026-10-13T02:36:33Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/conversations\\\", \\\"headers\\\": {\\\"Host\\\": \\\"127.0.0.1:35881\\\", \\\"Accept\\\": \\\"*/*\\\", \\\"Accept-Encoding\\\": \\\"gzip, deflate\\\", \\\"Connection\\\": \\\"keep-alive\\\", \\\"User-Agent\\\": \\\"python-httpx/0.28.1\\\", \\\"X-QA-F03\\\": \\\"delivered-hook\\\", \\\"X-Session-API-Key\\\": \\\"qa-user-key\\\", \\\"Content-Length\\\": \\\"4846\\\", \\\"Content-Type\\\": \\\"application/json\\\"}, \\\"body\\\": {\\\"id\\\": \\\"7bcb4125-0d32-4c70-8312\\u2026\"\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-023206-998c-map-f03/evidence/F03.init-delivered-webhooks/conversation-created.json\"\n}\n{\n  \"ok\": true,\n  \"requests\": 1,\n  \"paths\": {\n    \"/conversations\": 1\n  },\n  \"last\": [\n    \"{\\\"at\\\": \\\"2026-10-13T02:36:33Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/conversations\\\", \\\"headers\\\": {\\\"Host\\\": \\\"127.0.0.1:35881\\\", \\\"Accept\\\": \\\"*/*\\\", \\\"Accept-Encoding\\\": \\\"gzip, deflate\\\", \\\"Connection\\\": \\\"keep-alive\\\", \\\"User-Agent\\\": \\\"python-httpx/0.28.1\\\", \\\"X-QA-F03\\\": \\\"delivered-hook\\\", \\\"X-Session-API-Key\\\": \\\"qa-user-key\\\", \\\"Content-Length\\\": \\\"4846\\\", \\\"Content-Type\\\": \\\"application/json\\\"}, \\\"body\\\": {\\\"id\\\": \\\"7bcb4125-0d32-4c70-8312\\u2026\"\n  ]\n}\n{\n  \"ok\": true,\n  \"requests\": 1,\n  \"paths\": {\n    \"/conversations\": 1\n  },\n  \"last\": [\n    \"{\\\"at\\\": \\\"2026-10-13T02:36:33Z\\\", \\\"method\\\": \\\"POST\\\", \\\"path\\\": \\\"/conversations\\\", \\\"headers\\\": {\\\"Host\\\": \\\"127.0.0.1:35881\\\", \\\"Accept\\\": \\\"*/*\\\", \\\"Accept-Encoding\\\": \\\"gzip, deflate\\\", \\\"Connection\\\": \\\"keep-alive\\\", \\\"User-Agent\\\": \\\"python-httpx/0.28.1\\\", \\\"X-QA-F03\\\": \\\"delivered-hook\\\", \\\"X-Session-API-Key\\\": \\\"qa-user-key\\\", \\\"Content-Length\\\": \\\"4846\\\", \\\"Content-Type\\\": \\\"application/json\\\"}, \\\"body\\\": {\\\"id\\\": \\\"7bcb4125-0d32-4c70-8312\\u2026\"\n  ]\n}\n",
+  "stderr": ""
+}

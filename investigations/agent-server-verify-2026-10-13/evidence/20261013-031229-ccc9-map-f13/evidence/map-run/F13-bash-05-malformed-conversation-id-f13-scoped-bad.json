@@ -1,0 +1,15 @@
+{
+  "file": "F13-bash.md",
+  "bullet": "Malformed conversation id (`F13.scoped-bad-id`), known bug.",
+  "ids": [
+    "F13.scoped-bad-id"
+  ],
+  "line": 770,
+  "script": "CASE_FAILURE=0\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/bash/bash_events/search\" --expect 200\ncontrol-agent-server api GET <redacted:session-cookie>/not-a-uuid/bash/bash_events/search --expect 422 \\\n  --save F13.scoped-bad-id/search || CASE_FAILURE=1\ncontrol-agent-server api POST <redacted:session-cookie>/not-a-uuid/bash/execute_bash_command \\\n  --json '{\"command\": \"echo QA_F13_BADID\"}' --expect 422 --save F13.scoped-bad-id/execute || CASE_FAILURE=1\ntest \"$CASE_FAILURE\" -eq 0  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 2495,
+  "failed_line": 7,
+  "failed_command": "test \"$CASE_FAILURE\" -eq 0",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/822a6979-41b1-4fac-97bc-233217671863/bash/bash_events/search\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"32\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"items\": [],\n      \"next_page_id\": null\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 56\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/not-a-uuid/bash/bash_events/search\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"150\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"'State' object has no attribute 'runtime_event_service'\",\n      \"error_id\": \"54ba7cb1e44b4dadabd309c00f37aaab\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 464,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.scoped-bad-id/search.json\",\n  \"hint\": \"expected 422, got 500\"\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/not-a-uuid/bash/execute_bash_command\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"command\": \"echo QA_F13_BADID\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"150\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"'State' object has no attribute 'runtime_event_service'\",\n      \"error_id\": \"f09de8ace5b74a01b57d7fe155640aec\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 874,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-031229-ccc9-map-f13/evidence/F13.scoped-bad-id/execute.json\",\n  \"hint\": \"expected 422, got 500\"\n}\n",
+  "stderr": ""
+}

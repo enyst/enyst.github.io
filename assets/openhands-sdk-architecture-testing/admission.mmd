@@ -1,0 +1,8 @@
+flowchart TD
+    A["Approved contracts and verifier"] --> V["Independent evaluation"]
+    C["Candidate build"] --> R["Isolated Agent Server"]
+    R -->|"REST, WS, observed effects"| V
+    V --> G{"Required result"}
+    G -->|"Pass"| M["Merge candidate"]
+    G -->|"Failing trace"| F["Repair agent"]
+    F --> C

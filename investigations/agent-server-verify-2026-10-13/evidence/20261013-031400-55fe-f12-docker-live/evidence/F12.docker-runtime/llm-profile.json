@@ -1,0 +1,42 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/profiles/qa-f12-docker-llm",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "model": "openai/qa-stub",
+      "api_key": "qa",
+      "base_url": "http://127.0.0.1:9/v1",
+      "num_retries": 0
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "184",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "missing",
+          "loc": [
+            "body",
+            "llm"
+          ],
+          "msg": "Field required",
+          "input": {
+            "model": "openai/qa-stub",
+            "api_key": "<redacted>",
+            "base_url": "http://127.0.0.1:9/v1",
+            "num_retries": 0
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 86
+}

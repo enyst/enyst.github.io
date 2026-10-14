@@ -1,0 +1,13 @@
+{
+  "file": "F13-bash.md",
+  "bullet": "Preconditions",
+  "ids": [],
+  "line": 100,
+  "script": "NOLLM='{\"agent\": {\"llm\": {\"model\": \"openai/qa-f13-never-called\", \"usage_id\": \"qa-f13\"}, \"tools\": []}}'\nCID=$(control-agent-server conversation start --body-json \"$NOLLM\" --no-run --no-autotitle --print-id)\nCID2=$(control-agent-server conversation start --body-json \"$NOLLM\" --no-run --no-autotitle --print-id)\nWS1=$(control-agent-server api GET \"<redacted:session-cookie>/$CID\" --field workspace.working_dir)\nWS2=$(control-agent-server api GET \"<redacted:session-cookie>/$CID2\" --field workspace.working_dir)\nSERVER_CWD=\"$AGENT_SERVER_VERIFY_RUN/server\"\ntest -d \"$WS1\" && test -d \"$WS2\" && test -d \"$SERVER_CWD\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 1660,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "",
+  "stderr": ""
+}

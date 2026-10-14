@@ -1,0 +1,15 @@
+{
+  "file": "F13-bash.md",
+  "bullet": "Idle eviction kills a running command (`F13.scoped-idle-eviction`), known bug.",
+  "ids": [
+    "F13.scoped-idle-eviction"
+  ],
+  "line": 789,
+  "script": "EV=$(control-agent-server launch --new --name f13-evict --config-json '{\"conversation_idle_ttl_seconds\": 5}' --print-run)\ntrap 'control-agent-server stop --run \"$EV\" > /dev/null 2>&1 || true' EXIT\nEV_CID=$(control-agent-server conversation start --run \"$EV\" --body-json \"$NOLLM\" --no-run --no-autotitle --print-id)\nEV_MARK=QA_F13_EVICT_$RANDOM\nEV_CMD=$(control-agent-server api POST \"<redacted:session-cookie>/$EV_CID/bash/start_bash_command\" --run \"$EV\" \\\n  --json \"{\\\"command\\\": \\\"sleep 600 # $EV_MARK\\\"}\" --field id)\nEV_IDLE=$(control-agent-server conversation start --run \"$EV\" --body-json \"$NOLLM\" --no-run --no-autotitle --print-id)\nfor i in $(seq 1 20); do pgrep -f \"$EV_MARK\" > /dev/null && break; sleep 0.25; done\npgrep -f \"$EV_MARK\"\ncontrol-agent-server state ls owner_lease.json --run \"$EV\" --conversation \"$EV_IDLE\" --expect-count 1\ncontrol-agent-server logs --run \"$EV\" --grep 'Evicted idle' --expect-none\nT0=$SECONDS\nuntil control-agent-server state ls owner_lease.json --run \"$EV\" --conversation \"$EV_IDLE\" --expect-count 0 > /dev/null; do\n  test $((SECONDS - T0)) -le 100\n  sleep 2\ndone\ncontrol-agent-server logs --run \"$EV\" --grep 'Evicted idle' --expect-min 1\nsleep 3\npgrep -f \"$EV_MARK\"  # bug\ncontrol-agent-server api POST \"<redacted:session-cookie>/$EV_CID/bash/bash_commands/$EV_CMD/stop\" --run \"$EV\" --expect 200\ncontrol-agent-server api GET \"<redacted:session-cookie>/$EV_CID/bash/bash_events/search\" --run \"$EV\" \\\n  --query command_id__eq=\"$EV_CMD\" --until-ok 15 --check items.-1.exit_code eq -15\n",
+  "exit_code": 1,
+  "elapsed_ms": 88202,
+  "failed_line": 19,
+  "failed_command": "pgrep -f \"$EV_MARK\"",
+  "stdout": "72838\n{\n  \"ok\": true,\n  \"pattern\": \"owner_lease.json\",\n  \"count\": 1,\n  \"files\": [\n    {\n      \"path\": \"server/workspace/conversations/2d1196f23bb646c686a0cfa7b043b729/owner_lease.json\",\n      \"bytes\": 157,\n      \"mode\": \"0o600\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"log\": \"/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict/private/server.log\",\n  \"lines\": [],\n  \"total_matching\": 0\n}\n{\n  \"ok\": true,\n  \"log\": \"/workspace/verification-artifacts/runs/20261013-031250-486e-f13-evict/private/server.log\",\n  \"lines\": [\n    \"[10/13/26 03:13:58] INFO     Evicted idle           conversation_service.py:2140\",\n    \"[10/13/26 03:13:58] INFO     Evicted idle           conversation_service.py:2140\"\n  ],\n  \"total_matching\": 2\n}\n",
+  "stderr": ""
+}

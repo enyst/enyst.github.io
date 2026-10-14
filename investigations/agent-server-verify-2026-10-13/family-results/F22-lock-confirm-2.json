@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "file": "F22-meta-profiles.md",
+  "summary": {
+    "pass": 2,
+    "fail": 0,
+    "xfail": 1,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 92,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 21758,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/map-run/F22-meta-profiles-00-preconditions.json"
+    },
+    {
+      "bullet": "Save in classes mode (`F22.save-classes`).",
+      "ids": [
+        "F22.save-classes"
+      ],
+      "line": 172,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 25240,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/map-run/F22-meta-profiles-01-save-in-classes-mode-f22-save-classes.json"
+    },
+    {
+      "bullet": "Lock wait blocks the server (`F22.store-busy-responsive`), known bug.",
+      "ids": [
+        "F22.store-busy-responsive"
+      ],
+      "line": 577,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 56221,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/map-run/F22-meta-profiles-02-lock-wait-blocks-the-server-f22-store-bu.json",
+      "failed_line": 21,
+      "failed_command": "test \"$SLOW\" = 0",
+      "stdout_tail": "\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 752,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/F22.store-busy-responsive/alive-idle.json\"\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 27731,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/F22.store-busy-responsive/alive.json\",\n  \"hint\": \"took 27731 ms, limit 3000 ms\"\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles/qa-busy\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"45\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Meta-profile 'qa-busy' not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1166\n}\n",
+      "stderr_tail": ""
+    }
+  ]
+}

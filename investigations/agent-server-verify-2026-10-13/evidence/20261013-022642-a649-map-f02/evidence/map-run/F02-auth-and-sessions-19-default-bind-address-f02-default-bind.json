@@ -1,0 +1,15 @@
+{
+  "file": "F02-auth-and-sessions.md",
+  "bullet": "Default bind address (`F02.default-bind`).",
+  "ids": [
+    "F02.default-bind"
+  ],
+  "line": 451,
+  "script": "QA_F02_PYTHON=\"$(jq -r .checkout \"$AGENT_SERVER_VERIFY_RUN/run.json\")/.venv/bin/python\"\ncontrol-agent-server exec --save F02.default-bind/no-key --expect-output 'Starting OpenHands Agent Server on 127.0.0.1:8000' \\\n  --expect-output 'listening on 127.0.0.1:8000' --reject-output 'Binding to all interfaces' -- \\\n  unshare -rn env -i PATH=\"$PATH\" QA_F02_PYTHON=\"$QA_F02_PYTHON\" bash \"$F02/bind.sh\" \"$F02/bind-no-key\"\ncontrol-agent-server exec --save F02.default-bind/with-key --expect-output 'Starting OpenHands Agent Server on 0.0.0.0:8000' \\\n  --expect-output 'listening on 0.0.0.0:8000' --reject-output 'Binding to all interfaces' -- \\\n  unshare -rn env -i PATH=\"$PATH\" QA_F02_PYTHON=\"$QA_F02_PYTHON\" OH_SESSION_API_KEYS_0=qa-f02-bind-key bash \"$F02/bind.sh\" \"$F02/bind-key\"\ncontrol-agent-server exec --save F02.default-bind/wildcard-no-key --expect-output 'listening on 0.0.0.0:8000' \\\n  --expect-output 'Binding to all interfaces (0.0.0.0) without a session API key' -- \\\n  unshare -rn env -i PATH=\"$PATH\" QA_F02_PYTHON=\"$QA_F02_PYTHON\" bash \"$F02/bind.sh\" \"$F02/bind-wildcard\" --host 0.0.0.0\n",
+  "exit_code": 1,
+  "elapsed_ms": 1524,
+  "failed_line": 2,
+  "failed_command": "control-agent-server exec --save F02.default-bind/no-key --expect-output 'Starting OpenHands Agent Server on 127.0.0.1:8000' --expect-output 'listening on 127.0.0.1:8000' --reject-output 'Binding to all interfaces' -- unshare -rn env -i PATH=\"$PATH\" QA_F02_PYTHON=\"$QA_F02_PYTHON\" bash \"$F02/bind.sh\" \"$F02/bind-no-key\"",
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6036, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6000, in main\n    result = func(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 3318, in cmd_exec\n    result[\"saved\"] = str(save_evidence(run, args.save, transcript))\n                          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 394, in save_evidence\n    folder.mkdir(parents=True, exist_ok=True)\n    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 724, in mkdir\n    os.mkdir(self, mode)\n    ~~~~~~~~^^^^^^^^^^^^\nOSError: [Errno 28] No space left on device: '/workspace/verification-artifacts/runs/20261013-022642-a649-map-f02/evidence/F02.default-bind'\n"
+}

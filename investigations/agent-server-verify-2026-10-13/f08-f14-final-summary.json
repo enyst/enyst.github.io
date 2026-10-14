@@ -1,0 +1,100 @@
+{
+  "status": "complete",
+  "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+  "triage": "/workspace/verification-artifacts/triage-f08-f14.json",
+  "distinct_feature_ids": 190,
+  "final_feature_status_counts": {
+    "pass": 155,
+    "confirmed_product_failure": 35
+  },
+  "confirmed_grouped_defects": 32,
+  "confirmed_grouped_defect_severities": {
+    "high": 4,
+    "medium": 16,
+    "low": 12
+  },
+  "families": [
+    {
+      "family": "F08",
+      "distinct_feature_ids": 23,
+      "final_feature_status_counts": {
+        "pass": 20,
+        "xfail": 3
+      }
+    },
+    {
+      "family": "F09",
+      "distinct_feature_ids": 28,
+      "final_feature_status_counts": {
+        "pass": 19,
+        "xfail": 9
+      }
+    },
+    {
+      "family": "F10",
+      "distinct_feature_ids": 25,
+      "final_feature_status_counts": {
+        "pass": 19,
+        "xfail": 6
+      }
+    },
+    {
+      "family": "F11",
+      "distinct_feature_ids": 25,
+      "final_feature_status_counts": {
+        "pass": 23,
+        "xfail": 2
+      }
+    },
+    {
+      "family": "F12",
+      "distinct_feature_ids": 30,
+      "final_feature_status_counts": {
+        "pass": 27,
+        "xfail": 3
+      }
+    },
+    {
+      "family": "F13",
+      "distinct_feature_ids": 29,
+      "final_feature_status_counts": {
+        "pass": 24,
+        "xfail": 5
+      }
+    },
+    {
+      "family": "F14",
+      "distinct_feature_ids": 30,
+      "final_feature_status_counts": {
+        "pass": 23,
+        "xfail": 7
+      }
+    }
+  ],
+  "blocked_prerequisite_areas": 2,
+  "inconclusive_groups": 0,
+  "client_not_run_groups": 7,
+  "count_notes": [
+    "Counts use190 distinct frozen map IDs; repeat attempts and Preconditions are excluded.",
+    "35 confirmed failure IDs form32 grouped defects; the three two-ID groups are F08 runtime-secret persistence, F09 registered-LLM cache, and F10 fork credentials.",
+    "Initial ENOSPC and Docker image/layout/UID/transport/route-drift failures are preserved as harness/environment evidence and excluded from product-defect counts.",
+    "Compatible local image verifies frozen-source runtime lifecycle. Canonical Docker packaging and actual Codex/OpenAI credential refresh remain blocked.",
+    "Typed and async client wrappers not dynamically exercised in this range remain explicit; other family evidence may cover some."
+  ],
+  "docker": {
+    "run": "/workspace/verification-artifacts/runs/20261013-040101-d29e-map-f12",
+    "result": "pass",
+    "image": "qa-agent-server:acca181a-local-uid",
+    "source_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+    "scope": "Local frozen-source/locked-host-venv runtime; canonical packaging remains blocked.",
+    "artifact": "family-results/F12-docker-complete.json"
+  },
+  "publication": "Not performed by this worker.",
+  "cleanup": {
+    "own_recovery_run_dirs_checked": 24,
+    "live_server_process_groups": 0,
+    "owned_remaining_containers": 0,
+    "removed_own_created_containers": 2,
+    "product_checkout_changes": 0
+  }
+}

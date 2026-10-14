@@ -1,0 +1,54 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/settings/mcp/qa-bad",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "transport": "http",
+      "url": "https://x.invalid/mcp",
+      "headers": {
+        "Authorization": "a"
+      },
+      "auth": {
+        "strategy": "bearer",
+        "value": "b"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "456",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body"
+          ],
+          "msg": "Value error, 'auth' cannot be combined with an explicit top-level 'Authorization' header; use auth.strategy='header' instead.",
+          "input": {
+            "transport": "http",
+            "url": "https://x.invalid/mcp",
+            "headers": {
+              "Authorization": "<redacted>"
+            },
+            "auth": {
+              "strategy": "bearer",
+              "value": "b"
+            }
+          },
+          "ctx": {
+            "error": "'auth' cannot be combined with an explicit top-level 'Authorization' header; use auth.strategy='header' instead."
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 431
+}

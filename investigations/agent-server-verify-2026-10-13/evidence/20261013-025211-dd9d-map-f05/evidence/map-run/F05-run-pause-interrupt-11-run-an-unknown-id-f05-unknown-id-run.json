@@ -1,0 +1,15 @@
+{
+  "file": "F05-run-pause-interrupt.md",
+  "bullet": "Run an unknown id (`F05.unknown-id-run`).",
+  "ids": [
+    "F05.unknown-id-run"
+  ],
+  "line": 350,
+  "script": "control-agent-server api POST \"<redacted:session-cookie>/$NOPE/run\" --expect 404 --check detail eq 'Not Found' --save F05.unknown-id-run/run\n",
+  "exit_code": 0,
+  "elapsed_ms": 522,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/285be4a5-0734-4008-9c33-7dfb821455e1/run\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"22\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 76,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Not Found\",\n      \"ok\": true,\n      \"actual\": \"Not Found\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/evidence/F05.unknown-id-run/run.json\"\n}\n",
+  "stderr": ""
+}

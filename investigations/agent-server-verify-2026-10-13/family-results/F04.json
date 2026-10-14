@@ -1,0 +1,406 @@
+{
+  "ok": true,
+  "file": "F04-conversation-lifecycle.md",
+  "summary": {
+    "pass": 26,
+    "fail": 0,
+    "xfail": 7,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 108,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6583,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-00-preconditions.json"
+    },
+    {
+      "bullet": "Create from the saved settings (`F04.create-settings`).",
+      "ids": [
+        "F04.create-settings"
+      ],
+      "line": 174,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5045,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-01-create-from-the-saved-settings-f04-creat.json"
+    },
+    {
+      "bullet": "Inline agent (`F04.create-inline-agent`).",
+      "ids": [
+        "F04.create-inline-agent"
+      ],
+      "line": 192,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 905,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-02-inline-agent-f04-create-inline-agent.json"
+    },
+    {
+      "bullet": "Stored Agent Profile (`F04.create-agent-profile`).",
+      "ids": [
+        "F04.create-agent-profile"
+      ],
+      "line": 207,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7654,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-03-stored-agent-profile-f04-create-agent-pr.json"
+    },
+    {
+      "bullet": "Create validation (`F04.create-validation`).",
+      "ids": [
+        "F04.create-validation"
+      ],
+      "line": 221,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 15344,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-04-create-validation-f04-create-validation.json"
+    },
+    {
+      "bullet": "422 bodies keep the LLM key out (`F04.create-validation-redaction`).",
+      "ids": [
+        "F04.create-validation-redaction"
+      ],
+      "line": 248,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2688,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-05-422-bodies-keep-the-llm-key-out-f04-crea.json"
+    },
+    {
+      "bullet": "Idempotent create with a client id (`F04.create-idempotent`).",
+      "ids": [
+        "F04.create-idempotent"
+      ],
+      "line": 269,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 11897,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-06-idempotent-create-with-a-client-id-f04-c.json"
+    },
+    {
+      "bullet": "`initial_message.run: false` (`F04.create-initial-message-run-false`), known bug.",
+      "ids": [
+        "F04.create-initial-message-run-false"
+      ],
+      "line": 284,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 11460,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-07-initial-message-run-false-f04-create-ini.json",
+      "failed_line": 9,
+      "failed_command": "false",
+      "stdout_tail": "{\n  \"id\": \"ec003988-f3a5-4167-b646-972fe78234b9\",\n  \"ok\": true,\n  \"status\": \"finished\",\n  \"transitions\": [\n    \"finished\"\n  ],\n  \"waited_ms\": 658\n}\n{\n  \"ok\": true,\n  \"id\": \"8f7bb54a-4192-4a26-84f2-e5e949e4950b\",\n  \"total\": 8,\n  \"kinds\": {\n    \"SystemPromptEvent\": 1,\n    \"MessageEvent\": 1,\n    \"ConversationStateUpdateEvent\": 4,\n    \"ActionEvent\": 1,\n    \"ObservationEvent\": 1\n  },\n  \"matching\": 1,\n  \"events\": [\n    {\n      \"id\": \"06cf22a0-fea1-4153-b1b3-257a0948c386\",\n      \"kind\": \"MessageEvent\",\n      \"source\": \"user\",\n      \"timestamp\": \"2026-10-13T02:48:15.206860\",\n      \"llm_message\": \"{\\\"role\\\": \\\"user\\\", \\\"content\\\": [{\\\"cache_prompt\\\": false, \\\"type\\\": \\\"text\\\", \\\"text\\\": \\\"QA F04 run false.\\\"}], \\\"thinking_blocks\\\": []}\"\n    }\n  ]\n}\n{\n  \"id\": \"8f7bb54a-4192-4a26-84f2-e5e949e4950b\",\n  \"ok\": true,\n  \"status\": \"finished\",\n  \"transitions\": [\n    \"finished\"\n  ],\n  \"waited_ms\": 391\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Parent and child (`F04.create-parent`).",
+      "ids": [
+        "F04.create-parent"
+      ],
+      "line": 306,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 11390,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-08-parent-and-child-f04-create-parent.json"
+    },
+    {
+      "bullet": "Git worktree (`F04.create-worktree`).",
+      "ids": [
+        "F04.create-worktree"
+      ],
+      "line": 322,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6130,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-09-git-worktree-f04-create-worktree.json"
+    },
+    {
+      "bullet": "Observability headers (`F04.create-observability`).",
+      "ids": [
+        "F04.create-observability"
+      ],
+      "line": 335,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4725,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-10-observability-headers-f04-create-observa.json"
+    },
+    {
+      "bullet": "Body versus headers (`F04.create-observability-precedence`).",
+      "ids": [
+        "F04.create-observability-precedence"
+      ],
+      "line": 349,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10468,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-11-body-versus-headers-f04-create-observabi.json"
+    },
+    {
+      "bullet": "Start-time secrets (`F04.create-secrets`).",
+      "ids": [
+        "F04.create-secrets"
+      ],
+      "line": 382,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 1660,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-12-start-time-secrets-f04-create-secrets.json"
+    },
+    {
+      "bullet": "Start-time secret visible to GET (`F04.create-secrets-get`), known bug.",
+      "ids": [
+        "F04.create-secrets-get"
+      ],
+      "line": 395,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1036,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-13-start-time-secret-visible-to-get-f04-cre.json",
+      "failed_line": 1,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$SECID\" --expect 200 --check secret_registry.secret_sources.QA_F04_TOKEN.kind eq StaticSecret --save F04.create-secrets-get/get",
+      "stdout_tail": " [],\n          \"load_project_skills\": false,\n          \"load_memory\": false,\n          \"disabled_skills\": [],\n          \"secrets\": null,\n          \"current_datetime\": \"2026-10-13T02:48:51.932699Z\"\n        },\n        \"system_prompt\": null,\n        \"system_prompt_filename\": \"system_prompt.j2\",\n        \"security_policy_filename\": \"security_policy.j2\",\n        \"system_prompt_kwargs\": {\n          \"llm_security_analyzer\": true\n        },\n        \"condenser\": null,\n        \"critic\": null,\n        \"tool_concurrency_limit\": 1,\n        \"persona\": null,\n        \"kind\": \"Agent\"\n      },\n      \"client_tools\": [],\n      \"tool_module_qualnames\": {},\n      \"runtime_info\": {\n        \"runtime_status\": \"available\",\n        \"can_resume\": true,\n        \"runtime_error\": null\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 187,\n  \"checks\": [\n    {\n      \"check\": \"secret_registry.secret_sources.QA_F04_TOKEN.kind eq StaticSecret\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/F04.create-secrets-get/get.json\",\n  \"hint\": \"failed check: secret_registry.secret_sources.QA_F04_TOKEN.kind eq StaticSecret\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Plain-string secret value (`F04.create-secrets-plain`), known bug.",
+      "ids": [
+        "F04.create-secrets-plain"
+      ],
+      "line": 408,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1007,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-14-plain-string-secret-value-f04-create-sec.json",
+      "failed_line": 1,
+      "failed_command": "control-agent-server api POST <redacted:session-cookie> --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $OFFLINE_AGENT, \\\"autotitle\\\": false, \\\"secrets\\\": {\\\"QA_F04_PLAIN\\\": \\\"qa-f04-plain-value\\\"}}\" --expect 201,422 --save F04.create-secrets-plain/start",
+      "stdout_tail": ": {\n      \"workspace\": {\n        \"working_dir\": \"/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/fixtures/qa-f04-ws\"\n      },\n      \"agent\": {\n        \"llm\": {\n          \"model\": \"openai/qa-offline\",\n          \"api_key\": \"<redacted:api_key>\",\n          \"base_url\": \"http://127.0.0.1:9/v1\",\n          \"num_retries\": 0\n        },\n        \"tools\": [],\n        \"agent_context\": {\n          \"skills\": [\n            {\n              \"name\": \"qa-f04-skill\",\n              \"content\": \"Answer briefly.\"\n            }\n          ]\n        }\n      },\n      \"autotitle\": false,\n      \"secrets\": {\n        \"QA_F04_PLAIN\": \"qa-f04-plain-value\"\n      }\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"130\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"'str' object has no attribute 'pop'\",\n      \"error_id\": \"070dc096d3d7449d8cd70e4414e15159\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 505,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/F04.create-secrets-plain/start.json\",\n  \"hint\": \"expected 201,422, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "A real run (`F04.run-real`).",
+      "ids": [
+        "F04.run-real"
+      ],
+      "line": 419,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8565,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-15-a-real-run-f04-run-real.json"
+    },
+    {
+      "bullet": "Final response (`F04.final-response`).",
+      "ids": [
+        "F04.final-response"
+      ],
+      "line": 438,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5084,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-16-final-response-f04-final-response.json"
+    },
+    {
+      "bullet": "Title from a saved LLM profile (`F04.title-llm-profile`).",
+      "ids": [
+        "F04.title-llm-profile"
+      ],
+      "line": 452,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 5900,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-17-title-from-a-saved-llm-profile-f04-title.json"
+    },
+    {
+      "bullet": "Read one conversation (`F04.get`).",
+      "ids": [
+        "F04.get"
+      ],
+      "line": 476,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3837,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-18-read-one-conversation-f04-get.json"
+    },
+    {
+      "bullet": "Batch get (`F04.batch-get`).",
+      "ids": [
+        "F04.batch-get"
+      ],
+      "line": 493,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7884,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-19-batch-get-f04-batch-get.json"
+    },
+    {
+      "bullet": "100 ids in one batch (`F04.batch-get-limit`), known bug.",
+      "ids": [
+        "F04.batch-get-limit"
+      ],
+      "line": 511,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 2463,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-20-100-ids-in-one-batch-f04-batch-get-limit.json",
+      "failed_line": 2,
+      "failed_command": "control-agent-server exec --expect-output QA_BATCH_OK --save F04.batch-get-limit/hundred -- python3 \"$F/qa-f04-batch.py\" \"$IDS100\" 400,422",
+      "stdout_tail": "{\n  \"ok\": false,\n  \"exit_code\": 1,\n  \"elapsed_ms\": 1860,\n  \"stdout_tail\": \"{\\\"sent\\\": 100, \\\"status\\\": 500, \\\"body\\\": {\\\"detail\\\": \\\"Internal Server Error\\\", \\\"exception\\\": \\\"\\\", \\\"error_id\\\": \\\"988169054ba94fe39c4591e370d8f107\\\"}}\\nQA_BATCH_MISMATCH\\n\",\n  \"stderr_tail\": \"\",\n  \"hint\": {\n    \"missing\": [\n      \"QA_BATCH_OK\"\n    ],\n    \"unexpected\": []\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/F04.batch-get-limit/hundred.json\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Search pages (`F04.search-page`).",
+      "ids": [
+        "F04.search-page"
+      ],
+      "line": 520,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 11803,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-21-search-pages-f04-search-page.json"
+    },
+    {
+      "bullet": "Status filter (`F04.search-filter`).",
+      "ids": [
+        "F04.search-filter"
+      ],
+      "line": 540,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7499,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-22-status-filter-f04-search-filter.json"
+    },
+    {
+      "bullet": "Count (`F04.count`).",
+      "ids": [
+        "F04.count"
+      ],
+      "line": 557,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 2546,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-23-count-f04-count.json"
+    },
+    {
+      "bullet": "Rename (`F04.patch-title`).",
+      "ids": [
+        "F04.patch-title"
+      ],
+      "line": 564,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3442,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-24-rename-f04-patch-title.json"
+    },
+    {
+      "bullet": "Retag (`F04.patch-tags`).",
+      "ids": [
+        "F04.patch-tags"
+      ],
+      "line": 576,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 12823,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-25-retag-f04-patch-tags.json"
+    },
+    {
+      "bullet": "PATCH errors (`F04.patch-errors`).",
+      "ids": [
+        "F04.patch-errors"
+      ],
+      "line": 595,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8999,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-26-patch-errors-f04-patch-errors.json"
+    },
+    {
+      "bullet": "Whitespace-only title (`F04.patch-whitespace-title`), known bug.",
+      "ids": [
+        "F04.patch-whitespace-title"
+      ],
+      "line": 609,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 2832,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-27-whitespace-only-title-f04-patch-whitespa.json",
+      "failed_line": 2,
+      "failed_command": "control-agent-server api PATCH \"<redacted:session-cookie>/$CHILD\" --json '{\"title\": \"   \"}' --expect 422 --save F04.patch-whitespace-title/patch",
+      "stdout_tail": ",\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"PATCH\",\n    \"path\": \"<redacted:session-cookie>/17d8c499-5619-4dfa-a623-def5b245fc79\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"title\": \"QA F04 child\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 295,\n  \"checks\": [\n    {\n      \"check\": \"success eq true\",\n      \"ok\": true,\n      \"actual\": \"true\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"PATCH\",\n    \"path\": \"<redacted:session-cookie>/17d8c499-5619-4dfa-a623-def5b245fc79\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"title\": \"   \"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 125,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/F04.patch-whitespace-title/patch.json\",\n  \"hint\": \"expected 422, got 200\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "PATCH on an unknown id (`F04.patch-unknown-id`), known bug.",
+      "ids": [
+        "F04.patch-unknown-id"
+      ],
+      "line": 621,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 7047,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-28-patch-on-an-unknown-id-f04-patch-unknown.json",
+      "failed_line": 3,
+      "failed_command": "control-agent-server api PATCH \"<redacted:session-cookie>/$NOPE\" --json '{\"title\": \"QA nobody\"}' --expect 404 --save F04.patch-unknown-id/unknown",
+      "stdout_tail": "d}.patch.responses.404 exists\",\n      \"ok\": true,\n      \"actual\": \"{\\\"description\\\": \\\"Item not found\\\"}\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/4782919f-825e-4db1-9052-24e57a0bbe67\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"22\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 128\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"PATCH\",\n    \"path\": \"<redacted:session-cookie>/4782919f-825e-4db1-9052-24e57a0bbe67\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"title\": \"QA nobody\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"17\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": false\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 110,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/F04.patch-unknown-id/unknown.json\",\n  \"hint\": \"expected 404, got 200\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Delete (`F04.delete`).",
+      "ids": [
+        "F04.delete"
+      ],
+      "line": 632,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 16703,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-29-delete-f04-delete.json"
+    },
+    {
+      "bullet": "DELETE on an unknown id (`F04.delete-unknown-id`), known bug.",
+      "ids": [
+        "F04.delete-unknown-id"
+      ],
+      "line": 669,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 1902,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-30-delete-on-an-unknown-id-f04-delete-unkno.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server api DELETE \"<redacted:session-cookie>/$NOPE\" --expect 404 --save F04.delete-unknown-id/unknown",
+      "stdout_tail": " \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 57\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/4782919f-825e-4db1-9052-24e57a0bbe67\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"22\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Not Found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 62\n}\n{\n  \"ok\": false,\n  \"status\": 400,\n  \"request\": {\n    \"method\": \"DELETE\",\n    \"path\": \"<redacted:session-cookie>/4782919f-825e-4db1-9052-24e57a0bbe67\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"24\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Bad Request\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 79,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/F04.delete-unknown-id/unknown.json\",\n  \"hint\": \"expected 404, got 400\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Restart (`F04.restart-persist`).",
+      "ids": [
+        "F04.restart-persist"
+      ],
+      "line": 686,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 42021,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-31-restart-f04-restart-persist.json"
+    },
+    {
+      "bullet": "Cold reads do not load a conversation (`F04.read-no-hydrate`).",
+      "ids": [
+        "F04.read-no-hydrate"
+      ],
+      "line": 704,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7200,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/evidence/map-run/F04-conversation-lifecycle-32-cold-reads-do-not-load-a-conversation-f0.json"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04",
+  "launch_flags": []
+}

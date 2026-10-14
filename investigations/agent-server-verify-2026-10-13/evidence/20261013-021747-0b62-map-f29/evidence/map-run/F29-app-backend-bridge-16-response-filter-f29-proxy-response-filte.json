@@ -1,0 +1,15 @@
+{
+  "file": "F29-app-backend-bridge.md",
+  "bullet": "Response filter (`F29.proxy-response-filter`).",
+  "ids": [
+    "F29.proxy-response-filter"
+  ],
+  "line": 595,
+  "script": "HPORT=$(control-agent-server api GET /api/canvas-extensions/installed/qa-headers/backend --field port)\ntest \"$(curl -s -o /dev/null -w '%{http_code}' --noproxy '*' \"http://127.0.0.1:$HPORT/redirect\")\" = 302\ncontrol-agent-server api GET /app-backends/qa-headers/redirect --auth none --cookie \"oh_app_backend_session=$T2\" \\\n  --expect 502 --check exception eq '502: Upstream redirect is not allowed' --check-header location missing \\\n  --save F29.proxy-response-filter/redirect\nDIRECT=$(curl -s -D - -o /dev/null --noproxy '*' \"http://127.0.0.1:$HPORT/set-cookie\")\ngrep -qi '^set-cookie: qa_upstream=1' <<<\"$DIRECT\"\ncontrol-agent-server api GET /app-backends/qa-headers/set-cookie --auth none --cookie \"oh_app_backend_session=$T2\" \\\n  --expect 200 --check set_cookie eq sent --check-header set-cookie missing --save F29.proxy-response-filter/set-cookie\n",
+  "exit_code": 0,
+  "elapsed_ms": 6625,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 502,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/app-backends/qa-headers/redirect\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 502,\n    \"headers\": {\n      \"content-length\": \"86\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"502: Upstream redirect is not allowed\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 649,\n  \"checks\": [\n    {\n      \"check\": \"exception eq 502: Upstream redirect is not allowed\",\n      \"ok\": true,\n      \"actual\": \"502: Upstream redirect is not allowed\"\n    },\n    {\n      \"check\": \"header location missing\",\n      \"ok\": true,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021747-0b62-map-f29/evidence/F29.proxy-response-filter/redirect.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/app-backends/qa-headers/set-cookie\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-type\": \"application/json; charset=utf-8\"\n    },\n    \"body\": {\n      \"set_cookie\": \"sent\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 395,\n  \"checks\": [\n    {\n      \"check\": \"set_cookie eq sent\",\n      \"ok\": true,\n      \"actual\": \"sent\"\n    },\n    {\n      \"check\": \"header set-cookie missing\",\n      \"ok\": true,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021747-0b62-map-f29/evidence/F29.proxy-response-filter/set-cookie.json\"\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,53 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_qa-f30-unused",
+      "messages": [
+        {
+          "role": "system",
+          "content": "QA_F30_LATE_SYS"
+        },
+        {
+          "role": "user",
+          "content": "QA_F30_SWITCH: reply with one short word and use no tools."
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "301",
+      "content-type": "application/json",
+      "x-openhands-serverconversation-id": "5c2bed79-6ca3-45e5-a1ed-b39f4b1ecda5"
+    },
+    "body": {
+      "id": "chatcmpl-780fca2f5481417ba235699769f5048a",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "content": "Hi",
+            "role": "assistant"
+          }
+        }
+      ],
+      "created": 1791858133,
+      "model": "openhands_qa-f30-unused",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 59,
+        "prompt_tokens": 45206,
+        "total_tokens": 45265
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 2503
+}

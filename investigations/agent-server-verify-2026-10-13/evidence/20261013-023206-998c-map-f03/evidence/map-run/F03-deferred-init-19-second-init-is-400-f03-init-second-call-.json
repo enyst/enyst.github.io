@@ -1,0 +1,15 @@
+{
+  "file": "F03-deferred-init.md",
+  "bullet": "Second init is 400 (`F03.init-second-call-400`).",
+  "ids": [
+    "F03.init-second-call-400"
+  ],
+  "line": 411,
+  "script": "control-agent-server api POST /api/init --auth none --header \"X-Init-API-Key: $SK\" --json '{}' --expect 401 --save F03.init-second-call-400/old-key\ncontrol-agent-server api POST /api/init --auth none --header 'X-Init-API-Key: qa-f03-delivered-secret' \\\n  --json '{}' --expect 400 --check detail contains 'already in state: ready' --save F03.init-second-call-400/already-ready\ncontrol-agent-server api GET /api/init --auth none --check state eq ready\n",
+  "exit_code": 1,
+  "elapsed_ms": 1309,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api POST /api/init --auth none --header \"X-Init-API-Key: $SK\" --json '{}' --expect 401 --save F03.init-second-call-400/old-key",
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6036, in <module>\n    sys.exit(main())\n             ~~~~^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 6000, in main\n    result = func(args)\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 1358, in cmd_api\n    result[\"saved\"] = str(save_evidence(run, args.save, exchange))\n                          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/agent-sdk-verify/.agents/skills/verify-agent-server/scripts/control_agent_server.py\", line 394, in save_evidence\n    folder.mkdir(parents=True, exist_ok=True)\n    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 724, in mkdir\n    os.mkdir(self, mode)\n    ~~~~~~~~^^^^^^^^^^^^\nOSError: [Errno 28] No space left on device: '/workspace/verification-artifacts/runs/20261013-023206-998c-map-f03/evidence/F03.init-second-call-400'\n"
+}

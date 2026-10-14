@@ -1,0 +1,31 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/profiles/qa-sub/validate",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "llm": {
+        "model": "openai/gpt-5-mini",
+        "auth_type": "subscription"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "95",
+      "content-type": "application/json"
+    },
+    "body": {
+      "valid": false,
+      "error": {
+        "type": "ValueError",
+        "message": "OpenAI subscription login is required"
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 192
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F24-openai-subscription.md",
+  "bullet": "Start and poll a login offline (`F24.device-start-offline`), known bug.",
+  "ids": [
+    "F24.device-start-offline"
+  ],
+  "line": 487,
+  "script": "OUTAGE=\"\"\nGP=$(bash \"$F24/netgate.sh\" up 0)\ntrap 'if [ -n \"$OUTAGE\" ]; then control-agent-server stop --run \"$OUTAGE\" >/dev/null; fi; bash \"$F24/netgate.sh\" down \"$GP\"' EXIT\nOUTAGE=$(control-agent-server launch --new --name f24-outage --env \"HTTPS_PROXY=http://127.0.0.1:$GP\" --env \"https_proxy=http://127.0.0.1:$GP\" --print-run)\nDC4=$(control-agent-server api POST /api/llm/subscription/openai/device/start --run \"$OUTAGE\" --expect 200 --field device_code)\ncontrol-agent-server api POST /api/llm/subscription/openai/device/poll --run \"$OUTAGE\" --json \"{\\\"device_code\\\": \\\"$DC4\\\"}\" \\\n  --expect 200 --check connected eq false\nbash \"$F24/netgate.sh\" down \"$GP\"\ncontrol-agent-server api POST /api/llm/subscription/openai/device/start --run \"$OUTAGE\" --expect 502,503,504 \\\n  --save F24.device-start-offline/start  # bug\ncontrol-agent-server api POST /api/llm/subscription/openai/device/poll --run \"$OUTAGE\" --json \"{\\\"device_code\\\": \\\"$DC4\\\"}\" \\\n  --expect 502,503,504 --save F24.device-start-offline/poll  # bug\ncontrol-agent-server logs --run \"$OUTAGE\" --grep 'Unhandled exception' --expect-none\n",
+  "exit_code": 127,
+  "elapsed_ms": 5,
+  "failed_line": 2,
+  "failed_command": "GP=$(bash \"$F24/netgate.sh\" up 0)",
+  "stdout": "",
+  "stderr": "bash: /netgate.sh: No such file or directory\n"
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F14-files.md",
+  "bullet": "Trajectory errors (`F14.trajectory-errors`).",
+  "ids": [
+    "F14.trajectory-errors"
+  ],
+  "line": 643,
+  "script": "control-agent-server api GET /api/file/download-trajectory/00000000-0000-4000-8000-00000000f14a --expect 404 \\\n  --check detail eq 'Conversation not found' --save F14.trajectory-errors/unknown\ncontrol-agent-server api GET /api/file/download-trajectory/qa-f14-not-a-uuid --expect 422\n",
+  "exit_code": 0,
+  "elapsed_ms": 10464,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/file/download-trajectory/00000000-0000-4000-8000-00000000f14a\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"35\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Conversation not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 483,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Conversation not found\",\n      \"ok\": true,\n      \"actual\": \"Conversation not found\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022038-d620-map-f14/evidence/F14.trajectory-errors/unknown.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 422,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/file/download-trajectory/qa-f14-not-a-uuid\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 422,\n    \"headers\": {\n      \"content-length\": \"221\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": [\n        {\n          \"type\": \"uuid_parsing\",\n          \"loc\": [\n            \"path\",\n            \"conversation_id\"\n          ],\n          \"msg\": \"Input should be a valid UUID, invalid character: found `q` at 1\",\n          \"input\": \"qa-f14-not-a-uuid\",\n          \"ctx\": {\n            \"error\": \"invalid character: found `q` at 1\"\n          }\n        }\n      ]\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1203\n}\n",
+  "stderr": ""
+}

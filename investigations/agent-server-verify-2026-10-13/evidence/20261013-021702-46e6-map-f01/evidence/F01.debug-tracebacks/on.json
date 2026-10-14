@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/workspaces",
+    "query": [],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-length": "2089",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "Internal Server Error",
+      "exception": "500: Failed to read workspaces",
+      "traceback": "Traceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/workspaces_router.py\", line 68, in list_workspaces\n    persisted = store.load()\n  File \"/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/persistence/store.py\", line 750, in load\n    with self._path.open(\"r\", encoding=\"utf-8\") as f:\n         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/pathlib/_local.py\", line 539, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nIsADirectoryError: [Errno 21] Is a directory: '/workspace/verification-artifacts/runs/20261013-021702-46e6-map-f01/home/.openhands/workspaces.json'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/workspace/agent-sdk-verify/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"/workspace/agent-sdk-verify/.venv/lib/python3.13/site-packages/fastapi/routing.py\", line 120, in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n  File \"/workspace/agent-sdk-verify/.venv/lib/python3.13/site-packages/fastapi/routing.py\", line 674, in app\n    raw_response = await run_endpoint_function(\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n    )\n    ^\n  File \"/workspace/agent-sdk-verify/.venv/lib/python3.13/site-packages/fastapi/routing.py\", line 328, in run_endpoint_function\n    return await dependant.call(**values)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/agent-sdk-verify/openhands-agent-server/openhands/agent_server/workspaces_router.py\", line 71, in list_workspaces\n    raise HTTPException(status_code=500, detail=\"Failed to read workspaces\")\nfastapi.exceptions.HTTPException: 500: Failed to read workspaces\n"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 1977
+}

@@ -1,0 +1,67 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_deepseek-flash",
+      "messages": [
+        {
+          "role": "system",
+          "content": "QA_F30_SYS: answer in one short sentence and never use tools."
+        },
+        {
+          "role": "developer",
+          "content": "QA_F30_DEV: plain text only."
+        },
+        {
+          "role": "user",
+          "content": "QA_F30_OLD_TURN: remember the word apple."
+        },
+        {
+          "role": "assistant",
+          "content": "QA_F30_OLD_ANSWER"
+        },
+        {
+          "role": "user",
+          "content": "QA_F30_NEW_TURN: say hello."
+        }
+      ],
+      "temperature": 0,
+      "user": "qa-f30"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "306",
+      "content-type": "application/json",
+      "x-openhands-serverconversation-id": "d59dd0cb-5b74-45a8-9f47-f69b7b8ad642"
+    },
+    "body": {
+      "id": "chatcmpl-f7327a64be854668b5a8b71ef5d136a5",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "message": {
+            "content": "Hello!",
+            "role": "assistant"
+          }
+        }
+      ],
+      "created": 1791861653,
+      "model": "openhands_deepseek-flash",
+      "object": "chat.completion",
+      "usage": {
+        "completion_tokens": 50,
+        "prompt_tokens": 11264,
+        "total_tokens": 11314
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 1820
+}

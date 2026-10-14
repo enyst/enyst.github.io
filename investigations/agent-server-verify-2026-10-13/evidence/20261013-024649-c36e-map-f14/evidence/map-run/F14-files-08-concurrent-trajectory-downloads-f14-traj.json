@@ -1,0 +1,15 @@
+{
+  "file": "F14-files.md",
+  "bullet": "Concurrent trajectory downloads (`F14.trajectory-concurrent`), known bug.",
+  "ids": [
+    "F14.trajectory-concurrent"
+  ],
+  "line": 650,
+  "script": "CC=\"$F/concurrent\"\nmkdir -p \"$CC\"\ncontrol-agent-server api GET \"/api/file/download-trajectory/$CID\" --expect 200 --raw-out \"$CC/single.zip\"\npython3 -m zipfile -t \"$CC/single.zip\" > /dev/null\ncat > \"$CC/burst.sh\" <<'SH'\nfor r in 1 2 3 4 5; do\n  for i in 1 2 3 4 5 6; do\n    curl -sS -o \"$CC/$r-$i.zip\" -w '%{http_code}' -H \"X-Session-API-Key: $SESSION_API_KEY\" \\\n      \"$AGENT_SERVER_URL/api/file/download-trajectory/$CID\" > \"$CC/$r-$i.status\" 2> \"$CC/$r-$i.err\" &\n  done\n  wait\n  for i in 1 2 3 4 5 6; do\n    if [ \"$(cat \"$CC/$r-$i.status\")\" != 200 ] || ! python3 -m zipfile -t \"$CC/$r-$i.zip\" > /dev/null 2>&1; then\n      echo \"round $r: download $i is broken\"; exit 0\n    fi\n  done\n  echo \"round $r: six valid zips\"\ndone\nSH\ncontrol-agent-server exec --env CID=\"$CID\" --env CC=\"$CC\" --save F14.trajectory-concurrent/burst -- sh \"$CC/burst.sh\"\ntest -s \"$CC/1-6.status\"\nfor s in \"$CC\"/[1-5]-[1-6].status; do test \"$(cat \"$s\")\" = 200; test -s \"${s%.status}.zip\"; python3 -m zipfile -t \"${s%.status}.zip\" > /dev/null; done  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 11786,
+  "failed_line": 22,
+  "failed_command": "test -s \"${s%.status}.zip\"",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/file/download-trajectory/9dd9ebe4-13c3-4148-b4de-06db234789c7\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-type\": \"application/octet-stream\",\n      \"content-disposition\": \"attachment; filename=\\\"9dd9ebe413c34148b4de06db234789c7.zip\\\"\",\n      \"content-length\": \"20829\",\n      \"etag\": \"\\\"0190f473fe8006546e19e47445f22030\\\"\"\n    },\n    \"body\": \"<20829 bytes of application/octet-stream>\",\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 121,\n  \"raw_out\": \"/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/fixtures/qa-f14/concurrent/single.zip\"\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 10535,\n  \"stdout_tail\": \"round 1: download 1 is broken\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024649-c36e-map-f14/evidence/F14.trajectory-concurrent/burst.json\"\n}\n",
+  "stderr": ""
+}

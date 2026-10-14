@@ -1,0 +1,15 @@
+{
+  "file": "F14-files.md",
+  "bullet": "What `format` promises (`F14.archive-format-doc`), known bug.",
+  "ids": [
+    "F14.archive-format-doc"
+  ],
+  "line": 581,
+  "script": "control-agent-server api GET /openapi.json --expect 200 --quiet --raw-out \"$F/openapi.json\"\nDOC_FORMAT=$(python3 -c 'import json,sys; ps=json.load(open(sys.argv[1]))[\"paths\"][\"/api/file/archive\"][\"get\"][\"parameters\"]; print(next(p[\"description\"] for p in ps if p[\"name\"] == \"format\"))' \"$F/openapi.json\")\ntest -n \"$DOC_FORMAT\"\nDOCP=\"$F/doc-parent\"\nmkdir -p \"$DOCP\"\ncp -r \"$REPO\" \"$DOCP/proj\"\nprintf 'top\\n' > \"$DOCP/top.txt\"\ncontrol-agent-server api GET /api/file/archive --query path=\"$DOCP\" --query format=tar.gz --expect 200 \\\n  --raw-out \"$F/doc-parent.tgz\" --save F14.archive-format-doc/tar\ntar tzf \"$F/doc-parent.tgz\" > \"$F/doc-parent.list\"\ngrep -q 'proj/notes.txt$' \"$F/doc-parent.list\"\nif printf '%s\\n' \"$DOC_FORMAT\" | grep -q 'entire directory' && test -z \"$(grep 'top.txt' \"$F/doc-parent.list\")\"; then false; fi  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 8884,
+  "failed_line": 12,
+  "failed_command": "false",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/openapi.json\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"652413\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 6350,\n  \"raw_out\": \"/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/fixtures/qa-f14/openapi.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/file/archive\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/fixtures/qa-f14/doc-parent\"\n      ],\n      [\n        \"format\",\n        \"tar.gz\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-type\": \"application/gzip\",\n      \"content-disposition\": \"attachment; filename=\\\"proj.tar.gz\\\"\",\n      \"content-length\": \"719\",\n      \"etag\": \"\\\"49261f27a5d16ca0dc4c8d5ea7f1bb2c\\\"\"\n    },\n    \"body\": \"<719 bytes of application/gzip>\",\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 230,\n  \"raw_out\": \"/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/fixtures/qa-f14/doc-parent.tgz\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024217-af4c-map-f14/evidence/F14.archive-format-doc/tar.json\"\n}\n",
+  "stderr": ""
+}

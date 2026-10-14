@@ -1,0 +1,15 @@
+{
+  "file": "F34-typescript-client.md",
+  "bullet": "Git status type (`F34.workspace-git-types`), known bug.",
+  "ids": [
+    "F34.workspace-git-types"
+  ],
+  "line": 477,
+  "script": "REPO=$(control-agent-server fixture git-repo --name qa-f34-repo --print-path)\ncat > \"$F34/git-types.mjs\" <<'JS'\nimport { writeFileSync } from 'node:fs';\nimport { m, host, apiKey, F34, assert } from './lib.mjs';\nconst repo = process.argv[2];\nconst changes = await new m.RemoteWorkspace({ host, apiKey, workingDir: repo }).gitChanges(repo);\nconst statuses = changes.map((c) => c.status);\nassert.deepEqual(statuses, ['UPDATED', 'ADDED']);\nconst dist = process.cwd() + '/clients/typescript/dist';\nwriteFileSync(`${F34}/git-contract.mts`, `import type { GitChangeStatus } from '${dist}/generated/agent-server-schema.js';\\n` +\n  `export const statuses: GitChangeStatus[] = ${JSON.stringify(statuses)};\\n`);\nwriteFileSync(`${F34}/git-paths.mts`, `import type { GitChange } from '${dist}/index.js';\\n` +\n  `export const paths: Array<GitChange['path']> = ${JSON.stringify(changes.map((c) => c.path))};\\n`);\nwriteFileSync(`${F34}/git-types.mts`, `import type { GitChange } from '${dist}/index.js';\\n` +\n  `export const statuses: Array<GitChange['status']> = ${JSON.stringify(statuses)};\\n`);\nconsole.log('QA_F34_GIT_TYPES_WRITTEN');\nJS\ncontrol-agent-server exec --timeout 60 --expect-output QA_F34_GIT_TYPES_WRITTEN --save F34.workspace-git-types/program -- node \"$F34/git-types.mjs\" \"$REPO\"\nTSC=\"node clients/typescript/node_modules/typescript/bin/tsc --noEmit --strict --skipLibCheck --module nodenext --moduleResolution nodenext --target es2022\"\n$TSC \"$F34/git-contract.mts\"\n$TSC \"$F34/git-paths.mts\"\n$TSC \"$F34/git-types.mts\"  # bug\n",
+  "exit_code": 2,
+  "elapsed_ms": 19582,
+  "failed_line": 22,
+  "failed_command": "$TSC \"$F34/git-types.mts\"",
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 5546,\n  \"stdout_tail\": \"QA_F34_GIT_TYPES_WRITTEN\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.workspace-git-types/program.json\"\n}\n../verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/git-types.mts(2,54): error TS2322: Type '\"UPDATED\"' is not assignable to type '\"added\" | \"modified\" | \"deleted\" | \"renamed\"'.\n../verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/git-types.mts(2,64): error TS2820: Type '\"ADDED\"' is not assignable to type '\"added\" | \"modified\" | \"deleted\" | \"renamed\"'. Did you mean '\"added\"'?\n",
+  "stderr": ""
+}

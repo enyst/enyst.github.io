@@ -1,0 +1,46 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "<redacted:session-cookie>",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "workspace": {
+        "working_dir": "/workspace/verification-artifacts/runs/20261013-024705-d55f-map-f04/fixtures/qa-f04-ws"
+      },
+      "agent": {
+        "llm": {
+          "model": "openai/qa",
+          "api_key": "<redacted:api_key>",
+          "num_retries": "many"
+        },
+        "tools": []
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "171",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "int_parsing",
+          "loc": [
+            "body",
+            "agent",
+            "llm",
+            "num_retries"
+          ],
+          "msg": "Input should be a valid integer, unable to parse string as an integer",
+          "input": "many"
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 101
+}

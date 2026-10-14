@@ -1,0 +1,15 @@
+{
+  "file": "F33-sdk-remote-client.md",
+  "bullet": "Token callbacks on a remote conversation (`F33.conversation-token-callbacks`), known bug.",
+  "ids": [
+    "F33.conversation-token-callbacks"
+  ],
+  "line": 877,
+  "script": "test \"$(jq .deltas \"$F33/stream.json\")\" -gt 0\ntest \"$(jq .tokens \"$F33/stream.json\")\" -gt 0  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 74,
+  "failed_line": 2,
+  "failed_command": "test \"$(jq .tokens \"$F33/stream.json\")\" -gt 0",
+  "stdout": "",
+  "stderr": ""
+}

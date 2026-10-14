@@ -1,0 +1,15 @@
+{
+  "file": "F09-model-switching-plugins.md",
+  "bullet": "Switch during a running turn (`F09.switch-llm-mid-run`).",
+  "ids": [
+    "F09.switch-llm-mid-run"
+  ],
+  "line": 345,
+  "script": "MID=$(control-agent-server conversation start --tools terminal --no-autotitle --prompt 'Run this exact shell command and nothing else: sleep 20' --print-id)\ncontrol-agent-server ws start \"/sockets/events/$MID\" --name qa-f09-midrun --duration 300\ncontrol-agent-server ws read qa-f09-midrun --kinds ActionEvent --contains 'sleep 20' --expect-min 1 --wait 120\ncontrol-agent-server api POST \"<redacted:session-cookie>/$MID/switch_llm\" \\\n  --json \"{\\\"llm\\\": {\\\"model\\\": \\\"deepseek/deepseek-flash\\\", \\\"api_key\\\": \\\"$ENC\\\", \\\"usage_id\\\": \\\"qa-f09-midrun\\\", \\\"num_retries\\\": 0}}\" \\\n  --expect 200 --check success eq true --save F09.switch-llm-mid-run/switch\ncontrol-agent-server conversation wait \"$MID\" --until finished,error --timeout 240\ncontrol-agent-server ws stop qa-f09-midrun --kinds ConversationStateUpdateEvent --contains qa-f09-midrun --expect-min 1 --wait 20 --save F09.switch-llm-mid-run/frames\ncontrol-agent-server api GET \"<redacted:session-cookie>/$MID\" --until-ok 60 --quiet --check execution_status eq finished \\\n  --check agent.llm.usage_id eq qa-f09-midrun \\\n  --check stats.usage_to_metrics.default.accumulated_token_usage.prompt_tokens gt 0 \\\n  --check stats.usage_to_metrics.qa-f09-midrun.accumulated_token_usage.prompt_tokens gt 0 --save F09.switch-llm-mid-run/stats\n",
+  "exit_code": 1,
+  "elapsed_ms": 128837,
+  "failed_line": 3,
+  "failed_command": "control-agent-server ws read qa-f09-midrun --kinds ActionEvent --contains 'sleep 20' --expect-min 1 --wait 120",
+  "stdout": "{\n  \"ok\": true,\n  \"capture\": \"qa-f09-midrun\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/captures/qa-f09-midrun.jsonl\",\n  \"hint\": \"`control-agent-server ws stop qa-f09-midrun` (or `ws read qa-f09-midrun`) after triggering the action\"\n}\n{\n  \"ok\": false,\n  \"capture\": \"qa-f09-midrun\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/captures/qa-f09-midrun.jsonl\",\n  \"opened\": true,\n  \"stopped\": null,\n  \"frames\": 7,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 5,\n    \"ObservationEvent\": 1,\n    \"MessageEvent\": 1\n  },\n  \"close\": null,\n  \"matching\": 0,\n  \"matching_kinds\": [],\n  \"frames_shown\": []\n}\n",
+  "stderr": ""
+}

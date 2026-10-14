@@ -1,0 +1,15 @@
+{
+  "file": "F10-fork-navigate-condense-ask.md",
+  "bullet": "Unknown conversation (`F10.ask-agent-unknown`), known bug.",
+  "ids": [
+    "F10.ask-agent-unknown"
+  ],
+  "line": 507,
+  "script": "control-agent-server api GET /openapi.json --auth none --quiet \\\n  --check 'paths.<redacted:session-cookie>/{conversation_id}/ask_agent.post.responses.404' exists\ncontrol-agent-server api POST \"<redacted:session-cookie>/$NOPE/ask_agent\" --json '{\"question\": \"hi\"}' --expect 404 --save F10.ask-agent-unknown/unknown  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 4452,
+  "failed_line": 3,
+  "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$NOPE/ask_agent\" --json '{\"question\": \"hi\"}' --expect 404 --save F10.ask-agent-unknown/unknown",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/openapi.json\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"647770\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 3222,\n  \"checks\": [\n    {\n      \"check\": \"paths.<redacted:session-cookie>/{conversation_id}/ask_agent.post.responses.404 exists\",\n      \"ok\": true,\n      \"actual\": \"{\\\"description\\\": \\\"Item not found\\\"}\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/5e7fdd6e-af6d-4aaf-8d33-0d52ab5f6784/ask_agent\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"question\": \"hi\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"75\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"500: Internal Server Error\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 138,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024131-0603-map-f10/evidence/F10.ask-agent-unknown/unknown.json\",\n  \"hint\": \"expected 404, got 500\"\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checking the Agent SDK from outside — Engel's notebook</title>
+  <meta name="description" content="What the external OpenHands Agent SDK verifier checks, what its first Cloud run found, and what must exist before regular contract checks can begin.">
+  <meta property="og:title" content="Checking the Agent SDK from outside">
+  <meta property="og:description" content="The first external Agent SDK contract test, its Cloud evidence, and the path to regular checks.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/agent-sdk-external-contract.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="canonical" href="https://enyst.github.io/arch/agent-sdk-external-contract.html">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    html { color-scheme: dark; scroll-padding-top: 24px; }
+    .shell { max-width: 970px; font-size: 18px; }
+    header, article, footer { max-width: 74ch; margin-inline: auto; }
+    h1 { font-size: clamp(2.5rem, 6vw, 4rem); line-height: 1.08; margin: 26px 0 18px; text-wrap: balance; }
+    h2 { scroll-margin-top: 24px; }
+    p, li { max-width: 74ch; }
+    a { color: var(--teal); overflow-wrap: anywhere; text-underline-offset: .2em; }
+    a:hover { color: var(--ink); }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    strong { color: inherit; }
+    .meta { color: var(--muted); font-size: .86em; }
+    .lede { font-size: 1.12em; line-height: 1.6; color: var(--ink); }
+    .contents { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 16px 0; margin: 30px 0; border-block: 1px solid var(--border); font-size: .85em; }
+    .contents a { text-decoration: none; }
+    .table-scroll { overflow-x: auto; margin: 20px 0; }
+    .table-scroll table { min-width: 620px; margin: 0; }
+    th, td { vertical-align: top; }
+    .steps { padding-left: 27px; }
+    .steps li { padding-left: 8px; margin: 0 0 25px; }
+    .steps h3 { margin: 0 0 7px; color: var(--ink); font: 700 1em var(--sans); letter-spacing: 0; text-transform: none; }
+    .steps p { margin: 0; }
+    .sources li { margin: 9px 0; }
+    .note { background: var(--card); border-top: 1px solid var(--accent); padding: 18px 22px; margin: 24px 0; }
+    .note p { margin: 0; }
+    footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--border); }
+    footer p { font-size: 1em; }
+    @media (max-width: 640px) {
+      .shell { padding: 28px 20px 60px; font-size: 17px; }
+      h1 { font-size: 2.55rem; }
+      .contents { gap: 10px 16px; }
+    }
+    @media print {
+      html { color-scheme: light; }
+      body { background: #fff; color: #111; }
+      .shell { max-width: none; padding: 0; font-size: 11pt; }
+      header, article, footer { max-width: none; }
+      h1, h2, h3, strong, th { color: #111; }
+      a, .back, footer { color: #064f42; }
+      .meta { color: #444; }
+      .contents { display: none; }
+      .note, th, code { background: #eee; color: #111; }
+      .table-scroll { overflow: visible; }
+      .table-scroll table { min-width: 0; }
+      tr { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<main class="shell" id="top">
+  <header>
+    <a class="back" href="../index.html">&larr; Engel's code design notebook</a>
+    <h1>Checking the Agent SDK from outside</h1>
+    <p class="meta">Observed <time datetime="2026-10-09">9 October 2026</time> · Manual Cloud test · No active schedule</p>
+    <p class="lede">A separate verifier now tests a running Agent Server through REST and WebSocket. It does not import Agent SDK code. The first complete Cloud run found two failures against a proposed event-order rule.</p>
+    <nav class="contents" aria-label="On this page">
+      <a href="#reason">Why check from outside?</a>
+      <a href="#built">What exists</a>
+      <a href="#result">Cloud result</a>
+      <a href="#gap">Why it is disabled</a>
+      <a href="#path">Path to regular checks</a>
+      <a href="#coverage">What to test next</a>
+      <a href="#sources">Sources</a>
+    </nav>
+  </header>
+
+  <article>
+    <div class="note">
+      <p><strong>Current state:</strong> The Cloud automation is registered but disabled. We removed its temporary test endpoints and keys. The job has no active schedule or required pull-request check.</p>
+    </div>
+
+    <section id="reason">
+      <h2>Why check from outside?</h2>
+      <p>The <a href="openhands-sdk-architecture-testing.html">testing strategy</a> describes the larger aim. Code-writing agents can change repository tests. A trusted checker must hold the active rules and assign the result outside the candidate.</p>
+      <p>A <strong>candidate</strong> is the Agent Server build under test. A <strong>contract</strong> is the list of required behaviors. The <strong>verifier</strong> sends requests to the candidate and checks the replies.</p>
+      <p>The verifier uses public REST and WebSocket interfaces. It does not load candidate tests, plugins, helpers, or expected results. The verifier assigns each result from its own rules.</p>
+    </section>
+
+    <section id="built">
+      <h2>What exists</h2>
+      <div class="table-scroll" role="region" tabindex="0" aria-label="Current verifier parts">
+        <table>
+          <thead><tr><th scope="col">Part</th><th scope="col">Current state</th></tr></thead>
+          <tbody>
+            <tr><td>Contract bundle</td><td>Three required scenarios cover session replay, restart with saved storage, and a limited legacy event check. The live event-order rule is still a proposal.</td></tr>
+            <tr><td>External verifier</td><td>A deterministic program sends REST and WebSocket requests. A separate scripted provider returns a fixed tool call. No paid model call is needed.</td></tr>
+            <tr><td>Cloud automation</td><td>OpenHands Cloud can run the verifier bundle. The definition is disabled and has an inert staging schedule. Manual dispatch needs a separately prepared candidate.</td></tr>
+            <tr><td>Evidence</td><td>Each required scenario gets pass, fail, or blocked. The saved JSON contains the candidate revision, artifact hash, bundle and configuration hashes, received frames, and REST observations.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Repository CI checks the verifier's test cases and package. It does not test a live Agent Server candidate.</p>
+    </section>
+
+    <section id="result">
+      <h2>What the manual Cloud run found</h2>
+      <p>On 9 October, the verifier tested <a href="https://github.com/OpenHands/software-agent-sdk/tree/9f47d471ee6f91ba1d140d10d34f3b26d5ac2427">SDK commit <code>9f47d471</code></a>. A local controller started that build in a restricted process sandbox. This manual setup did not prove that an unattended service can isolate and identify each candidate.</p>
+      <p>The first Cloud attempt found a DNS fault in that sandbox. We corrected the test setup and ran the same verifier bundle again. The second run reached the scripted provider and recorded a request witness.</p>
+      <div class="table-scroll" role="region" tabindex="0" aria-label="Confirmed Cloud scenario results">
+        <table>
+          <thead><tr><th scope="col">Scenario</th><th scope="col">Observed behavior</th><th scope="col">Result</th></tr></thead>
+          <tbody>
+            <tr><td><code>WS-REPLAY-001</code></td><td>Saved history and replay matched. The live stream sent sequence 11 when the rule expected 10.</td><td>Fail against proposed order rule</td></tr>
+            <tr><td><code>WS-RESTART-001</code></td><td>The controller killed the server. Saved history and replay matched after restart. The live stream sent 13 when the rule expected 12.</td><td>Fail against proposed order rule</td></tr>
+            <tr><td><code>LEGACY-EVENTS-001</code></td><td>The legacy event endpoint returned all 14 saved events.</td><td>Pass for its limited scope</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The verifier also saw a socket error that did not enter durable history. The restored history matched before the post-restart live-order failure.</p>
+      <p>The durable live-order rule is still a proposal. An independent owner must decide whether it is a public contract. The run records a real difference from that proposed rule.</p>
+      <p>See the <a href="https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud">dated evaluation</a> and the <a href="https://github.com/enyst/automations/blob/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud/confirmed-run.json">exact confirmed-run evidence</a>. The first run remains there as a setup diagnostic.</p>
+    </section>
+
+    <section id="gap">
+      <h2>Why it is disabled</h2>
+      <p>Cloud runs the verifier. It does not build a pinned SDK candidate for this job. The manual candidate, provider route, and restart control used temporary services. Those services are closed.</p>
+      <p>The current Cloud definition has no active test keys. It cannot repeat this test without a new candidate, new controls, and new configuration.</p>
+      <p>The personal Cloud account can change its own automation bundle. An agent with that account key could change the test it faces. A separate owner must approve the active bundle and publish accepted results.</p>
+      <div class="note">
+        <p><strong>A run status is not a contract result.</strong> All required scenarios must pass in the evidence. A failed observation is a fail. A missing candidate, key, or trace is blocked.</p>
+      </div>
+    </section>
+
+    <section id="path">
+      <h2>Path to regular checks</h2>
+      <ol class="steps">
+        <li>
+          <h3>Approve the rules</h3>
+          <p>Decide the live-order guarantee first. Approve the exact verifier bundle digest and the effective configuration digest. Keep activation outside the implementation agent's control.</p>
+        </li>
+        <li>
+          <h3>Build a known candidate</h3>
+          <p>Choose one exact main or release commit for each run. Build its artifact and record the hash. Independently prove that the test endpoint serves that artifact. Isolate the candidate from verifier and publisher keys.</p>
+        </li>
+        <li>
+          <h3>Provide test controls</h3>
+          <p>Host the scripted provider where the candidate can reach it. Protect the provider's request witness. Add a trusted restart control that kills the process and keeps its storage. Issue new limited keys for each run.</p>
+        </li>
+        <li>
+          <h3>Save and judge the evidence</h3>
+          <p>Run the approved verifier in Cloud. Export the exact evidence and its hash before the sandbox ends. Compare the executed bundle and configuration with approved digests. Check the independently signed artifact binding, provider witness, and restart record. Treat missing proof as blocked.</p>
+        </li>
+        <li>
+          <h3>Publish and repeat</h3>
+          <p>Use a separate identity to publish the result for the exact tested commit. Then start a regular main or release check. The proposed first cadence is daily at 09:00 in Stockholm. Retain failing storage until investigation ends. Then remove test keys and candidate resources.</p>
+        </li>
+      </ol>
+      <p>A required pull-request check can follow after the regular path is reliable. A new PR head or base needs a new test result.</p>
+    </section>
+
+    <section id="coverage">
+      <h2>What to test next</h2>
+      <p>The present bundle focuses on event transport. Later rules can cover run ownership, cancellation, confirmation, secret delivery, streaming, storage faults, and client compatibility.</p>
+      <p>Each new rule needs a clear scope. A known good case must pass. A deliberate wrong case must fail. The approved bundle must change through the separate review path.</p>
+    </section>
+
+    <section id="sources">
+      <h2>Sources</h2>
+      <ul class="sources">
+        <li><a href="openhands-sdk-architecture-testing.html">Testing architecture when agents write the code</a> — the larger strategy.</li>
+        <li><a href="https://github.com/enyst/automations/blob/e0065ca3498c4ea39a446afbc61d1a1de5d1a8f9/sources/sdk-lifecycle-conformance/README.md">Verifier design and Cloud setup</a> — the merged implementation guide.</li>
+        <li><a href="https://github.com/enyst/automations/blob/e0065ca3498c4ea39a446afbc61d1a1de5d1a8f9/sources/sdk-lifecycle-conformance/contracts.json">Required scenarios</a> — the proposed contract bundle.</li>
+        <li><a href="https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud">First Cloud evaluation</a> — results, exact evidence, and limits.</li>
+        <li><a href="openhands-automations.html">OpenHands Automations</a> — how the service starts and records a job.</li>
+      </ul>
+    </section>
+  </article>
+
+  <footer>
+    <p>This dated page does not report live Cloud state. <a href="https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf">ASD-STE100 Issue 9</a> guided its short, direct sentences. No controlled-vocabulary check was done.</p>
+    <p class="foot-nav"><a href="../index.html">&larr; Back to the notebook</a></p>
+  </footer>
+</main>
+</body>
+</html>

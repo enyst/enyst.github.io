@@ -1,0 +1,15 @@
+{
+  "file": "F31-persistence-and-limits.md",
+  "bullet": "Dead owner takeover (`F31.lease-dead-owner-takeover`).",
+  "ids": [
+    "F31.lease-dead-owner-takeover"
+  ],
+  "line": 171,
+  "script": "DEAD=$(jq -r .pid \"$AGENT_SERVER_VERIFY_RUN/run.json\")\nNT=$(control-agent-server logs --grep 'Taking over conversation' | jq .total_matching)\ncontrol-agent-server restart --hard\nif kill -0 \"$DEAD\" 2>/dev/null; then false; fi\nPID3=$(jq -r .pid \"$AGENT_SERVER_VERIFY_RUN/run.json\")\ncontrol-agent-server state cat owner_lease.json --conversation \"$L\" --check owner_pid eq \"$DEAD\" --check generation eq 1 \\\n  --check expires_at gt \"$(date +%s)\"\ncontrol-agent-server api GET \"<redacted:session-cookie>/$L/events/count\" --expect 200 --save F31.lease-dead-owner-takeover/first-load\ncontrol-agent-server state cat owner_lease.json --conversation \"$L\" --check owner_pid eq \"$PID3\" --check generation eq 2\ncontrol-agent-server logs --grep 'Taking over conversation' --expect-min $((NT + 1))\n",
+  "exit_code": 1,
+  "elapsed_ms": 46545,
+  "failed_line": 4,
+  "failed_command": "false",
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-021830-e72b-map-f31\",\n  \"url\": \"http://127.0.0.1:43785\",\n  \"rotated_key\": false,\n  \"hard\": true,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 41998,\n  \"ready_path\": \"/ready\"\n}\n",
+  "stderr": ""
+}

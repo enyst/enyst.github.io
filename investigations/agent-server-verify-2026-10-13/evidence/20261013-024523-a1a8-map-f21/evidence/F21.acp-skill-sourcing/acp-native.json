@@ -1,0 +1,108 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/agent-profiles/qa-f21-acp/materialize",
+    "query": [],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "1802",
+      "content-type": "application/json"
+    },
+    "body": {
+      "agent_kind": "acp",
+      "valid": true,
+      "errors": [],
+      "unusable_tools": [],
+      "llm_profile_ref": null,
+      "llm_profile_resolved": false,
+      "llm_api_key_set": false,
+      "mcp_server_refs": null,
+      "resolved_mcp_config_keys": [],
+      "dangling_mcp_server_refs": [],
+      "disabled_skills": [],
+      "resolved_skills": [],
+      "secret_refs": [
+        "OPENAI_API_KEY"
+      ],
+      "acp_api_key_secret_name": "OPENAI_API_KEY",
+      "acp_base_url_secret_name": "OPENAI_BASE_URL",
+      "acp_file_secret_names": [
+        "CODEX_AUTH_JSON"
+      ],
+      "meta_profile_ref": null,
+      "dangling_meta_profile_ref": null,
+      "dangling_meta_profile_llm_refs": [],
+      "resolved_settings": {
+        "schema_version": 8,
+        "agent_kind": "acp",
+        "acp_server": "codex",
+        "acp_command": [],
+        "acp_args": [],
+        "acp_model": "gpt-5.5",
+        "acp_session_mode": null,
+        "acp_prompt_timeout": 1800.0,
+        "acp_startup_timeout": 90.0,
+        "mcp_config": {},
+        "acp_isolate_data_dir": false,
+        "acp_file_secrets": [
+          {
+            "secret_name": "CODEX_AUTH_JSON",
+            "filename": "auth.json",
+            "env_var": "CODEX_HOME",
+            "subdir": "codex",
+            "env_points_to": "dir",
+            "warn_if_unset": []
+          },
+          {
+            "secret_name": "GOOGLE_APPLICATION_CREDENTIALS_JSON",
+            "filename": "gcloud-credentials.json",
+            "env_var": "GOOGLE_APPLICATION_CREDENTIALS",
+            "subdir": "gemini-cli",
+            "env_points_to": "file",
+            "warn_if_unset": [
+              "GOOGLE_CLOUD_PROJECT",
+              "GOOGLE_CLOUD_LOCATION"
+            ]
+          },
+          {
+            "secret_name": "KIMI_CODE_CONFIG_TOML",
+            "filename": "config.toml",
+            "env_var": "KIMI_CODE_HOME",
+            "subdir": "kimi-code",
+            "env_points_to": "dir",
+            "warn_if_unset": []
+          },
+          {
+            "secret_name": "PI_AUTH_JSON",
+            "filename": "auth.json",
+            "env_var": "PI_CODING_AGENT_DIR",
+            "subdir": "pi",
+            "env_points_to": "dir",
+            "warn_if_unset": []
+          }
+        ],
+        "agent_context": {
+          "skills": [],
+          "system_message_suffix": null,
+          "user_message_suffix": null,
+          "load_user_skills": false,
+          "load_public_skills": false,
+          "marketplace_path": "marketplaces/default.json",
+          "registered_marketplaces": [],
+          "load_project_skills": false,
+          "load_memory": false,
+          "disabled_skills": [],
+          "secrets": null,
+          "current_datetime": null
+        }
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 483
+}

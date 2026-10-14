@@ -1,0 +1,15 @@
+{
+  "file": "F31-persistence-and-limits.md",
+  "bullet": "Config file and environment (`F31.config-precedence`).",
+  "ids": [
+    "F31.config-precedence"
+  ],
+  "line": 575,
+  "script": "control-agent-server restart --reset-config --config-json '{\"lease_ttl_seconds\": 30}'\ncontrol-agent-server config | jq -e '.config_file.lease_ttl_seconds == 30 and .server_env.OH_LEASE_TTL_SECONDS == null'\nP1=$(control-agent-server conversation start --tools none --no-autotitle --print-id)\nNOW=$(date +%s)\ncontrol-agent-server state cat owner_lease.json --conversation \"$P1\" --check expires_at gt \"$((NOW + 25))\" --check expires_at le \"$((NOW + 31))\"\ncontrol-agent-server restart --env OH_LEASE_TTL_SECONDS=90\ncontrol-agent-server config | jq -e '.config_file.lease_ttl_seconds == 30 and .server_env.OH_LEASE_TTL_SECONDS == \"90\"'\nP2=$(control-agent-server conversation start --tools none --no-autotitle --print-id)\nNOW=$(date +%s)\ncontrol-agent-server state cat owner_lease.json --conversation \"$P2\" --check expires_at gt \"$((NOW + 85))\" --check expires_at le \"$((NOW + 91))\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 87934,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-024316-e532-map-f31\",\n  \"url\": \"http://127.0.0.1:47795\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 19388,\n  \"ready_path\": \"/ready\"\n}\ntrue\n{\n  \"ok\": true,\n  \"path\": \"owner_lease.json\",\n  \"bytes\": 158,\n  \"mode\": \"0o600\",\n  \"content\": {\n    \"owner_instance_id\": \"73560e6833a84e6891dcd61a50527268\",\n    \"generation\": 1,\n    \"expires_at\": 1791860004.7605176,\n    \"owner_host\": \"e7ee1a756865\",\n    \"owner_pid\": 52838\n  },\n  \"checks\": [\n    {\n      \"check\": \"expires_at gt 1791860000\",\n      \"ok\": true,\n      \"actual\": \"1791860004.7605176\"\n    },\n    {\n      \"check\": \"expires_at le 1791860006\",\n      \"ok\": true,\n      \"actual\": \"1791860004.7605176\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-024316-e532-map-f31\",\n  \"url\": \"http://127.0.0.1:47795\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 25925,\n  \"ready_path\": \"/ready\"\n}\ntrue\n{\n  \"ok\": true,\n  \"path\": \"owner_lease.json\",\n  \"bytes\": 158,\n  \"mode\": \"0o600\",\n  \"content\": {\n    \"owner_instance_id\": \"16cb9a1e9c214fb59d5a1ee3d38b5618\",\n    \"generation\": 1,\n    \"expires_at\": 1791860111.0393808,\n    \"owner_host\": \"e7ee1a756865\",\n    \"owner_pid\": 53867\n  },\n  \"checks\": [\n    {\n      \"check\": \"expires_at gt 1791860106\",\n      \"ok\": true,\n      \"actual\": \"1791860111.0393808\"\n    },\n    {\n      \"check\": \"expires_at le 1791860112\",\n      \"ok\": true,\n      \"actual\": \"1791860111.0393808\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,13 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "Preconditions",
+  "ids": [],
+  "line": 19,
+  "script": "mkdir -p \"$AGENT_SERVER_VERIFY_RUN/evidence/F04.supplement\"\nif ! control-agent-server doctor > \"$AGENT_SERVER_VERIFY_RUN/evidence/F04.supplement/doctor.json\"; then\n  control-agent-server doctor > \"$AGENT_SERVER_VERIFY_RUN/evidence/F04.supplement/doctor-retry.json\"\nfi\nW=\"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f04-supplement-ws\"\nmkdir -p \"$W\"\nOFFLINE_AGENT='{\"llm\":{\"model\":\"openai/qa-offline\",\"api_key\":\"<redacted:api_key>\",\"base_url\":\"http://127.0.0.1:9/v1\",\"num_retries\":0},\"tools\":[]}'\nSTUB=$(control-agent-server fixture llm-stub --name qa-f04-supplement-stub --step 'tool:finish:{\"message\":\"QA_F04_SUPPLEMENT_DONE\"}' --print-path)\nSTUB_AGENT=\"{\\\"llm\\\":{\\\"model\\\":\\\"openai/qa-stub\\\",\\\"api_key\\\":\\\"<redacted:api_key>\\\",\\\"base_url\\\":\\\"$STUB/v1\\\",\\\"num_retries\\\":0},\\\"tools\\\":[]}\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 4010,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "",
+  "stderr": ""
+}

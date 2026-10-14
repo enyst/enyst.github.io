@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/profiles/qa-unreachable/validate",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "llm": {
+        "model": "openai/qa-unreachable",
+        "base_url": "http://127.0.0.1:9/v1",
+        "api_key": "<redacted:api_key>"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "159",
+      "content-type": "application/json"
+    },
+    "body": {
+      "valid": false,
+      "error": {
+        "type": "LLMServiceUnavailableError",
+        "message": "litellm.InternalServerError: InternalServerError: OpenAIException - Connection error."
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 120553
+}

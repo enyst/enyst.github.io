@@ -1,0 +1,542 @@
+{
+  "summary": {
+    "opened": true,
+    "frames": 9,
+    "kinds": {
+      "ConversationStateUpdateEvent": 4,
+      "ObservationEvent": 3,
+      "ActionEvent": 2
+    },
+    "stopped": "duration",
+    "close": null
+  },
+  "frames": [
+    {
+      "direction": "opened",
+      "at": "2026-10-13T03:30:17Z"
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T03:30:17Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "32b3a628-e4fb-4fd0-848e-6e006df739bf",
+        "timestamp": "2026-10-13T03:30:17.056869",
+        "source": "environment",
+        "key": "full_state",
+        "value": {
+          "id": "1b3eb5c3-f174-4ed0-a6a5-f537c1d1ac6e",
+          "agent": {
+            "llm": {
+              "model": "deepseek/deepseek-flash",
+              "api_key": "<redacted:api_key>",
+              "auth_type": "api_key",
+              "openrouter_site_url": "https://docs.all-hands.dev/",
+              "openrouter_app_name": "OpenHands",
+              "num_retries": 5,
+              "retry_multiplier": 8.0,
+              "retry_min_wait": 8,
+              "retry_max_wait": 64,
+              "timeout": 300,
+              "stream_idle_timeout": 300.0,
+              "max_message_chars": 30000,
+              "api_mode": "auto",
+              "capability_overrides": {},
+              "stream": false,
+              "drop_params": true,
+              "disable_stop_word": false,
+              "caching_prompt": true,
+              "log_completions": false,
+              "log_completions_folder": "logs/completions",
+              "native_tool_calling": true,
+              "reasoning_effort": "high",
+              "enable_encrypted_reasoning": true,
+              "prompt_cache_retention": "24h",
+              "extended_thinking_budget": 200000,
+              "usage_id": "default",
+              "litellm_extra_body": {},
+              "is_subscription": false
+            },
+            "tools": [
+              {
+                "name": "file_editor",
+                "params": {}
+              }
+            ],
+            "mcp_config": {},
+            "include_default_tools": [
+              "FinishTool",
+              "ThinkTool"
+            ],
+            "agent_context": {
+              "skills": [],
+              "load_user_skills": false,
+              "load_public_skills": false,
+              "marketplace_path": "marketplaces/default.json",
+              "registered_marketplaces": [],
+              "load_project_skills": false,
+              "load_memory": false,
+              "disabled_skills": [],
+              "current_datetime": "2026-10-13T03:29:49.003840Z"
+            },
+            "system_prompt_filename": "system_prompt.j2",
+            "security_policy_filename": "security_policy.j2",
+            "system_prompt_kwargs": {
+              "llm_security_analyzer": true
+            },
+            "condenser": {
+              "llm": {
+                "model": "deepseek/deepseek-flash",
+                "api_key": "<redacted:api_key>",
+                "auth_type": "api_key",
+                "openrouter_site_url": "https://docs.all-hands.dev/",
+                "openrouter_app_name": "OpenHands",
+                "num_retries": 5,
+                "retry_multiplier": 8.0,
+                "retry_min_wait": 8,
+                "retry_max_wait": 64,
+                "timeout": 300,
+                "stream_idle_timeout": 300.0,
+                "max_message_chars": 30000,
+                "api_mode": "auto",
+                "capability_overrides": {},
+                "stream": false,
+                "drop_params": true,
+                "disable_stop_word": false,
+                "caching_prompt": true,
+                "log_completions": false,
+                "log_completions_folder": "logs/completions",
+                "native_tool_calling": true,
+                "reasoning_effort": "high",
+                "enable_encrypted_reasoning": true,
+                "prompt_cache_retention": "24h",
+                "extended_thinking_budget": 200000,
+                "usage_id": "condenser",
+                "litellm_extra_body": {},
+                "is_subscription": false
+              },
+              "max_size": 240,
+              "keep_first": 2,
+              "minimum_progress": 0.1,
+              "hard_context_reset_max_retries": 5,
+              "hard_context_reset_context_scaling": 0.8,
+              "kind": "LLMSummarizingCondenser"
+            },
+            "tool_concurrency_limit": 1,
+            "kind": "Agent"
+          },
+          "workspace": {
+            "working_dir": "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/fixtures/workspaces/032948-994200",
+            "kind": "LocalWorkspace"
+          },
+          "persistence_dir": "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/server/workspace/conversations/1b3eb5c3f1744ed0a6a5f537c1d1ac6e",
+          "max_iterations": 500,
+          "stuck_detection": true,
+          "execution_status": "finished",
+          "confirmation_policy": {
+            "kind": "NeverConfirm"
+          },
+          "activated_knowledge_skills": [],
+          "activated_path_rules": [],
+          "invoked_skills": [],
+          "blocked_actions": {},
+          "blocked_messages": {},
+          "last_user_message_id": "fd1ccaa8-46c4-4ddc-9bee-c2e8ca631c87",
+          "leaf_event_id": "e8fc69d1-3d66-41c8-bf99-ab40f0346cdf",
+          "head_is_empty": false,
+          "stats": {
+            "usage_to_metrics": {
+              "default": {
+                "model_name": "deepseek/deepseek-flash",
+                "accumulated_cost": 0.001291776,
+                "accumulated_token_usage": {
+                  "model": "deepseek/deepseek-flash",
+                  "prompt_tokens": 16104,
+                  "completion_tokens": 406,
+                  "cache_read_tokens": 13696,
+                  "cache_write_tokens": 0,
+                  "reasoning_tokens": 28,
+                  "context_window": 1000000,
+                  "per_turn_token": 5667,
+                  "response_id": ""
+                },
+                "costs": [
+                  {
+                    "model": "deepseek/deepseek-flash",
+                    "cost": 0.000784968,
+                    "timestamp": 1791862192.5778532
+                  },
+                  {
+                    "model": "deepseek/deepseek-flash",
+                    "cost": 0.00026772,
+                    "timestamp": 1791862193.8654232
+                  },
+                  {
+                    "model": "deepseek/deepseek-flash",
+                    "cost": 0.00023908799999999998,
+                    "timestamp": 1791862195.2975302
+                  }
+                ],
+                "response_latencies": [
+                  {
+                    "model": "deepseek/deepseek-flash",
+                    "latency": 1.5597355365753174,
+                    "response_id": "f4cf31bb-7f71-44c5-9aa1-0741026f697e"
+                  },
+                  {
+                    "model": "deepseek/deepseek-flash",
+                    "latency": 1.2581160068511963,
+                    "response_id": "ac161ea0-a7f5-4bed-980c-ebe8efabd384"
+                  },
+                  {
+                    "model": "deepseek/deepseek-flash",
+                    "latency": 1.4087204933166504,
+                    "response_id": "969c9fb2-4a5b-4d74-a619-7c3619d3863c"
+                  }
+                ],
+                "token_usages": [
+                  {
+                    "model": "deepseek/deepseek-flash",
+                    "prompt_tokens": 5158,
+                    "completion_tokens": 180,
+                    "cache_read_tokens": 3328,
+                    "cache_write_tokens": 0,
+                    "reasoning_tokens": 25,
+                    "context_window": 1000000,
+                    "per_turn_token": 5338,
+                    "response_id": "f4cf31bb-7f71-44c5-9aa1-0741026f697e"
+                  },
+                  {
+                    "model": "deepseek/deepseek-flash",
+                    "prompt_tokens": 5370,
+                    "completion_tokens": 135,
+                    "cache_read_tokens": 5120,
+                    "cache_write_tokens": 0,
+                    "reasoning_tokens": 3,
+                    "context_window": 1000000,
+                    "per_turn_token": 5505,
+                    "response_id": "ac161ea0-a7f5-4bed-980c-ebe8efabd384"
+                  },
+                  {
+                    "model": "deepseek/deepseek-flash",
+                    "prompt_tokens": 5576,
+                    "completion_tokens": 91,
+                    "cache_read_tokens": 5248,
+                    "cache_write_tokens": 0,
+                    "reasoning_tokens": 0,
+                    "context_window": 1000000,
+                    "per_turn_token": 5667,
+                    "response_id": "969c9fb2-4a5b-4d74-a619-7c3619d3863c"
+                  }
+                ]
+              },
+              "condenser": {
+                "model_name": "deepseek/deepseek-flash",
+                "accumulated_cost": 0.0,
+                "accumulated_token_usage": {
+                  "model": "deepseek/deepseek-flash",
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "context_window": 0,
+                  "per_turn_token": 0,
+                  "response_id": ""
+                },
+                "costs": [],
+                "response_latencies": [],
+                "token_usages": []
+              }
+            }
+          },
+          "secret_registry": {
+            "secret_sources": {}
+          },
+          "tags": {},
+          "agent_state": {}
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T03:30:17Z",
+      "kind": "ObservationEvent",
+      "frame": {
+        "id": "5f60c624-37bd-49f1-96ca-36accd43422e",
+        "timestamp": "2026-10-13T03:29:52.588975",
+        "source": "environment",
+        "parent_id": "a6820ee9-d5f1-49d5-a421-401463a9ccd7",
+        "tool_name": "file_editor",
+        "tool_call_id": "call_00_jzhsXxOP5w4KAeS9wGDy2645",
+        "observation": {
+          "content": [
+            {
+              "cache_prompt": false,
+              "type": "text",
+              "text": "File created successfully at: /workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/fixtures/workspaces/032948-994200/qa.txt"
+            }
+          ],
+          "is_error": false,
+          "command": "create",
+          "path": "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/fixtures/workspaces/032948-994200/qa.txt",
+          "prev_exist": false,
+          "new_content": "QA_F06_LIVE",
+          "kind": "FileEditorObservation"
+        },
+        "action_id": "a6820ee9-d5f1-49d5-a421-401463a9ccd7",
+        "extended_content": [],
+        "kind": "ObservationEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T03:30:17Z",
+      "kind": "ActionEvent",
+      "frame": {
+        "id": "97600d55-6211-4fb5-b6ae-eb98d59a9298",
+        "timestamp": "2026-10-13T03:29:53.866235",
+        "source": "agent",
+        "parent_id": "5f60c624-37bd-49f1-96ca-36accd43422e",
+        "thought": [
+          {
+            "cache_prompt": false,
+            "type": "text",
+            "text": ""
+          }
+        ],
+        "reasoning_content": "Verify content.",
+        "thinking_blocks": [],
+        "action": {
+          "command": "view",
+          "path": "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/fixtures/workspaces/032948-994200/qa.txt",
+          "kind": "FileEditorAction"
+        },
+        "tool_name": "file_editor",
+        "tool_call_id": "call_00_eBFxrNcS7iI0sx043DEV1157",
+        "tool_call": {
+          "id": "call_00_eBFxrNcS7iI0sx043DEV1157",
+          "name": "file_editor",
+          "arguments": "{\"command\": \"view\", \"path\": \"/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/fixtures/workspaces/032948-994200/qa.txt\", \"security_risk\": \"LOW\", \"summary\": \"Verify qa.txt content\"}",
+          "origin": "completion"
+        },
+        "llm_response_id": "ac161ea0-a7f5-4bed-980c-ebe8efabd384",
+        "security_risk": "UNKNOWN",
+        "summary": "Verify qa.txt content",
+        "kind": "ActionEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T03:30:17Z",
+      "kind": "ObservationEvent",
+      "frame": {
+        "id": "1f7e333c-296e-43c2-bcd7-c5f7e5fab912",
+        "timestamp": "2026-10-13T03:29:53.875984",
+        "source": "environment",
+        "parent_id": "97600d55-6211-4fb5-b6ae-eb98d59a9298",
+        "tool_name": "file_editor",
+        "tool_call_id": "call_00_eBFxrNcS7iI0sx043DEV1157",
+        "observation": {
+          "content": [
+            {
+              "cache_prompt": false,
+              "type": "text",
+              "text": "Here's the result of running `cat -n` on /workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/fixtures/workspaces/032948-994200/qa.txt:\n     1\tQA_F06_LIVE\n"
+            }
+          ],
+          "is_error": false,
+          "command": "view",
+          "path": "/workspace/verification-artifacts/runs/20261013-032934-9891-map-f06/fixtures/workspaces/032948-994200/qa.txt",
+          "prev_exist": true,
+          "kind": "FileEditorObservation"
+        },
+        "action_id": "97600d55-6211-4fb5-b6ae-eb98d59a9298",
+        "extended_content": [],
+        "kind": "ObservationEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T03:30:17Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "8b367a4f-5348-4049-8766-1cf4eb5c77c0",
+        "timestamp": "2026-10-13T03:29:53.865549",
+        "source": "environment",
+        "parent_id": "1f7e333c-296e-43c2-bcd7-c5f7e5fab912",
+        "key": "stats",
+        "value": {
+          "usage_to_metrics": {
+            "default": {
+              "model_name": "deepseek/deepseek-flash",
+              "accumulated_cost": 0.001052688,
+              "max_budget_per_task": null,
+              "accumulated_token_usage": {
+                "model": "deepseek/deepseek-flash",
+                "prompt_tokens": 10528,
+                "completion_tokens": 315,
+                "cache_read_tokens": 8448,
+                "cache_write_tokens": 0,
+                "reasoning_tokens": 28,
+                "context_window": 1000000,
+                "per_turn_token": 5505,
+                "response_id": ""
+              }
+            },
+            "condenser": {
+              "model_name": "deepseek/deepseek-flash",
+              "accumulated_cost": 0.0,
+              "max_budget_per_task": null,
+              "accumulated_token_usage": {
+                "model": "deepseek/deepseek-flash",
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "cache_read_tokens": 0,
+                "cache_write_tokens": 0,
+                "reasoning_tokens": 0,
+                "context_window": 0,
+                "per_turn_token": 0,
+                "response_id": ""
+              }
+            }
+          }
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T03:30:17Z",
+      "kind": "ActionEvent",
+      "frame": {
+        "id": "a292aebc-afa3-49b9-b773-01d730060faf",
+        "timestamp": "2026-10-13T03:29:55.298262",
+        "source": "agent",
+        "parent_id": "1f7e333c-296e-43c2-bcd7-c5f7e5fab912",
+        "thought": [
+          {
+            "cache_prompt": false,
+            "type": "text",
+            "text": "Done. Created `qa.txt` containing exactly `QA_F06_LIVE`."
+          }
+        ],
+        "reasoning_content": "",
+        "thinking_blocks": [],
+        "action": {
+          "message": "Created qa.txt containing exactly QA_F06_LIVE. Verified with a file read.",
+          "kind": "FinishAction"
+        },
+        "tool_name": "finish",
+        "tool_call_id": "call_00_ET_fsHun5VOMARVfXk5opls3406",
+        "tool_call": {
+          "id": "call_00_ET_fsHun5VOMARVfXk5opls3406",
+          "name": "finish",
+          "arguments": "{\"summary\": \"Created qa.txt with required content\", \"message\": \"Created qa.txt containing exactly QA_F06_LIVE. Verified with a file read.\"}",
+          "origin": "completion"
+        },
+        "llm_response_id": "969c9fb2-4a5b-4d74-a619-7c3619d3863c",
+        "security_risk": "UNKNOWN",
+        "summary": "Created qa.txt with required content",
+        "kind": "ActionEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T03:30:17Z",
+      "kind": "ObservationEvent",
+      "frame": {
+        "id": "e8fc69d1-3d66-41c8-bf99-ab40f0346cdf",
+        "timestamp": "2026-10-13T03:29:55.301740",
+        "source": "environment",
+        "parent_id": "a292aebc-afa3-49b9-b773-01d730060faf",
+        "tool_name": "finish",
+        "tool_call_id": "call_00_ET_fsHun5VOMARVfXk5opls3406",
+        "observation": {
+          "content": [
+            {
+              "cache_prompt": false,
+              "type": "text",
+              "text": "Created qa.txt containing exactly QA_F06_LIVE. Verified with a file read."
+            }
+          ],
+          "is_error": false,
+          "kind": "FinishObservation"
+        },
+        "action_id": "a292aebc-afa3-49b9-b773-01d730060faf",
+        "extended_content": [],
+        "kind": "ObservationEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T03:30:17Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "528580e2-8406-4120-9203-a6bb531fc61e",
+        "timestamp": "2026-10-13T03:29:55.304940",
+        "source": "environment",
+        "parent_id": "e8fc69d1-3d66-41c8-bf99-ab40f0346cdf",
+        "key": "execution_status",
+        "value": "finished",
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T03:30:17Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "0bf137e1-f5d9-454e-9624-b57b72e5b53e",
+        "timestamp": "2026-10-13T03:29:55.297632",
+        "source": "environment",
+        "parent_id": "e8fc69d1-3d66-41c8-bf99-ab40f0346cdf",
+        "key": "stats",
+        "value": {
+          "usage_to_metrics": {
+            "default": {
+              "model_name": "deepseek/deepseek-flash",
+              "accumulated_cost": 0.001291776,
+              "max_budget_per_task": null,
+              "accumulated_token_usage": {
+                "model": "deepseek/deepseek-flash",
+                "prompt_tokens": 16104,
+                "completion_tokens": 406,
+                "cache_read_tokens": 13696,
+                "cache_write_tokens": 0,
+                "reasoning_tokens": 28,
+                "context_window": 1000000,
+                "per_turn_token": 5667,
+                "response_id": ""
+              }
+            },
+            "condenser": {
+              "model_name": "deepseek/deepseek-flash",
+              "accumulated_cost": 0.0,
+              "max_budget_per_task": null,
+              "accumulated_token_usage": {
+                "model": "deepseek/deepseek-flash",
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "cache_read_tokens": 0,
+                "cache_write_tokens": 0,
+                "reasoning_tokens": 0,
+                "context_window": 0,
+                "per_turn_token": 0,
+                "response_id": ""
+              }
+            }
+          }
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "ended",
+      "at": "2026-10-13T03:30:20Z",
+      "stopped": "duration",
+      "close": null
+    }
+  ]
+}

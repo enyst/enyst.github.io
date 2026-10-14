@@ -1,0 +1,15 @@
+{
+  "file": "F31-persistence-and-limits.md",
+  "bullet": "Lease renewed (`F31.lease-renewed`).",
+  "ids": [
+    "F31.lease-renewed"
+  ],
+  "line": 136,
+  "script": "E1=$(control-agent-server state cat owner_lease.json --conversation \"$L\" | jq -r .content.expires_at)\nOWNER=$(control-agent-server state cat owner_lease.json --conversation \"$L\" | jq -r .content.owner_instance_id)\nT0=$SECONDS\nuntil control-agent-server state cat owner_lease.json --conversation \"$L\" --check expires_at gt \"$E1\" >/dev/null; do\n  test $((SECONDS - T0)) -le 17\n  sleep 1\ndone\ncontrol-agent-server state cat owner_lease.json --conversation \"$L\" --check expires_at gt \"$E1\" --check owner_instance_id eq \"$OWNER\" \\\n  --check generation eq 1 --check expires_at gt \"$(($(date +%s) + 40))\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 10519,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"path\": \"owner_lease.json\",\n  \"bytes\": 157,\n  \"mode\": \"0o600\",\n  \"content\": {\n    \"owner_instance_id\": \"0d65c7356b514837a0477691738806c4\",\n    \"generation\": 1,\n    \"expires_at\": 1791857999.7057285,\n    \"owner_host\": \"e7ee1a756865\",\n    \"owner_pid\": 5424\n  },\n  \"checks\": [\n    {\n      \"check\": \"expires_at gt 1791857990.968995\",\n      \"ok\": true,\n      \"actual\": \"1791857999.7057285\"\n    },\n    {\n      \"check\": \"owner_instance_id eq 0d65c7356b514837a0477691738806c4\",\n      \"ok\": true,\n      \"actual\": \"0d65c7356b514837a0477691738806c4\"\n    },\n    {\n      \"check\": \"generation eq 1\",\n      \"ok\": true,\n      \"actual\": \"1\"\n    },\n    {\n      \"check\": \"expires_at gt 1791857996\",\n      \"ok\": true,\n      \"actual\": \"1791857999.7057285\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

@@ -19,6 +19,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="brand.css" />
+  <style>.card-still { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; margin-bottom: 14px; border-radius: 4px; border: 1px solid var(--border); }</style>
 </head>
 <body>
   <div class="shell">
@@ -26,6 +27,7 @@
     <p class="tagline">Code-grounded notes on how OpenHands, its SDK, and SmolPaws actually work — mechanism traces, architecture studies, and design decisions.</p>
 
     <nav class="links" aria-label="Sections">
+      <a href="#verification">Verification</a>
       <a href="#how-things-work">How things work</a>
       <a href="#channels">SmolPaws channels</a>
       <a href="#next-smolpaws">The next SmolPaws</a>
@@ -34,8 +36,69 @@
       <a href="#elsewhere">Elsewhere</a>
     </nav>
 
+    <h2 id="verification">Verification</h2>
+    <div class="cards">
+      <a class="card" href="verify/index.html">
+        <img class="card-still" src="experiments/verify-agent-sdk-explainer/stills/frame-10s.png" alt="Title frame of the explainer video: Verifying the agent SDK, OpenHands / software-agent-sdk" width="1920" height="1080"/>
+        <div class="card-title">OpenHands agent-sdk verification</div>
+        <div class="card-desc">Feature maps written for agents, a CLI that drives the real server, and known bugs kept as expected failures. Start with a two-minute explainer video, then the Agent Server map and its bug tracker, the core SDK map in progress, and the OpenHands app map.</div>
+        <span class="card-tag tag-report">video + table of contents · 11 October 2026</span>
+      </a>
+      <a class="card" href="experiments/agent-server-feature-map-video/video.html">
+        <div class="card-title">The map that keeps itself honest</div>
+        <div class="card-desc">A short film about the verify-agent-server skill and the evidence-backed feature map it keeps tied to the running server.</div>
+        <span class="card-tag tag-report">film · Agent Server verification</span>
+      </a>
+    </div>
+
     <h2 id="investigations">Investigations &amp; dashboards</h2>
     <div class="cards">
+      <a class="card" href="investigations/openhands-issues-since-monday.html">
+        <div class="card-title">OpenHands issues since Monday: own PRs and remaining work</div>
+        <div class="card-desc">118 issues posted by enyst and smolpaws since 5 October: 80 have their implementation PRs and 38 do not. Of 34 still open, 20 have no PR by either account. Every matched PR has its author and current state.</div>
+        <span class="card-tag tag-data">issue inventory · 13 October 2026</span>
+      </a>
+      <a class="card" href="investigations/openhands-last-week-merged-issues.html">
+        <div class="card-title">Last week’s issues: closed by merged PRs</div>
+        <div class="card-desc">75 issues posted by enyst and smolpaws on October 4–11 are closed by merged PRs: 61 by those accounts and 14 by others. Every issue links its closing PR and author; one partial tracker is labeled.</div>
+        <span class="card-tag tag-data">created during the week · 11 October 2026</span>
+      </a>
+      <a class="card" href="investigations/openhands-last-week-open-issues.html">
+        <div class="card-title">Last week’s issues: still open</div>
+        <div class="card-desc">31 issues posted by enyst and smolpaws on October 4–11 remain open. 24 have an open PR and 7 do not. Each issue shows its open PR count, titles and authors, including drafts.</div>
+        <span class="card-tag tag-data">created during the week · 11 October 2026</span>
+      </a>
+      <a class="card" href="investigations/openhands-pr-keep-close.html">
+        <div class="card-title">OpenHands PRs: Keep / Close without merge</div>
+        <div class="card-desc">2 Keep candidates and 32 Close candidates, with links, titles, authors and reasons. #17970 is held for changes. Ten merged and nine already closed submissions are separate; Close submissions will be superseded by independent fixes, with no reuse.</div>
+        <span class="card-tag tag-report">review queue · 13 October 2026</span>
+      </a>
+      <a class="card" href="investigations/openhands-issue-pr-report.html">
+        <div class="card-title">Earlier OpenHands issue / PR survey</div>
+        <div class="card-desc">Snapshot at 04:24 UTC on October 11: open issues of any age without an identified implementation PR by enyst or smolpaws, with other-author proposals. Its weekly tally uses closure dates. Use the separate pages above for issues posted during the week.</div>
+        <span class="card-tag tag-data">earlier survey · 11 October 2026</span>
+      </a>
+      <a class="card" href="investigations/open-prs-2026-10-12.html">
+        <div class="card-title">OpenHands PRs by enyst and smolpaws</div>
+        <div class="card-desc">28 open PRs in five OpenHands repositories. See what each changes, its latest review, checks, and next step.</div>
+        <span class="card-tag tag-report">work list · 12 October 2026</span>
+      </a>
+      <a class="card" href="arch/cloudflare-cli-vs-wrangler.html">
+        <div class="card-title">Can Cloudflare's new CLI replace Wrangler?</div>
+        <div class="card-desc">What the cf beta changes for Liberty Labs: prebuilt releases, local D1, credentials, and privacy checks. A source-linked assessment and a bounded trial before changing the deployment workflow.</div>
+        <span class="card-tag tag-report">deployment study · 5 October 2026</span>
+      </a>
+      <a class="card" href="arch/jev-openhands.html"><div class="card-title">Jev for OpenHands: decisions worth testing</div><div class="card-desc">57 live requests: issue triage, TOCTOU and supply-chain screening, personal relevance, and evidence sufficiency. Three reproducible typed examples.</div><span class="card-tag tag-report">experiment · 2026-09-21</span></a>
+      <a class="card" href="investigations/openhands-pr-17435-ui-audit.html">
+        <div class="card-title">Agent Canvas: a live UI audit</div>
+        <div class="card-desc">137 desktop and mobile screenshots from OpenHands PR #17435's Tailwind theme migration and shadcn-lint trial. Real conversations, workspace edits, settings, and automation screens — with page-by-page coverage, observed defects, and explicit testing gaps.</div>
+        <span class="card-tag tag-report">visual QA · 19 Sep 2026</span>
+      </a>
+      <a class="card" href="arch/openhands-review-auditor.html">
+        <div class="card-title">Reviewing the reviewer</div>
+        <div class="card-desc">Two verified approval contradictions, independent code checks, and a proposed OpenHands automation that scores reviews without confusing bad paperwork with bad code.</div>
+        <span class="card-tag tag-draft">investigation · proposed automation</span>
+      </a>
       <a class="card" href="investigations/openhands-what-users-want.html">
         <div class="card-title">What OpenHands users actually want</div>
         <div class="card-desc">All 648 open issues across OpenHands, software-agent-sdk, and automation — clustered by demand and weighted by signal (comments × reactions), then split into two lenses: the whole community, and the wide community (non-maintainers). Routed to Engel's attention or relayed to other maintainers by passion-fit.</div>
@@ -51,15 +114,51 @@
         <div class="card-desc">A daily newspaper of where I was pinged on GitHub — review requests and mentions first, the rest below. Regenerated each morning.</div>
         <span class="card-tag tag-daily">daily</span>
       </a>
+      <a class="card" href="pr-reviews.html">
+        <div class="card-title">PR review log</div>
+        <div class="card-desc">A dated record of scheduled AI code reviews posted on behalf of Engel Nyst, with the reviewed pull request, commit, review, and summary.</div>
+        <span class="card-tag tag-data">review archive</span>
+      </a>
+      <a class="card" href="field-notes/index.html">
+        <div class="card-title">Field notes</div>
+        <div class="card-desc">Autonomous investigations by OpenHands, selected from public code and discussions.</div>
+        <span class="card-tag tag-report">field notes</span>
+      </a>
+      <a class="card" href="field-notes/field-note-openhands-software-agent-sdk-pr-5164.html">
+        <div class="card-title">A host gateway name is only half of an agent’s service-discovery contract</div>
+        <div class="card-desc">A source-grounded look at Docker networking, Canvas-advertised service URLs, and the context an agent uses to reach host services, based on SDK PR #5164.</div>
+        <span class="card-tag tag-report">field note · OpenHands · 19 September 2026</span>
+      </a>
     </div>
 
 
     <h2 id="how-things-work">How things work</h2>
     <div class="cards">
+      <a class="card" href="arch/agentic-linting-refactoring.html">
+        <img class="card-still" src="experiments/agentic-linting-refactoring/poster.jpg" alt="Before and after the secret-selection switch: fixed green becomes theme-aware" width="1920" height="1080" loading="lazy" />
+        <div class="card-title">Agentic linting refactoring</div>
+        <div class="card-desc">Shared theme tokens, component ownership, and shadcn rules an agent can act on. A Before/After video, the proposals merged so far, and the next steps, with a direct MP4 download.</div>
+        <span class="card-tag tag-report">video + rollout · 11 October 2026</span>
+      </a>
+      <a class="card" href="arch/smolpaws-agent-reset.html">
+        <div class="card-title">How SmolPaws resets its context</div>
+        <div class="card-desc">The agent saves notes and chooses when to call condense. Two sequence diagrams trace that reset and the separate emergency summarizer, with warning thresholds, configuration and the context each path leaves behind.</div>
+        <span class="card-tag tag-report">implementation guide · 5 October 2026</span>
+      </a>
+      <a class="card" href="arch/path-to-a-software-factory.html">
+        <div class="card-title">The path to a software factory</div>
+        <div class="card-desc">Graham Neubig's plan for turning OpenHands OSS work into an autonomous software factory: profile-scoped Docker workers, four independent automations (triage → develop → review → watchdog-merge), and complete setup and operation through Agent Canvas. A mirror of his document — required outcome, existing machinery, the PRs each change needs, review/release order, and validation against the Box and Airbnb clones.</div>
+        <span class="card-tag tag-report">plan</span>
+      </a>
       <a class="card" href="arch/pstack-software-factory.html">
         <div class="card-title">What we take from pstack</div>
         <div class="card-desc">A decision record, not a survey: what we chose to adopt from Lauren Tan's (<code>@poteto</code>) pstack — verification-as-infrastructure and her two verification-skill generators (now in <code>.agents/skills/</code>), a feature map + control-app CLI for the product surfaces, and the SDK's projection oracle left as its own lever. Includes how to use it and how it maps onto Graham Neubig's four software-factory bottlenecks.</div>
         <span class="card-tag tag-report">decision</span>
+      </a>
+      <a class="card" href="arch/control-openhands-cli.html">
+        <div class="card-title">control-openhands: agents using Agent Canvas like a user</div>
+        <div class="card-desc">The CLI behind the verify-openhands skill (OpenHands PR #17961): isolated stacks, a browser that persists across commands, verbs for what screenshots miss, and an evidence ledger. Its commands, why an agent is better off with it than running the app directly, and how 36 parallel fix agents and their reviewers used it: 3,454 calls, 170 launches and 261 before/after screenshots.</div>
+        <span class="card-tag tag-report">how it works · 5 October 2026</span>
       </a>
       <a class="card" href="arch/openhands-ask-oracle.html">
         <div class="card-title">ask_oracle: a second opinion without switching your model</div>
@@ -107,18 +206,18 @@
     <div class="cards">
       <a class="card" href="smolpaws-whatsapp.html">
         <div class="card-title">SmolPaws WhatsApp Entry Point</div>
-        <div class="card-desc">The primary channel — Baileys multi-device, a SQLite-backed poll loop, scopes and permissions, image/audio/document handling, and voice notes.</div>
-        <span class="card-tag tag-live">live</span>
+        <div class="card-desc">The former root process — Baileys multi-device, a SQLite-backed poll loop, scopes and permissions, media, and voice notes. Kept as architecture history; the standalone relay bridge now serves the primary channel on the shared server.</div>
+        <span class="card-tag tag-report">historical · legacy path</span>
       </a>
       <a class="card" href="smolpaws-slack.html">
         <div class="card-title">SmolPaws Slack Entry Point</div>
-        <div class="card-desc">Socket Mode bridge — a real Slack app with thread tracking, access control, and guest rate limiting, now managed by the bridge loader.</div>
-        <span class="card-tag tag-live">live</span>
+        <div class="card-desc">Socket Mode bridge <code>paws</code> — a standalone process on the durable Message Relay and the TypeScript agent-server, with thread tracking, access control, and guest rate limiting. The first channel on the new stack.</div>
+        <span class="card-tag tag-report">relay · historical canary</span>
       </a>
       <a class="card" href="smolpaws-discord.html">
         <div class="card-title">SmolPaws Discord Entry Point</div>
-        <div class="card-desc">How the Discord ingress receives messages and dispatches to the agent server via the shared bridge adapter.</div>
-        <span class="card-tag tag-live">live</span>
+        <div class="card-desc">The legacy Discord adapter on the <code>/turns</code> runner, kept as history. The standalone relay rewrite has merged; a live check remains.</div>
+        <span class="card-tag tag-draft">historical</span>
       </a>
       <a class="card" href="smolpaws-github.html">
         <div class="card-title">SmolPaws GitHub Entry Point</div>
@@ -128,31 +227,51 @@
     </div>
 
     <h2 id="next-smolpaws">The next SmolPaws</h2>
-    <p class="tagline" style="margin-top:-4px">Three tracks in flight: move the primary channel onto the new transpiled stack, put a cat <em>inside</em> OpenHands, and make both cats talk in realtime voice.</p>
+    <p class="tagline" style="margin-top:-4px">Three tracks: run the primary channel on the new transpiled stack, put a cat <em>inside</em> OpenHands, and make both cats talk in realtime voice.</p>
     <div class="cards">
+      <a class="card" href="arch/agent-triggered-condensation.html">
+        <div class="card-title">Agent-triggered condensation: a note to your future self</div>
+        <div class="card-desc">The original design for agent-owned notes, staged warnings and a fresh context. Kept as design history; the implementation guide above explains the shipped mechanism.</div>
+        <span class="card-tag tag-draft">design history · September 19</span>
+      </a>
+      <a class="card" href="arch/llm-profiles.html">
+        <div class="card-title">LLM Profiles: configuration, runtime and maintenance</div>
+        <div class="card-desc">The current TypeScript contract: shared role/scope configuration, saved profiles and private credentials, native provider APIs, safe switching, usage accounting, tests and the separate GitHub LLM environments. Source-verified September 16.</div>
+        <span class="card-tag tag-report">implementation notebook</span>
+      </a>
+      <a class="card" href="arch/whatsapp-readiness.html">
+        <div class="card-title">WhatsApp: normal operation on the shared server</div>
+        <div class="card-desc">Main, OpenHands and Hunting moved to the normal shared server on September 17, preserving their conversations. Current storage paths and cutover verification, with the earlier iPad canary evidence kept separately.</div>
+        <span class="card-tag tag-live">production · shared :8790</span>
+      </a>
+      <a class="card" href="arch/smolpaws-bridges-topology.html">
+        <div class="card-title">Bridges, one server, and the last steps</div>
+        <div class="card-desc">One TypeScript OpenHands agent-server and standalone relay bridges. WhatsApp now uses the normal shared host; other ingress migrations remain separate. Process boundaries, dated deployment evidence and operational ownership.</div>
+        <span class="card-tag tag-live">current map</span>
+      </a>
       <a class="card" href="arch/whatsapp-as-bridge.html">
         <div class="card-title">WhatsApp as a bridge</div>
-        <div class="card-desc">Design proposal: lift the primary channel out of the repo root into a standalone <code>apps/whatsapp</code> on the durable Message Relay — following the Slack pattern, starting as its own process, and losing none of the SQLite store, scopes, scheduler, or media. <span class="mono">bead smolpaws-kxa · P0</span></div>
-        <span class="card-tag tag-draft">proposed</span>
+        <div class="card-desc">The design that moved the primary channel out of the repo root into a standalone <code>apps/whatsapp</code> on the durable Message Relay — implemented on the shared relay runtime and promoted to normal operation on September 17. <span class="mono">bead smolpaws-kxa · P0</span></div>
+        <span class="card-tag tag-live">implemented</span>
       </a>
       <a class="card" href="arch/insider-cat.html">
         <div class="card-title">The insider cat</div>
-        <div class="card-desc">Implementation record: a SmolPaws that runs <em>inside</em> the OpenHands UI — a three-pose avatar driven off live agent status, a “call the cat” button that opens a <code>smolpaws</code>-tagged conversation, and a local-environment identity injected via the agent-server system suffix. Where it lives, how big it is, and the decisions on record. <span class="mono">epic smolpaws-08f · v1</span></div>
-        <span class="card-tag tag-live">v1 shipped</span>
+        <div class="card-desc">The current Cat interface, one saved OpenHands agent across text and Voice, and a direct Codex handoff. Normal OpenHands tools, enabled skills, and accurate backend context let the Cat work through the existing API.</div>
+        <span class="card-tag tag-report">worktree prototype · not released</span>
       </a>
       <a class="card" href="arch/insider-cat-stories.html">
         <div class="card-title">The insider cat — from your side</div>
-        <div class="card-desc">The same cat as <em>user stories</em>: how you find it, click to call it, what the <code>smolpaws:insider</code> tag means and does, reading its mood from the three poses, what it knows the moment it wakes, and what starting realtime voice will feel like. Behavior only — with screenshots, and honest about what's shipped vs still design. <span class="mono">epics smolpaws-08f · 3e1 · s9e</span></div>
-        <span class="card-tag tag-live">behavior</span>
+        <div class="card-desc">Choose or create a Cat, talk and type into the same conversation, keep controls while navigating, and inspect saved results. Current behavior and coordination through the normal OpenHands terminal and API skills.</div>
+        <span class="card-tag tag-planned">behavior · Apps and next steps</span>
       </a>
       <a class="card" href="arch/secretary-cat.html">
         <div class="card-title">The Secretary</div>
-        <div class="card-desc">Design: the insider cat grows a job — a board that <em>manages the user's conversations</em> (dispatch, track, act), spoken to in realtime voice, shipped as an Agent Canvas Skin. Grounded in rbren's manager, the Skins PR #16232, and a working <code>/v1/chat/completions</code> that runs the whole agent as an LLM. <span class="mono">epics smolpaws-08f · 3e1</span></div>
-        <span class="card-tag tag-draft">design</span>
+        <div class="card-desc">Historical design for a conversation-management board and voice companion. Retained for the design lineage; the current Insider Cat review separates implemented skin behavior from proposed dispatch, tickets, and monitoring.</div>
+        <span class="card-tag tag-draft">historical proposal</span>
       </a>
       <a class="card" href="arch/smolpaws-message-work-adr.html">
         <div class="card-title">ADR: Durable message work belongs around agent-server</div>
-        <div class="card-desc">The architecture decision the whole cutover rests on — keep the agent-server upstream-shaped and put durable channel intake and delivery in a small local coordinator. The Message Relay that Slack already uses and WhatsApp is moving to.</div>
+        <div class="card-desc">The architecture decision the whole cutover rests on — keep the agent-server upstream-shaped and put durable channel intake and delivery in a small local coordinator. The Message Relay now shared by the standalone Slack, WhatsApp and Discord implementations.</div>
         <span class="card-tag tag-report">ADR · decision</span>
       </a>
       <a class="card" href="arch/openhands-transpile-maintenance.html">
@@ -162,13 +281,103 @@
       </a>
       <a class="card" href="arch/sdk-swap-surface.html">
         <div class="card-title">SDK swap surface</div>
-        <div class="card-desc">The wire-by-wire migration map for hooking smolpaws to the new package — every symbol it imports, where it lands in the fresh transpile, and what's clean, renamed, to-port, or a deviation to decide. Plus the Aug 30 decisions: plain text now ends a turn, <code>send_message</code> becomes an SDK tool, and the running Slack path is already on the new transpile.</div>
+        <div class="card-desc">Historical symbol inventory and August 30 decisions. Current contracts and provider guidance are linked from the maintenance page; current operational gates are in WhatsApp readiness.</div>
         <span class="card-tag tag-report">migration</span>
       </a>
     </div>
 
     <h2 id="architecture-studies">Architecture Studies</h2>
     <div class="cards">
+
+    <a class="card" href="arch/github-mention-router.html">
+      <div class="card-title">Routing GitHub mentions to Codex and Claude</div>
+      <div class="card-desc">A personal Cloudflare watcher for requests from enyst and smolpaws: public comment polling, hosted agent APIs, durable request and reply state, and code proposals through draft PRs.</div>
+      <span class="card-tag tag-draft">integration plan · 12 October 2026</span>
+    </a>
+
+    <a class="card" href="arch/agent-sdk-external-contract.html">
+      <div class="card-title">Checking the Agent SDK from outside</div>
+      <div class="card-desc">What the external verifier checks, what its first Cloud run found, and what a regular contract check still needs. The Cloud automation is disabled.</div>
+      <span class="card-tag tag-report">Agent SDK · 9 October 2026</span>
+    </a>
+
+    <a class="card" href="arch/codex-agents-vs-claude-rules.html">
+      <div class="card-title">Codex AGENTS.md vs Claude Code rules</div>
+      <div class="card-desc">How Codex applies repository instructions from the working directory while Claude rules can follow the path of each touched file, and where those trigger models differ.</div>
+      <span class="card-tag tag-report">comparison</span>
+    </a>
+
+    <a class="card" href="arch/eventlog-resume-orphaned-history.html">
+      <div class="card-title">The event tree that orphaned history on resume</div>
+      <div class="card-desc">Why a conversation resumed across Agent Server versions with 5,814 events intact but only its last 165 in context: the first new event was stamped as a hard tree root.</div>
+      <span class="card-tag tag-report">incident trace · SDK 1.33.0</span>
+    </a>
+
+    <a class="card" href="arch/finish-tool-task-outcome-4465.html">
+      <div class="card-title">FinishTool before and after: PR #4465</div>
+      <div class="card-desc">A focused before-and-after view of PR #4465’s FinishTool prompt change and structured <code>task_outcome</code> response, with FinishAction unchanged.</div>
+      <span class="card-tag tag-report">show-me · OpenHands #4465</span>
+    </a>
+
+    <a class="card" href="arch/hermes-crystallization-vs-dreaming.html">
+      <div class="card-title">Hermes skill crystallization vs SmolPaws dreaming</div>
+      <div class="card-desc">A comparison of Hermes’s MIT-licensed skill crystallization process with how SmolPaws consolidates its own memory.</div>
+      <span class="card-tag tag-report">comparison</span>
+    </a>
+
+    <a class="card" href="arch/issue-3984-agents-md-loading.html">
+      <div class="card-title">AGENTS.md loading: map today, deterministic path loading next</div>
+      <div class="card-desc">How root AGENTS.md maps and package instructions work today, and how file-operation triggers could load the applicable nested instructions deterministically.</div>
+      <span class="card-tag tag-report">SDK issue #3984</span>
+    </a>
+
+    <a class="card" href="arch/mcp-oauth-settings.html">
+      <div class="card-title">MCP OAuth and settings-backed authentication</div>
+      <div class="card-desc">How SDK #3964 and Canvas #1583 add a typed path to capture, encrypt, persist, and reuse MCP credentials across local and cloud conversations.</div>
+      <span class="card-tag tag-report">SDK #3964 · Canvas #1583</span>
+    </a>
+
+    <a class="card" href="arch/outbox-coordinator-vs-automation.html">
+      <div class="card-title">Two outboxes, compared</div>
+      <div class="card-desc">OpenHands Automation’s single completion callback alongside SmolPaws’ durable per-message delivery queue, including where PR #4465’s TaskOutcome fits.</div>
+      <span class="card-tag tag-report">architecture comparison</span>
+    </a>
+
+    <a class="card" href="arch/task-outcome-reporting-4465.html">
+      <div class="card-title">PR #4465: one TaskOutcome, two sources</div>
+      <div class="card-desc">How OpenHands uses one structured outcome for agent-reported completion and system or harness failure, distinguished by a <code>source</code> field.</div>
+      <span class="card-tag tag-report">OpenHands #4465</span>
+    </a>
+
+    <a class="card" href="arch/teach-typescript-client.html">
+      <div class="card-title">The typescript-client repo and the proposal to fold it into the SDK</div>
+      <div class="card-desc">An explainer on what typescript-client does, who uses it, how it stays in sync with the Python SDK, and the proposed repository move.</div>
+      <span class="card-tag tag-report">teach · SDK structure</span>
+    </a>
+
+    <a class="card" href="studies/index.html">
+      <div class="card-title">Studies</div>
+      <div class="card-desc">Research comparisons, with sources and limits kept close to the claims.</div>
+      <span class="card-tag tag-report">research index</span>
+    </a>
+
+    <a class="card" href="studies/swe-milestone-vs-slopcodebench.html">
+      <div class="card-title">When the next task inherits the last</div>
+      <div class="card-desc">A comparison of SWE-Milestone and SlopCodeBench: inherited regressions, structural erosion, session continuity, and what their numbers measure.</div>
+      <span class="card-tag tag-report">benchmark study</span>
+    </a>
+
+    <a class="card" href="wire/backend-selector.html">
+      <div class="card-title">Add a backend — wireframe</div>
+      <div class="card-desc">A low-fidelity chooser for Agent Server and Cloud backends, with the connection fields each path needs.</div>
+      <span class="card-tag tag-draft">wireframe · Canvas #15426</span>
+    </a>
+
+    <a class="card" href="arch/openhands-sdk-architecture-testing.html">
+      <div class="card-title">Testing architecture when agents write the code</div>
+      <div class="card-desc">A testing strategy for the OpenHands Agent SDK when humans no longer read PRs: separately governed architectural contracts, independent REST/WS verification, stateful and mutation testing, and a recurring self-healing loop. The complete response, reproduced verbatim.</div>
+      <span class="card-tag tag-report">testing strategy · 8 October 2026</span>
+    </a>
 
     <a class="card" href="arch/agent-server-rbac-same-place.html">
       <div class="card-title">They really are in the same place: RBAC (#17055), keys, and the sandbox</div>
@@ -208,7 +417,7 @@
 
       <a class="card" href="arch/smolpaws-message-work-adr.html">
         <div class="card-title">ADR: Durable message work belongs around agent-server</div>
-        <div class="card-desc">The architecture decision record for SmolPaws message reliability: keep the OpenHands agent-server upstream-shaped and put durable channel intake and delivery in a small local coordinator, borrowing Automation's table-as-queue mechanics and Hermes's per-session lane policy. Status: proposed.</div>
+        <div class="card-desc">The architecture decision record for SmolPaws message reliability: keep the OpenHands agent-server upstream-shaped and put durable channel intake and delivery in a small local coordinator, borrowing Automation's table-as-queue mechanics and Hermes's per-session lane policy. Status: accepted and implemented as the Message Relay.</div>
         <span class="card-tag tag-report">ADR · decision</span>
       </a>
       <a class="card" href="gateway-compat.html">
@@ -235,6 +444,11 @@
         <div class="card-title">OpenHands credential boundaries</div>
         <div class="card-desc">Issue #15298, verified: reference-only persistence, typed brokers, the real stdio MCP boundary, runtime-visible fallbacks, current-code seams, and a migration plan.</div>
         <span class="card-tag tag-report">architecture</span>
+      </a>
+      <a class="card" href="arch/openhands-automation-operations.html">
+        <div class="card-title">OpenHands Automations: where work runs</div>
+        <div class="card-desc">The September 15 operating snapshot: three local jobs, six enabled Cloud jobs, two paused jobs, what each can change, recent results, and decisions still to make.</div>
+        <span class="card-tag tag-report">operations · dated snapshot</span>
       </a>
       <a class="card" href="arch/openhands-automations.html">
         <div class="card-title">OpenHands Automations</div>
@@ -263,8 +477,8 @@
       </a>
       <a class="card" href="voice-landscape.html">
         <div class="card-title">Voice for AI Agents</div>
-        <div class="card-desc">The current state of voice tech: STT, TTS, real-time conversation, and the two architectures for giving an agent a voice.</div>
-        <span class="card-tag">landscape</span>
+        <div class="card-desc">June 2026 voice landscape, retained as historical background. The Insider Cat review has the September OpenAI Realtime/GPT-Live decision and an ElevenLabs comparison.</div>
+        <span class="card-tag tag-draft">historical landscape</span>
       </a>
       <a class="card" href="arch/executor-e2e-recording.html">
         <div class="card-title">Executor E2E Recording</div>
@@ -288,7 +502,7 @@
       </a>
       <a class="card" href="arch/smolpaws-turn-monitoring-duplication.html">
         <div class="card-title">smolpaws: The Turn-Monitoring Loop, Twice</div>
-        <div class="card-desc">Architecture review: monitorTurn and monitorConversationTurn run the same agent-server poll loop twice and have drifted. Deepen one, delete the other.</div>
+        <div class="card-desc">Architecture review of the legacy <code>/turns</code> client: monitorTurn and monitorConversationTurn ran the same poll loop twice. Moot once the legacy runner retires; kept as history.</div>
         <span class="card-tag tag-report">review</span>
       </a>
       <a class="card" href="arch/teach-triggerfree-groups.html">
@@ -303,8 +517,8 @@
       </a>
       <a class="card" href="arch/sdk-swap-surface.html">
         <div class="card-title">SDK swap surface: hooking smolpaws to the new package</div>
-        <div class="card-desc">The wire-by-wire migration map — every symbol smolpaws imports from agent-sdk 0.10, where it lands in the fresh TS transpile (0.1), and what's clean / renamed / to-port / a deviation to decide. The hookup, not a rewrite.</div>
-        <span class="card-tag tag-report">migration</span>
+        <div class="card-desc">Historical wire-by-wire migration map from agent-sdk 0.10 to the fresh transpile, kept for the Aug 30 decisions in its last section. Full ingress cutover remains tracked in the current readiness plan.</div>
+        <span class="card-tag tag-report">historical · migration</span>
       </a>
       <a class="card" href="arch/secrets-keyring-vs-cipher.html">
         <div class="card-title">Secrets: keyring refs vs. encrypted-at-rest</div>

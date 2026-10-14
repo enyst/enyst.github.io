@@ -1,0 +1,15 @@
+{
+  "file": "F11-goals.md",
+  "bullet": "Stop with nothing to stop (`F11.goal-stop-noop`).",
+  "ids": [
+    "F11.goal-stop-noop"
+  ],
+  "line": 207,
+  "script": "N=$(control-agent-server api GET \"<redacted:session-cookie>/$X/events/count\" --field .)\ncontrol-agent-server api POST \"<redacted:session-cookie>/$X/goal/stop\" --expect 200 --check success eq true --save F11.goal-stop-noop/stop\ncontrol-agent-server api GET \"<redacted:session-cookie>/$X/events/count\" --check . eq \"$N\"\ncontrol-agent-server conversation events \"$X\" --key goal --expect-count 0 --save F11.goal-stop-noop/goal-events\n",
+  "exit_code": 0,
+  "elapsed_ms": 10434,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/d81d6aea-90ca-4727-b80f-06b97b0d5477/goal/stop\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 449,\n  \"checks\": [\n    {\n      \"check\": \"success eq true\",\n      \"ok\": true,\n      \"actual\": \"true\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022002-af50-map-f11/evidence/F11.goal-stop-noop/stop.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/d81d6aea-90ca-4727-b80f-06b97b0d5477/events/count\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 0,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 393,\n  \"checks\": [\n    {\n      \"check\": \". eq 0\",\n      \"ok\": true,\n      \"actual\": \"0\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"id\": \"d81d6aea-90ca-4727-b80f-06b97b0d5477\",\n  \"total\": 0,\n  \"kinds\": {},\n  \"matching\": 0,\n  \"events\": [],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022002-af50-map-f11/evidence/F11.goal-stop-noop/goal-events.json\"\n}\n",
+  "stderr": ""
+}

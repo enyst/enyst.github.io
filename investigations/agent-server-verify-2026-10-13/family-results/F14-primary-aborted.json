@@ -1,0 +1,423 @@
+{
+  "ok": false,
+  "outcome": "primary map replay aborted while saving evidence",
+  "failure_class": "environment: disk full (ENOSPC)",
+  "run": "/workspace/verification-artifacts/runs/20261013-022038-d620-map-f14",
+  "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+  "preserved_primary_stdout_file": "/workspace/verification-artifacts/family-results/F14.json",
+  "completed_feature_count": 29,
+  "completed_results": {
+    "pass": 22,
+    "xfail": 5,
+    "fail": 2
+  },
+  "ledger": "/workspace/verification-artifacts/runs/20261013-022038-d620-map-f14/evidence/ledger.jsonl",
+  "rows": [
+    {
+      "at": "2026-10-13T02:23:16Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.auth",
+      "result": "pass",
+      "entry": "map run F14-files.md: Session key required (`F14.auth`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-01-session-key-required-f14-auth.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:23:25Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.upload-download",
+      "result": "pass",
+      "entry": "map run F14-files.md: Upload and download round trip (`F14.upload-download`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-02-upload-and-download-round-trip-f14-uploa.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:23:36Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.upload-errors",
+      "result": "pass",
+      "entry": "map run F14-files.md: Upload validation (`F14.upload-errors`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-03-upload-validation-f14-upload-errors.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:23:41Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.upload-onto-directory",
+      "result": "xfail",
+      "entry": "map run F14-files.md: Upload onto a directory (`F14.upload-onto-directory`), known bug.",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 1",
+      "artifacts": [
+        "evidence/map-run/F14-files-04-upload-onto-a-directory-f14-upload-onto-.json"
+      ],
+      "note": "known bug reproduced (expected failure); failed at line 4: control-agent-server api POST /api/file/upload --query path=\"$F/xfer/is-a-dir\" --file file=\"$F/v2.txt\" --expect 4xx --save F14.upload-onto-directory/upload"
+    },
+    {
+      "at": "2026-10-13T02:24:32Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.upload-size",
+      "result": "xfail",
+      "entry": "map run F14-files.md: Upload size in the consumers' result (`F14.upload-size`), known bug.",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 1",
+      "artifacts": [
+        "evidence/map-run/F14-files-05-upload-size-in-the-consumers-result-f14-.json"
+      ],
+      "note": "known bug reproduced (expected failure); failed at line 45: test \"$(cat \"$F/sdk-size.txt\")\" = 70000"
+    },
+    {
+      "at": "2026-10-13T02:26:38Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.upload-atomic",
+      "result": "fail",
+      "entry": "map run F14-files.md: Failed overwrite (`F14.upload-atomic`), known bug.",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 1",
+      "artifacts": [
+        "evidence/map-run/F14-files-06-failed-overwrite-f14-upload-atomic-known.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged; failed at line 15: control-agent-server doctor --run \"$B2\""
+    },
+    {
+      "at": "2026-10-13T02:26:48Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.download-errors",
+      "result": "pass",
+      "entry": "map run F14-files.md: Download errors (`F14.download-errors`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-07-download-errors-f14-download-errors.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:27:15Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.mkdir",
+      "result": "pass",
+      "entry": "map run F14-files.md: Create directories (`F14.mkdir`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-08-create-directories-f14-mkdir.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:27:20Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.home",
+      "result": "pass",
+      "entry": "map run F14-files.md: Home and favorites (`F14.home`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-09-home-and-favorites-f14-home.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:27:27Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.subdirs",
+      "result": "pass",
+      "entry": "map run F14-files.md: List subdirectories (`F14.subdirs`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-10-list-subdirectories-f14-subdirs.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:27:39Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.subdirs-pagination",
+      "result": "pass",
+      "entry": "map run F14-files.md: Pagination (`F14.subdirs-pagination`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-11-pagination-f14-subdirs-pagination.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:27:50Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.subdirs-errors",
+      "result": "pass",
+      "entry": "map run F14-files.md: Listing errors (`F14.subdirs-errors`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-12-listing-errors-f14-subdirs-errors.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:27:57Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.subdirs-case-pagination",
+      "result": "xfail",
+      "entry": "map run F14-files.md: Paging past a case-only twin (`F14.subdirs-case-pagination`), known bug.",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 1",
+      "artifacts": [
+        "evidence/map-run/F14-files-13-paging-past-a-case-only-twin-f14-subdirs.json"
+      ],
+      "note": "known bug reproduced (expected failure); failed at line 9: control-agent-server api GET /api/file/search_subdirs --query path=\"$CASE_DIR\" --query limit=1 --query page_id=\"$CASE_NEXT\" --expect 200 --check items len-eq 1 --check items.0.name eq \"$CASE_OTHER\" --check next_page_id missing --save F14.subdirs-case-pagination/page-2"
+    },
+    {
+      "at": "2026-10-13T02:28:05Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.archive-tar",
+      "result": "pass",
+      "entry": "map run F14-files.md: tar.gz archive (`F14.archive-tar`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-14-tar-gz-archive-f14-archive-tar.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:28:13Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.archive-excludes",
+      "result": "pass",
+      "entry": "map run F14-files.md: Exclude controls (`F14.archive-excludes`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-15-exclude-controls-f14-archive-excludes.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:28:26Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.archive-git-delta",
+      "result": "pass",
+      "entry": "map run F14-files.md: git-delta patch (`F14.archive-git-delta`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-16-git-delta-patch-f14-archive-git-delta.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:28:33Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.archive-auto-base",
+      "result": "pass",
+      "entry": "map run F14-files.md: Automatic base with a remote (`F14.archive-auto-base`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-17-automatic-base-with-a-remote-f14-archive.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:28:45Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.archive-nested-repo",
+      "result": "pass",
+      "entry": "map run F14-files.md: Nested repository (`F14.archive-nested-repo`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-18-nested-repository-f14-archive-nested-rep.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:29:07Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.archive-format-doc",
+      "result": "xfail",
+      "entry": "map run F14-files.md: What `format` promises (`F14.archive-format-doc`), known bug.",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 1",
+      "artifacts": [
+        "evidence/map-run/F14-files-19-what-format-promises-f14-archive-format-.json"
+      ],
+      "note": "known bug reproduced (expected failure); failed at line 12: false"
+    },
+    {
+      "at": "2026-10-13T02:29:38Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.archive-errors",
+      "result": "pass",
+      "entry": "map run F14-files.md: Archive validation (`F14.archive-errors`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-20-archive-validation-f14-archive-errors.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:29:50Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.trajectory",
+      "result": "pass",
+      "entry": "map run F14-files.md: Trajectory zip (`F14.trajectory`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-21-trajectory-zip-f14-trajectory.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:30:00Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.trajectory-errors",
+      "result": "pass",
+      "entry": "map run F14-files.md: Trajectory errors (`F14.trajectory-errors`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-22-trajectory-errors-f14-trajectory-errors.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:30:33Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.trajectory-concurrent",
+      "result": "xfail",
+      "entry": "map run F14-files.md: Concurrent trajectory downloads (`F14.trajectory-concurrent`), known bug.",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 1",
+      "artifacts": [
+        "evidence/map-run/F14-files-23-concurrent-trajectory-downloads-f14-traj.json"
+      ],
+      "note": "known bug reproduced (expected failure); failed at line 22: test \"$(cat \"$s\")\" = 200"
+    },
+    {
+      "at": "2026-10-13T02:31:55Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.scoped-transfer",
+      "result": "pass",
+      "entry": "map run F14-files.md: Conversation-scoped transfer (`F14.scoped-transfer`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-24-conversation-scoped-transfer-f14-scoped-.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:32:57Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.scoped-path-guard",
+      "result": "pass",
+      "entry": "map run F14-files.md: Workspace path guard (`F14.scoped-path-guard`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-25-workspace-path-guard-f14-scoped-path-gua.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:33:18Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.scoped-conversation-errors",
+      "result": "pass",
+      "entry": "map run F14-files.md: Unknown or malformed conversation (`F14.scoped-conversation-errors`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-26-unknown-or-malformed-conversation-f14-sc.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:34:09Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.scoped-trajectory-archive",
+      "result": "pass",
+      "entry": "map run F14-files.md: Scoped trajectory and archive (`F14.scoped-trajectory-archive`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-27-scoped-trajectory-and-archive-f14-scoped.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:35:39Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.sdk-workspace",
+      "result": "pass",
+      "entry": "map run F14-files.md: SDK workspace (`F14.sdk-workspace`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 0",
+      "artifacts": [
+        "evidence/map-run/F14-files-28-sdk-workspace-f14-sdk-workspace.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged"
+    },
+    {
+      "at": "2026-10-13T02:37:23Z",
+      "run": "20261013-022038-d620-map-f14",
+      "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+      "feature": "F14.restart",
+      "result": "fail",
+      "entry": "map run F14-files.md: Restart (`F14.restart`).",
+      "expected": "every command in the bullet exits 0 (its --expect/--check assertions hold)",
+      "actual": "exit 1",
+      "artifacts": [
+        "evidence/map-run/F14-files-29-restart-f14-restart.json"
+      ],
+      "note": "automated map run; prose-only expectations were not re-judged; failed at line 11: control-agent-server doctor"
+    }
+  ]
+}

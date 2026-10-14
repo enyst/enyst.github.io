@@ -1,0 +1,178 @@
+{
+  "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+  "status": "in_progress",
+  "confirmed_bugs": [
+    {
+      "id": "F22.store-busy-responsive",
+      "title": "A meta-profile store lock wait freezes unrelated server requests",
+      "severity": "high",
+      "feature_ids": [
+        "F22.store-busy-responsive"
+      ],
+      "expected": "GET /alive responds within 3000 ms while a meta-profile save waits on the store lock.",
+      "actual": "Fresh runs returned HTTP 200 only after 29087 ms and 27731 ms; idle controls took 743 ms and 752 ms.",
+      "repro_command": "control-agent-server map run --file F22 --only F22.save-classes,F22.store-busy-responsive --fresh --repeat 2 --record --keep-going",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1",
+        "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1/evidence/F22.store-busy-responsive/alive-idle.json",
+        "/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1/evidence/F22.store-busy-responsive/alive.json",
+        "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/F22.store-busy-responsive/alive-idle.json",
+        "/workspace/verification-artifacts/runs/20261013-023058-b5d0-f22-lock-confirm-2/evidence/F22.store-busy-responsive/alive.json",
+        "/workspace/verification-artifacts/family-results/F22-lock-confirm-1-doctor-before.json",
+        "/workspace/verification-artifacts/family-results/F22-lock-confirm-1-doctor-after.json",
+        "/workspace/verification-artifacts/family-results/F22-lock-confirm-2-doctor-before-retry.json",
+        "/workspace/verification-artifacts/family-results/F22-lock-confirm-2-doctor-after.json"
+      ],
+      "notes": "The async meta-profile router calls the synchronous file-locked MetaProfileStore on the event loop. The same root cause may be grouped with F20/F23 store lock stalls, if each endpoint's proof and counting convention are retained. Both clean confirmations use explicit fresh launch, successful doctor before map driving, doctor after recovery, and targeted stop. Second run required an initial OpenAPI warmup retry before driving. F22.save-classes supplies the undeclared store-directory prerequisite. No model inference occurs in the selected recipe."
+    },
+    {
+      "id": "F28.prepare-corrupt-archive",
+      "title": "Matching-checksum non-gzip backend archive returns unhandled 500",
+      "severity": "low",
+      "feature_ids": [
+        "F28.prepare-corrupt-archive"
+      ],
+      "expected": "POST backend/prepare rejects invalid archive format with HTTP 409 and records no approval.",
+      "actual": "Both fresh runs return HTTP 500 with exception not a gzip file after checksum validation.",
+      "repro_command": "control-agent-server map run --file F28 --only F28.prepare-corrupt-archive --fresh --repeat 2 --record",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/F28.prepare-corrupt-archive/prepare.json",
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-01-non-gzip-artifact-f28-prepare-corrupt-ar.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/F28.prepare-corrupt-archive/prepare.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-01-non-gzip-artifact-f28-prepare-corrupt-ar.json"
+      ],
+      "notes": "tarfile.ReadError escapes the router ValueError mapping. The case stops at this invalid-format assertion; later no-write checks in the recipe are not reached."
+    },
+    {
+      "id": "F28.install-ref-cached",
+      "title": "Cached install silently accepts a nonexistent git ref",
+      "severity": "medium",
+      "feature_ids": [
+        "F28.install-ref-cached"
+      ],
+      "expected": "An unknown ref returns HTTP 400 and leaves the existing pinned install untouched.",
+      "actual": "Both fresh runs return HTTP 200 for qa-no-such-ref and reinstall the cached checkout.",
+      "repro_command": "control-agent-server map run --file F28 --only F28.install-ref-cached --fresh --repeat 2 --record",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/F28.install-ref-cached/unknown-ref.json",
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-02-unknown-ref-on-a-cached-source-f28-insta.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/F28.install-ref-cached/unknown-ref.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-02-unknown-ref-on-a-cached-source-f28-insta.json"
+      ],
+      "notes": "The first pinned install is the positive control; the cache falls back after checkout failure. This shares a generic cached-repository cause with F25 but each driving bullet is counted separately unless grouping is explained."
+    },
+    {
+      "id": "F28.status-probe-latch",
+      "title": "One slow health probe permanently latches a recovered backend unhealthy",
+      "severity": "medium",
+      "feature_ids": [
+        "F28.status-probe-latch"
+      ],
+      "expected": "After direct health returns ok again, backend status returns ready without manual stop/start.",
+      "actual": "Both fresh runs keep reporting unhealthy during the five-second recovery poll, despite direct health ok and a live serving process.",
+      "repro_command": "control-agent-server map run --file F28 --only F28.status-probe-latch --fresh --repeat 2 --record",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/F28.status-probe-latch/after-recovery.json",
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-03-health-probe-latch-f28-status-probe-latc.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/F28.status-probe-latch/after-recovery.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-03-health-probe-latch-f28-status-probe-latc.json"
+      ],
+      "notes": "The slow probe has a one-second timeout. Once unhealthy, later status calls do not probe again. No timing-only model assertions are involved."
+    },
+    {
+      "id": "F28.hard-restart-orphan",
+      "title": "A live backend survives the server crash while status says stopped",
+      "severity": "high",
+      "feature_ids": [
+        "F28.hard-restart-orphan"
+      ],
+      "expected": "No backend process of the dead server survives its hard restart.",
+      "actual": "Both fresh runs report stopped with null pid after restart while pgrep of the run-private artifact path still finds the live backend.",
+      "repro_command": "control-agent-server map run --file F28 --only F28.hard-restart-orphan --fresh --repeat 2 --record",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28"
+      ],
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/F28.hard-restart-orphan/status-after-crash.json",
+        "/workspace/verification-artifacts/runs/20261013-025047-4da6-map-f28/evidence/map-run/F28-canvas-extensions-04-backend-outlives-a-crash-f28-hard-restar.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/F28.hard-restart-orphan/status-after-crash.json",
+        "/workspace/verification-artifacts/runs/20261013-025217-c43a-map-f28/evidence/map-run/F28-canvas-extensions-04-backend-outlives-a-crash-f28-hard-restar.json"
+      ],
+      "notes": "The backend starts a new session and survives SIGKILL with parent pid 1. Matching the artifact command path excludes an empty-cmdline zombie; this is separate from the unreaped-child observation limit in backend-stop/status-exit-hang. Automatic targeted CLI stop reaps owned orphans."
+    }
+  ],
+  "harness_map_issues": [
+    {
+      "feature_ids": [
+        "F23",
+        "F28"
+      ],
+      "kind": "environment_disk_exhaustion",
+      "actual": "The 32 GB overlay filled during unrelated Docker VFS verification. F23/F28 replay aborted with ENOSPC while saving evidence and arranging fixtures; these attempts are excluded from product confirmations and are being rerun after 26 GB was freed.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-022431-19cb-map-f23",
+        "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28",
+        "/workspace/verification-artifacts/runs/20261013-023753-d1da-map-f22"
+      ],
+      "notes": "All three affected run process groups were stopped through their explicit CLI --run selection. Partial ledgers are preserved. The last F22 directory was an unstarted confirmation attempt with zero evidence files."
+    },
+    {
+      "feature_ids": [
+        "F22.store-busy"
+      ],
+      "kind": "harness_timing_fragility",
+      "actual": "Full replay failed shell elapsed <=33s, while the saved HTTP exchange correctly returned 503 after 30360 ms. CLI startup overhead under concurrent load is included in shell SECONDS.",
+      "evidence": [
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/map-run/F22-meta-profiles-20-store-busy-f22-store-busy.json",
+        "/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.store-busy/save.json"
+      ],
+      "notes": "The subsequent DELETE timeout step was not reached in this raw bullet. This failure does not count as a product bug."
+    },
+    {
+      "feature_ids": [
+        "F22.activate-acp",
+        "F22.corrupt-settings",
+        "F22.store-busy-responsive"
+      ],
+      "kind": "undeclared_state_prerequisites",
+      "actual": "Several --only recipes depend on earlier state without declaring Requires. Activation and corrupted-settings need qa-direct active; responsive lock needs an existing meta-profile store directory.",
+      "notes": "Explicit prerequisite IDs or CLI setup restore reviewable reproduction. A discarded exploratory lock subset used save-direct alone, which saved the needed directory but failed its list-count assertion; neither exploratory attempt is used in the confirmed-bug count."
+    },
+    {
+      "feature_ids": [
+        "F28.restart-persistence",
+        "F28.uninstall"
+      ],
+      "kind": "map_count_drift",
+      "expected": "Unrelated installed-app counts 6 before uninstall and5 after.",
+      "actual": "New early qa-f28-flaky fixture installed by backend-stop makes counts7 and6; behavior checks after the obsolete count assert were skipped.",
+      "runs": [
+        "/workspace/verification-artifacts/runs/20261013-024207-5ac2-map-f28"
+      ],
+      "notes": "Fresh independent core persistence/uninstall supplement planned; no shared recipe edit."
+    }
+  ],
+  "blocked": [],
+  "inconclusive": [],
+  "family_results": {
+    "F22": "/workspace/verification-artifacts/family-results/F22.json",
+    "F23": "/workspace/verification-artifacts/family-results/F23.json",
+    "F28": "/workspace/verification-artifacts/family-results/F28.json"
+  }
+}

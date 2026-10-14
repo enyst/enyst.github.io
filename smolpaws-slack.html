@@ -21,17 +21,17 @@
 <body>
   <div class="shell">
     <a class="back" href="index.html">← Home</a>
-    <h1>SmolPaws Slack Message Relay <span class="tag">live canary proven</span></h1>
+    <h1>SmolPaws Slack Message Relay <span class="tag">historical canary proven</span></h1>
     <p class="meta">
       A greenfield Slack bridge for the durable SmolPaws Message Relay architecture.<br>
-      Source: <a href="https://github.com/enyst/smolpaws/tree/main/apps/slack">apps/slack/</a> &nbsp;&middot;&nbsp;
-      Core: <a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/messageRelay.ts">messageRelay.ts</a> &nbsp;&middot;&nbsp;
-      Outbound: <a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/outboundRelay.ts">outboundRelay.ts</a> &nbsp;&middot;&nbsp;
-      Dispatcher: <a href="https://github.com/enyst/smolpaws/blob/main/src/coordinator/deliveryDispatcher.ts">deliveryDispatcher.ts</a>
+      Source: <a href="https://github.com/smolpaws/smolpaws/tree/main/apps/slack">apps/slack/</a> &nbsp;&middot;&nbsp;
+      Core: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/coordinator/messageRelay.ts">messageRelay.ts</a> &nbsp;&middot;&nbsp;
+      Outbound: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/coordinator/outboundRelay.ts">outboundRelay.ts</a> &nbsp;&middot;&nbsp;
+      Dispatcher: <a href="https://github.com/smolpaws/smolpaws/blob/main/src/coordinator/deliveryDispatcher.ts">deliveryDispatcher.ts</a>
     </p>
 
     <div class="callout">
-      <p><strong>Status · 2026-08-16:</strong> the complete Liberty Labs Socket Mode round trip has been proven through the TypeScript agent-server, real agent loop, durable outbox sync, Delivery Dispatcher, and Slack Web API. The isolated canary used a deterministic test LLM; the ordinary long-running <code>paws</code> process still needs its real-provider production soak.</p>
+      <p><strong>Audit · 2026-09-14:</strong> the standalone Slack relay is implemented and uses the shared <code>src/coordinator/relayRuntime.ts</code> through its Slack wrapper. The August 16 transport canary below used a deterministic LLM; later deployment reports are historical evidence. The September 14 Mac preflight found no new-server listener on <code>:8790</code>. Verify current service and provider state before treating Slack as a live readiness signal. See <a href="arch/smolpaws-bridges-topology.html">current topology</a> and <a href="arch/whatsapp-readiness.html">WhatsApp readiness</a>.</p>
     </div>
 
     <div class="callout">
@@ -105,7 +105,7 @@ sequenceDiagram
     </table>
 
     <h2>Why <code>syncDeliveryOutbox()</code>?</h2>
-    <p>The Outbound Relay repeatedly catches a conversation up from its durable agent-event cursor. For the first Slack generation, the successful terminal <code>finish</code> observation becomes one durable delivery row. Repeating the sync is safe because the source identity combines the originating event and destination lane.</p>
+    <p>The Outbound Relay catches each conversation up from its durable agent-event cursor. The default extractor now accepts either a successful terminal <code>finish</code> observation or end-of-turn assistant text. Repeating the sync deduplicates by source event and destination lane. WhatsApp additionally extracts mid-turn <code>send_message</code> actions; that is not the default Slack extractor. <a href="https://github.com/smolpaws/smolpaws/blob/c344f79f197ce60a9ba783f242ba39a309e601dd/src/coordinator/messageRelay.ts#L120">Extractor source</a>.</p>
 
     <pre class="code">agent event id + destination lane
               ↓
@@ -146,10 +146,10 @@ replay becomes a no-op</pre>
     <h2>What remains</h2>
     <p>The architectural round trip is proven. The remaining boundary is operational rather than structural:</p>
     <ol>
-      <li>restart the ordinary host so the obsolete Slack Socket Mode connection is released;</li>
-      <li>run standalone <code>paws</code> against port <code>8790</code> with the configured real LLM profile;</li>
-      <li>verify the durable intake/delivery rows and EventLog;</li>
-      <li>soak restart and <code>delivery_unknown</code> reconciliation behavior before calling it the production Slack path.</li>
+      <li>inspect the current Slack socket owner and exact server build/profile rather than replaying old deployment steps;</li>
+      <li>verify an existing workspace and intended identity context on new conversations;</li>
+      <li>run a scoped real-provider canary and join durable intake/delivery evidence to its EventLog;</li>
+      <li>record restart and <code>delivery_unknown</code> reconciliation evidence before claiming a current production soak.</li>
     </ol>
 
     <div class="callout">
@@ -165,7 +165,7 @@ replay becomes a no-op</pre>
       <tr><td>Workspace canary</td><td>Real Liberty Labs Socket Mode round trip with the unique Relay response token</td></tr>
     </table>
 
-    <p>Operational commands and read-only inspection queries live in <a href="https://github.com/enyst/smolpaws/blob/main/docs/slack/instructions.md">docs/slack/instructions.md</a>.</p>
+    <p>Operational commands and read-only inspection queries live in <a href="https://github.com/smolpaws/smolpaws/blob/main/docs/slack/instructions.md">docs/slack/instructions.md</a>.</p>
 
     <p class="foot-nav"><a href="index.html">← Back to architecture index</a></p>
   </div>

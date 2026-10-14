@@ -1,0 +1,15 @@
+{
+  "file": "F02-auth-and-sessions.md",
+  "bullet": "Auth timeout (`F02.ws-auth-timeout`).",
+  "ids": [
+    "F02.ws-auth-timeout"
+  ],
+  "line": 223,
+  "script": "T0=$SECONDS\ncontrol-agent-server ws listen /sockets/bash-events --auth none --expect-close 4001 --duration 25 --save F02.ws-auth-timeout/silent\ntest $((SECONDS - T0)) -ge 9\ntest $((SECONDS - T0)) -le 16\n",
+  "exit_code": 0,
+  "elapsed_ms": 12810,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"path\": \"/sockets/bash-events\",\n  \"opened\": true,\n  \"frames\": 0,\n  \"kinds\": {},\n  \"stopped\": \"closed\",\n  \"close\": {\n    \"code\": 4001,\n    \"reason\": \"Authentication failed\"\n  },\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022642-a649-map-f02/evidence/F02.ws-auth-timeout/silent.json\",\n  \"first_frames\": []\n}\n",
+  "stderr": ""
+}

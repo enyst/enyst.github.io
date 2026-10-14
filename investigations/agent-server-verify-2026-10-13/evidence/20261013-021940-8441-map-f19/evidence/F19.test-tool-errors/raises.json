@@ -1,0 +1,42 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/test",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "server": {
+        "command": "/workspace/agent-sdk-verify/.venv/bin/python",
+        "args": [
+          "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/fixtures/f19/qa_f19_tools.py"
+        ]
+      },
+      "timeout": 30,
+      "tool_call": {
+        "name": "qa_fail"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "134",
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": true,
+      "tools": [
+        "qa_env",
+        "qa_sleep",
+        "qa_fail"
+      ],
+      "tool_result": {
+        "is_error": true,
+        "text": "Error executing tool qa_fail: QA_MCP_FAIL"
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 4796
+}

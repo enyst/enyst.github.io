@@ -1,0 +1,13 @@
+{
+  "file": "F03-deferred-init.md",
+  "bullet": "Preconditions",
+  "ids": [],
+  "line": 106,
+  "script": "SK=\"$(cat \"$AGENT_SERVER_VERIFY_RUN/private/secret_key\")\"\ntest -n \"$SK\"\nmkdir -p \"$AGENT_SERVER_VERIFY_RUN/fixtures/conv\" \"$AGENT_SERVER_VERIFY_RUN/fixtures/bash\" \"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f03-workspace\" \"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f03-worktrees\"\nF03_REPO=$(control-agent-server fixture git-repo --name qa-f03-repo --print-path)\ntest -d \"$F03_REPO/.git\"\nF03_HANG=$(control-agent-server fixture llm-stub --name qa-f03-hang --step hang:300 --print-path)\nF03_HOOKS=$(control-agent-server fixture http-sink --name qa-f03-hooks --print-path)\n",
+  "exit_code": 0,
+  "elapsed_ms": 31012,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "",
+  "stderr": ""
+}

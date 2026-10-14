@@ -1,0 +1,15 @@
+{
+  "file": "F06-conversation-events.md",
+  "bullet": "Log order is timestamp order (`F06.search-timestamp-order`), known bug.",
+  "ids": [
+    "F06.search-timestamp-order"
+  ],
+  "line": 543,
+  "script": "OBS_ID=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" \\\n  --query kind=openhands.sdk.event.llm_convertible.observation.ObservationEvent --check items len-ge 1 --field items.0.id)\nOBS_T=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/$OBS_ID\" --check id eq \"$OBS_ID\" --field timestamp)\nFROM_OBS=$(control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" --field items \\\n  | jq -e --arg id \"$OBS_ID\" '[.[].id] | length - index($id)')\ntest \"$FROM_OBS\" -ge 2\ncontrol-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/count\" --query timestamp__gte=\"$OBS_T\" \\\n  --check . ge \"$FROM_OBS\" --save F06.search-timestamp-order/count-since-observation  # bug\ncontrol-agent-server ws listen \"/sockets/events/$LIVE\" --query resend_mode=since --query after_timestamp=\"$OBS_T\" \\\n  --duration 3 --save F06.search-timestamp-order/replay-since-observation | jq -e --argjson n \"$FROM_OBS\" '.frames - 1 >= $n'  # bug\ncontrol-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/search\" --field items | jq -e '[.[].timestamp] | . == sort'  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 3365,
+  "failed_line": 7,
+  "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$LIVE/events/count\" --query timestamp__gte=\"$OBS_T\" --check . ge \"$FROM_OBS\" --save F06.search-timestamp-order/count-since-observation",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/636bc206-ecf3-4e24-8070-d1db23c74f83/events/count\",\n    \"query\": [\n      [\n        \"timestamp__gte\",\n        \"2026-10-13T03:03:39.597954\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 8,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 184,\n  \"checks\": [\n    {\n      \"check\": \". ge 9\",\n      \"ok\": false,\n      \"actual\": \"8\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-030025-5cd8-map-f06/evidence/F06.search-timestamp-order/count-since-observation.json\",\n  \"hint\": \"failed check: . ge 9\"\n}\n",
+  "stderr": ""
+}

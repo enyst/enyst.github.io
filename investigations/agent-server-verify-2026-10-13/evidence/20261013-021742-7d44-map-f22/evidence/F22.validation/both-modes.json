@@ -1,0 +1,52 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/meta-profiles/qa-bad",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "classifier_model": "deepseek-flash",
+      "prompt_template": "{{ instance_text }}",
+      "classes": [
+        {
+          "description": "d",
+          "model": "deepseek-flash"
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "346",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body"
+          ],
+          "msg": "Value error, Direct-routing meta-profiles cannot also define classes.",
+          "input": {
+            "classifier_model": "deepseek-flash",
+            "prompt_template": "{{ instance_text }}",
+            "classes": [
+              {
+                "description": "d",
+                "model": "deepseek-flash"
+              }
+            ]
+          },
+          "ctx": {
+            "error": "Direct-routing meta-profiles cannot also define classes."
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 62
+}

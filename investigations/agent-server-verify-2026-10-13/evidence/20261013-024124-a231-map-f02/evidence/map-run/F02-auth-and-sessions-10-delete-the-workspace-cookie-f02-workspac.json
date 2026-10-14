@@ -1,0 +1,15 @@
+{
+  "file": "F02-auth-and-sessions.md",
+  "bullet": "Delete the workspace cookie (`F02.workspace-session-delete`).",
+  "ids": [
+    "F02.workspace-session-delete"
+  ],
+  "line": 299,
+  "script": "control-agent-server api DELETE /api/auth/workspace-session --expect 204 --save F02.workspace-session-delete/delete \\\n  | jq -e '.response.headers[\"set-cookie\"] | startswith(\"oh_workspace_session_key=\\\"\\\"\") and contains(\"Max-Age=0\") and contains(\"Path=<redacted:session-cookie>\") and contains(\"HttpOnly\")'\ncontrol-agent-server api DELETE /api/auth/workspace-session --auth none --expect 401 --check detail eq Unauthorized\ncontrol-agent-server exec --save F02.workspace-session-delete/jar-delete -- bash \"$F02/jar.sh\" DELETE /api/auth/workspace-session key 204 'has:max-age=0'\nif grep oh_workspace_session_key \"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f02-cookies.txt\"; then false; fi\ncontrol-agent-server exec --save F02.workspace-session-delete/file-after-delete -- bash \"$F02/jar.sh\" GET \"<redacted:session-cookie>/$CID/workspace/qa-f02.html\" nokey 401\n",
+  "exit_code": 0,
+  "elapsed_ms": 1727,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "true\n{\n  \"ok\": true,\n  \"status\": 401,\n  \"request\": {\n    \"method\": \"DELETE\",\n    \"path\": \"/api/auth/workspace-session\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 401,\n    \"headers\": {\n      \"content-length\": \"25\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Unauthorized\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 56,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Unauthorized\",\n      \"ok\": true,\n      \"actual\": \"Unauthorized\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 34,\n  \"stdout_tail\": \"HTTP/1.1 204 No Content\\ndate: Tue, 13 Oct 2026 02:42:24 GMT\\nserver: uvicorn\\nset-cookie: oh_workspace_session_key=\\\"\\\"; HttpOnly; Max-Age=0; Path=<redacted:session-cookie>; SameSite=none; Secure; Partitioned\\n\\n\\nstatus=204\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024124-a231-map-f02/evidence/F02.workspace-session-delete/jar-delete.json\"\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 32,\n  \"stdout_tail\": \"HTTP/1.1 401 Unauthorized\\ndate: Tue, 13 Oct 2026 02:42:24 GMT\\nserver: uvicorn\\ncontent-length: 25\\ncontent-type: application/json\\n\\n{\\\"detail\\\":\\\"Unauthorized\\\"}\\nstatus=401\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024124-a231-map-f02/evidence/F02.workspace-session-delete/file-after-delete.json\"\n}\n",
+  "stderr": ""
+}

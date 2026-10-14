@@ -1,0 +1,15 @@
+{
+  "file": "F34-typescript-client.md",
+  "bullet": "Workspace session (`F34.workspace-session`).",
+  "ids": [
+    "F34.workspace-session"
+  ],
+  "line": 601,
+  "script": "cat > \"$F34/session.mjs\" <<'JS'\nimport { m, host, apiKey, NOPE, assert } from './lib.mjs';\nconst scid = process.argv[2];\nconst workspace = new m.RemoteWorkspace({ host, apiKey, workingDir: '/qa-f34-ignored' });\nconst base = await workspace.startWorkspaceSession(scid);\nassert.equal(base, `${host}<redacted:session-cookie>/${scid}/workspace/`);\nconst file = await fetch(base + 'qa-f34-scoped.txt', { headers: { 'X-Session-API-Key': apiKey } });\nassert.equal(file.status, 200);\nassert.equal(await file.text(), 'qa-f34-scoped');\nawait workspace.deleteWorkspaceSession();\nconst scoped = new m.RemoteWorkspace({ host, apiKey, workingDir: '/x', conversationId: scid });\nawait assert.rejects(scoped.startWorkspaceSession(NOPE), /Workspace session must belong to the selected runtime/);\nassert.equal(await scoped.startWorkspaceSession(scid), base);\nawait assert.rejects(new m.RemoteWorkspace({ host, workingDir: '/x' }).startWorkspaceSession(scid), (e) => e.status === 401);\nawait assert.rejects(new m.RemoteWorkspace({ host, workingDir: '/x' }).deleteWorkspaceSession(), (e) => e.status === 401);\nconsole.log('QA_F34_SESSION_OK');\nJS\ncontrol-agent-server exec --timeout 60 --expect-output QA_F34_SESSION_OK --save F34.workspace-session/program -- node \"$F34/session.mjs\" \"$SCID\"\ncontrol-agent-server api GET \"<redacted:session-cookie>/$SCID/workspace/qa-f34-scoped.txt\" --expect 200 --raw-out \"$F34/session.copy\"\ntest \"$(cat \"$F34/session.copy\")\" = qa-f34-scoped\n",
+  "exit_code": 0,
+  "elapsed_ms": 16090,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 9689,\n  \"stdout_tail\": \"QA_F34_SESSION_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/evidence/F34.workspace-session/program.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/36b83fb6-9423-4b08-86a5-f40bd9c94132/workspace/qa-f34-scoped.txt\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-type\": \"text/plain; charset=utf-8\",\n      \"content-length\": \"13\",\n      \"etag\": \"\\\"88503589136e8d8daf7acdaba2293769\\\"\"\n    },\n    \"body\": \"qa-f34-scoped\",\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 655,\n  \"raw_out\": \"/workspace/verification-artifacts/runs/20261013-022019-5e33-map-f34/fixtures/qa-f34/session.copy\"\n}\n",
+  "stderr": ""
+}

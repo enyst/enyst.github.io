@@ -1,0 +1,35 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/skills/installed/Bad_Name/refresh",
+    "query": [],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "202",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "string_pattern_mismatch",
+          "loc": [
+            "path",
+            "skill_name"
+          ],
+          "msg": "String should match pattern '^[a-z0-9]+(-[a-z0-9]+)*$'",
+          "input": "Bad_Name",
+          "ctx": {
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 76
+}

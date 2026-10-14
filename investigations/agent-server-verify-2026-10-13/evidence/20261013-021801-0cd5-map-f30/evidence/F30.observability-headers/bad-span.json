@@ -1,0 +1,38 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "query": [],
+    "auth": "bearer",
+    "body": {
+      "model": "openhands_qa-f30-missing",
+      "messages": [
+        {
+          "role": "user",
+          "content": "x"
+        }
+      ]
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "246",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [],
+          "msg": "Value error, Observability span name may only contain letters, numbers, dots, underscores, colons, slashes, and hyphens",
+          "input": "bad span",
+          "url": "https://errors.pydantic.dev/2.13/v/value_error"
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 288
+}

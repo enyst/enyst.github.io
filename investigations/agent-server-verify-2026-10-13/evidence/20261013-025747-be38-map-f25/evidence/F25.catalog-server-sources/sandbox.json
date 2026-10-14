@@ -1,0 +1,59 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/skills",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "load_public": false,
+      "load_user": false,
+      "load_project": false,
+      "load_org": false,
+      "sandbox_config": {
+        "exposed_urls": [
+          {
+            "name": "WORKER_1",
+            "url": "http://localhost:12000",
+            "port": 12000
+          },
+          {
+            "name": "VSCODE",
+            "url": "http://localhost:12001",
+            "port": 12001
+          }
+        ]
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "410",
+      "content-type": "application/json"
+    },
+    "body": {
+      "skills": [
+        {
+          "name": "work_hosts",
+          "type": "repo",
+          "content": "The user has access to the following hosts for accessing a web application, each of which has a corresponding port:\n* http://localhost:12000 (port 12000)",
+          "triggers": [],
+          "source": null,
+          "description": null,
+          "is_agentskills_format": false,
+          "disable_model_invocation": false
+        }
+      ],
+      "sources": {
+        "sandbox": 1,
+        "registered_marketplaces": 0,
+        "sdk_base": 0,
+        "org": 0,
+        "project": 0
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 47
+}

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands agent-sdk verification</title>
+  <meta name="description" content="How agents verify the OpenHands Agent SDK feature by feature: an explainer video, the Agent Server map and its bug tracker, the core SDK map in progress, and the OpenHands app feature map." />
+  <meta property="og:title" content="OpenHands agent-sdk verification" />
+  <meta property="og:description" content="Feature maps written for agents, a control CLI, and known bugs kept as expected failures, replayed on a real server with a real model." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://enyst.github.io/verify/" />
+  <meta property="og:image" content="https://enyst.github.io/experiments/verify-agent-sdk-explainer/stills/frame-10s.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://enyst.github.io/verify/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    .film { margin: 0 0 var(--space-md); }
+    .film video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; background: #111318; border: 1px solid var(--border); border-radius: var(--border-radius); }
+    .film figcaption { color: var(--muted); font-size: 0.88em; line-height: 1.5; margin-top: 10px; }
+    .film figcaption a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,0.3); }
+    .film figcaption a:hover { border-bottom-color: var(--teal); }
+    .page-intro { color: var(--muted); font-size: var(--text-lg); margin-bottom: 28px; }
+    .links { margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <div class="shell shell--wide">
+    <a class="back" href="../index.html">← Engel's Code Design Notebook</a>
+    <h1 class="page">OpenHands agent-sdk verification</h1>
+    <p class="page-intro">How agents check that the OpenHands Agent SDK does what it says, one feature at a time: a map of every behavior an agent can see, a CLI that drives the real thing, and known bugs kept as expected failures until someone fixes them. Everything here is open, and anyone can rerun it.</p>
+
+    <nav class="links" aria-label="Sections">
+      <a href="#explainer">The explainer</a>
+      <a href="#agent-server">Agent Server</a>
+      <a href="#core-sdk">Core SDK</a>
+      <a href="#openhands-app">OpenHands app</a>
+    </nav>
+
+    <h2 id="explainer">The explainer</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/verify-agent-sdk-explainer/stills/frame-10s.png">
+        <source src="../experiments/verify-agent-sdk-explainer/verify-agent-sdk-explainer.mp4" type="video/mp4" />
+        <a href="../experiments/verify-agent-sdk-explainer/verify-agent-sdk-explainer.mp4">Download the video (MP4, 2:08)</a>
+      </video>
+      <figcaption>Two minutes on what an agent actually sees when it uses the SDK: the map, the <code>control-agent-server</code> CLI, a recipe that caught a bug, and the full replay. Drawn with Manim, with a generated score. <a href="../experiments/verify-agent-sdk-explainer/verify-agent-sdk-explainer.mp4" download>Download (MP4, 10 MB)</a> · <a href="https://github.com/enyst/enyst.github.io/tree/main/experiments/verify-agent-sdk-explainer">Scene script and music</a></figcaption>
+    </figure>
+
+    <h2 id="agent-server">Agent Server</h2>
+    <p class="meta">The first map: 34 families and 931 sub-features of the Agent Server, driven over REST, WebSocket, the Python client and the TypeScript client. Its full replay: 771 pass, 156 known bugs reproduced, 6 blocked, no surprises. It lives in <a href="https://github.com/OpenHands/software-agent-sdk/pull/5621">software-agent-sdk PR #5621</a>.</p>
+    <div class="cards">
+      <a class="card" href="../investigations/agent-server-verify-2026-10-13/">
+        <div class="card-title">Full Agent Server replay with DeepSeek</div>
+        <div class="card-desc">935 mapped IDs across 34 families, two fresh proofs per confirmed defect, and five narrated live bug recordings. Complete results, recipe adaptations, coverage limits, and downloadable evidence.</div>
+        <span class="card-tag tag-report">full report + recorded bugs · 13 October 2026</span>
+      </a>
+      <a class="card" href="../arch/verify-agent-server.html">
+        <div class="card-title">A map that keeps itself honest</div>
+        <div class="card-desc">The presentation, opening with a short animated film: a control CLI, an executable map of 930 Agent Server behaviors, and known bugs as expected failures. The full replay, and the upstream fix it caught.</div>
+        <span class="card-tag tag-report">presentation + film · 11 October 2026</span>
+      </a>
+      <a class="card" href="../arch/agent-server-bug-tracker.html">
+        <div class="card-title">Agent Server bug tracker</div>
+        <div class="card-desc">38 Agent Server bugs the map found or reproduced: severity, status and a two-sentence summary each, linked to the issues and to umbrella #5653.</div>
+        <span class="card-tag tag-data">tracker · 9 October 2026</span>
+      </a>
+    </div>
+
+    <h2 id="core-sdk">Core SDK</h2>
+    <p class="meta">The next map covers the SDK used in process: the agent loop, LLMs, conversations, condensers, skills, MCP, tools, workspaces and more, in 21 families (S01–S21). It is being drafted now and will be linked here when it is published.</p>
+
+    <h2 id="openhands-app">OpenHands app</h2>
+    <p class="meta">The sister project: the same approach applied to the OpenHands app (Agent Canvas), with a browser-driving CLI and real before/after screenshots.</p>
+    <div class="cards">
+      <a class="card" href="../arch/verify-openhands.html">
+        <div class="card-title">Give agents a way to prove it</div>
+        <div class="card-desc">A visual presentation of OpenHands’ verification loop: 716 mapped behaviors, a control CLI, evidence rules, and maintenance. Real before/after screenshots show what the first run found and fixed, with credit to Lauren Tan’s pstack.</div>
+        <span class="card-tag tag-report">presentation · updated 9 October 2026</span>
+      </a>
+      <a class="card" href="../arch/verify-openhands-issues.html">
+        <div class="card-title">120 findings: the issues and their fixes</div>
+        <div class="card-desc">Issues filed by OpenHands feature-map verification runs, grouped by repository and theme, with the checked status of their fixing pull requests.</div>
+        <span class="card-tag tag-data">findings snapshot</span>
+      </a>
+      <a class="card" href="../arch/control-openhands-cli.html">
+        <div class="card-title">control-openhands: agents using Agent Canvas like a user</div>
+        <div class="card-desc">The CLI behind the verify-openhands skill: isolated stacks, a browser that persists across commands, and an evidence ledger.</div>
+        <span class="card-tag tag-report">how it works · 5 October 2026</span>
+      </a>
+    </div>
+
+    <!-- BEGIN OPENHANDS FEATURES -->
+    <section aria-labelledby="openhands-features">
+    <h2 id="openhands-features">OpenHands features</h2>
+    <p class="meta">The feature map, for humans: 743 behaviors in 27 families, with readable CLI scripts and real screenshots. Source snapshot: 9 October 2026.</p>
+    <div class="cards"><a class="card" href="../openhands-features/index.html"><div class="card-title">Explore the OpenHands feature map</div><div class="card-desc">Choose a family or search a behavior ID. Follow the user entry point, the commands, and the expected result.</div><span class="card-tag tag-data">openhands-features · full index</span></a></div>
+    <h3 style="margin:24px 0 12px">Starting work</h3><div class="cards">
+      <a class="card" href="../openhands-features/F01-first-run-and-sign-in.html"><div class="card-title">F01 · First run, onboarding and sign-in</div><div class="card-desc">22 behaviors · 26 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F02-app-shell.html"><div class="card-title">F02 · App shell, sidebar and command menu</div><div class="card-desc">26 behaviors · 26 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F03-home.html"><div class="card-title">F03 · Home and starting work</div><div class="card-desc">39 behaviors · 34 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F04-conversation-list.html"><div class="card-title">F04 · Conversation list and folders</div><div class="card-desc">40 behaviors · 40 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+    </div>
+    <h3 style="margin:24px 0 12px">Conversation &amp; workspace</h3><div class="cards">
+      <a class="card" href="../openhands-features/F05-composer.html"><div class="card-title">F05 · Composer, slash commands and plan mode</div><div class="card-desc">25 behaviors · 27 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F06-agent-activity.html"><div class="card-title">F06 · Agent activity: messages, events and lifecycle</div><div class="card-desc">35 behaviors · 28 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F07-conversation-page.html"><div class="card-title">F07 · Conversation page, header and management menu</div><div class="card-desc">25 behaviors · 26 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F08-workspace-files-and-changes.html"><div class="card-title">F08 · Workspace drawer: files and changes</div><div class="card-desc">33 behaviors · 31 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F27-workspace-tools.html"><div class="card-title">F27 · Workspace tools: terminal, browser, planner, tasks and usage</div><div class="card-desc">30 behaviors · 21 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+    </div>
+    <h3 style="margin:24px 0 12px">Settings &amp; configuration</h3><div class="cards">
+      <a class="card" href="../openhands-features/F09-settings-shell.html"><div class="card-title">F09 · Settings shell and navigation</div><div class="card-desc">25 behaviors · 21 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F10-llm-profiles.html"><div class="card-title">F10 · LLM profiles</div><div class="card-desc">34 behaviors · 33 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F11-provider-connections.html"><div class="card-title">F11 · Provider connections</div><div class="card-desc">21 behaviors · 23 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F12-model-router.html"><div class="card-title">F12 · Model router (meta-LLM profiles)</div><div class="card-desc">25 behaviors · 23 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F13-agent-profiles.html"><div class="card-title">F13 · Agent profiles</div><div class="card-desc">20 behaviors · 21 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F14-secrets.html"><div class="card-title">F14 · Secrets</div><div class="card-desc">11 behaviors · 14 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F15-agent-behavior-settings.html"><div class="card-title">F15 · Condenser, agent context and verification settings</div><div class="card-desc">23 behaviors · 24 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F16-application-settings.html"><div class="card-title">F16 · Application settings</div><div class="card-desc">19 behaviors · 21 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+    </div>
+    <h3 style="margin:24px 0 12px">Customization</h3><div class="cards">
+      <a class="card" href="../openhands-features/F17-mcp-servers.html"><div class="card-title">F17 · Customize hub and MCP servers</div><div class="card-desc">30 behaviors · 30 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F18-skills.html"><div class="card-title">F18 · Skills catalog</div><div class="card-desc">22 behaviors · 27 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F19-plugins.html"><div class="card-title">F19 · Plugins and plugin launch</div><div class="card-desc">25 behaviors · 27 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F20-canvas-apps.html"><div class="card-title">F20 · Canvas apps</div><div class="card-desc">24 behaviors · 26 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+    </div>
+    <h3 style="margin:24px 0 12px">Automations</h3><div class="cards">
+      <a class="card" href="../openhands-features/F21-automations-dashboard.html"><div class="card-title">F21 · Automations dashboard and actions</div><div class="card-desc">34 behaviors · 34 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F22-automation-creation.html"><div class="card-title">F22 · Creating automations: templates, setup and import</div><div class="card-desc">29 behaviors · 29 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F23-automation-detail.html"><div class="card-title">F23 · Automation detail, runs and editing</div><div class="card-desc">39 behaviors · 29 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F24-git-sync.html"><div class="card-title">F24 · Automation Git Sync</div><div class="card-desc">26 behaviors · 26 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+    </div>
+    <h3 style="margin:24px 0 12px">Backends &amp; runtimes</h3><div class="cards">
+      <a class="card" href="../openhands-features/F25-backends-and-cloud.html"><div class="card-title">F25 · Backends, Cloud and sharing</div><div class="card-desc">29 behaviors · 27 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+      <a class="card" href="../openhands-features/F26-runtime-variants.html"><div class="card-title">F26 · Launcher modes, Docker, desktop and library</div><div class="card-desc">32 behaviors · 28 readable recipes and supporting checks.</div><span class="card-tag tag-data">openhands-features</span></a>
+    </div>
+    </section>
+    <!-- END OPENHANDS FEATURES -->
+
+  </div>
+</body>
+</html>

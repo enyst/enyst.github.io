@@ -1,0 +1,172 @@
+{
+  "slug": "final-highlights",
+  "requires_final_counts": true,
+  "final_counts_confirmed": true,
+  "clips": [
+    {
+      "directory": "/workspace/verification-artifacts/video/lock-stall",
+      "title": "A store lock pauses the heartbeat",
+      "feature": "F22.store-busy-responsive",
+      "keep_ranges": [
+        [
+          0,
+          10.8
+        ],
+        [
+          20.9,
+          53.4
+        ],
+        [
+          81.1,
+          "summary"
+        ]
+      ],
+      "editing_note": "Video edit: server setup/cleanup shortened; heartbeat wait continuous.",
+      "probe_timer": {
+        "start_at": 23.383175484,
+        "end_at": 51.962874636
+      }
+    },
+    {
+      "directory": "/workspace/verification-artifacts/video/upload-atomic",
+      "title": "A failed overwrite destroys the old file",
+      "feature": "F14.upload-atomic",
+      "keep_ranges": [
+        [
+          0,
+          12.5
+        ],
+        [
+          52.55,
+          58.4
+        ],
+        [
+          73.99,
+          "summary"
+        ]
+      ],
+      "editing_note": "Video edit: isolated server setup/cleanup shortened; actual results preserved."
+    },
+    {
+      "directory": "/workspace/verification-artifacts/video/secret-loss",
+      "title": "An unrelated secret update erases the old credential",
+      "feature": "F18.secret-key-rotation",
+      "keep_ranges": [
+        [
+          0,
+          14.7
+        ],
+        [
+          51.5,
+          52.9
+        ],
+        [
+          119.85,
+          121.5
+        ],
+        [
+          156.1,
+          157.8
+        ],
+        [
+          193.6,
+          195.5
+        ],
+        [
+          210,
+          "summary"
+        ]
+      ],
+      "editing_note": "Video edit: server restart/setup/cleanup intervals shortened; actual controls/results retained."
+    },
+    {
+      "directory": "/workspace/verification-artifacts/video/git-space",
+      "title": "One space breaks the Git changes API",
+      "feature": "F15.changes-special-names",
+      "keep_ranges": [
+        [
+          0,
+          11.2
+        ],
+        [
+          101.2,
+          109.5
+        ],
+        [
+          123.45,
+          "summary"
+        ]
+      ],
+      "editing_note": "Video edit: server setup/cleanup shortened; actual API result preserved."
+    },
+    {
+      "directory": "/workspace/verification-artifacts/video/ts-binary",
+      "title": "Five binary bytes become eleven replacement bytes",
+      "feature": "F34.workspace-binary-download",
+      "keep_ranges": [
+        [
+          0,
+          11.1
+        ],
+        [
+          49.7,
+          52.0
+        ],
+        [
+          66.2,
+          "summary"
+        ]
+      ],
+      "editing_note": "Video edit: server/client setup and cleanup shortened; byte assertions retained.",
+      "equation": {
+        "after_at": 50.659689715,
+        "text": "3 \u00d7 3 + 2 = 11",
+        "caption": "three replacement sequences + two original bytes"
+      }
+    }
+  ],
+  "all_finding_counts": {
+    "High severity": 12,
+    "Medium severity": 69,
+    "Low severity": 49,
+    "Confirmed groups": 130,
+    "Active checks": 934
+  },
+  "ending_eyebrow": "Full verification \u00b7 34 families \u00b7 frozen target",
+  "ending_title": "Five shown. All 130 counted.",
+  "ending_caption": "Five are shown here; all 130 groups, including all 49 low severity cases, are in the report. Scope: 934 active feature checks across 34 families, plus one retired entry (935 mapped IDs). Three proven cross-family duplicates are merged.",
+  "ending_narration": "The film shows five defects: three high and two medium. The full report confirms one hundred thirty groups: twelve high, sixty nine medium, and forty nine low. Every low severity case is in the report. The map contains nine hundred thirty four active checks across thirty four families, plus one retired entry. Three proven cross-family duplicates are merged.",
+  "approved_counting_convention": {
+    "confirmed_groups": 130,
+    "high": 12,
+    "medium": 69,
+    "low": 49,
+    "family_batch_groups_before_cross_family_merges": 133,
+    "shown": 5,
+    "shown_high": 3,
+    "shown_medium": 2,
+    "active_mapped_ids": 934,
+    "retired_mapped_ids": 1,
+    "all_mapped_ids": 935,
+    "families": 34,
+    "cross_family_merges": [
+      [
+        "F34.events-unknown-id",
+        "F06.unknown-event"
+      ],
+      [
+        "F34.events-search-kind",
+        "F06.search-kind-short"
+      ],
+      [
+        "F04.create-secrets-get",
+        "F08.secret-runtime-persistence"
+      ]
+    ],
+    "store_lock_implementations_remain_distinct": [
+      "F20",
+      "F21",
+      "F22/F23"
+    ]
+  }
+}

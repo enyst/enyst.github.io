@@ -1,0 +1,15 @@
+{
+  "file": "F20-llm-profiles.md",
+  "bullet": "Encrypted at rest (`F20.key-encrypted-at-rest`).",
+  "ids": [
+    "F20.key-encrypted-at-rest"
+  ],
+  "line": 265,
+  "script": "control-agent-server state cat home/.openhands/profiles/qa-flash.json --mode 600 \\\n  --check api_key matches '^gAAAAA' --check model eq deepseek/deepseek-flash --check schema_version eq 1\ncontrol-agent-server state grep deepseek/deepseek-flash --glob 'home/**/*'\ncontrol-agent-server state grep --env-value DEEPSEEK_API_KEY --glob 'home/**/*' --expect-none\n",
+  "exit_code": 0,
+  "elapsed_ms": 9279,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"path\": \"home/.openhands/profiles/qa-flash.json\",\n  \"bytes\": 993,\n  \"mode\": \"0o600\",\n  \"content\": {\n    \"model\": \"deepseek/deepseek-flash\",\n    \"api_key\": \"<redacted:encrypted>\",\n    \"auth_type\": \"api_key\",\n    \"openrouter_site_url\": \"https://docs.all-hands.dev/\",\n    \"openrouter_app_name\": \"OpenHands\",\n    \"num_retries\": 0,\n    \"retry_multiplier\": 8.0,\n    \"retry_min_wait\": 8,\n    \"retry_max_wait\": 64,\n    \"timeout\": 300,\n    \"stream_idle_timeout\": 300.0,\n    \"max_message_chars\": 30000,\n    \"api_mode\": \"auto\",\n    \"capability_overrides\": {},\n    \"stream\": false,\n    \"drop_params\": true,\n    \"disable_stop_word\": false,\n    \"caching_prompt\": true,\n    \"log_completions\": false,\n    \"log_completions_folder\": \"logs/completions\",\n    \"native_tool_calling\": true,\n    \"reasoning_effort\": \"high\",\n    \"enable_encrypted_reasoning\": true,\n    \"prompt_cache_retention\": \"24h\",\n    \"extended_thinking_budget\": 200000,\n    \"usage_id\": \"default\",\n    \"litellm_extra_body\": {},\n    \"is_subscription\": false,\n    \"schema_version\": 1\n  },\n  \"checks\": [\n    {\n      \"check\": \"api_key matches ^gAAAAA\",\n      \"ok\": true,\n      \"actual\": \"<redacted:encrypted>\"\n    },\n    {\n      \"check\": \"model eq deepseek/deepseek-flash\",\n      \"ok\": true,\n      \"actual\": \"deepseek/deepseek-flash\"\n    },\n    {\n      \"check\": \"schema_version eq 1\",\n      \"ok\": true,\n      \"actual\": \"1\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"glob\": \"home/**/*\",\n  \"files_with_match\": [\n    \"home/.openhands/profiles/deepseek-flash.json\",\n    \"home/.openhands/profiles/qa-flash.json\",\n    \"home/.openhands/settings.json\"\n  ],\n  \"matches\": 3\n}\n{\n  \"ok\": true,\n  \"glob\": \"home/**/*\",\n  \"files_with_match\": [],\n  \"matches\": 0\n}\n",
+  "stderr": ""
+}

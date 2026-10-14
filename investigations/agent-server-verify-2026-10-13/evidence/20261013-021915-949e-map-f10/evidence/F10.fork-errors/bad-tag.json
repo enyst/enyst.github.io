@@ -1,0 +1,41 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "<redacted:session-cookie>/f55769c1-4c05-48f5-a483-82f70730e98a/fork",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "tags": {
+        "Bad-Key": "x"
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 422,
+    "headers": {
+      "content-length": "271",
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": [
+        {
+          "type": "value_error",
+          "loc": [
+            "body",
+            "tags"
+          ],
+          "msg": "Value error, Tag key 'Bad-Key' is invalid: keys must be lowercase alphanumeric only",
+          "input": {
+            "Bad-Key": "<redacted>"
+          },
+          "ctx": {
+            "error": "Tag key 'Bad-Key' is invalid: keys must be lowercase alphanumeric only"
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 373
+}

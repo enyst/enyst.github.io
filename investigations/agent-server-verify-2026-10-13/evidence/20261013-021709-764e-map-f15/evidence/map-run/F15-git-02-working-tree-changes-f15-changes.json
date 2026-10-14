@@ -1,0 +1,15 @@
+{
+  "file": "F15-git.md",
+  "bullet": "Working-tree changes (`F15.changes`).",
+  "ids": [
+    "F15.changes"
+  ],
+  "line": 151,
+  "script": "control-agent-server api GET /api/git/changes --query path=\"$REPO\" --expect 200 --check . len-eq 2 \\\n  --check 0.status eq UPDATED --check 0.path eq README.md --check 1.status eq ADDED --check 1.path eq notes.txt \\\n  --save F15.changes/fixture\ngit -C \"$REPO\" status --porcelain > \"$F/status.txt\"\ngrep -qx ' M README.md' \"$F/status.txt\"\ngrep -qx '?? notes.txt' \"$F/status.txt\"\ntest \"$(wc -l < \"$F/status.txt\")\" -eq 2\n",
+  "exit_code": 0,
+  "elapsed_ms": 367,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/git/changes\",\n    \"query\": [\n      [\n        \"path\",\n        \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/fixtures/qa-f15-repo\"\n      ]\n    ],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"79\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": [\n      {\n        \"status\": \"UPDATED\",\n        \"path\": \"README.md\"\n      },\n      {\n        \"status\": \"ADDED\",\n        \"path\": \"notes.txt\"\n      }\n    ],\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 73,\n  \"checks\": [\n    {\n      \"check\": \". len-eq 2\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"status\\\": \\\"UPDATED\\\", \\\"path\\\": \\\"README.md\\\"}, {\\\"status\\\": \\\"ADDED\\\", \\\"path\\\": \\\"notes.txt\\\"}]\"\n    },\n    {\n      \"check\": \"0.status eq UPDATED\",\n      \"ok\": true,\n      \"actual\": \"UPDATED\"\n    },\n    {\n      \"check\": \"0.path eq README.md\",\n      \"ok\": true,\n      \"actual\": \"README.md\"\n    },\n    {\n      \"check\": \"1.status eq ADDED\",\n      \"ok\": true,\n      \"actual\": \"ADDED\"\n    },\n    {\n      \"check\": \"1.path eq notes.txt\",\n      \"ok\": true,\n      \"actual\": \"notes.txt\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021709-764e-map-f15/evidence/F15.changes/fixture.json\"\n}\n",
+  "stderr": ""
+}

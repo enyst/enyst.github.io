@@ -1,0 +1,161 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/api/canvas-extensions/installed",
+    "query": [],
+    "auth": "header",
+    "body": null,
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "3114",
+      "content-type": "application/json"
+    },
+    "body": {
+      "canvas_extensions": [
+        {
+          "name": "qa-canvas",
+          "version": "0.1.0",
+          "description": "QA fixture Canvas app",
+          "enabled": false,
+          "source": "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/fixtures/canvas/qa-canvas",
+          "requested_ref": null,
+          "resolved_ref": null,
+          "repo_path": null,
+          "installed_at": "2026-10-13T02:33:34.847665+00:00",
+          "install_path": "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/home/.openhands/canvas-extensions/installed/qa-canvas",
+          "manifest": {
+            "schema_version": 1,
+            "name": "qa-canvas",
+            "display_name": "QA qa-canvas",
+            "version": "0.1.0",
+            "description": "QA fixture Canvas app",
+            "entrypoint": "dist/index.js",
+            "contributes": {
+              "pages": [
+                {
+                  "id": "main",
+                  "title": "QA qa-canvas",
+                  "path": "/qa-canvas"
+                }
+              ]
+            },
+            "icon": "assets/icon.svg"
+          }
+        },
+        {
+          "name": "qa-backend",
+          "version": "0.1.0",
+          "description": "QA fixture Canvas app",
+          "enabled": false,
+          "source": "file:///workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/fixtures/canvas/qa-backend",
+          "requested_ref": null,
+          "resolved_ref": "0d20b588539457fda2817e9a17168601eca0fc28",
+          "repo_path": null,
+          "installed_at": "2026-10-13T02:34:02.947341+00:00",
+          "install_path": "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/home/.openhands/canvas-extensions/installed/qa-backend",
+          "manifest": {
+            "schema_version": 1,
+            "name": "qa-backend",
+            "display_name": "QA qa-backend",
+            "version": "0.1.0",
+            "description": "QA fixture Canvas app",
+            "entrypoint": "dist/index.js",
+            "contributes": {
+              "pages": [
+                {
+                  "id": "main",
+                  "title": "QA qa-backend",
+                  "path": "/qa-backend"
+                }
+              ]
+            },
+            "backend": {
+              "schema_version": 1,
+              "artifacts": {
+                "linux-amd64": {
+                  "path": "backend/linux.tar.gz",
+                  "url": null,
+                  "sha256": "6907e67215f99bbbcaee706a9bb152353d997bcf28bf372e976273674b4e6409",
+                  "strip_components": 0
+                },
+                "linux-arm64": {
+                  "path": "backend/linux.tar.gz",
+                  "url": null,
+                  "sha256": "6907e67215f99bbbcaee706a9bb152353d997bcf28bf372e976273674b4e6409",
+                  "strip_components": 0
+                }
+              },
+              "argv": [
+                "{artifact_dir}/server.py",
+                "{port}",
+                "{data_dir}"
+              ],
+              "health": {
+                "path": "/health",
+                "timeout_seconds": 15.0,
+                "interval_seconds": 0.1
+              },
+              "inherit_environment": []
+            },
+            "icon": "assets/icon.svg"
+          }
+        },
+        {
+          "name": "qa-f28-logs",
+          "version": "0.1.0",
+          "description": "",
+          "enabled": false,
+          "source": "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/fixtures/f28",
+          "requested_ref": null,
+          "resolved_ref": null,
+          "repo_path": "qa-f28-logs",
+          "installed_at": "2026-10-13T02:35:11.159781+00:00",
+          "install_path": "/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/home/.openhands/canvas-extensions/installed/qa-f28-logs",
+          "manifest": {
+            "schema_version": 1,
+            "name": "qa-f28-logs",
+            "display_name": "qa-f28-logs",
+            "version": "0.1.0",
+            "description": "",
+            "entrypoint": "dist/index.js",
+            "contributes": {
+              "pages": []
+            },
+            "backend": {
+              "schema_version": 1,
+              "artifacts": {
+                "linux-amd64": {
+                  "path": "backend/linux.tar.gz",
+                  "url": null,
+                  "sha256": "8e0fe899c6660230cd2cefafc3c78c675f5ca842b05a494f20d94cb15414c581",
+                  "strip_components": 0
+                },
+                "linux-arm64": {
+                  "path": "backend/linux.tar.gz",
+                  "url": null,
+                  "sha256": "8e0fe899c6660230cd2cefafc3c78c675f5ca842b05a494f20d94cb15414c581",
+                  "strip_components": 0
+                }
+              },
+              "argv": [
+                "{artifact_dir}/run.sh",
+                "{port}"
+              ],
+              "health": {
+                "path": "/health",
+                "timeout_seconds": 30.0,
+                "interval_seconds": 0.2
+              },
+              "inherit_environment": []
+            }
+          }
+        }
+      ]
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 994
+}

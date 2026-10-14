@@ -1,0 +1,303 @@
+{
+  "ok": false,
+  "file": "F17-workspaces-registry.md",
+  "summary": {
+    "pass": 22,
+    "fail": 1,
+    "xfail": 2,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 78,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3166,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-00-preconditions.json"
+    },
+    {
+      "bullet": "Empty registry (`F17.list-empty`).",
+      "ids": [
+        "F17.list-empty"
+      ],
+      "line": 162,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4983,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-01-empty-registry-f17-list-empty.json"
+    },
+    {
+      "bullet": "A refused delete on a fresh directory (`F17.noop-delete-no-file`), known bug.",
+      "ids": [
+        "F17.noop-delete-no-file"
+      ],
+      "line": 170,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 11628,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-02-a-refused-delete-on-a-fresh-directory-f1.json",
+      "failed_line": 7,
+      "failed_command": "control-agent-server state ls home/.openhands/workspaces.json --expect-count 0",
+      "stdout_tail": "04,\n    \"headers\": {\n      \"content-length\": \"39\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Workspace parent not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 418,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Workspace parent not found\",\n      \"ok\": true,\n      \"actual\": \"Workspace parent not found\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/workspaces\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"39\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"workspaces\": [],\n      \"workspaceParents\": []\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 484,\n  \"checks\": [\n    {\n      \"check\": \"workspaces len-eq 0\",\n      \"ok\": true,\n      \"actual\": \"[]\"\n    },\n    {\n      \"check\": \"workspaceParents len-eq 0\",\n      \"ok\": true,\n      \"actual\": \"[]\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"pattern\": \"home/.openhands/workspaces.json\",\n  \"count\": 1,\n  \"files\": [\n    {\n      \"path\": \"home/.openhands/workspaces.json\",\n      \"bytes\": 71,\n      \"mode\": \"0o600\"\n    }\n  ]\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Register a repository and a plain directory (`F17.add-workspaces`).",
+      "ids": [
+        "F17.add-workspaces"
+      ],
+      "line": 188,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8188,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-03-register-a-repository-and-a-plain-direct.json"
+    },
+    {
+      "bullet": "Wire format (`F17.wire-format`).",
+      "ids": [
+        "F17.wire-format"
+      ],
+      "line": 201,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6892,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-04-wire-format-f17-wire-format.json"
+    },
+    {
+      "bullet": "Idempotent re-add (`F17.idempotent-add`).",
+      "ids": [
+        "F17.idempotent-add"
+      ],
+      "line": 221,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7889,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-05-idempotent-re-add-f17-idempotent-add.json"
+    },
+    {
+      "bullet": "Delete a workspace (`F17.delete-workspace`).",
+      "ids": [
+        "F17.delete-workspace"
+      ],
+      "line": 235,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7943,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-06-delete-a-workspace-f17-delete-workspace.json"
+    },
+    {
+      "bullet": "Unknown paths (`F17.delete-not-found`).",
+      "ids": [
+        "F17.delete-not-found"
+      ],
+      "line": 247,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 11057,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-07-unknown-paths-f17-delete-not-found.json"
+    },
+    {
+      "bullet": "No-op writes leave the file alone (`F17.noop-write-untouched`), known bug.",
+      "ids": [
+        "F17.noop-write-untouched"
+      ],
+      "line": 260,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 3542,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-08-no-op-writes-leave-the-file-alone-f17-no.json",
+      "failed_line": 6,
+      "failed_command": "test \"$(stat -c '%i %y' \"$WS\")\" = \"$STAMP\"",
+      "stdout_tail": " \"name\": \"qa-f17-plain\",\n          \"path\": \"/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/fixtures/qa-f17/plain\"\n        },\n        {\n          \"id\": \"/qa-f17/snake\",\n          \"name\": \"qa-f17-snake\",\n          \"path\": \"/qa-f17/snake\",\n          \"parentPath\": \"/qa-f17\"\n        },\n        {\n          \"id\": \"/qa-f17/null\",\n          \"name\": \"qa-f17-null\",\n          \"path\": \"/qa-f17/null\"\n        },\n        {\n          \"id\": \"/qa-f17/dup\",\n          \"name\": \"qa-f17-dup-first\",\n          \"path\": \"/qa-f17/dup\"\n        }\n      ],\n      \"workspaceParents\": []\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 303,\n  \"checks\": [\n    {\n      \"check\": \"workspaces len-eq 5\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"id\\\": \\\"/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/fixtures/qa-f17-repo\\\", \\\"name\\\": \\\"qa-f17-repo\\\", \\\"path\\\": \\\"/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/\\u2026\"\n    },\n    {\n      \"check\": \"workspaces.0.name eq qa-f17-repo\",\n      \"ok\": true,\n      \"actual\": \"qa-f17-repo\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/F17.noop-write-untouched/readd.json\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Paths are opaque strings (`F17.paths-opaque`).",
+      "ids": [
+        "F17.paths-opaque"
+      ],
+      "line": 282,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 22452,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-09-paths-are-opaque-strings-f17-paths-opaqu.json"
+    },
+    {
+      "bullet": "Validation (`F17.validation`).",
+      "ids": [
+        "F17.validation"
+      ],
+      "line": 311,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 34608,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-10-validation-f17-validation.json"
+    },
+    {
+      "bullet": "Register parents (`F17.add-parents`).",
+      "ids": [
+        "F17.add-parents"
+      ],
+      "line": 354,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 9633,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-11-register-parents-f17-add-parents.json"
+    },
+    {
+      "bullet": "Children of a parent (`F17.parent-children`).",
+      "ids": [
+        "F17.parent-children"
+      ],
+      "line": 371,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10371,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-12-children-of-a-parent-f17-parent-children.json"
+    },
+    {
+      "bullet": "Delete a parent (`F17.delete-parent`).",
+      "ids": [
+        "F17.delete-parent"
+      ],
+      "line": 386,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13627,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-13-delete-a-parent-f17-delete-parent.json"
+    },
+    {
+      "bullet": "Two independent lists (`F17.lists-independent`).",
+      "ids": [
+        "F17.lists-independent"
+      ],
+      "line": 402,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 15910,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-14-two-independent-lists-f17-lists-independ.json"
+    },
+    {
+      "bullet": "Persistence across a restart (`F17.persist-restart`).",
+      "ids": [
+        "F17.persist-restart"
+      ],
+      "line": 418,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 94768,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-15-persistence-across-a-restart-f17-persist.json"
+    },
+    {
+      "bullet": "Session key required (`F17.auth-required`).",
+      "ids": [
+        "F17.auth-required"
+      ],
+      "line": 427,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 41125,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-16-session-key-required-f17-auth-required.json"
+    },
+    {
+      "bullet": "Concurrent writes (`F17.concurrent-adds`).",
+      "ids": [
+        "F17.concurrent-adds"
+      ],
+      "line": 454,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 22173,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-17-concurrent-writes-f17-concurrent-adds.json"
+    },
+    {
+      "bullet": "Two servers, one file (`F17.shared-dir`).",
+      "ids": [
+        "F17.shared-dir"
+      ],
+      "line": 487,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 108396,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-18-two-servers-one-file-f17-shared-dir.json"
+    },
+    {
+      "bullet": "TypeScript client (`F17.ts-client`).",
+      "ids": [
+        "F17.ts-client"
+      ],
+      "line": 532,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 9707,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-19-typescript-client-f17-ts-client.json"
+    },
+    {
+      "bullet": "Corrupted file (`F17.corrupted-file`).",
+      "ids": [
+        "F17.corrupted-file"
+      ],
+      "line": 544,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 25482,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-20-corrupted-file-f17-corrupted-file.json"
+    },
+    {
+      "bullet": "Future or invalid schema (`F17.future-schema`).",
+      "ids": [
+        "F17.future-schema"
+      ],
+      "line": 570,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 67311,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-21-future-or-invalid-schema-f17-future-sche.json"
+    },
+    {
+      "bullet": "Unreadable file (`F17.io-error`).",
+      "ids": [
+        "F17.io-error"
+      ],
+      "line": 605,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 29562,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-22-unreadable-file-f17-io-error.json"
+    },
+    {
+      "bullet": "No-op writes on read-only storage (`F17.noop-write-readonly`), known bug.",
+      "ids": [
+        "F17.noop-write-readonly"
+      ],
+      "line": 633,
+      "status": "fail",
+      "exit_code": 127,
+      "elapsed_ms": 2883,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-23-no-op-writes-on-read-only-storage-f17-no.json",
+      "failed_line": 3,
+      "failed_command": "chattr +i \"$PDIR\"",
+      "stdout_tail": "",
+      "stderr_tail": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/private/F17-workspaces-registry.recipe.sh: line 7: chattr: command not found\n",
+      "hint": "no failure was confirmed at the `# bug` assertion; the bug was not reproduced"
+    },
+    {
+      "bullet": "Location without `OH_PERSISTENCE_DIR` (`F17.persistence-location`).",
+      "ids": [
+        "F17.persistence-location"
+      ],
+      "line": 667,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 261305,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17/evidence/map-run/F17-workspaces-registry-24-location-without-oh-persistence-dir-f17-.json"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-022059-b8c2-map-f17",
+  "launch_flags": []
+}

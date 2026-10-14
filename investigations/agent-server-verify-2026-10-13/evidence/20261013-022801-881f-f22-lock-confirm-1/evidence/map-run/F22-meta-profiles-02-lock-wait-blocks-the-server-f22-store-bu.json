@@ -1,0 +1,15 @@
+{
+  "file": "F22-meta-profiles.md",
+  "bullet": "Lock wait blocks the server (`F22.store-busy-responsive`), known bug.",
+  "ids": [
+    "F22.store-busy-responsive"
+  ],
+  "line": 577,
+  "script": "M=\"$AGENT_SERVER_VERIFY_RUN/home/.openhands/meta-profiles\"\nHELD=\"$F22/lock-held-2\"\nrm -f \"$HELD\"\ncontrol-agent-server api GET /alive --auth none --expect 200 --expect-max-ms 3000 --save F22.store-busy-responsive/alive-idle\nflock -x \"$M/.meta-profiles.lock\" sh -c \"touch '$HELD'; sleep 40\" &\nLOCKER=$!\nfor i in $(seq 100); do test -e \"$HELD\" && break; sleep 0.1; done\ntest -e \"$HELD\"\ncontrol-agent-server api POST /api/meta-profiles/qa-busy --timeout 60 --expect 503 --quiet \\\n  --json '{\"classifier_model\": \"deepseek-flash\", \"classes\": [{\"description\": \"any\", \"model\": \"deepseek-pro\"}]}' > \"$F22/busy-save.json\" &\nSAVER=$!\nSLOW=0\nfor i in $(seq 6); do\n  sleep 2\n  control-agent-server api GET /alive --auth none --expect 200 --expect-max-ms 3000 --timeout 60 --quiet \\\n    --save F22.store-busy-responsive/alive || { SLOW=$i; break; }\ndone\nwait \"$SAVER\"\nwait \"$LOCKER\"\ncontrol-agent-server api GET /api/meta-profiles/qa-busy --expect 404\ntest \"$SLOW\" = 0  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 49246,
+  "failed_line": 21,
+  "failed_command": "test \"$SLOW\" = 0",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"status\": \"ok\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 743,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1/evidence/F22.store-busy-responsive/alive-idle.json\"\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/alive\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"15\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 29087,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-022801-881f-f22-lock-confirm-1/evidence/F22.store-busy-responsive/alive.json\",\n  \"hint\": \"took 29087 ms, limit 3000 ms\"\n}\n{\n  \"ok\": true,\n  \"status\": 404,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/meta-profiles/qa-busy\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 404,\n    \"headers\": {\n      \"content-length\": \"45\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Meta-profile 'qa-busy' not found\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 682\n}\n",
+  "stderr": ""
+}

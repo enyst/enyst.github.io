@@ -1,0 +1,15 @@
+{
+  "file": "F28-canvas-extensions.md",
+  "bullet": "Bundle (`F28.bundle`).",
+  "ids": [
+    "F28.bundle"
+  ],
+  "line": 330,
+  "script": "BUNDLE=\"$AGENT_SERVER_VERIFY_RUN/fixtures/f28/bundle-v1.js\"\nETAG1=$(control-agent-server api GET /api/canvas-extensions/installed/qa-canvas/bundle --expect 200 \\\n  --check-header cache-control eq no-cache --check-header content-type contains text/javascript \\\n  --check-header etag exists --raw-out \"$BUNDLE\" --print-header etag)\ncmp \"$BUNDLE\" \"$FX/dist/index.js\"\ncontrol-agent-server api GET /api/canvas-extensions/installed/qa-canvas/bundle --check-header etag eq \"$ETAG1\" \\\n  --quiet --save F28.bundle/bundle\n",
+  "exit_code": 0,
+  "elapsed_ms": 6096,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/canvas-extensions/installed/qa-canvas/bundle\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"cache-control\": \"no-cache\",\n      \"content-type\": \"text/javascript; charset=utf-8\",\n      \"content-length\": \"40\",\n      \"etag\": \"\\\"c811f7e92b8b443de80dca8b9a92bea6\\\"\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 332,\n  \"checks\": [\n    {\n      \"check\": \"header etag eq \\\"c811f7e92b8b443de80dca8b9a92bea6\\\"\",\n      \"ok\": true,\n      \"actual\": \"\\\"c811f7e92b8b443de80dca8b9a92bea6\\\"\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-023125-701d-map-f28/evidence/F28.bundle/bundle.json\"\n}\n",
+  "stderr": ""
+}

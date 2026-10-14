@@ -1,0 +1,48 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/test",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "server": {
+        "command": "/workspace/agent-sdk-verify/.venv/bin/python",
+        "args": [
+          "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/fixtures/f19/qa_f19_tools.py"
+        ],
+        "env": {
+          "QA_F19_TOKEN": "<redacted:encrypted>"
+        }
+      },
+      "timeout": 30,
+      "tool_call": {
+        "name": "qa_env",
+        "arguments": {
+          "name": "QA_F19_TOKEN"
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "118",
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": true,
+      "tools": [
+        "qa_env",
+        "qa_sleep",
+        "qa_fail"
+      ],
+      "tool_result": {
+        "is_error": false,
+        "text": "QA_ENV:qa-f19-env-secret"
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 5901
+}

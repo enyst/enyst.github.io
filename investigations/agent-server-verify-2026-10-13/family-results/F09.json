@@ -1,0 +1,375 @@
+{
+  "ok": false,
+  "file": "F09-model-switching-plugins.md",
+  "summary": {
+    "pass": 19,
+    "fail": 2,
+    "xfail": 8,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 92,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3889,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-00-preconditions.json"
+    },
+    {
+      "bullet": "Key required (`F09.auth-required`).",
+      "ids": [
+        "F09.auth-required"
+      ],
+      "line": 118,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3999,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-01-key-required-f09-auth-required.json"
+    },
+    {
+      "bullet": "Switch to a caller-supplied LLM (`F09.switch-llm`).",
+      "ids": [
+        "F09.switch-llm"
+      ],
+      "line": 129,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6396,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-02-switch-to-a-caller-supplied-llm-f09-swit.json"
+    },
+    {
+      "bullet": "Socket view of a switch (`F09.switch-llm-ws`).",
+      "ids": [
+        "F09.switch-llm-ws"
+      ],
+      "line": 150,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 14284,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-03-socket-view-of-a-switch-f09-switch-llm-w.json"
+    },
+    {
+      "bullet": "Switch errors (`F09.switch-llm-errors`).",
+      "ids": [
+        "F09.switch-llm-errors"
+      ],
+      "line": 171,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 4976,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-04-switch-errors-f09-switch-llm-errors.json"
+    },
+    {
+      "bullet": "Mid-conversation switch with a cipher token (`F09.switch-llm-encrypted-key`).",
+      "ids": [
+        "F09.switch-llm-encrypted-key"
+      ],
+      "line": 186,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8559,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-05-mid-conversation-switch-with-a-cipher-to.json"
+    },
+    {
+      "bullet": "Switch through a provider connection (`F09.switch-llm-provider-connection`).",
+      "ids": [
+        "F09.switch-llm-provider-connection"
+      ],
+      "line": 204,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 10846,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-06-switch-through-a-provider-connection-f09.json"
+    },
+    {
+      "bullet": "Switch to a saved profile (`F09.switch-profile`).",
+      "ids": [
+        "F09.switch-profile"
+      ],
+      "line": 230,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 9872,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-07-switch-to-a-saved-profile-f09-switch-pro.json"
+    },
+    {
+      "bullet": "Profile switch errors (`F09.switch-profile-errors`).",
+      "ids": [
+        "F09.switch-profile-errors"
+      ],
+      "line": 250,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 7831,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-08-profile-switch-errors-f09-switch-profile.json"
+    },
+    {
+      "bullet": "Switch to an edited profile (`F09.switch-profile-edited`), known bug.",
+      "ids": [
+        "F09.switch-profile-edited"
+      ],
+      "line": 271,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 19341,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-09-switch-to-an-edited-profile-f09-switch-p.json",
+      "failed_line": 9,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$EID\" --quiet --check agent.llm.model eq openai/qa-f09-edit-2 --save F09.switch-profile-edited/get",
+      "stdout_tail": ",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"profile_name\": \"qa-f09-edit\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 449,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.switch-profile-edited/switch-again.json\"\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/ecd4ba2e-bb55-4dc5-9fee-5ea83b29ca6f\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"4946\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 266,\n  \"checks\": [\n    {\n      \"check\": \"agent.llm.model eq openai/qa-f09-edit-2\",\n      \"ok\": false,\n      \"actual\": \"openai/qa-f09-edit-1\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.switch-profile-edited/get.json\",\n  \"hint\": \"failed check: agent.llm.model eq openai/qa-f09-edit-2\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Switch onto a registered usage id (`F09.switch-llm-registered-usage-id`), known bug.",
+      "ids": [
+        "F09.switch-llm-registered-usage-id"
+      ],
+      "line": 296,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 13370,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-10-switch-onto-a-registered-usage-id-f09-sw.json",
+      "failed_line": 9,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$KID\" --quiet --check agent.llm.model eq deepseek/deepseek-v4-pro --save F09.switch-llm-registered-usage-id/get",
+      "stdout_tail": " \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"5751\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 382,\n  \"checks\": [\n    {\n      \"check\": \"agent.llm.usage_id eq default\",\n      \"ok\": true,\n      \"actual\": \"default\"\n    },\n    {\n      \"check\": \"execution_status eq idle\",\n      \"ok\": true,\n      \"actual\": \"idle\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/f4d35627-68d1-4676-8373-92246a5e6896\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"5751\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 229,\n  \"checks\": [\n    {\n      \"check\": \"agent.llm.model eq deepseek/deepseek-v4-pro\",\n      \"ok\": false,\n      \"actual\": \"openai/qa-placeholder\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.switch-llm-registered-usage-id/get.json\",\n  \"hint\": \"failed check: agent.llm.model eq deepseek/deepseek-v4-pro\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Switch before the first run (`F09.switch-llm-before-first-run`), known bug.",
+      "ids": [
+        "F09.switch-llm-before-first-run"
+      ],
+      "line": 324,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 33871,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-11-switch-before-the-first-run-f09-switch-l.json",
+      "failed_line": 7,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$BID\" --until-ok 20 --quiet --check stats.usage_to_metrics.qa-f09-early.accumulated_token_usage.prompt_tokens gt 0 --save F09.switch-llm-before-first-run/stats",
+      "stdout_tail": ",\n    \"headers\": {\n      \"content-length\": \"5357\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 455,\n  \"checks\": [\n    {\n      \"check\": \"execution_status eq finished\",\n      \"ok\": true,\n      \"actual\": \"finished\"\n    },\n    {\n      \"check\": \"agent.llm.usage_id eq qa-f09-early\",\n      \"ok\": true,\n      \"actual\": \"qa-f09-early\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/b25d61e6-1fee-4abe-917b-1d30fa82b259\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"5357\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 20481,\n  \"checks\": [\n    {\n      \"check\": \"stats.usage_to_metrics.qa-f09-early.accumulated_token_usage.prompt_tokens gt 0\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"attempts\": 33,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.switch-llm-before-first-run/stats.json\",\n  \"hint\": \"failed check: stats.usage_to_metrics.qa-f09-early.accumulated_token_usage.prompt_tokens gt 0\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Switch during a running turn (`F09.switch-llm-mid-run`).",
+      "ids": [
+        "F09.switch-llm-mid-run"
+      ],
+      "line": 345,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 128837,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-12-switch-during-a-running-turn-f09-switch-.json",
+      "failed_line": 3,
+      "failed_command": "control-agent-server ws read qa-f09-midrun --kinds ActionEvent --contains 'sleep 20' --expect-min 1 --wait 120",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"capture\": \"qa-f09-midrun\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/captures/qa-f09-midrun.jsonl\",\n  \"hint\": \"`control-agent-server ws stop qa-f09-midrun` (or `ws read qa-f09-midrun`) after triggering the action\"\n}\n{\n  \"ok\": false,\n  \"capture\": \"qa-f09-midrun\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/captures/qa-f09-midrun.jsonl\",\n  \"opened\": true,\n  \"stopped\": null,\n  \"frames\": 7,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 5,\n    \"ObservationEvent\": 1,\n    \"MessageEvent\": 1\n  },\n  \"close\": null,\n  \"matching\": 0,\n  \"matching_kinds\": [],\n  \"frames_shown\": []\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "GET right after a mid-run switch (`F09.switch-llm-mid-run-get`), known bug.",
+      "ids": [
+        "F09.switch-llm-mid-run-get"
+      ],
+      "line": 367,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 139846,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-13-get-right-after-a-mid-run-switch-f09-swi.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server ws read qa-f09-midget --kinds ActionEvent --contains 'sleep 20' --expect-min 1 --wait 120",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"capture\": \"qa-f09-midget\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/captures/qa-f09-midget.jsonl\",\n  \"hint\": \"`control-agent-server ws stop qa-f09-midget` (or `ws read qa-f09-midget`) after triggering the action\"\n}\n{\n  \"ok\": false,\n  \"capture\": \"qa-f09-midget\",\n  \"out\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/captures/qa-f09-midget.jsonl\",\n  \"opened\": true,\n  \"stopped\": null,\n  \"frames\": 7,\n  \"kinds\": {\n    \"ConversationStateUpdateEvent\": 5,\n    \"ObservationEvent\": 1,\n    \"MessageEvent\": 1\n  },\n  \"close\": null,\n  \"matching\": 0,\n  \"matching_kinds\": [],\n  \"frames_shown\": []\n}\n",
+      "stderr_tail": "",
+      "hint": "no failure was confirmed at the `# bug` assertion; the bug was not reproduced"
+    },
+    {
+      "bullet": "ACP switch on a regular conversation (`F09.acp-model-native`).",
+      "ids": [
+        "F09.acp-model-native"
+      ],
+      "line": 401,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13750,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-14-acp-switch-on-a-regular-conversation-f09.json"
+    },
+    {
+      "bullet": "ACP model before the first run (`F09.acp-model-deferred`).",
+      "ids": [
+        "F09.acp-model-deferred"
+      ],
+      "line": 412,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 21359,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-15-acp-model-before-the-first-run-f09-acp-m.json"
+    },
+    {
+      "bullet": "Blank ACP model (`F09.acp-model-blank`), known bug.",
+      "ids": [
+        "F09.acp-model-blank"
+      ],
+      "line": 428,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 7244,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-16-blank-acp-model-f09-acp-model-blank-know.json",
+      "failed_line": 3,
+      "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$AID2/switch_acp_model\" --json '{\"model\": \"   \"}' --expect 400,422 --save F09.acp-model-blank/blank",
+      "stdout_tail": "   \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"3927\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 637,\n  \"checks\": [\n    {\n      \"check\": \"agent.kind eq ACPAgent\",\n      \"ok\": true,\n      \"actual\": \"ACPAgent\"\n    },\n    {\n      \"check\": \"agent.acp_model eq sonnet\",\n      \"ok\": true,\n      \"actual\": \"sonnet\"\n    },\n    {\n      \"check\": \"execution_status eq idle\",\n      \"ok\": true,\n      \"actual\": \"idle\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/930ba4d8-21a1-4c95-b4c7-af5e2ac401ab/switch_acp_model\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"model\": \"   \"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 390,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.acp-model-blank/blank.json\",\n  \"hint\": \"expected 400,422, got 200\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "LLM switches on an ACP conversation (`F09.switch-llm-acp-refused`), known bug.",
+      "ids": [
+        "F09.switch-llm-acp-refused"
+      ],
+      "line": 440,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 10007,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-17-llm-switches-on-an-acp-conversation-f09-.json",
+      "failed_line": 3,
+      "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$AID3/switch_profile\" --json '{\"profile_name\": \"deepseek-pro\"}' --expect 400,409,422 --save F09.switch-llm-acp-refused/switch-profile",
+      "stdout_tail": "rsations/44d4cfc1-f811-45c3-b882-608ea4103cda\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"3927\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 533,\n  \"checks\": [\n    {\n      \"check\": \"agent.llm.usage_id eq acp-managed\",\n      \"ok\": true,\n      \"actual\": \"acp-managed\"\n    },\n    {\n      \"check\": \"agent.llm.model eq sonnet\",\n      \"ok\": true,\n      \"actual\": \"sonnet\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/44d4cfc1-f811-45c3-b882-608ea4103cda/switch_profile\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"profile_name\": \"deepseek-pro\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"16\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"success\": true\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 493,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.switch-llm-acp-refused/switch-profile.json\",\n  \"hint\": \"expected 400,409,422, got 200\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Live ACP switch (`F09.acp-model-live`).",
+      "ids": [
+        "F09.acp-model-live"
+      ],
+      "line": 463,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 132342,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-18-live-acp-switch-f09-acp-model-live.json"
+    },
+    {
+      "bullet": "Unknown model on a live session (`F09.acp-model-live-unknown`), known bug.",
+      "ids": [
+        "F09.acp-model-live-unknown"
+      ],
+      "line": 509,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 24010,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-19-unknown-model-on-a-live-session-f09-acp-.json",
+      "failed_line": 3,
+      "failed_command": "control-agent-server api POST \"<redacted:session-cookie>/$LID/switch_acp_model\" --json '{\"model\": \"qa-f09-nope\"}' --expect 400,422 --save F09.acp-model-live-unknown/switch",
+      "stdout_tail": "/$25 per Mtok\\\"}, {\\\"model_id\\\": \\\"opus[1m]\\\", \\\"name\\\": \\\"Opus (1M con\\u2026\"\n    },\n    {\n      \"check\": \"available_models not-contains qa-f09-nope\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"model_id\\\": \\\"default\\\", \\\"name\\\": \\\"Default (recommended)\\\", \\\"description\\\": \\\"Use the default model (currently Opus 5 (1M context)) \\\\u00b7 $5/$25 per Mtok\\\"}, {\\\"model_id\\\": \\\"opus[1m]\\\", \\\"name\\\": \\\"Opus (1M con\\u2026\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"<redacted:session-cookie>/316c1f41-d279-4a24-b54f-efa8b36fdbc3/switch_acp_model\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"model\": \"qa-f09-nope\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"109\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"Internal error\",\n      \"error_id\": \"71ebb4e7d71e4ef48313f6eb406a0cc7\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 19723,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.acp-model-live-unknown/switch.json\",\n  \"hint\": \"expected 400,422, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Live switch that times out (`F09.acp-model-live-timeout`).",
+      "ids": [
+        "F09.acp-model-live-timeout"
+      ],
+      "line": 529,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 42107,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-20-live-switch-that-times-out-f09-acp-model.json"
+    },
+    {
+      "bullet": "TypeScript client (`F09.ts-client`).",
+      "ids": [
+        "F09.ts-client"
+      ],
+      "line": 546,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 34163,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-21-typescript-client-f09-ts-client.json"
+    },
+    {
+      "bullet": "TypeScript docstrings for a pre-run ACP switch (`F09.ts-client-acp-docs`), known bug.",
+      "ids": [
+        "F09.ts-client-acp-docs"
+      ],
+      "line": 600,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 159,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-22-typescript-docstrings-for-a-pre-run-acp-.json",
+      "failed_line": 3,
+      "failed_command": "false",
+      "stdout_tail": "420:  async switchAcpModel(conversationId: string, model: string): Promise<void> {\n332:  async switchAcpModel(model: string): Promise<void> {\nclients/typescript/src/client/conversation-client.ts:417:   * the server returns 409 before the first message (set the default via\nclients/typescript/src/conversation/remote-conversation.ts:329:   * server returns 409 before the first message and 400 for non-ACP\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Load a plugin (`F09.load-plugin`).",
+      "ids": [
+        "F09.load-plugin"
+      ],
+      "line": 615,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 52406,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-23-load-a-plugin-f09-load-plugin.json"
+    },
+    {
+      "bullet": "The loaded hook runs (`F09.load-plugin-hook-runs`).",
+      "ids": [
+        "F09.load-plugin-hook-runs"
+      ],
+      "line": 642,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8267,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-24-the-loaded-hook-runs-f09-load-plugin-hoo.json"
+    },
+    {
+      "bullet": "Plugin load errors (`F09.load-plugin-errors`).",
+      "ids": [
+        "F09.load-plugin-errors"
+      ],
+      "line": 653,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 80174,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-25-plugin-load-errors-f09-load-plugin-error.json"
+    },
+    {
+      "bullet": "Load the same plugin twice (`F09.load-plugin-twice`), known bug.",
+      "ids": [
+        "F09.load-plugin-twice"
+      ],
+      "line": 693,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 15337,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-26-load-the-same-plugin-twice-f09-load-plug.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server api GET \"<redacted:session-cookie>/$QID\" --quiet --check hook_config.user_prompt_submit len-eq 1 --save F09.load-plugin-twice/get",
+      "stdout_tail": "\n      \"actual\": \"[{\\\"matcher\\\": \\\"*\\\", \\\"hooks\\\": [{\\\"type\\\": \\\"command\\\", \\\"name\\\": null, \\\"command\\\": \\\"echo QA_PLUGIN_HOOK\\\", \\\"prompt\\\": null, \\\"system_prompt\\\": null, \\\"tools\\\": [], \\\"timeout\\\": 60, \\\"max_iterations\\\": 3, \\\"async\\\": false}]\\u2026\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/bd3eed9a-ed9d-4fb9-869c-5902ac4b0add\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"5546\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1007,\n  \"checks\": [\n    {\n      \"check\": \"hook_config.user_prompt_submit len-eq 1\",\n      \"ok\": false,\n      \"actual\": \"[{\\\"matcher\\\": \\\"*\\\", \\\"hooks\\\": [{\\\"type\\\": \\\"command\\\", \\\"name\\\": null, \\\"command\\\": \\\"echo QA_PLUGIN_HOOK\\\", \\\"prompt\\\": null, \\\"system_prompt\\\": null, \\\"tools\\\": [], \\\"timeout\\\": 60, \\\"max_iterations\\\": 3, \\\"async\\\": false}]\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/F09.load-plugin-twice/get.json\",\n  \"hint\": \"failed check: hook_config.user_prompt_submit len-eq 1\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Load a plugin from the Python SDK (`F09.load-plugin-sdk`).",
+      "ids": [
+        "F09.load-plugin-sdk"
+      ],
+      "line": 710,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 116424,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-27-load-a-plugin-from-the-python-sdk-f09-lo.json"
+    },
+    {
+      "bullet": "Restart (`F09.restart-persist`).",
+      "ids": [
+        "F09.restart-persist"
+      ],
+      "line": 745,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 104344,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09/evidence/map-run/F09-model-switching-plugins-28-restart-f09-restart-persist.json"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-021812-2254-map-f09",
+  "launch_flags": []
+}

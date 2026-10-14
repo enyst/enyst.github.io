@@ -1,0 +1,174 @@
+{
+  "capture": "qa-f08-reject",
+  "frames": [
+    {
+      "direction": "opened",
+      "at": "2026-10-13T02:17:45Z"
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:17:45Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "8e72f8e8-a8c3-4eff-b64f-fb5feae66651",
+        "timestamp": "2026-10-13T02:17:45.695523",
+        "source": "environment",
+        "key": "full_state",
+        "value": {
+          "id": "1af5cd7b-68fb-48fd-b2c9-f3f91e06b709",
+          "agent": {
+            "llm": {
+              "model": "openai/qa-stub",
+              "api_key": "<redacted:api_key>",
+              "auth_type": "api_key",
+              "base_url": "http://127.0.0.1:59495/v1",
+              "openrouter_site_url": "https://docs.all-hands.dev/",
+              "openrouter_app_name": "OpenHands",
+              "num_retries": 0,
+              "retry_multiplier": 8.0,
+              "retry_min_wait": 8,
+              "retry_max_wait": 64,
+              "timeout": 300,
+              "stream_idle_timeout": 300.0,
+              "max_message_chars": 30000,
+              "api_mode": "auto",
+              "capability_overrides": {},
+              "stream": false,
+              "drop_params": true,
+              "disable_stop_word": false,
+              "caching_prompt": true,
+              "log_completions": false,
+              "log_completions_folder": "logs/completions",
+              "native_tool_calling": true,
+              "reasoning_effort": "high",
+              "enable_encrypted_reasoning": true,
+              "prompt_cache_retention": "24h",
+              "extended_thinking_budget": 200000,
+              "usage_id": "default",
+              "litellm_extra_body": {},
+              "is_subscription": false
+            },
+            "tools": [
+              {
+                "name": "terminal",
+                "params": {}
+              }
+            ],
+            "mcp_config": {},
+            "include_default_tools": [
+              "FinishTool",
+              "ThinkTool"
+            ],
+            "system_prompt_filename": "system_prompt.j2",
+            "security_policy_filename": "security_policy.j2",
+            "system_prompt_kwargs": {
+              "llm_security_analyzer": true
+            },
+            "tool_concurrency_limit": 1,
+            "kind": "Agent"
+          },
+          "workspace": {
+            "working_dir": "/workspace/verification-artifacts/runs/20261013-021713-afec-map-f08/fixtures/qa-f08/reject",
+            "kind": "LocalWorkspace"
+          },
+          "persistence_dir": "/workspace/verification-artifacts/runs/20261013-021713-afec-map-f08/server/workspace/conversations/1af5cd7b68fb48fdb2c9f3f91e06b709",
+          "max_iterations": 500,
+          "stuck_detection": true,
+          "execution_status": "waiting_for_confirmation",
+          "confirmation_policy": {
+            "kind": "AlwaysConfirm"
+          },
+          "activated_knowledge_skills": [],
+          "activated_path_rules": [],
+          "invoked_skills": [],
+          "blocked_actions": {},
+          "blocked_messages": {},
+          "last_user_message_id": "70ceb554-082d-4374-a0ab-23604dbc3874",
+          "leaf_event_id": "43ef92bf-30a6-4d48-a95e-c1fc62cfeb0e",
+          "head_is_empty": false,
+          "stats": {
+            "usage_to_metrics": {
+              "default": {
+                "model_name": "openai/qa-stub",
+                "accumulated_cost": 0.0,
+                "accumulated_token_usage": {
+                  "model": "openai/qa-stub",
+                  "prompt_tokens": 10,
+                  "completion_tokens": 5,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "context_window": 0,
+                  "per_turn_token": 15,
+                  "response_id": ""
+                },
+                "costs": [],
+                "response_latencies": [
+                  {
+                    "model": "openai/qa-stub",
+                    "latency": 0.008642196655273438,
+                    "response_id": "chatcmpl-qa-1afc7d35"
+                  }
+                ],
+                "token_usages": [
+                  {
+                    "model": "openai/qa-stub",
+                    "prompt_tokens": 10,
+                    "completion_tokens": 5,
+                    "cache_read_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "reasoning_tokens": 0,
+                    "context_window": 0,
+                    "per_turn_token": 15,
+                    "response_id": "chatcmpl-qa-1afc7d35"
+                  }
+                ]
+              }
+            }
+          },
+          "secret_registry": {
+            "secret_sources": {}
+          },
+          "tags": {},
+          "agent_state": {}
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:17:46Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "fc75eb02-a38b-400e-923e-7c6ca23ffd08",
+        "timestamp": "2026-10-13T02:17:46.843614",
+        "source": "environment",
+        "parent_id": "43ef92bf-30a6-4d48-a95e-c1fc62cfeb0e",
+        "key": "execution_status",
+        "value": "idle",
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:17:46Z",
+      "kind": "UserRejectObservation",
+      "frame": {
+        "id": "1e5c79ac-18cd-47d6-b18f-1adbc466a86b",
+        "timestamp": "2026-10-13T02:17:46.850620",
+        "source": "environment",
+        "parent_id": "43ef92bf-30a6-4d48-a95e-c1fc62cfeb0e",
+        "tool_name": "terminal",
+        "tool_call_id": "call_qa_14fb7683",
+        "rejection_reason": "QA_F08 rejected",
+        "rejection_source": "user",
+        "action_id": "43ef92bf-30a6-4d48-a95e-c1fc62cfeb0e",
+        "kind": "UserRejectObservation"
+      }
+    },
+    {
+      "direction": "stopped",
+      "at": "2026-10-13T02:17:48Z"
+    }
+  ]
+}

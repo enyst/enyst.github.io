@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/profiles/qa-draft/validate",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "llm": {
+        "model": "deepseek/qa-no-such-model",
+        "api_key": "<redacted:DEEPSEEK_API_KEY>",
+        "num_retries": 0
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "376",
+      "content-type": "application/json"
+    },
+    "body": {
+      "valid": false,
+      "error": {
+        "type": "LLMBadRequestError",
+        "message": "litellm.BadRequestError: DeepseekException - {\"error\":{\"message\":\"The supported API model names are deepseek-flash, deepseek-v4-pro, but you passed qa-no-such-model. (request_id: 0affdb5d-f84c-4cc4-beaa-a73db0dcf7a7)\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_request_error\"}}"
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 606
+}

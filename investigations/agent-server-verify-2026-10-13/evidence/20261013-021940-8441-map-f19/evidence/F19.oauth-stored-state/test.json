@@ -1,0 +1,105 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/mcp/test",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "server": {
+        "type": "http",
+        "url": "http://127.0.0.1:58477/mcp",
+        "auth": {
+          "strategy": "oauth2",
+          "authentication": {
+            "type": "oauth",
+            "client_auth_method": "none",
+            "scopes": [
+              "mail.read"
+            ]
+          },
+          "state": {
+            "tokens": {
+              "access_token": "<redacted:encrypted>",
+              "refresh_token": "<redacted:encrypted>",
+              "token_type": "Bearer",
+              "expires_in": 3600,
+              "scope": "mail.read"
+            },
+            "client_info": {
+              "redirect_uris": [
+                "http://localhost:52195/callback"
+              ],
+              "token_endpoint_auth_method": "none",
+              "grant_types": [
+                "authorization_code",
+                "refresh_token"
+              ],
+              "response_types": [
+                "code"
+              ],
+              "scope": "mail.read",
+              "client_name": "FastMCP Client",
+              "client_id": "3fda2590-df73-45cc-8378-4d87b7c13e0a",
+              "client_id_issued_at": 1791858258
+            },
+            "token_expires_at": 1791861866.4435003
+          }
+        }
+      },
+      "timeout": 15,
+      "tool_call": {
+        "name": "read_subject",
+        "arguments": {
+          "subject": "again"
+        }
+      }
+    },
+    "files": []
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-length": "988",
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": true,
+      "tools": [
+        "read_subject"
+      ],
+      "tool_result": {
+        "is_error": false,
+        "text": "QA_HTTP_SUBJECT:again"
+      },
+      "oauth_state": {
+        "tokens": {
+          "access_token": "<redacted:encrypted>",
+          "refresh_token": "<redacted:encrypted>",
+          "token_type": "Bearer",
+          "expires_in": 3600,
+          "scope": "mail.read"
+        },
+        "client_info": {
+          "redirect_uris": [
+            "http://localhost:52195/callback"
+          ],
+          "token_endpoint_auth_method": "none",
+          "grant_types": [
+            "authorization_code",
+            "refresh_token"
+          ],
+          "response_types": [
+            "code"
+          ],
+          "scope": "mail.read",
+          "client_name": "FastMCP Client",
+          "client_id": "3fda2590-df73-45cc-8378-4d87b7c13e0a",
+          "client_id_issued_at": 1791858258
+        },
+        "token_expires_at": 1791861866.4435003
+      }
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 951
+}

@@ -1,0 +1,677 @@
+{
+  "capture": "f05-l-stuck",
+  "frames": [
+    {
+      "direction": "opened",
+      "at": "2026-10-13T02:57:05Z"
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:05Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "f085f07b-e5f9-44d5-ab5c-d0e41a3c7f26",
+        "timestamp": "2026-10-13T02:57:05.289273",
+        "source": "environment",
+        "key": "full_state",
+        "value": {
+          "id": "39a0b331-fbbd-4902-8489-3cafc1c18cc2",
+          "agent": {
+            "llm": {
+              "model": "openai/qa-stub",
+              "api_key": "<redacted:api_key>",
+              "auth_type": "api_key",
+              "base_url": "http://127.0.0.1:44947/v1",
+              "openrouter_site_url": "https://docs.all-hands.dev/",
+              "openrouter_app_name": "OpenHands",
+              "num_retries": 0,
+              "retry_multiplier": 8.0,
+              "retry_min_wait": 8,
+              "retry_max_wait": 64,
+              "timeout": 300,
+              "stream_idle_timeout": 300.0,
+              "max_message_chars": 30000,
+              "api_mode": "auto",
+              "capability_overrides": {},
+              "stream": false,
+              "drop_params": true,
+              "disable_stop_word": false,
+              "caching_prompt": true,
+              "log_completions": false,
+              "log_completions_folder": "logs/completions",
+              "native_tool_calling": true,
+              "reasoning_effort": "high",
+              "enable_encrypted_reasoning": true,
+              "prompt_cache_retention": "24h",
+              "extended_thinking_budget": 200000,
+              "usage_id": "default",
+              "litellm_extra_body": {},
+              "is_subscription": false
+            },
+            "tools": [],
+            "mcp_config": {},
+            "include_default_tools": [
+              "FinishTool",
+              "ThinkTool"
+            ],
+            "system_prompt_filename": "system_prompt.j2",
+            "security_policy_filename": "security_policy.j2",
+            "system_prompt_kwargs": {
+              "llm_security_analyzer": true
+            },
+            "tool_concurrency_limit": 1,
+            "kind": "Agent"
+          },
+          "workspace": {
+            "working_dir": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/fixtures/workspaces/025253-640526",
+            "kind": "LocalWorkspace"
+          },
+          "persistence_dir": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/server/workspace/conversations/39a0b331fbbd490284893cafc1c18cc2",
+          "max_iterations": 500,
+          "stuck_detection": true,
+          "execution_status": "idle",
+          "confirmation_policy": {
+            "kind": "NeverConfirm"
+          },
+          "activated_knowledge_skills": [],
+          "activated_path_rules": [],
+          "invoked_skills": [],
+          "blocked_actions": {},
+          "blocked_messages": {},
+          "last_user_message_id": "ecc48bc6-2cdf-4929-9125-7e753c5c9db0",
+          "leaf_event_id": "ecc48bc6-2cdf-4929-9125-7e753c5c9db0",
+          "head_is_empty": false,
+          "stats": {
+            "usage_to_metrics": {
+              "default": {
+                "model_name": "openai/qa-stub",
+                "accumulated_cost": 0.0,
+                "accumulated_token_usage": {
+                  "model": "openai/qa-stub",
+                  "prompt_tokens": 0,
+                  "completion_tokens": 0,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "context_window": 0,
+                  "per_turn_token": 0,
+                  "response_id": ""
+                },
+                "costs": [],
+                "response_latencies": [],
+                "token_usages": []
+              }
+            }
+          },
+          "secret_registry": {
+            "secret_sources": {}
+          },
+          "tags": {},
+          "agent_state": {}
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "fc1ac0f7-4092-4454-8e78-591a293dda91",
+        "timestamp": "2026-10-13T02:57:07.155825",
+        "source": "environment",
+        "parent_id": "ecc48bc6-2cdf-4929-9125-7e753c5c9db0",
+        "key": "execution_status",
+        "value": "running",
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ActionEvent",
+      "frame": {
+        "id": "b12f5783-a525-4ce5-991b-ef6101668c9b",
+        "timestamp": "2026-10-13T02:57:07.259260",
+        "source": "agent",
+        "parent_id": "ecc48bc6-2cdf-4929-9125-7e753c5c9db0",
+        "thought": [],
+        "thinking_blocks": [],
+        "action": {
+          "thought": "QA_F05_LOOP",
+          "kind": "ThinkAction"
+        },
+        "tool_name": "think",
+        "tool_call_id": "call_qa_aa9a84e2",
+        "tool_call": {
+          "id": "call_qa_aa9a84e2",
+          "name": "think",
+          "arguments": "{\"thought\": \"QA_F05_LOOP\"}",
+          "origin": "completion"
+        },
+        "llm_response_id": "chatcmpl-qa-d94255d7",
+        "security_risk": "UNKNOWN",
+        "summary": "think: {\"thought\": \"QA_F05_LOOP\"}",
+        "kind": "ActionEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ObservationEvent",
+      "frame": {
+        "id": "d019efd5-301f-4f34-9011-bc7771e58728",
+        "timestamp": "2026-10-13T02:57:07.265500",
+        "source": "environment",
+        "parent_id": "b12f5783-a525-4ce5-991b-ef6101668c9b",
+        "tool_name": "think",
+        "tool_call_id": "call_qa_aa9a84e2",
+        "observation": {
+          "content": [
+            {
+              "cache_prompt": false,
+              "type": "text",
+              "text": "Your thought has been logged."
+            }
+          ],
+          "is_error": false,
+          "kind": "ThinkObservation"
+        },
+        "action_id": "b12f5783-a525-4ce5-991b-ef6101668c9b",
+        "extended_content": [],
+        "kind": "ObservationEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "35d28c5b-a0d4-4290-a985-22eae9d3c433",
+        "timestamp": "2026-10-13T02:57:07.258457",
+        "source": "environment",
+        "parent_id": "d019efd5-301f-4f34-9011-bc7771e58728",
+        "key": "stats",
+        "value": {
+          "usage_to_metrics": {
+            "default": {
+              "model_name": "openai/qa-stub",
+              "accumulated_cost": 0.0,
+              "max_budget_per_task": null,
+              "accumulated_token_usage": {
+                "model": "openai/qa-stub",
+                "prompt_tokens": 10,
+                "completion_tokens": 5,
+                "cache_read_tokens": 0,
+                "cache_write_tokens": 0,
+                "reasoning_tokens": 0,
+                "context_window": 0,
+                "per_turn_token": 15,
+                "response_id": ""
+              }
+            }
+          }
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ActionEvent",
+      "frame": {
+        "id": "b6bd96cb-88a2-4043-8a12-5f3655ed2732",
+        "timestamp": "2026-10-13T02:57:07.307465",
+        "source": "agent",
+        "parent_id": "d019efd5-301f-4f34-9011-bc7771e58728",
+        "thought": [],
+        "thinking_blocks": [],
+        "action": {
+          "thought": "QA_F05_LOOP",
+          "kind": "ThinkAction"
+        },
+        "tool_name": "think",
+        "tool_call_id": "call_qa_dd75915e",
+        "tool_call": {
+          "id": "call_qa_dd75915e",
+          "name": "think",
+          "arguments": "{\"thought\": \"QA_F05_LOOP\"}",
+          "origin": "completion"
+        },
+        "llm_response_id": "chatcmpl-qa-08e943f1",
+        "security_risk": "UNKNOWN",
+        "summary": "think: {\"thought\": \"QA_F05_LOOP\"}",
+        "kind": "ActionEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ObservationEvent",
+      "frame": {
+        "id": "0ae1eee9-e001-4f2c-83e3-c6f3eb9ff8d9",
+        "timestamp": "2026-10-13T02:57:07.331883",
+        "source": "environment",
+        "parent_id": "b6bd96cb-88a2-4043-8a12-5f3655ed2732",
+        "tool_name": "think",
+        "tool_call_id": "call_qa_dd75915e",
+        "observation": {
+          "content": [
+            {
+              "cache_prompt": false,
+              "type": "text",
+              "text": "Your thought has been logged."
+            }
+          ],
+          "is_error": false,
+          "kind": "ThinkObservation"
+        },
+        "action_id": "b6bd96cb-88a2-4043-8a12-5f3655ed2732",
+        "extended_content": [],
+        "kind": "ObservationEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "d7f1725e-d731-476a-a7fa-2623bdbe40cf",
+        "timestamp": "2026-10-13T02:57:07.306887",
+        "source": "environment",
+        "parent_id": "0ae1eee9-e001-4f2c-83e3-c6f3eb9ff8d9",
+        "key": "stats",
+        "value": {
+          "usage_to_metrics": {
+            "default": {
+              "model_name": "openai/qa-stub",
+              "accumulated_cost": 0.0,
+              "max_budget_per_task": null,
+              "accumulated_token_usage": {
+                "model": "openai/qa-stub",
+                "prompt_tokens": 20,
+                "completion_tokens": 10,
+                "cache_read_tokens": 0,
+                "cache_write_tokens": 0,
+                "reasoning_tokens": 0,
+                "context_window": 0,
+                "per_turn_token": 15,
+                "response_id": ""
+              }
+            }
+          }
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ActionEvent",
+      "frame": {
+        "id": "8149f273-10cd-47a4-8f49-4f8262c6cf13",
+        "timestamp": "2026-10-13T02:57:07.494642",
+        "source": "agent",
+        "parent_id": "0ae1eee9-e001-4f2c-83e3-c6f3eb9ff8d9",
+        "thought": [],
+        "thinking_blocks": [],
+        "action": {
+          "thought": "QA_F05_LOOP",
+          "kind": "ThinkAction"
+        },
+        "tool_name": "think",
+        "tool_call_id": "call_qa_30c668ae",
+        "tool_call": {
+          "id": "call_qa_30c668ae",
+          "name": "think",
+          "arguments": "{\"thought\": \"QA_F05_LOOP\"}",
+          "origin": "completion"
+        },
+        "llm_response_id": "chatcmpl-qa-fe69664e",
+        "security_risk": "UNKNOWN",
+        "summary": "think: {\"thought\": \"QA_F05_LOOP\"}",
+        "kind": "ActionEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ObservationEvent",
+      "frame": {
+        "id": "668ee29f-128a-4cdd-893e-7e656ba429d5",
+        "timestamp": "2026-10-13T02:57:07.508701",
+        "source": "environment",
+        "parent_id": "8149f273-10cd-47a4-8f49-4f8262c6cf13",
+        "tool_name": "think",
+        "tool_call_id": "call_qa_30c668ae",
+        "observation": {
+          "content": [
+            {
+              "cache_prompt": false,
+              "type": "text",
+              "text": "Your thought has been logged."
+            }
+          ],
+          "is_error": false,
+          "kind": "ThinkObservation"
+        },
+        "action_id": "8149f273-10cd-47a4-8f49-4f8262c6cf13",
+        "extended_content": [],
+        "kind": "ObservationEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "51b162e6-68d1-43f8-83ac-7ba65bf2b73d",
+        "timestamp": "2026-10-13T02:57:07.487723",
+        "source": "environment",
+        "parent_id": "668ee29f-128a-4cdd-893e-7e656ba429d5",
+        "key": "stats",
+        "value": {
+          "usage_to_metrics": {
+            "default": {
+              "model_name": "openai/qa-stub",
+              "accumulated_cost": 0.0,
+              "max_budget_per_task": null,
+              "accumulated_token_usage": {
+                "model": "openai/qa-stub",
+                "prompt_tokens": 30,
+                "completion_tokens": 15,
+                "cache_read_tokens": 0,
+                "cache_write_tokens": 0,
+                "reasoning_tokens": 0,
+                "context_window": 0,
+                "per_turn_token": 15,
+                "response_id": ""
+              }
+            }
+          }
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ActionEvent",
+      "frame": {
+        "id": "df203762-b43f-4f62-81db-8115dd9d1280",
+        "timestamp": "2026-10-13T02:57:07.665455",
+        "source": "agent",
+        "parent_id": "668ee29f-128a-4cdd-893e-7e656ba429d5",
+        "thought": [],
+        "thinking_blocks": [],
+        "action": {
+          "thought": "QA_F05_LOOP",
+          "kind": "ThinkAction"
+        },
+        "tool_name": "think",
+        "tool_call_id": "call_qa_d9047859",
+        "tool_call": {
+          "id": "call_qa_d9047859",
+          "name": "think",
+          "arguments": "{\"thought\": \"QA_F05_LOOP\"}",
+          "origin": "completion"
+        },
+        "llm_response_id": "chatcmpl-qa-ec90644b",
+        "security_risk": "UNKNOWN",
+        "summary": "think: {\"thought\": \"QA_F05_LOOP\"}",
+        "kind": "ActionEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ObservationEvent",
+      "frame": {
+        "id": "cb12a49e-9914-4436-afff-421756608099",
+        "timestamp": "2026-10-13T02:57:07.669181",
+        "source": "environment",
+        "parent_id": "df203762-b43f-4f62-81db-8115dd9d1280",
+        "tool_name": "think",
+        "tool_call_id": "call_qa_d9047859",
+        "observation": {
+          "content": [
+            {
+              "cache_prompt": false,
+              "type": "text",
+              "text": "Your thought has been logged."
+            }
+          ],
+          "is_error": false,
+          "kind": "ThinkObservation"
+        },
+        "action_id": "df203762-b43f-4f62-81db-8115dd9d1280",
+        "extended_content": [],
+        "kind": "ObservationEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "b1eaedb7-a360-4346-8229-fb3f01afa006",
+        "timestamp": "2026-10-13T02:57:07.664715",
+        "source": "environment",
+        "parent_id": "cb12a49e-9914-4436-afff-421756608099",
+        "key": "stats",
+        "value": {
+          "usage_to_metrics": {
+            "default": {
+              "model_name": "openai/qa-stub",
+              "accumulated_cost": 0.0,
+              "max_budget_per_task": null,
+              "accumulated_token_usage": {
+                "model": "openai/qa-stub",
+                "prompt_tokens": 40,
+                "completion_tokens": 20,
+                "cache_read_tokens": 0,
+                "cache_write_tokens": 0,
+                "reasoning_tokens": 0,
+                "context_window": 0,
+                "per_turn_token": 15,
+                "response_id": ""
+              }
+            }
+          }
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "3921e6a5-c223-43c0-a138-80f7f3e0ad6d",
+        "timestamp": "2026-10-13T02:57:07.683995",
+        "source": "environment",
+        "parent_id": "cb12a49e-9914-4436-afff-421756608099",
+        "key": "execution_status",
+        "value": "stuck",
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "received",
+      "at": "2026-10-13T02:57:07Z",
+      "kind": "ConversationStateUpdateEvent",
+      "frame": {
+        "id": "b897a36e-80c3-4168-9319-36eb6ce64247",
+        "timestamp": "2026-10-13T02:57:07.693992",
+        "source": "environment",
+        "key": "full_state",
+        "value": {
+          "id": "39a0b331-fbbd-4902-8489-3cafc1c18cc2",
+          "agent": {
+            "llm": {
+              "model": "openai/qa-stub",
+              "api_key": "<redacted:api_key>",
+              "auth_type": "api_key",
+              "base_url": "http://127.0.0.1:44947/v1",
+              "openrouter_site_url": "https://docs.all-hands.dev/",
+              "openrouter_app_name": "OpenHands",
+              "num_retries": 0,
+              "retry_multiplier": 8.0,
+              "retry_min_wait": 8,
+              "retry_max_wait": 64,
+              "timeout": 300,
+              "stream_idle_timeout": 300.0,
+              "max_message_chars": 30000,
+              "api_mode": "auto",
+              "capability_overrides": {},
+              "stream": false,
+              "drop_params": true,
+              "disable_stop_word": false,
+              "caching_prompt": true,
+              "log_completions": false,
+              "log_completions_folder": "logs/completions",
+              "native_tool_calling": true,
+              "reasoning_effort": "high",
+              "enable_encrypted_reasoning": true,
+              "prompt_cache_retention": "24h",
+              "extended_thinking_budget": 200000,
+              "usage_id": "default",
+              "litellm_extra_body": {},
+              "is_subscription": false
+            },
+            "tools": [],
+            "mcp_config": {},
+            "include_default_tools": [
+              "FinishTool",
+              "ThinkTool"
+            ],
+            "system_prompt_filename": "system_prompt.j2",
+            "security_policy_filename": "security_policy.j2",
+            "system_prompt_kwargs": {
+              "llm_security_analyzer": true
+            },
+            "tool_concurrency_limit": 1,
+            "kind": "Agent"
+          },
+          "workspace": {
+            "working_dir": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/fixtures/workspaces/025253-640526",
+            "kind": "LocalWorkspace"
+          },
+          "persistence_dir": "/workspace/verification-artifacts/runs/20261013-025211-dd9d-map-f05/server/workspace/conversations/39a0b331fbbd490284893cafc1c18cc2",
+          "max_iterations": 500,
+          "stuck_detection": true,
+          "execution_status": "stuck",
+          "confirmation_policy": {
+            "kind": "NeverConfirm"
+          },
+          "activated_knowledge_skills": [],
+          "activated_path_rules": [],
+          "invoked_skills": [],
+          "blocked_actions": {},
+          "blocked_messages": {},
+          "last_user_message_id": "ecc48bc6-2cdf-4929-9125-7e753c5c9db0",
+          "leaf_event_id": "cb12a49e-9914-4436-afff-421756608099",
+          "head_is_empty": false,
+          "stats": {
+            "usage_to_metrics": {
+              "default": {
+                "model_name": "openai/qa-stub",
+                "accumulated_cost": 0.0,
+                "accumulated_token_usage": {
+                  "model": "openai/qa-stub",
+                  "prompt_tokens": 40,
+                  "completion_tokens": 20,
+                  "cache_read_tokens": 0,
+                  "cache_write_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "context_window": 0,
+                  "per_turn_token": 15,
+                  "response_id": ""
+                },
+                "costs": [],
+                "response_latencies": [
+                  {
+                    "model": "openai/qa-stub",
+                    "latency": 0.07804322242736816,
+                    "response_id": "chatcmpl-qa-d94255d7"
+                  },
+                  {
+                    "model": "openai/qa-stub",
+                    "latency": 0.011832475662231445,
+                    "response_id": "chatcmpl-qa-08e943f1"
+                  },
+                  {
+                    "model": "openai/qa-stub",
+                    "latency": 0.08292198181152344,
+                    "response_id": "chatcmpl-qa-fe69664e"
+                  },
+                  {
+                    "model": "openai/qa-stub",
+                    "latency": 0.10441279411315918,
+                    "response_id": "chatcmpl-qa-ec90644b"
+                  }
+                ],
+                "token_usages": [
+                  {
+                    "model": "openai/qa-stub",
+                    "prompt_tokens": 10,
+                    "completion_tokens": 5,
+                    "cache_read_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "reasoning_tokens": 0,
+                    "context_window": 0,
+                    "per_turn_token": 15,
+                    "response_id": "chatcmpl-qa-d94255d7"
+                  },
+                  {
+                    "model": "openai/qa-stub",
+                    "prompt_tokens": 10,
+                    "completion_tokens": 5,
+                    "cache_read_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "reasoning_tokens": 0,
+                    "context_window": 0,
+                    "per_turn_token": 15,
+                    "response_id": "chatcmpl-qa-08e943f1"
+                  },
+                  {
+                    "model": "openai/qa-stub",
+                    "prompt_tokens": 10,
+                    "completion_tokens": 5,
+                    "cache_read_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "reasoning_tokens": 0,
+                    "context_window": 0,
+                    "per_turn_token": 15,
+                    "response_id": "chatcmpl-qa-fe69664e"
+                  },
+                  {
+                    "model": "openai/qa-stub",
+                    "prompt_tokens": 10,
+                    "completion_tokens": 5,
+                    "cache_read_tokens": 0,
+                    "cache_write_tokens": 0,
+                    "reasoning_tokens": 0,
+                    "context_window": 0,
+                    "per_turn_token": 15,
+                    "response_id": "chatcmpl-qa-ec90644b"
+                  }
+                ]
+              }
+            }
+          },
+          "secret_registry": {
+            "secret_sources": {}
+          },
+          "tags": {},
+          "agent_state": {}
+        },
+        "kind": "ConversationStateUpdateEvent"
+      }
+    },
+    {
+      "direction": "stopped",
+      "at": "2026-10-13T02:57:14Z"
+    }
+  ]
+}

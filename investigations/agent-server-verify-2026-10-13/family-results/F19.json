@@ -1,0 +1,352 @@
+{
+  "ok": false,
+  "file": "F19-mcp.md",
+  "summary": {
+    "pass": 25,
+    "fail": 1,
+    "xfail": 3,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 96,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 20401,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-00-preconditions.json"
+    },
+    {
+      "bullet": "Auth (`F19.auth`).",
+      "ids": [
+        "F19.auth"
+      ],
+      "line": 251,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 20643,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-01-auth-f19-auth.json"
+    },
+    {
+      "bullet": "Create one server (`F19.settings-create`).",
+      "ids": [
+        "F19.settings-create"
+      ],
+      "line": 263,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 12999,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-02-create-one-server-f19-settings-create.json"
+    },
+    {
+      "bullet": "Invalid servers (`F19.settings-validation`).",
+      "ids": [
+        "F19.settings-validation"
+      ],
+      "line": 285,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13907,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-03-invalid-servers-f19-settings-validation.json"
+    },
+    {
+      "bullet": "Server with neither command nor url (`F19.settings-empty-server`), known bug.",
+      "ids": [
+        "F19.settings-empty-server"
+      ],
+      "line": 299,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 7012,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-04-server-with-neither-command-nor-url-f19-.json",
+      "failed_line": 2,
+      "failed_command": "false",
+      "stdout_tail": "_summarizing\",\n          \"enabled\": true,\n          \"max_size\": 240,\n          \"max_tokens\": null,\n          \"keep_first\": 2,\n          \"minimum_progress\": 0.1,\n          \"hard_context_reset_max_retries\": 5,\n          \"hard_context_reset_context_scaling\": 0.8\n        },\n        \"verification\": {\n          \"critic_enabled\": false,\n          \"critic_mode\": \"finish_and_message\",\n          \"enable_iterative_refinement\": false,\n          \"critic_threshold\": 0.6,\n          \"max_refinement_iterations\": 3,\n          \"critic_server_url\": null,\n          \"critic_model_name\": null,\n          \"critic_api_key\": null\n        }\n      },\n      \"conversation_settings\": {\n        \"schema_version\": 1,\n        \"max_iterations\": 500,\n        \"confirmation_mode\": false,\n        \"security_analyzer\": \"llm\"\n      },\n      \"llm_api_key_is_set\": true,\n      \"active_profile\": \"deepseek-flash\",\n      \"active_agent_profile_id\": null,\n      \"active_meta_profile\": null,\n      \"misc_settings\": {}\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 556,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/F19.settings-empty-server/create.json\",\n  \"hint\": \"expected 422, got 201\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Sparse patch (`F19.settings-patch`).",
+      "ids": [
+        "F19.settings-patch"
+      ],
+      "line": 315,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 23230,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-05-sparse-patch-f19-settings-patch.json"
+    },
+    {
+      "bullet": "Delete one server (`F19.settings-delete`).",
+      "ids": [
+        "F19.settings-delete"
+      ],
+      "line": 342,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13742,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-06-delete-one-server-f19-settings-delete.json"
+    },
+    {
+      "bullet": "Connection test body validation (`F19.test-validation`).",
+      "ids": [
+        "F19.test-validation"
+      ],
+      "line": 357,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 16707,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-07-connection-test-body-validation-f19-test.json"
+    },
+    {
+      "bullet": "Test a stdio server (`F19.test-stdio`).",
+      "ids": [
+        "F19.test-stdio"
+      ],
+      "line": 371,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13651,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-08-test-a-stdio-server-f19-test-stdio.json"
+    },
+    {
+      "bullet": "Tool failures stay in `tool_result` (`F19.test-tool-errors`).",
+      "ids": [
+        "F19.test-tool-errors"
+      ],
+      "line": 384,
+      "status": "fail",
+      "exit_code": 1,
+      "elapsed_ms": 18404,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-09-tool-failures-stay-in-tool-result-f19-te.json",
+      "failed_line": 5,
+      "failed_command": "control-agent-server api POST /api/mcp/test --timeout 20 --expect-max-ms 15000 --save F19.test-tool-errors/slow-tool --json \"$(jq -nc --argjson s \"$TOOLS_SRV\" '{server: $s, timeout: 3, tool_call: {name: \"qa_sleep\", arguments: {seconds: 30}}}')\" --expect 200 --check ok eq true --check tool_result.is_error eq true --check tool_result.text contains 'timed out after 3.0 seconds'",
+      "stdout_tail": "\": {\n          \"seconds\": 30\n        }\n      }\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"318\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"ok\": false,\n      \"error\": \"MCP tool listing timed out after 3.0 seconds.\\nMCP servers configured: test-server\\n\\nPossible solutions:\\n  1. Increase the timeout value (default is 30 seconds)\\n  2. Check if the MCP server is running and responding\\n  3. Verify network connectivity to the MCP server\\n\",\n      \"error_kind\": \"timeout\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 3874,\n  \"checks\": [\n    {\n      \"check\": \"ok eq true\",\n      \"ok\": false,\n      \"actual\": \"false\"\n    },\n    {\n      \"check\": \"tool_result.is_error eq true\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    },\n    {\n      \"check\": \"tool_result.text contains timed out after 3.0 seconds\",\n      \"ok\": false,\n      \"actual\": \"null\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/F19.test-tool-errors/slow-tool.json\",\n  \"hint\": \"failed check: ok eq true; tool_result.is_error eq true; tool_result.text contains timed out after 3.0 seconds\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Connection failures (`F19.test-connect-failures`).",
+      "ids": [
+        "F19.test-connect-failures"
+      ],
+      "line": 397,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 11103,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-10-connection-failures-f19-test-connect-fai.json"
+    },
+    {
+      "bullet": "Handshake timeout (`F19.test-timeout`).",
+      "ids": [
+        "F19.test-timeout"
+      ],
+      "line": 409,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 6795,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-11-handshake-timeout-f19-test-timeout.json"
+    },
+    {
+      "bullet": "Encrypted env from settings (`F19.test-encrypted-env`).",
+      "ids": [
+        "F19.test-encrypted-env"
+      ],
+      "line": 426,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 16643,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-12-encrypted-env-from-settings-f19-test-enc.json"
+    },
+    {
+      "bullet": "Remote server behind a bearer token (`F19.test-remote-bearer`).",
+      "ids": [
+        "F19.test-remote-bearer"
+      ],
+      "line": 444,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 11508,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-13-remote-server-behind-a-bearer-token-f19-.json"
+    },
+    {
+      "bullet": "OAuth start refusals and early outcomes (`F19.oauth-start-errors`).",
+      "ids": [
+        "F19.oauth-start-errors"
+      ],
+      "line": 463,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 19049,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-14-oauth-start-refusals-and-early-outcomes-.json"
+    },
+    {
+      "bullet": "Unknown jobs (`F19.oauth-unknown-job`).",
+      "ids": [
+        "F19.oauth-unknown-job"
+      ],
+      "line": 484,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 8531,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-15-unknown-jobs-f19-oauth-unknown-job.json"
+    },
+    {
+      "bullet": "Full OAuth consent (`F19.oauth-flow`).",
+      "ids": [
+        "F19.oauth-flow"
+      ],
+      "line": 492,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 13824,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-16-full-oauth-consent-f19-oauth-flow.json"
+    },
+    {
+      "bullet": "Replayed callback (`F19.oauth-callback-replay`), known bug.",
+      "ids": [
+        "F19.oauth-callback-replay"
+      ],
+      "line": 515,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 15872,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-17-replayed-callback-f19-oauth-callback-rep.json",
+      "failed_line": 3,
+      "failed_command": "control-agent-server api POST \"/api/mcp/oauth/callback/$J\" --json \"$RBODY\" --expect 200,4xx --save F19.oauth-callback-replay/replay",
+      "stdout_tail": "t\": 1791861866.4435003\n      }\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 352,\n  \"checks\": [\n    {\n      \"check\": \"status eq succeeded\",\n      \"ok\": true,\n      \"actual\": \"succeeded\"\n    },\n    {\n      \"check\": \"callback_ready eq true\",\n      \"ok\": true,\n      \"actual\": \"true\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/mcp/oauth/callback/d63c6285f80a4134b20cef0216049766\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"callback_url\": \"http://localhost:52195/callback?code=test_auth_code_020036e5808fce6edaddce7f85b313d0&state=6kF8ByxfwPfnZcxm882GOOfVTyE596rTRis4isSIglw\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"125\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"All connection attempts failed\",\n      \"error_id\": \"2f2d5a9b7bb24d03a5ab4bf55255b563\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 10229,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/F19.oauth-callback-replay/replay.json\",\n  \"hint\": \"expected 200,4xx, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Port out of range (`F19.oauth-callback-bad-port`), known bug.",
+      "ids": [
+        "F19.oauth-callback-bad-port"
+      ],
+      "line": 534,
+      "status": "xfail",
+      "exit_code": 1,
+      "elapsed_ms": 15539,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-18-port-out-of-range-f19-oauth-callback-bad.json",
+      "failed_line": 6,
+      "failed_command": "control-agent-server api POST \"/api/mcp/oauth/callback/$JB\" --json '{\"callback_url\":\"http://localhost:99999/callback?code=x\"}' --expect 400 --save F19.oauth-callback-bad-port/port-99999",
+      "stdout_tail": "ponse\": {\n    \"status\": 400,\n    \"headers\": {\n      \"content-length\": \"42\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Unexpected OAuth callback URL\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 745,\n  \"checks\": [\n    {\n      \"check\": \"detail eq Unexpected OAuth callback URL\",\n      \"ok\": true,\n      \"actual\": \"Unexpected OAuth callback URL\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 500,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/mcp/oauth/callback/227d470f96b84671ac3c36b320caf3f9\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"callback_url\": \"http://localhost:99999/callback?code=x\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 500,\n    \"headers\": {\n      \"content-length\": \"120\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"Port out of range 0-65535\",\n      \"error_id\": \"004044449c0a472097fd461861340631\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 3307,\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/F19.oauth-callback-bad-port/port-99999.json\",\n  \"hint\": \"expected 400, got 500\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Callback URL checks on a live job (`F19.oauth-callback-validation`).",
+      "ids": [
+        "F19.oauth-callback-validation"
+      ],
+      "line": 556,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 33030,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-19-callback-url-checks-on-a-live-job-f19-oa.json"
+    },
+    {
+      "bullet": "Denied consent (`F19.oauth-consent-denied`).",
+      "ids": [
+        "F19.oauth-consent-denied"
+      ],
+      "line": 582,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 16214,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-20-denied-consent-f19-oauth-consent-denied.json"
+    },
+    {
+      "bullet": "Consent timeout (`F19.oauth-consent-timeout`).",
+      "ids": [
+        "F19.oauth-consent-timeout"
+      ],
+      "line": 605,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 9811,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-21-consent-timeout-f19-oauth-consent-timeou.json"
+    },
+    {
+      "bullet": "Inline OAuth server refresh (`F19.oauth-inline-writeback`).",
+      "ids": [
+        "F19.oauth-inline-writeback"
+      ],
+      "line": 621,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 23801,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-22-inline-oauth-server-refresh-f19-oauth-in.json"
+    },
+    {
+      "bullet": "Stored OAuth state (`F19.oauth-stored-state`).",
+      "ids": [
+        "F19.oauth-stored-state"
+      ],
+      "line": 653,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 19370,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-23-stored-oauth-state-f19-oauth-stored-stat.json"
+    },
+    {
+      "bullet": "Disabled servers stay off (`F19.disabled-server`).",
+      "ids": [
+        "F19.disabled-server"
+      ],
+      "line": 680,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 33384,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-24-disabled-servers-stay-off-f19-disabled-s.json"
+    },
+    {
+      "bullet": "The agent uses the MCP tool (`F19.conversation-tool`).",
+      "ids": [
+        "F19.conversation-tool"
+      ],
+      "line": 704,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 30931,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-25-the-agent-uses-the-mcp-tool-f19-conversa.json"
+    },
+    {
+      "bullet": "Stored OAuth token refresh (`F19.oauth-refresh-writeback`).",
+      "ids": [
+        "F19.oauth-refresh-writeback"
+      ],
+      "line": 723,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 32245,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-26-stored-oauth-token-refresh-f19-oauth-ref.json"
+    },
+    {
+      "bullet": "Credentials at rest (`F19.conversation-secrets-at-rest`).",
+      "ids": [
+        "F19.conversation-secrets-at-rest"
+      ],
+      "line": 758,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 39313,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-27-credentials-at-rest-f19-conversation-sec.json"
+    },
+    {
+      "bullet": "Restart (`F19.restart`).",
+      "ids": [
+        "F19.restart"
+      ],
+      "line": 787,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 222863,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19/evidence/map-run/F19-mcp-28-restart-f19-restart.json"
+    }
+  ],
+  "run": "/workspace/verification-artifacts/runs/20261013-021940-8441-map-f19",
+  "launch_flags": [
+    "--webhook-sink"
+  ]
+}

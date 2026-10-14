@@ -1,0 +1,11 @@
+--- .agents/skills/verify-agent-server/references/feature-map/F34-typescript-client.md	2026-10-13 02:14:19.961463792 +0000
++++ /workspace/verification-artifacts/harness-f29-f34/.agents/skills/verify-agent-server/references/feature-map/F34-typescript-client.md	2026-10-13 02:56:34.850944062 +0000
+@@ -214,7 +214,7 @@
+     const down = () => r.states.findIndex((s) => !s.isConnected && s.isReconnecting);
+     const up = () => (down() < 0 ? -1 : r.states.findIndex((s, i) => i > down() && s.isConnected));
+     await until(() => down() >= 0, 60000);
+-    await until(() => up() >= 0 && seen(r, 'qa-f34-after-restart', up()) > 0, 60000);
++    await until(() => up() >= 0 && seen(r, 'qa-f34-after-restart', up()) > 0, 120000);
+     const last = r.states.at(-1);
+     r.stream.stop();
+     return [r.mode, { went_down: down() >= 0, reconnected: up() >= 0, attempts: Math.max(...r.states.map((s) => s.attemptCount)),

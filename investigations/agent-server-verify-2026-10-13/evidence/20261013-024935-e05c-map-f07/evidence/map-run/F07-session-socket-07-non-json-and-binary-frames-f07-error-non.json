@@ -1,0 +1,15 @@
+{
+  "file": "F07-session-socket.md",
+  "bullet": "Non-JSON and binary frames (`F07.error-non-json`).",
+  "ids": [
+    "F07.error-non-json"
+  ],
+  "line": 193,
+  "script": "mkdir -p \"$AGENT_SERVER_VERIFY_RUN/fixtures\"\ncat > \"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f07-raw-frames.py\" <<'EOF'\nimport json, os, sys\nfrom websockets.sync.client import connect\n\nurl = os.environ[\"AGENT_SERVER_URL\"].replace(\"http\", \"ws\", 1) + \"/sockets/session/\" + sys.argv[1]\nwith connect(url) as ws:\n    ws.send(json.dumps({\"type\": \"auth\", \"session_api_key\": os.environ[\"SESSION_API_KEY\"]}))\n    ws.send(\"QA_F07 this is not JSON\")\n    ws.send(b\"QA_F07 binary frame\")\n    ws.send(\"{}\")\n    frames = [json.loads(ws.recv(timeout=10)) for _ in range(5)]\ntypes = [f[\"type\"] for f in frames]\ncodes = [f.get(\"code\") for f in frames if f[\"type\"] == \"error\"]\nprint(\"types\", types, \"codes\", codes)\nassert types == [\"sync\", \"transient\", \"error\", \"error\", \"error\"], types\nassert codes[0] == \"JSONDecodeError\" and codes[2] == \"ValidationError\", codes\nprint(\"QA_OK\")\nEOF\ncontrol-agent-server exec --expect-output QA_OK --save \"F07.error-non-json/raw-$CID\" -- .venv/bin/python \"$AGENT_SERVER_VERIFY_RUN/fixtures/qa-f07-raw-frames.py\" \"$CID\"\ncontrol-agent-server api GET \"<redacted:session-cookie>/$CID/events/count\" --check . eq 5\n",
+  "exit_code": 0,
+  "elapsed_ms": 3243,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 571,\n  \"stdout_tail\": \"types ['sync', 'transient', 'error', 'error', 'error'] codes ['JSONDecodeError', 'KeyError', 'ValidationError']\\nQA_OK\\n\",\n  \"stderr_tail\": \"\",\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-024935-e05c-map-f07/evidence/F07.error-non-json/raw-c7e754eb-3ed6-43e2-aa98-e4a010314b36.json\"\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/c7e754eb-3ed6-43e2-aa98-e4a010314b36/events/count\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": null,\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"1\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": 5,\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 203,\n  \"checks\": [\n    {\n      \"check\": \". eq 5\",\n      \"ok\": true,\n      \"actual\": \"5\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

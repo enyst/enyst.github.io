@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/api/meta-profiles/qa-direct",
+    "query": [],
+    "auth": "header",
+    "body": {
+      "classifier_model": "deepseek-flash",
+      "prompt_template": "Task:\n{{ instance_text }}\n\nAvailable models:\n{{ model_table }}\n\nAnswer with JSON only: {\"model\": \"<name>\"}",
+      "model_table": "deepseek-pro: the only model; choose it for every task"
+    },
+    "files": []
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "content-length": "63",
+      "content-type": "application/json"
+    },
+    "body": {
+      "name": "qa-direct",
+      "message": "Meta-profile 'qa-direct' saved"
+    },
+    "truncated": false
+  },
+  "elapsed_ms": 468
+}

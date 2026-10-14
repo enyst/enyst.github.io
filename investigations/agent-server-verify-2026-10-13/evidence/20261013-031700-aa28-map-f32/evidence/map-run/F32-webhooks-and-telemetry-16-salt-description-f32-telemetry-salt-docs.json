@@ -1,0 +1,15 @@
+{
+  "file": "F32-webhooks-and-telemetry.md",
+  "bullet": "Salt description (`F32.telemetry-salt-docs`), known bug.",
+  "ids": [
+    "F32.telemetry-salt-docs"
+  ],
+  "line": 668,
+  "script": "control-agent-server api GET /openapi.json --auth none --quiet --check 'components.schemas.InitRequest.properties.telemetry.anyOf.0.$ref' eq '#/components/schemas/TelemetrySpec' --check components.schemas.TelemetrySpec.properties.salt.description exists\ncontrol-agent-server api GET /openapi.json --auth none --quiet --check components.schemas.TelemetrySpec.properties.salt.description matches '(?i)secret'  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 2239,
+  "failed_line": 2,
+  "failed_command": "control-agent-server api GET /openapi.json --auth none --quiet --check components.schemas.TelemetrySpec.properties.salt.description matches '(?i)secret'",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/openapi.json\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"648994\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 1313,\n  \"checks\": [\n    {\n      \"check\": \"components.schemas.InitRequest.properties.telemetry.anyOf.0.$ref eq #/components/schemas/TelemetrySpec\",\n      \"ok\": true,\n      \"actual\": \"#/components/schemas/TelemetrySpec\"\n    },\n    {\n      \"check\": \"components.schemas.TelemetrySpec.properties.salt.description exists\",\n      \"ok\": true,\n      \"actual\": \"Key used to pseudonymize conversation identifiers. Falls back to a per-process random salt, which keeps pseudonyms stable within a run but unlinkable across runs.\"\n    }\n  ]\n}\n{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/openapi.json\",\n    \"query\": [],\n    \"auth\": \"none\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"648994\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 190,\n  \"checks\": [\n    {\n      \"check\": \"components.schemas.TelemetrySpec.properties.salt.description matches (?i)secret\",\n      \"ok\": false,\n      \"actual\": \"Key used to pseudonymize conversation identifiers. Falls back to a per-process random salt, which keeps pseudonyms stable within a run but unlinkable across runs.\"\n    }\n  ],\n  \"hint\": \"failed check: components.schemas.TelemetrySpec.properties.salt.description matches (?i)secret\"\n}\n",
+  "stderr": ""
+}

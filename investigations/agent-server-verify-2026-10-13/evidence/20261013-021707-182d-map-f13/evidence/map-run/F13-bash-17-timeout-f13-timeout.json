@@ -1,0 +1,15 @@
+{
+  "file": "F13-bash.md",
+  "bullet": "Timeout (`F13.timeout`).",
+  "ids": [
+    "F13.timeout"
+  ],
+  "line": 507,
+  "script": "SLP=30.$RANDOM\nBODY=\"{\\\"command\\\": \\\"echo QA_F13_STARTED; sleep $SLP; echo QA_F13_NOT_REACHED\\\", \\\"timeout\\\": 2}\"\n( control-agent-server api POST /api/bash/execute_bash_command --json \"$BODY\" \\\n  --expect 200 --timeout 20 --expect-max-ms 8000 --check exit_code eq -1 \\\n  --check stdout eq $'QA_F13_STARTED\\n' --quiet --save F13.timeout/execute ) &\nEXEC_JOB=$!\nfor i in $(seq 1 40); do pgrep -fx \"sleep $SLP\" > /dev/null && break; sleep 0.1; done\npgrep -fx \"sleep $SLP\"\nwait \"$EXEC_JOB\"\ntest -z \"$(pgrep -fx \"sleep $SLP\" || true)\"\n",
+  "exit_code": 0,
+  "elapsed_ms": 3424,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "7618\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/bash/execute_bash_command\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"218\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 2279,\n  \"checks\": [\n    {\n      \"check\": \"exit_code eq -1\",\n      \"ok\": true,\n      \"actual\": \"-1\"\n    },\n    {\n      \"check\": \"stdout eq QA_F13_STARTED\\n\",\n      \"ok\": true,\n      \"actual\": \"QA_F13_STARTED\\n\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021707-182d-map-f13/evidence/F13.timeout/execute.json\"\n}\n",
+  "stderr": ""
+}

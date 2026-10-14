@@ -1,0 +1,22 @@
+{
+  "command": [
+    "bash",
+    "/workspace/verification-artifacts/runs/20261013-022642-a649-map-f02/fixtures/qa-f02/jar.sh",
+    "OPTIONS",
+    "<redacted:session-cookie>/count",
+    "nokey",
+    "400",
+    "has:Disallowed CORS origin",
+    "lacks:access-control-allow-origin",
+    "--",
+    "-H",
+    "Origin: https://qa-evil.example",
+    "-H",
+    "Access-Control-Request-Method: GET"
+  ],
+  "cwd": "/workspace/agent-sdk-verify",
+  "exit_code": 0,
+  "elapsed_ms": 197,
+  "stdout": "HTTP/1.1 400 Bad Request\ndate: Tue, 13 Oct 2026 02:36:43 GMT\nserver: uvicorn\nvary: Origin\naccess-control-allow-methods: DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT\naccess-control-max-age: 600\naccess-control-allow-credentials: true\ncontent-length: 22\ncontent-type: text/plain; charset=utf-8\n\nDisallowed CORS origin\nstatus=400\n",
+  "stderr": ""
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F13-bash.md",
+  "bullet": "Sanitized environment (`F13.env-sanitized`).",
+  "ids": [
+    "F13.env-sanitized"
+  ],
+  "line": 184,
+  "script": "control-agent-server restart --env SESSION_API_KEY=qa-f13-legacy-not-a-key\ncontrol-agent-server config | jq -e '.server_env.OH_SESSION_API_KEYS_0 == \"<set>\" and .server_env.OH_SECRET_KEY == \"<set>\" and .server_env.SESSION_API_KEY == \"<set>\"'\ncontrol-agent-server api POST /api/bash/execute_bash_command \\\n  --json '{\"command\": \"echo keys=${OH_SESSION_API_KEYS_0:-unset} legacy=${SESSION_API_KEY:-unset} secret=${OH_SECRET_KEY:-unset} agent=$AI_AGENT home=$HOME\"}' \\\n  --check exit_code eq 0 \\\n  --check stdout eq \"keys=unset legacy=unset secret=unset agent=openhands home=$AGENT_SERVER_VERIFY_RUN/home\"$'\\n' \\\n  --save F13.env-sanitized/env\n",
+  "exit_code": 0,
+  "elapsed_ms": 22610,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"run\": \"/workspace/verification-artifacts/runs/20261013-021707-182d-map-f13\",\n  \"url\": \"http://127.0.0.1:45949\",\n  \"rotated_key\": false,\n  \"hard\": false,\n  \"rotated_secret_key\": false,\n  \"ready_ms\": 6612,\n  \"ready_path\": \"/ready\"\n}\ntrue\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/bash/execute_bash_command\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"command\": \"echo keys=${OH_SESSION_API_KEYS_0:-unset} legacy=${SESSION_API_KEY:-unset} secret=${OH_SECRET_KEY:-unset} agent=$AI_AGENT home=$HOME\"\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"333\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"id\": \"77c1f89b07b84f4b96d2d92384b51685\",\n      \"timestamp\": \"2026-10-13T02:17:45.719308Z\",\n      \"command_id\": \"ba757cf10b6f4174ba81901eb5cd06c9\",\n      \"order\": 0,\n      \"exit_code\": 0,\n      \"stdout\": \"keys=unset legacy=unset secret=unset agent=openhands home=/workspace/verification-artifacts/runs/20261013-021707-182d-map-f13/home\\n\",\n      \"stderr\": null,\n      \"kind\": \"BashOutput\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 68,\n  \"checks\": [\n    {\n      \"check\": \"exit_code eq 0\",\n      \"ok\": true,\n      \"actual\": \"0\"\n    },\n    {\n      \"check\": \"stdout eq keys=unset legacy=unset secret=unset agent=openhands home=/workspace/verification-artifacts/runs/20261013-021707-182d-map-f13/home\\n\",\n      \"ok\": true,\n      \"actual\": \"keys=unset legacy=unset secret=unset agent=openhands home=/workspace/verification-artifacts/runs/20261013-021707-182d-map-f13/home\\n\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021707-182d-map-f13/evidence/F13.env-sanitized/env.json\"\n}\n",
+  "stderr": ""
+}

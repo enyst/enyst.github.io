@@ -1,0 +1,25 @@
+{
+  "status": "complete",
+  "checkout_sha": "acca181af1f353975965bcf6486e1d0a58f444c0",
+  "triage": "/workspace/verification-artifacts/triage-f15-f21.json",
+  "confirmed_grouped_defects": 24,
+  "confirmed_grouped_defect_severities": {"high": 3, "medium": 14, "low": 7},
+  "confirmed_grouped_defects_by_family": {"F15": 5, "F16": 3, "F17": 1, "F18": 4, "F19": 3, "F20": 5, "F21": 3},
+  "confirmed_product_failure_recipe_bullets": 28,
+  "confirmed_product_failure_recipe_bullets_by_family": {"F15": 5, "F16": 3, "F17": 2, "F18": 6, "F19": 3, "F20": 6, "F21": 3},
+  "distinct_confirmed_failure_feature_ids": 26,
+  "blocked_recipe_bullets": 3,
+  "inconclusive_groups": 0,
+  "original_full_map_recipe_status_counts": {"pass": 171, "fail": 10, "xfail": 29, "blocked": 2},
+  "recipe_outcomes_after_triage": {"verified_recipe_pass": 180, "confirmed_product_failure_recipe": 28, "blocked_recipe": 3, "source_map_drift_recipe": 1},
+  "count_notes": [
+    "Recipe counts include each family's Preconditions bullet. They are not distinct feature-ID ledger rows.",
+    "F18 uses the same feature ID for separate agent/meta-pointer recipes and separate malformed/busy-profile recipes, so its six failure bullets cover four distinct IDs.",
+    "Original39 fail/xfail bullets include ten environment/harness failures and one F21 source-doc drift. Nine environment/harness failures pass after correction; the missing chattr branch is blocked.",
+    "F21 dangling-LLM recipe's expectation comes only from a private source docstring. The public response contract and live materialize response agree, so this is excluded from product defects.",
+    "Every counted grouped defect has at least two fresh confirmations and all cited evidence paths were validated.",
+    "Two client-entrypoint groups remain explicitly not run: F16 TypeScript session/VSCode wrappers and F19 TypeScript MCP/OAuth/settings wrappers. REST evidence does not prove these wrappers."
+  ],
+  "cleanup": {"own_recovery_run_dirs_checked": 20, "live_server_process_groups": 0, "product_checkout_changes": 0},
+  "publication": "Not performed by this worker."
+}

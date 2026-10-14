@@ -1,0 +1,16 @@
+# syntax=docker/dockerfile:1.7
+FROM python:3.13-slim-bookworm
+RUN --mount=type=secret,id=system_ca,required=true,mode=0444 \
+    export SSL_CERT_FILE=/run/secrets/system_ca; \
+    apt-get update && apt-get install -y --no-install-recommends git tmux && \
+    rm -rf /var/lib/apt/lists/* && \
+    ln -s /usr/local/bin/python3.13 /usr/bin/python3.13 && \
+    mkdir -p /var/openhands /workspace/project
+COPY . /workspace/agent-sdk-verify
+COPY --from=qa_venv / /workspace/agent-sdk-verify/.venv/
+ENV OPENHANDS_BUILD_GIT_SHA=acca181af1f353975965bcf6486e1d0a58f444c0 \
+    OPENHANDS_BUILD_GIT_REF=verification-source \
+    OH_PRELOAD_TOOLS=false OH_ENABLE_VSCODE=false \
+    PATH=/workspace/agent-sdk-verify/.venv/bin:$PATH
+WORKDIR /workspace/agent-sdk-verify
+ENTRYPOINT ["/workspace/agent-sdk-verify/.venv/bin/python", "-m", "openhands.agent_server"]

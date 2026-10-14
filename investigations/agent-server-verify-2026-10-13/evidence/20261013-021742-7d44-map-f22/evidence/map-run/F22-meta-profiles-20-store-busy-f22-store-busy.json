@@ -1,0 +1,15 @@
+{
+  "file": "F22-meta-profiles.md",
+  "bullet": "Store busy (`F22.store-busy`).",
+  "ids": [
+    "F22.store-busy"
+  ],
+  "line": 541,
+  "script": "M=\"$AGENT_SERVER_VERIFY_RUN/home/.openhands/meta-profiles\"\nHELD=\"$F22/lock-held\"\nrm -f \"$HELD\"\nflock -x \"$M/.meta-profiles.lock\" sh -c \"touch '$HELD'; sleep 66\" &\nLOCKER=$!\nfor i in $(seq 100); do test -e \"$HELD\" && break; sleep 0.1; done\ntest -e \"$HELD\"\nT0=$SECONDS\ncontrol-agent-server api POST /api/meta-profiles/qa-busy --timeout 60 --expect 503 \\\n  --json '{\"classifier_model\": \"deepseek-flash\", \"classes\": [{\"description\": \"any\", \"model\": \"deepseek-pro\"}]}' \\\n  --check exception eq '503: Meta-profile store is busy. Please retry.' --save F22.store-busy/save\ntest $((SECONDS - T0)) -ge 29\ntest $((SECONDS - T0)) -le 33\nT1=$SECONDS\ncontrol-agent-server api DELETE /api/meta-profiles/qa-direct --timeout 60 --expect 503 \\\n  --check exception eq '503: Meta-profile store is busy. Please retry.' --save F22.store-busy/delete\ntest $((SECONDS - T1)) -ge 29\ntest $((SECONDS - T1)) -le 33\nwait \"$LOCKER\"\ncontrol-agent-server api GET /api/meta-profiles/qa-busy --expect 404\ncontrol-agent-server api GET /api/meta-profiles --check meta_profiles len-eq 1 --check active_meta_profile eq qa-direct\ncontrol-agent-server api GET /api/meta-profiles/qa-direct --expect 200 --check config.model_table matches '^deepseek-pro: '\ncontrol-agent-server api POST /api/meta-profiles/qa-busy --expect 201 --expect-max-ms 5000 \\\n  --json '{\"classifier_model\": \"deepseek-flash\", \"classes\": [{\"description\": \"any\", \"model\": \"deepseek-pro\"}]}'\ncontrol-agent-server api DELETE /api/meta-profiles/qa-busy --expect 200\n",
+  "exit_code": 1,
+  "elapsed_ms": 66736,
+  "failed_line": 13,
+  "failed_command": "test $((SECONDS - T0)) -le 33",
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 503,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/meta-profiles/qa-busy\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"body\": {\n      \"classifier_model\": \"deepseek-flash\",\n      \"classes\": [\n        {\n          \"description\": \"any\",\n          \"model\": \"deepseek-pro\"\n        }\n      ]\n    },\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 503,\n    \"headers\": {\n      \"content-length\": \"95\",\n      \"content-type\": \"application/json\"\n    },\n    \"body\": {\n      \"detail\": \"Internal Server Error\",\n      \"exception\": \"503: Meta-profile store is busy. Please retry.\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 30360,\n  \"checks\": [\n    {\n      \"check\": \"exception eq 503: Meta-profile store is busy. Please retry.\",\n      \"ok\": true,\n      \"actual\": \"503: Meta-profile store is busy. Please retry.\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-021742-7d44-map-f22/evidence/F22.store-busy/save.json\"\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,15 @@
+{
+  "file": "F27-hooks-subagents-tools.md",
+  "bullet": "Playwright browsers directory (`F27.browser-playwright-path`), known bug.",
+  "ids": [
+    "F27.browser-playwright-path"
+  ],
+  "line": 756,
+  "script": "control-agent-server api GET /api/tools/catalog --expect 200 --quiet \\\n  --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": false'\ncontrol-agent-server restart --env PLAYWRIGHT_BROWSERS_PATH=\"$PW\"\ncontrol-agent-server api GET /api/tools/catalog --expect 200 --quiet --check tools contains '{\"name\": \"terminal\", \"user_selectable\": true, \"usable\": true'\ncontrol-agent-server api GET /api/tools/catalog --expect 200 --quiet --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": true' --save F27.browser-playwright-path/catalog  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 701,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api GET /api/tools/catalog --expect 200 --quiet --check tools contains '{\"name\": \"browser_tool_set\", \"user_selectable\": true, \"usable\": false'",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"/api/tools/catalog\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"2217\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 453,\n  \"checks\": [\n    {\n      \"check\": \"tools contains {\\\"name\\\": \\\"browser_tool_set\\\", \\\"user_selectable\\\": true, \\\"usable\\\": false\",\n      \"ok\": false,\n      \"actual\": \"[{\\\"name\\\": \\\"route_task_to_model\\\", \\\"user_selectable\\\": false, \\\"usable\\\": true, \\\"description\\\": \\\"\\\", \\\"in_default_set\\\": false}, {\\\"name\\\": \\\"ask_oracle\\\", \\\"user_selectable\\\": false, \\\"usable\\\": true, \\\"description\\\": \\u2026\"\n    }\n  ],\n  \"hint\": \"failed check: tools contains {\\\"name\\\": \\\"browser_tool_set\\\", \\\"user_selectable\\\": true, \\\"usable\\\": false\"\n}\n",
+  "stderr": ""
+}

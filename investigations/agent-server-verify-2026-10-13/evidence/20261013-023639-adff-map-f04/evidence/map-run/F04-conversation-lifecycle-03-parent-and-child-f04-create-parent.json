@@ -1,0 +1,15 @@
+{
+  "file": "F04-conversation-lifecycle.md",
+  "bullet": "Parent and child (`F04.create-parent`).",
+  "ids": [
+    "F04.create-parent"
+  ],
+  "line": 306,
+  "script": "CHILD=$(control-agent-server api POST <redacted:session-cookie> \\\n  --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $OFFLINE_AGENT, \\\"autotitle\\\": false, \\\"parent_conversation_id\\\": \\\"$IID\\\"}\" \\\n  --expect 201 --check parent_conversation_id eq \"$IID\" --field id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$IID\" --check sub_conversation_ids contains \"$CHILD\" --save F04.create-parent/parent\ncontrol-agent-server api POST <redacted:session-cookie> --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W/other\\\"}, \\\"agent\\\": $OFFLINE_AGENT, \\\"parent_conversation_id\\\": \\\"$IID\\\"}\" \\\n  --expect 422 --check detail contains 'different workspace'\ncontrol-agent-server api POST <redacted:session-cookie> --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $OFFLINE_AGENT, \\\"parent_conversation_id\\\": \\\"$NOPE\\\"}\" \\\n  --expect 422 --check detail contains 'not found'\ncontrol-agent-server api POST <redacted:session-cookie> --json \"{\\\"conversation_id\\\": \\\"$NOPE\\\", \\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $OFFLINE_AGENT, \\\"parent_conversation_id\\\": \\\"$NOPE\\\"}\" \\\n  --expect 422 --check detail contains 'own parent'\n",
+  "exit_code": 1,
+  "elapsed_ms": 8922,
+  "failed_line": 3,
+  "failed_command": "CHILD=$(control-agent-server api POST <redacted:session-cookie> --json \"{\\\"workspace\\\": {\\\"working_dir\\\": \\\"$W\\\"}, \\\"agent\\\": $OFFLINE_AGENT, \\\"autotitle\\\": false, \\\"parent_conversation_id\\\": \\\"$IID\\\"}\" --expect 201 --check parent_conversation_id eq \"$IID\" --field id)",
+  "stdout": "",
+  "stderr": ""
+}

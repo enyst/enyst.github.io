@@ -47,6 +47,8 @@
       <p><strong>Short version:</strong> the service uses the database as both catalog and durable queue. Cron polling, webhook ingress, and manual dispatch all create <code>AutomationRun</code> rows in <code>PENDING</code>. A dispatcher claims those rows, starts bash in an execution backend, then returns immediately. Completion is reconciled by an SDK callback, with a watchdog that verifies stale runs if the callback is missed.</p>
     </div>
 
+    <p>For the dated inventory of Engel's deployments, recent results, and pending decisions, see <a href="openhands-automation-operations.html">OpenHands Automations: where work runs</a>.</p>
+
     <h2>What this service owns</h2>
     <p>OpenHands Automations is not the agent runtime. It owns the <em>when</em> and the packaging of <em>what</em> to run. The actual work happens in an agent server: either a new OpenHands Cloud sandbox per run or a configured local/self-hosted agent server.</p>
 

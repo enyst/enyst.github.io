@@ -1,0 +1,15 @@
+{
+  "file": "F16-workspace-serving-and-vscode.md",
+  "bullet": "Key delivered by init, no URL (`F16.vscode-url-after-init`).",
+  "ids": [
+    "F16.vscode-url-after-init"
+  ],
+  "line": 468,
+  "script": "DI=$(control-agent-server launch --new --no-auth --deferred-init --vscode --name f16-deferred --config-json '{\"vscode_port\": '\"$VPORT\"'}' --print-run)\ntrap 'control-agent-server stop --run \"$DI\" >/dev/null' EXIT\ncontrol-agent-server api POST /api/init --run \"$DI\" --auth none --header \"X-Init-API-Key: $(cat \"$DI/private/secret_key\")\" \\\n  --json '{\"session_api_keys\": [\"qa-f16-init-key\"]}' --expect 200 --check state eq ready\ncontrol-agent-server api GET /api/vscode/url --run \"$DI\" --auth none --expect 401\ncontrol-agent-server api GET /api/vscode/status --run \"$DI\" --auth none --header 'X-Session-API-Key: qa-f16-init-key' --expect 200 \\\n  --check enabled eq true --check running eq false --save F16.vscode-url-after-init/status\ncontrol-agent-server api GET /api/vscode/url --run \"$DI\" --auth none --header 'X-Session-API-Key: qa-f16-init-key' --expect 200 \\\n  --check . eq '{\"url\": null}' --save F16.vscode-url-after-init/url\ncontrol-agent-server stop --run \"$DI\"\n",
+  "exit_code": 2,
+  "elapsed_ms": 1865,
+  "failed_line": 1,
+  "failed_command": "DI=$(control-agent-server launch --new --no-auth --deferred-init --vscode --name f16-deferred --config-json '{\"vscode_port\": '\"$VPORT\"'}' --print-run)",
+  "stdout": "",
+  "stderr": ""
+}

@@ -1,0 +1,55 @@
+{
+  "ok": false,
+  "file": "F27-browser-container.md",
+  "summary": {
+    "pass": 1,
+    "fail": 2,
+    "xfail": 0,
+    "xpass": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "no-commands": 0
+  },
+  "bullets": [
+    {
+      "bullet": "Preconditions",
+      "ids": [],
+      "line": 3,
+      "status": "pass",
+      "exit_code": 0,
+      "elapsed_ms": 3869,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-035347-6ab0-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-00-preconditions.json"
+    },
+    {
+      "bullet": "Home-cache positive control (`F27.browser-probe`).",
+      "ids": [
+        "F27.browser-probe"
+      ],
+      "line": 10,
+      "status": "fail",
+      "exit_code": 3,
+      "elapsed_ms": 135342,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-035347-6ab0-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-01-home-cache-positive-control-f27-browser-.json",
+      "failed_line": 5,
+      "failed_command": "control-agent-server api GET /alive --expect 200 --quiet",
+      "stdout_tail": "\"/api/tools/catalog\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"2218\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 98,\n  \"checks\": [\n    {\n      \"check\": \"tools contains {\\\"name\\\": \\\"browser_tool_set\\\", \\\"user_selectable\\\": true, \\\"usable\\\": false\",\n      \"ok\": true,\n      \"actual\": \"[{\\\"name\\\": \\\"route_task_to_model\\\", \\\"user_selectable\\\": false, \\\"usable\\\": true, \\\"description\\\": \\\"\\\", \\\"in_default_set\\\": false}, {\\\"name\\\": \\\"ask_oracle\\\", \\\"user_selectable\\\": false, \\\"usable\\\": true, \\\"description\\\": \\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-035347-6ab0-qa-f27-browser-path-1/evidence/F27.browser-probe/before.json\"\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 403,\n  \"stdout_tail\": \"QA_HOME_CACHE_LINKED\\n\",\n  \"stderr_tail\": \"\"\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 3120,\n  \"stdout_tail\": \"qa-f27-browser-path-1\\n\",\n  \"stderr_tail\": \"\"\n}\n{\n  \"ok\": false,\n  \"exit\": 3,\n  \"error\": \"ConnectError: [Errno 111] Connection refused\",\n  \"hint\": \"Is the server up? `control-agent-server doctor`\"\n}\n",
+      "stderr_tail": ""
+    },
+    {
+      "bullet": "Playwright override (`F27.browser-playwright-path`), known bug.",
+      "ids": [
+        "F27.browser-playwright-path"
+      ],
+      "line": 19,
+      "status": "fail",
+      "exit_code": 3,
+      "elapsed_ms": 132153,
+      "transcript": "/workspace/verification-artifacts/runs/20261013-035347-6ab0-qa-f27-browser-path-1/evidence/map-run/F27-browser-container-02-playwright-override-f27-browser-playwrig.json",
+      "failed_line": 4,
+      "failed_command": "control-agent-server api GET /alive --expect 200 --quiet",
+      "stdout_tail": "{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 432,\n  \"stdout_tail\": \"QA_HOME_CACHE_REMOVED\\n\",\n  \"stderr_tail\": \"\"\n}\n{\n  \"ok\": true,\n  \"exit_code\": 0,\n  \"elapsed_ms\": 3415,\n  \"stdout_tail\": \"qa-f27-browser-path-1\\n\",\n  \"stderr_tail\": \"\"\n}\n{\n  \"ok\": false,\n  \"exit\": 3,\n  \"error\": \"ConnectError: [Errno 111] Connection refused\",\n  \"hint\": \"Is the server up? `control-agent-server doctor`\"\n}\n",
+      "stderr_tail": "",
+      "hint": "no failure was confirmed at the `# bug` assertion; the bug was not reproduced"
+    }
+  ]
+}

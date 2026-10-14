@@ -1,0 +1,15 @@
+{
+  "file": "F10-fork-navigate-condense-ask.md",
+  "bullet": "Metrics on a fork (`F10.fork-metrics`).",
+  "ids": [
+    "F10.fork-metrics"
+  ],
+  "line": 178,
+  "script": "control-agent-server api GET \"<redacted:session-cookie>/$A\" --quiet --check stats.usage_to_metrics.default.accumulated_cost gt 0\nFK=$(control-agent-server api POST \"<redacted:session-cookie>/$A/fork\" --json '{\"reset_metrics\": false}' --expect 201 --quiet \\\n  --check stats.usage_to_metrics.default.accumulated_cost gt 0 --save F10.fork-metrics/kept --field id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$FK\" --quiet --check stats.usage_to_metrics.default.accumulated_cost gt 0\nFR=$(control-agent-server api POST \"<redacted:session-cookie>/$A/fork\" --expect 201 --quiet \\\n  --check stats.usage_to_metrics len-eq 0 --save F10.fork-metrics/reset --field id)\ncontrol-agent-server api GET \"<redacted:session-cookie>/$FR\" --quiet --check stats.usage_to_metrics len-eq 0\n",
+  "exit_code": 0,
+  "elapsed_ms": 12822,
+  "failed_line": null,
+  "failed_command": null,
+  "stdout": "{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/2069300f-e117-4504-bea3-59455031bd82\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"6204\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 394,\n  \"checks\": [\n    {\n      \"check\": \"stats.usage_to_metrics.default.accumulated_cost gt 0\",\n      \"ok\": true,\n      \"actual\": \"0.000274968\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/8a287760-889d-4530-a205-c5474cc942a1\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"6200\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 399,\n  \"checks\": [\n    {\n      \"check\": \"stats.usage_to_metrics.default.accumulated_cost gt 0\",\n      \"ok\": true,\n      \"actual\": \"0.000274968\"\n    }\n  ]\n}\n{\n  \"ok\": true,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"GET\",\n    \"path\": \"<redacted:session-cookie>/ee2462a6-0dab-47b4-aa74-5bbe7f595237\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"4970\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 385,\n  \"checks\": [\n    {\n      \"check\": \"stats.usage_to_metrics len-eq 0\",\n      \"ok\": true,\n      \"actual\": \"{}\"\n    }\n  ]\n}\n",
+  "stderr": ""
+}

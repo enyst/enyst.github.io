@@ -1,0 +1,15 @@
+{
+  "file": "F13-bash.md",
+  "bullet": "Large output through execute (`F13.execute-large-output`), known bug.",
+  "ids": [
+    "F13.execute-large-output"
+  ],
+  "line": 492,
+  "script": "control-agent-server api POST /api/bash/execute_bash_command \\\n  --json '{\"command\": \"yes a | head -c 1100000; echo QA_F13_TAIL\", \"timeout\": 60}' --expect 200 \\\n  --check exit_code eq 0 --check stdout len-eq 1100012 --quiet --save F13.execute-large-output/execute  # bug\n",
+  "exit_code": 1,
+  "elapsed_ms": 319,
+  "failed_line": 1,
+  "failed_command": "control-agent-server api POST /api/bash/execute_bash_command --json '{\"command\": \"yes a | head -c 1100000; echo QA_F13_TAIL\", \"timeout\": 60}' --expect 200 --check exit_code eq 0 --check stdout len-eq 1100012 --quiet --save F13.execute-large-output/execute",
+  "stdout": "{\n  \"ok\": false,\n  \"status\": 200,\n  \"request\": {\n    \"method\": \"POST\",\n    \"path\": \"/api/bash/execute_bash_command\",\n    \"query\": [],\n    \"auth\": \"header\",\n    \"files\": []\n  },\n  \"response\": {\n    \"status\": 200,\n    \"headers\": {\n      \"content-length\": \"77350\",\n      \"content-type\": \"application/json\"\n    },\n    \"truncated\": false\n  },\n  \"elapsed_ms\": 75,\n  \"checks\": [\n    {\n      \"check\": \"exit_code eq 0\",\n      \"ok\": true,\n      \"actual\": \"0\"\n    },\n    {\n      \"check\": \"stdout len-eq 1100012\",\n      \"ok\": false,\n      \"actual\": \"a\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\na\\n\\u2026\"\n    }\n  ],\n  \"saved\": \"/workspace/verification-artifacts/runs/20261013-031029-c530-map-f13/evidence/F13.execute-large-output/execute.json\",\n  \"hint\": \"failed check: stdout len-eq 1100012\"\n}\n",
+  "stderr": ""
+}
