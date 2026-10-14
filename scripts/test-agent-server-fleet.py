@@ -57,12 +57,35 @@ class FleetTests(unittest.TestCase):
             self.assertEqual(set(attrs['rel'].split()), {'noopener', 'noreferrer'})
             self.assertIn('opens in a new tab', attrs['aria-label'])
 
+    def test_decision_heading_detection(self):
+        for body in ['## Decision needed\nA choice.', '### **Decision needed**\nChoose.', '## Decision needed: API contract\nChoose.', '## decision needed ##\nChoose.']:
+            self.assertTrue(REFRESH.has_decision_section(body), body)
+        for body in ['See Decision needed above.', '## Summary\nDecision needed in another PR.', '```md\n## Decision needed\n```', '## Decision needed later on another PR']:
+            self.assertFalse(REFRESH.has_decision_section(body), body)
+
+    def test_decision_priority_and_unique_rows(self):
+        prs = RENDER['PRS']
+        page = (ROOT / 'arch/agent-server-fleet.html').read_text()
+        self.assertEqual(page.count('<article class="pr'), len(prs))
+        for pr in prs:
+            self.assertEqual(page.count(f'id="pr-{pr["number"]}"'), 1)
+        decisions = RENDER['decisions']
+        self.assertEqual({p['number'] for p in decisions}, {p['number'] for p in prs if p['decision_needed']})
+        terminal_seen = False
+        for pr in decisions:
+            if pr['state'] != 'OPEN':
+                terminal_seen = True
+            else:
+                self.assertFalse(terminal_seen)
+        if decisions:
+            self.assertLess(page.index('id="decisions"'), page.index('<article'))
+
     def sample(self):
         return {'prs': [{'number': 1, 'summary': 'Keep this summary.'}]}
 
     def live(self):
         return dict(number=1, headRefName='claude/umbrella-bug-fixes-test', title='Fix', url='https://example.com',
-                    state='MERGED', isDraft=False, reviewDecision='APPROVED', mergedAt='now', closedAt='now', updatedAt='now')
+                    state='MERGED', isDraft=False, reviewDecision='APPROVED', mergedAt='now', closedAt='now', updatedAt='now', body='## Decision needed\nChoose a contract.\n## Why\nA bug.')
 
     def test_refresh_retains_merged_and_closed_rows_and_summary(self):
         for state in ['MERGED', 'CLOSED']:
@@ -72,6 +95,7 @@ class FleetTests(unittest.TestCase):
             self.assertEqual(result['prs'][0]['state'], state)
             self.assertEqual(result['prs'][0]['summary'], 'Keep this summary.')
             self.assertEqual(result['observed_at'], 'now')
+            self.assertTrue(result['prs'][0]['decision_needed'])
 
     def test_missing_or_new_pr_stops_before_snapshot_mutation(self):
         for fetched in [[], [self.live(), self.live() | {'number': 2}]]:

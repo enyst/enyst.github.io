@@ -57,18 +57,31 @@ legend = ''.join(badge(key, STATUS_COUNTS[key]) for key in STATUSES)
 status_options = ''.join(f'<option value="{key}">{label} ({STATUS_COUNTS[key]})</option>'
                          for key, (label, _) in STATUSES.items())
 
-sections = []
-for category in CATEGORIES:
-    rows = []
-    for p in sorted((p for p in PRS if p['category'] == category), key=lambda p: -p['number']):
-        status = status_key(p)
-        search = STATUSES[status][0].lower() + ' ' + ' '.join(str(p[k]) for k in ['number', 'category', 'heading', 'summary', 'title']).lower()
-        rows.append(f'''<article class="pr" id="pr-{p['number']}" data-category="{esc(category)}" data-status="{status}" data-search="{esc(search)}">
+def render_row(p):
+    status = status_key(p)
+    decision = p.get('decision_needed', False)
+    search = ('decision needed ' if decision else '') + STATUSES[status][0].lower() + ' ' + ' '.join(str(p[k]) for k in ['number', 'category', 'heading', 'summary', 'title']).lower()
+    flag = '<p class="decision-flag">◆ Decision needed · PR description</p>' if decision else ''
+    return f'''<article class="pr{' pr-decision' if decision else ''}" id="pr-{p['number']}" data-category="{esc(p['category'])}" data-status="{status}" data-search="{esc(search)}">
 <a class="pr-number" href="{esc(p['url'])}" target="_blank" rel="noopener noreferrer" aria-label="Read pull request {p['number']} on GitHub (opens in a new tab)">#{p['number']} <span aria-hidden="true">↗</span></a>
-<div><div class="pr-heading"><h3><a href="{esc(p['url'])}" target="_blank" rel="noopener noreferrer" aria-label="{esc(p['heading'])} (opens in a new tab)">{esc(p['heading'])}</a></h3>{badge(status)}</div><p>{esc(p['summary'])}</p>
-<details><summary>Original PR title</summary><p>{esc(p['title'])}</p></details></div></article>''')
-    sections.append(f'''<section class="topic" id="{SLUGS[category]}" aria-labelledby="heading-{SLUGS[category]}"><h2 id="heading-{SLUGS[category]}">{esc(category)} <span>{COUNTS[category]}</span></h2>{''.join(rows)}</section>''')
-nav = ''.join(f'<a href="#{SLUGS[c]}">{esc(c)} <span>{COUNTS[c]}</span></a>' for c in CATEGORIES)
+<div>{flag}<div class="pr-heading"><h3><a href="{esc(p['url'])}" target="_blank" rel="noopener noreferrer" aria-label="{esc(p['heading'])} (opens in a new tab)">{esc(p['heading'])}</a></h3>{badge(status)}</div><p>{esc(p['summary'])}</p>
+<details><summary>Original PR title</summary><p>{esc(p['title'])}</p></details></div></article>'''
+
+
+decisions = sorted((p for p in PRS if p.get('decision_needed')), key=lambda p: (p['state'] != 'OPEN', -p['number']))
+open_decisions = sum(p['state'] == 'OPEN' for p in decisions)
+sections = []
+if decisions:
+    sections.append(f'''<section class="topic decision-topic" id="decisions" aria-labelledby="heading-decisions"><h2 id="heading-decisions">Decision needed <span>{len(decisions)}</span></h2>
+<p class="decision-note">These PR descriptions contain a “Decision needed” section. Open PRs come first: {open_decisions} open, {len(decisions) - open_decisions} merged or closed. The label records the section’s presence; it does not mean a decision is still unresolved after merge.</p>
+{''.join(render_row(p) for p in decisions)}</section>''')
+nav = f'<a class="decision-jump" href="#decisions">◆ Decision needed <span>{len(decisions)}</span></a>' if decisions else ''
+for category in CATEGORIES:
+    remaining = sorted((p for p in PRS if p['category'] == category and not p.get('decision_needed')), key=lambda p: -p['number'])
+    if not remaining:
+        continue
+    sections.append(f'''<section class="topic" id="{SLUGS[category]}" aria-labelledby="heading-{SLUGS[category]}"><h2 id="heading-{SLUGS[category]}">{esc(category)} <span>{len(remaining)}</span></h2>{''.join(render_row(p) for p in remaining)}</section>''')
+    nav += f'<a href="#{SLUGS[category]}">{esc(category)} <span>{len(remaining)}</span></a>'
 options = ''.join(f'<option value="{esc(c)}">{esc(c)} ({COUNTS[c]})</option>' for c in CATEGORIES)
 page = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -85,7 +98,7 @@ page = f'''<!doctype html>
 <p class="lead">What each fix changes.<br>A short summary. A link to the code.</p>
 <div class="snapshot"><strong>{len(PRS)}</strong><div>fix PRs · {STATUS_COUNTS["open"] + STATUS_COUNTS["approved"] + STATUS_COUNTS["changes-requested"] + STATUS_COUNTS["draft"]} open · {STATUS_COUNTS["merged"]} merged · {STATUS_COUNTS["closed"]} closed<br><time datetime="{esc(DATA['observed_at'])}">{STAMP}</time></div></div>
 <p>The <a href="verify-agent-server.html">verify-agent-server feature map</a> let agents use the real API and record unexpected behavior. This page tracks the fleet’s fixes for those findings, including merged and closed PRs.</p>
-<p class="notice">Status checked at the time above. <strong>Approved does not mean merged.</strong> Approval reflects GitHub’s review decision and may come from a bot. Merged changes may not be released yet. PR links open in a new tab.</p></header>
+<p class="notice">Status checked at the time above. <strong>Approved does not mean merged.</strong> Approval reflects GitHub’s review decision and may come from a bot. Merged changes may not be released yet. PRs with a “Decision needed” section appear first. PR links open in a new tab.</p></header>
 <div class="status-legend" aria-label="PR status counts">{legend}</div>
 <nav class="topics" aria-label="Jump to a topic">{nav}</nav>
 <div class="controls" hidden><form id="filters" role="search"><div><label for="query">Find a fix</label><input id="query" type="search" placeholder="PR number, feature or API name"></div><div><label for="category">Topic</label><select id="category"><option value="">All topics ({len(PRS)})</option>{options}</select></div><div><label for="status">Status</label><select id="status"><option value="">All statuses ({len(PRS)})</option>{status_options}</select></div><button type="reset">Clear</button></form><p id="count" role="status" aria-live="polite">Showing {len(PRS)} of {len(PRS)} fix PRs.</p></div>
