@@ -40,10 +40,10 @@
 <main class="shell">
   <a class="back" href="../index.html">&larr; Home</a>
   <h1>Routing GitHub mentions to Codex and Claude <span class="tag tag-draft">draft plan</span></h1>
-  <p class="meta">12 October 2026 · Personal GitHub integration · Implementation home: <code>github-mention-router</code></p>
+  <p class="meta">12 October 2026 · Updated 14 October 2026 · Personal GitHub integration · Implementation home: <code>github-mention-router</code></p>
 
   <div class="callout">
-    <p><strong>Use a Cloudflare Worker with Cron Triggers, D1, and Workflows.</strong> Poll public GitHub comments, accept requests from <code>enyst</code> and <code>smolpaws</code>, and route <code>@codex</code> to the OpenAI Agents API or <code>@claude</code> to Claude Managed Agents. Both providers supply hosted agent execution. The router owns authorization, durable delivery, and replies under the authorizing GitHub account.</p>
+    <p><strong>Use a Cloudflare Worker with Cron Triggers, D1, and Workflows.</strong> Poll public GitHub comments, accept requests from <code>enyst</code> and <code>smolpaws</code>, and route <code>@codex</code> to the OpenAI Agents API or <code>@claude</code> to Claude Managed Agents. Both providers supply hosted agent execution. The router owns authorization and durable delivery, and publishes attributed replies as <code>smolpaws</code>.</p>
   </div>
   <p>This gives us a way to ask the two agents for help on OpenHands issues and PRs without installing their GitHub apps on the repository. A first version should return findings and proposed patches as comments. Branches and draft PRs can follow after the request and reply path works reliably.</p>
   <p class="status">Proposed architecture. No watcher or provider execution has been activated by this draft.</p>
@@ -62,7 +62,7 @@
   <h2 id="access">GitHub access determines the trigger</h2>
   <p>The target supplied as <code>OpenHands/agent-sdk</code> currently resolves to <a href="https://github.com/OpenHands/software-agent-sdk">OpenHands/software-agent-sdk</a>, repository ID <code>1043426082</code>. Store the ID as the boundary and resolve the current name during preflight. A rename should change API paths, not silently change which repository may receive work.</p>
   <p>Push access is enough to propose code through a writable branch. It does not establish authority to configure a repository webhook. GitHub requires repository ownership or admin access to create one. Polling its public comment API avoids that dependency. If an administrator later adds a webhook, it can feed the same request ledger while polling remains a reconciliation path. <a href="https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks">GitHub webhook requirements</a>.</p>
-  <p><code>smolpaws</code> needs permission to leave its request comment, but needs no push permission for the router to act. The router checks the GitHub author ID and uses the authorizing account for its own writes. The model providers do not become repository members through this arrangement.</p>
+  <p><code>smolpaws</code> can leave requests and publish the agents' replies through its own comment access. It has no labeling or maintainer permissions. The router checks request author IDs and chooses the writing identity by action: <code>smolpaws</code> for ordinary comments, and <code>enyst</code> for later authorized code publication. Labeling and other maintainer tasks require their own authorized path. The model providers do not become repository members through this arrangement.</p>
 
   <div class="table-scroll" role="region" aria-label="Ownership of trigger and publication permissions" tabindex="0">
     <table>
@@ -70,8 +70,9 @@
       <tbody>
         <tr><td>Read public comments and source</td><td>Router and hosted sandbox</td><td>Public read access; authenticated API reads give a larger rate allowance.</td></tr>
         <tr><td>Request Codex or Claude</td><td><code>enyst</code> or <code>smolpaws</code></td><td>Ability to comment, plus the router author allowlist.</td></tr>
-        <tr><td>Publish a result comment</td><td>Router as <code>enyst</code></td><td>A credential that can write the relevant issue or PR comment.</td></tr>
-        <tr><td>Publish a branch and draft PR</td><td>Router in the later code phase</td><td>Contents and pull request write access to that destination.</td></tr>
+        <tr><td>Publish a result comment</td><td>Router as <code>smolpaws</code></td><td>SmolPaws's existing comment access.</td></tr>
+        <tr><td>Publish a branch and draft PR</td><td>Router as <code>enyst</code>, in the later code phase</td><td>Contents and pull request write access to that destination.</td></tr>
+        <tr><td>Label or perform maintainer tasks</td><td><code>enyst</code>, through a separately authorized path</td><td>The permission required by that operation; outside the comment route.</td></tr>
         <tr><td>Install a repository webhook</td><td>A repository administrator</td><td>Separate administrative authority.</td></tr>
       </tbody>
     </table>
@@ -150,10 +151,10 @@ Ambiguous responses: dispatch unknown · delivery unknown</pre>
 
   <h3>Publish through an outbox</h3>
   <p>Prepare the reply in D1 before calling GitHub. Include the provider and configured model, source request, assessed commit, findings, and actual test evidence. Write a stable hidden run marker into the comment and record its GitHub ID after success. After a lost acknowledgement, reconcile the destination thread for that marker under the expected writer before another attempt.</p>
-  <p>Replies posted as <code>enyst</code> should identify the agent that produced them. Record generated comment IDs and filter them before routing; also avoid copied mention tokens that ping or re-trigger agents. This closes the feedback loop where an agent quotes its original request in its own answer.</p>
+  <p>Replies posted as <code>smolpaws</code> should identify whether Codex or Claude produced them. Record generated comment IDs and filter them before routing; also avoid copied mention tokens that ping or re-trigger agents. This closes the feedback loop where an agent quotes its original request in its own answer.</p>
 
   <h2 id="credentials">Keep writing credentials in the controller</h2>
-  <p>The router needs GitHub publication access and provider API credentials. Provision them into Worker secrets during deployment. Keep them out of prompts, D1 payloads, logs, and agent-visible files or environment variables. Public source can enter a sandbox as a commit-pinned archive or through a public clone; neither requires the writing credential.</p>
+  <p>The comment route needs SmolPaws's GitHub credential and provider API credentials. Provision them into Worker secrets during deployment. Keep enyst's separate write credential for the later code publication path; a failed comment post must not escalate to it. Keep credentials out of prompts, D1 payloads, logs, and agent-visible files or environment variables. Public source can enter a sandbox as a commit-pinned archive or through a public clone; neither requires a writing credential.</p>
   <p>OpenAI's hosted sandbox accepts input files and setup commands and offers restricted network access. Configure the network explicitly and supply the dependencies required by the SDK's real tests. Anthropic supports GitHub repository mounts with an authorization token; that is an optional integration, not a prerequisite for this public-repository plan. <a href="https://developers.openai.com/api/docs/guides/agents-api/environments/openai-hosted">OpenAI hosted sandbox configuration</a> and <a href="https://platform.claude.com/docs/en/managed-agents/github">Claude GitHub access</a>.</p>
   <p>The agent can produce findings and patch artifacts while deterministic router code controls publication. Repository instructions and other authors' text can guide analysis, but cannot grant the agent secrets, a new repository destination, or extra write permissions.</p>
 
@@ -183,10 +184,10 @@ Ambiguous responses: dispatch unknown · delivery unknown</pre>
   <ul>
     <li>Choose provider accounts, models, sandbox setup, and per-request spending limits after a real preflight.</li>
     <li>Confirm the publication policy: comments first, then which implementation requests may create draft PRs.</li>
-    <li>Choose a dedicated GitHub credential with the minimum access available under the organization policy. The existing authorizing identity can bootstrap the integration; a separate token makes rotation and isolation easier.</li>
+    <li>Choose a dedicated SmolPaws credential for replies with the minimum access available under the organization policy. Provision enyst's separate credential only when the code publication phase is authorized.</li>
     <li>Decide whether review summary bodies need priority before target activation, and whether follow-up comments should eventually reuse sessions.</li>
   </ul>
-  <p class="source-note">API capabilities and repository naming checked against the linked sources on 12 October 2026. The lifecycle, limits, and rollout above are proposed design choices. Provider account execution and target activation belong to the implementation gates.</p>
+  <p class="source-note">API capabilities and repository naming checked against the linked sources on 12 October 2026. Reply identity and the separation of comment access from maintainer permissions updated on 14 October 2026. The lifecycle, limits, and rollout above are proposed design choices. Provider account execution and target activation belong to the implementation gates.</p>
   <nav class="foot-nav" aria-label="Related pages"><a href="../index.html">&larr; Notebook</a> · <a href="../smolpaws-github.html">SmolPaws GitHub entry point</a> · <a href="openhands-automations.html">OpenHands Automations</a></nav>
 </main>
 </body>
