@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verify everything, thus fix everything</title>
+  <meta name="description" content="What came after the first full run of the OpenHands Agent Server feature map: every medium and low bug fixed, one pull request each, with the maintainer's choices written down. A narrated video walks through the most telling fixes." />
+  <meta property="og:title" content="Verify everything, thus fix everything" />
+  <meta property="og:description" content="126 pull requests, one per bug, each proven against the feature map, and about fifty with a Decision needed section for the maintainers." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/verify/fix-everything.html" />
+  <meta property="og:image" content="https://enyst.github.io/experiments/umbrella-fixes-video/stills/title.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://enyst.github.io/verify/fix-everything.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    .film { margin: 0 0 var(--space-md); }
+    .film video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; background: #111318; border: 1px solid var(--border); border-radius: var(--border-radius); }
+    .film figcaption { color: var(--muted); font-size: 0.88em; line-height: 1.5; margin-top: 10px; }
+    .film figcaption a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,0.3); }
+    .film figcaption a:hover { border-bottom-color: var(--teal); }
+    .page-intro { color: var(--muted); font-size: var(--text-lg); margin-bottom: 28px; }
+    .three { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 8px 0 var(--space-md); }
+    .three div { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 16px 18px; line-height: 1.5; font-size: 0.92em; }
+    .three b { display: block; font-family: var(--mono); font-size: 0.78em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+    .numbers { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 4px 0 18px; }
+    .numbers div { font-size: 0.9em; color: var(--muted); }
+    .numbers span { display: block; font-family: var(--serif); font-size: 2.2em; color: var(--ink); line-height: 1.1; }
+    .decision { background: var(--card); border: 1px solid var(--accent); border-radius: var(--border-radius); padding: 18px 20px; margin: 16px 0 20px; line-height: 1.55; font-size: 0.92em; }
+    .decision h3 { font-family: var(--sans); font-size: 1.1em; color: var(--accent); margin: 0 0 8px; }
+    .decision p { margin: 0 0 8px; }
+    .decision .imp { color: var(--green); font-weight: 700; }
+    .decision .alt { color: var(--report); font-weight: 700; }
+    .decision a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,0.3); }
+    .decision code, .prose code { word-break: break-word; }
+  </style>
+</head>
+<body>
+  <div class="shell shell--wide">
+    <a class="back" href="index.html">← OpenHands agent-sdk verification</a>
+    <h1 class="page">Verify everything, thus fix everything</h1>
+    <p class="page-intro">The first full run of the Agent Server feature map found a long list of bugs. Then an agent fixed them: every medium and low one, one pull request each, each proven against the map, and every choice that belonged to a maintainer written down for them to make.</p>
+
+    <h2 id="idea">The idea, in three parts</h2>
+    <div class="three">
+      <div><b>The feature map</b>Everything an agent can do with the OpenHands Agent Server, written for agents: 34 families, 931 sub-features, each with a stable ID and an exact recipe to drive it.</div>
+      <div><b>A CLI for agents</b><code>control-agent-server</code> launches a real server, drives every REST, WebSocket and client step one command at a time, and keeps the evidence. Every command prints one JSON object.</div>
+      <div><b>Verify everything</b>A known bug stays in the map as a line with a predicate that describes how it fails today. When you can see every behavior, you can fix every behavior, and prove each fix.</div>
+    </div>
+
+    <h2 id="video">The video</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/umbrella-fixes-video/stills/title.png">
+        <source src="../experiments/umbrella-fixes-video/umbrella-fixes.mp4" type="video/mp4" />
+        <a href="../experiments/umbrella-fixes-video/umbrella-fixes.mp4">Download the video (MP4, 4:43)</a>
+      </video>
+      <figcaption>A walk through the most telling fixes: how a fix is proven, a sub-agent naming a missing skill, a failed run that froze the server, silent sockets after a delete, secret key rotation, and the one question still open. Drawn with Manim; narrated by Kokoro-82M, an open-weight speech model; the score is generated with numpy. <a href="../experiments/umbrella-fixes-video/umbrella-fixes.mp4" download>Download (MP4, 12 MB)</a> · <a href="https://github.com/enyst/enyst.github.io/tree/main/experiments/umbrella-fixes-video">Scene script, narration and music</a></figcaption>
+    </figure>
+
+    <h2 id="proof">How a fix is proven</h2>
+    <div class="prose">
+      <p>Each bug from the run lives in the map as a line that ends in <code># bug: &lt;predicate&gt;</code>, for example <code># bug: status eq 500 &amp;&amp; body.exception contains 'not found'</code>. A fix counts only when that line fails exactly as predicted on <code>main</code> twice (xfail), passes on the fix branch twice (xpass), and then loses its marker. From then on it is an ordinary check that guards the fix.</p>
+    </div>
+    <div class="numbers">
+      <div><span>126</span>pull requests, one per bug</div>
+      <div><span>2</span>merged</div>
+      <div><span>124</span>green, ready for review</div>
+      <div><span>~50</span>with a Decision needed section</div>
+    </div>
+    <p class="meta">13 medium bugs; 14 more mediums that already had contributor pull requests, fixed again independently so the maintainers can keep the better one; 8 older reports the umbrella issue lists; and 93 low-severity bugs, each given its own issue first. All are tracked in <a href="https://github.com/OpenHands/software-agent-sdk/issues/5653">umbrella issue #5653</a>.</p>
+
+    <h2 id="decisions">Decision needed</h2>
+    <div class="prose">
+      <p>An agent can do the work, but some choices are not its to make. When an issue's triage left a real question open, the pull request says so near the top, in a section called <em>Decision needed</em>: the option implemented and the alternative, with what each costs. The section stays even when the recommended option is the one that was built, so the maintainer still sees the choice. This one is from <a href="https://github.com/OpenHands/software-agent-sdk/pull/5754">#5754</a>, one of the two fixes already merged:</p>
+    </div>
+    <div class="decision">
+      <h3>Decision needed</h3>
+      <p>Scope relative to the broader issue "Plugin or skill loading error should not prevent conversation from starting": its triage asks whether it absorbs <a href="https://github.com/OpenHands/software-agent-sdk/issues/5630">#5630</a> or stays a separate umbrella.</p>
+      <p><span class="imp">Implemented:</span> #5630 is kept separate. This PR fixes only sub-agent registration, for file-based and plugin-provided definitions, as #5630's triage scoped.</p>
+      <p><span class="alt">Alternative:</span> folding #5630 into the broader issue would widen this PR to plugin loading and possibly a new client-facing notice, touching the server models, the TypeScript client and the UI.</p>
+    </div>
+
+    <h2 id="fixes">The fixes in the video</h2>
+    <div class="prose">
+      <ul>
+        <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5754">#5754</a> (merged): a sub-agent naming a missing skill made the first message answer 500. Invalid definitions are now skipped with a warning.</li>
+        <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5780">#5780</a>: a failed run froze the whole server for about five seconds, because a Rich traceback was rendered on the event loop. The slowest health probe went from about 4.5 seconds to under 150 ms.</li>
+        <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5757">#5757</a>: deleting a conversation left its WebSockets open and silent. They now close with 1012, and a reconnect after a delete gets 4004 and stops.</li>
+        <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5758">#5758</a>: changing the server's secret key left every stored secret unreadable. With <code>OH_PREVIOUS_SECRET_KEYS</code>, old values stay readable and move to the new key when saved.</li>
+        <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5830">#5830</a>: a live ACP switch to a model the session does not offer answered 500. Whether to check the model list locally or translate the agent's error is still open, waiting on a maintainer.</li>
+      </ul>
+    </div>
+
+    <h2 id="sources">Sources</h2>
+    <p class="meta">The map and the CLI: <a href="https://github.com/OpenHands/software-agent-sdk/pull/5621">software-agent-sdk PR #5621</a>. The run that found the bugs: <a href="../investigations/agent-server-verify-2026-10-13/">full Agent Server replay</a>. The first explainer: <a href="index.html#explainer">verifying the agent SDK</a>. Everything here is open source, and anyone can rerun it.</p>
+  </div>
+</body>
+</html>
