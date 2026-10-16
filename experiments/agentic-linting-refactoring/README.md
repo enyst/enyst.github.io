@@ -190,3 +190,14 @@ Automation #18526 is now ready with green CI and its initial bot review requeste
 - [#18535](https://github.com/OpenHands/OpenHands/pull/18535): Readable built-in critic score. `critic-messages-before-after.mp4` is ten seconds with tiny original ambience; its silent GIF is eight seconds. `critic-messages-source.json` records exact base/after heads and actual scoped evidence. Live proof covers score 0, header, stars, percentage, border and hint. Categories, detail expansion, intermediate and success scores, and probabilities remain live-unverified; separately labeled palette and existing behavior checks supplement this limited proof.
 
 All four are draft at this publication snapshot while CI/readiness completes. Device authorization #18528 is now ready, and BrandButton #18513 and launch #18515 have bot approval. Budget #18533 and managed-agent #18520 remain draft for explicit backend/authenticated-state prerequisites. No current integrated-main warning count or rule-severity promotion is claimed. Markdown #18530 and chat #18531 evidence remain in progress.
+
+## Chat-status feedback
+
+[#18531](https://github.com/OpenHands/OpenHands/pull/18531), issue #18523,
+compares8238b7af82 with5b8ed56a6d. The eighteen-second
+`chat-status-before-after.mp4` has four genuine component scenes, clear captions
+and very quiet original ambience; the silent GIF is sixteen seconds. Forty
+scoped measurements cover actual pending history loading and actual tool timeouts
+in five themes, desktop and phone. Fetches resume ten to twenty generated user
+messages. The neighboring generic header text remains outside the color claim.
+Source metadata excludes conversation identifiers and private paths.
