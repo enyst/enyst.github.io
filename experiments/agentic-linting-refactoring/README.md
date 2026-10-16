@@ -19,7 +19,10 @@ describes the on-screen changes; the soundtrack contains quiet music only.
 
 The source PRs retain the detailed tests, contrast measurements, app evidence,
 and reproducible capture recipes. The combined film includes the secret-selection
-change, now merged, and the page tracks the remaining open proposals.
+change, now merged. The dated page snapshot tracks twenty-one merged proposals,
+including the latest focus, context Usage, connection banner, and spec-note cleanup
+changes. The composer context popover is the next batch in progress. Recording
+source heads stay unchanged when the PR status snapshot is refreshed.
 
 ## Git Sync semantic colors
 
