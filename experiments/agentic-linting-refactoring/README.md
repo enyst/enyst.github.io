@@ -78,8 +78,8 @@ the preference false. The dated status snapshot keeps the proposal-head lint
 counts separate from the base-main audit and tracks review/merge status.
 
 At the dated status snapshot, #18504, #18508 and model profile messages
-in #18510 are merged. Destructive buttons in draft #18513 have real Before/After
-evidence while CI runs. Recording heads and media hashes stay attached
+in #18510 are merged. Destructive buttons in #18513 are ready with green CI and bot review requested;
+launch feedback in draft #18515 has real Before/After evidence while CI runs. Recording heads and media hashes stay attached
 to the source revisions actually captured.
 
 ## Model profile messages
@@ -106,7 +106,7 @@ were also verified; the downloaded bytes match the source manifest.
 
 ## Shared destructive buttons
 
-Draft [#18513](https://github.com/OpenHands/OpenHands/pull/18513) addresses
+[#18513](https://github.com/OpenHands/OpenHands/pull/18513) addresses
 [bug #18512](https://github.com/OpenHands/OpenHands/issues/18512) with semantic
 colors for ghost and filled destructive BrandButton variants. The 18-second
 `brand-button-before-after.mp4` includes original very quiet ambience; its silent
@@ -120,3 +120,19 @@ and successful fixture delete/uninstall checks. Changed ghost text reaches
 4.94:1 and filled text 4.89:1 at their minima. Filled labels already passed at
 baseline; the reproduced contrast defect concerns ghost labels. Other variants,
 Cloud/ACP and DigitalOcean are outside the recorded scope.
+
+## Launch error feedback
+
+Draft [#18515](https://github.com/OpenHands/OpenHands/pull/18515) addresses
+[bug #18514](https://github.com/OpenHands/OpenHands/issues/18514). The 14-second
+`launch-before-after.mp4` and 12.01-second silent GIF show only the generic
+real launch error card. Generated inert local metadata plus stopping the own
+registered backend before Start triggers a real failed request, before any
+source installation or model execution. No private path or user content appears.
+
+`launch-source.json` pins base `8238b7af82` and after `6e1abb6408`, forty actual
+creation-failure measurements, missing-source coverage, functional trust/retry
+and Go Home checks, asset hashes and limits. Heading contrast reaches 4.94:1
+and retry text 10.66:1 at the after minima. Retry already passed at baseline;
+its change follows the theme. Source installation and Cloud/ACP authorization
+are outside this recording's scope.
