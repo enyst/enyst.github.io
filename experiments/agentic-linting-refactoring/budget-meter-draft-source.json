@@ -1,0 +1,130 @@
+{
+  "canvasSourceCommit": "8238b7af825b8639191b9d7b4c6b080d4a93f388",
+  "pinnedVersions": {
+    "openhands-sdk": "1.55.1",
+    "openhands-agent-server": "1.55.1"
+  },
+  "conclusion": "BudgetProgressBar has a real consuming path, but standard pinned Agent Server settings/create/API contracts cannot produce a non-null max_budget_per_task metric. Treat a color migration as defensive component/build coverage until a supported backend budget contract exists.",
+  "canvasPath": [
+    {
+      "file": "src/components/features/conversation/usage-panel/usage-panel.tsx",
+      "line": 77,
+      "role": "CostSection receives live metrics cost and budget cap."
+    },
+    {
+      "file": "src/components/features/conversation/metrics-modal/cost-section.tsx",
+      "line": 19,
+      "role": "Renders BudgetDisplay for non-null cost."
+    },
+    {
+      "file": "src/components/features/conversation-panel/budget-display.tsx",
+      "line": 14,
+      "role": "Renders progress only for non-null cost and positive maxBudgetPerTask."
+    },
+    {
+      "file": "src/hooks/use-live-conversation-metrics.ts",
+      "line": 44,
+      "role": "Prefers live WebSocket store; falls back to REST-combined stats."
+    },
+    {
+      "file": "src/utils/conversation-metrics.ts",
+      "line": 33,
+      "role": "REST combines the first non-null usage_to_metrics budget value."
+    },
+    {
+      "file": "src/contexts/conversation-websocket-context.tsx",
+      "line": 333,
+      "role": "WebSocket stats updates combine the first non-null budget value."
+    },
+    {
+      "file": "src/api/cloud/settings-service.api.ts",
+      "line": 47,
+      "role": "Optional flat settings field exists but has no path into conversation metrics."
+    }
+  ],
+  "sdk": [
+    {
+      "file": "openhands/sdk/llm/utils/metrics.py",
+      "line": 86,
+      "role": "MetricsSnapshot.max_budget_per_task defaults None; snapshots/merge preserve existing values only."
+    },
+    {
+      "file": "openhands/sdk/llm/llm.py",
+      "line": 673,
+      "role": "LLM metrics are PrivateAttr and not configuration fields."
+    },
+    {
+      "file": "openhands/sdk/llm/llm.py",
+      "line": 916,
+      "role": "Creates fresh Metrics(model_name=self.model); does not set a cap."
+    },
+    {
+      "file": "openhands/sdk/llm/llm.py",
+      "line": 982,
+      "role": "restore_metrics seeds already-existing persisted metrics, not a budget setting."
+    },
+    {
+      "file": "openhands/sdk/settings/model.py",
+      "line": 1097,
+      "role": "ConversationSettings has no per-task/run budget field."
+    },
+    {
+      "file": "openhands/sdk/conversation/request.py",
+      "line": 107,
+      "role": "ConversationConfig/StartConversationRequest have no budget field."
+    },
+    {
+      "file": "openhands/sdk/conversation/impl/local_conversation.py",
+      "line": 239,
+      "role": "Python constructor supports separate max_budget_per_run cost ceiling."
+    },
+    {
+      "file": "openhands/sdk/conversation/impl/local_conversation.py",
+      "line": 727,
+      "role": "Run ceiling checks accumulated cost; never writes max_budget_per_task."
+    }
+  ],
+  "agentServer": [
+    {
+      "file": "openhands/agent_server/event_service.py",
+      "line": 1260,
+      "role": "Constructs LocalConversation without forwarding a budget."
+    },
+    {
+      "file": "openhands/agent_server/event_service.py",
+      "line": 1110,
+      "role": "Emits authoritative state.stats as stats updates."
+    }
+  ],
+  "excludedMethods": [
+    "Frontend store/event mutation",
+    "Server metrics/state injection",
+    "Manual persistence-file edits",
+    "Custom SDK program mutating Metrics directly"
+  ],
+  "limits": [
+    "No frontend store/event injection, metrics mutation or persistence edits were used.",
+    "Custom or older external Cloud behavior was not audited; a flat settings field alone does not establish a live cap."
+  ],
+  "backendPrerequisite": "Define a supported persisted/create-request budget contract in software-agent-sdk/Agent Server; propagate its intended per-task/run semantics into authoritative metrics; expose via typed client before Canvas renders and records it.",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18533",
+  "issue": "https://github.com/OpenHands/OpenHands/issues/18525",
+  "proposalHead": "50ae78643fb497b028bdddf6adfd0dea366b5b49",
+  "evidenceType": "Draft source-contract trace and actual supported-runtime gate; no rendered positive-cap meter.",
+  "liveGate": {
+    "actualUsageExists": true,
+    "costUsd": 0.0055998359999999995,
+    "maxBudgetPerTask": null,
+    "budgetBarRendered": false,
+    "model": "Generated bounded DeepSeek QA turn",
+    "sourceCommit": "8238b7af825b8639191b9d7b4c6b080d4a93f388"
+  },
+  "validation": {
+    "focusedTestsPassed": 18,
+    "fullLint": {
+      "errors": 0,
+      "warnings": 666
+    },
+    "scope": "Defensive component/build checks on the independent proposal head; not live positive-cap UI proof."
+  }
+}

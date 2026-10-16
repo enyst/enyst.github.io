@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-16T08:11:57+00:00",
+  "checkedAt": "2026-10-16T08:23:31+00:00",
   "displayTimeZone": "Europe/Stockholm",
   "main": "d3a58cd1cc045bbb1b24f2c8c0d79a8404ef239b",
   "shadcnLintVersion": "0.2.1",
@@ -1018,19 +1018,33 @@
       "state": "OPEN",
       "mergedAt": null,
       "headRefOid": "f52f2f7b2929f78e4037afe4a1f56770bfc6e378",
-      "reviewDecision": "REVIEW_REQUIRED",
+      "reviewDecision": "APPROVED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
-      "reviews": [],
-      "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSn6_sw",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Review summary\n\nScope check: this is a Canvas presentation change to the shared `BrandButton` (`src/components/features/settings/brand-button.tsx`), which is owned by `OpenHands/OpenHands`. It replaces fixed red palette classes with existing theme roles; no SDK, automation, or wire contract is involved. Belongs here.\n\n### What the change does\n\n- `danger`: `bg-red-600 text-white hover:bg-red-700` -> `bg-feedback-error text-contrast-foreground hover:bg-feedback-error/90`\n- `ghost-danger`: `text-red-600 ... hover:text-red-700` -> `text-feedback-error ...` (underline/hover:no-underline preserved)\n\n### Verification on the current head (`f52f2f7b`)\n\n- Re-fetched the mutable state: head SHA still matches, PR is open, label `type: fix`, no existing reviews or review threads, linked issues #18512 (`bug`, `priority:low`) and #18004 (`ready-for-dev`) unchanged.\n- Check runs for the exact head are green (ubuntu/windows test-and-build, PR-description, artifact checks).\n- Ran the focused tests in the workspace at this head: `brand-button`, `delete-profile-modal`, and `color-themes` - 31 passed. `color-themes.test.tsx` re-derives the `--oh-feedback-error` contract per theme, which is the behavior this PR relies on.\n- Recomputed WCAG contrast from the shipped tokens for all five themes:\n  - filled normal: neutral/neo 6.62, DeepSea 7.47, Light+ 5.86, Solarized Light 5.61\n  - filled hover (feedback-error at 90% over the modal surface): neutral/neo 5.70, DeepSea 6.40, Light+ 5.13, Solarized Light 4.91\n  - ghost label on the card surface: neutral/neo 5.14, DeepSea 5.45, Light+ 5.28, Solarized Light 4.94\n  All >= 4.5:1, matching the PR's stated figures.\n\n### Design notes (non-blocking)\n\nUsing `--oh-contrast-foreground` as the filled label ink is a sound pick: it is dark in the dark themes and light in the light themes, so it clears 4.5:1 on `--oh-feedback-error` everywhere. The danger-specific `--oh-danger-foreground` fallback in the dark themes is near-white, which would not clear the threshold on the light-red feedback surface, so avoiding it is correct.\n\n### Acceptance checklist\n\n- [x] Four raw red classes replaced with existing semantic roles; still visibly destructive (red surface).\n- [x] Destructive labels >= 4.5:1 on normal and hover backgrounds in all five shipped themes (computed above).\n- [x] Variants, disabled state, handlers, and confirmation/deletion flow untouched; only the two destructive class strings changed.\n- [x] No API, stored-state, translation, or lint-severity change.\n- [x] Existing relevant tests and CI pass on the exact head; before/after media attached in the PR.\n\nNo material correctness, security, compatibility, or architecture findings.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T08:09:31Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "f52f2f7b2929f78e4037afe4a1f56770bfc6e378"
+          }
+        }
       ],
+      "draft": false,
+      "requestedReviewers": [],
       "latestChecks": {
-        "pass": 7,
         "skip": 6,
         "pending": 0,
         "failed": 0,
+        "pass": 7,
         "url": "https://github.com/OpenHands/OpenHands/pull/18513/checks"
       },
       "issue": 18512,
@@ -1043,19 +1057,33 @@
       "state": "OPEN",
       "mergedAt": null,
       "headRefOid": "6e1abb6408d2568160dae51f8cf2fb64e69e72e9",
-      "reviewDecision": "REVIEW_REQUIRED",
+      "reviewDecision": "APPROVED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
-      "reviews": [],
-      "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSn2RoA",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Review: PR #18515 \u2014 fix(theme): keep launch errors and retry readable\n\n**Scope:** `src/routes/launch.tsx` is Agent Canvas frontend presentation, owned by this repository. The change is confined to two `className` swaps; no API, state, i18n, theme-token, or dependency changes. Scope gate passes. Linked issue #18514 carries `bug`, `priority:low`, `ready-for-dev`; parent #18004 is `enhancement`, `priority:low`, `ready-for-dev`.\n\n**Head verified:** `6e1abb6408d2568160dae51f8cf2fb64e69e72e9`, no existing reviews or review comments, no failing check runs on the head.\n\n### What changed\n\n- Error heading: `text-red-400` \u2192 `text-feedback-error` (existing readable error-text role, `--oh-feedback-error`, per `specs/form-feedback.md` FF-001 / `@spec MCP-004`).\n- Try Again: `bg-blue-600 text-white hover:bg-blue-700` \u2192 `bg-contrast text-contrast-foreground hover:bg-contrast/90`. This mirrors the established `contrast`/`contrast-foreground` action-role pair already used in `src/components/features/sidebar/sidebar-onboarding-checklist-item-preview.tsx`.\n\n### Verification\n\nI recomputed sRGB contrast against the real rendered `bg-surface` card from the shipped theme tokens:\n\n| Theme | Heading (`feedback-error` on `surface`) | Old `red-400` baseline |\n|---|---|---|\n| openhands-deepsea | 5.45:1 | \u2014 |\n| openhands-neutral | 5.14:1 | \u2014 |\n| openhands-neo | 5.14:1 | \u2014 |\n| light-plus | 5.28:1 | 2.49:1 |\n| solarized-light | 4.94:1 | 2.26:1 |\n\nAll five themes clear the 4.5:1 normal-text threshold (20px medium is below the large-text threshold); the two light themes were the failing ones and now pass. Try Again label contrast, including the composited `bg-contrast/90` hover fill over the card surface, is \u2265 10.7:1 normal and hover in every theme.\n\n**Focused tests in the workspace (node 24, committed `package-lock.json`):**\n- `vitest run __tests__/routes/launch.test.tsx __tests__/themes/color-themes.test.tsx` \u2192 2 files, 50 tests passed. This covers parsing, parameter rendering, trust, creation and navigation/failure paths, plus the FF-001/WN-001 theme contrast contract.\n- `grep` confirms no raw palette utilities (`red-*`, `blue-*`, `text-white`, arbitrary hex) remain in `src/routes/launch.tsx`.\n- Head CI: `test-and-build (ubuntu)`, `test-and-build (windows)`, `check-pr-artifacts`, and the PR-title/description validators all report `success`; zero failing check runs.\n\n### Acceptance criteria (from #18514)\n\n- [x] Heading meets 4.5:1 on the actual card surface in all five themes (ratios above).\n- [x] Try Again uses existing semantic roles only; no raw palette utilities remain; label meets 4.5:1 normal and hover across themes.\n- [x] Behavior/layout unchanged: only `className` strings differ; Go Home still navigates to `/conversations`, Try Again still calls `window.location.reload()`, trust requirement, error copy, ARIA, and layout untouched.\n- [x] Focused route and theme tests pass.\n\nNon-blocking note: the PR body claims `npm run lint` passes with 0 errors; I could not reproduce a full `eslint` run in this review sandbox (the process was OOM-killed under the default heap), so I relied on the green Ubuntu/Windows `test-and-build` checks and the focused Vitest runs. That does not change the verdict.\n\nNo material correctness, security, compatibility, architecture, or evidence gaps found. The change is a minimal, correctly-scoped migration to existing semantic theme roles, backed by per-theme contrast math and a real running-app before/after capture.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T08:02:37Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "6e1abb6408d2568160dae51f8cf2fb64e69e72e9"
+          }
+        }
       ],
+      "draft": false,
+      "requestedReviewers": [],
       "latestChecks": {
-        "pass": 7,
         "skip": 6,
         "pending": 0,
         "failed": 0,
+        "pass": 7,
         "url": "https://github.com/OpenHands/OpenHands/pull/18515/checks"
       },
       "issue": 18514,
@@ -1076,10 +1104,10 @@
       "draft": true,
       "requestedReviewers": [],
       "latestChecks": {
-        "pass": 6,
         "skip": 6,
         "pending": 0,
         "failed": 1,
+        "pass": 6,
         "url": "https://github.com/OpenHands/OpenHands/pull/18520/checks"
       },
       "issue": 18517,
@@ -1109,10 +1137,10 @@
         "all-hands-bot"
       ],
       "latestChecks": {
-        "pass": 7,
         "skip": 6,
         "pending": 0,
         "failed": 0,
+        "pass": 7,
         "url": "https://github.com/OpenHands/OpenHands/pull/18526/checks"
       },
       "issue": 18519,
@@ -1129,16 +1157,179 @@
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
       "reviews": [],
-      "draft": true,
-      "requestedReviewers": [],
+      "draft": false,
+      "requestedReviewers": [
+        "all-hands-bot"
+      ],
       "latestChecks": {
-        "pass": 6,
         "skip": 6,
-        "pending": 1,
+        "pending": 0,
         "failed": 0,
+        "pass": 7,
         "url": "https://github.com/OpenHands/OpenHands/pull/18528/checks"
       },
       "issue": 18527,
+      "migrationIssue": 18004
+    },
+    {
+      "number": 18529,
+      "title": "fix(theme): make bulk model save outcomes readable",
+      "url": "https://github.com/OpenHands/OpenHands/pull/18529",
+      "state": "OPEN",
+      "mergedAt": null,
+      "headRefOid": "b685ae43ae6d8f91447e6bb4c23125c6b3aba932",
+      "reviewDecision": "REVIEW_REQUIRED",
+      "mergeable": "MERGEABLE",
+      "mergeCommit": null,
+      "reviews": [],
+      "draft": true,
+      "requestedReviewers": [],
+      "latestChecks": {
+        "skip": 6,
+        "pending": 1,
+        "failed": 0,
+        "pass": 6,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18529/checks"
+      },
+      "issue": 18516,
+      "migrationIssue": 18004
+    },
+    {
+      "number": 18530,
+      "title": "fix(theme): keep Markdown links readable across themes",
+      "url": "https://github.com/OpenHands/OpenHands/pull/18530",
+      "state": "OPEN",
+      "mergedAt": null,
+      "headRefOid": "8ddc5e57fcb9090805c5cc9dcaa5f26d7d3e444c",
+      "reviewDecision": "REVIEW_REQUIRED",
+      "mergeable": "MERGEABLE",
+      "mergeCommit": null,
+      "reviews": [],
+      "draft": true,
+      "requestedReviewers": [],
+      "latestChecks": {
+        "skip": 6,
+        "pending": 1,
+        "failed": 0,
+        "pass": 6,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18530/checks"
+      },
+      "issue": 18522,
+      "migrationIssue": 18004
+    },
+    {
+      "number": 18531,
+      "title": "fix(theme): clarify chat loading and timeout colors",
+      "url": "https://github.com/OpenHands/OpenHands/pull/18531",
+      "state": "OPEN",
+      "mergedAt": null,
+      "headRefOid": "5b8ed56a6d839c3470338f63362c237c4b7b8637",
+      "reviewDecision": "REVIEW_REQUIRED",
+      "mergeable": "MERGEABLE",
+      "mergeCommit": null,
+      "reviews": [],
+      "draft": true,
+      "requestedReviewers": [],
+      "latestChecks": {
+        "skip": 6,
+        "pending": 1,
+        "failed": 0,
+        "pass": 6,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18531/checks"
+      },
+      "issue": 18523,
+      "migrationIssue": 18004
+    },
+    {
+      "number": 18532,
+      "title": "refactor(theme): use semantic file chooser colors",
+      "url": "https://github.com/OpenHands/OpenHands/pull/18532",
+      "state": "OPEN",
+      "mergedAt": null,
+      "headRefOid": "7d7222b157546ec6a6e7f196877f4e20f312146c",
+      "reviewDecision": "REVIEW_REQUIRED",
+      "mergeable": "MERGEABLE",
+      "mergeCommit": null,
+      "reviews": [],
+      "draft": true,
+      "requestedReviewers": [],
+      "latestChecks": {
+        "skip": 6,
+        "pending": 1,
+        "failed": 0,
+        "pass": 6,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18532/checks"
+      },
+      "issue": 18518,
+      "migrationIssue": 18004
+    },
+    {
+      "number": 18533,
+      "title": "refactor(theme): use semantic budget meter fills",
+      "url": "https://github.com/OpenHands/OpenHands/pull/18533",
+      "state": "OPEN",
+      "mergedAt": null,
+      "headRefOid": "50ae78643fb497b028bdddf6adfd0dea366b5b49",
+      "reviewDecision": "REVIEW_REQUIRED",
+      "mergeable": "MERGEABLE",
+      "mergeCommit": null,
+      "reviews": [],
+      "draft": true,
+      "requestedReviewers": [],
+      "latestChecks": {
+        "skip": 6,
+        "pending": 0,
+        "failed": 1,
+        "pass": 6,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18533/checks"
+      },
+      "issue": 18525,
+      "migrationIssue": 18004
+    },
+    {
+      "number": 18534,
+      "title": "fix(lint): theme hook diagnostics and status badges",
+      "url": "https://github.com/OpenHands/OpenHands/pull/18534",
+      "state": "OPEN",
+      "mergedAt": null,
+      "headRefOid": "a0fe71bea3b56fb5d3e09636d072cdccb83c081d",
+      "reviewDecision": "REVIEW_REQUIRED",
+      "mergeable": "MERGEABLE",
+      "mergeCommit": null,
+      "reviews": [],
+      "draft": true,
+      "requestedReviewers": [],
+      "latestChecks": {
+        "skip": 6,
+        "pending": 1,
+        "failed": 0,
+        "pass": 6,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18534/checks"
+      },
+      "issue": 18521,
+      "migrationIssue": 18004
+    },
+    {
+      "number": 18535,
+      "title": "fix(lint): theme critic result text and scores",
+      "url": "https://github.com/OpenHands/OpenHands/pull/18535",
+      "state": "OPEN",
+      "mergedAt": null,
+      "headRefOid": "3e0b09078a861aa445f48b84d69ecab29f2b3b6b",
+      "reviewDecision": "REVIEW_REQUIRED",
+      "mergeable": "MERGEABLE",
+      "mergeCommit": null,
+      "reviews": [],
+      "draft": true,
+      "requestedReviewers": [],
+      "latestChecks": {
+        "skip": 6,
+        "pending": 1,
+        "failed": 0,
+        "pass": 6,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18535/checks"
+      },
+      "issue": 18524,
       "migrationIssue": 18004
     }
   ],
@@ -1226,6 +1417,50 @@
       "errors": 0,
       "warnings": 665,
       "note": "Independent automation-validation proposal-head audit, reported with its recording source. No combined current-main total or rule-severity change is implied."
+    },
+    {
+      "reportedAt": "2026-10-16T08:23:31+00:00",
+      "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18529",
+      "sourceCommit": "b685ae43ae6d8f91447e6bb4c23125c6b3aba932",
+      "baseCommit": "8238b7af825b8639191b9d7b4c6b080d4a93f388",
+      "command": "npm run lint",
+      "errors": 0,
+      "warnings": 666,
+      "reportedRawColorFindingsRemoved": 2,
+      "note": "Independent proposal-head audit, not a combined or current-main count."
+    },
+    {
+      "reportedAt": "2026-10-16T08:23:31+00:00",
+      "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18532",
+      "sourceCommit": "7d7222b157546ec6a6e7f196877f4e20f312146c",
+      "baseCommit": "8238b7af825b8639191b9d7b4c6b080d4a93f388",
+      "command": "npm run lint",
+      "errors": 0,
+      "warnings": 667,
+      "reportedRawColorFindingsRemoved": 1,
+      "note": "Independent proposal-head audit, not a combined or current-main count."
+    },
+    {
+      "reportedAt": "2026-10-16T08:23:31+00:00",
+      "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18534",
+      "sourceCommit": "a0fe71bea3b56fb5d3e09636d072cdccb83c081d",
+      "baseCommit": "8238b7af825b8639191b9d7b4c6b080d4a93f388",
+      "command": "npm run lint",
+      "errors": 0,
+      "warnings": 665,
+      "reportedRawColorFindingsRemoved": 3,
+      "note": "Independent proposal-head audit, not a combined or current-main count."
+    },
+    {
+      "reportedAt": "2026-10-16T08:23:31+00:00",
+      "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18535",
+      "sourceCommit": "3e0b09078a861aa445f48b84d69ecab29f2b3b6b",
+      "baseCommit": "8238b7af825b8639191b9d7b4c6b080d4a93f388",
+      "command": "npm run lint",
+      "errors": 0,
+      "warnings": 659,
+      "reportedRawColorFindingsRemoved": 9,
+      "note": "Independent proposal-head audit, not a combined or current-main count."
     }
   ],
   "mainLintAudits": [
