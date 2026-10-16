@@ -79,7 +79,8 @@ counts separate from the base-main audit and tracks review/merge status.
 
 At the dated status snapshot, #18504, #18508 and model profile messages
 in #18510 are merged. Destructive buttons in #18513 are ready with green CI and bot review requested;
-launch feedback in draft #18515 has real Before/After evidence while CI runs. Recording heads and media hashes stay attached
+launch feedback in #18515 is ready with real Before/After evidence, passing CI,
+and an initial all-hands-bot review request. Recording heads and media hashes stay attached
 to the source revisions actually captured.
 
 ## Model profile messages
@@ -123,7 +124,7 @@ Cloud/ACP and DigitalOcean are outside the recorded scope.
 
 ## Launch error feedback
 
-Draft [#18515](https://github.com/OpenHands/OpenHands/pull/18515) addresses
+[#18515](https://github.com/OpenHands/OpenHands/pull/18515) addresses
 [bug #18514](https://github.com/OpenHands/OpenHands/issues/18514). The 14-second
 `launch-before-after.mp4` and 12.01-second silent GIF show only the generic
 real launch error card. Generated inert local metadata plus stopping the own
@@ -136,3 +137,14 @@ and Go Home checks, asset hashes and limits. Heading contrast reaches 4.94:1
 and retry text 10.66:1 at the after minima. Retry already passed at baseline;
 its change follows the theme. Source installation and Cloud/ACP authorization
 are outside this recording's scope.
+
+## Managed-agent focus: draft trace
+
+Draft [#18520](https://github.com/OpenHands/OpenHands/pull/18520) records four
+focus-token substitutions at `f7caf58063`. `managed-agent-focus-draft-source.json`
+is a static palette audit, with a 3.26:1 minimum on the evaluated surfaces.
+Authenticated affected-state evidence needs an authorized DigitalOcean Managed
+Agents connection, an agent and a session, which the disposable stack lacks.
+[Issue #18517](https://github.com/OpenHands/OpenHands/issues/18517) remains
+unreproduced/unready; the description validator requires live proof. There is no
+movie or authenticated-state verification claim, and no bot review request.
