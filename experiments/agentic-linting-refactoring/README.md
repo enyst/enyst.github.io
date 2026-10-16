@@ -22,7 +22,8 @@ and reproducible capture recipes. The combined film includes the secret-selectio
 change, now merged. The dated page snapshot tracks twenty-one merged proposals,
 including the latest focus, context Usage, connection banner, and spec-note cleanup
 changes. Draft #18504 tracks the composer context popover as the twenty-second
-proposal, with live evidence and review preparation in progress. Recording source
+proposal, with its real Before/After evidence now available and review preparation
+in progress. Recording source
 heads stay unchanged when the PR status snapshot is refreshed.
 
 ## Git Sync semantic colors
@@ -42,3 +43,21 @@ Notebook's original ambient bed at a very low level (mean -46.1 dBFS, maximum
 hash are in `git-sync-semantic-colors-poster.png`,
 `git-sync-semantic-colors-captions.vtt`, and
 `git-sync-semantic-colors-sources.json`.
+
+## Composer context popover
+
+Draft [#18504](https://github.com/OpenHands/OpenHands/pull/18504) addresses
+[bug #18505](https://github.com/OpenHands/OpenHands/issues/18505). Its 18-second
+`context-popover-before-after.mp4` compares real warning/danger states in Light+
+at base `0c7c2258a8` and head `8189e21472`, using production Canvas, Agent Server
+1.55.1, and DeepSeek Flash. The movie crops only the popover and blank composer
+controls, excluding all conversation/sidebar content. It labels every Before/After
+scene and contains original synthesized ambience at a maximum -42.9 dBFS.
+
+The matching GIF, poster, captions, five-theme comparison, and component-only PNGs
+are named in `context-popover-source.json`, which preserves hashes, source heads,
+crop coordinates, configured context budgets, and 60 desktop/phone measurements.
+The scoped warning/danger text, fill, and boundary checks pass; existing muted
+Solarized text and the phone popover's 2 px left-edge clip remain unchanged.
+The movie and screenshots document the proposed head; they do not imply that the
+PR is ready for review or merged.
