@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warm-pool key rotation — Engel Nyst</title>
+  <meta name="description" content="Why a warm-pool Agent Server accepted the right keys but kept a stale cipher, and the small initialization fix in OpenHands PR #5758.">
+  <meta property="og:title" content="Warm-pool key rotation: refresh the stores">
+  <meta property="og:description" content="A before-and-after flow of the cached-cipher bug and the initialization fix in OpenHands PR #5758.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/warm-pool-cipher-refresh.html">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    .shell { max-width: 1040px; }
+    h1 { font-size: clamp(2.4rem, 5vw, 3.5rem); max-width: 19ch; text-wrap: balance; margin-top: 26px; }
+    h2 { text-transform: none; letter-spacing: -.01em; margin-top: 36px; }
+    a { color: var(--teal); text-underline-offset: .2em; }
+    a:hover { color: var(--ink); }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    ::selection { background: var(--accent); color: var(--bg); }
+    .intro { max-width: 69ch; font-size: 1.08rem; margin: 20px 0 12px; }
+    .meta { margin-bottom: 26px; }
+    .setup { padding: 16px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); max-width: none; }
+    .setup p { margin: 0; }
+    .keys { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 10px; font-size: .85rem; color: #b7b1a6; }
+    .key { font-family: var(--mono); font-weight: 600; color: var(--accent); }
+    .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 26px; }
+    .lane { min-width: 0; }
+    .lane h2 { font-family: var(--sans); font-size: 1.12rem; margin: 0 0 16px; border: 0; padding: 0; }
+    .before h2, .before .outcome strong { color: #ef987f; }
+    .after h2, .after .outcome strong { color: var(--teal); }
+    .flow { list-style: none; padding: 0; margin: 0; }
+    .flow li { position: relative; padding: 13px 16px; margin: 0 0 28px; border: 1px solid #48453d; border-radius: var(--border-radius); background: var(--card); font-size: .93rem; line-height: 1.5; }
+    .flow li:not(:last-child)::after { content: ""; position: absolute; left: 50%; top: calc(100% + 1px); width: 1px; height: 20px; background: #8a847a; }
+    .flow li:not(:last-child)::before { content: ""; position: absolute; left: calc(50% - 3px); top: calc(100% + 16px); width: 7px; height: 7px; border-right: 1px solid #8a847a; border-bottom: 1px solid #8a847a; transform: rotate(45deg); }
+    .flow li:last-child { margin-bottom: 0; }
+    .flow strong { display: block; }
+    .flow small { display: block; color: #b7b1a6; font-size: .84rem; margin-top: 3px; }
+    .flow .stale { border-color: #b96c58; }
+    .flow .refresh { border-color: var(--teal); }
+    .flow .outcome { background: transparent; }
+    code { overflow-wrap: anywhere; }
+    .flow code { border: 0; padding: 0; background: none; font-size: .9em; }
+    .note { color: #b7b1a6; font-size: .86rem; margin: 16px 0 0; }
+    .implementation { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; align-items: start; }
+    pre.code { margin: 0; font-size: .76rem; padding: 16px; }
+    pre code { border: 0; padding: 0; background: none; font-size: inherit; }
+    .added { color: var(--teal); }
+    .implementation p { margin: 0 0 12px; }
+    .proof { margin: 30px 0 0; padding: 20px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .proof h2 { margin: 0 0 8px; border: 0; padding: 0; font-size: 1rem; }
+    .proof p { margin: 0; max-width: 72ch; }
+    footer { margin-top: 26px; border: 0; padding: 0; line-height: 1.9; }
+    @media (max-width: 700px) {
+      .shell { padding: 28px 20px 48px; }
+      .comparison, .implementation { grid-template-columns: 1fr; gap: 28px; }
+      h1 { max-width: 18ch; }
+    }
+  </style>
+</head>
+<body>
+<main class="shell">
+  <a class="back" href="../index.html#architecture-studies">← Architecture studies</a>
+  <header>
+    <h1>Warm-pool key rotation: refresh the stores</h1>
+    <p class="intro">The server accepted the right keys, but its cached persistence stores kept the startup cipher. Rebuild those stores before the initialized services use them.</p>
+    <p class="meta">OpenHands Agent Server · <a href="https://github.com/OpenHands/software-agent-sdk/pull/5758">Fix in PR #5758</a> · 16 October 2026</p>
+  </header>
+
+  <div class="setup">
+    <p><strong>The setup.</strong> A warm-pool server boots before it knows the user’s keys. Startup code can already create settings and secrets stores, which capture the boot cipher.</p>
+    <div class="keys" aria-label="Key legend">
+      <span><b class="key">A</b> encrypted the saved data</span>
+      <span><b class="key">B</b> new user key</span>
+      <span><b class="key">C</b> temporary boot key</span>
+    </div>
+  </div>
+
+  <section class="comparison" aria-label="Before and after initialization flow">
+    <div class="lane before">
+      <h2>Before · the cache keeps C</h2>
+      <ol class="flow">
+        <li><strong><code>POST /api/init</code> receives B + A</strong><small>The new config has both the current and previous key.</small></li>
+        <li class="stale"><strong>Existing stores still hold C</strong><small>Passing the new config to a singleton getter returns the same cached store.</small></li>
+        <li><strong>Rotation uses the stale stores</strong><small>They never receive A, so saved values remain unreadable.</small></li>
+        <li class="outcome"><strong>Init 200 · settings write 409</strong><small>The saved LLM key appears missing. Data on disk stays intact.</small></li>
+      </ol>
+    </div>
+    <div class="lane after">
+      <h2>After · refresh at initialization</h2>
+      <ol class="flow">
+        <li><strong><code>POST /api/init</code> receives B + A</strong><small>Stop boot telemetry before clearing the stores it reads.</small></li>
+        <li class="refresh"><strong>Reset the cached stores</strong><small>Clear in-memory references; preserve the saved files.</small></li>
+        <li><strong>Fresh stores use B + A</strong><small>Read with A; re-encrypt settings and secrets with B.</small></li>
+        <li class="outcome"><strong>Start consumers → ready</strong><small>Saved credentials are available. Reads and writes succeed.</small></li>
+      </ol>
+    </div>
+  </section>
+
+  <section aria-labelledby="fix-title">
+    <h2 id="fix-title">One lifecycle boundary, using the existing reset</h2>
+    <div class="implementation">
+      <pre class="code" aria-label="Initialization ordering excerpt"><code>await shutdown_telemetry_sink()
+<span class="added">reset_stores()
+await asyncio.to_thread(
+    reencrypt_stale_stores, new_config
+)</span>
+# Then build telemetry and services.</code></pre>
+      <div>
+        <p><strong>Order matters.</strong> New telemetry reads persisted consent; the conversation service captures its stores. Both must start after the reset and rotation.</p>
+        <p class="note">The fix adds the existing reset and moves re-encryption earlier. <a href="https://github.com/OpenHands/software-agent-sdk/commit/f4dfad4ae15d74bb9fa01929d1aa940279d83798">See the small production diff</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <aside class="proof" aria-labelledby="proof-title">
+    <h2 id="proof-title">Verified through startup → init → settings</h2>
+    <p>Regression tests cover rotated and already-current keys. Real-process HTTP checks reproduced the failure, then confirmed working reads and writes with the fix. A restart with <strong>B alone</strong> recovered the saved values. <a href="https://github.com/OpenHands/software-agent-sdk/blob/bdea6cd02039473754fca62a09d3bf9da34acdb2/.pr/live-verification.md">Evidence and scope</a>.</p>
+  </aside>
+
+  <footer>
+    Verified at <a href="https://github.com/OpenHands/software-agent-sdk/commit/bdea6cd02039473754fca62a09d3bf9da34acdb2">bdea6cd02</a> ·
+    <a href="https://github.com/OpenHands/software-agent-sdk/blob/bdea6cd02039473754fca62a09d3bf9da34acdb2/openhands-agent-server/openhands/agent_server/persistence/store.py#L921-L1003">Store lifecycle</a> ·
+    <a href="https://github.com/OpenHands/software-agent-sdk/blob/bdea6cd02039473754fca62a09d3bf9da34acdb2/tests/cross/test_remote_conversation_live_server.py#L275-L366">Regression test</a><br>
+    Related: <a href="openhands-deferred-init-runtime-boundary.html">Deferred-init runtime boundaries</a>
+  </footer>
+</main>
+</body>
+</html>
