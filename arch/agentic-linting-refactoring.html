@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Agentic linting refactoring · Engel's Code Design Notebook</title>
-  <meta name="description" content="The OpenHands Agent Canvas linting refactor: shared theme tokens, component contracts, staged shadcn rules, 21 merged proposals, the next color batch, and real Before/After videos." />
+  <meta name="description" content="The OpenHands Agent Canvas linting refactor: shared theme tokens, component contracts, staged shadcn rules, 21 merged proposals, the draft composer popover batch, and real Before/After videos." />
   <meta property="og:title" content="Agentic linting refactoring" />
   <meta property="og:description" content="Real Before/After films, the proposal rollout, and what comes next: make the design rules something an agent can check and act on." />
   <meta property="og:type" content="article" />
@@ -65,7 +65,7 @@
     <a class="back" href="../index.html">← Engel's Code Design Notebook</a>
     <h1 class="page">Agentic linting refactoring</h1>
     <p class="page-intro">Make the design rules something a coding agent can check and act on: known Tailwind classes, readable theme colors, and shared controls whose appearance has one owner. This is the ongoing linting refactor in OpenHands Agent Canvas.</p>
-    <p class="snapshot">Status checked <time datetime="2026-10-16T05:10:53+00:00">16 October 2026, 07:10</time> · Stockholm time. All twenty-one tracked proposals are merged, including backend focus, context Usage, connection banners, and the small documentation cleanup. The composer context popover is the next color batch, now in progress.</p>
+    <p class="snapshot">Status checked <time datetime="2026-10-16T05:19:34+00:00">16 October 2026, 07:19</time> · Stockholm time. Twenty-one of the twenty-two tracked proposals are merged, including backend focus, context Usage, connection banners, and the small documentation cleanup. The composer context popover is now <a href="https://github.com/OpenHands/OpenHands/pull/18504">draft #18504</a>; live evidence and review preparation are in progress.</p>
     <nav class="links" aria-label="On this page">
       <a href="#latest-films">Latest films</a>
       <a href="#providers-focus-film">Providers focus</a>
@@ -324,6 +324,7 @@
           <li><div class="entry-head"><h3>Keep automation setup errors readable</h3><span class="state">Merged · 15 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18482">#18482</a> keeps the automation setup draft bar's error pill at 4.5:1 text contrast in every built-in theme. The palette contract checks the actual tinted pill against its parent surface.</p></li>
           <li><div class="entry-head"><h3>Theme the connection status banners</h3><span class="state">Merged · 16 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18493">#18493</a> replaces 18 raw-color findings in its audited batch with theme-aware status and feedback roles. The film shows configured credentials and disconnected-backend feedback; the configured banner was checked in all five palettes and both recorded banners at phone width. CLI-authenticated success remains outside the live capture coverage. The film records <code>0a9d129f8d</code>; final head <code>faea309c9d</code> also incorporates main and removes minor-change spec bookkeeping. The PR merged at 06:59 Stockholm time.</p></li>
           <li><div class="entry-head"><h3>Keep minor color fixes free of spec bookkeeping</h3><span class="state">Merged · 16 October</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18499">#18499</a> removes the context-color batch's added spec notes and tags. Runtime behavior, focused tests, and recorded evidence stay intact. Backend focus and connection banners received the same cleanup before their own merges.</p></li>
+          <li><div class="entry-head"><h3>Keep composer context feedback readable</h3><span class="state state-open">Draft · evidence in progress</span></div><p><a href="https://github.com/OpenHands/OpenHands/pull/18504">#18504</a> proposes semantic warning and danger feedback on a raised popover surface, with a visible boundary around its full context bar. It follows the merged Usage drawer correction; thresholds, navigation, and compaction behavior stay intact. The PR is draft while real Before/After evidence and review preparation are completed. <a href="../experiments/agentic-linting-refactoring/composer-context-before-warning-light-plus-component.png">Baseline Light+ popover crop</a> · <a href="../experiments/agentic-linting-refactoring/composer-context-screenshot-sources.json">capture source</a>.</p></li>
         </ol>
         <p>The earlier MCP feedback and secret-selection changes together remove <strong>15 raw-color findings</strong>. Inline-style warnings expose a separate existing backlog; these figures do not describe the net warning count.</p>
       </section>
@@ -331,7 +332,7 @@
       <section aria-labelledby="next">
         <h2 id="next">What's next, in order</h2>
         <ol class="steps">
-          <li><strong>Theme the composer context popover · in progress.</strong> With <a href="https://github.com/OpenHands/OpenHands/pull/18431">#18431</a> merged, take the popover's raw warning and danger colors in their own PR. Its text sits on a tertiary surface and its bar has a mixed track, so copying class names alone does not establish contrast. Check the popover's actual surface and track in all five palettes, especially DeepSea; the DeepSea feedback-text correction it needs is now merged.</li>
+          <li><strong>Verify the composer context popover · draft #18504.</strong> <a href="https://github.com/OpenHands/OpenHands/pull/18504">The next color batch</a> uses a raised surface and a visible full-range bar boundary alongside semantic warning and danger roles. Live evidence is in progress across all five palettes, including DeepSea, on desktop and phone. The PR remains draft while its media, human note, and CI are completed.</li>
           <li><strong>Keep raw colors at warning severity until a fresh audit is complete.</strong> Rerun <a href="https://github.com/OpenHands/OpenHands/issues/18004">#18004</a>'s audit on the then-current main, account for every remaining finding and narrow exception, and verify rendering before promoting <code>no-raw-colors</code> to an error. Historical batch counts are not today's remaining total.</li>
           <li><strong>Keep other ownership audits separate.</strong> Typography, menus, and <code>Pre</code> need their own appearance decisions. Review dynamic-style owners before strengthening inline-style enforcement; preserve measured layout and public renderer interfaces. Arbitrary-value warnings also need an owner decision rather than a blanket severity change.</li>
         </ol>

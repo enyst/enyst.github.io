@@ -21,8 +21,9 @@ The source PRs retain the detailed tests, contrast measurements, app evidence,
 and reproducible capture recipes. The combined film includes the secret-selection
 change, now merged. The dated page snapshot tracks twenty-one merged proposals,
 including the latest focus, context Usage, connection banner, and spec-note cleanup
-changes. The composer context popover is the next batch in progress. Recording
-source heads stay unchanged when the PR status snapshot is refreshed.
+changes. Draft #18504 tracks the composer context popover as the twenty-second
+proposal, with live evidence and review preparation in progress. Recording source
+heads stay unchanged when the PR status snapshot is refreshed.
 
 ## Git Sync semantic colors
 
