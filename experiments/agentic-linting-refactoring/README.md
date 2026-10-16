@@ -60,7 +60,7 @@ The scoped warning/danger text, fill, and boundary checks pass; existing muted
 Solarized text and the phone popover's 2 px left-edge clip remain unchanged.
 The movie and screenshots document the proposed head. The dated status snapshot
 records that #18504 is ready for review with bot approval; it is not
-merged. The consent backend-scope text is the next separate color batch.
+merged. The separate consent backend-scope batch is documented below.
 
 ## Consent backend scope
 
@@ -77,3 +77,7 @@ artifact hashes. The backend-scope line reaches 12.25–16.29:1; other descripti
 colors are unchanged. Unchecking consent, confirming, and reloading still keeps
 the preference false. The dated status snapshot keeps the proposal-head lint
 counts separate from the base-main audit and tracks review/merge status.
+
+At the final dated status snapshot, both #18504 and #18508 are open and ready
+for review, with passing CI. The bot approved #18504 and is requested on #18508.
+The recording heads and media hashes remain unchanged.
