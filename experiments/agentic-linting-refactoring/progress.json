@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-16T06:49:02+00:00",
+  "checkedAt": "2026-10-16T07:25:22+00:00",
   "displayTimeZone": "Europe/Stockholm",
-  "main": "6296a8e76f7c9a9f5e759a41b72a9d0d6fb0e5f5",
+  "main": "d3a58cd1cc045bbb1b24f2c8c0d79a8404ef239b",
   "shadcnLintVersion": "0.2.1",
   "pullRequests": [
     {
@@ -940,18 +940,49 @@
     {
       "number": 18510,
       "title": "fix(theme): keep model profile messages readable",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T07:05:29Z",
       "url": "https://github.com/OpenHands/OpenHands/pull/18510",
       "headRefOid": "e71b4499fa721f67ced214d83b22452d469ecb83",
-      "reviewDecision": "REVIEW_REQUIRED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
-      "reviews": [],
-      "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
+      "reviewDecision": "APPROVED",
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "2437df930ece23f2a4f09a06878289d5eb33c480"
+      },
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSnUIsA",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nPresentation-only change to `src/components/features/chat/model-messages.tsx` (+11/-11) that replaces fixed Tailwind neutral palette classes with the repository's semantic theme roles. Scope is Canvas-owned (UI presentation), the change follows the dependency direction, and it needs no Agent Server/SDK contract work. No material correctness, security, compatibility, or architecture defect found.\n\n**What I verified on head `e71b4499fa721f67ced214d83b22452d469ecb83`**\n\n- Diff is confined to the one component; event anchoring, expansion, profile switching, diagnostics rendering, free-model display, and the shared `GenericEventMessage` wrapper are untouched (only className strings changed).\n- Every replacement resolves to an existing token declared in `src/tailwind.css` (`border-border`, `text-text-tertiary`, `text-contrast`, `bg-surface-raised`, `hover:bg-interactive-hover-low`), so no raw hex/neutral utility remains in the file.\n- I recomputed WCAG contrast from the shipped palettes in `src/themes/color-theme/definitions/*` against the real chat surface (`conversation-main` renders the chat panel as `bg-canvas-base`): profile name and titles (`text-contrast`) 12.25:1 to 16.29:1; expanded diagnostics and the info icon (`text-text-tertiary`) 4.99:1 on Light+/Solarized chat and 4.65:1 on the hover surface; switch chip (`text-contrast` on `bg-surface-raised`) 12.39:1 or better; the closest value is Solarized Light, which still clears the 4.5:1 text and 3:1 icon targets. Hover resolves to the theme's own `interactive-hover-low`, so light themes no longer paint a dark neutral surface.\n- Focused tests pass locally: `__tests__/components/features/chat/model-messages.test.tsx`, `__tests__/components/conversation-events/chat/messages-model-messages.test.tsx`, and `__tests__/themes/color-themes.test.tsx` (19 passed).\n- Current head checks: `test-and-build (ubuntu)` and `test-and-build (windows)` success, `pr-title`, `Validate PR description`, and `check-pr-artifacts` success; `live-e2e` and manifest jobs are skipped as designed for a PR (they run post-merge). Linked issue #18509 is open with `bug`, `priority:low`, `ready-for-dev`; parent #18004 remains open. No prior review from this account on this head.\n\n**Acceptance-criteria checklist (issue #18509)**\n\n- [x] Names, diagnostics, titles, and switch chip meet their contrast targets in all five shipped themes on the rendered chat/hover/chip surfaces (recomputed from the palette definitions; Solarized Light is the tightest and still passes).\n- [x] Switch info icon meets the 3:1 UI-icon target in all five themes (>=4.65:1).\n- [x] Border and row hover resolve to semantic roles (`border-border`, `hover:bg-interactive-hover-low`); no dark neutral hover in light themes.\n- [x] No `shadcn/no-raw-colors` hits remain in the changed file and no new allow entries were added to `eslint.config.js`.\n- [x] Event anchoring, expansion/collapse, `/model <name>` switching, the diagnostic readout, the `(free)` suffix, and the empty-profile hint are behaviorally unchanged (covered by the passing focused tests).\n\nEvidence: the PR supplies before/after media, a five-theme comparison, a hover comparison, and a video captured in the real Canvas against a real local backend, with provenance for computed colors, which satisfies the functional-change evidence rule. The change affects no prompts, tool selection, conversation payloads, or evaluation paths, so there is no eval risk.\n\nNo blocking or non-blocking findings to report.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T07:05:02Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "e71b4499fa721f67ced214d83b22452d469ecb83"
+          }
+        },
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSnV5AQ",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Review: PR #18510 \u2014 fix(theme): keep model profile messages readable\n\nFresh review of head `e71b4499fa721f67ced214d83b22452d469ecb83` (matches the PR head).\n\n**Scope.** The change is a presentation-only batch of #18004 in `src/components/features/chat/model-messages.tsx`, fully owned by this repository (Agent Canvas UI). It correctly stays within the linked issue's declared scope: the shared `GenericEventMessage` wrapper and its outer muted chevron are untouched.\n\n**Correctness.** Every replacement maps to a real semantic theme role defined in `src/tailwind.css` `@theme inline` (`text-contrast`, `text-text-tertiary`, `border-border`, `bg-interactive-hover-low`, `bg-surface-raised`), all backed by `--oh-*` tokens in `:root` and the five theme definitions. A nonexistent class would silently no-op, so I verified each one resolves. Only `className` strings changed; no logic, state, or anchoring behavior is affected.\n\n- Row border `border-neutral-700` to `border-border`; `hr` border likewise.\n- Row hover `hover:bg-neutral-700` to `hover:bg-interactive-hover-low` (`#F2F2F2` in Light+, `#F5EEDB` in Solarized Light, `cool-grey-900` in dark themes), removing the dark hover surface on light palettes.\n- Name / titles / chip text `text-neutral-200` to `text-contrast` (`#1F1F1F` Light+, `#002B36` Solarized Light, `#FFFFFF` default dark), fixing the ~1.26:1 name contrast.\n- Diagnostics, empty-profile hint, row chevron, switch info icon (`text-neutral-300`/`text-neutral-400`) to `text-text-tertiary` (`#4D4D4D` Light+, `#586E75` Solarized Light).\n- Switch chip `bg-neutral-800` to `bg-surface-raised`.\n\n**Acceptance criteria.**\n- [x] Names, diagnostics, icons, titles, and chips follow all five shipped themes and meet contrast targets \u2014 token values support the reported AFTER measurements (diagnostics >=4.99:1, icons >=4.65:1, chips >=12.39:1), with before/after captures linked in the PR and issue.\n- [x] Borders and hover use semantic theme roles; no raw palette classes remain in the component, and no `shadcn/no-raw-colors` allowlist exception was added to `eslint.config.js`.\n- [x] Event anchoring, expansion, switching, diagnostics, and free-model display are unchanged (CSS-only diff).\n\n**Evidence and checks.** This is a small localized CSS fix (LOW risk), so no design doc is required. The PR supplies real-app before/after captures, a five-theme comparison, and a hover comparison with measurement provenance. CI on the exact head is green (`test-and-build` ubuntu and windows success; lint/typecheck covered). Locally I ran the focused suites \u2014 `get-event-content.test.tsx`, `syntax-highlighter-themes.test.ts`, `terminal-themes.test.ts` \u2014 107 passed. No test asserts the replaced class strings, so no regression path is broken.\n\nNo material correctness, security, compatibility, or architecture findings. This is a cosmetic accessibility fix with appropriate evidence.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T07:07:48Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "e71b4499fa721f67ced214d83b22452d469ecb83"
+          }
+        }
       ],
+      "draft": false,
+      "requestedReviewers": [],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
@@ -979,6 +1010,29 @@
           "appBuild": "passed"
         }
       }
+    },
+    {
+      "number": 18513,
+      "title": "fix(theme): keep destructive button labels readable",
+      "url": "https://github.com/OpenHands/OpenHands/pull/18513",
+      "state": "OPEN",
+      "mergedAt": null,
+      "headRefOid": "f52f2f7b2929f78e4037afe4a1f56770bfc6e378",
+      "reviewDecision": "REVIEW_REQUIRED",
+      "mergeable": "MERGEABLE",
+      "mergeCommit": null,
+      "reviews": [],
+      "draft": true,
+      "requestedReviewers": [],
+      "latestChecks": {
+        "pass": 6,
+        "skip": 6,
+        "pending": 1,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18513/checks"
+      },
+      "issue": 18512,
+      "migrationIssue": 18004
     }
   ],
   "lintAudit": {

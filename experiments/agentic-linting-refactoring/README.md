@@ -77,9 +77,9 @@ colors are unchanged. Unchecking consent, confirming, and reloading still keeps
 the preference false. The dated status snapshot keeps the proposal-head lint
 counts separate from the base-main audit and tracks review/merge status.
 
-At the dated status snapshot, #18504 and #18508 are merged. Model profile
-messages in #18510 are ready for review with passing CI and an initial
-all-hands-bot review request. Recording heads and media hashes stay attached
+At the dated status snapshot, #18504, #18508 and model profile messages
+in #18510 are merged. Destructive buttons in draft #18513 have real Before/After
+evidence while CI runs. Recording heads and media hashes stay attached
 to the source revisions actually captured.
 
 ## Model profile messages
@@ -103,3 +103,20 @@ The full CI run at `e71b4499fa` passed on Ubuntu and Windows: 9,097 tests
 passed across 837 files (one skipped, seven todo), app/library builds passed,
 and the package dry-run passed. Browser playback and the direct MP4 download
 were also verified; the downloaded bytes match the source manifest.
+
+## Shared destructive buttons
+
+Draft [#18513](https://github.com/OpenHands/OpenHands/pull/18513) addresses
+[bug #18512](https://github.com/OpenHands/OpenHands/issues/18512) with semantic
+colors for ghost and filled destructive BrandButton variants. The 18-second
+`brand-button-before-after.mp4` includes original very quiet ambience; its silent
+GIF lasts 16.01 seconds. Component-only source pixels show the generated local
+delete-profile fixture and disabled built-in demo-app footer, without user data
+or credential values. No model turn ran.
+
+`brand-button-source.json` preserves exact base `8238b7af82` and after
+`f52f2f7b29`, asset hashes, source crops, 80 actual theme/viewport/state captures,
+and successful fixture delete/uninstall checks. Changed ghost text reaches
+4.94:1 and filled text 4.89:1 at their minima. Filled labels already passed at
+baseline; the reproduced contrast defect concerns ghost labels. Other variants,
+Cloud/ACP and DigitalOcean are outside the recorded scope.
