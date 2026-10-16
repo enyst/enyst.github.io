@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Warm-pool key rotation — Engel Nyst</title>
-  <meta name="description" content="Why a warm-pool Agent Server accepted the right keys but kept a stale cipher, and the small initialization fix in OpenHands PR #5758.">
-  <meta property="og:title" content="Warm-pool key rotation: refresh the stores">
-  <meta property="og:description" content="A before-and-after flow of the cached-cipher bug and the initialization fix in OpenHands PR #5758.">
+  <title>Safe key rotation · PR #5758 — Engel Nyst</title>
+  <meta name="description" content="OpenHands PR #5758: support encryption-key rotation, preserve saved secrets when a key is missing, and initialize warm-pool stores with the right keys.">
+  <meta property="og:title" content="Rotate keys without losing saved secrets">
+  <meta property="og:description" content="The original data-loss bug, current and previous keys, guarded writes, and when persisted files are re-encrypted.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://enyst.github.io/arch/warm-pool-cipher-refresh.html">
   <link rel="icon" href="data:,">
@@ -46,6 +46,14 @@
     code { overflow-wrap: anywhere; }
     .flow code { border: 0; padding: 0; background: none; font-size: .9em; }
     .note { color: #b7b1a6; font-size: .86rem; margin: 16px 0 0; }
+    .old-flow { display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 22px; list-style: none; padding: 0; margin: 12px 0 4px; }
+    .old-flow li { position: relative; margin: 0; font-size: .9rem; color: #ef987f; }
+    .old-flow li + li::before { content: "→"; position: absolute; left: -20px; color: #b7b1a6; }
+    .old-flow strong { color: inherit; }
+    .migration { font-size: .9rem; }
+    .migration th { text-transform: none; font-family: var(--sans); font-size: .95em; letter-spacing: 0; }
+    .migration th:first-child { width: 30%; }
+    .warm-flow { color: var(--teal); font-weight: 700; }
     .implementation { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; align-items: start; }
     pre.code { margin: 0; font-size: .76rem; padding: 16px; }
     pre code { border: 0; padding: 0; background: none; font-size: inherit; }
@@ -59,6 +67,8 @@
       .shell { padding: 28px 20px 48px; }
       .comparison, .implementation { grid-template-columns: 1fr; gap: 28px; }
       h1 { max-width: 18ch; }
+      .old-flow { grid-template-columns: 1fr; }
+      .old-flow li + li::before { content: "↓"; position: static; display: block; margin: 4px 0; }
     }
   </style>
 </head>
@@ -66,66 +76,78 @@
 <main class="shell">
   <a class="back" href="../index.html#architecture-studies">← Architecture studies</a>
   <header>
-    <h1>Warm-pool key rotation: refresh the stores</h1>
-    <p class="intro">The server accepted the right keys, but its cached persistence stores kept the startup cipher. Rebuild those stores before the initialized services use them.</p>
-    <p class="meta">OpenHands Agent Server · <a href="https://github.com/OpenHands/software-agent-sdk/pull/5758">Fix in PR #5758</a> · 16 October 2026</p>
+    <h1>Rotate keys without losing saved secrets</h1>
+    <p class="intro">PR #5758 adds previous keys for decryption, moves saved values to the current key, and blocks destructive settings and secrets writes when no configured key can read the existing data.</p>
+    <p class="meta">OpenHands Agent Server · <a href="https://github.com/OpenHands/software-agent-sdk/pull/5758">PR #5758</a> · fixes <a href="https://github.com/OpenHands/software-agent-sdk/issues/5622">#5622</a> · 16 October 2026</p>
   </header>
 
-  <div class="setup">
-    <p><strong>The setup.</strong> A warm-pool server boots before it knows the user’s keys. Startup code can already create settings and secrets stores, which capture the boot cipher.</p>
-    <div class="keys" aria-label="Key legend">
-      <span><b class="key">A</b> encrypted the saved data</span>
-      <span><b class="key">B</b> new user key</span>
-      <span><b class="key">C</b> temporary boot key</span>
-    </div>
-  </div>
-
-  <section class="comparison" aria-label="Before and after initialization flow">
-    <div class="lane before">
-      <h2>Before · the cache keeps C</h2>
-      <ol class="flow">
-        <li><strong><code>POST /api/init</code> receives B + A</strong><small>The new config has both the current and previous key.</small></li>
-        <li class="stale"><strong>Existing stores still hold C</strong><small>Passing the new config to a singleton getter returns the same cached store.</small></li>
-        <li><strong>Rotation uses the stale stores</strong><small>They never receive A, so saved values remain unreadable.</small></li>
-        <li class="outcome"><strong>Init 200 · settings write 409</strong><small>The saved LLM key appears missing. Data on disk stays intact.</small></li>
-      </ol>
-    </div>
-    <div class="lane after">
-      <h2>After · refresh at initialization</h2>
-      <ol class="flow">
-        <li><strong><code>POST /api/init</code> receives B + A</strong><small>Stop boot telemetry before clearing the stores it reads.</small></li>
-        <li class="refresh"><strong>Reset the cached stores</strong><small>Clear in-memory references; preserve the saved files.</small></li>
-        <li><strong>Fresh stores use B + A</strong><small>Read with A; re-encrypt settings and secrets with B.</small></li>
-        <li class="outcome"><strong>Start consumers → ready</strong><small>Saved credentials are available. Reads and writes succeed.</small></li>
-      </ol>
-    </div>
+  <section class="setup" aria-label="Original bug before this PR">
+    <p><strong>Before this PR: a key change could become permanent data loss.</strong></p>
+    <ol class="old-flow">
+      <li>Replace encryption key <strong>A</strong> with <strong>B</strong></li>
+      <li>Old secrets cannot decrypt; reads show them as unset</li>
+      <li>A later edit returns <strong>200</strong> and saves nulls over the ciphertext</li>
+    </ol>
+    <p class="note">After that overwrite, restoring A cannot recover the erased values.</p>
   </section>
 
-  <section aria-labelledby="fix-title">
-    <h2 id="fix-title">One lifecycle boundary, using the existing reset</h2>
-    <div class="implementation">
-      <pre class="code" aria-label="Initialization ordering excerpt"><code>await shutdown_telemetry_sink()
-<span class="added">reset_stores()
-await asyncio.to_thread(
-    reencrypt_stale_stores, new_config
-)</span>
-# Then build telemetry and services.</code></pre>
-      <div>
-        <p><strong>Order matters.</strong> New telemetry reads persisted consent; the conversation service captures its stores. Both must start after the reset and rotation.</p>
-        <p class="note">The fix adds the existing reset and moves re-encryption earlier. <a href="https://github.com/OpenHands/software-agent-sdk/commit/f4dfad4ae15d74bb9fa01929d1aa940279d83798">See the small production diff</a>.</p>
+  <section aria-labelledby="behavior-title">
+    <h2 id="behavior-title">After: two deliberate paths</h2>
+    <div class="comparison">
+      <div class="lane after">
+        <h2>Old key available · rotate</h2>
+        <ol class="flow">
+          <li><strong>Current key B + previous key A</strong><small>Try B first, then each previous key in order.</small></li>
+          <li class="refresh"><strong>Read the original values</strong><small>Old ciphertext stays usable through the shared cipher and secret serializers.</small></li>
+          <li class="outcome"><strong>Encrypt every new save with B</strong><small>Re-encryption moves readable old values onto the current key.</small></li>
+        </ol>
+      </div>
+      <div class="lane before">
+        <h2>Old key missing · preserve</h2>
+        <ol class="flow">
+          <li><strong>No configured key decrypts a value</strong><small>Ordinary reads still show the secret as unavailable.</small></li>
+          <li class="stale"><strong>Strict load before changing a store</strong><small>Settings and secrets updates stop if existing encrypted values cannot be read.</small></li>
+          <li class="outcome"><strong>Refuse the write; keep the file intact</strong><small>Settings PATCH: 409. Secret PUT/DELETE: 500. Restore or supply the missing key to recover.</small></li>
+        </ol>
       </div>
     </div>
   </section>
 
+  <section aria-labelledby="rotation-title">
+    <h2 id="rotation-title">Supply the old key, then restart</h2>
+    <div class="implementation">
+      <pre class="code" aria-label="Rotation configuration with illustrative placeholders"><code>OH_SECRET_KEY="&lt;new-key-B&gt;"
+OH_PREVIOUS_SECRET_KEYS='["&lt;old-key-A&gt;"]'</code></pre>
+      <p class="note">Previous keys are a JSON list; indexed variables such as <code>OH_PREVIOUS_SECRET_KEYS_0</code> also work. These placeholders illustrate the config.</p>
+    </div>
+    <table class="migration">
+      <caption class="note">When existing ciphertext moves to B</caption>
+      <thead><tr><th scope="col">When</th><th scope="col">Which files</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Startup / deferred init</th><td><code>settings.json</code> and <code>secrets.json</code>: rewrite only when stale tokens exist and all values decrypt, under a lock with atomic writes.</td></tr>
+        <tr><th scope="row">On the next save</th><td>Conversations, LLM profiles and provider connections.</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Keep previous keys while older files still need them.</strong> This PR does not perform a full archive migration. Set <code>OH_SECRET_KEY</code> explicitly to separate encryption from session auth; otherwise rotating the first session key also rotates the cipher key.</p>
+  </section>
+
+  <section aria-labelledby="warm-title">
+    <h2 id="warm-title">Warm pools use the same rotation path</h2>
+    <p><code>POST /api/init</code> accepts <code>previous_secret_keys</code>. Changed config keys rebuild the cipher; startup-created stores must also be refreshed before services use them.</p>
+    <p class="warm-flow">Stop boot telemetry → reset cached stores → re-encrypt → start new consumers</p>
+    <p class="note">The cache reset preserves the files. This ordering fixes the follow-up bug where init returned 200 but stores still held the boot cipher.</p>
+  </section>
+
   <aside class="proof" aria-labelledby="proof-title">
-    <h2 id="proof-title">Verified through startup → init → settings</h2>
-    <p>Regression tests cover rotated and already-current keys. Real-process HTTP checks reproduced the failure, then confirmed working reads and writes with the fix. A restart with <strong>B alone</strong> recovered the saved values. <a href="https://github.com/OpenHands/software-agent-sdk/blob/bdea6cd02039473754fca62a09d3bf9da34acdb2/.pr/live-verification.md">Evidence and scope</a>.</p>
+    <h2 id="proof-title">Checked through the persistence lifecycle</h2>
+    <p>Tests cover previous-key reads, current-key writes, missing-key refusal, unchanged files on failure, and startup / init rotation. Live checks exercise both rotation and lost-key behavior; warm-pool checks also verify a restart with only the new key for settings and secrets. <a href="https://github.com/OpenHands/software-agent-sdk/pull/5758">PR and test details</a> · <a href="https://github.com/OpenHands/software-agent-sdk/blob/bdea6cd02039473754fca62a09d3bf9da34acdb2/.pr/live-verification.md">Warm-pool evidence</a>.</p>
   </aside>
 
   <footer>
-    Verified at <a href="https://github.com/OpenHands/software-agent-sdk/commit/bdea6cd02039473754fca62a09d3bf9da34acdb2">bdea6cd02</a> ·
-    <a href="https://github.com/OpenHands/software-agent-sdk/blob/bdea6cd02039473754fca62a09d3bf9da34acdb2/openhands-agent-server/openhands/agent_server/persistence/store.py#L921-L1003">Store lifecycle</a> ·
-    <a href="https://github.com/OpenHands/software-agent-sdk/blob/bdea6cd02039473754fca62a09d3bf9da34acdb2/tests/cross/test_remote_conversation_live_server.py#L275-L366">Regression test</a><br>
+    Implementation at <a href="https://github.com/OpenHands/software-agent-sdk/commit/5012894096afccd56bca98710dc3e97f78ad851a">5012894</a> ·
+    <a href="https://github.com/OpenHands/software-agent-sdk/blob/5012894096afccd56bca98710dc3e97f78ad851a/openhands-sdk/openhands/sdk/utils/cipher.py">Cipher</a> ·
+    <a href="https://github.com/OpenHands/software-agent-sdk/blob/5012894096afccd56bca98710dc3e97f78ad851a/openhands-agent-server/openhands/agent_server/persistence/store.py">Store guards</a> ·
+    <a href="https://github.com/OpenHands/software-agent-sdk/blob/5012894096afccd56bca98710dc3e97f78ad851a/openhands-agent-server/openhands/agent_server/README.md#rotating-the-key">Rotation guide</a><br>
     Related: <a href="openhands-deferred-init-runtime-boundary.html">Deferred-init runtime boundaries</a>
   </footer>
 </main>
