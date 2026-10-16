@@ -151,7 +151,7 @@ movie or authenticated-state verification claim, and no bot review request.
 
 ## Automation validation decoration
 
-Draft [#18526](https://github.com/OpenHands/OpenHands/pull/18526) addresses
+[#18526](https://github.com/OpenHands/OpenHands/pull/18526) addresses
 [bug #18519](https://github.com/OpenHands/OpenHands/issues/18519) with three
 raw-color replacements in error decoration. `automation-validation-before-after.mp4`
 is ten seconds with original very quiet ambience; the silent GIF is eight seconds.
@@ -163,3 +163,21 @@ asset hashes, behavior checks and limits. Existing baseline text already passed;
 after minima remain 4.58:1 for the pill and 4.78:1 for the alert. The independent
 head audit reports zero errors and 665 warnings, separate from historical main
 and other proposal inventories. Other controls and Cloud integration are excluded.
+
+## Device authorization feedback
+
+Draft [#18528](https://github.com/OpenHands/OpenHands/pull/18528) addresses
+[bug #18527](https://github.com/OpenHands/OpenHands/issues/18527). The 18-second
+`device-auth-before-after.mp4` and 16.01-second silent GIF show actual local
+warning/error components at base `8238b7af82` and after `bd30e4c7df`.
+`QA-NOT-REAL` is visibly an invalid fixture; temporary issued-link pixels stay
+private. No account grant, persistent key/backend save, or model turn occurred
+during these auth captures. The borrowed baseline runtime's unrelated earlier
+checks are outside this evidence.
+
+`device-auth-source.json` records 140 genuine captures, five themes and both
+viewports, scoped contrast minima, actual retry/cancel behavior, exact source
+selection, hashes and limits. Successful Cloud authorization remains unverified;
+its success icon uses separately labeled automated/static palette evidence.
+Existing unrelated muted copy is outside the changed-text contrast claim.
+Automation #18526 is now ready with green CI and its initial bot review requested.
