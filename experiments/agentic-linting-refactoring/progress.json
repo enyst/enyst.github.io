@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-16T06:32:44+00:00",
+  "checkedAt": "2026-10-16T06:49:02+00:00",
   "displayTimeZone": "Europe/Stockholm",
-  "main": "3419bdb4f710d4766e255d77c434078fd9849495",
+  "main": "6296a8e76f7c9a9f5e759a41b72a9d0d6fb0e5f5",
   "shadcnLintVersion": "0.2.1",
   "pullRequests": [
     {
@@ -866,11 +866,16 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABSm0F7w",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nReviewed head `8189e214720e18de9236907b9c5d4cf8c2518392` against the current `main`, with a fresh read of the PR, its reviews/comments (none), and the linked issues #18505 and #18004 (both open, both carrying `ready-for-dev` and `priority:low`).\n\nScope: this is Canvas presentation in `src/components/features/chat/components/context-window-meter.tsx` plus its theme-contrast test. It owns the popover surface and tone maps, so it belongs in `OpenHands/OpenHands`; no server, wire-contract, or persisted-state surface is touched.\n\nWhat I verified on the head:\n- The tone maps now resolve from the same semantic roles the sibling Usage drawer (`usage-panel/context-meter.tsx`) already uses: `text-feedback-warning`/`text-feedback-error` for labels and `bg-feedback-warning`/`bg-status-error` for fills. No new palette token is added; per-theme overrides (Light+, Solarized Light, DeepSea) are inherited.\n- The popover is now `bg-surface-raised`, which matches the surface the contrast test already measured (`--oh-surface-raised`), so the test and the rendered backdrop are consistent instead of measuring a surface the component did not use.\n- The bar keeps its 6px height (`h-1.5`); the 1px `border` with `borderColor: CONTEXT_WINDOW_TRACK_COLOR` adds the full-range boundary without growing the bar, and the absolutely-positioned fill (`inset-y-0 left-0`) sits inside the padding box, so the boundary stays visible under the fill.\n- The diff only extends the existing five-theme checks (adds `--oh-foreground` to the fill-vs-track loop and a composited boundary check); no assertion is removed or weakened.\n\nEvidence and CI: authenticated local Agent Server 1.55.1 + real `deepseek/deepseek-flash` before/after GIF, MP4, and a five-theme PNG are linked and are appropriate for a static-render color change; the latest `Validate PR description`, `CI / test-and-build (ubuntu)`, and `test-and-build (windows)` check runs on this head are green. The `release ready` `startup_failure` is not head-specific: every recent run of that reusable workflow fails at startup across unrelated branches.\n\nFocused tests in the workspace: `__tests__/themes/color-themes.test.tsx`, `context-window-ring.test.tsx`, `context-window-meter.test.tsx`, and `usage-panel/context-meter.test.tsx` plus the surrounding chat/usage/theme suites: 118 passed, 38 of them the directly-scoped color/ring/meter files.\n\nAcceptance criteria checklist (issue #18505):\n- [x] Warning/danger labels meet 4.5:1 on the popover surface in all five themes (asserted against `--oh-surface-raised`).\n- [x] Neutral, warning, and danger fills meet 3:1 against the track; the full-range boundary meets 3:1 against the popover surface (composited check).\n- [x] Tones resolve from semantic feedback roles; no shared palette token added or modified.\n- [x] Thresholds (70%/90%), ring, compaction, and Usage navigation unchanged; existing handlers and tests still pass.\n- [x] `npm run lint` / `npm run build` gates are green on this head in CI.\n- [x] Theme contract in `__tests__/themes/color-themes.test.tsx` covers the popover surface and its boundary.\n\nNon-blocking, already disclosed by the author: the change moves the popover backdrop from `--oh-color-tertiary` to `--oh-surface-raised`, which slightly improves (but does not fix) the unrelated muted-text contrast in Solarized Light; issue #18505 scopes muted text and the ring's fixed amber/red arc out of this change, so this is not a merge gate.\n\nNo material correctness, security, compatibility, architecture, or evidence gaps found.\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-16T05:56:56Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "8189e214720e18de9236907b9c5d4cf8c2518392"
           }
@@ -891,20 +896,27 @@
     {
       "number": 18508,
       "title": "fix(theme): make consent backend scope readable",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T06:47:11Z",
       "url": "https://github.com/OpenHands/OpenHands/pull/18508",
       "headRefOid": "dd4987f1d5e621e7dda2ddcad5aa780b9c51f714",
       "reviewDecision": "APPROVED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "6296a8e76f7c9a9f5e759a41b72a9d0d6fb0e5f5"
+      },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABSm9yaQ",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n**Scope**: This is a Canvas presentation change in `src/components/features/analytics/telemetry-consent-banner.tsx` \u2014 the repository owns Agent Canvas UI/presentation, so it belongs here.\n\n**What I verified on the current head `dd4987f1d`**\n\n- The diff is exactly one class: `text-neutral-400` \u2192 `text-contrast` on the backend-scope line. Copy, layout, checkbox default, consent persistence, and telemetry logic are untouched.\n- `text-contrast` resolves through the semantic token chain `--color-contrast` \u2192 `--oh-contrast` (registered in `src/tailwind.css`) and is already used broadly across the app, so the utility is valid and theme-aware.\n- Contrast on the actual modal surface (`ModalBody` uses `bg-base-secondary` = `--oh-color-base-secondary`) computed per theme: deepsea 15.32:1, neutral 16.29:1, neo 16.29:1, Light+ 14.85:1, Solarized Light 12.25:1 \u2014 all comfortably above 4.5:1, versus the reported 2.33:1 / 2.11:1 for the raw neutral in the light themes.\n- Focused tests pass in the workspace: `__tests__/components/features/analytics/telemetry-consent-banner.test.tsx`, `__tests__/components/analytics/telemetry-consent-banner.test.tsx`, and `__tests__/themes/` \u2014 51 tests, 6 files, all green.\n- CI on the exact head is green: `test-and-build (ubuntu)` and `test-and-build (windows)` succeeded; the only non-success checks are SKIPPED jobs (Docker/live-e2e/release), and the status rollup is SUCCESS. mergeStateStatus is BLOCKED solely because a review is required, which this review satisfies.\n\n**Linked acceptance criteria**\n\n- [x] Scope line no longer uses the raw `text-neutral-400` palette class and resolves through a semantic theme token.\n- [x] Line meets at least 4.5:1 against its actual modal surface in all five shipped themes.\n- [x] No new allow/exception entry is introduced; the raw-color finding for this line is removed.\n- [x] Backend name/host text, modal layout, checkbox default, consent persistence, and telemetry behavior are unchanged.\n- [x] Existing consent and theme contrast tests pass.\n\nNo material correctness, security, compatibility, architecture, or evidence concerns found. Visual before/after evidence is linked in the PR description (Light+ and Solarized Light, plus a five-theme comparison) and is consistent with the computed contrast values.\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-16T06:19:18Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "dd4987f1d5e621e7dda2ddcad5aa780b9c51f714"
           }
@@ -915,14 +927,15 @@
         "malhotra5"
       ],
       "latestChecks": {
-        "pass": 7,
+        "pass": 6,
         "skip": 6,
-        "pending": 0,
+        "pending": 1,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18508/checks"
       },
       "issue": 18507,
-      "migrationIssue": 18004
+      "migrationIssue": 18004,
+      "checksNote": "The application CI passed before merge. Any pending cleanup-after-merge job is post-merge maintenance."
     },
     {
       "number": 18510,
@@ -935,17 +948,37 @@
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
       "reviews": [],
-      "draft": true,
-      "requestedReviewers": [],
+      "draft": false,
+      "requestedReviewers": [
+        "all-hands-bot"
+      ],
       "latestChecks": {
-        "pass": 6,
+        "pass": 7,
         "skip": 6,
-        "pending": 1,
+        "pending": 0,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18510/checks"
       },
       "issue": 18509,
-      "migrationIssue": 18004
+      "migrationIssue": 18004,
+      "ci": {
+        "url": "https://github.com/OpenHands/OpenHands/actions/runs/38860962201",
+        "headSha": "e71b4499fa721f67ced214d83b22452d469ecb83",
+        "conclusion": "success",
+        "ubuntu": {
+          "lint": "passed",
+          "testFiles": 837,
+          "testsPassed": 9097,
+          "testsSkipped": 1,
+          "testsTodo": 7,
+          "appBuild": "passed",
+          "libraryBuild": "passed",
+          "packDryRunFiles": 11346
+        },
+        "windows": {
+          "appBuild": "passed"
+        }
+      }
     }
   ],
   "lintAudit": {

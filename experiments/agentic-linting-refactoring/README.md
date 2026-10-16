@@ -77,14 +77,14 @@ colors are unchanged. Unchecking consent, confirming, and reloading still keeps
 the preference false. The dated status snapshot keeps the proposal-head lint
 counts separate from the base-main audit and tracks review/merge status.
 
-At the dated status snapshot, #18504 is merged and #18508 is open and ready
-for review, with passing CI and bot approval. Model profile messages are now
-tracked separately in draft #18510, with real Before/After evidence. Recording heads and media hashes stay attached
+At the dated status snapshot, #18504 and #18508 are merged. Model profile
+messages in #18510 are ready for review with passing CI and an initial
+all-hands-bot review request. Recording heads and media hashes stay attached
 to the source revisions actually captured.
 
 ## Model profile messages
 
-Draft [#18510](https://github.com/OpenHands/OpenHands/pull/18510) addresses
+[#18510](https://github.com/OpenHands/OpenHands/pull/18510) addresses
 [bug #18509](https://github.com/OpenHands/OpenHands/issues/18509) with semantic
 colors for saved profile feedback. The ten-second `model-messages-before-after.mp4`
 and eight-second GIF compare exact main `3419bdb4f7` with head `e71b4499fa`.
@@ -98,3 +98,8 @@ artifact hashes, and explicit empty-hint/shared-wrapper coverage limits.
 The source-branch audit reaches 659 warnings and 47 raw-color findings; it is
 independent of the consent proposal. Main and proposal audits stay separately
 recorded in `progress.json`. All earlier films and their recording heads remain.
+
+The full CI run at `e71b4499fa` passed on Ubuntu and Windows: 9,097 tests
+passed across 837 files (one skipped, seven todo), app/library builds passed,
+and the package dry-run passed. Browser playback and the direct MP4 download
+were also verified; the downloaded bytes match the source manifest.
