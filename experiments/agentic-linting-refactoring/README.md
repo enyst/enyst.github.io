@@ -148,3 +148,18 @@ Agents connection, an agent and a session, which the disposable stack lacks.
 [Issue #18517](https://github.com/OpenHands/OpenHands/issues/18517) remains
 unreproduced/unready; the description validator requires live proof. There is no
 movie or authenticated-state verification claim, and no bot review request.
+
+## Automation validation decoration
+
+Draft [#18526](https://github.com/OpenHands/OpenHands/pull/18526) addresses
+[bug #18519](https://github.com/OpenHands/OpenHands/issues/18519) with three
+raw-color replacements in error decoration. `automation-validation-before-after.mp4`
+is ten seconds with original very quiet ambience; the silent GIF is eight seconds.
+The real invalid-cron saved draft and Test guard run without model calls or dispatch.
+
+`automation-validation-source.json` pins base `8238b7af82` and after
+`2487541846`, forty actual desktop/phone captures across five themes, source crops,
+asset hashes, behavior checks and limits. Existing baseline text already passed;
+after minima remain 4.58:1 for the pill and 4.78:1 for the alert. The independent
+head audit reports zero errors and 665 warnings, separate from historical main
+and other proposal inventories. Other controls and Cloud integration are excluded.
