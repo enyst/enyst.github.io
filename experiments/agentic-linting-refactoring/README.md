@@ -194,7 +194,7 @@ All four are draft at this publication snapshot while CI/readiness completes. De
 ## Chat-status feedback
 
 [#18531](https://github.com/OpenHands/OpenHands/pull/18531), issue #18523,
-compares8238b7af82 with5b8ed56a6d. The eighteen-second
+compares base 8238b7af82 with 5b8ed56a6d. The eighteen-second
 `chat-status-before-after.mp4` has four genuine component scenes, clear captions
 and very quiet original ambience; the silent GIF is sixteen seconds. Forty
 scoped measurements cover actual pending history loading and actual tool timeouts
@@ -204,14 +204,22 @@ Source metadata excludes conversation identifiers and private paths.
 
 ## Markdown links on actual supported surfaces
 
-[#18530](https://github.com/OpenHands/OpenHands/pull/18530), focused issue#18522,
-uses corrected heada0818714a239c8a957d4dd23f038779cc7de4822 versus8238b7af82.
-The26-second `markdown-links-before-after.mp4` and24-second silent GIF show
+[#18530](https://github.com/OpenHands/OpenHands/pull/18530), focused issue #18522,
+uses corrected head a0818714a239c8a957d4dd23f038779cc7de4822 versus 8238b7af82.
+The 26-second `markdown-links-before-after.mp4` and 24-second silent GIF show
 chat, Note alert and file-backed plan links before and after, with tiny original
-ambience. All140 actual captures include normal and hover measurements for
-ordinary links, allfive single alert types and a plan in five themes, desktop
-and phone. All changed links pass4.5:1 and retain safe destination attributes.
+ambience. All 140 actual captures include normal and hover measurements for
+ordinary links, all five single alert types and a plan in five themes, desktop
+and phone. All changed links pass 4.5:1 and retain safe destination attributes.
 Only links are claimed; existing alert chrome and arbitrary nested composites
-remain outside scope. The old8ddc packet was held, not published as complete
+remain outside scope. The old 8ddc packet was held, not published as complete
 evidence. Exact heads, source crops, actual values and hashes live in
-`markdown-links-source.json`. CI/readiness is separate inprogress.json.
+`markdown-links-source.json`. CI/readiness is separate in progress.json.
+
+## Final wave status — 2026-10-16T17:56:09+00:00
+
+25 of 36 tracked proposals are merged, 9 are ready (including 5 approved),
+and 2 remain draft for the explicit managed-agent authentication and budget
+backend prerequisites. All 23 films and direct downloads remain intact.
+Historical capture-time CI statuses and source heads are preserved; current
+PR states and exact checks are recorded separately in progress.json.

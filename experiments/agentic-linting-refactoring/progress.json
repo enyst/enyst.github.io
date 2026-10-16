@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-16T08:40:28+00:00",
+  "checkedAt": "2026-10-16T17:56:09+00:00",
   "displayTimeZone": "Europe/Stockholm",
-  "main": "d3a58cd1cc045bbb1b24f2c8c0d79a8404ef239b",
+  "main": "33fcb2e1b394349d4f003a04807abcbca6161b4f",
   "shadcnLintVersion": "0.2.1",
   "pullRequests": [
     {
@@ -1127,7 +1127,7 @@
       "url": "https://github.com/OpenHands/OpenHands/pull/18526",
       "state": "OPEN",
       "mergedAt": null,
-      "headRefOid": "2487541846b326948be65aac136464d9635b306c",
+      "headRefOid": "0188d43c29eb38a530f409ff6c487d1d5258e623",
       "reviewDecision": "APPROVED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
@@ -1185,12 +1185,25 @@
           "commit": {
             "oid": "bd30e4c7df146160fc4e346127b24bf3dc00f53d"
           }
+        },
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSq8rqQ",
+          "author": {
+            "login": "neubig"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "",
+          "submittedAt": "2026-10-16T12:47:31Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "bd30e4c7df146160fc4e346127b24bf3dc00f53d"
+          }
         }
       ],
       "draft": false,
-      "requestedReviewers": [
-        "neubig"
-      ],
+      "requestedReviewers": [],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
@@ -1208,12 +1221,30 @@
       "state": "OPEN",
       "mergedAt": null,
       "headRefOid": "b685ae43ae6d8f91447e6bb4c23125c6b3aba932",
-      "reviewDecision": "REVIEW_REQUIRED",
+      "reviewDecision": "APPROVED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
-      "reviews": [],
-      "draft": true,
-      "requestedReviewers": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSudEbw",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Summary\n\nPure presentational token substitution in `src/components/features/settings/llm-profiles/add-models-modal.tsx` (+8/-8, class strings only). Six `text-white` uses move to `text-contrast`, and the per-row `text-green-400` / `text-red-400` outcomes move to the `text-feedback-success` / `text-feedback-error` roles. No logic, state, payload, or control-flow line is touched.\n\n## Verification\n\nScope belongs here: `src/themes/README.md` reserves literal white for fixed-color surfaces and directs small status text to the `--oh-feedback-*` roles, and `AGENTS.md` assigns Canvas presentation to this repository.\n\nResolved token contrast (WCAG relative luminance, against the modal surface `--oh-color-base-secondary`):\n\n| Theme | `text-contrast` / surface | `text-contrast` / select bg | success / surface | error / surface |\n|---|---|---|---|---|\n| light-plus | 14.85:1 | 16.48:1 | 5.29:1 | 5.28:1 |\n| solarized-light | 12.25:1 | 13.92:1 | 4.86:1 | 4.94:1 |\n| openhands-neutral / -neo | 16.29:1 | 17.76:1 | 11.01:1 | 5.14:1 |\n| openhands-deepsea | 15.32:1 | 19.32:1 | 10.36:1 | 5.45:1 |\n\nThe lowest changed value (4.86:1) clears the issue's 4.5:1 bar, matching the PR's stated 4.86:1 floor. The existing `__tests__/themes/color-themes.test.tsx` already asserts both feedback roles at >= 4.5:1 against `--oh-color-base-secondary` for every palette, so the roles this diff adopts are covered by a shipped contract test rather than only by the new capture set.\n\nLocal, on this exact head: `npx vitest run __tests__/themes/color-themes.test.tsx __tests__/components/settings/llm-profiles/add-models-modal.test.tsx` -> Test Files 2 passed (2); Tests 35 passed (35), reproducing the PR's stated counts. GitHub Actions for `b685ae43` report `test-and-build (ubuntu)` and `test-and-build (windows)` both success (the full-check matrix runs `npm run lint`, `npm test`, `npm run build`, `npm run build:lib`, and `npm pack --dry-run`). A grep of the changed file finds no remaining raw palette or fixed-white class. (A local `eslint` invocation hit a container heap limit; the file's lint gate is covered by the green CI run.)\n\nEvidence: the PR supplies 40 genuine Canvas before/after captures across five themes x desktop/phone x keyless/connection, pinned to the exact After head, plus measured provenance. A video-backed partial save (201 then 409, Saved and Failed visible together) is the right artifact type for the sequential-outcome behavior, and the footer is correctly declared out of scope, consistent with the issue's stated verification scope.\n\n## Linked acceptance criteria (#18516)\n\n- [x] Labels, selections, Select all, model names, Saved/Failed readable across the five built-in themes at >= 4.5:1 - measured above; lowest 4.86:1.\n- [x] Usable at desktop and 390px; outcomes still distinguished by translated text - only color classes changed, so text-based distinction and layout are unaffected.\n- [x] Bulk-save selection, partial success and retry behavior unchanged - no non-className line in the diff.\n- [x] `npm run lint` clean for this file and `npm test` passing - CI green on the head; focused suites pass locally.\n\nNo material correctness, security, compatibility, architecture, or evidence gap found. No inline findings.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T17:52:46Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "b685ae43ae6d8f91447e6bb4c23125c6b3aba932"
+          }
+        }
+      ],
+      "draft": false,
+      "requestedReviewers": [
+        "juanmichelini"
+      ],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
@@ -1235,12 +1266,14 @@
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
       "reviews": [],
-      "draft": true,
-      "requestedReviewers": [],
+      "draft": false,
+      "requestedReviewers": [
+        "all-hands-bot"
+      ],
       "latestChecks": {
-        "pass": 6,
+        "pass": 7,
         "skip": 6,
-        "pending": 1,
+        "pending": 0,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18530/checks"
       },
@@ -1258,8 +1291,10 @@
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
       "reviews": [],
-      "draft": true,
-      "requestedReviewers": [],
+      "draft": false,
+      "requestedReviewers": [
+        "all-hands-bot"
+      ],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
@@ -1281,8 +1316,10 @@
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
       "reviews": [],
-      "draft": true,
-      "requestedReviewers": [],
+      "draft": false,
+      "requestedReviewers": [
+        "all-hands-bot"
+      ],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
@@ -1322,15 +1359,44 @@
       "url": "https://github.com/OpenHands/OpenHands/pull/18534",
       "state": "OPEN",
       "mergedAt": null,
-      "headRefOid": "a0fe71bea3b56fb5d3e09636d072cdccb83c081d",
+      "headRefOid": "b0f5abf7a085e9189955934f296291a574fb7732",
       "reviewDecision": "REVIEW_REQUIRED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
-      "reviews": [],
-      "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSokbgg",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Review \u2014 PR #18534 `fix(lint): theme hook diagnostics and status badges`\n\n**Head verified:** `a0fe71bea3b56fb5d3e09636d072cdccb83c081d` (base `8238b7af825b8639191b9d7b4c6b080d4a93f388`, matching the PR's stated Before). All check-runs on this head are `success`/`skipped`. No prior review by this account on this head.\n\n### Scope\nCanvas-owned presentation change in `src/components/shared/hook-execution-event-message.tsx`. In scope for this repository; no cross-repository ownership concern and no Agent Server / Cloud / wire-contract surface touched.\n\n### What I verified independently\n- Raw palette literals (`bg-amber-900/50`, `text-amber-300`, `text-amber-400`, `text-red-400`, `bg-green-900/50`, `bg-red-900/50`, `text-green-300`, `text-red-300`) are gone from the component; only semantic `feedback-*` roles remain.\n- Focused suites pass: `__tests__/components/shared/hook-execution-event-message.test.tsx` + `__tests__/themes/color-themes.test.tsx` \u2192 26 passed.\n- I recomputed each migrated role's contrast against its 10% tint over the chat canvas, mirroring the new test's resolution logic, from the shipped token values in `src/themes/color-theme/definitions/*` and `src/tailwind.css`. All three roles clear 4.5:1 in all five themes (minimum 4.804:1 \u2014 Solarized Light `--oh-feedback-error`; Light+ warning 5.302 / error 5.001 / success 5.086). The PR's stated minima are consistent with this.\n- Hook execution, precedence, metadata, truncation and success-indicator behavior are unchanged: the diff only swaps class strings, so blocked still suppresses the indicator and ok/failed still show theirs.\n\n### Acceptance-criteria checklist (issue #18521)\n- [x] Badges and blocked-reason/error/stderr resolve from the theme feedback palette; fixed Tailwind literals gone.\n- [x] Colors change with the selected theme (they now reference CSS variables, not constants).\n- [x] Migrated small text \u2265 4.5:1 on its rendered background in all five themes (independently reproduced).\n- [x] `ok`/`failed`/`blocked` labels, expandable details, output text and success-indicator behavior preserved.\n- [x] Desktop/phone layout: the class-only swap does not change layout.\n- [ ] **Automated coverage distinguishes blocked/successful/failed rows through the theme feedback role, so a regression back to a fixed palette class fails a test.** \u2014 unmet; see the inline finding.\n\n### Finding\nOne acceptance criterion is not met. The PR removes the only assertions binding this component to any color role and adds only a *palette-token* contrast contract in `__tests__/themes/color-themes.test.tsx` that never imports the component. The replacement assertions (`toBeInTheDocument()`) pass regardless of which color classes the component emits, so a revert to the fixed palette classes would pass both the suite and lint (`shadcn/no-raw-colors` is `warn`, and CI runs `eslint src` without `--max-warnings`). Repo precedent for the intended shape already exists \u2014 `context-meter.test.tsx` asserts `toHaveClass(\"text-feedback-warning\")` as a functional CSS contract. Details in the inline comment.\n\n### Notes (non-blocking)\n- The new token test models the badge backdrop as `--oh-color-base`; the conversation message pane is actually painted over `bg-surface`. The difference does not push any ratio below 4.5:1 in either light or dark palettes, so the contract still holds \u2014 worth revisiting if the palettes change.\n- No security, state-migration, telemetry, or Agent Server compatibility impact.\n\n\ud83d\udd04 CHANGES REQUESTED",
+          "submittedAt": "2026-10-16T09:06:41Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "a0fe71bea3b56fb5d3e09636d072cdccb83c081d"
+          }
+        },
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSuQFTw",
+          "author": {
+            "login": "enyst"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "",
+          "submittedAt": "2026-10-16T17:36:23Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "b0f5abf7a085e9189955934f296291a574fb7732"
+          }
+        }
       ],
+      "draft": false,
+      "requestedReviewers": [],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
@@ -1345,12 +1411,14 @@
       "number": 18535,
       "title": "fix(lint): theme critic result text and scores",
       "url": "https://github.com/OpenHands/OpenHands/pull/18535",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T17:12:35Z",
       "headRefOid": "3e0b09078a861aa445f48b84d69ecab29f2b3b6b",
       "reviewDecision": "APPROVED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "72a8d9c6aa434debbfa82f476c44bee2b5395674"
+      },
       "reviews": [
         {
           "id": "PRR_kwDOLfkiw88AAAABSoPufg",
@@ -1366,12 +1434,25 @@
           "commit": {
             "oid": "3e0b09078a861aa445f48b84d69ecab29f2b3b6b"
           }
+        },
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSq7qIQ",
+          "author": {
+            "login": "neubig"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "",
+          "submittedAt": "2026-10-16T12:45:53Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "3e0b09078a861aa445f48b84d69ecab29f2b3b6b"
+          }
         }
       ],
       "draft": false,
-      "requestedReviewers": [
-        "neubig"
-      ],
+      "requestedReviewers": [],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
