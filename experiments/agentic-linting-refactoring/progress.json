@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-16T08:28:10+00:00",
+  "checkedAt": "2026-10-16T08:40:28+00:00",
   "displayTimeZone": "Europe/Stockholm",
   "main": "d3a58cd1cc045bbb1b24f2c8c0d79a8404ef239b",
   "shadcnLintVersion": "0.2.1",
@@ -1128,14 +1128,28 @@
       "state": "OPEN",
       "mergedAt": null,
       "headRefOid": "2487541846b326948be65aac136464d9635b306c",
-      "reviewDecision": "REVIEW_REQUIRED",
+      "reviewDecision": "APPROVED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
-      "reviews": [],
-      "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSoMEjQ",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nThis is Canvas-owned presentation work in `OpenHands/OpenHands` (Agent Canvas UI), matching the repository ownership table and the dependency direction. No server/SDK/automation contract is touched, so no `compatibility.minimumAgentServer` bump is expected, consistent with `AGENTS.md`.\n\n## What I verified on head `2487541846b326948be65aac136464d9635b306c`\n\n- The two decorations now resolve from the theme feedback role: the draft pill uses `bg-feedback-error/5` and the Test runs alert uses `border-feedback-error/40 bg-feedback-error/10`, both with `text-feedback-error`. Because `--color-feedback-error` maps to `var(--oh-feedback-error)`, an embedding host's `--oh-feedback-error` override now owns ink and decoration together, which is exactly what issue #18519 asked for.\n- The old hardcoded `#fb2c36` red-500 tint model was removed from `__tests__/themes/color-themes.test.tsx` and replaced with the actual rendered surfaces: 5% over `--oh-surface` (the pill over `bg-[var(--oh-surface)]`) and 10% over `--oh-color-base` (the alert over `bg-canvas-base`). I traced both surface tokens against the component's real backgrounds and they match.\n- I recomputed WCAG contrast for all five themes against those tinted surfaces: pill ranges ~4.59 (Solarized Light) to 5.09 (DeepSea); alert ranges ~4.80 to 6.13. Every theme clears 4.5:1, so the honest `toBeGreaterThanOrEqual(4.5)` assertion is not a vacuous pass. The focused theme suite passes 13/13 locally.\n- The owning feature recipe `F28.error-contrast` was updated consistently (tint described as the `--oh-feedback-error` 5%/10% over the draft bar / canvas-base), and the stale red-500 wording was removed. This is the correct owning document per the `verify-openhands` skill.\n- Behavior is untouched: only className strings changed. The automation setup panel suite passes 49/49 locally, including the invalid-draft validation/dispatch assertions, and `__tests__/scripts/raw-colors-lint.test.ts` passes 3/3.\n\n## Acceptance criteria from #18519 (currently `bug`, `priority:low`, `ready-for-dev`)\n\n- [x] Pill and alert decorations resolve from the selected feedback-error palette in all five themes.\n- [x] Host `--oh-feedback-error` override changes ink and decoration together.\n- [x] Error text keeps >=4.5:1, and the theme check measures the actual decoration rather than a hardcoded red-500 tint.\n- [x] The two error decorations no longer use fixed `red-500` classes; the earlier `shadcn/no-raw-colors` findings in this scope are gone.\n- [x] Save/Test/validation/no-dispatch behavior, messages, ARIA state and `data-testid`s are unchanged (covered by the passing panel tests).\n- [x] Valid-draft success pill and layouts untouched (diff is limited to the two error branches).\n\n## CI\n\nAll required checks for this exact head are green: `test-and-build (ubuntu)` and `test-and-build (windows)` succeeded (ubuntu runs `npm run lint`, `npm test`, app and library builds), plus PR title/description and artifact checks. Docker/live-e2e jobs are skipped by design for PR events. `mergeable_state` is `blocked` only because a review is required, which this review supplies.\n\nNo material correctness, security, compatibility, or evidence gaps found. The change is a small, well-scoped fix with its test contract and owning feature recipe updated in the same PR.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T08:32:38Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "2487541846b326948be65aac136464d9635b306c"
+          }
+        }
       ],
+      "draft": false,
+      "requestedReviewers": [],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
@@ -1153,13 +1167,29 @@
       "state": "OPEN",
       "mergedAt": null,
       "headRefOid": "bd30e4c7df146160fc4e346127b24bf3dc00f53d",
-      "reviewDecision": "REVIEW_REQUIRED",
+      "reviewDecision": "APPROVED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
-      "reviews": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSoPpng",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Verdict summary\n\nScope and ownership are correct: this is Agent Canvas presentation work in `OpenHands/OpenHands`, replacing raw Tailwind color literals with the repo's existing semantic roles. No API, wire-contract, state, routing, or authentication behavior is touched. The head `bd30e4c7d` matches the review request, and CI for that head is green (`test-and-build (ubuntu)`, `test-and-build (windows)`, lint/PR-validation all `success`; `live-e2e` is deliberately `skipped`).\n\nI re-ran the focused suites in the workspace: `device-verify`, `color-themes`, `device-flow-login`, `use-device-flow`, and `device-flow-client` \u2014 85 tests pass. I also independently recomputed the WCAG contrast ratios from the shipped theme definitions (`light-plus.ts`, `solarized-light.ts`, the neutral palette, `openhands-deepsea.ts`, `openhands-neo.ts`, and the `src/tailwind.css` defaults). The changed roles clear their thresholds on the surfaces they actually render on in all five themes:\n\n- Warning heading (`text-feedback-warning`/`border-feedback-warning`): 5.03:1 min (Light+) against the `--oh-warning` 5% tint.\n- Warning instruction (`text-contrast`): 11.77:1 min against that tint. This is the right call: unchanged `text-muted` would measure 2.50:1 (Solarized) and 4.34:1 (Neo), so muted could not remain.\n- Manual link (`text-contrast`): 12.39:1 min on the raised surface, with `hover:underline` retained.\n- Flow error (`text-feedback-error` on `bg-status-error/5`): 4.54:1 min (default dark on the modal `base-secondary` surface), rising to 4.62:1/4.92:1 in Solarized/Light+.\n- Result icons (`text-feedback-success`/`text-feedback-error` vs `--oh-surface-raised`): 4.91:1 min, above the 3:1 icon requirement.\n- Authorize (`bg-contrast text-contrast-foreground`, `hover:bg-contrast/90`): 10.74:1 min including the hover composite.\n\nThe two removed test assertions (`document.querySelector(\".text-green-600\")`, `.text-red-600`) were brittle presentation-only class-string checks, which `AGENTS.md` explicitly discourages; their behavior/message assertions remain and the suites pass. Unrelated `text-muted` result/body copy stays out of scope as stated. No compatibility, security, or architecture checkpoint applies to a class-only change, so no blocking finding stands.\n\n## Acceptance-criteria checklist (#18527)\n\n- [x] Verification warning heading/body, manual link, and device-flow error text meet 4.5:1 across all five themes \u2014 verified by computation and the existing theme test.\n- [x] Verification success/error icons meet 3:1 against the result-card surface; Authorize meets 4.5:1 normal/hover \u2014 verified.\n- [x] Host validation, popup safety, cancellation, token polling, verification requests, and navigation/retry unchanged \u2014 diff is class strings only; focused tests pass.\n- [x] Every changed color is an existing semantic role; no shared token, palette, or theme-definition edits.\n- [x] Spec-comment IDs (`WN-001`, existing roles) are reused, not renumbered.\n- [x] Reviewer reproduction path (Light+/Solarized warning, unreachable-host error, anonymous awaiting/cancel) is captured in the PR body across five themes.\n\nNote: successful Cloud authorization is not claimed by the PR (it needs a service grant), which is consistent with the issue's stated scope. No material findings.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T08:37:46Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "bd30e4c7df146160fc4e346127b24bf3dc00f53d"
+          }
+        }
+      ],
       "draft": false,
       "requestedReviewers": [
-        "all-hands-bot"
+        "neubig"
       ],
       "latestChecks": {
         "pass": 7,
@@ -1200,7 +1230,7 @@
       "url": "https://github.com/OpenHands/OpenHands/pull/18530",
       "state": "OPEN",
       "mergedAt": null,
-      "headRefOid": "8ddc5e57fcb9090805c5cc9dcaa5f26d7d3e444c",
+      "headRefOid": "a0818714a239c8a957d4dd23f038779cc7de4822",
       "reviewDecision": "REVIEW_REQUIRED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
@@ -1208,9 +1238,9 @@
       "draft": true,
       "requestedReviewers": [],
       "latestChecks": {
-        "pass": 7,
+        "pass": 6,
         "skip": 6,
-        "pending": 0,
+        "pending": 1,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18530/checks"
       },
@@ -1254,9 +1284,9 @@
       "draft": true,
       "requestedReviewers": [],
       "latestChecks": {
-        "pass": 6,
+        "pass": 7,
         "skip": 6,
-        "pending": 1,
+        "pending": 0,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18532/checks"
       },
@@ -1318,16 +1348,34 @@
       "state": "OPEN",
       "mergedAt": null,
       "headRefOid": "3e0b09078a861aa445f48b84d69ecab29f2b3b6b",
-      "reviewDecision": "REVIEW_REQUIRED",
+      "reviewDecision": "APPROVED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
-      "reviews": [],
-      "draft": true,
-      "requestedReviewers": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSoPufg",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Review: `fix(lint): theme critic result text and scores`\n\n**Scope:** Belongs here. This is Agent Canvas UI presentation in `src/components/conversation-events/chat/...`; it consumes the published critic result type without changing any wire contract, endpoint, or shared adapter. No new Agent Server dependency, so no `minimumAgentServer` bump is required.\n\n**What I verified on head `3e0b090`**\n\n- Raw palette classes (`text-green-400`/`text-yellow-400`/`text-red-400`, `text-neutral-200/300/400/500`, `border-neutral-600`, `fill-neutral-400`) are replaced with existing semantic theme roles: `text-feedback-{success,warning,error}`, `text-text-tertiary`, `text-contrast`, `border-border` and `fill-text-tertiary`. Every one of these utilities resolves through the `@theme inline` mapping in `src/tailwind.css` to a real `--oh-*` role, and each role is defined for all five registered themes (or by `AGENT_SERVER_UI_DEFAULT_CSS_VARIABLES` for the dark defaults).\n- Score/issue thresholds are preserved exactly (`>=0.6` / `>=0.4`; `>=0.7` / `>=0.5`), as are normalization, star math, accessible `Score:` label, grouping, expand/collapse and the refinement hint.\n- The chat panel renders on `bg-canvas-base`, which maps to `--oh-color-base`; the new contrast contract correctly tests the critic roles against that surface.\n- The added palette contract in `__tests__/themes/color-themes.test.tsx` runs `it.each` over all five themes and asserts each of `--oh-feedback-success/warning/error`, `--oh-text-tertiary` and `--oh-contrast` stays >= 4.5:1 against `--oh-color-base`.\n- I ran the two focused suites in the workspace at this head: `vitest run __tests__/themes/color-themes.test.tsx __tests__/components/.../critic-result-display.test.tsx` -> 26 passed / 0 failed. The `CI` workflow for this head is `success`.\n\n**Removals:** The three deleted assertions only mirrored raw class strings for score thresholds, which `AGENTS.md` explicitly discourages (\"Do not mirror literal source ... or class-string definitions in tests\"). The surviving suites still cover score rendering, labels, non-finite normalization, accessibility, expansion and the refinement hint, and the palette contract now covers the score/issue color roles across every theme, so no behavior contract is dropped.\n\n**Non-blocking:** the score -> role threshold mapping itself is no longer directly asserted as behavior; the values are unchanged in code and the guide discourages class-string tests, so this is acceptable rather than a gap requiring action.\n\n**Not attributable to this PR:** the `release ready` workflow shows `startup_failure`, but every branch (including unrelated ones) shows the same, so it is a repo-wide/environmental condition, not a regression from this diff. The `.pr/sdk-version-bump.svg` artifact notice also concerns a file already present in the base and untouched by this PR.\n\nNo material correctness, security, compatibility, or architecture findings.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T08:37:54Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "3e0b09078a861aa445f48b84d69ecab29f2b3b6b"
+          }
+        }
+      ],
+      "draft": false,
+      "requestedReviewers": [
+        "neubig"
+      ],
       "latestChecks": {
-        "pass": 6,
+        "pass": 7,
         "skip": 6,
-        "pending": 1,
+        "pending": 0,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18535/checks"
       },
@@ -1474,6 +1522,17 @@
       "warnings": 666,
       "reportedRawColorFindingsRemoved": 2,
       "note": "Independent chat-status proposal-head audit; not current integrated-main count."
+    },
+    {
+      "reportedAt": "2026-10-16T08:40:28+00:00",
+      "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18530",
+      "sourceCommit": "a0818714a239c8a957d4dd23f038779cc7de4822",
+      "baseCommit": "8238b7af825b8639191b9d7b4c6b080d4a93f388",
+      "command": "npm run lint",
+      "errors": 0,
+      "warnings": 666,
+      "reportedRawColorFindingsRemoved": 2,
+      "note": "Corrected independent Markdown proposal head includes both light link roles and all five supported alert composites. Not current integrated-main count."
     }
   ],
   "mainLintAudits": [

@@ -201,3 +201,17 @@ scoped measurements cover actual pending history loading and actual tool timeout
 in five themes, desktop and phone. Fetches resume ten to twenty generated user
 messages. The neighboring generic header text remains outside the color claim.
 Source metadata excludes conversation identifiers and private paths.
+
+## Markdown links on actual supported surfaces
+
+[#18530](https://github.com/OpenHands/OpenHands/pull/18530), focused issue#18522,
+uses corrected heada0818714a239c8a957d4dd23f038779cc7de4822 versus8238b7af82.
+The26-second `markdown-links-before-after.mp4` and24-second silent GIF show
+chat, Note alert and file-backed plan links before and after, with tiny original
+ambience. All140 actual captures include normal and hover measurements for
+ordinary links, allfive single alert types and a plan in five themes, desktop
+and phone. All changed links pass4.5:1 and retain safe destination attributes.
+Only links are claimed; existing alert chrome and arbitrary nested composites
+remain outside scope. The old8ddc packet was held, not published as complete
+evidence. Exact heads, source crops, actual values and hashes live in
+`markdown-links-source.json`. CI/readiness is separate inprogress.json.
