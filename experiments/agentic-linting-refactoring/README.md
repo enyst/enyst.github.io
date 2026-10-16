@@ -223,3 +223,12 @@ and 2 remain draft for the explicit managed-agent authentication and budget
 backend prerequisites. All 23 films and direct downloads remain intact.
 Historical capture-time CI statuses and source heads are preserved; current
 PR states and exact checks are recorded separately in progress.json.
+
+## Remaining open work — 2026-10-16T22:02:00+00:00
+
+33 of 36 tracked proposals are merged. Open status: 1 ready, 2 draft.
+The ready hook proposal has green CI and its earlier inline thread is
+resolved; approval remains required. Managed-agent and budget drafts retain
+green test/build checks, while description validation still needs authentic
+affected-state proof. Fresh read-only checks confirmed the account/runtime
+prerequisites. All 23 films, source snapshots and historical audits are preserved.

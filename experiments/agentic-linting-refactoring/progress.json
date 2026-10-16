@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-16T17:56:09+00:00",
+  "checkedAt": "2026-10-16T22:02:00+00:00",
   "displayTimeZone": "Europe/Stockholm",
-  "main": "33fcb2e1b394349d4f003a04807abcbca6161b4f",
+  "main": "1f91e1bcc0d06990d02eb230c103820e53df7894",
   "shadcnLintVersion": "0.2.1",
   "pullRequests": [
     {
@@ -17,148 +17,233 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABN6tA7g",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "\ud83d\udfe1 **Acceptable** \u2014 the direction is right (map tokens into `@theme`, let the linter reason about real utilities), and the ~1000 bracket\u2192utility rewrites are mechanically sound. But the PR claims \"every replacement is value-identical\" and that is not true in three places, one of which is a real regression. The trap is instructive: the linter told an agent to \"use a theme token\" and the agent picked a token whose *name* matched without checking what it *compiles to*.\n\n### Three Questions\n1. **Real problem?** Yes \u2014 agents writing `bg-[var(--oh-border)]` because the design token isn't a utility is exactly the drift this fixes.\n2. **Simpler way?** The `@theme` mapping is the simplest correct fix. No complaints on the approach.\n3. **What will this break?** See below.\n\n### Issue checklist (#17480)\n- [x] `--oh-*` tokens mapped into `@theme inline`\n- [x] bracket-token usages rewritten to first-class utilities\n- [x] `no-arbitrary-values` at `warn`, other rules registered `off`\n- [x] lint/build/test green\n- [ ] \"visual output unchanged\" \u2014 **not true**, see Critical/Improvement below\n\n**[CRITICAL ISSUES]**\n\n- [src/components/features/chat/components/chat-input-field.tsx, L48 & L52], [src/components/features/onboarding/steps/say-hello-step.tsx, L110] **Regression \u2014 `text-[16px]` \u2192 `text-base` drops the font size.** In this repo `text-base` is a **color** utility, not a font-size utility: `--color-base: var(--oh-color-base)` is declared in `@theme inline`, so Tailwind emits `.text-base{color:var(--oh-color-base)}` and nothing for font-size (verified in the built CSS \u2014 `text-xs`/`text-sm`/`text-lg` emit `font-size`, `text-base` does not). `main` already relies on this: `bg-primary text-base` is used 24\u00d7 as \"dark text on a gold button\". Net effect: the chat input and the onboarding hello input lose their explicit 16px and inherit whatever the parent has, and L48 gets `color: cool-grey-950` competing with `text-text-tertiary` (currently saved only by cascade order). This is a user-visible regression in the primary input surface.\n\n**[IMPROVEMENT OPPORTUNITIES]**\n\n- [src/tailwind.css, L56] **Silent visual change**: adding `--color-warning` re-binds the *pre-existing* `text-warning` / `bg-warning/10` / `border-warning/40` usages on `main` (openai-subscription-auth-card, free-models-note, model-selector) from HeroUI's amber `hsl(37 91% 55%)` to `#c9b974`. I built with `main`'s `tailwind.css` vs this branch's to confirm. This is probably *desirable* (those sites were off-system), but it contradicts \"no visual changes intended\" and should be stated in the PR rather than discovered by the next person who greps.\n- [src/tailwind.css, L41] Same story for `--color-border`: `markdown/blockquote.tsx` used `border-border` from `tailwind.config.js`'s `border.DEFAULT: #242424`; it now resolves to cool-grey-700. Also `tailwind.config.js` still declares `border.DEFAULT` \u2014 two writers for one utility name. Either delete the legacy `border` entry from `tailwind.config.js` or note that `@theme` wins.\n- [src/tailwind.css, L59] **Dead code**: `--radius-default` is added but `rounded-default` appears 0 times in `src/` and Tailwind doesn't emit it. Remove it or use it.\n- [src/ui/divider.tsx, L10] (and 7 other `h-0.25` / `ml-0.25` sites) `[1px]` \u2192 `0.25` is `0.0625rem`, i.e. *not* value-identical to 1px (it only matches at 16px root). Tailwind has `h-px` / `ml-px` for exactly this, and `main` already uses `h-px` 11\u00d7. Use the idiom, not a fraction.\n- [eslint.config.js, L394\u2013L419] ~30 lines of comment that paraphrase the PR description (\"TRIAL: \u2026\", \"What remains under this rule are genuine one-offs\u2026\"). That narrative belongs in the PR / commit message; it will rot the moment someone flips a rule. Keep the docs link and a one-liner per `off` rule.\n\n**[DEPENDENCIES]**\n\n- [package.json, L134] **Supply chain**: `@shadcn/lint@0.1.0` was published **2026-09-14 (2 days ago)** and is the package's *first* release. It pulls `cn@0.2.6` (10 days old) and ~21 optional `oxc-parser` native binaries into the lockfile. It's a devDependency from the shadcn org so the risk is bounded, but per the 7-day rule this shouldn't merge before ~2026-09-21, and I'd want a human to eyeball the `oxc-parser` binary footprint.\n\n**[TESTING GAPS]**\n\n- The updated unit tests only assert the new class *strings*; nothing catches the `text-base` semantic swap because the tests don't compile CSS. That's fine \u2014 but the evidence section should then include a visual check of the chat input, not just lint/build/test output.\n\n**[RISK ASSESSMENT]**\n- [Overall PR] \u26a0\ufe0f Risk Assessment: \ud83d\udfe1 MEDIUM \u2014 381 files of mechanical class rewrites with one confirmed font-size regression on the primary input and two undisclosed color re-bindings; plus a 2-day-old new dev dependency with native binaries. No agent/benchmark behaviour touched.\n\n**VERDICT:** \u2705 **Worth merging** once the `text-base` regression is fixed and the PR is honest about the `warning`/`border` re-binding.\n\n**KEY INSIGHT:** Mapping tokens into `@theme` changes the meaning of *every existing* class that shares the new name \u2014 the review surface is `git grep <utility>` on `main`, not just the diff.\n\n---\n\n> **Improve this review?** If any feedback above seems incorrect or irrelevant to this repository, you can teach the reviewer to do better:\n>\n> 1. Add a `.agents/skills/custom-codereview-guide.md` file to your branch (or edit it if one already exists) with the `/codereview` trigger and the context the reviewer is missing (e.g., \"Security concerns about X do not apply here because Y\"). See the [customization docs](https://docs.openhands.dev/openhands/usage/use-cases/code-review#customization) for the required frontmatter format.\n> 2. Re-request a review - the reviewer reads guidelines from the PR branch, so your changes take effect immediately.\n> 3. When your PR is merged, the guideline file goes through normal code review by repository maintainers.\n>\n> **Resolve with AI?** Install the [iterate skill](https://github.com/OpenHands/extensions/tree/main/skills/iterate) in your agent and run `/iterate` to automatically drive this PR through CI, review, and QA until it's merge-ready.\n>\n> Was this review helpful? React with \ud83d\udc4d or \ud83d\udc4e to give feedback.\n\n_This review was posted by an AI agent (OpenHands) on behalf of @enyst._",
           "submittedAt": "2026-09-16T22:19:18Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "cb259f3c701a9c09b09e017c465f59a3bb7f9ef4"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABN60BeA",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-16T22:37:49Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "78ee1efa850d4ef91175040def0aa0d9b86940f9"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABN60B_Q",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-16T22:37:51Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "78ee1efa850d4ef91175040def0aa0d9b86940f9"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABN60Cgw",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-16T22:37:52Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "78ee1efa850d4ef91175040def0aa0d9b86940f9"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABN60DBQ",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-16T22:37:54Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "78ee1efa850d4ef91175040def0aa0d9b86940f9"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABN60Dfw",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-16T22:37:55Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "78ee1efa850d4ef91175040def0aa0d9b86940f9"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABN60EAA",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-16T22:37:57Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "78ee1efa850d4ef91175040def0aa0d9b86940f9"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABN60EkA",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-16T22:37:59Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "78ee1efa850d4ef91175040def0aa0d9b86940f9"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABN60FDw",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-16T22:38:00Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "78ee1efa850d4ef91175040def0aa0d9b86940f9"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABOP-dnw",
           "author": {
             "login": "DevinVinson"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-18T18:31:01Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "cb259f3c701a9c09b09e017c465f59a3bb7f9ef4"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABOU2Jrg",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-09-19T16:04:46Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "cb259f3c701a9c09b09e017c465f59a3bb7f9ef4"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABOVAq6Q",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "I am an AI agent based on GPT-6-Astra helping Engel Nyst (@enyst) with project maintenance.\n\nReviewed the lint-trial changes and rechecked the findings against current head `18c5c3ee34a8e30879658f8484e9fabf1f0e5c94`.\n\n**Recommendation: worth pursuing, but fix the remaining sign regressions and provide UI verification before merging.**\n\n**Finding: preserve negative signs in the mechanical class replacements.**\n- `src/components/features/conversation-panel/conversation-card/conversation-tag-chips.tsx:231` and `src/components/features/skills/skill-card-pill-row.tsx:192` replace `-left-[10000px]` with `left-2500`. At a 16px root size this moves the hidden measurement rows from \u221210,000px to +10,000px. Positive off-screen placement introduces a horizontal-overflow risk; opacity and pointer-events do not remove layout boxes. Use `-left-2500`, or retain the literal negative pixel value if exact pixel positioning matters.\n- `src/components/features/conversation/conversation-tabs/conversation-tabs-context-menu.tsx:224` replaces `-mr-[5px]` with `mr-1.25`. This changes the pinned icon's right margin from \u22125px to +5px at the default root size, altering its alignment. Use `-mr-1.25`.\n\nI verified the sign changes with the installed Tailwind compiler. I have not reproduced their effects in the running PR UI, so the overflow consequence is a risk identified from source, not an observed browser result.\n\n**Verification and acceptance criteria (#17480):**\n- [x] Semantic theme aliases are added.\n- [x] `no-arbitrary-values` remains a warning and the other five rules are explicitly off with a documentation link.\n- [x] Current Ubuntu and Windows test-and-build jobs pass. The stale folder-row assertion identified in my earlier inspection is fixed in this head and is no longer an outstanding finding.\n- [ ] Value-identical/no-visual-change migration: the sign errors above remain. Pixel-to-rem substitutions also depend on root font size; the two intentional color rebindings are disclosed.\n- [ ] Please add actual UI verification of the affected measurement rows, pinned menu icon, chat inputs, and warning/border colors. The terminal screenshot demonstrates command results, not visual preservation.\n\nThe token aliases are useful, and warning-level adoption is reasonable for a trial. I would not treat the dependency waiting date alone as sufficient for merge readiness.",
           "submittedAt": "2026-09-19T16:47:49Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "18c5c3ee34a8e30879658f8484e9fabf1f0e5c94"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABOWAE2g",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "I am an AI agent based on GPT-6-Astra helping Engel Nyst (@enyst) with project maintenance.\n\nFollow-up audit of `d3408b22ffeb9447d1660edef62d22cf289a7eeb`: I recommend merging once the final CI checks pass, with the fixes now pushed to this branch.\n\nThe expanded audit found two additional migration regressions and corrected them:\n- `BrandButton`: replacing the foreground with `text-base` caused tailwind-merge to drop the existing `text-sm`, because the merger considers that name a font size while this theme emits it as a color. Primary labels became 16px. The new `text-on-primary` alias preserves both foreground and font size; two regression cases cover default and overridden sizes. In the real mobile MCP dialog, all action labels now measure 14px and buttons remain 36px high.\n- Automation status badges: the replacements silently switched from `--oh-success` / `--oh-danger` to independently overrideable `--oh-color-success` / `--oh-color-danger`. Explicit semantic aliases now preserve the original variables for embedding hosts. Generated CSS and the actual default-theme badges were checked.\n\nI also fixed existing narrow-layout crowding in the automation/MCP headers and MCP dialog actions. The earlier negative-offset and profile-menu fixes remain present; the final profile menu stays inside the viewport and scrolls.\n\nCoverage: every changed file is inventoried (391 files; 359 source files, including 342 TSX component/route files). The source/CSS audit covers all changed components. I captured and inspected 51 screenshots using the real local backend at desktop, phone and tablet sizes; 141 changed components/routes have linked visual samples. The other 201 are explicitly source/CSS-only in the local audit matrix. This is not exhaustive visual sign-off: Cloud auth, live streaming/approval states, populated file/diff views, and several setup/destructive-action states still need suitable fixtures. No live schedules, installs, sync runs or credentials were changed.\n\nRemaining observations:\n- The expanded sidebars leave MCP only 152px of content width at a 768px viewport, making the tablet layout impractical. I reproduced the same width and crowding on an independently built PR base, so this is an existing responsive-layout issue rather than a migration regression.\n- The synced-backend note is 11px muted text with about 3.7:1 contrast against its background; this existing accessibility issue deserves a separate pass.\n- Historical automation failures and missing conversation workspaces shown during inspection were existing backend data, not new failures introduced by the PR.\n\nValidation: the full suite passed (724 files, 7,617 tests, 7 todo) with `NODE_OPTIONS=--no-experimental-webstorage`; the initial default-Node failures were caused by experimental Web Storage interfering with jsdom. Final follow-ups passed 82 button/layout tests and 42 status/Git Sync tests. App and library builds pass. Lint/typecheck/formatting pass with zero errors and 347 intentionally non-blocking arbitrary-value warnings. Commit hooks passed for all fixes. Final CI is still the merge gate.\n\nThe detailed searchable per-file matrix and screenshot gallery were delivered locally to Engel; local backend screenshots were not uploaded publicly.\n",
           "submittedAt": "2026-09-19T20:34:51Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "d3408b22ffeb9447d1660edef62d22cf289a7eeb"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABOYt8QQ",
           "author": {
             "login": "enyst"
           },
-          "state": "APPROVED",
+          "authorAssociation": "MEMBER",
+          "body": "Moving forward with this, because my agent tested it with 137 screenshots of functionality (!) by itself and it\u2019s so exciting!\r\n\r\n[OpenHands UI visual tests](https://enyst.github.io/investigations/openhands-pr-17435-ui-audit.html), with 137 screenshots (+8 it remade for passwords fields) and they look good.\r\n\r\nBut now I\u2019d _really_ love a weekly UI verification! The LLM capabilities are there, they are really there for a while now. And I believe we need something like that in place to catch stuff, and who knows, save the day \ud83d\ude05, when things may be incomplete during the week, while Graham puts in place a software factory.\r\n\r\n_Edited to add:_ my agent made findings that don\u2019t appear to be from this PR, but they don\u2019t look right, in particular on mobile. It was a side-effect of testing, of the agent testing so much UI surface affected by this PR. THIS is what I think we could benefit from, when we automate it: the agent checking itself and finding what was missed.",
           "submittedAt": "2026-09-20T10:56:37Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [
+            {
+              "content": "ROCKET",
+              "users": {
+                "totalCount": 1
+              }
+            }
+          ],
+          "state": "APPROVED",
           "commit": {
             "oid": "d3408b22ffeb9447d1660edef62d22cf289a7eeb"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 8,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/17435/checks"
+      }
     },
     {
       "number": 17644,
@@ -173,38 +258,61 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABO8KdJw",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Summary\n\nScope is correct: the change is entirely Canvas-owned (`eslint.config.js`, `src/components/...`, `src/utils/form-control-classes.ts`) and needs no SDK/automation/extensions counterpart. This is a bounded lint-adoption chore, matching the linked issue #17642's stated \"initial PR at warn\" plan.\n\n## Verification performed on head `33c23f8b`\n\n- **Rule is real and configured validly.** Installed `@shadcn/lint@0.1.0`; its `no-unknown-classes` schema takes `allow: string[]` compiled as anchored glob patterns (`compileEntries`/`matches`), so the two literal entries are exact matches, not prefixes. A near-match typo (`environment-switch-overla`) still warns \u2014 confirmed by running the committed probe.\n- **Allow entries have real consumers.** `environment-switch-overlay` is styled in `src/index.css:134` (outside the Tailwind `@import` graph in `src/tailwind.css`), and `conversation-overview-diffs-git-action` targets `has-[.conversation-overview-diffs-git-action:hover]` in `conversation-overview-diffs-row.tsx`. Both comments in the config are accurate.\n- **The four removals are inert.** Compiled CSS with the real Tailwind theme (via `@tailwindcss/node`) shows `ease`, `max-w-auto`, and `drag-over-content` each produce **zero** CSS delta versus the preflight baseline, while control utilities (`ease-in`, `max-w-full`, `flex`) do. `twMerge` preserves the removed tokens unchanged. Both dropdown wrappers compose `cn(\"relative\", className)` with no competing max-width, and the transition helper keeps `transition-[transform] duration-75 motion-reduce:transition-none` plus the default timing function, so `ease` behavior is unchanged. Repository search found no CSS/JS/test consumer of any removed class.\n- **Zero unknown-class warnings across the tree.** Chunked ESLint runs with the real flat config over every `src` directory returned `unknownClassWarnings=0` in all chunks, corroborating the PR's central claim (a full single-process `eslint src` run OOMs in this sandbox, so I used directory-scoped runs).\n- **Focused tests pass.** `vitest run` on the five form/dropdown/helper suites: **5 files / 69 tests passed**, matching the PR.\n- **CI for the exact head is green:** `test-and-build (ubuntu)` passed (Lint, Test, Build app, Build library) and `test-and-build (windows)` passed. `live-e2e` is skipped for fork PRs by design. The transient duplicate `PR Description Check` failure is superseded by the later success at 21:32:49Z; the `release ready` `startup_failure` is a `pull_request_target` workflow/config event untouched by this PR.\n\n## Acceptance criteria (#17642)\n\n- [x] Rule runs through `npm run lint` against the real theme without theme-loading/fallback warnings.\n- [x] Baseline/final rule-specific findings and exception reasons recorded (`.pr/lint-verification.md`, six-to-zero inventory).\n- [x] Reproducible detection/acceptance check (both committed probes pass here).\n- [x] Class changes justified by emitted CSS + before/after real-app screenshots for the affected UI.\n- [x] `npm run lint`, `npm test`, `npm run build`, `npm run build:lib` pass; pre-existing arbitrary-value warnings identified separately.\n- [x] Other shadcn rules retain their prior settings (only `no-unknown-classes` changed).\n\n## Non-blocking notes\n\n- The one full-suite failure the PR discloses (`DeleteProfileModal` success-toast intermittent) is a pre-existing flake; this change touches no runtime source, and the isolated rerun passed. Not attributable to this PR.\n- The `.drag-over-content` marker is removed rather than wired to the similarly named `.drag-over-ui-content` rule; deferring that styling decision is reasonable and explicitly documented.\n\nNo material correctness, security, compatibility, or architecture findings.\n\n\u2705 APPROVED",
           "submittedAt": "2026-09-23T22:35:29Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "33c23f8b89ef771cd3485a60dd2f449026c90fa4"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABO8c9lg",
           "author": {
             "login": "neubig"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "The verification now shows **zero** remaining `shadcn/no-unknown-classes` findings, so could we promote this specific rule from `warn` to `error` in this PR?\n\nThat would give us a simple zero-baseline ratchet through the existing `npm run lint` CI path: every newly introduced unknown class would fail lint, while the two intentional exact exceptions remain allowed. It also avoids adding a custom warning-count script or conflating this rule with the existing `no-arbitrary-values` warning backlog.\n\nThe issue originally proposed `warn` for an incremental rollout, but since all six findings have been resolved there is no remaining debt to roll down incrementally.\n\n_This review was generated by an AI agent (OpenHands) on behalf of @neubig._",
           "submittedAt": "2026-09-23T23:19:08Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "33c23f8b89ef771cd3485a60dd2f449026c90fa4"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABQmP_OA",
           "author": {
             "login": "enyst"
           },
-          "state": "APPROVED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-10-04T23:46:10Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "16d21fdb1fae5373291015befbe8672901a58478"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/17644/checks"
+      }
     },
     {
       "number": 17916,
@@ -219,18 +327,31 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABQrswsA",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Summary\n\nScope check: this change belongs in `OpenHands/OpenHands` \u2014 it edits the Canvas ESLint policy, its regression probe, and suppression comments only. No backend contract, SDK, or automation ownership is touched, so the dependency direction is respected.\n\nI verified the head `1a84d363fad75bf1692831054525bf6108ece414` against the current GitHub state and ran the focused probe locally.\n\n## Evidence\n\n- Focused test on the exact head: `npx vitest run __tests__/scripts/static-classes-lint.test.ts` \u2192 **2 passed**.\n- Head check runs: `test-and-build (ubuntu)` (runs `npm run lint` and `npm test`) and `test-and-build (windows)` are both **success**; `Validate PR description` is **success** (latest 12:23:31Z). The only failure is a stale run from 00:28Z, superseded by the later green runs.\n- Read the shipped rule (`@shadcn/lint@0.1.0`) to confirm option semantics: `componentImports` patterns are tested against the import source (`^#/ui(/|$)` matches both `#/ui` and `#/ui/...` but not `#/ui-utils`), so the `#/ui` recognition is genuinely active rather than a no-op. Flat-config ordering makes the `src/ui/**` override take effect after the `src/**` error setting.\n\n## Acceptance criteria checklist (issue #17912)\n\n- [x] `shadcn/require-static-classes` set to `\"error\"` for `src/**` with explicit `#/ui` recognition via `componentImports`.\n- [x] Rule is `\"off\"` only for `src/ui/**`; `no-unknown-classes` and `no-arbitrary-values` remain active there (probe test 2 asserts an unknown-class error still fires in `src/ui`).\n- [x] Exactly three `eslint-disable` directives for the rule, each with an inline reason; no shared constant duplicated and no component API changed.\n- [x] Probe reports errors for a template-literal-from-prop, an import alias, and namespaced `Typography.Paragraph`, while static ternary, `cn(...)`, and `className` forwarding produce none.\n- [x] Probe fails on the base configuration: with the rule at `\"off\"` the expected two findings cannot appear, so test 1 cannot pass spuriously.\n- [x] `npm run lint` / `npm run build` pass (green `test-and-build (ubuntu)` on the head).\n- [x] The enforcement boundary is documented as `#/ui` only.\n\n## Findings\n\nNo material correctness, security, compatibility, or architecture issues found. The suppressions are narrow and correctly placed (lint runs at error level, so a mis-placed disable would have failed CI), and the probe exercises the real shipped config rather than a copied rule setting.\n\n## Verdict\n\n\u2705 APPROVED\n",
           "submittedAt": "2026-10-05T12:33:20Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "1a84d363fad75bf1692831054525bf6108ece414"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/17916/checks"
+      }
     },
     {
       "number": 17987,
@@ -245,18 +366,31 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABQsHnlg",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Approved \u2014 dev-only dependency bump with no runtime impact, and I don't see any major issues.\n\n- Net change from `main` is exactly: `@shadcn/lint` 0.1.0 \u2192 0.2.0 (lockfile also moves `cn` 0.2.6 \u2192 0.3.2 and makes `@typescript-eslint/parser` an optional peer), plus comment-only updates in `eslint.config.js`. No rule severities changed, so the `require-static-classes` activation from #17916 is preserved.\n- Verified the registry integrity hashes for both changed packages against the lockfile, and confirmed both were published via trusted publishing (GitHub Actions, maintainer `shadcn`).\n- CI is green on both ubuntu and windows (`test-and-build`), plus the PR description/title checks.\n\nNice supply-chain write-up in the description. Ship it.\n\n_This review was generated by an AI agent (OpenHands) on behalf of the user._\n",
           "submittedAt": "2026-10-05T13:10:49Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "9f32863ec46d595b9e0ecaa82b0820ce0578842e"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 8,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/17987/checks"
+      }
     },
     {
       "number": 18006,
@@ -271,28 +405,46 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABQyKgYw",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Summary\n\nVerified at head `1d94b9d0a398d1e1e8bb2786785bbc0ecf010dbd`. The change is correctly scoped to this repository (Canvas lint tooling) and the implementation is sound. `shadcn/no-raw-colors` is enabled at `warn` in the `src/**/*.{ts,tsx}` block, with eight exact `allow` entries that correspond to real declarations (`hero.ts` / `@heroui/theme` and `tailwind.config.js`), plus a real-config regression test. No component, stylesheet, dependency, or rendered-color changes.\n\n## Verification performed\n\n- Focused tests: `npx vitest run __tests__/scripts/raw-colors-lint.test.ts __tests__/scripts/static-classes-lint.test.ts` -> 2 files / 4 tests passed.\n- Confirmed the shipped config emits severity-1 `shadcn/no-raw-colors` warnings for raw palette classes (e.g. `text-red-500`, `bg-amber-500`) in real source files, and that all eight exempted tokens are actually used under `src`, so the exemptions are meaningful.\n- Required status check `test-and-build (ubuntu)` on this head: success.\n\n## Acceptance criteria (issue #18005)\n\n- [x] Enable `shadcn/no-raw-colors` at warning in source files, including primitives\n- [x] Exempt only the eight exact classes; no raw palette or namespace wildcard\n- [x] Regression tests cover raw palette, unknown tokens, SVG literals, verified tokens, and a misspelled plugin token\n- [x] Roadmap comment updated; existing rule severities retained; no rendered UI/color change\n- [x] Lint/build recorded; 148 remaining findings tracked in #18004\n\n## Gap (merge gate)\n\nThe head's `Validate PR description` check is failing: \"This PR touches frontend code but the description has no screenshot or video.\" The diff touches `__tests__/scripts/raw-colors-lint.test.ts`, which `.github/scripts/check_pr_description.py` classifies as frontend code. `.agents/skills/custom-codereview-guide.md` (\"Testing and Production Evidence\") requires frontend-touching PRs to carry the required evidence and directs COMMENT when that evidence is absent or ambiguous. The PR body argues no rendered-UI change, which is a fair point for a lint-config change, but the repository's own automated validator still fails on this exact head, so the requirement is currently unmet.\n\nSmallest correction: add the requested artifact under `## Video/Screenshots` - for a non-UI lint change, a terminal capture of `npm run lint` or the focused vitest run showing the new warnings is proportional evidence - or have a maintainer explicitly override the check. No code changes are needed; the implementation itself passes review.\n\n\ud83d\udd04 CHANGES REQUESTED\n",
           "submittedAt": "2026-10-05T22:19:57Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "1d94b9d0a398d1e1e8bb2786785bbc0ecf010dbd"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABQ0qGoA",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Summary\n\nApproving at head `1d94b9d0a398d1e1e8bb2786785bbc0ecf010dbd`. The change is correctly scoped to this repository (Canvas lint tooling), the implementation is sound, and the previously noted merge gate is now cleared: the `Validate PR description` check passes on this head (run 37400153511), so the earlier COMMENT no longer applies. The diff is limited to `eslint.config.js` and the new `__tests__/scripts/raw-colors-lint.test.ts`; no component, stylesheet, dependency, or rendered-color changes.\n\n## Verification performed\n\n- Focused tests: `npx vitest run __tests__/scripts/raw-colors-lint.test.ts __tests__/scripts/static-classes-lint.test.ts` -> 2 files / 4 tests passed.\n- Ran the shipped `eslint.config.js` against a temporary probe file: raw palette (`text-red-500`, `bg-amber-500`), an unknown token (`text-unregistered-color`), and an SVG literal (`fill=\"#ec4899\"`) all report `shadcn/no-raw-colors` at severity 1; all eight `allow` classes produce no finding; the misspelled `bg-content9` still warns. The exemptions are exact-match entries, not palette or namespace wildcards.\n- Required check `test-and-build (ubuntu)` on this head: success. The PR is `MERGEABLE`; only `REVIEW_REQUIRED` remains.\n\n## Acceptance criteria (issue #18005)\n\n- [x] `shadcn/no-raw-colors` is enabled at `warn` (replacing `off`) in the `src/**/*.{ts,tsx}` block, including `src/ui/**` primitives.\n- [x] The `allow` option contains exactly the eight verified HeroUI/legacy JS-config tokens; no raw palette class and no prefix/namespace wildcard is exempted.\n- [x] A regression test runs the shipped config through the ESLint API and asserts severity-1 findings for a raw palette class, an unknown color name, and an SVG literal; no finding for existing theme tokens or the eight exempt classes; and a continued finding for a misspelled plugin-style token (`bg-content9`), covering both a regular and a `src/ui` path.\n- [x] No existing rule severities change; the roadmap comment records the `warn` stage and the dependency on #18004.\n- [x] `npm run lint` records 0 errors and `npm run build` passes; the 148 remaining findings are deferred to #18004.\n- [x] The diff changes only `eslint.config.js` and the new test file: no `src/**` changes and no `package.json`/`package-lock.json` changes.\n\nNo blocking findings. Note on scope of verification: full `eslint src` could not be reproduced in my sandbox (Node ran out of memory on the full tree), but the focused real-config probe and the passing `test-and-build (ubuntu)` check cover the behavior this PR changes.\n",
           "submittedAt": "2026-10-06T04:53:25Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "1d94b9d0a398d1e1e8bb2786785bbc0ecf010dbd"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18006/checks"
+      }
     },
     {
       "number": 18194,
@@ -307,48 +459,76 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABRcRy8A",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "CHANGES_REQUESTED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Solid, low-risk rule activation \u2014 thanks.\n\n**Blocking: the PR description check is failing.** `Validate PR description` is red on the latest head (multiple completed runs, not a flake). Please fix the description so that check goes green before this merges.\n\nEverything else looks good:\n- Scoping `no-restyle` to `#/ui/(divider|toggle-switch)` (plus the automation re-export) and `allow: [\"layout\"]`, with `ToggleSwitch` additionally permitting `opacity`, is a sensible first slice.\n- Turning the rule off inside `src/ui` is correct \u2014 the primitives own their appearance there.\n- The new `__tests__/scripts/restyle-lint.test.ts` is the right shape for this: it exercises the shipped config both ways (aliases + re-export + allowed layout/opacity reject, `src/ui` internals allowed), so the explicit `errors` line numbers make the contract precise and the `src/ui` case guards against the rule leaking into the exception.\n\nOne small note: the two tests are coupled to the comment block and ordering of the probe string (they assert exact line numbers and the full ordered `errors` array). That's a fair trade for how precise it is, but expect to touch the probe whenever it's edited. Non-blocking.\n\n---\n_This review was generated by an AI agent (OpenHands) on behalf of the maintainers._",
           "submittedAt": "2026-10-09T03:39:52Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "CHANGES_REQUESTED",
           "commit": {
             "oid": "d0312fddadfdab8f26c5cc68679ef5d36cb6866e"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABRdwhKA",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Approving \u2014 my earlier blocker is resolved: the latest `Validate PR description` run on the head commit is green (only superseded runs are red), and CI (`test-and-build`) passes.\n\nScoping `no-restyle` to `#/ui/(divider|toggle-switch)` plus the automations re-export, with `allow: [\"layout\"]` and the `ToggleSwitch` opacity exception, is a sensible, low-risk first slice. The new `restyle-lint.test.ts` exercises both the enforced and exempt paths.\n\nNon-blocking (unchanged from before): the tests assert exact line numbers and the ordered `errors` array, so the probe will need updating whenever it is edited.\n\n---\n_This review was generated by an AI agent (OpenHands) on behalf of the maintainers._",
           "submittedAt": "2026-10-09T07:17:15Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "d0312fddadfdab8f26c5cc68679ef5d36cb6866e"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABRgcRSA",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nReviewing the current head `d8841048` (`test(lint): assert restyle policy without diagnostic ordering`), which moved past the earlier `d0312fd` review. The `eslint.config.js` change is unchanged from that commit; the new commit only rewrites `__tests__/scripts/restyle-lint.test.ts` to assert the set of flagged probes rather than exact line numbers and diagnostic order. That addresses the earlier non-blocking note and makes the test resilient to probe edits.\n\nScope fits this repository: `shadcn/no-restyle` is the repo's own authoritative lint mechanism (same plugin/config already used by `require-static-classes` and `no-unknown-classes` in `eslint.config.js`) and the change only activates it for existing first-party components. No product source, dependencies, or component APIs change.\n\nVerification on the head (Node 24.21.0, `npm ci --ignore-scripts`):\n- `vitest run __tests__/scripts/restyle-lint.test.ts` \u2192 2/2 passed.\n- Direct ESLint probe against the real consumer classNames in `src/components/features/canvas-extensions/canvas-extension-card.tsx` (`className={isBusy ? \"pointer-events-none opacity-50\" : undefined}`), `src/components/features/conversation-panel/menu-row.tsx` / `hide-older-conversations-row.tsx` (`ml-auto`), and Divider `my-1` produces **no** `no-restyle` findings, while `bg-danger` on `ToggleSwitch`, `opacity-50` on `ToggleSwitchVisual`, and `bg-border`/`p-2`/`gap-3`/`rounded-full` on `Divider` each report at error severity. The rule behaves exactly as the contracts describe.\n- All completed checks on the head are green (`Validate PR description`, `test-and-build (ubuntu)`, `test-and-build (windows)`, `check-pr-artifacts`, `prepare-test-matrix`, both `pr-title` jobs).\n\nAcceptance-criteria checklist:\n- [x] Divider color/shape/internal-spacing classes fail lint; layout classes pass \u2014 confirmed by probe.\n- [x] Same color/shape/spacing-versus-layout behavior for `ToggleSwitch`/`ToggleSwitchVisual`.\n- [x] `opacity-*` passes on the `ToggleSwitch` wrapper, reported on `ToggleSwitchVisual` and `Divider` \u2014 per-component `contracts` entry plus the `allow: [\"layout\"]` base.\n- [x] Recognition covers direct imports, aliased imports, and the `#/components/features/automations/toggle-switch` re-export \u2014 exercised in the test probe.\n- [x] `src/ui/**` implementations can own their appearance (`no-restyle: off` block); existing `no-raw-colors`/`require-static-classes`/`no-unknown-classes` scope and severity unchanged.\n- [x] `npm run lint` green on `src` with no appearance edits and no new suppressions (per the PR's recorded run; consumer classes spot-checked above produce no findings).\n- [x] Automated probe runs the shipped `eslint.config.js` and asserts flagged-vs-allowed usage.\n- [x] Change limited to lint config plus its policy test; `no-inline-styles` stays off.\n\nNo material correctness, security, compatibility, or architecture findings. One non-blocking note: `ToggleSwitchVisual` is currently only restyled-free because no standalone consumer dims it; if such a need arises, the contract will report it and the primitive should gain an explicit variant rather than an exception \u2014 no action needed now.\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-09T12:12:02Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "877df6ea3f491fd475c28956175cac53e85d08be"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABRk4B0w",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Reviewed \u2014 looks good to me.\n\nEnabling `shadcn/no-restyle` as an error for just `divider` / `toggle-switch` (plus the automation re-export), keeping `allow: [\"layout\"]` and adding the targeted `opacity` allowance for `ToggleSwitch`, is a sensible, incremental core rule. Scoping `no-restyle` off inside `src/ui` is correct since that is where the appearance is implemented. The new probe test is well-constructed \u2014 asserting the set of flagged lines rather than a count or diagnostic order is the robust choice \u2014 and using the shipped config while only relaxing type-aware parsing exercises the real policy. CI (ubuntu + windows) is green.\n\nApproving.\n\n_Reviewed by an AI agent (OpenHands) on behalf of the requester._",
           "submittedAt": "2026-10-09T19:28:48Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "877df6ea3f491fd475c28956175cac53e85d08be"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18194/checks"
+      }
     },
     {
       "number": 18270,
@@ -363,18 +543,31 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABRrx60w",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nCanvas-owned presentation/theming change in `OpenHands/OpenHands`. It adds no Agent Server, Cloud, or SDK contract, endpoint, or wire change, so the normal dependency direction is respected and the scope gate passes.\n\n## What I verified on head `0dfa490`\n\n- **Diff (+112/-9, 10 files)** wires two new feedback tokens through `AGENT_SERVER_UI_DEFAULT_CSS_VARIABLES`, `src/tailwind.css` (`:root` and `@theme inline`), and the two light palettes; the nine raw `text-red-500` / `text-green-500` sites in `install-server-modal.tsx` and `mcp-server-form.tsx` now use `text-feedback-error` / `text-feedback-success`. No raw palette colors remain in either component.\n- **Dark palettes** derive `--oh-feedback-*` from `--oh-color-danger` / `--oh-color-success`. The issue's acceptance criteria explicitly allow this (distinct values are required only for the light themes where the shortfall was reported), and the general control colors stay unchanged.\n- **Contrast**: I recomputed WCAG ratios from the shipped values against `bg-base-secondary` \u2014 the modal surface used by both `InstallServerModal` and `CustomServerEditor`, which is the only place `MCPServerForm` renders \u2014 and reproduced the PR table exactly: DeepSea 4.83 / 10.36, Neutral 5.14 / 11.01, Neo 5.14 / 11.01, Light+ 5.28 / 5.29, Solarized Light 4.94 / 4.86. All are >= 4.5:1.\n- **Focused tests**: `npx vitest run` over `color-themes`, `mcp-server-form.validation`, `install-server-modal`, and `custom-server-editor` \u2014 4 files / 75 tests passed, including the five new palette cases and the host-override preservation test.\n- **CI on the exact head**: all check runs are `success` (or intentionally `skipped`); `test-and-build (ubuntu)` and `test-and-build (windows)` are green.\n\n## Acceptance criteria checklist (#18269)\n\n- [x] The nine raw red/green findings are removed through named tokens; no `allow`/suppression was added.\n- [x] Inline validation errors use the error token; `mcp-test-message` success uses the success token; the `mcp-test-message` / `mcp-install-modal-error` test ids and message text are unchanged.\n- [x] Both tokens are defined for all five built-in themes.\n- [x] Measured contrast is >= 4.5:1 against the actual modal surface in every theme (method and ratios above).\n- [x] Embedded host overrides survive palette changes (`color-themes.test.tsx`).\n- [x] Existing MCP behavior tests still pass; invalid submissions stay rejected and a failed test keeps the form open.\n- [x] `shadcn/no-raw-colors` stays `warn`; no i18n or layout change.\n\n## Notes\n\n- The PR body links real-app before/after captures across all five themes at desktop and phone widths plus a SHA-pinned design doc, which satisfies the functional-change evidence rule for a presentation change.\n- No material correctness, security, compatibility, or architecture findings. No inline comments.\n\n\u2705 APPROVED\n",
           "submittedAt": "2026-10-11T03:23:53Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "0dfa490441b0762e143486cf29dfe5d2e2a7758f"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18270/checks"
+      }
     },
     {
       "number": 18274,
@@ -389,18 +582,31 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABRr_8-w",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Reviewed \u2014 LGTM.\n\n- Adds `#/ui/combobox-caret` to the `no-restyle` `componentImports` and defines clear appearance/state contracts: layout + text-color stay public, padding/background/shape/effects remain internal to the primitive, and stateful carets must use `isOpen` instead of `rotate-*`.\n- The new probe covers aliases, namespaces, allowed classes, forbidden appearance classes, and negative/variant rotation, and asserts severity `error` \u2014 matching the rule level.\n- Docs addition is consistent with the config. Non-functional: no product source, CSS, or API changes.\n\n_This review was posted by an AI agent (OpenHands) on behalf of the user._",
           "submittedAt": "2026-10-11T04:53:47Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "469bf2a588e372ed00546af3673c47bd680991ea"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18274/checks"
+      }
     },
     {
       "number": 18275,
@@ -415,18 +621,31 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABRr_9QA",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Reviewed \u2014 LGTM.\n\n- Flips `shadcn/no-inline-styles` from `off` to `warn` and adds a single, well-justified exception for `agent-server-ui-root.tsx`, whose public `style`/`styleOverrides` API must forward arbitrary caller-owned styles.\n- New probe correctly asserts warning severity (`1`) and verifies numeric CSS vars / semantic tokens pass while literal colors, opaque objects, and `<style>` elements warn. The embedding-owner case confirms the exception.\n- Staging as warnings (not errors) with an explicit owner inventory is the right, low-risk first step. Non-functional: no product source, CSS, or API changes.\n\n_This review was posted by an AI agent (OpenHands) on behalf of the user._",
           "submittedAt": "2026-10-11T04:53:49Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "335134efef02cd2aa65a9ee364b8fb7d892deede"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18275/checks"
+      }
     },
     {
       "number": 18278,
@@ -441,18 +660,31 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABRsGyIg",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\nBelongs in `OpenHands/OpenHands`: a localized Canvas presentation change to `SaveAsSecretToggle`. It reuses the shared `ToggleSwitchVisual` (`src/ui/toggle-switch.tsx`) and existing theme tokens; no Agent Server/Cloud contract, no dependency, and no raw endpoint work. #18004 explicitly keeps the broader migration and rule promotion separate, and #18277 (`ready-for-dev`) is the bounded acceptance source.\n\n## Verified on the current head\n- Head is `7bc8d5e9552b5872cb2e9c7b582a4fc05343fe80` (base `main` @ `8af7ee5`); 4 files, +60/-50.\n- Focused Vitest in the workspace: **3 files / 50 tests pass** (`save-as-secret-toggle`, `install-server-modal`, `toggle-switch`).\n- Tailwind 4.3.3 compiles every new utility: `has-focus-visible:outline-2/-offset-2/outline-focus` resolves to `:has(:focus-visible)`, and `bg-contrast/4`, `bg-contrast/5`, `border-contrast/25`, `text-contrast`, `break-all`, `size-3.75` all compile. No `no-unknown-classes`/`no-raw-colors` exposure.\n- Prettier clean on the changed files.\n- CI on the exact head: `test-and-build (ubuntu)` and `(windows)` success, `Validate PR description` success, `pr-title` success, `check-pr-artifacts` success; `mergeable: true`.\n\n## Acceptance criteria (#18277)\n- [x] Row text, secret name, and help glyph >= 4.5:1 in all five palettes, both states. Linked after-measurements: light-plus checked label 13.53 / name 12.55, solarized-light checked label 11.14 / name 10.40; unchecked also > 11 (was 1.70 / 1.56).\n- [x] Selected switch renders via shared `ToggleSwitchVisual`; thumb/track >= 3:1 (light-plus 13.53, solarized-light 11.14).\n- [x] At 390 px the secret name and help control stay inside the row (`rowInsideViewport` true, `rowContentOverflow` false across palettes/states).\n- [x] Label click and Space operate the native checkbox; help stays independent (test asserts the help click neither calls `onToggle` nor changes the checkbox); keyboard focus is visible (solid 2px, theme focus color).\n- [x] The six raw-green findings are removed; `eslint.config.js` keeps `shadcn/no-raw-colors` at its current severity and its `allow` list unchanged.\n- [x] Live Canvas evidence (real local Agent Server 1.54.0, Chrome, production build) for all five palettes at desktop and 390 px, with before/after captures and a keyboard/help video, pinned to immutable SHA `5328e3f`.\n\n## Regressions checked\n- The native checkbox stays the semantic control (`sr-only`, controlled `checked`/`onChange` API unchanged); `ToggleSwitchVisual` is `aria-hidden` decorative. No state or persistence path is touched, and the component is shared by the STDIO, remote-header, and hosted-credential forms.\n- Presentation-only change; `mergeable_state: blocked` reflects the pending review, not a conflict.\n\nNo material correctness, security, compatibility, architecture, or evidence gaps found.\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-11T05:45:17Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "7bc8d5e9552b5872cb2e9c7b582a4fc05343fe80"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18278/checks"
+      }
     },
     {
       "number": 18315,
@@ -467,18 +699,31 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABRwqWyw",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Approving \u2014 no major issues found.\n\nVerified on the PR head:\n- `package.json` / `package-lock.json` exact-pin `@shadcn/lint` 0.2.0 \u2192 0.2.1 and its `cn` dependency 0.3.2 \u2192 0.4.0; resolved URLs and SHA-512 integrity match the npm registry metadata, and neither changed package ships install lifecycle scripts.\n- `eslint.config.js`: diffing main vs. head ignoring whitespace shows only comment refreshes plus two pure formatting collapses \u2014 all rule severities, options, `allow`/exception entries (`layout`, `text-medium`, etc.) and `componentImports` are unchanged. So this cannot silently change diagnostics beyond the upstream fixes.\n- The new regression in `__tests__/scripts/raw-colors-lint.test.ts` genuinely exercises the shipped config: it fails on 0.2.0 (`fill-none`/`stroke-none` reported as undeclared colors) and passes on 0.2.1.\n- Focused suite passes locally on a locked install (`npm ci --ignore-scripts`): 6 files / 18 tests, including the new SVG paint-clearing case.\n- CI is green on the head SHA, including the Ubuntu lint/test/build/package-verify job and the Windows install+build job.\n\nDev-only tooling change with no runtime impact; the bump strictly removes false positives (SVG paint-clearing classes) while keeping the rule rollout unchanged. The full `npm run lint` typecheck/ESLint steps couldn't complete in my review sandbox due to a local memory limit, but they are covered by the passing CI lint job.\n\n_This review was created by an AI agent (OpenHands) on behalf of the user._",
           "submittedAt": "2026-10-12T05:34:04Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "9d1d0edbfa810d099f7c5adc08e6463996aed278"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 8,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18315/checks"
+      }
     },
     {
       "number": 18320,
@@ -493,28 +738,46 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABR1IVNA",
           "author": {
             "login": "VascoSch92"
           },
-          "state": "APPROVED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-10-12T13:34:05Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "cd42717bb93ee360d40b182c1418847529964dc7"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABR1hKyQ",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Review: PR #18320 \u2014 chore(lint): remove redundant text-medium color exception\n\n**Scope:** The change is confined to `eslint.config.js` and belongs in this repository (Agent Canvas frontend lint configuration). Single hunk: removes the exact-class `\"text-medium\"` entry from the `shadcn/no-raw-colors` `allow` array and updates the adjacent comment. +1 / -2, one file.\n\n**Verification (workspace, head `cd42717b`):**\n- All GitHub Actions checks for the head are green (`test-and-build (ubuntu)`, `test-and-build (windows)`, PR-title/description validators).\n- Focused lint probe suite passes on the head: 14 tests across `raw-colors-lint`, `restyle-lint`, `static-classes-lint`, `inline-styles-lint`, `lint-staged-portability`, and `tailwind-text-base`. `text-medium` is still accepted (no `shadcn/no-raw-colors` warning) in both `src/routes/*` and `src/ui/*`, while raw palettes and undeclared tokens still warn.\n- `npx eslint src/ui/combobox-caret.tsx` (the only `text-medium` consumer in `src/`) reports no `shadcn/no-raw-colors` warning, confirming the exception is genuinely redundant with `@shadcn/lint@0.2.1` (the installed version).\n\n**Linked issue #18318 (`ready-for-dev`, `priority:low`) acceptance criteria:**\n- [x] `\"text-medium\"` removed from `shadcn/no-raw-colors` allow array.\n- [x] All seven retained entries present (`bg-background`, `bg-content1`, `text-primary-foreground`, `bg-status-fail-bg`, `text-status-fail-text`, `text-content-muted`, `text-modal-muted`).\n- [x] Adjacent comment no longer claims the medium font size is exempt.\n- [x] No `shadcn/*` severity or option changed.\n- [x] Change limited to `eslint.config.js`; no application/shared-UI class strings modified.\n- [x] Existing probe test passes unmodified.\n- [x] ESLint over the `text-medium` consumer produces no attributable raw-color warning.\n\n**Risk:** LOW. No runtime or visual change; documentation/test-only lint configuration edit. No material correctness, security, compatibility, or architecture concerns. (An approving review from a human maintainer already exists on this head.)\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-12T14:08:48Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "cd42717bb93ee360d40b182c1418847529964dc7"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18320/checks"
+      }
     },
     {
       "number": 18321,
@@ -529,28 +792,46 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABR1IhLA",
           "author": {
             "login": "VascoSch92"
           },
-          "state": "APPROVED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-10-12T13:34:23Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "60c81e2000a683101889ee54b20407b7d76108eb"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABR1iByA",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\nThis is Canvas-owned frontend presentation work (backend connection feedback styling), so it belongs in `OpenHands/OpenHands`. No SDK/automation contract changes.\n\n## What I verified on head `60c81e2`\n- Tokens exist and are host-overridable: `--oh-feedback-error/-success` are defined in `tailwind.css`, `src/styles/agent-server-ui-style-scope.ts`, and per-theme in `light-plus.ts` / `solarized-light.ts`, and are mapped to Tailwind `text-feedback-*` utilities. `--color-semantic-danger` -> `var(--oh-danger)` exists. The new `bg-semantic-danger/5` / `border-semantic-danger/40` follow the same established pattern already used by `automation-health-badge.tsx` and `run-status-badge.tsx`, and Tailwind v4 opacity modifiers use `color-mix`, so they are value-format agnostic.\n- Every changed consumer is legitimately reachable: `BackendStatusBadge`, backend-form connection errors, manual Cloud connection errors, `BackendRow` status/detail (default backend name `Local`), and `api-key-entry-screen` status. Selectors referenced by the new e2e test (`backend-selector`, `manage-backends-menu-item`, `manage-backends-status-Local`, `manage-backends-done`, `add-backend-*`) all exist.\n- Focused unit tests pass in the workspace: `npx vitest run __tests__/components/backends __tests__/themes __tests__/components/features/backends` -> 12 files / 166 tests passed.\n- The new mock-LLM regression asserts a real CSS contract (host override `--oh-feedback-error/-success` honored by connected status and failed connection text), not a class-string mirror, matching the repo test guidance. The API-key test edits replace brittle literal-class assertions with rejected-key behavior, also consistent with the guidance.\n\n## CI\n`test-and-build (ubuntu)` and `test-and-build (windows)` succeeded. `Validate PR description` shows a historical `failure` on the first run (`bug` label not on linked issues; no screenshot detection), but a later run on this same head concluded `success` \u2014 so the description/label gate is satisfied at the current head.\n\n## Observations (nonblocking)\n- The linked issue #18319 has since gained the `bug` label and `ready-for-dev`; issue #18004 carries `enhancement` + `ready-for-dev`. No readiness or priority blocker.\n- Presentation-only token migration: no change to APIs, auth flow, connection state, copy, layout, focus styling, or rule severities.\n\nNo material correctness, security, compatibility, or architecture findings. The change is small, self-contained, and its consumer behavior is covered by passing tests plus a real-CSS regression.\n\n\u2705 APPROVED\n",
           "submittedAt": "2026-10-12T14:09:49Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "60c81e2000a683101889ee54b20407b7d76108eb"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18321/checks"
+      }
     },
     {
       "number": 18327,
@@ -565,21 +846,31 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABSkv-KQ",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nReviewed head `8c8573b188dcd9c62ab50a9fe591210299c4d168` (8 files, +106/-6) against the repo guidance in `AGENTS.md` and `.agents/skills/custom-codereview-guide.md`. Scope is in-repository: theme tokens, focus-role classes, and a Tailwind opacity utility in the Canvas frontend, with no SDK/automation contract change.\n\n### What I verified on the current head\n\n- **Focus role binding.** `focus-visible:outline-blue-300` is gone from all three backend controls (`BackendOptionTab`, `AgentServerGuidance`, and the `add-backend-provider-digitalocean` card); each now uses `focus-visible:outline-focus`. Compiling `src/tailwind.css` with `@tailwindcss/node` shows `.outline-focus { outline-color: var(--oh-focus); }`, so the outline follows the host-overridable role. Outline width/offset (`outline-2`, `-outline-offset-2` on the tab, `outline-offset-2` elsewhere) and `:focus-visible`-only behavior are unchanged from base `cb835dd328`.\n- **Contrast, recomputed independently (WCAG relative luminance).** With no host override, `--oh-focus` clears 3:1 on base / base-secondary / surface-raised / interactive-hover in all five palettes: openhands-neutral (white) 19.32/15.32/12.98/7.59; light-plus (#007ACC) 4.51/4.06/3.89/3.58; solarized-light (#227FBE) 4.02/3.54/3.58/3.26. The old solarized `#268BD2` measures 2.77 on the hovered `#E6DFCC` surface, matching the PR's claim. The two remaining palettes (deepsea, neo) share the neutral scale and the default white `--oh-focus`, so they are unaffected; only the solarized token value changed.\n- **Scrim utility.** `bg-black/50` compiles to `background-color: color-mix(in srgb, #000 50%, transparent)` with the `@supports` fallback, and `bg-black` alone emits opaque `var(--color-black)`; `bg-opacity-50` no longer resolves to a utility in this Tailwind v4 setup, so the previous pairing produced an opaque scrim. The new form is correct in both emitted branches.\n- **Tests.** `npx vitest run __tests__/components/features/settings/settings-navigation.test.tsx __tests__/components/backends __tests__/themes` passes (201 tests, 16 files), including the new compiled-CSS scrim contract and the extended five-palette focus check. The new e2e ids resolve: `add-backend-local-guidance-toggle` is derived from `testIdRoot=\"add-backend-local\"`, and the default `agentServerLocation` is `local`.\n- **CI.** Every check run on this exact head is `success` (ubuntu + windows `test-and-build`, which run `npm run lint`, `npm test`, `npm run build`, `npm run build:lib`), and the `no-raw-colors` severity/allow list in `eslint.config.js` is untouched.\n\n### Acceptance criteria (#18324)\n\n- [x] No raw palette color remains on the connection tabs or guidance toggle; focus resolves from `--oh-focus` and stays `:focus-visible`-only.\n- [x] Outline width/offset and Tab/Enter/Space behavior preserved (classes unchanged except the color role).\n- [x] Default focus \u22653:1 on base, modal, raised, and hovered surfaces in all five palettes; solarized strengthened; no other palette regressed (independently recomputed above).\n- [x] Host `--oh-focus` override wins and is covered by the new actual-browser regression; the other palettes keep their own value.\n- [x] `bg-opacity-50` removed in favor of `bg-black/50`, with a compiled-CSS assertion covering the modern and fallback output.\n- [x] `npm run lint` / `npm test` / build pass on the head per CI.\n- [x] Before/after keyboard-focus evidence captured with real Canvas; the legacy drawer is presented as a build contract rather than a live navigation change.\n- [x] No unrelated changes: font cleanup, backend feedback messages, rule severities, and API contracts are untouched.\n\nNo material correctness, security, compatibility, or architecture issue found. This is a CSS/theme change with no agent- or benchmark-path impact, so no eval evidence is warranted.\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-16T00:15:38Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "8c8573b188dcd9c62ab50a9fe591210299c4d168"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABSliaDg",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nReviewed the new head `ff33f4a7dbe6e6a31baf366afe75a72d5f424b1f` (7 files, +93/-6) against `AGENTS.md`, `.agents/skills/custom-codereview-guide.md`, `.agents/skills/frontend-development/SKILL.md`, and `src/api/mars/AGENTS.md`. Scope is in-repository: theme tokens, focus-role classes, and a Tailwind opacity utility in the Canvas frontend, with no Agent Server/SDK/automation contract change.\n\n### What this revision changes\n\nThis head sits one commit past the previously reviewed `8c8573b18`: `ff33f4a7d chore: remove spec paperwork from theme cleanup`. The delta (`8c8573b18..ff33f4a7d`) is **comment- and paperwork-only** \u2014 a filtered diff shows zero non-comment lines; it removes `specs/theme-interactions.md` and the four `// @spec TI-001/TI-002` tags and two prose comments that referenced it. The `specs/theme-interactions.md` file was introduced by this branch and never existed on `origin/main`, so its removal abandons no merged contract and, per a repo-wide grep, leaves no dangling `TI-001`/`TI-002` references. Product behavior is byte-for-byte identical to the approved revision.\n\n### What I verified on this head\n\n- **Focus role binding.** The three backend controls (`BackendOptionTab`, `AgentServerGuidance`, `add-backend-provider-digitalocean`) use `focus-visible:outline-focus`; no `outline-blue-300` remains. Outline geometry (`outline-2`, `-outline-offset-2` on the tab, `outline-offset-2` elsewhere) and `:focus-visible`-only behavior are unchanged from base `cb835dd328`. `.outline-focus` resolves to `outline-color: var(--oh-focus)`, so host `--oh-focus` overrides win.\n- **Contrast.** `--oh-focus` clears 3:1 against base / base-secondary / surface-raised / interactive-hover in all five palettes (the added assertion in `color-themes.test.tsx` covers exactly those four roles). Solarized moves `#268BD2 \u2192 #227FBE`; deepsea and neo keep the neutral scale and default white focus.\n- **Scrim.** `bg-black bg-opacity-50` \u2192 `bg-black/50`, which compiles to a 50% `color-mix` background; `bg-opacity-50` is not a Tailwind v4 utility here, so the old pairing produced an opaque scrim. The new compiled-CSS test asserts the emitted background carries `50%`/`0.5`.\n- **Tests.** `npx vitest run __tests__/themes __tests__/components/features/settings/settings-navigation.test.tsx` \u2192 5 files / 32 tests passed; `__tests__/components/backends` \u2192 11 files / 169 tests passed. `validate-empty-pr-description` and the PR-description validator both pass.\n- **CI and mergeability.** On this exact head, `test-and-build (ubuntu)`, `test-and-build (windows)`, and `Validate PR description` are all `success`; branch is `mergeable: true`.\n\n### Acceptance criteria (#18324, current labels: `bug`, `priority:medium`, `ready-for-dev`)\n\n- [x] No raw palette color on the connection tabs or guidance toggle; focus resolves from `--oh-focus`, `:focus-visible`-only.\n- [x] Outline width/offset and keyboard behavior preserved.\n- [x] Default focus \u22653:1 on base, modal, raised, and hovered surfaces in all five palettes; solarized strengthened; no other palette regressed.\n- [x] Host `--oh-focus` override wins, covered by the new actual-browser regression (sets `--oh-focus` on the root and asserts the resolved `outline-color`).\n- [x] `bg-opacity-50` replaced with `bg-black/50`, with a compiled-CSS assertion.\n- [x] `npm run lint` / `npm test` / builds pass per CI on the head.\n- [x] Real-Canvas before/after focus evidence is linked for Light+ and Solarized Light; the legacy drawer is presented as a build contract, matching the fact that the live app uses `SettingsMobileHub`.\n- [x] No unrelated changes: rule severities, feedback migration, font cleanup, and API contracts are untouched (`eslint.config.js` not in the diff).\n\nNo material correctness, security, compatibility, or architecture issue. The removed spec file was branch-only and its tags are consistently removed, so no grep-able coverage is orphaned. This CSS/theme change cannot affect agent or benchmark behavior, so no eval evidence is warranted.\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-16T02:25:33Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "ff33f4a7dbe6e6a31baf366afe75a72d5f424b1f"
           }
@@ -592,10 +883,12 @@
       "latestChecks": {
         "pass": 7,
         "skip": 6,
-        "pendingOrFailed": 0,
+        "pending": 0,
+        "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18327/checks"
       },
-      "issue": 18324
+      "issue": 18324,
+      "mergeable": "UNKNOWN"
     },
     {
       "number": 18330,
@@ -610,18 +903,31 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABR1Eiqg",
           "author": {
             "login": "VascoSch92"
           },
-          "state": "APPROVED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-10-12T13:29:04Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "9c599fc675e01e8a5b01cbecaeab666dc461dc09"
           }
         }
       ],
       "draft": false,
-      "requestedReviewers": []
+      "requestedReviewers": [],
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18330/checks"
+      }
     },
     {
       "number": 18333,
@@ -636,11 +942,16 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABR4CNWg",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nBelongs in `OpenHands/OpenHands`: Agent Canvas theme tokens and UI presentation, no backend/contract or cross-repo ownership concerns. Dependency direction (Agent Server contract -> client -> Canvas) is unaffected.\n\n## What I verified on the current head\n\n- Head is still `864dd26bfb5a2668c3a2fc1d4561923c274789ff`; the linked issue #18331 remains open with `bug`, `priority:low`, `ready-for-dev`.\n- No raw `amber-*`/`yellow-*` utility remains in the four named files (`llm-not-configured-banner.tsx`, `canvas-extensions.tsx`, `acp-conflict-warnings.tsx`, `setup-acp-secrets-step.tsx`).\n- The new role mirrors the existing `--oh-feedback-error`/`--oh-feedback-success` mechanism end to end: `:root` default in `src/tailwind.css`, `--color-feedback-warning` alias, entry in `AGENT_SERVER_UI_DEFAULT_CSS_VARIABLES` (so `AgentServerUIStyleOverrides` exposes it), and per-theme overrides for Light+ / Solarized Light.\n- `--oh-warning` is untouched in all five themes and stays the token behind the trust panel tint/border, matching the issue's non-goal.\n- Contrast contract independently recomputed. `--oh-feedback-warning` clears 4.5:1 on the modal (`bg-base-secondary`), Home banner (`bg-surface-raised`), and the `warning/5`-tinted trust surface in every theme: Light+ 5.50/5.26/5.80, Solarized Light 5.72/5.78/6.19, Neutral 8.28/7.49/8.28, DeepSea 7.79/6.60/9.17, Neo 8.28/7.49/7.94. I modeled the `bg-warning/5` blend with Tailwind v4's `color-mix(in oklab, ...)` and alpha compositing, not just the linear-RGB approximation the test uses, and the results still hold.\n- Focused tests pass in the workspace: `color-themes.test.tsx` (13), the three component/screen suites (35), the additional default-variable consumers (24), and the style-scope guard (6), after regenerating the gitignored `src/i18n/declaration.ts`.\n- CI on this head is green (`test-and-build` ubuntu/windows, PR-title, checkout-artifacts, PR-description validation all pass; Docker/build jobs skip for a fork PR as expected).\n\n## Notes (non-blocking)\n\n- The theme test resolves `--oh-warning` by regex-reading `src/tailwind.css` so the test does not hardcode the CSS-owned default; it achieves that, though it is an admittedly odd read. Not a defect.\n- The two Playwright additions set the override via `element.closest('[data-agent-server-ui]').style.setProperty(...)`, which verifies the utility resolves through the scoped variable rather than a true host-prop injection. It is adequate regression coverage of the variable wiring; the design context and the linked five-theme capture cover the rendered result, which the reviewer evidence rule treats as the substantive rendering proof here.\n\n## Acceptance-criteria checklist\n\n- [x] `--oh-feedback-warning` added as a small-text role, registered in `AgentServerUIStyleOverrides`, exposed as a Tailwind text utility.\n- [x] >= 4.5:1 on the Home banner, trust tint, and ACP/onboarding surfaces in all five themes.\n- [x] `--oh-warning` unchanged in all five themes and still owns the trust tint/border.\n- [x] Six raw amber/yellow findings removed from the four files.\n- [x] Copy, validation, and navigation unchanged (only class strings changed).\n- [x] Host override applied in real UI and survives a palette change.\n- [x] Theme contrast test added across five themes; existing tests, lint, and build pass per CI.\n- [x] Five-theme / desktop-plus-phone visual coverage provided in the PR.\n\nNo material correctness, security, compatibility, or architecture findings on the current head.\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-12T18:24:55Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "864dd26bfb5a2668c3a2fc1d4561923c274789ff"
           }
@@ -648,7 +959,15 @@
       ],
       "draft": false,
       "requestedReviewers": [],
-      "issue": 18331
+      "issue": 18331,
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18333/checks"
+      }
     },
     {
       "number": 18346,
@@ -663,11 +982,16 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABR48djQ",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\nThis is the Canvas-owned Git Sync UI in `OpenHands/OpenHands`; no cross-repository contract change. The diff is a small, self-explanatory semantic-token migration (+6/-6 across 3 files), so no design doc is required.\n\n## What I verified on head `a3096ca2e`\n- **Tokens exist and resolve for all themes and embedded roots.** `--color-feedback-error`/`--color-feedback-success` and `--color-status-success`/`--color-status-error` are declared in `src/tailwind.css`, and `--oh-color-danger` / feedback roles are also provided by `src/styles/agent-server-ui-style-scope.ts`, so the new classes resolve in both standalone Canvas and embedded hosts. `border-danger` maps to `--oh-color-danger` the same way.\n- **Token choice matches repository guidance.** `src/themes/README.md` says to use `feedback-error`/`feedback-success` for small validation/connection text, which is exactly what the three call sites now do; `status-*` usage for surfaces is consistent with existing components such as `src/components/shared/error-alert.tsx`.\n- **No remaining raw palette colors** in the three changed files.\n- **Focused tests pass.** `git-sync-activity-row`, `git-sync-config-form`, `git-sync-overview-section`, and `automation-git-sync` route: 56/56 passed locally after `npm run make-i18n`.\n- **CI for the exact head passes.** `test-and-build (ubuntu)` and `test-and-build (windows)` both succeeded; `live-e2e` is skipped by policy. `check-pr-artifacts` and PR-title/description validation succeeded.\n\n## Findings\nNo material correctness, security, or compatibility issues found. The change only swaps feedback color utility classes and drops the dimming opacity on the supporting error text so it inherits the readable `feedback-error` role, matching the stated intent. Layout, copy, and Git Sync behavior are unchanged.\n\n## Notes (non-blocking)\nThe new error surfaces use `danger` for border/background and `feedback-error` for text, while the activity row uses `status-error`/`status-success`; both are legitimate theme tokens and both render consistently. Not a defect, just an observation for a later unification pass.\n\n## Checklist vs #18004\n- [x] Replace raw palette classes with theme tokens for this batch (Git Sync feedback).\n- [x] Before/after behavior shown in Light+ for the failed repository check and persistent sync-failure activity.\n- [x] Preserve existing no-unknown-classes / require-static-classes behavior (unchanged).\n- [ ] Issue is broader than this batch (text-medium and the remaining findings stay separately scoped).\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-12T20:14:35Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "a3096ca2eaecbeedf49b69f008a18acddc9745d8"
           }
@@ -675,7 +999,15 @@
       ],
       "draft": false,
       "requestedReviewers": [],
-      "issue": 18004
+      "issue": 18004,
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 7,
+        "skip": 7,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18346/checks"
+      }
     },
     {
       "number": 18431,
@@ -690,31 +1022,46 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABSkEwcA",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nScope: this belongs in `OpenHands/OpenHands`. The change only swaps Canvas presentation classes and adds a theme-contrast assertion; it does not touch an Agent Server/Cloud API, an event wire contract, persisted state, or `minimumAgentServer`. Dependency direction and ownership are respected.\n\nCurrent head `5b060141` is unchanged, `mergeable: true`, and the rollup for that SHA is green (`test-and-build (ubuntu)` / `(windows)`, `pr-title`, `Validate PR description` on run 38814966946, `check-pr-artifacts`). The earlier `Validate PR description` failure at 21:26 was superseded by the 22:08 run. I ran the focused suites locally on this head (`make-i18n` first, since `src/i18n/declaration.ts` is generated): `color-themes.test.tsx`, `context-meter.test.tsx`, `compact-context-button.test.tsx` \u2014 3 files, 22 tests passed.\n\n## Material finding\n\n**The new contrast assertion measures a surface the meter does not render on, and its 4.5:1 claim is false on `OpenHands-DeepSea`.**\n\n`UsagePanel` renders `ContextMeter` inside `bg-surface-raised` (`src/components/features/conversation/usage-panel/usage-panel.tsx:47`), and `CompactContextButton` inside the same card. The added test asserts the error and warning text against `--oh-surface`, not `--oh-surface-raised`. Recomputing WCAG ratios from the shipped palettes for the real background:\n\n| theme | `--oh-surface-raised` | error text vs raised | warning text vs raised |\n| --- | --- | --- | --- |\n| OpenHands-Neutral (default) | `#282828` | 4.65 | 7.49 |\n| OpenHands-Neo | `#282828` | 4.65 | 7.49 |\n| OpenHands-DeepSea | `#2C313F` | **4.09** | 6.60 |\n| Light+ | `#EEEEEE` | 5.05 | 5.26 |\n| Solarized Light | `#F0E9D6` | 4.99 | 5.78 |\n\nAgainst `--oh-surface` DeepSea reads 4.83 and the assertion passes, so the test reports a 4.5:1 contract that the DeepSea danger readout (95% state) does not actually meet. The fills are fine (`--oh-feedback-warning` vs `--oh-color-tertiary` is 5.35/6.61/4.84/5.27 and `--oh-status-error` vs the same track is 3.68/4.55/3.91/3.48, all >= 3), so only the text surface is mis-stated. This also makes the new sentence in `specs/warning-feedback.md:6` inaccurate: the role does not meet 4.5:1 \"on the theme surfaces used by ... context-usage meter\" for every built-in palette. Note the change still improves DeepSea (old `text-red-500` on raised was 3.45), so the direction is right \u2014 the assertion and the spec sentence are what need to match reality.\n\nSmallest viable correction: point `contextMeterSurface` at `--oh-surface-raised`, then either darken `--oh-feedback-error` in `openhands-deepsea.ts` to reach 4.5:1 or state the achieved 4.09:1 explicitly in the spec and assert the value that actually holds.\n\n## Non-blocking follow-up\n\nThe chat-input context meter popover is the same warning/danger readout but still uses the raw utilities this PR removes: `TONE_BAR_CLASS` / `TONE_LABEL_CLASS` in `src/components/features/chat/components/context-window-meter.tsx:26-36` (`bg-amber-500`, `bg-red-500`, `text-amber-500`, `text-red-500`). That file is untouched here, so it is a pre-existing gap rather than a regression, but it is the same semantic role and the same feature surface as issue #18004's remaining `no-raw-colors` findings.\n\n## Acceptance checklist (issue #18004)\n\n- [ ] Group remaining findings by semantic role and replace palette classes with theme tokens \u2014 partially: this PR covers the context meter only; 148 findings across 50 files remain.\n- [x] Justify brand-specific exceptions narrowly \u2014 no new exceptions added.\n- [ ] Audit legacy JS-config tokens \u2014 not in this PR's scope.\n- [ ] Investigate `bg-opacity-50` on `settings-mobile-drawer` \u2014 not in this PR's scope.\n- [ ] Check affected states in the real app across supported themes with before/after evidence and contrast checks \u2014 the PR supplies Light+ before/after captures and a video; DeepSea is covered by the built-in-palette contract only, and that contract is the part that is mis-stated above.\n- [x] Preserve `no-unknown-classes` / `require-static-classes` behavior \u2014 the replacement classes are static literals in the same `cn()` branches.\n\nVerdict below. Because the head's own contrast assertion and the updated spec text do not hold on a built-in palette, this needs the assertion/spec (and, if 4.5:1 is the intent, the DeepSea error token) corrected before merge.\n\n\ud83d\udd04 CHANGES REQUESTED",
           "submittedAt": "2026-10-15T22:35:00Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "5b060141aa5b39ba4a998f73d03a5bb11a2574a6"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABSkYMkg",
           "author": {
             "login": "enyst"
           },
-          "state": "COMMENTED",
+          "authorAssociation": "MEMBER",
+          "body": "",
           "submittedAt": "2026-10-15T23:18:00Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
           "commit": {
             "oid": "807a93d213e8cfef01423f297cfd0c5ec474eea0"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABSkhVlw",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nScope: this belongs in `OpenHands/OpenHands`. The change only swaps Canvas presentation classes, adjusts one theme token, and updates a theme-contrast assertion. It touches no Agent Server/Cloud API, event wire contract, persisted state, or `minimumAgentServer`. Ownership and dependency direction are respected.\n\nCurrent state re-read now: head `807a93d213e8cfef01423f297cfd0c5ec474eea0` matches the requested SHA, PR is open, `mergeable: true`, labels `type: fix`, and the linked issue #18004 is still open with `enhancement` / `priority:low` / `ready-for-dev`.\n\nHead checks are green: `test-and-build (ubuntu)` (23:27:44) and `(windows)`, `pr-title`, `check-pr-artifacts`, and the latest `Validate PR description` (23:20:23). An earlier `Validate PR description` run at 23:14 failed with \"This PR is marked as `bug` but none of the linked issues (#18004) carry the `bug` label\"; the PR body's Type section now shows `Refactor` checked and `Bug fix` unchecked, and the current run passes. That was a metadata mismatch, not a code defect.\n\nI ran the focused suites on this head (after `npm run make-i18n`, since `src/i18n/declaration.ts` is generated): `color-themes.test.tsx`, `context-meter.test.tsx`, `compact-context-button.test.tsx` \u2014 3 files, 22 tests passed.\n\n## Previous finding is resolved\n\nMy earlier review asked that the new assertion measure the surface the meter actually renders on. The new commit changes `contextMeterSurface` to `--oh-surface-raised`, matching `UsagePanel`'s `bg-surface-raised` card, and adds a `tokens` block to `openhands-deepsea.ts` with `--oh-feedback-error: #EF766A`. I recomputed WCAG ratios from the shipped palettes for the real raised card:\n\n| theme | raised card | error text | warning text | warning fill / track | danger fill / track |\n| --- | --- | --- | --- | --- | --- |\n| OpenHands-Neutral (default) | `#282828` | 4.65 | 7.49 | 6.61 | 4.55 |\n| OpenHands-Neo | `#282828` | 4.65 | 7.49 | 6.61 | 4.55 |\n| OpenHands-DeepSea | `#2C313F` | **4.62** | 6.60 | 5.35 | 3.68 |\n| Light+ | `#EEEEEE` | 5.05 | 5.26 | 4.84 | 3.91 |\n| Solarized Light | `#F0E9D6` | 4.99 | 5.78 | 5.27 | 3.48 |\n\nEvery text pair clears 4.5:1 and both fills clear 3:1, so the assertion now states a contract the built-in palettes actually meet. The spec text in `specs/warning-feedback.md` was corrected to scope the meter claim to the raised card rather than the generic theme surfaces.\n\n## No regression from the DeepSea token\n\n`#EF766A` is lighter than `#e76a5e`, so on DeepSea's dark surfaces contrast only improves. I checked the other consumers of `--oh-feedback-error` in that palette and all move in the safe direction: modal/base surface 4.83 \u2192 5.45, `--oh-surface-deep` 6.36 \u2192 7.17, `RiskAlert`'s `#4A0709` background 5.00 \u2192 5.64, and the automation draft-bar error pill (Tailwind red-500 at 5% over `--oh-surface`) 4.67 \u2192 5.27. The pre-existing `--oh-feedback-error` assertions in the same test file still hold on all five palettes (pill 4.67 / 4.67 / 5.27 / 4.93 / 4.62). No `bg-feedback-error` or border/icon usage exists that would read a fill role from this token.\n\n## Acceptance checklist (issue #18004)\n\n- [ ] Group remaining findings by semantic role and replace palette classes with theme tokens \u2014 this PR covers the Usage panel meter and compact button only; the rest of the 148 findings across 50 files remain, and the PR description correctly notes the chat-input popover's raw classes as a separate follow-up.\n- [x] Justify brand-specific exceptions narrowly \u2014 the one new token override is scoped to DeepSea with a spec comment explaining why.\n- [ ] Audit legacy JS-config tokens \u2014 not in this PR's scope.\n- [ ] Investigate `bg-opacity-50` on `settings-mobile-drawer` \u2014 not in this PR's scope.\n- [x] Check affected states in the real app across supported themes with before/after evidence and contrast checks \u2014 the PR supplies real Light+ and DeepSea captures plus videos on genuine model metrics, and the browser-computed DeepSea contrast (4.0916 \u2192 4.6160) matches my palette calculation.\n- [x] Preserve `no-unknown-classes` / `require-static-classes` behavior \u2014 the replacement classes are static literals in the same `cn()` branches, and `context-meter.test.tsx` asserts them.\n\nNo material correctness, security, compatibility, or architecture findings on this head. This is a presentation-token change with no agent-behavior or evaluation-path impact.\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-15T23:40:17Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "807a93d213e8cfef01423f297cfd0c5ec474eea0"
           }
@@ -725,10 +1072,12 @@
       "latestChecks": {
         "pass": 7,
         "skip": 6,
-        "pendingOrFailed": 0,
+        "pending": 0,
+        "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18431/checks"
       },
-      "issue": 18004
+      "issue": 18004,
+      "mergeable": "UNKNOWN"
     },
     {
       "number": 18482,
@@ -743,11 +1092,16 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABSfTxvg",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nScope: `automation-setup-panel.tsx` (one class on the draft-bar error pill: `bg-red-500/10` \u2192 `bg-red-500/5`), a per-theme contrast assertion added to `__tests__/themes/color-themes.test.tsx`, and five `.pr/18481/` screenshots. Small, local, and the right shape for the defect #18481 describes.\n\nVerified on head `47001a0`:\n\n- The arithmetic reproduces exactly from source tokens. Tailwind 4.3.3 `red-500` is `oklch(63.7% 0.237 25.331)` = `#fb2c36`. Compositing the pill's tint over `--oh-surface` and comparing against `--oh-feedback-error`: at 10% \u2192 Light+ 4.60, Solarized Light 4.33, Neutral/Neo 4.73, DeepSea 4.48; at 5% \u2192 4.93 / 4.62 / 4.95 / 4.95 / 4.67. Every number in the PR table matches my own computation.\n- The new assertion is a genuine regression check: with the test's tint set back to `0.10` it fails on exactly the two themes, `4.4829\u2026` (DeepSea) and `4.3274\u2026` (Solarized Light), matching the live measurements; at `0.05` it passes.\n- `npx vitest run __tests__/themes/color-themes.test.tsx __tests__/components/automations/automation-setup-panel.test.tsx` \u2192 62 passed, as stated.\n- The two tokens are the ones actually in play: `DraftStatusBar` renders inside the `bg-[var(--oh-surface)]` section, and `--oh-feedback-error` is `var(--oh-color-danger)` per theme.\n- The runs-page alert keeps its 10% tint and is untouched; its lowest ratio (4.88, Solarized Light) is unchanged by this diff.\n\nNon-blocking observations:\n\n1. **The new assertion does not pin the component.** It hardcodes `#fb2c36` and `0.05` instead of reading the class from `automation-setup-panel.tsx`. I reverted the component to `bg-red-500/10` and the theme test still passed 13/13, so a future edit back to `/10` (or `/15`) would not fail CI. If this is meant as a contract, assert the class in `automation-setup-panel.test.tsx` (`toHaveClass(\"bg-red-500/5\")`) or drive both sides from a single shared constant.\n2. **A theme-token tint would meet the contract without a raw color.** `bg-[var(--oh-feedback-error)]/5` over `--oh-surface` measures DeepSea 4.54, Neutral/Neo 4.83, Light+ 4.89, Solarized Light 4.59 \u2014 all \u2265 4.5 \u2014 and drops the raw `red-500` (and its `shadcn/no-raw-colors` warning) entirely. The sibling success branch already uses a token (`bg-[var(--oh-success)]/10`), so this would also make the pill's two states consistent. Your call; the current fix is correct as written.\n3. **Follow-up, not this PR:** applying the same recipe to that sibling status pill (`bg-[var(--oh-success)]/10 text-[var(--oh-success)]`) computes to 3.81:1 on Light+ and 2.40:1 on Solarized Light \u2014 worse than the defect being fixed here. If FF-001's \"small error text must remain readable in all five themes\" is the bar, that pill deserves its own issue.\n\nOne CI note: `Validate PR description` is red on this head, but it failed at 12:20:31 because #18481 did not carry `ready-for-dev` yet (label added 12:40:46). That workflow only re-runs on description edits, `synchronize`, or `ready_for_review`, so it will stay red until the body is edited or a commit is pushed. The body itself validates \u2014 I ran `.github/scripts/check_pr_description.py` against it locally and it passed.\n\nNo credentials, configuration, or external state are touched; the code change is one opacity step on a single class.\n\n\u2705 APPROVED\n",
           "submittedAt": "2026-10-15T15:36:35Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "47001a0bf0057f4be96941df4512d81440c2a3bd"
           }
@@ -755,7 +1109,15 @@
       ],
       "draft": false,
       "requestedReviewers": [],
-      "issue": 18481
+      "issue": 18481,
+      "mergeable": "UNKNOWN",
+      "latestChecks": {
+        "pass": 12,
+        "skip": 3,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18482/checks"
+      }
     },
     {
       "number": 18493,
@@ -770,41 +1132,61 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABSkpUMA",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n**Scope.** Canvas-owned UI only: semantic color tokens for the onboarding backend banner and the ACP auth banner. No SDK/automation/extension contract, no new Agent Server dependency, no durable-state or wire change. Belongs in this repository.\n\n**Verified on `0a9d129`**\n- Color-only diff across 4 files. No raw palette classes remain in either changed component (`green-*`/`red-*`/`blue-*` grep returns nothing there).\n- Every new class resolves to a registered token in `src/tailwind.css`: `status-success/-error`, `feedback-success/-error`, `surface-raised`, `border-subtle`, `text-secondary`, `contrast`.\n- Recomputed WCAG ratios for the backdrops the banners actually sit on \u2014 onboarding modal is `bg-base-secondary`, the Settings page is `bg-canvas-base` \u2014 compositing the 5% status tint, for all five shipped themes. `--oh-feedback-success`/`--oh-feedback-error` clear 4.5:1 on both surfaces; `--oh-contrast` on the opaque `--oh-surface-raised` configured-credential banner is 12.4\u201314.7:1. Tightest cases: solarized-light error on base-secondary (4.62) and deepsea error on base-secondary (4.54).\n- Tests run in the workspace: `color-themes.test.tsx` + `acp-auth-status-banner.test.tsx` \u2192 18 passed; `onboarding-modal.test.tsx` \u2192 34 passed; `raw-colors-lint.test.ts` \u2192 3 passed.\n- Head checks: `test-and-build (ubuntu)` and `(windows)` success; `Validate PR description`, `pr-title`, `check-pr-artifacts` success; `live-e2e` skipped (runs on main).\n\n**Checklist against #18004**\n- [x] Replace raw palette classes with semantic tokens for this batch (the 18 banner findings).\n- [x] Check affected states across supported themes with before/after captures plus a contrast check \u2014 Light+ before/after captures and all-five-theme shots are attached; the success branch is disclosed as defensive rather than a reproduced production bug and is covered by the token contrast test.\n- [x] Preserve `no-unknown-classes` and `require-static-classes` \u2014 lint job and raw-colors lint test are green.\n- [n/a] Remaining raw-color batches and the `bg-opacity-50` investigation are explicitly out of this batch.\n\n**Non-blocking coverage note.** The new assertion in `color-themes.test.tsx` covers the text roles and the opaque configured-credential surface. The banner icons/borders use the separate `--oh-status-*` tokens, which that assertion does not exercise; those are decorative (`aria-hidden` in the ACP banner) and still improved versus the previous `green-400`/`red-400` (e.g. solarized-light success icon 1.32 \u2192 2.50). Not a merge gate \u2014 optional follow-up if you want the icon tokens under the same contract.\n\n\u2705 APPROVED\n",
           "submittedAt": "2026-10-15T23:59:10Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "0a9d129f8d373c0a3d85ec790ee8e4e17a93e95e"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABSlg_kg",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n**Scope.** Canvas-owned only: semantic color tokens in the onboarding backend banner and the shared ACP auth banner, plus a contrast test. No changes to Agent Server contracts, the TypeScript client, automation, or extensions. This matches the ownership table, and no compatibility, wire-contract, or durable-state checkpoint applies (no API calls, no persisted state, no new event fields).\n\n**What changed on this head.** Commit `0a9d129` carried the color migration; `1e2ca71` removes the self-introduced `FF-002` spec scaffolding (the spec entry and its `@spec` tags). `FF-002` never existed on `main`, so no stable spec ID is lost or renumbered \u2014 no AGENTS.md spec-hygiene issue.\n\n**Verification I ran on `1e2ca71`** (after `npm ci` and `npm run make-i18n`):\n- `npx vitest run __tests__/themes/color-themes.test.tsx` \u2014 13 passed.\n- `npx vitest run __tests__/components/settings/acp-auth-status-banner.test.tsx __tests__/components/onboarding/setup-acp-secrets-step.test.tsx __tests__/components/onboarding/onboarding-modal.test.tsx` \u2014 65 passed.\n- `npx vitest run __tests__/scripts/raw-colors-lint.test.ts` \u2014 3 passed.\n- CI on the exact head: `test-and-build (ubuntu)`, `test-and-build (windows)`, `Validate PR description`, `pr-title`, `check-pr-artifacts` all success.\n\nI independently reproduced the test's WCAG math for all five shipped palettes (resolving the `var()` chains), compositing each 5% status tint over `--oh-color-base` and `--oh-color-base-secondary`. Every banner text role clears 4.5:1, and `--oh-contrast` on `--oh-surface-raised` is 12.4\u201314.7:1. The migration is a genuine fix for light themes: the legacy `green-200`/`red-200`/`blue-200` text sat at ~1.0\u20131.2:1 on its tints in Light+ and Solarized Light, versus ~4.6\u20135.5:1 now. The neutral configured-credential treatment (`bg-surface-raised` + `text-contrast`) reads clearly in every theme and stays distinct from the verified-login banner.\n\n**Non-blocking observation (no change requested).** The status glyphs use `text-status-success`/`text-status-error` \u2014 the same token that forms their own 5% tint \u2014 so they are the weakest element on the banner. Against that tint over `--oh-color-base-secondary`, the Solarized Light success icon is 2.50:1 and the Light+ icons are 4.06\u20134.14:1, while the text roles beside them pass comfortably. Both icons are decorative (`aria-hidden`, or redundant with the adjacent `role=\"status\"` text), so this is not a text-contrast failure, and it is still far better than the previous 1.3\u20132.2:1. Using the readable feedback role for the glyph would bring the icon in line with the text contract if you want that. Not a merge gate.\n\n**Acceptance (issue #18004 batch; issue is open, `ready-for-dev`, `priority:low`).**\n- [x] Removes the 18 raw-palette findings from the onboarding and ACP banners by replacing them with semantic tokens.\n- [x] Status, neutral-text, and action roles are chosen semantically rather than by nearest-color.\n- [x] Affected states are exercised in the real app across the built-in themes, with before/after media and contrast checks.\n- [x] Preserves `no-unknown-classes` / `require-static-classes` behavior (lint and the guard test are green).\n\n\u2705 APPROVED\n",
           "submittedAt": "2026-10-16T02:22:03Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "1e2ca71fe8924f45de9a37a410a132fc28b9a2cc"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABSlhShQ",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n**Scope.** Canvas-owned UI only: semantic color tokens for the onboarding backend banner and the ACP auth banner. No SDK/automation/extension contract, no Agent Server dependency, no durable-state or wire change. Belongs in this repository.\n\n**What changed since the last review.** The head moved from `0a9d129f8` to `1e2ca71fe`. The delta is `chore(lint): remove banner color spec scaffolding` \u2014 it drops the newly added `FF-002` spec section and its three `// @spec FF-002` tags, and removes `specs/form-feedback.md` from the diff. All shipped styling and the contrast test block are byte-identical to the previously reviewed revision. Since `FF-002` was created and removed inside this same unmerged PR, no stable spec ID is renumbered, deprecated, or lost; `FF-001` is untouched. This is a scope-narrowing cleanup, not a behavior regression.\n\n**Verified on `1e2ca71fe`**\n- Color-only diff across 3 files. No raw palette classes remain in either changed component (`green-*`/`red-*`/`blue-*` grep returns nothing there).\n- Every new class resolves to a registered token in `src/tailwind.css`: `status-success/-error`, `feedback-success/-error`, `surface-raised`, `border-subtle`, `text-secondary`, `contrast`.\n- Recomputed WCAG ratios independently for the backdrops the banners actually sit on \u2014 the onboarding modal renders on `bg-base-secondary` (`--oh-color-base-secondary`), the ACP banner context on `bg-canvas-base` (`--oh-color-base`) \u2014 compositing the 5% status tint for all five shipped themes. All banner text clears 4.5:1; tightest is deepsea error on `color-base-secondary` at 4.54. `--oh-contrast` on the opaque `--oh-surface-raised` configured-credential banner is 12.4\u201314.2:1.\n- I also checked the test's tint model against Tailwind's actual `bg-*/5` compilation (`color-mix(in oklab, C 5%, transparent)` premultiplied over the backdrop). The oklab path and the test's naive sRGB lerp agree to 4 decimal places of contrast, so the assertion models the real CSS.\n- Tests run in the workspace: `color-themes.test.tsx` + `acp-auth-status-banner.test.tsx` \u2192 18 passed; `onboarding-modal.test.tsx` \u2192 34 passed; `raw-colors-lint.test.ts` \u2192 3 passed.\n- Head checks all green: `test-and-build (ubuntu)` and `(windows)` success; `Validate PR description`, `pr-title`, `check-pr-artifacts`, `prepare-test-matrix` success; `live-e2e` skipped (runs on main). `mergeable_state` is `clean`.\n\n**Checklist against #18004**\n- [x] Replace raw palette classes with semantic tokens for this batch (the 18 banner findings).\n- [x] Check affected states across supported themes with before/after captures plus a contrast check \u2014 Light+ before/after captures and all-five-theme shots are attached; the success branch is disclosed as defensive rather than a reproduced production bug and is covered by the token contrast test.\n- [x] Preserve `no-unknown-classes` and `require-static-classes` \u2014 lint job and raw-colors lint test are green.\n- [n/a] Remaining raw-color batches and the `bg-opacity-50` investigation are explicitly out of this batch.\n\n**Non-blocking note.** Removing the `@spec` tags leaves the new status-banner and configured-credential contrast assertions untagged, while sibling blocks in the same file carry tags. It is not a gate (no tooling validates spec coverage here, and untagged tests already exist in this file), but a one-line spec entry would keep the coverage grep-able per the repo's `@spec` convention. Also, the changed components' decorative icons use the separate `--oh-status-*` tokens, which the new assertion does not exercise; they remain far better than the previous `green-400`/`red-400` (e.g. solarized-light success icon 1.32 \u2192 2.50).\n\n\u2705 APPROVED\n",
           "submittedAt": "2026-10-16T02:22:50Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "1e2ca71fe8924f45de9a37a410a132fc28b9a2cc"
           }
         },
         {
+          "id": "PRR_kwDOLfkiw88AAAABSmeHOw",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n**Scope.** Canvas-owned presentation only: semantic color tokens for the onboarding backend banner and the ACP auth banner. No SDK/automation/extension contract, no Agent Server dependency, no wire or durable-state change. Belongs in this repository.\n\n**Head and current state.** Head is `faea309c9`, matching the requested SHA. It is a merge commit (`Merge main into connection banner colors`) that brought `origin/main` into the PR branch; the PR's own three-file change is unchanged by it - the two banner components are byte-identical to the previously reviewed revision, and the test file differs only by unrelated main-side additions. The PR's diff vs `main` remains +42/-14 across 3 files. Note: this PR merged at 2026-10-16T04:59:02Z (merge commit `0c7c2258`) while CI was completing; I verified that merge commit carries the banner changes. No review existed on this head before this one, and the head did not move, so this is the fresh review for it.\n\n**Verified on `faea309c9`**\n- No raw palette classes remain in either changed component; every new class maps to a registered token in `src/tailwind.css` (`status-success/-error`, `feedback-success/-error`, `surface-raised`, `border-subtle`, `text-secondary`, `contrast`).\n- Recomputed WCAG ratios independently for the backdrops the banners actually sit on - the onboarding modal renders on `bg-base-secondary`, the ACP banner context on `bg-canvas-base` - compositing the 5% status tint for all five shipped themes, including the token values the merge pulled in (deepsea `--oh-feedback-error` `#EF766A`, solarized-light `--oh-focus` `#227FBE`). All banner text clears 4.5:1; tightest is deepsea/neutral/neo error on `color-base-secondary` at 4.54. `--oh-contrast` on the opaque `--oh-surface-raised` configured-credential banner is 12.4-14.2:1.\n- The test's tint model matches Tailwind's real `bg-*/5` compilation (`color-mix(in oklab, C 5%, transparent)` premultiplied over the backdrop): the oklab path and the test's naive sRGB lerp agree to 4 decimal places of contrast, so the assertion models the shipped CSS.\n- Workspace tests: `color-themes.test.tsx` + `acp-auth-status-banner.test.tsx` -> 18 passed; `onboarding-modal.test.tsx` + `raw-colors-lint.test.ts` -> 37 passed.\n- Head checks all green: `test-and-build (ubuntu)` and `(windows)` success; `Validate PR description`, `pr-title`, `PR Artifacts`, `prepare-test-matrix` success; `live-e2e` skipped (runs on main).\n- Linked issue #18004 is open with `ready-for-dev` and `priority:low`, consistent with this being one batch of that migration.\n\n**Checklist against #18004**\n- [x] Replace raw palette classes with semantic tokens for this batch (the 18 banner findings).\n- [x] Cover affected states across supported themes with before/after captures plus a contrast check - Light+ before/after captures and all-five-theme shots attached; the success branch is disclosed as defensive rather than a reproduced production bug and is covered by the token contrast test.\n- [x] Preserve `no-unknown-classes` / `require-static-classes` - lint job and raw-colors lint test are green.\n- [n/a] Remaining raw-color batches are explicitly out of this batch.\n\n**Non-blocking note.** The changed components' decorative icons use the separate `--oh-status-*` tokens, which the new assertion does not exercise; they remain well above the previous `green-400`/`red-400` values (e.g. solarized-light success icon 1.32 -> 2.50). Not a gate.\n\n\u2705 APPROVED\n",
           "submittedAt": "2026-10-16T05:02:05Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "faea309c9df3306a0c4d0acc8e5daa2b20f0f270"
           }
@@ -815,10 +1197,12 @@
       "latestChecks": {
         "pass": 7,
         "skip": 6,
-        "pendingOrFailed": 0,
+        "pending": 0,
+        "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18493/checks"
       },
-      "issue": 18004
+      "issue": 18004,
+      "mergeable": "UNKNOWN"
     },
     {
       "number": 18499,
@@ -833,11 +1217,16 @@
       },
       "reviews": [
         {
+          "id": "PRR_kwDOLfkiw88AAAABSmOOGQ",
           "author": {
             "login": "all-hands-bot"
           },
-          "state": "APPROVED",
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nScope: this is a `type: chore` cleanup in `OpenHands/OpenHands` (Agent Canvas frontend) \u2014 it removes six `// @spec WN-001` annotations and trims one sentence from `specs/warning-feedback.md`. That belongs in this repository and needs no cross-repo or product/architecture decision.\n\nWhat I verified on head `4f7a052`:\n- The change is comment- and documentation-only. The underlying #18431 fix is retained: the semantic tokens in `openhands-deepsea.ts` (`--oh-feedback-error`), the contrast assertions in `__tests__/themes/color-themes.test.tsx`, and the component tests are all untouched. The remaining WN-001 annotations elsewhere in the tree (light-plus, solarized-light, home banner, ACP conflicts, onboarding, canvas-extensions, agent-server-ui-style-scope, e2e regressions) are preserved, and `specs/warning-feedback.md` keeps a stable WN-001 ID with an accurate description, so `AGENTS.md`'s \"keep spec IDs stable / strikethrough rather than renumber\" rule is not violated.\n- Focused tests pass locally: `npx vitest run __tests__/themes/color-themes.test.tsx src/components/features/conversation/usage-panel/context-meter.test.tsx` -> 2 files, 20 tests passed.\n- CI for this head: `test-and-build (ubuntu)` and `test-and-build (windows)` succeeded.\n\nThe `Validate PR description` check rollup still shows one FAILURE, but it is stale: the failing run started 2026-10-16T01:49:40Z against the pre-edit body (\"Add a short human-written note between `HUMAN:` and `AGENT:`\"). The two `Validate PR description` runs started 2026-10-16T04:09:18Z/04:09:20Z on this same head both succeeded, and I re-ran `.github/scripts/check_pr_description.py` against the current body and file list, which reports \"PR description validation passed.\" No action is needed for this review's verdict; if the merge gate still counts the superseded run, a re-run of that check will clear it.\n\nNo material correctness, security, compatibility, or architecture findings. The removal of the non-spec annotations is an intentional maintainer decision by the author, and contextual behavior coverage remains via the verify-openhands feature map (F27).\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-16T04:15:51Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
           "commit": {
             "oid": "4f7a05275bbea4bf250739394c1d200c008329c4"
           }
@@ -848,9 +1237,11 @@
       "latestChecks": {
         "pass": 7,
         "skip": 6,
-        "pendingOrFailed": 0,
+        "pending": 0,
+        "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18499/checks"
-      }
+      },
+      "mergeable": "UNKNOWN"
     },
     {
       "number": 18504,
@@ -927,9 +1318,9 @@
         "malhotra5"
       ],
       "latestChecks": {
-        "pass": 6,
+        "pass": 7,
         "skip": 6,
-        "pending": 1,
+        "pending": 0,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18508/checks"
       },
@@ -1015,12 +1406,14 @@
       "number": 18513,
       "title": "fix(theme): keep destructive button labels readable",
       "url": "https://github.com/OpenHands/OpenHands/pull/18513",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T19:25:49Z",
       "headRefOid": "f52f2f7b2929f78e4037afe4a1f56770bfc6e378",
       "reviewDecision": "APPROVED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "fd660b681279ca9dc0ce9af40725e7b819817f20"
+      },
       "reviews": [
         {
           "id": "PRR_kwDOLfkiw88AAAABSn6_sw",
@@ -1054,12 +1447,14 @@
       "number": 18515,
       "title": "fix(theme): keep launch errors and retry readable",
       "url": "https://github.com/OpenHands/OpenHands/pull/18515",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T19:26:53Z",
       "headRefOid": "6e1abb6408d2568160dae51f8cf2fb64e69e72e9",
       "reviewDecision": "APPROVED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "080154fd7a18ea90d1dfa0574825fc5ae2e6f3a0"
+      },
       "reviews": [
         {
           "id": "PRR_kwDOLfkiw88AAAABSn2RoA",
@@ -1125,12 +1520,14 @@
       "number": 18526,
       "title": "fix(lint): theme automation validation decorations",
       "url": "https://github.com/OpenHands/OpenHands/pull/18526",
-      "state": "OPEN",
-      "mergedAt": null,
-      "headRefOid": "0188d43c29eb38a530f409ff6c487d1d5258e623",
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T21:20:16Z",
+      "headRefOid": "677aa6f2b68397b1dc56447a6e2e7e16ea342296",
       "reviewDecision": "APPROVED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "e29a3631128e9d80ed78638ff87adb9b8cc85f59"
+      },
       "reviews": [
         {
           "id": "PRR_kwDOLfkiw88AAAABSoMEjQ",
@@ -1164,12 +1561,14 @@
       "number": 18528,
       "title": "fix(theme): keep device authorization feedback readable",
       "url": "https://github.com/OpenHands/OpenHands/pull/18528",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T19:37:02Z",
       "headRefOid": "bd30e4c7df146160fc4e346127b24bf3dc00f53d",
       "reviewDecision": "APPROVED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "8da32cbb462edccff8ccf814731906fb193561be"
+      },
       "reviews": [
         {
           "id": "PRR_kwDOLfkiw88AAAABSoPpng",
@@ -1218,12 +1617,14 @@
       "number": 18529,
       "title": "fix(theme): make bulk model save outcomes readable",
       "url": "https://github.com/OpenHands/OpenHands/pull/18529",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T19:27:50Z",
       "headRefOid": "b685ae43ae6d8f91447e6bb4c23125c6b3aba932",
       "reviewDecision": "APPROVED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "3d2abb0de2c4443988bf610bba5c04c3b4999e0e"
+      },
       "reviews": [
         {
           "id": "PRR_kwDOLfkiw88AAAABSudEbw",
@@ -1259,16 +1660,34 @@
       "number": 18530,
       "title": "fix(theme): keep Markdown links readable across themes",
       "url": "https://github.com/OpenHands/OpenHands/pull/18530",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T19:28:53Z",
       "headRefOid": "a0818714a239c8a957d4dd23f038779cc7de4822",
-      "reviewDecision": "REVIEW_REQUIRED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
-      "reviews": [],
+      "reviewDecision": "APPROVED",
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "9c99443a7e75762124827c7b67fc2325b73ba2d9"
+      },
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSvJDnw",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nReviewed exact head `a0818714` (unchanged), against base `d3a58cd1`.\n\n**Scope.** Canvas-owned presentation: the shared Markdown `anchor`/plan renderers, the `--oh-link` role in two built-in light palettes, one Tailwind `@theme inline` alias, and the theme contrast contract. No Agent Server, SDK, or automation contract is touched, and the dependency direction is respected. In scope for this repository.\n\n**What I verified in the workspace (head checked out detached, no tracked files modified):**\n\n- Both renderers now resolve color from the public token instead of the raw palette class. `tailwind.css` compiles `--color-link: var(--oh-link)` and the probe build emits `.text-link { color: var(--oh-link) }`, so host `--oh-link` overrides on the nearest `[data-agent-server-ui]` scope keep working (issue AC 7).\n- Contrast is real, not just asserted. Recomputing WCAG ratios from the shipped palettes: Light+ `#005A99` and Solarized Light `#005A88` clear 4.5:1 on the bare contract surfaces and on every 10% alert tint (worst 4.91:1, Solarized tertiary + Caution). The old values fail on exactly the surfaces the test targets \u2014 Light+ on `--oh-surface-raised`/`--oh-color-tertiary` (as low as 4.01:1), Solarized Light on all four (as low as 2.43:1) \u2014 so the TDD red-before/green-after claim holds. The four alert constants I could convert from the shipped Tailwind v4 oklch values match the test fixtures exactly (blue, emerald, purple, rose); yellow-500 rounds to `#f0b100` vs the fixture's `#efb100`, a 1/255 difference with ~0.9 of margin, so it does not affect the assertion.\n- The persistent `underline` is the identifying cue where link and body colors coincide. In the three dark themes `--oh-link` resolves to `--cool-grey-100`, the same value as body text, so the underline is what satisfies the \"distinguishable before hover\" criterion; the captured after-state confirms `decoration: underline`.\n- No semantic or security change: `target=\"_blank\"` and `rel=\"noopener noreferrer\"` are unchanged in both renderers, and `MARKDOWN_SANITIZE_SCHEMA` (including the link protocol allow-list and the deliberately permissive `rel` handling) is untouched.\n- Cascade checked, not assumed: Tailwind Typography's `:where(a)` link rule has zero specificity and the utility layer follows it, so `.text-link` wins in the prose-based Files drawer and diff viewer as intended. `tailwind-merge` does not drop `text-link` when `extraClassName` (`shine-text`) is appended.\n\n**Tests and CI.** `npm run make-i18n` then focused runs pass locally: the three directly affected files (57 tests) and the wider theme/markdown/plan-preview/chat-linking set (13 files, 123 tests). All required checks on this head pass: `test-and-build (ubuntu)` and `(windows)`, `Validate PR description`, `check-pr-artifacts`, `pr-title`; `live-e2e` is skipped by design.\n\n**Acceptance criteria checklist for #18522:**\n\n- [x] Renderers use a theme-aware link color, not raw `text-blue-500`.\n- [x] Link text meets 4.5:1 on its supported surfaces in every built-in palette, including the reported Light+ chat (3.76:1) and planner (3.39:1) cases \u2014 those two baseline numbers reproduce exactly from `text-blue-500` on the base and secondary surfaces.\n- [x] A persistent non-hover cue (underline) distinguishes links where link and body colors match.\n- [x] The same treatment reaches the planner tab, plan preview, Markdown file preview, and Files drawer, all of which use these renderers.\n- [x] The contrast contract test covers the link role per palette and runs under `npm test`.\n- [x] `href`, `target`, `rel`, and the sanitize protocol allow-list are unchanged.\n- [x] Embedded-root override follows the nearest `[data-agent-server-ui]` scope via the `@theme inline` alias.\n- [x] No new overflow or geometry change; the head evidence records unchanged boxes and destinations.\n\n**Evidence.** The linked provenance record is genuine product evidence: 140 measurements (70 before / 70 after) across five themes and two viewports, taken from the real running Canvas at the stated base and this exact head. The before-minimum 2.343:1 (deepsea Warning tint) and after-minimum 4.888:1 (Solarized Light Caution tint, underlined, href/target/rel intact) match the PR description. This is a static-presentation change that does not depend on model output, and the recorded captures exercise the real composer and the real Planner file path with a refused loopback profile and no external model request, which is the right bar here.\n\nThe change is minimal, correctly targeted, and limited to the reported defect; the remaining raw alert palette colors are explicitly out of scope and stay tracked by #18004. No material correctness, security, compatibility, architecture, or evidence gap found, and no inline findings to raise.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T18:54:44Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "a0818714a239c8a957d4dd23f038779cc7de4822"
+          }
+        }
+      ],
       "draft": false,
       "requestedReviewers": [
-        "all-hands-bot"
+        "neubig"
       ],
       "latestChecks": {
         "pass": 7,
@@ -1284,17 +1703,33 @@
       "number": 18531,
       "title": "fix(theme): clarify chat loading and timeout colors",
       "url": "https://github.com/OpenHands/OpenHands/pull/18531",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T19:36:23Z",
       "headRefOid": "5b8ed56a6d839c3470338f63362c237c4b7b8637",
-      "reviewDecision": "REVIEW_REQUIRED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
-      "reviews": [],
-      "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
+      "reviewDecision": "APPROVED",
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "a53c2c1d9260c540c76e367958499c190c525a90"
+      },
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSuhsEA",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Assessment\n\nTwo-line presentation fix that replaces raw palette classes with existing semantic theme roles. Scope, token resolution, contrast, and preserved behavior all check out on the current head. No material findings.\n\n### What I verified in the workspace at `5b8ed56a`\n\n- **Scope is exactly the claimed pair.** `git diff origin/main...HEAD` touches only `src/components/features/chat/chat-interface.tsx:602` (`text-neutral-400` -> `text-text-tertiary`) and `src/components/features/chat/success-indicator.tsx:14` (`fill-yellow-500` -> `fill-feedback-warning`). No `src/themes/**`, no palette/token addition, and no new `allow` entry in `eslint.config.js`.\n- **Both classes resolve through the documented roles.** `--color-text-tertiary` and `--color-feedback-warning` are declared in `src/tailwind.css` (`@theme inline`), backed by `--oh-text-tertiary` and `--oh-feedback-warning`. `shadcn/no-unknown-classes` runs at `error`, so the head's green lint means both utilities resolve. `feedback-warning` is the role `specs/warning-feedback.md` (WN-001) explicitly defines for readable warning text and warning icons.\n- **Contrast, recomputed independently from the shipped tokens.** Against each theme's `--oh-color-base`: label 14.96:1 (deepsea), 12.95:1 (neutral), 12.95:1 (neo), 8.45:1 (light-plus), 4.99:1 (solarized-light); clock 9.82:1, 9.03:1, 9.03:1, 6.10:1, 6.50:1. Both targets are met in every theme, and the minima match the PR's reported 4.99:1 / 6.10:1. The before values also reproduce (label 2.58:1, clock 1.91:1 on Light+).\n- **Behavior is untouched.** `data-testid=\"loading-older-events\"` and `status-icon` are intact; the label still renders only while `isLoadingOlderEvents` is true; the clock still renders only for `status === \"timeout\"` from `getObservationResult`, which is unchanged. The layout classes (`flex items-center justify-center gap-2 py-3 text-sm`, `h-4 w-4 ml-2 inline`) are byte-for-byte preserved, so the desktop/390px geometry claim holds. No test asserts the removed class strings, so none needed updating.\n- **Host override path still works.** `--oh-text-tertiary` is in the `AgentServerUIRoot` default scope and `--oh-feedback-warning` is overridable; `__tests__/themes/color-themes.test.tsx` covers the override and the per-theme role contrast, and passes.\n- **Checks.** `test-and-build (ubuntu)` and `test-and-build (windows)` are green on this exact SHA, along with the PR-title and PR-description checks. Locally I ran `__tests__/themes/color-themes.test.tsx` (13 passed), `__tests__/components/features/chat` (39 files / 360 tests passed), and `__tests__/components/conversation-events/chat` (26 files / 317 tests passed); Prettier reports the two files clean. `npm run lint`/`typecheck` OOM the Node heap in this review sandbox, so CI remains the authority for that gate.\n- **Evidence.** The before/after GIF, five-theme montage, and provenance JSON all resolve (HTTP 200). The provenance measures computed styles on the real running Canvas with `before` pinned to `8238b7af`, which is exactly the parent commit of this head, and `after` pinned to this head, so the comparison is directly attributable.\n\n### Acceptance criteria (issue #18523)\n\n- [x] Loading label >= 4.5:1 in all five shipped themes (min 4.99:1, solarized-light).\n- [x] Timeout clock >= 3:1 in all five themes (min 6.10:1, light-plus) and remains a distinct warning presentation.\n- [x] Neither `text-neutral-400` nor `fill-yellow-500` remains; both resolve through existing semantic roles, including host overrides.\n- [x] No `src/themes/**` change, no new token/palette, no new `shadcn/no-raw-colors` allow entry.\n- [x] Loading/resumption, `hasMore`, testids, and `getObservationResult` timeout classification unchanged; no event-contract change.\n- [x] Desktop and 390px layout classes preserved.\n- [x] Contrast verified against rendered surfaces, with method and per-theme ratios recorded.\n- [x] `npm run lint`, `npm test`, and `npm run build` pass in CI on this head.\n\n### Notes\n\nNo agent, tool-selection, prompt, or conversation-payload path is touched, so there is no eval risk here.\n\n\u2705 APPROVED\n",
+          "submittedAt": "2026-10-16T17:57:57Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "5b8ed56a6d839c3470338f63362c237c4b7b8637"
+          }
+        }
       ],
+      "draft": false,
+      "requestedReviewers": [],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
@@ -1309,17 +1744,33 @@
       "number": 18532,
       "title": "refactor(theme): use semantic file chooser colors",
       "url": "https://github.com/OpenHands/OpenHands/pull/18532",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T19:31:00Z",
       "headRefOid": "7d7222b157546ec6a6e7f196877f4e20f312146c",
-      "reviewDecision": "REVIEW_REQUIRED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
-      "reviews": [],
-      "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
+      "reviewDecision": "APPROVED",
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "cd67f45578e9ce5a3a5cf46676b350097bccb5be"
+      },
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABSu5lnQ",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "COLLABORATOR",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n**Scope.** In-repository: the change is presentation of a manifest-declared field in Agent Canvas (`src/components/features/manifest/manifest-form-field.tsx`). No agent-server endpoint/field/schema reliance, no wire contract, no persisted state, so the ownership, compatibility, and durable-state checkpoints do not apply.\n\n**What changed.** One class swap in the `tarball-upload` branch of `SetupFormField`: `file:bg-neutral-700 file:text-white` -> `file:bg-interactive-hover file:text-contrast`. Both are existing theme roles (`src/tailwind.css`: `--color-interactive-hover` -> `--oh-interactive-hover`, `--color-contrast` -> `--oh-contrast`), so the native `::file-selector-button` now follows the active palette. The same pairing is already used statically by other Canvas surfaces (`chat/uploaded-file.tsx`, `settings/brand-button.tsx`, `files-tab/segmented-toggle.tsx`, `conversation-panel/cloud-new-conversation-menu.tsx`), and its readability is an executable contract: `__tests__/themes/color-themes.test.tsx` asserts `--oh-contrast` against `--oh-interactive-hover` at >= 4.5:1 (HL-001) and `--oh-focus` against `--oh-interactive-hover` at >= 3:1.\n\n**Verification on head `7d7222b157546ec6a6e7f196877f4e20f312146c`.**\n- CI for this head: `test-and-build (ubuntu)` and `test-and-build (windows)` both `success`; that job runs `npm run lint`, `npm test`, `npm run build`, `npm run build:lib`, and `npm pack --dry-run`. Other jobs are `skipped` as expected for this event.\n- Workspace: `npx vitest run __tests__/components/manifest/` -> 2 files, 27 tests pass; `npx vitest run __tests__/themes/color-themes.test.tsx` -> 13 pass.\n- No raw palette token remains in the changed file, so the file's single `shadcn/no-raw-colors` warning is cleared.\n- Evidence: 40 real-Canvas measurements (five themes x desktop/390px x normal/focus) report a minimum after button text contrast of 7.59:1, which matches the DeepSea pair I read from the workspace theme files (`--oh-interactive-hover` `#4B5468` / white); the light-theme pairs likewise match `light-plus` (`#E5E5E5`/`#1F1F1F`) and `solarized-light` (`#E6DFCC`/`#002B36`). Recorded functional proof: missing-file `aria-invalid`, generated tarball selected, reached Review, nothing created or dispatched.\n\n**Acceptance criteria for #18518** (labels still `enhancement, priority:low, ready-for-dev`; #18004 unchanged):\n- [x] Chooser follows each supported theme with readable button text (>= 4.5:1) - five-theme measurement set, minimum 7.59:1.\n- [x] Visible keyboard focus retained - real Tab/Shift+Tab captures; the `--oh-focus` vs `--oh-interactive-hover` >= 3:1 contract is enforced by the theme test.\n- [x] At desktop and 390px a supported archive can be chosen and its filename read - all captures inside the viewport with no page horizontal overflow.\n- [x] Missing-file validation and recovery to Review unchanged - the diff does not touch `accept`, `onChange`, `aria-invalid`, or the validation path, and the recorded run shows the same validation-then-recovery sequence.\n\nNo material correctness, security, compatibility, architecture, or evidence gaps found. This is a small, self-evident presentation change whose token pairing already has an executable contrast contract; no design-context or eval follow-up is required.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-16T18:30:44Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "7d7222b157546ec6a6e7f196877f4e20f312146c"
+          }
+        }
       ],
+      "draft": false,
+      "requestedReviewers": [],
       "latestChecks": {
         "pass": 7,
         "skip": 6,
