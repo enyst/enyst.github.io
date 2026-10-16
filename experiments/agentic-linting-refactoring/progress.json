@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-16T06:06:25+00:00",
+  "checkedAt": "2026-10-16T06:32:44+00:00",
   "displayTimeZone": "Europe/Stockholm",
-  "main": "3fa6a3552ab91beeab76e457ce29a4ce541071da",
+  "main": "3419bdb4f710d4766e255d77c434078fd9849495",
   "shadcnLintVersion": "0.2.1",
   "pullRequests": [
     {
@@ -855,13 +855,15 @@
     {
       "number": 18504,
       "title": "fix(theme): keep composer context feedback readable",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-16T06:08:49Z",
       "url": "https://github.com/OpenHands/OpenHands/pull/18504",
       "headRefOid": "8189e214720e18de9236907b9c5d4cf8c2518392",
       "reviewDecision": "APPROVED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "3419bdb4f710d4766e255d77c434078fd9849495"
+      },
       "reviews": [
         {
           "author": {
@@ -893,13 +895,24 @@
       "mergedAt": null,
       "url": "https://github.com/OpenHands/OpenHands/pull/18508",
       "headRefOid": "dd4987f1d5e621e7dda2ddcad5aa780b9c51f714",
-      "reviewDecision": "REVIEW_REQUIRED",
+      "reviewDecision": "APPROVED",
       "mergeable": "MERGEABLE",
       "mergeCommit": null,
-      "reviews": [],
+      "reviews": [
+        {
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "state": "APPROVED",
+          "submittedAt": "2026-10-16T06:19:18Z",
+          "commit": {
+            "oid": "dd4987f1d5e621e7dda2ddcad5aa780b9c51f714"
+          }
+        }
+      ],
       "draft": false,
       "requestedReviewers": [
-        "all-hands-bot"
+        "malhotra5"
       ],
       "latestChecks": {
         "pass": 7,
@@ -909,14 +922,30 @@
         "url": "https://github.com/OpenHands/OpenHands/pull/18508/checks"
       },
       "issue": 18507,
-      "migrationIssue": 18004,
-      "ciRun": {
-        "conclusion": "success",
-        "databaseId": 38857826080,
-        "headSha": "dd4987f1d5e621e7dda2ddcad5aa780b9c51f714",
-        "status": "completed",
-        "url": "https://github.com/OpenHands/OpenHands/actions/runs/38857826080"
-      }
+      "migrationIssue": 18004
+    },
+    {
+      "number": 18510,
+      "title": "fix(theme): keep model profile messages readable",
+      "state": "OPEN",
+      "mergedAt": null,
+      "url": "https://github.com/OpenHands/OpenHands/pull/18510",
+      "headRefOid": "e71b4499fa721f67ced214d83b22452d469ecb83",
+      "reviewDecision": "REVIEW_REQUIRED",
+      "mergeable": "MERGEABLE",
+      "mergeCommit": null,
+      "reviews": [],
+      "draft": true,
+      "requestedReviewers": [],
+      "latestChecks": {
+        "pass": 6,
+        "skip": 6,
+        "pending": 1,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18510/checks"
+      },
+      "issue": 18509,
+      "migrationIssue": 18004
     }
   ],
   "lintAudit": {
@@ -969,6 +998,80 @@
         }
       },
       "note": "Counts describe the consent PR head before merge. The main-source audit remains separately recorded in lintAudit; no rule severity or exception changes are part of this proposal."
+    },
+    {
+      "recordedAt": "2026-10-16T06:22:44+00:00",
+      "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18510",
+      "sourceCommit": "e71b4499fa721f67ced214d83b22452d469ecb83",
+      "baseCommit": "3419bdb4f710d4766e255d77c434078fd9849495",
+      "command": "npm run lint",
+      "errors": 0,
+      "warnings": 659,
+      "rules": {
+        "shadcn/no-arbitrary-values": {
+          "warnings": 523,
+          "files": 177
+        },
+        "shadcn/no-inline-styles": {
+          "warnings": 89,
+          "files": 45
+        },
+        "shadcn/no-raw-colors": {
+          "warnings": 47,
+          "files": 16
+        }
+      },
+      "note": "Counts describe the model-message PR head on base3419 before merge. The separate consent PR is not included in this branch, so these inventories should not be combined as a main total."
+    }
+  ],
+  "mainLintAudits": [
+    {
+      "completedAt": "2026-10-16T05:13:46Z",
+      "sourceCommit": "0c7c2258a8acc309852ceb248b3ade606b79869c",
+      "command": "node_modules/.bin/eslint src --format json --output-file lint-audit.json",
+      "commandNote": "Run at the repository root after installing the pinned dependencies. The output filename is local and may be chosen freely.",
+      "errors": 0,
+      "warnings": 669,
+      "rules": {
+        "shadcn/no-arbitrary-values": {
+          "warnings": 523,
+          "files": 177
+        },
+        "shadcn/no-inline-styles": {
+          "warnings": 89,
+          "files": 45
+        },
+        "shadcn/no-raw-colors": {
+          "warnings": 57,
+          "files": 17
+        }
+      },
+      "coverageNotes": [
+        "The composer context popover stores four raw-color classes in module-level tone maps. This audit emits no no-raw-colors messages for that file, so the four declarations are additional migration work beyond the 57 reported findings.",
+        "The audit counts refer to this source commit, before the composer popover follow-up; no rule severity change is implied."
+      ]
+    },
+    {
+      "recordedAt": "2026-10-16T06:15:16+00:00",
+      "sourceCommit": "3419bdb4f710d4766e255d77c434078fd9849495",
+      "reproductionCommand": "node_modules/.bin/eslint src --format json --output-file lint-audit.json",
+      "commandNote": "Run from the repository root after installing pinned dependencies; the output filename is chosen locally.",
+      "errors": 0,
+      "warnings": 669,
+      "rules": {
+        "shadcn/no-arbitrary-values": {
+          "warnings": 523,
+          "files": 177
+        },
+        "shadcn/no-inline-styles": {
+          "warnings": 89,
+          "files": 45
+        },
+        "shadcn/no-raw-colors": {
+          "warnings": 57,
+          "files": 17
+        }
+      }
     }
   ]
 }

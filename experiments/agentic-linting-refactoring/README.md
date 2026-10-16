@@ -19,9 +19,9 @@ describes the on-screen changes; the soundtrack contains quiet music only.
 
 The source PRs retain the detailed tests, contrast measurements, app evidence,
 and reproducible capture recipes. The combined film includes the secret-selection
-change, now merged. The dated page snapshot tracks twenty-one merged proposals,
+change, now merged. The dated page snapshot tracks twenty-two merged proposals,
 including the latest focus, context Usage, connection banner, and spec-note cleanup
-changes. Ready-for-review #18504 tracks the composer context popover as the twenty-second
+changes. Merged #18504 tracks the composer context popover as the twenty-second
 proposal, with its real Before/After evidence available, passing CI, and bot approval. Recording source
 heads stay unchanged when the PR status snapshot is refreshed.
 
@@ -59,8 +59,7 @@ crop coordinates, configured context budgets, and 60 desktop/phone measurements.
 The scoped warning/danger text, fill, and boundary checks pass; existing muted
 Solarized text and the phone popover's 2 px left-edge clip remain unchanged.
 The movie and screenshots document the proposed head. The dated status snapshot
-records that #18504 is ready for review with bot approval; it is not
-merged. The separate consent backend-scope batch is documented below.
+records that #18504 merged on 16 October after passing CI and bot approval. The separate consent backend-scope batch is documented below.
 
 ## Consent backend scope
 
@@ -78,6 +77,24 @@ colors are unchanged. Unchecking consent, confirming, and reloading still keeps
 the preference false. The dated status snapshot keeps the proposal-head lint
 counts separate from the base-main audit and tracks review/merge status.
 
-At the final dated status snapshot, both #18504 and #18508 are open and ready
-for review, with passing CI. The bot approved #18504 and is requested on #18508.
-The recording heads and media hashes remain unchanged.
+At the dated status snapshot, #18504 is merged and #18508 is open and ready
+for review, with passing CI and bot approval. Model profile messages are now
+tracked separately in draft #18510, with real Before/After evidence. Recording heads and media hashes stay attached
+to the source revisions actually captured.
+
+## Model profile messages
+
+Draft [#18510](https://github.com/OpenHands/OpenHands/pull/18510) addresses
+[bug #18509](https://github.com/OpenHands/OpenHands/issues/18509) with semantic
+colors for saved profile feedback. The ten-second `model-messages-before-after.mp4`
+and eight-second GIF compare exact main `3419bdb4f7` with head `e71b4499fa`.
+Only the real model-message component is shown, using generated QA profiles and
+a synthetic loopback endpoint. The key readout is presence-only. No user
+conversation content or credential value is visible; no model turn ran.
+
+`model-messages-source.json` records 40 settled normal/hover captures across five
+themes and desktop/phone viewports, source crops, idle/no-usage proof, named
+artifact hashes, and explicit empty-hint/shared-wrapper coverage limits.
+The source-branch audit reaches 659 warnings and 47 raw-color findings; it is
+independent of the consent proposal. Main and proposal audits stay separately
+recorded in `progress.json`. All earlier films and their recording heads remain.
