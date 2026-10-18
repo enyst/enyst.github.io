@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-18T05:43:29+00:00",
+  "checkedAt": "2026-10-18T18:10:15+00:00",
   "displayTimeZone": "Europe/Stockholm",
-  "main": "852132d38dbc15e03d6825bbacbeb971c72575be",
+  "main": "78beca15f1db169e184afc5a90ee0b7d105c721e",
   "shadcnLintVersion": "0.2.1",
   "pullRequests": [
     {
@@ -1501,7 +1501,7 @@
           "author": {
             "login": "all-hands-bot"
           },
-          "authorAssociation": "COLLABORATOR",
+          "authorAssociation": "MEMBER",
           "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nIn-repo. This is a presentation-only token swap in the Agent Canvas UI (`src/components/features/backends/managed-agents/digitalocean-connect-panel.tsx`), which `AGENTS.md` assigns to `OpenHands/OpenHands`. No dependency-direction or ownership concern.\n\n## What I verified on the current head\n\nHead is still `f7caf580638b5f71e9461476f2ca33d7d819af17`; 1 file, +4/-4. The diff replaces four `focus-visible:outline-blue-300` recipes with `focus-visible:outline-focus` and changes nothing else - outline widths (`outline-2`) and offsets (`outline-offset-2` / `-outline-offset-2`), hover surfaces, disabled states, keyboard handlers and the agent/session actions are untouched.\n\n- `outline-focus` resolves through `--color-focus` -> `--oh-focus` (`src/tailwind.css:55,145`) and is the established recipe in `backend-form-modal.tsx` and `settings-switch.tsx`. This is exactly what `src/themes/README.md` prescribes: \"Use `focus` for keyboard outlines and rings on neutral controls ... retain the control's outline width/offset and preserve host `--oh-focus` overrides.\"\n- Contrast: I recomputed `--oh-focus` against base, base-secondary, surface-raised and interactive-hover per theme - Light+ 3.58, Solarized 3.26, DeepSea 7.59, Neutral/Neo 10.37, all at or above 3:1. These match the numbers in the PR body, and `__tests__/themes/color-themes.test.tsx` asserts this contract.\n- Focused tests pass in the workspace: `managed-agents-view`, `managed-agents-session-row`, `digitalocean-new-agent-form` and `color-themes` - 30 passed.\n\nNo code defect found. The class-token change is correct and consistent with the theme contract.\n\n## Merge gate is not met\n\n- The required `Validate PR description` check **fails on this exact head** (run 39051459248). Re-running `.github/scripts/check_pr_description.py` against the current body and the current changed-file list reproduces exactly one error: \"This PR touches frontend code but the description has no screenshot or video.\"\n- `.agents/skills/custom-codereview-guide.md` (\"Testing and Production Evidence\") requires screenshots or video of the running Canvas for functional changes, and for a bug fix a before/after demonstration. It states that token, class-name and source-string assertions do not prove computed styling, isolation or readability. The static palette audit the PR links is explicitly not live affected-state evidence. The guide directs a COMMENT when production-facing evidence is required but absent.\n- The PR is still a draft with no review request, and `mergeStateStatus` is `BLOCKED`.\n\n## Linked acceptance criteria (#18517, currently `bug` + `priority:low`, no `ready-for-dev`)\n\n- [ ] Authenticated New Agent/refresh, agent-row/icon and nested session controls show a visible keyboard focus outline across all five themes at desktop and phone widths - **not evidenced**. The PR and issue both state the authenticated DigitalOcean state was unavailable, so no live capture exists.\n- [~] Focus outlines meet 3:1 against adjacent neutral, raised and hovered surfaces - **token-level contract verified** (theme test plus recomputed 3.26-10.37), but not measured on the live authenticated control.\n- [x] Keyboard navigation, expand/collapse, selection, launch and session operations unchanged - met; the diff is color-only and the focused tests pass.\n\n## Required before approval\n\n1. Get `Validate PR description` green on this head by adding a running-Canvas capture of the four changed recipes (Add Backend -> Providers -> DigitalOcean, keyboard focus on neutral and hovered surfaces, all five themes, desktop and phone widths) under `## Video/Screenshots`. Because this is labeled a bug fix, include base-versus-head behavior if the authenticated state can be produced; if it genuinely cannot, state that explicitly in the description so the change reads as defensive token alignment rather than a reproduced production bug.\n2. No further code changes are needed for the token swap itself.\n\n\ud83d\udd04 CHANGES REQUESTED",
           "submittedAt": "2026-10-18T04:23:02Z",
           "includesCreatedEdit": false,
@@ -1813,7 +1813,7 @@
           "author": {
             "login": "all-hands-bot"
           },
-          "authorAssociation": "COLLABORATOR",
+          "authorAssociation": "MEMBER",
           "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nIn scope. `src/components/features/conversation-panel/budget-progress-bar.tsx` is a Canvas presentation helper, which this repository owns; no SDK, automation, or extension contract is reimplemented.\n\n## Code assessment\n\nThe one-line change replaces the fixed `bg-red-500` / `bg-blue-500` palette classes with the existing semantic roles `bg-status-error` / `bg-foreground`. Both tokens are defined in `src/tailwind.css` (`--color-status-error`, `--color-foreground`) and match the adjacent `ContextMeter` neutral/danger fills exactly. The cap gating in `budget-display.tsx`, the percentage math, the `> 80` threshold, and the geometry are untouched, so no behavioral regression is introduced. The change is the smallest viable correction for the targeted raw-color finding.\n\nFocused tests pass on this head: `__tests__/components/features/conversation-panel/budget-display.test.tsx` and `__tests__/themes/color-themes.test.tsx` \u2014 2 files, 18 tests. The palette contract asserts `--oh-foreground` and `--oh-status-error` at >=3:1 against the `--oh-color-tertiary` track in every theme, which is the exact contract this change relies on. `test-and-build (ubuntu)` and `test-and-build (windows)` are green on `50ae786`.\n\n## Acceptance criteria (issue #18525)\n\n- [x] Null, zero, and negative caps still hide the meter; cost percentage and over-budget threshold unchanged (existing cases cover this).\n- [x] Existing palette and BudgetDisplay contract checks pass.\n- [ ] Both fills follow the active theme and contrast >=3:1 against the tertiary track *when a real backend supplies a positive cap*. The static palette contract passes, but no live affected-state verification exists.\n\n## Merge gate\n\nThe required check **Validate PR description** fails on this exact head: `This PR touches frontend code but the description has no screenshot or video.` This is a functional (rendered-color) change, so the evidence rule applies \u2014 token and class-name assertions do not prove computed styling, isolation, or readability. Issue #18525 itself makes live affected-state verification a prerequisite for making its implementation PR ready, and the repository guide requires a `COMMENT` for a failing required check or missing required evidence even when the code is sound.\n\nThe PR body is candid that the pinned Agent Server/SDK does not expose a positive `max_budget_per_task`, so the meter is unreachable through the real product. That is an acceptable explanation and correctly avoids fabricating state, but it does not satisfy the gate. Before approval, add one of:\n\n- a capture from a running Canvas on a supported backend that genuinely reports a positive cap, showing the normal and over-budget fills under the active theme; or\n- an explicit maintainer decision to waive the media requirement for this defensive, currently unreachable-state change.\n\nThe implementation is sound; the blocker is the missing evidence, not the code.\n\n\ud83d\udd04 CHANGES REQUESTED",
           "submittedAt": "2026-10-18T04:15:04Z",
           "includesCreatedEdit": false,
@@ -1840,19 +1840,21 @@
       "number": 18534,
       "title": "fix(lint): theme hook diagnostics and status badges",
       "url": "https://github.com/OpenHands/OpenHands/pull/18534",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-18T17:44:45Z",
       "headRefOid": "b0f5abf7a085e9189955934f296291a574fb7732",
       "reviewDecision": "APPROVED",
-      "mergeable": "MERGEABLE",
-      "mergeCommit": null,
+      "mergeable": "UNKNOWN",
+      "mergeCommit": {
+        "oid": "433edb9a1f0352bed1019f3cad44d87bdca1a062"
+      },
       "reviews": [
         {
           "id": "PRR_kwDOLfkiw88AAAABSokbgg",
           "author": {
             "login": "all-hands-bot"
           },
-          "authorAssociation": "COLLABORATOR",
+          "authorAssociation": "MEMBER",
           "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Review \u2014 PR #18534 `fix(lint): theme hook diagnostics and status badges`\n\n**Head verified:** `a0fe71bea3b56fb5d3e09636d072cdccb83c081d` (base `8238b7af825b8639191b9d7b4c6b080d4a93f388`, matching the PR's stated Before). All check-runs on this head are `success`/`skipped`. No prior review by this account on this head.\n\n### Scope\nCanvas-owned presentation change in `src/components/shared/hook-execution-event-message.tsx`. In scope for this repository; no cross-repository ownership concern and no Agent Server / Cloud / wire-contract surface touched.\n\n### What I verified independently\n- Raw palette literals (`bg-amber-900/50`, `text-amber-300`, `text-amber-400`, `text-red-400`, `bg-green-900/50`, `bg-red-900/50`, `text-green-300`, `text-red-300`) are gone from the component; only semantic `feedback-*` roles remain.\n- Focused suites pass: `__tests__/components/shared/hook-execution-event-message.test.tsx` + `__tests__/themes/color-themes.test.tsx` \u2192 26 passed.\n- I recomputed each migrated role's contrast against its 10% tint over the chat canvas, mirroring the new test's resolution logic, from the shipped token values in `src/themes/color-theme/definitions/*` and `src/tailwind.css`. All three roles clear 4.5:1 in all five themes (minimum 4.804:1 \u2014 Solarized Light `--oh-feedback-error`; Light+ warning 5.302 / error 5.001 / success 5.086). The PR's stated minima are consistent with this.\n- Hook execution, precedence, metadata, truncation and success-indicator behavior are unchanged: the diff only swaps class strings, so blocked still suppresses the indicator and ok/failed still show theirs.\n\n### Acceptance-criteria checklist (issue #18521)\n- [x] Badges and blocked-reason/error/stderr resolve from the theme feedback palette; fixed Tailwind literals gone.\n- [x] Colors change with the selected theme (they now reference CSS variables, not constants).\n- [x] Migrated small text \u2265 4.5:1 on its rendered background in all five themes (independently reproduced).\n- [x] `ok`/`failed`/`blocked` labels, expandable details, output text and success-indicator behavior preserved.\n- [x] Desktop/phone layout: the class-only swap does not change layout.\n- [ ] **Automated coverage distinguishes blocked/successful/failed rows through the theme feedback role, so a regression back to a fixed palette class fails a test.** \u2014 unmet; see the inline finding.\n\n### Finding\nOne acceptance criterion is not met. The PR removes the only assertions binding this component to any color role and adds only a *palette-token* contrast contract in `__tests__/themes/color-themes.test.tsx` that never imports the component. The replacement assertions (`toBeInTheDocument()`) pass regardless of which color classes the component emits, so a revert to the fixed palette classes would pass both the suite and lint (`shadcn/no-raw-colors` is `warn`, and CI runs `eslint src` without `--max-warnings`). Repo precedent for the intended shape already exists \u2014 `context-meter.test.tsx` asserts `toHaveClass(\"text-feedback-warning\")` as a functional CSS contract. Details in the inline comment.\n\n### Notes (non-blocking)\n- The new token test models the badge backdrop as `--oh-color-base`; the conversation message pane is actually painted over `bg-surface`. The difference does not push any ratio below 4.5:1 in either light or dark palettes, so the contract still holds \u2014 worth revisiting if the palettes change.\n- No security, state-migration, telemetry, or Agent Server compatibility impact.\n\n\ud83d\udd04 CHANGES REQUESTED",
           "submittedAt": "2026-10-16T09:06:41Z",
           "includesCreatedEdit": false,
@@ -1882,7 +1884,7 @@
           "author": {
             "login": "all-hands-bot"
           },
-          "authorAssociation": "COLLABORATOR",
+          "authorAssociation": "MEMBER",
           "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Review \u2014 PR #18534 `fix(lint): theme hook diagnostics and status badges`\n\n**Head verified:** `b0f5abf7a085e9189955934f296291a574fb7732` (2 commits; production change `a0fe71b` + test-only follow-up `b0f5abf`). All check-runs on this head are `success`/`skipped`, including `test-and-build (ubuntu)` and `test-and-build (windows)`. No prior review by this account on this head.\n\n### Scope\nCanvas-owned presentation change in `src/components/shared/hook-execution-event-message.tsx` plus its tests. In scope for this repository: it changes how Canvas renders an existing Agent Server event, not the wire contract or a server API. No ownership or dependency-direction concern.\n\n### What I verified on this head\n- **Raw palette literals are gone** from the component: `bg-amber-900/50`, `text-amber-300`, `text-amber-400`, `text-red-400`, `bg-green-900/50`, `bg-red-900/50`, `text-green-300`, `text-red-300` are all replaced by the semantic `feedback-warning` / `feedback-success` / `feedback-error` roles. Grep confirms no leftovers.\n- **Focused suites pass:** `__tests__/components/shared/hook-execution-event-message.test.tsx` + `__tests__/themes/color-themes.test.tsx` \u2192 29 passed.\n- **Contrast, recomputed independently.** Mirroring the palette resolution from `src/themes/color-theme/definitions/*` and `src/tailwind.css`, every migrated role clears 4.5:1 against its 10% tint over the chat canvas in all five themes. Minimum is 4.804:1 (Solarized Light `--oh-feedback-error`); Light+ is 5.302 / 5.001 / 5.086 for warning / error / success. All roles also clear 4.5:1 against `--oh-surface`, which is the stderr `<pre>` background.\n- **The new regression test genuinely binds the component to the feedback role.** It renders each blocked/ok/failed badge, compiles the badge's *emitted* classes through the real `src/tailwind.css` via `@tailwindcss/node`, and asserts the final `color` and `background-color` declarations reference the expected variable. I reproduced this check directly: the current classes yield `var(--oh-feedback-warning|success|error)` and `color-mix(in oklab, var(<role>) 10%, transparent)`, while the pre-fix classes yield `var(--color-amber-300)` / `var(--color-green-900)` etc. and fail. The assertion therefore catches a revert without pinning a utility-class spelling, which matches the `AGENTS.md` testing baseline.\n- **Behavior preserved:** the production diff only swaps class strings; hook execution, precedence, metadata, command truncation and success-indicator behavior are untouched (blocked still suppresses the indicator; ok/failed keep theirs).\n- **Presentation-only:** no API, persisted state, telemetry, or Agent Server compatibility surface changes, so there is no eval risk.\n\n### Acceptance-criteria checklist (issue #18521, currently `bug` / `priority:medium` / `ready-for-dev`)\n- [x] Badges and blocked-reason/error/stderr resolve from the theme feedback palette; fixed Tailwind literals removed.\n- [x] Rendered colors change with the selected theme (they now resolve through CSS variables).\n- [x] Migrated small text \u2265 4.5:1 on its rendered background in all five themes (independently reproduced; min 4.804:1).\n- [x] `ok` / `failed` / `blocked` labels, expandable details, output text and success-indicator behavior preserved.\n- [x] Desktop/phone layout: the change is class-only and does not alter layout.\n- [x] Automated coverage distinguishes blocked/successful/failed rows through the theme feedback role, and a regression to a fixed palette class fails the test (verified by restoring the old classes).\n\n### Prior finding \u2014 resolved\nMy earlier review flagged that acceptance criterion 6 was unmet because the only assertions binding the component to a color role had been removed. The follow-up commit `b0f5abf` closes that gap with the stylesheet-build contract described above, and the review thread is resolved. The non-blocking note I raised about the badge backdrop was also incorrect: `conversation-chat-panel` in `ConversationMain` (line 277) uses `bg-canvas-base`, so the test's `--oh-color-base` model is right, and the `bg-surface` at line 388 belongs to the right tools panel.\n\nNo blocking or non-blocking findings remain.\n\n\u2705 APPROVED",
           "submittedAt": "2026-10-17T17:00:34Z",
           "includesCreatedEdit": false,
@@ -2186,12 +2188,12 @@
       "repository": "OpenHands/software-agent-sdk",
       "issue": "https://github.com/OpenHands/software-agent-sdk/issues/5561",
       "pullRequest": "https://github.com/OpenHands/software-agent-sdk/pull/5603",
-      "status": "open; ready for review; CI passed; bot review requested",
-      "integrationNote": "The proposal defines per-run limits and is not yet merged or released. It does not populate legacy max_budget_per_task. Matching current-run usage snapshots in Agent Server REST/WebSocket metrics, then client and Canvas integration, are still required for the current lifetime-cost/task-cap meter.",
-      "publishedHeadRefOid": "10bcfc30179d2338697377228f78975764dd024c",
+      "status": "open; ready for review; CI passed; provider-compatibility fix published; renewed bot review requested",
+      "integrationNote": "The proposal defines per-run limits and is not yet merged or released. It does not populate legacy max_budget_per_task. Matching current-run usage snapshots in Agent Server REST/WebSocket metrics, then typed client and Canvas integration, are still required for the current lifetime-cost/task-cap meter.",
+      "publishedHeadRefOid": "c9980ec792decae373c32edbd3767322c2cab665",
       "ciAtCheck": "passed",
-      "reviewFollowUp": "Conflicts and two inline findings were fixed. Conservative admission and ordinary OpenAI function-tool handling are repaired; 122 focused and 1,725 broader LLM/local/remote conversation tests passed locally. Full exact-head CI is green and the bot review was requested after it passed.",
-      "productCodeCommit": "dceb668511cb6ccbc9e16dd3320b1a5d2019144b",
+      "reviewFollowUp": "The latest bot finding about ordinary Claude and Gemini calls is fixed, replied to, and resolved. Ordinary GPT/o, Claude, and Gemini optional-search pricing is distinguished from intrinsic search; native/legacy tools and opaque cached content remain refused. Endpoint pricing and conservative settlement are guarded. All 191 focused and 1,794 broader tests passed locally; final exact-head CI is green. A fresh substantive bot review was requested after it passed.",
+      "productCodeCommit": "322790065776568285eb852ea36cbb260a3df47e",
       "latestChecks": {
         "pass": 32,
         "skip": 6,
@@ -2203,25 +2205,27 @@
         "all-hands-bot"
       ],
       "designReview": {
-        "url": "https://htmlpreview.github.io/?https://github.com/analisaperlengkapan/software-agent-sdk/blob/10bcfc30179d2338697377228f78975764dd024c/.pr/budget-design.html",
-        "productCodeCommit": "dceb668511cb6ccbc9e16dd3320b1a5d2019144b"
+        "url": "https://htmlpreview.github.io/?https://github.com/analisaperlengkapan/software-agent-sdk/blob/c9980ec792decae373c32edbd3767322c2cab665/.pr/budget-design.html",
+        "productCodeCommit": "322790065776568285eb852ea36cbb260a3df47e"
       },
       "documentationCompanion": {
         "repository": "OpenHands/docs",
         "pullRequest": "https://github.com/OpenHands/docs/pull/970",
-        "headRefOid": "4662e5ec98e67941fb0aa49b0b64c07ea3ca303a",
+        "headRefOid": "1aea6fec1d20ce78939461b91e48b68d052cb8c4",
         "status": "open; ready for review; PR checks passed; original bot review request preserved",
         "latestChecks": {
           "pass": 3,
-          "skip": 2,
+          "skip": 1,
           "pending": 0,
-          "failed": 0
+          "failed": 0,
+          "neutral": 1
         },
         "reviewDecision": "REVIEW_REQUIRED",
         "requestedReviewers": [
           "all-hands-bot"
         ]
-      }
+      },
+      "inlineReply": "https://github.com/OpenHands/software-agent-sdk/pull/5603#discussion_r4308093387"
     }
   }
 }
