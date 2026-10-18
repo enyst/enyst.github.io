@@ -232,3 +232,21 @@ resolved; approval remains required. Managed-agent and budget drafts retain
 green test/build checks, while description validation still needs authentic
 affected-state proof. Fresh read-only checks confirmed the account/runtime
 prerequisites. All 23 films, source snapshots and historical audits are preserved.
+
+## Budget lifecycle and SDK prerequisite — 2026-10-18T04:26:36+00:00
+
+33 of 36 tracked proposals are merged; two are open and non-draft, and one is
+draft. Hook #18534 is approved with green CI. Budget #18533 is non-draft at
+50ae78643fb497b028bdddf6adfd0dea366b5b49; tests/builds pass, while description
+validation still requires genuine live meter media before merge. Managed-agent
+#18520 remains draft pending authenticated-state evidence.
+
+Existing SDK [issue #5561](https://github.com/OpenHands/software-agent-sdk/issues/5561)
+and [PR #5603](https://github.com/OpenHands/software-agent-sdk/pull/5603) are work
+in progress. Conflicts and two inline findings are fixed at 091882a47; CI is
+running, and a separately confirmed reservation-pricing gap is being corrected
+before bot review. This is not an approved hard-budget contract. Per-run limits
+differ from the current meter's lifetime-cost/task-cap values; client and Canvas
+integration is still required. Live capture remains blocked by the normal local
+launcher memory guard. All 23 films, source
+snapshots and historical audit objects are preserved.
