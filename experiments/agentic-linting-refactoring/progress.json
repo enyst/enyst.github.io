@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-18T04:26:36+00:00",
+  "checkedAt": "2026-10-18T05:43:29+00:00",
   "displayTimeZone": "Europe/Stockholm",
   "main": "852132d38dbc15e03d6825bbacbeb971c72575be",
   "shadcnLintVersion": "0.2.1",
@@ -2186,11 +2186,42 @@
       "repository": "OpenHands/software-agent-sdk",
       "issue": "https://github.com/OpenHands/software-agent-sdk/issues/5561",
       "pullRequest": "https://github.com/OpenHands/software-agent-sdk/pull/5603",
-      "status": "work in progress",
-      "integrationNote": "The proposal defines per-run limits. It is work in progress, not an approved hard-budget contract; follow-up client/Canvas integration is required for the current lifetime-cost/task-cap meter.",
-      "publishedHeadRefOid": "091882a47b3b1f235cb01dfab23b8eb29ca09bdc",
-      "ciAtCheck": "running",
-      "reviewFollowUp": "Conflicts and two inline findings fixed. A separately confirmed reservation-pricing gap is being corrected before bot review."
+      "status": "open; ready for review; CI passed; bot review requested",
+      "integrationNote": "The proposal defines per-run limits and is not yet merged or released. It does not populate legacy max_budget_per_task. Matching current-run usage snapshots in Agent Server REST/WebSocket metrics, then client and Canvas integration, are still required for the current lifetime-cost/task-cap meter.",
+      "publishedHeadRefOid": "10bcfc30179d2338697377228f78975764dd024c",
+      "ciAtCheck": "passed",
+      "reviewFollowUp": "Conflicts and two inline findings were fixed. Conservative admission and ordinary OpenAI function-tool handling are repaired; 122 focused and 1,725 broader LLM/local/remote conversation tests passed locally. Full exact-head CI is green and the bot review was requested after it passed.",
+      "productCodeCommit": "dceb668511cb6ccbc9e16dd3320b1a5d2019144b",
+      "latestChecks": {
+        "pass": 32,
+        "skip": 6,
+        "pending": 0,
+        "failed": 0
+      },
+      "reviewDecision": "REVIEW_REQUIRED",
+      "requestedReviewers": [
+        "all-hands-bot"
+      ],
+      "designReview": {
+        "url": "https://htmlpreview.github.io/?https://github.com/analisaperlengkapan/software-agent-sdk/blob/10bcfc30179d2338697377228f78975764dd024c/.pr/budget-design.html",
+        "productCodeCommit": "dceb668511cb6ccbc9e16dd3320b1a5d2019144b"
+      },
+      "documentationCompanion": {
+        "repository": "OpenHands/docs",
+        "pullRequest": "https://github.com/OpenHands/docs/pull/970",
+        "headRefOid": "4662e5ec98e67941fb0aa49b0b64c07ea3ca303a",
+        "status": "open; ready for review; PR checks passed; original bot review request preserved",
+        "latestChecks": {
+          "pass": 3,
+          "skip": 2,
+          "pending": 0,
+          "failed": 0
+        },
+        "reviewDecision": "REVIEW_REQUIRED",
+        "requestedReviewers": [
+          "all-hands-bot"
+        ]
+      }
     }
   }
 }

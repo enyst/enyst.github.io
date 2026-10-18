@@ -250,3 +250,24 @@ differ from the current meter's lifetime-cost/task-cap values; client and Canvas
 integration is still required. Live capture remains blocked by the normal local
 launcher memory guard. All 23 films, source
 snapshots and historical audit objects are preserved.
+
+## SDK admission repair and companion guide — 2026-10-18T05:43:29+00:00
+
+All 36 tracked Canvas proposals were rechecked: 33 merged, two open and
+non-draft, one draft. Their media and account prerequisites remain explicit.
+
+SDK [PR #5603](https://github.com/OpenHands/software-agent-sdk/pull/5603) is
+published at 10bcfc30179d2338697377228f78975764dd024c (product code dceb668511cb6ccbc9e16dd3320b1a5d2019144b).
+Local verification passed 122 focused and 1,725 broader LLM/local/remote
+conversation tests. Full exact-head CI is green and the initial bot review
+was requested after CI passed. Documentation companion
+[PR #970](https://github.com/OpenHands/docs/pull/970) is ready at
+4662e5ec98e67941fb0aa49b0b64c07ea3ca303a with green PR checks; its original
+bot request is preserved. The two unrelated docs sync workflow definitions
+still fail validation on unchanged docs main; those are not PR checks.
+
+The SDK proposal remains unmerged and unreleased. It does not populate
+`max_budget_per_task`; matching current-run usage snapshots in Agent Server
+REST/WebSocket metrics, followed by client and Canvas integration, are still
+required. Live meter capture remains blocked by the normal launcher memory
+guard. All 23 films, source assets, and historical lint audits are unchanged.
