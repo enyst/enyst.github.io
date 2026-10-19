@@ -355,3 +355,19 @@ is complete; the PR remains draft until its independent media/readiness update.
 all-hands-bot review requested. The scan #18643 remains approved; launcher
 #18645 retains its last Ubuntu-pending snapshot. All 24 prior films, historical
 audits, original 36-PR snapshot, budget work and launcher proof are unchanged.
+
+## Final readiness snapshot — 2026-10-19T02:43:28+00:00
+
+All four current PRs are ready, each with 13 checks passed and two skipped;
+there are no current failed or pending checks. Status colors #18641, chooser
+slides #18642 and independent launcher repair #18645 each have their initial
+all-hands-bot review requested and pending. The class-map scan #18643 remains
+approved at 65828a3d51 with no pending reviewer. All heads are unchanged.
+
+The 39-proposal lint cohort now contains 34 merged, four open non-draft and
+one draft. Launcher #18645 remains separate at 743f204fd4. Its capture run
+is fully stopped, all owned ports closed and private run state purged.
+Both published UI MP4s were independently served as HTTP 200 video/mp4 with
+SHA-256 values matching their manifests. All 25 main films, original 36 dated
+entries, historical audits, budget work, capture limits and media bytes remain
+unchanged. This update makes no PR changes or review requests.
