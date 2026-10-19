@@ -300,3 +300,15 @@ The cohort now contains 39 proposals: 34 merged, one open non-draft and four
 drafts. Only the three new entries were refreshed in this update; the original
 36 retain their 18 October status snapshot. Existing budget work, all 23 films,
 media hashes and recording source heads are preserved.
+
+## Class-map scan ready for review — 2026-10-19T01:46:02+00:00
+
+[#18643](https://github.com/OpenHands/OpenHands/pull/18643) is ready at
+`65828a3d51b91cc93ebdd3bb0519cdffd5a80b11`: all 13 current checks pass,
+two are skipped, and the initial all-hands-bot review is requested and pending.
+Its CI summary remains tooling evidence; no Canvas rendering claim is added.
+The cohort has 34 merged, two open non-draft and three draft proposals.
+The status-class and chooser-slide drafts still need matching live captures
+under the normal launcher memory guard. Their existing check snapshots, the
+original 36-PR snapshot, historical audits, budget work and all 23 films remain
+unchanged.
