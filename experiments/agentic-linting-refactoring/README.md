@@ -271,3 +271,32 @@ The SDK proposal remains unmerged and unreleased. It does not populate
 REST/WebSocket metrics, followed by client and Canvas integration, are still
 required. Live meter capture remains blocked by the normal launcher memory
 guard. All 23 films, source assets, and historical lint audits are unchanged.
+
+## Fresh main audit and three small drafts — 2026-10-19T01:21:26+00:00
+
+The new integrated-main audit at `83c9b64af66fae23a64aa07de6a3706cdab1144c`
+records zero errors and 616 warnings: 521 arbitrary values in 176 files,
+89 inline styles in 45 files, and six reported palette colors in two files.
+`main-lint-audit-2026-10-19-83c9b64af6.json` is the full public, relative-path audit.
+The original `lintAudit` and two older main audits remain unchanged.
+
+The reported six are not the complete color backlog. The proposed five-owner
+scan in [#18643](https://github.com/OpenHands/OpenHands/pull/18643) exposes
+34 additional genuine palette declarations, for 40 under that scope. The broad
+all-string probe's 46 includes six unrelated or valid-token findings. Seven
+exact legacy-token exceptions remain necessary, and arbitrary hexadecimal
+colors are owned by the separate arbitrary-value rule. No severity is promoted.
+
+[#18641](https://github.com/OpenHands/OpenHands/pull/18641) replaces four
+inline status colors with exact existing classes; 35 focused tests and local
+type/app/library checks pass.
+[#18642](https://github.com/OpenHands/OpenHands/pull/18642) moves two chooser
+slide styles to static utilities; 30 focused tests pass and a real recording
+is in progress. The five-owner scan passes five focused tests and changes no UI.
+All three remain draft: CI is running and description validation is red.
+No live affected-state pass is claimed from read-only API probes.
+
+The cohort now contains 39 proposals: 34 merged, one open non-draft and four
+drafts. Only the three new entries were refreshed in this update; the original
+36 retain their 18 October status snapshot. Existing budget work, all 23 films,
+media hashes and recording source heads are preserved.
