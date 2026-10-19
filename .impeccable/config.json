@@ -84,6 +84,24 @@
         ],
         "createdAt": "2026-10-19T01:14:21.982Z",
         "reason": "Agent verified imported brand.css body background #0f0f0e and card background #1a1a18. The detector assumes #ffffff after the nested CSS import: metadata text is 8.31:1 or 5.17:1 on the actual page, at least 4.70:1 on cards; strong text #f0ece4 also passes. Existing dark theme is unchanged."
+      },
+      {
+        "rule": "undersized-ui-text",
+        "value": "*",
+        "files": [
+          "arch/insider-cat.html"
+        ],
+        "createdAt": "2026-10-19T01:20:21.605Z",
+        "reason": "Codex verified CSS cascade: the page inline style follows arch.css and sets both table and th to 14px at equal specificity. The detector reports the earlier imported 0.88em times 0.78em instead. These overrides are unchanged from main a71a739."
+      },
+      {
+        "rule": "all-caps-body",
+        "value": "*",
+        "files": [
+          "arch/insider-cat.html"
+        ],
+        "createdAt": "2026-10-19T01:20:21.627Z",
+        "reason": "Codex verified CSS cascade: the page inline th rule follows arch.css and sets text-transform:none at equal specificity. The detector reports the earlier imported uppercase rule instead. This override is unchanged from main a71a739."
       }
     ]
   }
