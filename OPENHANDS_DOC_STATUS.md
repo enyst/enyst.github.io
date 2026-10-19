@@ -16,6 +16,11 @@ The linked issues and PRs own current CI/test status; physical-device audio rema
 
 ## Current explanations
 
+- [Automation profile launch](arch/automation-profile-launch.html): 19 October 2026
+  reading of automation #600's fourth design. Separates reported preset/profile-store
+  failures from proposed dispatch-time creation and the enterprise tools/secrets gate.
+  Public source contracts checked; no fresh live-run or deployment verification.
+
 - [Checking the Agent SDK from outside](arch/agent-sdk-external-contract.html):
   9 October 2026 snapshot of the merged external verifier, the confirmed manual
   Cloud run, and the controls needed before periodic checks. The Cloud
