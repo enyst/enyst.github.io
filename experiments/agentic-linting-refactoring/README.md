@@ -336,3 +336,22 @@ The independent launcher [#18645](https://github.com/OpenHands/OpenHands/pull/18
 remains draft, with 12 checks passed, one pending and two skipped in its last
 CI snapshot. Its capture run is fully stopped and all owned ports closed;
 only cleanup metadata changed in `macos-memory-source.json`.
+
+## Chooser film published; status colors ready — 2026-10-19T02:38:28+00:00
+
+The 25th main film, `backend-chooser-before-after.mp4`, preserves the full
+70.54-second desktop and phone recordings at 1× speed, adding short chapter
+cards, uniform letterboxing and tiny original ambience. The page has a
+same-origin MP4 download for Slack, an eight-second excerpt GIF, poster,
+captions and `backend-chooser-provenance.json`. All eight authentic originals
+are copied byte-for-byte under `backend-chooser-raw/`; reduced-motion clips
+are linked separately and clearly labelled. No credential, provisioning or
+managed-agent execution is claimed.
+
+Matching capture for [#18642](https://github.com/OpenHands/OpenHands/pull/18642)
+is complete; the PR remains draft until its independent media/readiness update.
+[#18641](https://github.com/OpenHands/OpenHands/pull/18641) is ready at
+6e93317744, with 13 current checks passed, two skipped and its initial
+all-hands-bot review requested. The scan #18643 remains approved; launcher
+#18645 retains its last Ubuntu-pending snapshot. All 24 prior films, historical
+audits, original 36-PR snapshot, budget work and launcher proof are unchanged.
