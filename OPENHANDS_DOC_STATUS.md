@@ -16,6 +16,12 @@ The linked issues and PRs own current CI/test status; physical-device audio rema
 
 ## Current explanations
 
+- [Keep DigitalOcean connected](arch/mars-signin-and-restore.html): 19 October 2026
+  proposal for shared OAuth with PKCE, platform-specific safe storage, lasting
+  browser-host sessions, and DO-aware recovery. Public DO metadata confirms
+  code/refresh/S256 capability; no live OAuth registration, exchange or restore
+  test was performed. Product changes remain proposed.
+
 - [Automation profile launch](arch/automation-profile-launch.html): 19 October 2026
   reading of automation #600's fourth design. Separates reported preset/profile-store
   failures from proposed dispatch-time creation and the enterprise tools/secrets gate.
