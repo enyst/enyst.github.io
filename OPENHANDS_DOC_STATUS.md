@@ -7,11 +7,11 @@ Beads owns task status; the site explains dated architecture, decisions and plan
 
 ## Insider Voice integration
 
-The 5 October 2026 maintenance pass follows SDK [#5180](https://github.com/OpenHands/software-agent-sdk/pull/5180),
+The 19 October 2026 source refresh follows SDK [#5180](https://github.com/OpenHands/software-agent-sdk/pull/5180),
 Canvas [#17558](https://github.com/OpenHands/OpenHands/pull/17558), and Insider [#2](https://github.com/enyst/insider/pull/2).
 [SDK issue #5515](https://github.com/OpenHands/software-agent-sdk/issues/5515) tracks the shared acceptance criteria;
 [Canvas issue #17557](https://github.com/OpenHands/OpenHands/issues/17557) tracks host behavior.
-[The Insider page](arch/insider-cat.html#october-validation) separates the fresh validation from September's provider observations.
+[The Insider page](arch/insider-cat.html#october-main-refresh) separates branch integration and automated checks from September's provider observations, and retains the earlier 5 October maintenance note.
 The linked issues and PRs own current CI/test status; physical-device audio remains a separate validation task.
 
 ## Current explanations
