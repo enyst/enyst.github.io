@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-19T02:43:28+00:00",
+  "checkedAt": "2026-10-19T03:12:57.226378+00:00",
   "displayTimeZone": "Europe/Stockholm",
   "main": "83c9b64af66fae23a64aa07de6a3706cdab1144c",
   "shadcnLintVersion": "0.2.1",
@@ -2020,22 +2020,35 @@
     {
       "number": 18641,
       "title": "refactor(theme): use status classes for icons and diff counts",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-19T03:12:40Z",
       "url": "https://github.com/OpenHands/OpenHands/pull/18641",
       "headRefOid": "6e93317744f6bbd07ab0c7af7512a9d452c2603e",
-      "reviewDecision": "REVIEW_REQUIRED",
-      "mergeCommit": null,
+      "reviewDecision": "APPROVED",
+      "mergeCommit": {
+        "oid": "2a0806d8200f6bce580c0c78f2c51483d8120a82"
+      },
       "mergeable": "MERGEABLE",
       "draft": false,
-      "requestedReviewers": [
+      "requestedReviewers": [],
+      "reviews": [
         {
-          "__typename": "User",
-          "login": "all-hands-bot"
+          "id": "PRR_kwDOLfkiw88AAAABS8oZLQ",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n**Scope.** Canvas-owned presentation change: three frontend files swap four inline `style={{ color: var(--oh-status-*) }}` writers for the existing `text-status-error` / `text-status-success` utilities. In scope for `OpenHands/OpenHands` per the ownership table; no server contract, dependency direction, or cross-repo work involved. Linked issue #18638 is open with `ready-for-dev` / `priority:low`, and this diff satisfies its acceptance criteria.\n\n**Verification on `6e93317744` (workspace, unmodified tracked files).**\n- Compiled `src/tailwind.css` with the repo's own `@tailwindcss/node` path (`__tests__/themes/tailwind-text-base.test.ts` harness) and confirmed the emitted utilities resolve to the same variables the inline styles used: `.text-status-error { color: var(--oh-status-error) }`, `.text-status-success { color: var(--oh-status-success) }`. The variable owner (`:root` / `[data-agent-server-ui]`, plus theme `applyColorTheme` overrides) is untouched, so host `--oh-status-*` overrides stay effective.\n- No competing color rule targets these elements: the `CircleX` icons carry only layout classes and the two diff-count spans carry only the status class, so dropping from inline style to a layered utility introduces no precedence regression. `react-hot-toast` renders the `Toaster` in-tree under `AgentServerUIRoot` (`src/root.tsx:110`) rather than through a portal, so the scoped `[data-agent-server-ui] .text-status-error` selector still matches the toast icon.\n- Focused tests: 47 passed across the error-banner, diff-row, toast-handler, and theme suites.\n- `style={{ color ... }}` is gone from all three source files, and `eslint.config.js` is unchanged (no new rule exception or severity change), which is what the issue's fourth criterion asked for.\n- CI on the exact head: `test-and-build (ubuntu)` / `(windows)`, lint, app and library builds, package check, and both `Validate PR description` re-runs are green. The single 01:17:30Z `Validate PR description` failure is stale and was resolved by the 02:33/02:35 re-runs after the body was updated.\n\n**Acceptance criteria.**\n- [x] Error banner and toast icons retain their themed error color \u2014 same variable, verified in compiled CSS and in the PR's before/after computed-RGB captures.\n- [x] Overview additions/deletions retain success/error colors \u2014 same, plus real +3/-1 counters in the captures.\n- [x] Existing host `--oh-status-*` overrides remain effective \u2014 the utility consumes the unchanged theme variable.\n- [x] Four static inline-color warnings eliminated without broad lint exceptions \u2014 no inline color left, no eslint config change.\n\n**Non-blocking note.** `__tests__/components/chat/error-message-banner.test.tsx` replaced the `toHaveStyle({ color: \"var(--oh-status-error)\" })` assertions with bare `toBeInTheDocument()` in three cases, so those now assert only icon presence while the sibling warning case (line 65) still asserts `toHaveClass(\"text-warning\")`. Asserting `toHaveClass(\"text-status-error\")` would keep a unit-level contract for the error-color path, consistent with the repo's functional-CSS-contract test convention. The color contract is independently covered here by the compiled-CSS check and the live captures, so this does not gate the merge.\n\nNo correctness, security, compatibility, or architecture concerns found; no model prompt, event, transport, or backend behavior is touched.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-19T03:07:29Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "6e93317744f6bbd07ab0c7af7512a9d452c2603e"
+          }
         }
       ],
-      "reviews": [],
-      "checkedAt": "2026-10-19T02:43:28+00:00",
+      "checkedAt": "2026-10-19T03:12:57.226378+00:00",
       "latestChecks": {
         "SUCCESS": 13,
         "SKIPPED": 2
@@ -2144,28 +2157,46 @@
         "film": "status-classes-before-after.mp4",
         "gif": "status-classes-before-after.gif",
         "source": "status-classes-source.json",
-        "reviewStatus": "Ready with 13 current checks passed and two skipped; initial all-hands-bot review requested and pending."
+        "reviewStatus": "all-hands-bot approved the exact head; a new independent risk review cleared it; all 13 effective checks passed and two skipped before the authorized squash merge."
+      },
+      "independentRiskReview": {
+        "verdict": "CLEAR",
+        "reviewedHead": "6e93317744f6bbd07ab0c7af7512a9d452c2603e",
+        "scope": "Supply-chain and prompt-injection risks; read-only review of the full diff by a new independent agent; no findings."
       }
     },
     {
       "number": 18642,
       "title": "refactor(backends): express chooser slides with static utilities",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-19T03:11:34Z",
       "url": "https://github.com/OpenHands/OpenHands/pull/18642",
       "headRefOid": "7dc9c74f930ac33eab56912b52ae3ea3afe6513a",
-      "reviewDecision": "REVIEW_REQUIRED",
-      "mergeCommit": null,
+      "reviewDecision": "APPROVED",
+      "mergeCommit": {
+        "oid": "319ea59b2e23a86308c6b10ba8352b1823a948ab"
+      },
       "mergeable": "MERGEABLE",
       "draft": false,
-      "requestedReviewers": [
+      "requestedReviewers": [],
+      "reviews": [
         {
-          "__typename": "User",
-          "login": "all-hands-bot"
+          "id": "PRR_kwDOLfkiw88AAAABS8oZ7w",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n**Verdict: \u2705 APPROVED** \u2014 value-preserving two-line styling refactor; belongs in this repository, all applicable checkpoints pass.\n\n### Scope and ownership\n`OpenHands/OpenHands` owns Agent Canvas UI. The change is confined to the presentational `AddBackendAddModeBody` chooser slide in `src/components/features/backends/backend-form-modal.tsx` (+2/\u22122), with no Agent Server contract, persisted state, or dependency change. No cross-repository or compatibility impact.\n\n### Technical verification (workspace, head `7dc9c74f93`)\n- **The transition still animates the new property.** The PR's key claim is that the installed Tailwind `transition-transform` covers `translate`. I compiled the pinned `tailwindcss@4.3.3` and confirmed the emitted rule is `transition-property: transform, translate, scale, rotate`, and that the three utilities emit the `translate` property (`-translate-x-full` \u2192 `--tw-translate-x: -100%`; `translate-x-0` \u2192 `0px`; `translate-x-full` \u2192 `100%`). The off-screen/on-screen values match the removed `translateX(\u00b1100% / 0%)` exactly, and `duration-300 ease-out motion-reduce:transition-none` is retained.\n- **State and structure preserved.** `aria-hidden`, `inert`, `pointer-events-none absolute inset-0`, and the focus effect (`add-backend-provider-digitalocean` / `add-backend-providers-back`) are untouched. The panes still carry no other transform/translate utility, so `tailwind-merge` cannot drop a conflicting class, and no global `translate`/`transform` rule competes with these nodes.\n- **Inline-style goal met.** Exactly one `style={{...}}` remains in the file (line 1205, the measured `AnimatedPanelHeight` height), consistent with the reported 3 \u2192 1 findings.\n- **Base behavior is the true baseline.** Blob hash of the changed file is `94c519f` at both `83c9b64a` (stated base) and `6e933177` (stated Before-capture commit), and `8a2f9f6` at the head \u2014 so the Before/After comparison is against byte-identical chooser source.\n\n### Evidence and CI\n- Video/GIF/poster/captions and `\u2026-provenance.json` all resolve (MP4 70.5s @1440\u00d71100; GIF 96 frames). Provenance records product source `7dc9c74f93` == PR head, real Agent Server 1.55.1, no credentials submitted, and separates the three verification-skill files from the product build. Motion behavior is shown by video, which is the right artifact type for a transition change.\n- All current checks on the head pass (`test-and-build (ubuntu)` and `(windows)`, `Validate PR description`, `Verify skill isolation`, `check-pr-artifacts`, image builds). The one earlier `Validate PR description` failure is stale; the current runs pass.\n- Locally, `src/components/features/backends` (11 tests) and `__tests__/components/backends` (173 tests) pass. Per the repo testing baseline, a class-string assertion here would be brittle presentation mirroring, so the absence of a new unit test is consistent with guidance.\n\n### Acceptance criteria (issue #18639)\n- [x] Provider select slides chooser out / provider in; Back restores it with the same 300 ms `ease-out` \u2014 classes map 1:1 to the removed inline transforms; shown in the video.\n- [x] Inactive panel keeps `aria-hidden` / `inert` / `pointer-events-none absolute inset-0`; visible panel stays interactive.\n- [x] Keyboard focus still lands on `add-backend-provider-digitalocean` then `add-backend-providers-back` (effect unchanged).\n- [x] Reduced motion respected \u2014 `motion-reduce:transition-none` retained; separate reduced-motion clips provided.\n- [x] Both fixed-transform inline-style findings removed; measured modal height and unrelated provider behavior unchanged.\n\nNo material correctness, security, compatibility, architecture, or evidence gaps found.\n\n\u2705 APPROVED\n",
+          "submittedAt": "2026-10-19T03:07:31Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "7dc9c74f930ac33eab56912b52ae3ea3afe6513a"
+          }
         }
       ],
-      "reviews": [],
-      "checkedAt": "2026-10-19T02:43:28+00:00",
+      "checkedAt": "2026-10-19T03:12:57.226378+00:00",
       "latestChecks": {
         "SUCCESS": 13,
         "SKIPPED": 2
@@ -2271,18 +2302,25 @@
         "film": "backend-chooser-before-after.mp4",
         "gif": "backend-chooser-preview.gif",
         "source": "backend-chooser-provenance.json",
-        "reviewStatus": "Ready with 13 current checks passed and two skipped; initial all-hands-bot review requested and pending."
+        "reviewStatus": "all-hands-bot approved the exact head; a new independent risk review cleared it; all 13 effective checks passed and two skipped before the authorized squash merge."
+      },
+      "independentRiskReview": {
+        "verdict": "CLEAR",
+        "reviewedHead": "7dc9c74f930ac33eab56912b52ae3ea3afe6513a",
+        "scope": "Supply-chain and prompt-injection risks; read-only review of the full diff by a new independent agent; no findings."
       }
     },
     {
       "number": 18643,
       "title": "chore(lint): report palette colors hidden in audited class maps",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-19T02:46:17Z",
       "url": "https://github.com/OpenHands/OpenHands/pull/18643",
       "headRefOid": "65828a3d51b91cc93ebdd3bb0519cdffd5a80b11",
       "reviewDecision": "APPROVED",
-      "mergeCommit": null,
+      "mergeCommit": {
+        "oid": "9f166c97fd88010d08c7678601c4ab3d36b936fe"
+      },
       "mergeable": "MERGEABLE",
       "draft": false,
       "requestedReviewers": [],
@@ -2303,7 +2341,7 @@
           }
         }
       ],
-      "checkedAt": "2026-10-19T02:43:28+00:00",
+      "checkedAt": "2026-10-19T03:12:57.226378+00:00",
       "latestChecks": {
         "SUCCESS": 13,
         "SKIPPED": 2
@@ -2410,7 +2448,7 @@
           "errors": 0,
           "warnings": 650
         },
-        "reviewStatus": "all-hands-bot approved the exact head; no pending reviewer."
+        "reviewStatus": "all-hands-bot approved the exact head; merged by the maintainer before the approval watch."
       }
     }
   ],
@@ -2701,7 +2739,7 @@
       "issue": "https://github.com/OpenHands/OpenHands/issues/18644",
       "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18645",
       "headRefOid": "743f204fd4c845a93d11fff3f8b973c65ecd6ade",
-      "status": "ready;13 current checks passed and two skipped; initial all-hands-bot review requested and pending",
+      "status": "merged after bot approval, a new independent risk review and green CI",
       "source": "macos-memory-source.json",
       "relationship": "Separate verification-skill prerequisite for matching captures on status classes #18641 and chooser slides #18642.",
       "guardOverrideUsed": false,
@@ -2716,16 +2754,16 @@
         "allRunPortsClosed": true,
         "privateStatePurged": true
       },
-      "state": "OPEN",
+      "state": "MERGED",
       "draft": false,
-      "reviewDecision": "REVIEW_REQUIRED",
+      "reviewDecision": "APPROVED",
       "requestedReviewers": [
         {
           "__typename": "User",
-          "login": "all-hands-bot"
+          "login": "neubig"
         }
       ],
-      "checkedAt": "2026-10-19T02:43:28+00:00",
+      "checkedAt": "2026-10-19T03:12:57.226378+00:00",
       "checkDetails": [
         {
           "name": "Verify skill isolation",
@@ -2817,7 +2855,33 @@
           "conclusion": "SKIPPED",
           "url": "https://github.com/OpenHands/OpenHands/actions/runs/39189462302/job/117858853384"
         }
-      ]
+      ],
+      "mergedAt": "2026-10-19T02:57:59Z",
+      "mergeCommit": {
+        "oid": "67ddddf7f4f051d43d5153dc9de0825e8219549c"
+      },
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABS8krnQ",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Summary\n\nScoped fix in the independent verification skill: `availableMemoryBytes()` now reads `process.availableMemory()` on Darwin before the `/proc/meminfo` / `os.freemem()` fallback. The default 2,000 MiB guard, the `--min-free-mb` override, and the Linux/non-Linux paths are untouched.\n\n## Scope\n\nOnly three files change, all under `.agents/skills/verify-openhands/` (`SKILL.md`, `control-openhands.mjs`, `control-openhands.test.mjs`). That matches the verify-skill isolation rule in `AGENTS.md` (a verify-skill PR may contain only verify-skill paths, `AGENTS.md`, and root `.pr/` evidence). No product source, backend contract, dependency, or feature-map change. Change belongs in this repository.\n\n## Verification performed on the head\n\n- Confirmed head `743f204fd4c845a93d11fff3f8b973c65ecd6ade`; all 15 non-skipped GitHub checks on that commit are `success` (`test-and-build (ubuntu)` and `(windows)`, `Verify skill isolation`, `Validate PR description`).\n- Ran the focused suite in the workspace: `npx vitest run .agents/skills/verify-openhands` -> 2 files, 99 passed, 1 skipped.\n- Confirmed the base function (`HEAD~1`) had no Darwin branch, so `os.freemem()` (unused pages only) drove the guard; the reported undercount is real.\n- Verified upstream semantics: libuv 1.52 `uv_get_available_memory` on darwin returns `free_count + inactive_count + purgeable_count`, while `uv_get_free_memory` returns only `free_count`; libuv 1.51 returned `uv_get_free_memory()`. This supports the SKILL.md claim about libuv >= 1.52 and the conservative older-runtime note.\n- Confirmed the direct `process.availableMemory()` call is safe at the launcher's supported floor: `cmdLaunch` enforces `nodeMajor() >= 24` before `availableMemoryBytes()` runs, and `process.availableMemory` is a writable/configurable own property of `process` on Node 24 (checked live).\n- Confirmed `availableMemoryBytes()` has exactly one caller (the `launch` preflight), so the new branch cannot change unrelated paths.\n- Confirmed no tracked files were modified during review.\n\n## Acceptance criteria (issue #18644)\n\n- [x] macOS with native available above 2,000 MiB while unused is below proceeds: Darwin case `freeMb: 300, availableMb: 8192` reaches the next prerequisite instead of exiting on memory.\n- [x] Available below threshold still exits 3 before services start: `availableMb: 1024` and `availableMb: 0` cases.\n- [x] `--min-free-mb` compared against available memory: `availableMb: 3000, --min-free-mb 4000` refused.\n- [x] Linux `MemAvailable` and the fallback preserved: both Linux cases (with and without `/proc/meminfo`) covered.\n- [x] Other platforms keep the `os.freemem()` fallback: `win32` case covered.\n- [x] Change stays within `.agents/skills/verify-openhands/`.\n- [x] `SKILL.md` memory wording matches the new behavior.\n\nThe new tests drive the real CLI entrypoint and preload only OS/FS memory inputs; the empty-`PATH` child stops at the missing `uvx` prerequisite, so they exercise the guard rather than a mock of it. No behavioral regression found in the changed branch or its side effects.\n\nNo material correctness, security, compatibility, or architecture findings.\n\n\u2705 APPROVED\n",
+          "submittedAt": "2026-10-19T02:53:25Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "743f204fd4c845a93d11fff3f8b973c65ecd6ade"
+          }
+        }
+      ],
+      "independentRiskReview": {
+        "verdict": "CLEAR",
+        "reviewedHead": "743f204fd4c845a93d11fff3f8b973c65ecd6ade",
+        "scope": "Supply-chain and prompt-injection risks; read-only review of the full diff by a new independent agent; no findings."
+      }
     }
   },
   "statusSnapshotCoverage": {
@@ -2828,6 +2892,46 @@
       18642,
       18643
     ],
-    "note": "All three new lint PRs and the separate launcher prerequisite were freshly verified ready with 13 checks passed and two skipped each. The scan is approved; the other three initial bot reviews are pending. Matching UI media is published. The original36 entries retain their dated snapshot; historical audits, budget work and media remain unchanged."
+    "note": "All three new lint PRs are merged. The maintainer merged #18643 before the watch. During the bounded watch, #18641, #18642 and the separate launcher #18645 each received bot approval, a new independent risk review with no findings, and ordinary green CI/merge gates before exact-head squash merges. Matching UI media is preserved. The original 36 entries retain their dated snapshot; historical audits and budget records are unchanged."
+  },
+  "approvalWatch": {
+    "startedAt": "2026-10-19T02:49:08Z",
+    "deadline": "2026-10-19T03:49:08Z",
+    "finishedAt": "2026-10-19T03:12:57.226378+00:00",
+    "status": "complete; stopped early because all targets merged; heartbeat paused",
+    "mergedByWatch": [
+      {
+        "number": 18645,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18645",
+        "reviewedHead": "743f204fd4c845a93d11fff3f8b973c65ecd6ade",
+        "mergeCommit": "67ddddf7f4f051d43d5153dc9de0825e8219549c",
+        "mergedAt": "2026-10-19T02:57:59Z",
+        "independentRiskVerdict": "CLEAR"
+      },
+      {
+        "number": 18642,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18642",
+        "reviewedHead": "7dc9c74f930ac33eab56912b52ae3ea3afe6513a",
+        "mergeCommit": "319ea59b2e23a86308c6b10ba8352b1823a948ab",
+        "mergedAt": "2026-10-19T03:11:34Z",
+        "independentRiskVerdict": "CLEAR"
+      },
+      {
+        "number": 18641,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18641",
+        "reviewedHead": "6e93317744f6bbd07ab0c7af7512a9d452c2603e",
+        "mergeCommit": "2a0806d8200f6bce580c0c78f2c51483d8120a82",
+        "mergedAt": "2026-10-19T03:12:40Z",
+        "independentRiskVerdict": "CLEAR"
+      }
+    ],
+    "alreadyMergedByMaintainer": [
+      {
+        "number": 18643,
+        "mergedAt": "2026-10-19T02:46:17Z",
+        "mergeCommit": "9f166c97fd88010d08c7678601c4ab3d36b936fe"
+      }
+    ],
+    "remainingTargets": []
   }
 }
