@@ -371,3 +371,66 @@ Both published UI MP4s were independently served as HTTP 200 video/mp4 with
 SHA-256 values matching their manifests. All 25 main films, original 36 dated
 entries, historical audits, budget work, capture limits and media bytes remain
 unchanged. This update makes no PR changes or review requests.
+
+## Fresh main audit and two palette batches — 20 October 2026
+
+The actual full lint command passes at exact main `8d39305538c1d17a30cbe477e57a0e18fcee7d95`:
+**0 errors and 645 warnings across 1,408 linted files**. The breakdown is
+522 arbitrary-value findings in 177 files, 83 inline-style findings in 42 files,
+and 40 palette findings in seven files. Another 47 hardcoded-color messages
+belong to the arbitrary-value total. Typecheck and formatting pass.
+`main-lint-audit-2026-10-20-8d39305538.json` preserves all active messages with relative paths, exact
+commands and runtime versions; its SHA-256 is
+`62315fdf08d20d0484ea2d180a94c5e393f4df3eb2f1a86cbe8aa3a857c84a0d`.
+The 616-warning audit at 83c9b64af6 remains unchanged dated history, alongside
+the earlier audits. The new proposals do not change that 645-warning main result.
+
+[#18694](https://github.com/OpenHands/OpenHands/pull/18694), issue
+[#18693](https://github.com/OpenHands/OpenHands/issues/18693), removes two fixed
+failure-dot palette classes at `123afde75d2c94caff4b3a0e31fae2b461d20857`. It is ready with eight checks
+passed, six skipped and its initial bot review requested. All 112 focused tests
+pass. The 54.2-second
+`health-dots-before-after.mp4`, silent GIF, poster, captions, source manifest
+and original-capture ZIP preserve the actual missing-command MCP and stopped
+secondary-backend paths. Forty paired captures span five themes and both
+viewports using Agent Server/SDK 1.56.0. Baseline contrast already passed 3:1;
+minimum sampled nontext contrast changes from 3.107 to 3.774:1. Eight superseded
+wrong-cause light-theme screenshots are explicitly excluded. No model turn,
+authenticated Cloud/ACP session or custom embedded-host visual pass is claimed.
+
+[#18696](https://github.com/OpenHands/OpenHands/pull/18696), issue
+[#18695](https://github.com/OpenHands/OpenHands/issues/18695), removes twenty
+palette warnings through five alert-owned roles at `e2c79483dd4fda6099686ee4b165d79cef4e5937`. Five families,
+labels, icons and parsing remain; quieter 5% tints and contrast body ink cover
+nested alerts. The actual Files prose regression first reproduced 3.376:1
+Solarized emphasis, then passed with scoped emphasis/headings/code/kbd/caption/
+marker roles; bold links retain link ink and ordinary Markdown is unchanged.
+All 69 focused tests and full local lint pass with 0 errors and 625 warnings.
+Independent implementation review is clear. Actual Before/After capture spans
+five themes, desktop/phone and agent chat, user Markdown and Files previews.
+The `markdown-alerts-*` film, GIF, poster, captions, provenance, paired matrix
+and 140-image evidence ZIP are assembled. The 53.8-second film is 1440 × 1120,
+with quiet original ambience. Selected live title/icon contrast improves from
+1.003:1 to at least 4.558:1; body/emphasis reaches at least 8.520:1 and links
+at least 4.848:1. Both platform jobs and media-description validation pass:
+eight checks passed and six skipped. The initial bot review is requested and
+pending; no approval or merge is claimed.
+
+Both capture stacks are stopped, all owned ports closed and private run state
+purged. Recording heads and final hashes belong to their source manifests.
+All 25 earlier films, their 50 MP4 download links, historical audits, original 39
+PR objects, budget records and completed approvalWatch are retained. The cohort
+currently has 41 proposals: 37 merged, 3 open non-draft and 1 draft. Both new
+proposals are ready with green current checks and their initial bot reviews
+requested. The existing non-draft budget policy case is separate from these
+two batches; the remaining draft requires authorized DigitalOcean evidence.
+
+Twelve start-task badge/indicator palette findings are currently unreachable
+through an ordinary Local or Cloud launch: `useStartTasks` returns `[]`, and
+its selector excludes READY/ERROR. Restoring real list data and deciding
+terminal-state visibility is separate product work before live evidence.
+Managed-agent focus retains its authorized DigitalOcean-resource prerequisite;
+budget-meter cleanup retains its existing description-policy gate and separate
+SDK/client/Canvas integration path. A next independent style candidate is the
+Markdown diff-preview's one 600 px `maxHeight` warning; preserve the shared
+`MAX_DIFF_EDITOR_HEIGHT_PX` owner and verify its real old/new view before changing it.
