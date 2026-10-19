@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-19T01:46:02+00:00",
+  "checkedAt": "2026-10-19T02:30:23+00:00",
   "displayTimeZone": "Europe/Stockholm",
   "main": "83c9b64af66fae23a64aa07de6a3706cdab1144c",
   "shadcnLintVersion": "0.2.1",
@@ -2194,8 +2194,12 @@
         "appBuild": "passed locally",
         "libraryBuild": "passed locally",
         "inlineWarningsRemoved": 4,
-        "liveAffectedStateVerified": false,
-        "note": "Exact existing --oh-status-error/success aliases replace inline colors. Live evidence is still pending; no UI redesign or color change is claimed."
+        "liveAffectedStateVerified": true,
+        "note": "Actual +3/-1 diff counts, actual 404 toast and genuine Agent Server disconnect preserve exact computed status colors before/after. Neutral and Light+ scoped live checks, with phone toast/error-icon checks. No five-theme or model-response success claim. GitHub draft/check state stays separately recorded.",
+        "matchingCaptureComplete": true,
+        "film": "status-classes-before-after.mp4",
+        "gif": "status-classes-before-after.gif",
+        "source": "status-classes-source.json"
       }
     },
     {
@@ -2383,18 +2387,29 @@
       "mergedAt": null,
       "url": "https://github.com/OpenHands/OpenHands/pull/18643",
       "headRefOid": "65828a3d51b91cc93ebdd3bb0519cdffd5a80b11",
-      "reviewDecision": "REVIEW_REQUIRED",
+      "reviewDecision": "APPROVED",
       "mergeCommit": null,
       "mergeable": "MERGEABLE",
       "draft": false,
-      "requestedReviewers": [
+      "requestedReviewers": [],
+      "reviews": [
         {
-          "__typename": "User",
-          "login": "all-hands-bot"
+          "id": "PRR_kwDOLfkiw88AAAABS8YPuQ",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nIn scope for this repository: the change is limited to `eslint.config.js`, an existing lint-contract test, and a contributor-skill doc. It alters lint analysis only \u2014 no product source, CSS, Tailwind theme, dependency, or feature-map change. Nothing here belongs in `software-agent-sdk`, `extensions`, or `automation`.\n\n## Verification performed on `65828a3d5`\n\n- Head still matches `65828a3d51b91cc93ebdd3bb0519cdffd5a80b11`; no earlier review by this account exists on this head, so this is not a duplicate pass.\n- Latest check runs for the head: 13 success, 2 skipped (cleanup/live-e2e), 0 failing. The earlier `Validate PR description` failure at 01:18Z was superseded by a success at 01:41Z after the body gained media.\n- `npx vitest run __tests__/scripts/raw-colors-lint.test.ts` \u2192 5/5 pass.\n- Real-config lint of the five adopted files reports exactly the 34 declarations the issue names (`blockquote.tsx` 20, `start-task-status-badge.tsx` 9, `start-task-status-indicator.tsx` 3, `backend-status-dot.tsx` 1, `mcp-server-health.tsx` 1); every message is a genuine raw-palette finding.\n- Non-adopted files are unchanged: `digitalocean-connect-panel.tsx` 4, `budget-progress-bar.tsx` 2, `modal-button.tsx` 0 \u2014 the six pre-existing warnings survive and no new ones appear outside the scope.\n- With the new override active, the seven legacy allow tokens and semantic tokens (`bg-surface`, `text-foreground`, `text-danger`, `bg-status-success`, \u2026) still produce 0 findings, and severity stays `1`.\n- Counterfactual on the new test's probe: `scanAllStrings` on \u2192 1 warning, off \u2192 0, so the added test genuinely exercises the config change rather than passing vacuously.\n\n## Acceptance criteria (#18640)\n\n- [x] Palette strings behind dynamic lookups in the five owners warn (34 findings reproduced).\n- [x] Declared semantic theme colors remain accepted.\n- [x] Severity stays `warn` (1) and the seven exact exceptions still suppress only those tokens.\n- [x] Unrelated union tags such as `text-like` in `modal-button.tsx` do not acquire warnings.\n- [x] Lint-analysis-only change; no product CSS, theme, runtime, dependency, or feature-map change.\n- [x] A lint test lints an adopted-path probe (asserts the palette warning) and a non-adopted-path probe (asserts no `text-like` warning).\n- [~] The `eslint.config.js` staged-rollout note: the intent is documented, but not in the location the criterion names. The PR adds a comment on the new override block and a section in `.agents/skills/frontend-development/references/guide.md`, while the existing rollout comment near the base `no-raw-colors` block (around line 414) is unchanged and the new inline comment does not itself say other map owners still need audit. Substance is covered by the guide; this is a documentation-placement deviation, non-blocking.\n\n## Notes (non-blocking)\n\n- The new override re-states `\"warn\"` for the rule in addition to sharing `legacyColorClasses`. If the base severity is ever promoted, the override would silently keep these five files at `warn`; worth a shared constant when severity is next touched, but not a defect today.\n- `scanAllStrings` will flag any literal in those five files that looks like a color utility. No such false positive exists at this head, and the PR deliberately scopes adoption to avoid the repo-wide `text-like` case, so the residual risk is the documented trade-off.\n\nThe change does what it claims, is correctly scoped, and its evidence is reproducible. No material correctness, security, compatibility, or architecture finding.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-19T02:07:57Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "65828a3d51b91cc93ebdd3bb0519cdffd5a80b11"
+          }
         }
       ],
-      "reviews": [],
-      "checkedAt": "2026-10-19T01:46:02+00:00",
+      "checkedAt": "2026-10-19T02:30:23+00:00",
       "latestChecks": {
         "SUCCESS": 13,
         "SKIPPED": 2
@@ -2501,7 +2516,7 @@
           "errors": 0,
           "warnings": 650
         },
-        "reviewStatus": "Initial all-hands-bot review requested after all current checks passed; review pending."
+        "reviewStatus": "all-hands-bot approved the exact proposal head 65828a3d51 on 19 October; no review request remains pending."
       }
     }
   ],
@@ -2792,10 +2807,22 @@
       "issue": "https://github.com/OpenHands/OpenHands/issues/18644",
       "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18645",
       "headRefOid": "743f204fd4c845a93d11fff3f8b973c65ecd6ade",
-      "status": "draft; local regression tests and real default-threshold launch passed; CI pending",
+      "status": "draft; local regression tests and real default-threshold launch passed; last CI snapshot: 12 passed, 1 pending, 2 skipped, no failures",
       "source": "macos-memory-source.json",
       "relationship": "Separate verification-skill prerequisite for matching captures on status classes #18641 and chooser slides #18642.",
-      "guardOverrideUsed": false
+      "guardOverrideUsed": false,
+      "latestChecks": {
+        "SUCCESS": 12,
+        "PENDING": 1,
+        "SKIPPED": 2,
+        "FAILURE": 0
+      },
+      "cleanup": {
+        "completed": true,
+        "launcherStopped": true,
+        "browserStopped": true,
+        "allRunPortsClosed": true
+      }
     }
   },
   "statusSnapshotCoverage": {
@@ -2804,6 +2831,6 @@
     "freshPullRequests": [
       18643
     ],
-    "note": "This refresh updates PR #18643 readiness, current checks and its existing initial bot review request. The other two new UI PR entries retain their 19 October 03:38 Stockholm snapshot and remain draft pending matching live captures. The original 36 entries retain the 18 October snapshot; their evidence and related budget work are unchanged."
+    "note": "This refresh records the approved class-map review and completed matching status-class capture. PR #18641 remains draft in its existing GitHub snapshot until its media/readiness update. PR #18642 retains its earlier draft snapshot while its film is being finished. The original 36 entries, historical audits and budget work are unchanged."
   }
 }

@@ -52,7 +52,7 @@
     "Older native runtimes may retain a conservative unused-memory reading.",
     "The failing preflight has no running-Canvas screenshot because it does not start the app.",
     "The after screenshot proves startup, not an LLM response or onboarding success.",
-    "The run is subsequently used for a separate status-class baseline capture and will be stopped afterward."
+    "The run was used for the separate status-class baseline capture and then fully stopped; the browser, launcher and all owned service ports were confirmed closed."
   ],
   "assets": [
     {
@@ -75,5 +75,17 @@
       "bytes": 1341,
       "sha256": "4494e3cbab3ee12da8c5d2fd88e2d3f4157903a1359d5bd4a8f79cde9b8619ea"
     }
-  ]
+  ],
+  "cleanup": {
+    "completed": true,
+    "browserStopped": true,
+    "launcherStopped": true,
+    "ports": {
+      "ingress": "closed",
+      "agentServer": "closed",
+      "automation": "closed",
+      "frontend": "closed",
+      "vscode": "closed"
+    }
+  }
 }

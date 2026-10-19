@@ -316,3 +316,23 @@ unchanged.
 ## 19 October 2026 — macOS verification launcher prerequisite
 
 PR [#18645](https://github.com/OpenHands/OpenHands/pull/18645), issue [#18644](https://github.com/OpenHands/OpenHands/issues/18644): original unused-memory guard refuses a real run despite native available memory above the unchanged 2,000 MiB threshold. Verification-only fix `743f204fd4c845a93d11fff3f8b973c65ecd6ade` passes 100 tests and launches the actual stack with doctor passing. `macos-memory-source.json` records original output, after doctor output, reviewed screenshot and exact hashes. UI captures can now proceed; CI remains pending. This prerequisite is outside the 39-proposal lint cohort.
+
+## Status-color film published and scan approved — 2026-10-19T02:30:23+00:00
+
+The 24th film, `status-classes-before-after.mp4`, shows the same colors before
+and after [#18641](https://github.com/OpenHands/OpenHands/pull/18641): actual
++3/-1 git counts, an actual 404 toast and a real backend-disconnection CircleX.
+It has clear Before/After labels, quiet original ambience, a same-origin MP4
+download for Slack, a silent GIF, poster and captions. `status-classes-source.json`
+records product heads 83c9b64af6/6e93317744 separately from the baseline
+verification harness 743f204fd4, both SDK 1.55.1 runs, crops, hashes and limits.
+Matching capture is complete, while the PR remains draft until its separate
+media/readiness update. Only the five approved film files were added.
+
+[#18643](https://github.com/OpenHands/OpenHands/pull/18643) now has all-hands-bot
+approval on 65828a3d51 and no pending reviewer. The original 36-PR snapshot,
+all historical audits, budget work and all 23 prior films remain unchanged.
+The independent launcher [#18645](https://github.com/OpenHands/OpenHands/pull/18645)
+remains draft, with 12 checks passed, one pending and two skipped in its last
+CI snapshot. Its capture run is fully stopped and all owned ports closed;
+only cleanup metadata changed in `macos-memory-source.json`.
