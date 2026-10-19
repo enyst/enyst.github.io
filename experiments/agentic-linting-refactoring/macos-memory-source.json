@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-19T02:20:44.808223+00:00",
+  "repository": "OpenHands/OpenHands",
+  "issue": 18644,
+  "pullRequest": 18645,
+  "baseCommit": "83c9b64af66fae23a64aa07de6a3706cdab1144c",
+  "fixCommit": "743f204fd4c845a93d11fff3f8b973c65ecd6ade",
+  "scope": "Independent verification-skill maintenance only; product sources unchanged from base.",
+  "environment": {
+    "os": "macOS27.0.1",
+    "node": "24.19.0",
+    "libuv": "1.52.1",
+    "physicalMemoryGiB": 24
+  },
+  "guard": {
+    "defaultMinimumMiB": 2000,
+    "overrideUsed": false
+  },
+  "before": {
+    "readingsAndActualOutput": "macos-memory-before.json",
+    "actualExitCode": 3,
+    "observation": "Native available memory exceeded the threshold, but the original guard used unused pages and refused before any services started."
+  },
+  "after": {
+    "nativeReadingBeforeLaunch": {
+      "at": "2026-10-19T02:18:19.662Z",
+      "node": "v24.19.0",
+      "libuv": "1.52.1",
+      "unusedBytes": 689061888,
+      "availableBytes": 8609562624
+    },
+    "actualLaunchExitCode": 0,
+    "doctor": "macos-memory-after-doctor.json",
+    "doctorPassed": true,
+    "screenshot": "macos-memory-launch-after.png",
+    "servedBuildFingerprint": "124ec80fd014f88b",
+    "backend": {
+      "agentServer": "1.55.1",
+      "automation": "1.20.1"
+    },
+    "observation": "Real isolated Agent Server, automation, frontend and ingress started with default threshold; doctor passed auth/health/build identity/browser checks."
+  },
+  "regressionChecks": {
+    "red": "Four Darwin cases failed before the one-line production change; Linux and fallback cases already passed.",
+    "green": "100/100 tests across the two verification JS suites.",
+    "syntaxAndDiff": "passed"
+  },
+  "limits": [
+    "Memory snapshots are adjacent measurements, not simultaneous or a guarantee of future capacity.",
+    "Native available memory is an estimate including reclaimable pages; memory-pressure percentages were not converted to bytes.",
+    "Older native runtimes may retain a conservative unused-memory reading.",
+    "The failing preflight has no running-Canvas screenshot because it does not start the app.",
+    "The after screenshot proves startup, not an LLM response or onboarding success.",
+    "The run is subsequently used for a separate status-class baseline capture and will be stopped afterward."
+  ],
+  "assets": [
+    {
+      "path": "macos-memory-launch-after.png",
+      "bytes": 99317,
+      "sha256": "a208accf4e3db9b8f5d7320046878264085752f355f199d85fdb7a91a45002eb"
+    },
+    {
+      "path": "macos-memory-before.json",
+      "bytes": 832,
+      "sha256": "e5fed1f5796d738ff6d0c263b973b917c1f6c9631022afeb80c483bece019086"
+    },
+    {
+      "path": "macos-memory-before.txt",
+      "bytes": 243,
+      "sha256": "bd4d80916a7ec1c24e6fb8c056c2f10d300c00a4214e861215610d39c027fe5e"
+    },
+    {
+      "path": "macos-memory-after-doctor.json",
+      "bytes": 1341,
+      "sha256": "4494e3cbab3ee12da8c5d2fd88e2d3f4157903a1359d5bd4a8f79cde9b8619ea"
+    }
+  ]
+}

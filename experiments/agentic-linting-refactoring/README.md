@@ -312,3 +312,7 @@ The status-class and chooser-slide drafts still need matching live captures
 under the normal launcher memory guard. Their existing check snapshots, the
 original 36-PR snapshot, historical audits, budget work and all 23 films remain
 unchanged.
+
+## 19 October 2026 — macOS verification launcher prerequisite
+
+PR [#18645](https://github.com/OpenHands/OpenHands/pull/18645), issue [#18644](https://github.com/OpenHands/OpenHands/issues/18644): original unused-memory guard refuses a real run despite native available memory above the unchanged 2,000 MiB threshold. Verification-only fix `743f204fd4c845a93d11fff3f8b973c65ecd6ade` passes 100 tests and launches the actual stack with doctor passing. `macos-memory-source.json` records original output, after doctor output, reviewed screenshot and exact hashes. UI captures can now proceed; CI remains pending. This prerequisite is outside the 39-proposal lint cohort.
