@@ -388,7 +388,7 @@ the earlier audits. The new proposals do not change that 645-warning main result
 [#18694](https://github.com/OpenHands/OpenHands/pull/18694), issue
 [#18693](https://github.com/OpenHands/OpenHands/issues/18693), removes two fixed
 failure-dot palette classes at `123afde75d2c94caff4b3a0e31fae2b461d20857`. It is ready with eight checks
-passed, six skipped and its initial bot review requested. All 112 focused tests
+passed, six skipped and all-hands-bot approval at this exact head. The PR remains open. All 112 focused tests
 pass. The 54.2-second
 `health-dots-before-after.mp4`, silent GIF, poster, captions, source manifest
 and original-capture ZIP preserve the actual missing-command MCP and stopped
@@ -421,8 +421,8 @@ purged. Recording heads and final hashes belong to their source manifests.
 All 25 earlier films, their 50 MP4 download links, historical audits, original 39
 PR objects, budget records and completed approvalWatch are retained. The cohort
 currently has 41 proposals: 37 merged, 3 open non-draft and 1 draft. Both new
-proposals are ready with green current checks and their initial bot reviews
-requested. The existing non-draft budget policy case is separate from these
+proposals are ready with green current checks. All-hands-bot approved the health
+dots at exact `123afde75d`; its initial Markdown review is pending. The existing non-draft budget policy case is separate from these
 two batches; the remaining draft requires authorized DigitalOcean evidence.
 
 Twelve start-task badge/indicator palette findings are currently unreachable
