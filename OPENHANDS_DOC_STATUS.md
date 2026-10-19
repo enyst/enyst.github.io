@@ -22,6 +22,14 @@ The linked issues and PRs own current CI/test status; physical-device audio rema
   code/refresh/S256 capability; no live OAuth registration, exchange or restore
   test was performed. Product changes remain proposed.
 
+- [People sign in, agents use keys](arch/digitalocean-sign-in-and-agent-keys.html):
+  19 October 2026 proposal for one host-side DigitalOcean bridge (desktop and
+  browser), OAuth with PKCE kept in the OS keychain, and scoped Canvas agent
+  keys. Today's browser behavior was driven live with `control-openhands` at
+  8d39305 (restart signs you out); connecting a session was blocked in the
+  sandbox and no OAuth exchange was run. Reconciled with
+  [Keep DigitalOcean connected](arch/mars-signin-and-restore.html).
+
 - [Automation profile launch](arch/automation-profile-launch.html): 19 October 2026
   reading of automation #600's fourth design. Separates reported preset/profile-store
   failures from proposed dispatch-time creation and the enterprise tools/secrets gate.
