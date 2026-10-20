@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"smolpaws","llm":null,"date":"2026-10-19","role":"author"},{"agent":"claude-code","llm":null,"date":"2026-10-19","role":"author"},{"agent":"claude-code","llm":null,"date":"2026-10-20","role":"editor"}]} -->
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"smolpaws","llm":null,"date":"2026-10-19","role":"author"},{"agent":"claude-code","llm":null,"date":"2026-10-19","role":"author"},{"agent":"claude-code","llm":null,"date":"2026-10-20","role":"editor"},{"agent":"smolpaws","llm":null,"date":"2026-10-20","role":"editor"}]} -->
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Keep DigitalOcean connected · Engel’s Notebook</title>
 <meta name="description" content="One design for DigitalOcean in Agent Canvas: sign in with OAuth and stay signed in across restarts, one bridge for the desktop app and the browser, safe restore of the selected session, and agents using the Canvas key. Plain-language summary, UX mockups, code plan and live checks.">
@@ -113,8 +113,9 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <main>
 <header>
 <div class="eyebrow">Agent Canvas · DigitalOcean · design proposal · 20 October 2026</div>
+<div class="eyebrow" style="margin-top:16px;font-size:15px">People log in. Agents use keys.</div>
 <h1>Keep DigitalOcean connected.</h1>
-<p class="lede">A normal restart shouldn’t ask you to sign in again, or change which DigitalOcean session you had open. One bridge on the machine that runs Canvas holds the connection, for the desktop app, the browser, and the agents that hold the Canvas key.</p>
+<p class="lede">Choose DigitalOcean, sign in, and open your session. On an iPad, sign in to approve that browser too. A normal restart keeps your place. Agents use the existing Canvas session key for now; people should not copy that key to finish a DO login.</p>
 <div class="chips"><span class="chip">Merged from two proposals · smolpaws and Claude Code</span><span class="chip">Today’s behavior checked live · revision 8d39305</span><span class="chip">Proposal · nothing implemented</span></div>
 <div class="brief"><div class="label">In short · decided 20 October</div>
 <ul class="brief-list">
@@ -122,8 +123,10 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <li>Canvas keeps that sign-in in the Keychain (or the Windows or Linux equivalent) on the machine that runs Canvas.</li>
 <li>The desktop app and the browser work the same way, through one bridge.</li>
 <li>After a restart, Canvas reopens the DigitalOcean session you had open. If something is missing, it says what, and keeps your selection.</li>
-<li>Agents use the Canvas key they already have. It can do everything, for now. Three small fixes make it work fully.</li>
+<li>Agents use the existing Canvas session key. Treat it as an admin key. No new key types or permission levels in this release.</li>
+<li>New-browser sign-in must also approve access to this Canvas host. The owner check and a working return path are release checks, not assumed solved.</li>
 </ul></div>
+<div class="note"><p><strong>The user experience comes first.</strong> DigitalOcean should be the easiest backend to connect and restore. Keep ordinary backends’ own keys unchanged. For DO, make login the normal action. Keep saved sessions, accounts and conversations intact. Show one useful next step when a connection fails.</p></div>
 <p class="small">This page merges smolpaws’s <em>Keep DigitalOcean connected</em> and Claude Code’s <em>People sign in, agents use keys</em>, both written on 19 October, with Engel’s decisions from the next day. Their earlier versions are linked under <a href="#evidence">Evidence</a>.</p>
 </header>
 
@@ -132,7 +135,7 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <div class="terms">
 <div class="term"><span class="sym">01</span><b>Canvas host</b><p>The computer that runs Canvas: your Mac with the desktop app, or a Mac mini, Linux box or container running <code>npx @openhands/agent-canvas</code>.</p></div>
 <div class="term"><span class="sym">02</span><b>Bridge</b><p>Code on the Canvas host. It calls DigitalOcean and keeps the connection to your sessions open.</p></div>
-<div class="term"><span class="sym">03</span><b>Session key</b><p>The Canvas host’s own key. It unlocks all of Canvas, the bridge included. The desktop app and a browser on the same machine receive it automatically.</p></div>
+<div class="term"><span class="sym">03</span><b>Session key</b><p>The existing admin key accepted by the Canvas host’s protected routes, including its bridge. It is not a DO token or a guest Agent Server key. The local launcher can supply it automatically; other backends keep their own keys.</p></div>
 <div class="term"><span class="sym">04</span><b>DO session</b><p>A running sandbox on DigitalOcean with its own Agent Server. MARS is the integration’s internal name.</p></div>
 <div class="term"><span class="sym">05</span><b>Backend</b><p>A saved destination in Canvas. A DigitalOcean backend points at one DO session through the bridge.</p></div>
 <div class="term"><span class="sym">06</span><b>OAuth</b><p>You approve access on DigitalOcean’s own page, and DigitalOcean gives the host a token: a secret that grants limited permission.</p></div>
@@ -140,9 +143,9 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <div class="term"><span class="sym">08</span><b>Safe storage</b><p>The operating system’s protected secret store: Keychain on macOS, Credential Manager on Windows, Secret Service on Linux desktops.</p></div>
 </div>
 <div class="grid" style="margin-top:18px">
-<article class="card"><div class="label">Permission A · browsers and agents</div><h3>May this caller use this Canvas host?</h3><p>The host checks the session key. A browser then keeps a cookie derived from that key, so a restart doesn’t sign it out; rotating the key signs out every browser. Agents present the same key.</p></article>
-<article class="card"><div class="label">Permission B · the host</div><h3>May this host use this DigitalOcean account?</h3><p>DigitalOcean checks an OAuth token or a personal token. The bridge holds it in safe storage. It never reaches a page, an agent, or the Agent Server inside the DO session.</p></article></div>
-<div class="note"><p><strong>OAuth replaces typing a DigitalOcean token. It doesn’t replace protecting the host.</strong> Whoever has permission A can use permission B. A Canvas host reachable over a network still needs its session key kept private, and ideally HTTPS.</p></div>
+<article class="card"><div class="label">Permission A · caller → Canvas host</div><h3>May this caller use this bridge?</h3><p>Today the bridge checks the Canvas session key or its cookie. In the proposed people flow, a successful DO login by the approved owner also earns a browser cookie. Agents keep presenting the existing session key. The cookie is for <code>/mars</code>; it does not change other backends’ keys.</p></article>
+<article class="card"><div class="label">Permission B · the host</div><h3>May this host use this DigitalOcean account?</h3><p>DigitalOcean checks an OAuth token or a personal token. The bridge holds it in safe storage. An OAuth grant is not returned to the page or an agent, and is never forwarded to the Agent Server inside DO. Manual token entry remains an advanced fallback.</p></article></div>
+<div class="note"><p><strong>OAuth replaces typing a DigitalOcean token. It doesn’t replace protecting the host.</strong> Only an approved caller may use the saved DO connection. A different person’s successful DO login must not unlock this host. Keep the session key private and use HTTPS or a protected network.</p></div>
 </section>
 
 <section id="today"><span class="label">02 / What happens today · checked on 19 October</span>
@@ -179,8 +182,8 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 
 <section id="model"><span class="label">03 / One bridge</span>
 <h2>One host holds the keys. Everyone else asks it.</h2>
-<p>The <strong>Canvas host</strong> is the machine running Canvas: the desktop app on your Mac, or <code>npx @openhands/agent-canvas</code> on a Mac mini, a Linux box or a container. It is the only place a DigitalOcean credential exists.</p>
-<figure class="desktop-flow"><svg viewBox="0 0 880 476" role="img" aria-labelledby="mtitle mdesc"><title id="mtitle">Who talks to whom</title><desc id="mdesc">People in a browser or the desktop app reach the Canvas host with the Canvas session key, and approve Canvas on DigitalOcean once. Agents near the host reach it with the same session key. The Canvas host exchanges and refreshes the DigitalOcean grant, keeps it in the keychain, calls harness-api and tunnels to sessions. Agents elsewhere use their own DigitalOcean token directly.</desc>
+<p>The <strong>Canvas host</strong> is the machine running Canvas: the desktop app on your Mac, or <code>npx @openhands/agent-canvas</code> on a Mac mini, a Linux box or a container. It is the only Canvas component that keeps the DigitalOcean credential. The optional direct-DO path for outside agents uses their own credentials.</p>
+<figure class="desktop-flow"><svg viewBox="0 0 880 476" role="img" aria-labelledby="mtitle mdesc"><title id="mtitle">Who talks to whom</title><desc id="mdesc">People sign in with DigitalOcean and receive a browser cookie after the host approves their identity. Agents reach the host with the existing Canvas session key. The Canvas host exchanges and refreshes the DigitalOcean grant, keeps it in the keychain, calls harness-api and tunnels to sessions. Agents elsewhere use their own DigitalOcean token directly.</desc>
 <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10" fill="none" stroke="#345a40" stroke-width="1.6"/></marker><marker id="arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10" fill="none" stroke="#2f5a8a" stroke-width="1.6"/></marker></defs>
 <rect x="1" y="1" width="878" height="474" rx="5" fill="#fffefb" stroke="#d9ddd0"/>
 <text x="300" y="22" font-size="11.5" fill="#2f5a8a">approve on DigitalOcean (once, in the browser)</text>
@@ -193,7 +196,7 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <text x="324" y="50" font-size="11" fill="#61675e">CANVAS HOST · ONE BRIDGE</text><text x="324" y="74" font-size="17" font-weight="600">Canvas server</text>
 <g font-size="13"><rect x="322" y="88" width="230" height="38" rx="4" fill="#fffefb" stroke="#c9d4c0"/><text x="334" y="112">Sign-in · OAuth + PKCE, refresh</text>
 <rect x="322" y="134" width="230" height="38" rx="4" fill="#fffefb" stroke="#c9d4c0"/><text x="334" y="158">OS keychain · DigitalOcean grants</text>
-<rect x="322" y="180" width="230" height="38" rx="4" fill="#fffefb" stroke="#c9d4c0"/><text x="334" y="204">Sandbox prep · every connect</text>
+<rect x="322" y="180" width="230" height="38" rx="4" fill="#fffefb" stroke="#c9d4c0"/><text x="334" y="204">Sandbox prep · if still needed</text>
 <rect x="322" y="226" width="230" height="58" rx="4" fill="#fffefb" stroke="#c9d4c0"/><text x="334" y="250">Tunnels + session proxy</text><text x="334" y="269" font-size="11.5" fill="#61675e">/mars/sessions/&lt;id&gt;/…</text></g>
 <rect x="668" y="24" width="190" height="392" rx="6" fill="#e7eef7" stroke="#9fb4d1"/>
 <text x="684" y="50" font-size="11" fill="#61675e">DIGITALOCEAN</text>
@@ -201,8 +204,8 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <rect x="682" y="128" width="162" height="50" rx="4" fill="#fffefb" stroke="#bccbe0"/><text x="694" y="150">harness-api</text><text x="694" y="168" font-size="11" fill="#61675e">/v2/agents/*</text>
 <rect x="682" y="192" width="162" height="72" rx="4" fill="#fffefb" stroke="#bccbe0"/><text x="694" y="214">Sessions</text><text x="694" y="232" font-size="11" fill="#61675e">an Agent Server in</text><text x="694" y="247" font-size="11" fill="#61675e">each sandbox</text></g>
 <g font-size="11.5" fill="#345a40">
-<path d="M210 65 H306" stroke="#345a40" stroke-width="2" marker-end="url(#ar)" fill="none"/><text x="222" y="58">session key</text>
-<path d="M210 143 H306" stroke="#345a40" stroke-width="2" marker-end="url(#ar)" fill="none"/><text x="222" y="136">same key</text>
+<path d="M210 65 H306" stroke="#345a40" stroke-width="2" marker-end="url(#ar)" fill="none"/><text x="222" y="58">login / cookie</text>
+<path d="M210 143 H306" stroke="#345a40" stroke-width="2" marker-end="url(#ar)" fill="none"/><text x="222" y="136">login / cookie</text>
 <path d="M210 250 H306" stroke="#345a40" stroke-width="2" marker-end="url(#ar)" fill="none"/><text x="222" y="243">session key</text>
 <path d="M568 98 H682" stroke="#345a40" stroke-width="2" marker-end="url(#ar)" fill="none"/><text x="578" y="91">code, refresh</text>
 <path d="M568 153 H682" stroke="#345a40" stroke-width="2" marker-end="url(#ar)" fill="none"/><text x="578" y="146">access token</text>
@@ -211,22 +214,22 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <path d="M210 390 H760 V264" stroke="#2f5a8a" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arb)" fill="none"/><text x="300" y="382" font-size="11.5" fill="#2f5a8a">its own DigitalOcean token, direct (doctl, port-forward)</text>
 </g>
 <path d="M116 70 V30 H812 V97" stroke="#2f5a8a" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arb)" fill="none"/>
-</svg><figcaption>Solid lines carry the Canvas session key or the host’s own calls; dashed lines go straight to DigitalOcean. The DigitalOcean grant never leaves the green box.</figcaption></figure>
+</svg><figcaption>People use login and cookies; agents use the Canvas session key. Dashed lines go straight to DigitalOcean. This diagram shows the proposed flow, not today’s browser-login support. The DigitalOcean grant never leaves the green box.</figcaption></figure>
 <ol class="steps mobile-flow">
-<li><strong>People</strong> (browser or desktop app) reach the Canvas host with the Canvas session key. They approve Canvas on DigitalOcean once.</li>
+<li><strong>People</strong> sign in with DigitalOcean. The host admits only its approved owner and gives the browser a cookie. A new browser signs in too.</li>
 <li><strong>The Canvas host</strong> keeps the DigitalOcean grant in the OS keychain, refreshes it, and opens tunnels to sessions.</li>
 <li><strong>Agents near Canvas</strong> reach the host with the same session key and work in sessions through its proxy.</li>
 <li><strong>Agents elsewhere</strong> use their own DigitalOcean token with DigitalOcean directly. Canvas isn’t involved.</li>
 </ol>
 <h3>Five rules the code keeps</h3>
 <ol class="rules">
-<li><strong>DigitalOcean tokens stay in the host process.</strong> No page, agent, log line or RPC response carries one.</li>
+<li><strong>DigitalOcean tokens stay in the host process.</strong> No saved grant is returned to a page, agent, log line or RPC response. The optional personal-token fallback accepts a token once, then stores it on the host.</li>
 <li><strong>Secrets go in the OS keychain, and descriptions go in a file.</strong> When a host has no keychain, Canvas says where it keeps the sign-in instead of pretending.</li>
 <li><strong>One bridge serves the desktop app and the browser.</strong> Electron stops running its own.</li>
-<li><strong>The session key is all of Canvas, and the docs say so.</strong> Whoever holds it, a person’s browser or an agent, can also use the host’s DigitalOcean connection: list, start, connect, pause and stop sessions.</li>
-<li><strong>Canvas dials only what someone is using.</strong> Every probe counts as sandbox activity and keeps a sandbox awake, and billing. So, as today, nothing polls sessions in the background.</li>
+<li><strong>The existing session key has admin access, and the docs say so.</strong> An agent holding it can also use the host’s DigitalOcean connection: list, start, connect, pause and stop sessions. No extra permissions system is proposed.</li>
+<li><strong>Canvas dials only what someone is using.</strong> Do not assume a probe is free: traffic to a sandbox can keep it awake and billing. Do not reconnect or poll every saved session in the background.</li>
 </ol>
-<div class="note"><p><strong>The sign-in belongs to the host, not to a browser tab.</strong> Every browser that holds this Canvas’s session key uses the host’s DigitalOcean sign-in. That is already true today, in memory. Keeping it in the keychain makes it last, so the UI names the host it lives on.</p></div>
+<div class="note"><p><strong>The sign-in belongs to the host, not to a browser tab.</strong> Today, a browser with the host key or cookie can use the host’s in-memory DO connection. The target adds DO login for an approved new browser, without key entry. Saving the DO grant makes it last across restarts. Each view names the host that holds it.</p></div>
 </section>
 
 <section id="people"><span class="label">04 / Signing in · proposed</span><span id="oauth"></span>
@@ -241,6 +244,11 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <li><strong>Renew access before it expires.</strong> One renewal at a time per connection. Save the replacement pair together. If DigitalOcean refuses a renewal, keep the selected DO session and ask for sign-in (screen E).</li>
 </ol>
 
+<h3 id="new-browser">New browser: sign in again, not “paste the Canvas key”.</h3>
+<p>On an iPad, choose DigitalOcean and click sign-in. Approve on DO. Canvas checks that this is its approved owner, then gives this browser a <code>/mars</code> cookie. If DO already knows you, this may be only a few clicks. Otherwise DO asks you to log in.</p>
+<div class="note warn"><p><strong>DO login is not an open invitation to this host.</strong> Someone else can log in to their own DO account. They must not gain access to this host’s saved connection. Record the allowed owner during trusted first setup. Check a stable DO owner identity and the approved team on return; team membership alone is not enough. If DO’s reply cannot prove the owner identity, require approval from an already trusted browser or on the host. Test this before claiming new-browser login is complete.</p></div>
+<p>The public sign-in-start route may create only a short-lived login attempt. It cannot list sessions, return saved account details, or change a working connection. Apply a request limit. Keep attempt status private to the starter: an attempt ID alone is not access to the result. Management routes remain protected. A wrong account, cancelled login or failed save leaves the existing DO connection untouched.</p>
+<p><strong>First setup is different from another browser.</strong> A local setup action or one-time host approval claims the owner. Do not let the first stranger who reaches an unclaimed network host become its owner. Ordinary local or remote Agent Server backends still use their own keys; DO login does not grant access to those backends.</p>
 <h3>What people see</h3>
 <p>The same screens appear in the desktop app and the browser. The sign-in button comes first. The token field moves behind a disclosure, for organizations that don’t allow third-party apps. Every signed-in view says where the sign-in is kept.</p>
 <div class="mocks">
@@ -261,7 +269,7 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <div class="m-label">Address of the page that didn’t load</div>
 <div class="m-field">http://127.0.0.1:8000/mars/oauth/callback?code=…&amp;state=…</div>
 <span class="m-btn m-primary">Finish sign-in</span></div>
-<figcaption><b>C · Another computer (later).</b> Only after a test shows DigitalOcean’s code survives a copy-and-paste round trip. Until then, a remote browser uses a token, with the plain-HTTP warning below.</figcaption></figure>
+<figcaption><b>C · Possible fallback, not the target UX.</b> Prefer a working HTTPS return or a protected forward. Test any copy-and-paste flow before offering it; never present a broken loopback redirect as successful login.</figcaption></figure>
 <figure class="mockfig"><div class="mock" role="img" aria-label="Mock: signed in, listing OpenHands agents, with team, email and storage location">
 <div class="m-list"><div class="m-list-head">OpenHands agents <span>+ New Agent · ⟳</span></div>
 <div class="m-item"><span class="m-ava">P</span><div><b>pr18604-live</b><small>1 session · Yesterday</small></div></div>
@@ -288,16 +296,16 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <div id="rcase" aria-live="polite" aria-atomic="true"><div class="trace"><div><span>Page address</span><b id="r-origin">http://127.0.0.1:8000</b></div><div><span>redirect_uri</span><b id="r-uri">http://127.0.0.1:8000/mars/oauth/callback</b></div><div><span>OAuth client</span><b id="r-client">Any client with a loopback callback (loopback matches any port)</b></div></div>
 <p id="r-verdict" class="verdict">One click. The callback lands on Canvas itself. This ships first.</p>
 <p id="r-explain" class="small">This covers the desktop app, a browser on the Canvas machine, and SSH port forwarding: there, the page address is loopback on your laptop and the forward carries the callback home.</p></div></div>
-<noscript><p>The three cases: on the same computer the callback is the page’s own loopback address, so one click finishes; this ships first. A Canvas served over HTTPS could register its own callback with DigitalOcean, if DigitalOcean accepts that for a self-registered client; until a test shows it, it uses a token. A browser on another computer over plain HTTP uses a token at first; after a test, it can paste the address of the callback page that didn’t load.</p></noscript>
+<noscript><p>The target is DO login on each device. On the same computer, a loopback return can work. On an iPad, the return must reach the Canvas host, usually through a configured HTTPS address. Verify registration and the return path before enabling that option. A token remains an explicit fallback while unsupported setups are clearly labelled; it is not the completed new-browser experience.</p></noscript>
 <div class="note warn"><p><strong>Plain HTTP gets a warning, not a block.</strong> Paste-back only changes where DigitalOcean’s reply goes. It doesn’t make the connection safe. But Canvas can’t tell a safe network from an open one. And on an open network the session key is already exposed, which matters more.</p><p>Today, such a person would paste a long-lived token over that same link. A pasted code works once, and is useless without the proof that stays on the host. So Canvas warns on every plain-HTTP page from another address, and suggests HTTPS, a tailnet or an SSH tunnel.</p></div>
 
 <details><summary>Registering the OAuth client</summary><p>DigitalOcean says public clients are “typically” created through its registration endpoint (<code>/v1/oauth/register</code>), which never returns a client secret. So OpenHands registers one public client that way, with loopback callbacks, and ships its client ID in <code>config/defaults.json</code>; <code>DO_OAUTH_CLIENT_ID</code> overrides it. The separate registration-management secret stays with the maintainers. Hosts don’t register a new client on every restart.</p><p>Later, a self-hosted Canvas behind HTTPS may register its own client with its configured HTTPS callback, if DigitalOcean accepts that. Never put a client secret in shipped JavaScript or a desktop binary; a centrally operated web service could hold one, but Canvas isn’t that.</p></details>
 <details><summary>Callback checks</summary><ul class="compact">
-<li>Start sign-in only from an authenticated, same-origin request: the RPC that carries the session key.</li>
+<li>Starting sign-in may be public, but only through a same-origin, rate-limited login route. It creates a temporary attempt and grants no access. Already admitted callers can also start sign-in through the existing RPC. Admit the browser only after the owner check; never return the host key to the page.</li>
 <li>Bind the attempt to the browser that started it with a short-lived, HttpOnly attempt cookie, <code>SameSite=Lax</code> so it survives the return from DigitalOcean; the normal bridge cookie stays <code>Strict</code>. The desktop app’s return arrives in the system browser, which has no such cookie. There, <code>state</code> plus PKCE carry it, the native-app pattern of RFC 8252.</li>
 <li>The callback route is reachable before the normal bridge checks, but must pass its own one-time checks: single-use <code>state</code>, 10-minute expiry, <code>redirect_uri</code> pinned per attempt. Use the configured origin and path prefix; don’t trust an arbitrary <code>Host</code> header.</li>
 <li>Keep tokens out of URLs, logs and localStorage. Remove the code from the address bar after the exchange. Load no third-party content on the callback page.</li>
-<li>Show success only after the exchange, the access check and the safe save complete. A cancelled, expired or replayed attempt leaves the old connection unchanged.</li>
+<li>Show success only after the exchange, owner and team checks, access check and safe save complete. Issue the browser cookie only then. A cancelled, expired or replayed attempt leaves the old connection unchanged.</li>
 </ul></details>
 
 <h3>Copy that changes</h3>
@@ -308,7 +316,7 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <tr><td>Account line</td><td>“DigitalOcean token”</td><td>“My Team · you@example.com”. For a token: the team from <code>GET /v2/account</code> when the token may read it, else “Token · added 19 Oct”.</td></tr>
 <tr><td>Storage line</td><td>A warning in Manage Backends only, and only when nothing is saved</td><td>In every signed-in view: “Saved in the macOS Keychain on studio.local”, “Saved encrypted on this server (no keychain here)”, or “Not saved: you’ll sign in again after Canvas restarts”.</td></tr>
 <tr><td>Plain-HTTP warning</td><td>None</td><td>On a non-loopback page served over plain HTTP, for all of Canvas: “This connection isn’t encrypted. Your Canvas key and what you do here can be read on this network. Use HTTPS, a tailnet or an SSH tunnel.”</td></tr>
-<tr><td>Keychain locked</td><td>Not distinguished from signed out</td><td>“Canvas can’t open the Keychain on studio.local. Unlock that Mac, or sign in again here.”</td></tr>
+<tr><td>Keychain locked</td><td>Not distinguished from signed out</td><td>“Canvas can’t open the Keychain on studio.local. Unlock secure storage, then retry. Your saved connection is unchanged.”</td></tr>
 </tbody></table></div>
 </section>
 
@@ -327,9 +335,9 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <thead><tr><th>Where the Canvas host runs</th><th>Store</th><th>Important limit</th></tr></thead>
 <tbody>
 <tr><td>macOS</td><td>Login Keychain, generic password</td><td>Run as the right OS user. A new binary reading an item may ask once (“Always Allow”), for example after a Node upgrade for <code>npx</code> users. A locked keychain (Canvas started over SSH, or by launchd with nobody logged in) is a visible <em>unavailable</em> state, never a reason to save plaintext.</td></tr>
-<tr><td>Windows</td><td>Credential Manager, generic credential</td><td>Check the service account and packaging; don’t assume the desktop user’s store is there. The 2,560-byte blob limit is far above these entries.</td></tr>
+<tr><td>Windows</td><td>Credential Manager, generic credential</td><td>Check the service account and packaging; don’t assume the desktop user’s store is there. Measure the encoded token-pair record against the Windows store’s size limit. Do not assume every future OAuth reply fits.</td></tr>
 <tr><td>Linux desktop</td><td>Secret Service (GNOME Keyring, KWallet) over D-Bus</td><td>Only a store that survives reboot counts. The kernel keyring that some <code>keyring</code> builds fall back to doesn’t, so the probe rejects it rather than calling it saved.</td></tr>
-<tr><td>Linux server, container</td><td>No keychain → an encrypted file on a persistent volume, keyed by <code>OH_SECRET_KEY</code></td><td>The key comes from the environment, not from a file beside the store, the same protection Canvas settings get there. Without <code>OH_SECRET_KEY</code>: an explicit “this run only” mode with the warning, never a silent fallback. <code>MARS_TOKEN</code> still seeds a connection.</td></tr>
+<tr><td>Linux server, container</td><td>No keychain → an encrypted file on a persistent volume, keyed by <code>OH_SECRET_KEY</code></td><td>This is the Canvas host’s encryption configuration, not the <code>OH_SECRET_KEY</code> inside a DO guest. Supply the key separately from the encrypted file and keep it stable. Without <code>OH_SECRET_KEY</code>: an explicit “this run only” mode with the warning, never a silent fallback. <code>MARS_TOKEN</code> still seeds a connection.</td></tr>
 </tbody></table></div>
 <details><summary>Save a complete connection, not just an access token</summary><p>Give each connection a stable ID and a known team; connections are keyed by team. Signing in again for a team that already has one replaces its secret and keeps its ID, so a selected backend and its tunnels carry on. Keep labels separate from secrets.</p><p>Record a format version. Write a new file completely, then replace the old one in one step, with access limited to the host’s OS user. Don’t overwrite a working credential until the new one passes the access check. Clear cached secrets when a connection is removed. Make migration reversible.</p></details>
 <details><summary>What is stored where</summary>
@@ -359,14 +367,14 @@ digitalocean/&lt;connection id&gt;   {"v":1,"kind":"pat","token":"…"}
     return r.access_token;                              <span class="com">// token is already spent: needs-sign-in, never success</span>
   }));
 }</code></pre></details>
-<details><summary>The browser cookie: derived from the session key</summary><p>The cookie value becomes <code>HMAC-SHA256(session key, "mars-web-cookie/v1")</code>, set <code>HttpOnly</code>, <code>SameSite=Strict</code> and <code>Path=/mars</code>, and <code>Secure</code> on HTTPS. It stays valid across restarts and changes when the key rotates, so <code>control-openhands restart --rotate-key</code> still invalidates it, as it should. Nothing new is stored.</p><p>The accepted cost: no signing out one browser, and rotating the key signs out all of them. Saved per-browser sessions (a random cookie per browser, stored only as a hash, with an expiry) are the upgrade if Canvas ever needs per-browser sign-out or a host shared by several people.</p></details>
+<details><summary>The browser cookie: derived from the session key</summary><p>The cookie value becomes <code>HMAC-SHA256(session key, "mars-web-cookie/v1")</code>, set <code>HttpOnly</code>, <code>SameSite=Strict</code> and <code>Path=/mars</code>, and <code>Secure</code> on HTTPS. Give it a bounded browser lifetime. It stays valid across normal restarts only if the host keeps the same session key. Key rotation invalidates it. The browser saves the cookie; the host derives its value and stores no extra cookie secret.</p><p>For DO, an approved OAuth return can issue a new cookie without exposing or asking for the session key. If the browser still has a valid host credential, it may renew silently. After key rotation, the target is DO sign-in again for people and the replacement key for agents. Keep the saved DO grant and selected conversation intact.</p><p>The accepted cost: no signing out one browser, and rotating the key signs out all of them. Saved per-browser sessions (a random cookie per browser, stored only as a hash, with an expiry) are the upgrade if Canvas ever needs per-browser sign-out or a host shared by several people.</p></details>
 </section>
 
 <section id="restore"><span class="label">06 / Restoring after a restart</span>
 <h2>Keep the destination. Repair the missing step.</h2>
 <p>Read the saved backend first. If it is a DigitalOcean backend, show DigitalOcean recovery, never the ordinary local-backend key form. A saved credential removes the most common failure, but not every one.</p>
-<div class="flowlist" aria-label="Proposed restore order"><span>Keep the saved DO identity</span><i aria-hidden="true">→</i><span>Unlock the host, if needed</span><i aria-hidden="true">→</i><span>Load or renew DO permission</span><i aria-hidden="true">→</i><span>Reconnect the tunnel</span><i aria-hidden="true">→</i><span>Check the Agent Server</span><i aria-hidden="true">→</i><span>Open the same conversation</span></div>
-<div class="grid"><article class="card bad"><div class="label">Current risk</div><h3>401 → generic key form → edited backend</h3><p>The error says only “not authorised”. The form can then replace the selected DigitalOcean backend’s address with the Canvas origin.</p></article><article class="card good"><div class="label">Proposed rule</div><h3>Name the missing step. Keep DigitalOcean selected.</h3><p>Unlock the host, sign in to DigitalOcean, unlock safe storage, or reconnect the tunnel. None of these may edit the saved DO session identity.</p></article></div>
+<div class="flowlist" aria-label="Proposed restore order"><span>Keep the saved DO identity</span><i aria-hidden="true">→</i><span>Approve browser access, if needed</span><i aria-hidden="true">→</i><span>Load or renew DO permission</span><i aria-hidden="true">→</i><span>Reconnect the tunnel</span><i aria-hidden="true">→</i><span>Check the Agent Server</span><i aria-hidden="true">→</i><span>Open the same conversation</span></div>
+<div class="grid"><article class="card bad"><div class="label">Current risk</div><h3>401 → generic key form → edited backend</h3><p>The error says only “not authorised”. The form can then replace the selected DigitalOcean backend’s address with the Canvas origin.</p></article><article class="card good"><div class="label">Proposed rule</div><h3>Name the missing step. Keep DigitalOcean selected.</h3><p>Sign in to approve this browser, sign in to DigitalOcean again, unlock safe storage, or reconnect the tunnel. None of these may edit the saved DO session identity.</p></article></div>
 <div class="sim" style="margin-top:24px"><div class="label">Illustrative recovery · no network calls</div>
 <div class="selectline"><label for="surface">Canvas runs in</label><select id="surface"><option value="web">a browser</option><option value="desktop">the desktop app</option></select><label for="condition">After a restart</label><select id="condition"><option value="good">everything saved is usable</option><option value="host">the browser lost host access</option><option value="do">DigitalOcean needs sign-in again</option><option value="locked">safe storage is locked</option><option value="offline">the tunnel can’t connect</option><option value="missing">the DO session was deleted</option></select></div>
 <div id="restore-result" aria-live="polite" aria-atomic="true"><div class="trace"><div><span>1 · Keep</span><b id="keep">The saved DO backend and conversation</b></div><div><span>2 · Show</span><b id="show">Reconnecting to your DO session…</b></div><div><span>3 · Do</span><b id="action">Load permission, reconnect, then probe</b></div></div>
@@ -376,7 +384,7 @@ digitalocean/&lt;connection id&gt;   {"v":1,"kind":"pat","token":"…"}
 <div class="tablewrap"><table>
 <thead><tr><th>Missing step</th><th>What the person sees</th><th>What must stay intact</th></tr></thead>
 <tbody>
-<tr><td>Host access (browser only)</td><td>“Unlock this Canvas host”: a screen of its own for the session key, after a key rotation or cleared cookies.</td><td>The DigitalOcean backend, connection, session and conversation selection.</td></tr>
+<tr><td>Host access (browser only)</td><td>“Sign in with DigitalOcean to use this Canvas host.” Check the approved owner and issue a new bridge cookie. Do not edit a backend or ask for the guest’s key.</td><td>The DigitalOcean backend, connection, session and conversation selection.</td></tr>
 <tr><td>DigitalOcean permission</td><td>“Sign in to DigitalOcean to reconnect” (screen E).</td><td>The saved destination. Check the returned team before reconnecting.</td></tr>
 <tr><td>Safe storage locked</td><td>“Unlock secure storage”, with retry.</td><td>All saved records. A locked store is not an empty store.</td></tr>
 <tr><td>Tunnel or network</td><td>“Can’t reach this DO session. Retry, or manage connections.”</td><td>Credentials and destination. No generic key prompt.</td></tr>
@@ -389,7 +397,7 @@ digitalocean/&lt;connection id&gt;   {"v":1,"kind":"pat","token":"…"}
 
 <section id="agents"><span class="label">07 / Agents</span>
 <h2>Agents use the key they already have.</h2>
-<p>Agents in local Canvas conversations already receive the session key, as <code>OPENHANDS_AUTOMATION_API_KEY</code>. A personal agent on the same machine can be given the same key: <code>LOCAL_BACKEND_API_KEY</code>, or <code>~/.openhands/agent-canvas/api-key.txt</code> on the Canvas host. With it, an agent can already reach the bridge. So there’s no new kind of key; the work is to make that path complete, and to document it.</p>
+<p>Agents in local Canvas conversations already receive the session key, as <code>OPENHANDS_AUTOMATION_API_KEY</code>. A trusted agent that can reach the host can be given the same key: <code>LOCAL_BACKEND_API_KEY</code>, or <code>~/.openhands/agent-canvas/api-key.txt</code> on the Canvas host. With it, an agent can already reach the bridge. The key belongs to Canvas, not to the Agent Server inside DO. There is no new kind of key or permission level in this release. The remaining work completes and documents this path.</p>
 <div class="note"><p><strong>Decided:</strong> the session key is admin-type for now, and an agent’s connect uses whichever DigitalOcean team is active in the UI. Existing tunnels keep their owner.</p></div>
 <h3>What works today (checked live, 20 October)</h3>
 <div class="tablewrap"><table>
@@ -404,13 +412,14 @@ digitalocean/&lt;connection id&gt;   {"v":1,"kind":"pat","token":"…"}
 <p class="small">A person had signed in through the UI first. Connecting a session wasn’t possible in this sandbox (section 02). As for people, a restart takes DigitalOcean away from agents until the sign-in is saved.</p>
 <h3>Three gaps to close, after the saved sign-in</h3>
 <ol class="rules">
-<li><strong>The proxy accepts the SDK’s socket login.</strong> The Python SDK and the TypeScript client send the key as the first message on the event socket. Today the proxy refuses them before that message arrives. It should wait up to 10 seconds for it, check the key, then connect to the session. This is how the Agent Server itself works, so the clients need no change. Agents that only use REST calls don’t need it.</li>
-<li><strong>The host prepares the sandbox, not the browser.</strong> DigitalOcean’s sandbox template needs two fixes before an agent can run commands. Today the browser applies them when a person opens a session (<code>prepareMarsSandbox</code>). A session an agent opens skips them, and its terminal fails. The bridge should apply them on every connect, until DigitalOcean fixes the template (<a href="https://github.com/OpenHands/OpenHands/issues/18338">#18338</a>).</li>
+<li><strong>The proxy accepts the SDK’s socket login.</strong> The Python SDK and the TypeScript client send the key as the first message on the event socket. Today the proxy refuses them before that message arrives. It should wait up to 10 seconds for it, check the key, then connect to the session. The Agent Server supports this style of login; verify the released clients against a real connected session before promising no client change. Agents that only use REST calls don’t need it.</li>
+<li><strong>The host prepares the sandbox, not the browser.</strong> The browser currently runs <code>prepareMarsSandbox</code> when a person attaches. An agent calling the bridge directly skips that preparation. Keep any still-needed preparation in the host’s connect step so both callers get it. Do not assume every guest needs both workarounds: upstream Agent Server releases already fix the tmux path issue. Check the actual guest version and retain the encryption-key workaround until its template fix is verified (<a href="https://github.com/OpenHands/OpenHands/issues/18338">#18338</a>).</li>
 <li><strong>The five calls get docs and tests.</strong> Agents use five bridge calls plus the proxy. Documenting and testing them means a UI change can’t quietly break agents. They keep today’s shape: <code>POST /mars/rpc/&lt;method&gt;</code> with <code>{"args":[…]}</code>.</li>
 </ol>
 <h3>Starting a conversation on a DigitalOcean agent</h3>
 <pre><code><span class="com"># KEY: OPENHANDS_AUTOMATION_API_KEY in a local conversation, or ~/.openhands/agent-canvas/api-key.txt on the host</span>
-B=http://127.0.0.1:8000
+B="${CANVAS_URL:?Set CANVAS_URL to the Canvas address reachable from this agent}"
+<span class="com"># 127.0.0.1 only if Canvas runs in this agent’s network environment.</span>
 rpc() { curl -s -X POST "$B/mars/rpc/$1" -H "X-Session-API-Key: $KEY" -H 'Content-Type: application/json' -d "{\"args\":$2}"; }
 
 rpc listAgentConfigs '[]'                         <span class="com"># configs; use those with "agent":"openhands"</span>
@@ -421,20 +430,24 @@ rpc openTunnel "[{\"sessionId\":\"$SESSION\"}]"   <span class="com"># wakes a pa
 curl -s -X POST "$B/mars/sessions/$SESSION/api/conversations" \
   -H "X-Session-API-Key: $KEY" -H 'Content-Type: application/json' -d @start.json
 rpc pauseSession "[\"$SESSION\"]"                 <span class="com"># when done</span></code></pre>
-<p>The conversation needs an LLM, either set in that session’s Agent Server settings or sent in the start request. With the OpenHands SDK, point <code>RemoteWorkspace(host=…, api_key=KEY)</code> at the <code>host</code> that <code>openTunnel</code> returns. Its REST calls work today; its event socket works once gap 1 is closed (checked against the SDK and Agent Server 1.56.0).</p>
-<div class="note warn"><p><strong>What this key can do, said plainly.</strong> Whoever holds the session key can also start sessions, which bill, and stop them and delete agents, for the active team. Only give it to agents you would let do that. A narrower key would mean something only once agents stop receiving the full one; that’s a separate decision about the session key itself.</p></div>
+<p>The conversation needs an LLM, either set in that session’s Agent Server settings or sent in the start request. With the OpenHands SDK, point <code>RemoteWorkspace(host=…, api_key=KEY)</code> at the <code>host</code> that <code>openTunnel</code> returns. The source supports REST authentication today; the reported live check stopped at a disconnected-session 409. Real conversation REST and event streaming still need a connected-session test. The event socket also needs gap 1 closed (checked against the SDK and Agent Server 1.56.0).</p>
+<div class="note warn"><p><strong>What this key can do, said plainly.</strong> Whoever holds the session key can also start sessions, which bill, and stop them and delete agents, for the active team. Only give it to agents you would let do that. This plan does not add roles, permission levels or different key types. Later, people may create and revoke additional keys with the same admin authority.</p></div>
 <p>An agent that can’t reach Canvas, such as a cloud worker or CI, uses its own DigitalOcean token with DigitalOcean directly (<code>doctl agents port-forward</code>). Canvas isn’t involved.</p>
-<details><summary>Not proposed now: scoped agent keys</summary><p>An earlier draft proposed Canvas-issued agent keys: named, bound to one team, with permissions to <em>see</em>, <em>use</em>, <em>start</em> and <em>manage</em>, stored as hashes, revocable, behind a <code>/mars/v1</code> API. They’re only worth building once agents stop receiving the full session key. If that day comes, the design is in <a href="https://github.com/enyst/enyst.github.io/blob/d9b6796/arch/digitalocean-sign-in-and-agent-keys.html">that draft</a>.</p></details>
+<h3 id="follow-ups">Two recorded follow-ups, not extra key systems.</h3>
+<ol class="rules">
+<li><strong>Make loopback and remote addresses work.</strong> A DO guest, container or cloud worker cannot reach your Mac through its own <code>127.0.0.1</code>. Choose a reachable Canvas address and retain the session-proxy path. Test the same issue for an iPad’s OAuth return. Keep the connection protected; do not solve it by exposing an unauthenticated guest. Tracking: <code>smolpaws-hf5n</code>.</li>
+<li><strong>Let the person create new admin keys.</strong> Add create, copy and revoke actions for additional keys of the same authority. Revoking one must not require replacing all the others. No roles, tiers or permission picker. The existing session key remains the first path. Tracking: <code>smolpaws-wmaj</code>.</li>
+</ol><p class="small">These are recorded in the local work tracker for follow-through. They are not claims that upstream issues or implementation PRs exist.</p>
 </section>
 
 <div class="part"><div class="label">Part 2 · for the people building it</div><p>Sections 08 to 13 are the details. You can stop reading here.</p></div>
 <section id="code"><span class="label">08 / Code plan · proposed names are marked</span>
 <h2>One bridge in the Canvas server, one way in.</h2>
-<p>The bridge moves entirely into the Canvas server process that fronts the page: <code>scripts/ingress.mjs</code> in the full stack, or <code>scripts/static-server.mjs</code> on its own. People and agents reach it the same way, through <code>/mars/rpc</code> and the <code>/mars/sessions</code> proxy, with the session key. The only route without the key is the OAuth callback, which has its own one-time checks. Root picks the recovery screen from the restore result; it doesn’t guess which credential failed.</p>
+<p>The bridge moves entirely into the Canvas server process that fronts the page: <code>scripts/ingress.mjs</code> in the full stack, or <code>scripts/static-server.mjs</code> on its own. Admitted browsers use the bridge cookie; agents use the existing session key. Both reach <code>/mars/rpc</code> and the <code>/mars/sessions</code> proxy. Discovery and the limited sign-in start / callback routes do not need the key. Those login routes use one-time checks and grant no management access until the owner is approved. Root picks the recovery screen from the restore result; it doesn’t guess which credential failed.</p>
 <div class="tablewrap"><table>
 <thead><tr><th>Code</th><th>Change</th><th>Must not</th></tr></thead>
 <tbody>
-<tr><td><code>scripts/mars-web-bridge.mjs</code><br><span class="small">existing</span></td><td>The host bridge for both builds: <code>/mars/rpc</code>, <code>/mars/oauth/callback</code> and the <code>/mars/sessions</code> proxy, whose event socket also accepts first-message auth. Cookie derived from the session key.</td><td>Expose DigitalOcean secrets in responses, or pass host credentials to the guest.</td></tr>
+<tr><td><code>scripts/mars-web-bridge.mjs</code><br><span class="small">existing</span></td><td>The host bridge for both builds: <code>/mars/rpc</code>, <code>/mars/oauth/callback</code> and the <code>/mars/sessions</code> proxy, whose event socket also accepts first-message auth. Cookie derived from the session key; approved OAuth sign-in can issue it. Keep a saved owner record and a bounded public login attempt.</td><td>Expose DigitalOcean secrets in responses, or pass host credentials to the guest.</td></tr>
 <tr><td><code>scripts/mars-tunnel-bridge.mjs</code><br><span class="small">existing</span></td><td>Service only; <code>registerIpc</code> goes away. A connection-bound token provider for API calls and tunnel redials. <code>openTunnel</code> takes an optional connection: the UI passes the backend’s, agents get the active one. Its connect step runs the sandbox preparation.</td><td>Move an existing tunnel to another team.</td></tr>
 <tr><td><code>scripts/mars-credentials.mjs</code><br><span class="small">existing</span></td><td><strong>ConnectionStore</strong>: versioned metadata (team, kind, status) with atomic saves; secrets through <code>SecretStore</code>.</td><td>Fall back to plaintext, or erase a record because its store is locked.</td></tr>
 <tr><td><code>scripts/mars-secret-store.mjs</code><br><span class="small">new</span></td><td><strong>SecretStore</strong>: <code>keychain</code>, <code>encrypted-file</code> and <code>memory</code> (“this run only”) backends. Probed at start; <code>OH_CANVAS_SECRET_STORE</code> overrides it.</td><td>Accept a store that doesn’t survive reboot as “saved”.</td></tr>
@@ -443,18 +456,18 @@ rpc pauseSession "[\"$SESSION\"]"                 <span class="com"># when done<
 <tr><td><code>electron/main.mjs</code>, <code>preload-main.cjs</code><br><span class="small">existing</span></td><td>No bridge; the ingress hosts it. A one-time migration moves the <code>safeStorage</code> file into <code>SecretStore</code>.</td><td>Keep a second sign-in path.</td></tr>
 <tr><td><code>src/api/mars/mars-web-bridge.ts</code><br><span class="small">existing</span></td><td>The only bridge client. OAuth through <code>beginSignIn</code> and <code>awaitSignIn</code>.</td><td>Hold a token, or put one in localStorage.</td></tr>
 <tr><td><code>useRestoreMarsTunnels</code> / root<br><span class="small">existing</span></td><td>Wait for each restore step; report host access, DigitalOcean sign-in, locked store or tunnel error separately.</td><td>Route every 401 to the local-backend key form.</td></tr>
-<tr><td><code>ApiKeyEntryScreen</code><br><span class="small">existing · narrower</span></td><td>Ordinary local-backend setup only. Host unlock gets its own screen. A hard guard refuses to edit a DigitalOcean backend.</td><td>Merge a Canvas-origin host or key into the selected DigitalOcean record.</td></tr>
+<tr><td><code>ApiKeyEntryScreen</code><br><span class="small">existing · narrower</span></td><td>Ordinary local-backend setup only. DO gets its own browser sign-in screen. A hard guard refuses to edit a DigitalOcean backend.</td><td>Merge a Canvas-origin host or key into the selected DigitalOcean record.</td></tr>
 <tr><td><code>src/components/features/backends/managed-agents/*</code><br><span class="small">existing</span></td><td>Screens A–F in section 04.</td><td>—</td></tr>
 </tbody></table></div>
 
 <details><summary>Sign-in, step by step</summary>
 <ol class="steps">
-<li><span class="who page">page</span><code>beginSignIn({ origin })</code> on click. <span class="who host">host</span>Checks that the callback can land (section 04), creates <code>state</code> and a PKCE verifier (memory, 10 minutes, single use), sets the attempt cookie, and returns <code>{ attemptId, authorizeUrl }</code>.</li>
+<li><span class="who page">page</span><code>beginSignIn({ origin })</code> on click. <span class="who host">host</span>Creates only a bounded login attempt; checks that the callback can land (section 04), creates <code>state</code> and a PKCE verifier (memory, 10 minutes, single use), sets the attempt cookie, and returns <code>{ attemptId, authorizeUrl }</code>.</li>
 <li><span class="who page">page</span>Opens <code>about:blank</code> synchronously in the click handler, so popup blockers allow it, then points that window at <code>authorizeUrl</code>. Electron already sends such windows to the system browser; the OpenHands Cloud device login uses the same route.</li>
 <li><span class="who person">person</span>Picks the team on DigitalOcean and approves.</li>
 <li><span class="who do">DigitalOcean</span><code>GET /mars/oauth/callback?code&amp;state</code> on the Canvas origin. (Later, paste-back sends the same address through <code>completeSignIn</code>.)</li>
-<li><span class="who host">host</span><code>POST /v1/oauth/token</code> with the code and verifier. It receives a one-hour access token, a refresh token and <code>info.team_uuid</code> and <code>info.team_name</code>, checks that the token can list sessions, and writes the secret before the metadata.</li>
-<li><span class="who page">page</span><code>awaitSignIn(attemptId)</code>, a long poll, resolves, and the panel lists the team’s agents. The callback tab says “Signed in to DigitalOcean as My Team. You can close this tab.”</li>
+<li><span class="who host">host</span><code>POST /v1/oauth/token</code> with the code and verifier. It receives a one-hour access token, a refresh token and <code>info.team_uuid</code> and <code>info.team_name</code>, checks the approved owner and team, checks that the token can list sessions, writes the secret before the metadata, then issues the browser cookie. An unknown identity gets no host access.</li>
+<li><span class="who page">page</span><code>awaitSignIn(attemptId)</code>, a long poll protected by the starter’s temporary browser proof, resolves after owner approval. Issue the bridge cookie to this original Canvas browser, not only to the callback tab. This also covers Electron when DO returns in the separate system browser. The panel lists the team’s agents. The callback tab says “Signed in to DigitalOcean as My Team. You can close this tab.”</li>
 </ol></details>
 
 <details><summary>An agent’s request, end to end</summary>
@@ -478,6 +491,9 @@ SecretStore
   status()  → ready | locked | unavailable | session-only
   read(connectionId) · write(connectionId, completeSecretRecord) · remove(connectionId)
 
+ApprovedOwner                         <span class="com">// set only during trusted first setup</span>
+  stableDoIdentity, approvedTeam, claimMethod
+
 DoConnection                          <span class="com">// kept by the host, keyed by team</span>
   id, teamUuid, teamName, email, kind: oauth | pat, status: ok | needs-sign-in | unavailable
 
@@ -495,8 +511,9 @@ interface MarsAuthState {
   oauth: { available: boolean; reason: string | null };                                    <span class="com">// was canUseOAuth</span>
 }
 <span class="com">// replaces signInWithOAuth()</span>
-beginSignIn({ origin }) → { attemptId, authorizeUrl }
+beginSignIn({ origin }) → { attemptId, authorizeUrl }  <span class="com">// public, bounded attempt; no access yet</span>
 awaitSignIn(attemptId)  → { state: "pending" | "done" | "failed", error?, auth? }
+  <span class="com">// requires the starter’s temporary proof; issues cookie only after owner approval</span>
 cancelSignIn(attemptId)
 completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-back</span></code></pre>
 <p>Keep <code>kind: local</code> for Agent Server API compatibility, and add an explicit <code>provider</code> rather than infer DigitalOcean from a hostname. Old records with <code>marsSessionId</code> stay recognised during migration.</p></details>
@@ -504,7 +521,7 @@ completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-b
 <details><summary>The desktop app joins the host bridge</summary>
 <p>Electron stops creating its own bridge in the main process, and the preload drops <code>window.marsBridge</code>. Electron also stops passing <code>marsWebBridge: false</code> to the stack. The page then finds the bridge at <code>/mars/health</code>, exactly as a browser does, and its window already receives the session key.</p>
 <p>Before the stack starts, a one-time migration reads <code>mars-credentials.json</code> (v1) from the app’s data folder. It decrypts each token with <code>safeStorage</code>, writes <code>SecretStore</code> entries and v2 metadata without changing connection IDs, and renames the old file to <code>.migrated</code>. Implicit-grant tokens have no refresh token, so they move as they are and ask for sign-in once when they expire.</p>
-<p>The trade: DigitalOcean in the desktop app now needs the ingress process, which the stack starts after waiting for the local Agent Server. The desktop app already opens its window from that ingress, and already shows a startup failure when the Agent Server doesn’t come up. So no setup that works today loses DigitalOcean. Letting DigitalOcean work while the local Agent Server is down would be a separate improvement.</p></details>
+<p>The trade: DigitalOcean in the desktop app now needs the ingress process, which the stack starts after waiting for the local Agent Server. The desktop app already opens its window from that ingress, and already shows a startup failure when the Agent Server doesn’t come up. Test packaged startup and saved-connection migration before claiming no working setup loses DigitalOcean. Letting DigitalOcean work while the local Agent Server is down would be a separate improvement.</p></details>
 </section>
 
 <section id="security"><span class="label">09 / Security</span>
@@ -513,12 +530,12 @@ completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-b
 <thead><tr><th>Risk</th><th>What stops it</th></tr></thead>
 <tbody>
 <tr><td>A token reaches the page</td><td>The bridge only ever sends descriptions, never secrets. The callback page shows the team name, nothing more.</td></tr>
-<tr><td>A fake callback</td><td>The request marker works once and expires in 10 minutes. The PKCE proof never leaves the host. The browser that started the sign-in carries a short-lived attempt cookie.</td></tr>
+<tr><td>A fake callback</td><td>The request marker works once and expires in 10 minutes. The PKCE proof never leaves the host. Check the starter’s temporary proof and the saved approved owner before issuing a cookie. A successful login by a stranger grants no host access.</td></tr>
 <tr><td>Someone reads tokens from disk</td><td>They live in the keychain. The fallback file is encrypted. The description file holds no secrets.</td></tr>
 <tr><td>The session key on a network</td><td>Canvas listens only on 127.0.0.1 by default. Plain HTTP from another address shows a warning. The fix is HTTPS, a tailnet or an SSH tunnel.</td></tr>
 <tr><td>An agent with the session key</td><td>It can do anything Canvas can, DigitalOcean included. The docs say so. Give it only to agents you trust that far.</td></tr>
 <tr><td>A slow or fake socket login</td><td>A 10-second limit, a constant-time key check, and no connection to the session until the key checks out.</td></tr>
-<tr><td>A surprise bill</td><td>Starting a session bills while it runs. Nothing checks sessions in the background, and a restore wakes only the selected one.</td></tr>
+<tr><td>A surprise bill</td><td>Starting a session bills while it runs. Do not reconnect saved sessions in the background. Restore may wake only the selected one; show that consequence. Listing account metadata is not the same as probing a guest.</td></tr>
 <tr><td>Another website, or a DNS trick</td><td>Unchanged from today: the bridge refuses other origins, and checks the <code>Host</code> header on loopback.</td></tr>
 </tbody></table></div>
 </section>
@@ -526,13 +543,14 @@ completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-b
 <section id="rollout"><span class="label">10 / Rollout and proof</span>
 <h2>Three steps. Each one helps on its own.</h2>
 <div class="phase"><div class="label">Step 1</div><div><h3>Stay signed in. Keep the selection.</h3><p>Save today’s token sign-in in safe storage. Derive the cookie from the session key. Show the team and where the sign-in is kept. Add DigitalOcean-aware recovery, and stop the generic key form from editing a DigitalOcean backend. The desktop app doesn’t change yet.</p><p><strong>You notice:</strong> a restart no longer signs you out, and your agents keep DigitalOcean too.</p></div></div>
-<div class="phase"><div class="label">Step 2</div><div><h3>Sign in with DigitalOcean</h3><p>First, one small test with a real sign-in: register the client, check the permissions, refresh once, and measure what later steps need. Then ship OAuth for the desktop app and for browsers on the same machine. The desktop app moves onto the one bridge, keeping its saved sign-ins. The token stays available under “Use a personal access token instead”.</p><p><strong>You notice:</strong> a “Sign in with DigitalOcean” button in the browser, and no monthly re-login.</p></div></div>
-<div class="phase"><div class="label">Step 3</div><div><h3>Agents can drive DigitalOcean</h3><p>Socket login on the proxy, sandbox preparation on the host, and the five calls documented and tested.</p><p><strong>You notice:</strong> your agent, or one in a local conversation, can open a DigitalOcean session and work in it.</p></div></div>
-<div class="phase"><div class="label">Later</div><div><p>Only when a test or a need calls for it: paste-back for remote browsers, self-registered clients for HTTPS hosts, per-browser sessions, and scoped agent keys. Also DigitalOcean’s public session address as a second route, once its WebSocket fix (microvm#1920) ships.</p></div></div>
+<div class="phase"><div class="label">Step 2</div><div><h3>Sign in with DigitalOcean</h3><p>First, one small test with a real sign-in: register the client, check the permissions, refresh once, and measure what later steps need. Then ship OAuth for the desktop app and a verified browser return path. Test the owner check before admitting a browser without a host key. Same-machine support is a milestone, not proof that iPad sign-in is done. The desktop app moves onto the one bridge, keeping its saved sign-ins. The token stays available under “Use a personal access token instead”.</p><p><strong>You notice:</strong> a “Sign in with DigitalOcean” button in the browser, and no monthly re-login.</p></div></div>
+<div class="phase"><div class="label">Step 3</div><div><h3>Agents can drive DigitalOcean</h3><p>Socket login on the proxy, sandbox preparation on the host, and the five calls documented and tested.</p><p><strong>You notice:</strong> your agent, or one in a local conversation, can open a DigitalOcean session and work in it. This is the target after connected-session and SDK tests, not a claim proved by the listing check.</p></div></div>
+<div class="phase"><div class="label">Recorded next</div><div><p><a href="#follow-ups">Loopback / remote address handling and user-created admin keys</a>. These have follow-up records. No limited keys or key types are in this plan. A per-browser session store and DigitalOcean’s public session address can be considered separately.</p></div></div>
 <h3 id="proof">What to test before release</h3>
 <ul class="check">
 <li><strong>Sign-in:</strong> a real DigitalOcean sign-in grants what Canvas needs. Try it from the desktop app and from a browser on the same machine. Try cancelling, a wrong marker, a wrong proof and a replay.</li>
-<li><strong>Another device:</strong> on a phone or tablet, the first release offers the token, never a broken return.</li>
+<li><strong>Another device:</strong> the target is DO login on iPad without a Canvas-key prompt. Test the return path, owner check and cookie. A stranger’s DO login must fail without changing the saved account. Until this works, label the setup incomplete and keep any token fallback explicit.</li>
+<li><strong>Rotation:</strong> a normal restart keeps access. Host-key rotation invalidates the bridge cookie; the approved person can sign in again and agents get the new key. Neither flow edits the DO destination or other backends’ keys.</li>
 <li><strong>Storage:</strong> macOS, Windows and Linux keep the sign-in through a restart and a reboot. A locked store says so.</li>
 <li><strong>Renewal:</strong> an expired access token renews once, even with several tabs open. A failed save after renewal asks for sign-in instead of claiming success.</li>
 <li><strong>Restore:</strong> attach, open a conversation, reload, restart Canvas, and land in the same conversation. Record it in one take, and compare the IDs before and after.</li>
@@ -548,7 +566,7 @@ completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-b
 <div class="grid">
 <article class="card"><h3>Two bridges</h3><p>Keep Electron’s own bridge and add safe storage to the browser one. It’s a smaller change, but agents couldn’t use DigitalOcean through the desktop app, and the two sign-ins would keep drifting apart.</p></article>
 <article class="card"><h3>Per-browser sessions now</h3><p>One revocable cookie per browser. More control, more state. The derived cookie is enough for a host with one owner. It’s kept as the upgrade.</p></article>
-<article class="card"><h3>Scoped agent keys now</h3><p>Agents in local conversations already hold the full key, so an extra narrow key doesn’t limit them. Worth it only once they stop getting the full one.</p></article>
+<article class="card"><h3>A new key-permission system now</h3><p>Out of scope. Agents use the existing admin key. The follow-up creates more keys with that same authority, not different roles or types.</p></article>
 <article class="card"><h3>Tokens in the browser</h3><p>That puts a secret in the page. DigitalOcean’s API doesn’t allow browser calls anyway, and agents would be left out.</p></article>
 <article class="card"><h3>A hosted token exchange</h3><p>Not needed now that DigitalOcean supports PKCE. It would add a third party that sees everyone’s tokens: the wrong direction for an open, self-hosted tool.</p></article>
 <article class="card"><h3>Keep the implicit grant</h3><p>DigitalOcean no longer advertises it, and its tokens can’t be renewed, so everyone would sign in again every month.</p></article>
@@ -562,6 +580,7 @@ completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-b
 <li><strong>Permissions and renewal lifetime.</strong> Does that client get <code>agent_harness_session:read</code> and <code>:operate</code>? How long does a refresh token last? That decides how long a host can sit idle before someone signs in again.</li>
 <li><strong>Paste-back.</strong> How long does a code last, and does it work only once? Does iPad Safari keep the full address on the failed page?</li>
 <li><strong>HTTPS hosts.</strong> Will DigitalOcean accept an HTTPS callback for a client a host registers itself?</li>
+<li><strong>Approved owner.</strong> Verify which stable DO identity the OAuth reply proves and how trusted first setup records it. Do not approve a browser solely because it belongs to the same team. Resolve this before releasing new-browser DO login.</li>
 <li><strong>The keychain library.</strong> Confirm <code>@napi-rs/keyring</code>: license, builds for each platform, service accounts, and headless Linux. A store that forgets on reboot doesn’t count.</li>
 </ol>
 </section>
@@ -583,8 +602,8 @@ completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-b
 (function(){
   var cases={
     local:{origin:"http://127.0.0.1:8000",uri:"http://127.0.0.1:8000/mars/oauth/callback",client:"The shipped client (loopback matches any port)",verdict:"One click. The callback lands on Canvas itself. This ships first.",cls:"verdict",explain:"This covers the desktop app, a browser on the Canvas machine, and SSH port forwarding: there, the page address is loopback on your laptop and the forward carries the callback home."},
-    https:{origin:"https://canvas.example.org",uri:"https://canvas.example.org/mars/oauth/callback",client:"A client this host registers itself",verdict:"Later, after a test: one click. Until then, a token.",cls:"verdict gate",explain:"DigitalOcean’s reference doesn’t say whether it accepts HTTPS callbacks for clients a host registers itself, so this waits for the test."},
-    lan:{origin:"http://192.168.1.20:8000",uri:"http://127.0.0.1:8000/mars/oauth/callback",client:"The shipped client; Canvas registers no plain-HTTP addresses",verdict:"First release: a token, with the plain-HTTP warning. Later: paste the address of the page that didn’t load.",cls:"verdict gate",explain:"The test checks what DigitalOcean’s reference doesn’t state: how long a code lasts, whether it works only once, and whether browsers such as iPad Safari keep the full address on the failed page."}
+    https:{origin:"https://canvas.example.org",uri:"https://canvas.example.org/mars/oauth/callback",client:"A client this host registers itself",verdict:"Target: sign in on this device too. Verify the HTTPS callback and owner check first.",cls:"verdict gate",explain:"Test client registration and the HTTPS return with DO. Until that passes, do not label new-device OAuth complete or ask for the Canvas key as if it were the DO login."},
+    lan:{origin:"http://192.168.1.20:8000",uri:"http://127.0.0.1:8000/mars/oauth/callback",client:"The shipped client; Canvas registers no plain-HTTP addresses",verdict:"No working direct callback yet. Use a protected forward or configured HTTPS; token entry is an explicit fallback.",cls:"verdict gate",explain:"The test checks what DigitalOcean’s reference doesn’t state: how long a code lasts, whether it works only once, and whether browsers such as iPad Safari keep the full address on the failed page."}
   };
   var buttons=document.querySelectorAll("[data-case]");
   function show(name){
@@ -599,7 +618,7 @@ completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-b
   buttons.forEach(function(b){b.addEventListener("click",function(){show(b.getAttribute("data-case"));});});
   var scenarios={
     good:["Reconnecting to your DO session…","Load permission, reconnect, then check","Open the same conversation. Don’t ask for a token.",""],
-    host:["Unlock this Canvas host","Enter the session key on its own screen; don’t edit a backend","Keep DigitalOcean selected while the browser gets host access back.","gate"],
+    host:["Sign in with DigitalOcean to use this host","Check the approved owner, then issue the bridge cookie","No key entry for the DO person flow. Keep the same backend and conversation.","gate"],
     "do":["Sign in to DigitalOcean to reconnect","Check the returned team, then reconnect","Keep the saved session. Don’t replace its address.","gate"],
     locked:["Unlock secure storage","Wait or retry; keep saved records","A locked store is not an empty store.","gate"],
     offline:["Can’t reach this DO session","Retry, or manage the connection","Keep credentials and selection. Don’t ask for a local key.","fail"],
@@ -609,7 +628,7 @@ completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-b
     var desktop=document.getElementById("surface").value==="desktop";
     var kind=document.getElementById("condition").value;
     var s=scenarios[kind];
-    if(desktop&&kind==="host")s=["Nothing to unlock in the desktop app","Its window gets the session key at launch; go on to DigitalOcean and the tunnel","Only a key rotation can break this step, and a relaunch fixes it.",""];
+    if(desktop&&kind==="host")s=["Use the desktop app’s host access","Its window can receive host access at launch; check DO permission next","Test relaunch after rotation; keep the saved DO session unchanged.",""];
     document.getElementById("show").textContent=s[0];
     document.getElementById("action").textContent=s[1];
     var o=document.getElementById("outcome");o.textContent=s[2];o.className="verdict "+s[3];
