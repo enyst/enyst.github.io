@@ -27,6 +27,7 @@ code{font:.86em/1.6 var(--mono);background:#efeee6;padding:2px 5px;border-radius
 pre{font:12.5px/1.75 var(--mono);background:#efeee6;padding:18px;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:3px;margin:14px 0}pre code{background:none;padding:0}
 .com{color:#7a7f73}
 .note{padding:17px 20px;border-left:3px solid var(--green);background:var(--soft);margin:20px 0;max-width:860px}.note.warn{border-color:var(--gold);background:var(--cream)}.note.sea{border-color:var(--sea);background:var(--sky)}.note p:last-child{margin-bottom:0}.note p:first-child{margin-top:0}
+.note ul{margin:8px 0 0;padding-left:20px}.note li{margin:6px 0}
 .source{margin-top:18px}
 figure{margin:24px 0}figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:4px;background:#191919}
 svg{width:100%;height:auto;display:block}svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--ink)}
@@ -209,7 +210,7 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 </ol>
 <p class="small">Not checked here: connecting a session, because in this sandbox the tunnel’s WebSocket bypasses the proxy that supplies DigitalOcean credentials. Also not checked: Electron’s OAuth window, since there is no display. Those rows come from the source.</p>
 <div class="note sea"><p><strong>DigitalOcean’s sign-in has improved.</strong> Today’s desktop code uses an older method, the implicit grant, because <a href="https://github.com/OpenHands/OpenHands/blob/8d39305538c1d17a30cbe477e57a0e18fcee7d95/scripts/mars-oauth.mjs#L1-L11">it was written</a> when DigitalOcean documented no PKCE. DigitalOcean’s <a href="https://cloud.digitalocean.com/.well-known/oauth-authorization-server">live metadata</a> now lists the code flow with PKCE and refresh tokens, and no longer lists the older method. <a href="https://www.rfc-editor.org/rfc/rfc9700.html#section-2.1.2">Current security guidance</a> discourages the older method anyway.</p>
-<p><a href="https://docs.digitalocean.com/reference/api/oauth/">DigitalOcean’s docs</a> add three useful facts. Access lasts an hour and renews by itself. A return address on this machine can use any port. And the reply names the team. That removes the monthly re-login, the fixed port 53682, and the missing team name. It still needs one test with a real sign-in.</p></div>
+<p><a href="https://docs.digitalocean.com/reference/api/oauth/">DigitalOcean’s docs</a> add three useful facts. Access lasts an hour and renews by itself. A return address on this machine can use any port. And the reply names the team. That removes the monthly re-login, the fixed port 53682, and the missing team name. A real sign-in on 20 October confirmed all three (<a href="#live">what it showed</a>).</p></div>
 <details><summary>Why #18604 is useful but not enough</summary><p>The PR stops a ready DigitalOcean backend from looking like an ordinary local server with a missing key. It doesn’t replace the restart flow. On an auth error, root can still show the generic key form. That form tests the Canvas origin, then merges its fields into the selected backend, so the saved DO session ID can survive while its address changes. This is a code-path risk read from source; nobody ran the destructive sequence.</p><p class="source"><a href="https://github.com/OpenHands/OpenHands/blob/7b9fbcda38e916fba87c11f1cd9f3bf34f7a5ada/src/root.tsx#L395-L402">PR auth-error branch</a> · <a href="https://github.com/OpenHands/OpenHands/blob/8d39305538c1d17a30cbe477e57a0e18fcee7d95/src/components/features/backends/api-key-entry-screen.tsx#L34-L65">Form writes the selected backend</a></p></details>
 </section>
 
@@ -276,6 +277,13 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <li><strong>Check and save the permission.</strong> Verify that the token can list sessions. Save the access token, refresh token, expiry, team and granted permissions in safe storage. If any of this fails, keep the connection that was already working.</li>
 <li><strong>Renew access before it expires.</strong> One renewal at a time per connection. Save the replacement pair together. If DigitalOcean refuses a renewal, keep the selected DO session and ask for sign-in (screen E).</li>
 </ol>
+<div class="note sea" id="live"><p><strong>Checked with a real sign-in (20 October, <a href="https://github.com/OpenHands/OpenHands/pull/18706">PR 2</a>).</strong> Canvas showed the team and email, saved the sign-in, and still had it after a restart. What it showed:</p>
+<ul>
+<li><strong>Use the code at once.</strong> One code that waited a while was refused. DigitalOcean doesn’t document how long a code lasts.</li>
+<li><strong>A used refresh token gets <code>invalid_request</code>,</strong> not the usual <code>invalid_grant</code>. Canvas reads both as “signed out”, so a network error never looks like one.</li>
+<li><strong>Sign out with the access token.</strong> Revoking the refresh token answered without error, but the sign-in kept working. Revoking the access token ended the whole sign-in: the old refresh token was refused afterwards.</li>
+<li><strong>A loopback return with no port matches any port,</strong> as documented. The test used port 18800.</li>
+</ul></div>
 
 <h3 id="new-browser">New browser: sign in again, not “paste the Canvas key”.</h3>
 <p>On an iPad, choose DigitalOcean and click sign-in. Approve on DO. Canvas checks that this is its approved owner, then gives this browser a <code>/mars</code> cookie. If DO already knows you, this may be only a few clicks. Otherwise DO asks you to log in.</p>
