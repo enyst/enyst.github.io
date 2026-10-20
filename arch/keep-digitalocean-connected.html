@@ -96,6 +96,7 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 @media(max-width:580px){.terms{grid-template-columns:1fr}.brief-list{font-size:17px}}
 </style></head><body><div class="layout">
 <aside><a class="home" href="../index.html">← Engel’s Notebook</a><div class="label">Stay signed in. Restore safely.</div><ol>
+<li><a href="#stories">User stories</a></li>
 <li><a href="#words">A small dictionary</a></li>
 <li><a href="#today">What happens today</a></li>
 <li><a href="#model">One bridge</a></li>
@@ -130,6 +131,37 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <div class="note"><p><strong>The user experience comes first.</strong> DigitalOcean should be the easiest backend to connect and restore. Keep ordinary backends’ own keys unchanged. For DO, make login the normal action. Keep saved sessions, accounts and conversations intact. Show one useful next step when a connection fails.</p></div>
 <p class="small">This page merges smolpaws’s <em>Keep DigitalOcean connected</em> and Claude Code’s <em>People sign in, agents use keys</em>, both written on 19 October, with Engel’s decisions from the next day. Their earlier versions are linked under <a href="#evidence">Evidence</a>.</p>
 </header>
+
+<section id="stories"><span class="label">Start here / User stories</span>
+<h2>Three short stories.</h2>
+<p>What a person and their agents should be able to do. People sign in; they don’t type keys. Agents use keys.</p>
+<div class="grid3" style="align-items:start">
+<article class="card good"><div class="label">Story 1 · on the Mac</div><h3>Set up once</h3>
+<ol class="compact" style="padding-left:20px;margin:0">
+<li>Install Agent Canvas.</li>
+<li>Onboarding creates the Local backend. The Mac’s own browser gets the Canvas key by itself.</li>
+<li>Add Backend → DigitalOcean → <strong>Sign in with DigitalOcean</strong>. Approve on DigitalOcean.</li>
+<li><strong>New Agent</strong> makes an OpenHands agent on DigitalOcean. Open it and work.</li>
+<li>Restart the Mac or Canvas: still signed in, back in the same session.</li>
+</ol>
+<p class="small" style="margin-top:12px">If your organization blocks third-party apps, paste a personal access token once instead of signing in.</p></article>
+<article class="card good"><div class="label">Story 2 · on the iPad</div><h3>Add a device</h3>
+<ol class="compact" style="padding-left:20px;margin:0">
+<li>Open Canvas’s address on the iPad, over the same Wi-Fi or a tailnet. The iPad isn’t in yet.</li>
+<li>On the Mac: <strong>Add another device</strong>. A QR code appears.</li>
+<li>Scan it with the iPad. Done: the Local and DigitalOcean backends both work.</li>
+</ol>
+<p class="small" style="margin-top:12px">Later option: <strong>Sign in with DigitalOcean</strong> on the iPad instead (<a href="#pairing">compare</a>). That one opens only the DigitalOcean backends.</p>
+<p class="small">Needed first: Canvas has to accept devices on your network. Today only the <code>npx</code> launcher can (<code>--host</code>). The desktop app needs a setting for it.</p></article>
+<article class="card good"><div class="label">Story 3 · agents</div><h3>Let an agent use DigitalOcean</h3>
+<ol class="compact" style="padding-left:20px;margin:0">
+<li>An agent in a local conversation already has the Canvas key. It can list your DigitalOcean agents, open a session and start a conversation there.</li>
+<li>Your own agent on the Mac, Wi-Fi or tailnet: give it the Canvas key. It has full access, for now.</li>
+<li>An agent in the cloud, or inside a DigitalOcean session, can’t reach the Mac. Give it its own DigitalOcean token instead.</li>
+</ol>
+<p class="small" style="margin-top:12px">The details are in <a href="#agents">section 07</a>.</p></article>
+</div>
+</section>
 
 <section id="words"><span class="label">01 / A small dictionary</span>
 <h2>Eight words, one meaning each.</h2>
