@@ -249,6 +249,38 @@ footer{margin-top:55px;padding-top:20px;border-top:1px solid var(--line);color:v
 <div class="note warn"><p><strong>DO login is not an open invitation to this host.</strong> Someone else can log in to their own DO account. They must not gain access to this host’s saved connection. Record the allowed owner during trusted first setup. Check a stable DO owner identity and the approved team on return; team membership alone is not enough. If DO’s reply cannot prove the owner identity, require approval from an already trusted browser or on the host. Test this before claiming new-browser login is complete.</p></div>
 <p>The public sign-in-start route may create only a short-lived login attempt. It cannot list sessions, return saved account details, or change a working connection. Apply a request limit. Keep attempt status private to the starter: an attempt ID alone is not access to the result. Management routes remain protected. A wrong account, cancelled login or failed save leaves the existing DO connection untouched.</p>
 <p><strong>First setup is different from another browser.</strong> A local setup action or one-time host approval claims the owner. Do not let the first stranger who reaches an unclaimed network host become its owner. Ordinary local or remote Agent Server backends still use their own keys; DO login does not grant access to those backends.</p>
+
+<h3 id="pairing">Another way in: pair from a device you already trust</h3>
+<p class="small">An option to compare, added 20 October. Not decided.</p>
+<p>The DigitalOcean sign-in already lives on the host. So a new iPad doesn’t really need to sign in to DigitalOcean. It only needs to prove it belongs to you. A device that is already in can vouch for it.</p>
+<div class="grid" style="align-items:start">
+<figure class="mockfig" style="margin:0;max-width:360px"><div class="mock" role="img" aria-label="Mock: add another device, with a QR code, a copy link button and a five-minute expiry">
+<p class="m-title-left">Add another device</p>
+<div style="display:grid;place-items:center;margin:6px 0 12px"><svg viewBox="0 0 21 21" width="132" height="132" style="width:132px;height:132px;background:#fff;border-radius:6px;padding:6px" aria-hidden="true"><g fill="#191919"><path d="M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0z"/><path fill="#fff" d="M1 1h5v5H1zM15 1h5v5h-5zM1 15h5v5H1z"/><path d="M2 2h3v3H2zM16 2h3v3h-3zM2 16h3v3H2zM9 1h1v2H9zM11 2h2v1h-2zM8 4h2v2H8zM12 5h1v3h-1zM9 8h3v1H9zM1 9h2v1H1zM4 8h1v3H4zM6 10h2v1H6zM14 9h2v2h-2zM17 8h3v1h-3zM18 10h2v2h-2zM9 11h1v3H9zM11 12h3v1h-3zM15 13h1v2h-1zM8 15h2v1H8zM11 15h2v3h-2zM14 16h3v1h-3zM18 15h2v1h-2zM9 18h1v2H9zM15 18h1v2h-1zM17 19h3v1h-3z"/></g></svg></div>
+<span class="m-btn m-secondary">Copy link instead</span>
+<p class="m-note">Works once. Expires in 5 minutes.</p></div>
+<figcaption><b>G · Pairing.</b> Shown on the Mac, or in any browser that is already in. The iPad scans it, opens the link, and is in.</figcaption></figure>
+<div>
+<ol class="steps">
+<li><strong>On a device that’s already in,</strong> choose “Add another device”. Canvas shows a QR code and a link.</li>
+<li><strong>On the iPad,</strong> scan the code or open the link. Canvas checks it, and the iPad is in.</li>
+<li><strong>That’s once per device.</strong> After that, the iPad stays in across restarts, like any browser.</li>
+</ol>
+<p class="small">The secret part of the link sits after a <code>#</code>, so it never appears in server or proxy logs. The page reads it and sends it once.</p>
+</div></div>
+<div class="note"><p><strong>Do you have to be near the Mac?</strong> No, near <em>a device that’s already in</em>. The QR code needs a screen you can see, but the link can travel any way you like: AirDrop, a message to yourself, or a terminal over SSH on a host without a screen. The very first device is the Mac itself, or any browser that already has the Canvas key. The one case pairing can’t help: you’re away, and the iPad is the only device you have.</p></div>
+<div class="tablewrap"><table>
+<thead><tr><th></th><th>DigitalOcean login</th><th>Pairing</th></tr></thead>
+<tbody>
+<tr><td>On the new device</td><td>Sign in with DigitalOcean</td><td>Scan a code or open a link</td></tr>
+<tr><td>Needs a device that’s already in</td><td>No</td><td>Yes, once</td></tr>
+<tr><td>Login page anyone can reach</td><td>Yes, guarded by the owner check</td><td>No. Only devices already in can create a link</td></tr>
+<tr><td>Owner check and first-setup claim</td><td>Needed</td><td>Not needed</td></tr>
+<tr><td>HTTPS return from DigitalOcean</td><td>Needed for an iPad</td><td>Not needed; the iPad never visits DigitalOcean</td></tr>
+<tr><td>What the new device gets</td><td>The DigitalOcean part only, unless the design adds more</td><td>The same access as typing the Canvas key, without typing it</td></tr>
+<tr><td>Revoke one device</td><td>Not with the derived cookie</td><td>Not with the derived cookie; yes, if pairing creates a new admin key per device (the <a href="#follow-ups">recorded follow-up</a>)</td></tr>
+</tbody></table></div>
+<p>Both can exist. Pairing is the smaller change and needs nothing new from DigitalOcean, so it could come first. DigitalOcean login stays the “from anywhere, with no other device” option, once its owner check and HTTPS return are tested.</p>
 <h3>What people see</h3>
 <p>The same screens appear in the desktop app and the browser. The sign-in button comes first. The token field moves behind a disclosure, for organizations that don’t allow third-party apps. Every signed-in view says where the sign-in is kept.</p>
 <div class="mocks">
@@ -384,7 +416,7 @@ digitalocean/&lt;connection id&gt;   {"v":1,"kind":"pat","token":"…"}
 <div class="tablewrap"><table>
 <thead><tr><th>Missing step</th><th>What the person sees</th><th>What must stay intact</th></tr></thead>
 <tbody>
-<tr><td>Host access (browser only)</td><td>“Sign in with DigitalOcean to use this Canvas host.” Check the approved owner and issue a new bridge cookie. Do not edit a backend or ask for the guest’s key.</td><td>The DigitalOcean backend, connection, session and conversation selection.</td></tr>
+<tr><td>Host access (browser only)</td><td>“Sign in with DigitalOcean to use this Canvas host”, or pair from a trusted device (<a href="#pairing">section 04</a>). Check the approved owner and issue a new bridge cookie. Do not edit a backend or ask for the guest’s key.</td><td>The DigitalOcean backend, connection, session and conversation selection.</td></tr>
 <tr><td>DigitalOcean permission</td><td>“Sign in to DigitalOcean to reconnect” (screen E).</td><td>The saved destination. Check the returned team before reconnecting.</td></tr>
 <tr><td>Safe storage locked</td><td>“Unlock secure storage”, with retry.</td><td>All saved records. A locked store is not an empty store.</td></tr>
 <tr><td>Tunnel or network</td><td>“Can’t reach this DO session. Retry, or manage connections.”</td><td>Credentials and destination. No generic key prompt.</td></tr>
@@ -580,6 +612,7 @@ completeSignIn({ attemptId, callbackUrl })   <span class="com">// later: paste-b
 <li><strong>Permissions and renewal lifetime.</strong> Does that client get <code>agent_harness_session:read</code> and <code>:operate</code>? How long does a refresh token last? That decides how long a host can sit idle before someone signs in again.</li>
 <li><strong>Paste-back.</strong> How long does a code last, and does it work only once? Does iPad Safari keep the full address on the failed page?</li>
 <li><strong>HTTPS hosts.</strong> Will DigitalOcean accept an HTTPS callback for a client a host registers itself?</li>
+<li><strong>A new browser: DigitalOcean login, pairing, or both?</strong> Pairing needs a device that’s already in, but no public login page and nothing new from DigitalOcean. DigitalOcean login works with no other device, but needs the owner check and an HTTPS return (<a href="#pairing">compare</a>).</li>
 <li><strong>Approved owner.</strong> Verify which stable DO identity the OAuth reply proves and how trusted first setup records it. Do not approve a browser solely because it belongs to the same team. Resolve this before releasing new-browser DO login.</li>
 <li><strong>The keychain library.</strong> Confirm <code>@napi-rs/keyring</code>: license, builds for each platform, service accounts, and headless Linux. A store that forgets on reboot doesn’t count.</li>
 </ol>
