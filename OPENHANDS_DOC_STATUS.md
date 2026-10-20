@@ -16,21 +16,14 @@ The linked issues and PRs own current CI/test status; physical-device audio rema
 
 ## Current explanations
 
-- [Keep DigitalOcean connected](arch/mars-signin-and-restore.html): 19 October 2026
-  proposal for shared OAuth with PKCE, platform-specific safe storage, lasting
-  browser-host sessions, and DO-aware recovery. Public DO metadata confirms
-  code/refresh/S256 capability; no live OAuth registration, exchange or restore
-  test was performed. Product changes remain proposed.
-
-- [People sign in, agents use keys](arch/digitalocean-sign-in-and-agent-keys.html):
-  19 October 2026 proposal, revised 20 October after review: one host-side
-  DigitalOcean bridge (desktop and browser), OAuth with PKCE kept in the OS
-  keychain, a cookie derived from the session key, and agents using the
-  session key they already hold (no scoped agent keys for now). Today's
-  browser behavior and the agent path were driven live with `control-openhands`
-  at 8d39305 (restart signs you out; stock clients' event socket gets 401);
-  connecting a session was blocked in the sandbox and no OAuth exchange was
-  run. Reconciled with [Keep DigitalOcean connected](arch/mars-signin-and-restore.html).
+- [Keep DigitalOcean connected](arch/keep-digitalocean-connected.html): 20 October
+  2026 merge of smolpaws's and Claude Code's 19 October proposals, with Engel's
+  decisions: one host bridge, OAuth with PKCE kept in the OS keychain, a cookie
+  derived from the session key, DigitalOcean-aware restore, and agents using the
+  admin-type session key on the active team. Browser behavior and the agent path
+  were driven live with `control-openhands` at 8d39305; connecting a session and a
+  real OAuth exchange were not possible in the sandbox. The two earlier URLs
+  redirect here.
 
 - [Automation profile launch](arch/automation-profile-launch.html): 19 October 2026
   reading of automation #600's fourth design. Separates reported preset/profile-store
