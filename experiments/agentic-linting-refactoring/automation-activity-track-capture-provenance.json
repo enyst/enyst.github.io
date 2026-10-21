@@ -1,0 +1,3550 @@
+{
+  "schemaVersion": 1,
+  "subject": "Automation activity track height",
+  "generatedAt": "2026-10-21T23:36:56.650787+00:00",
+  "repository": "OpenHands/OpenHands",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18788",
+  "authoritativeManifestSha256": "06cb3c433fa16714768d3659c808f2fde0dbf6d3bd84fe3cf0575f527f0c3bb9",
+  "implementation": {
+    "layoutOnly": true,
+    "intendedVisualRedesign": false,
+    "sourcePath": "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx",
+    "change": "Move the fixed 18px sparkline track height from an inline declaration to the CSS recipe. Dynamic per-bar height calculation is unchanged."
+  },
+  "fixture": {
+    "name": "Layout review",
+    "prompt": "Reply with the single word: Ready. Do not run any tools.",
+    "yearlyCron": "0 0 1 1 *",
+    "timezone": "UTC",
+    "model": "deepseek-flash",
+    "runsPerPhase": 2,
+    "runsWereIndependent": true,
+    "sameActualRunData": false,
+    "actionAudit": "Each genuine conversation has exactly one ActionEvent: finish. No terminal, file, browser, or external action tool calls."
+  },
+  "conditions": [
+    "Unmodified control-openhands CLI; actual Chrome, Local Agent Server and automation backends.",
+    "4 actual consumers: Dashboard grid/list, Home pinned card/activity row.",
+    "Desktop1440x1000 and phone390x844, OpenHands-Neutral/Light+/OpenHands-DeepSea.",
+    "Each phase has2 genuinely completed DeepSeekFlash runs via UI Run now. No mocks, interception, model response injection or localStorage seeding.",
+    "24 paired geometry measurements,4 bar deeplinks per phase, tooltip on desktop; original screenshots and normal clips.",
+    "Both scoped run-owned fixtures deleted through real API; both owned browser/launcher stacks stopped, all10portsclosed and privatecredentials/statepurged."
+  ],
+  "limitations": [
+    "Layout-only lint refactor: same18px track retained. Dynamic per-bar height code is unchanged.",
+    "Independent real runs have naturally different durations, summaries and IDs. Per-run heights are compared against actual duration formula, not asserted identical across phases.",
+    "Initial Before read-only capture attempts had an input-text selector mismatch and an output-field handling error. Two early grid/list PNGs, two selector-failure PNGs and an initial running screenshot are retained locally but excluded from publication; no app or harness source was edited.",
+    "The first transient deep-link/log inspection accidentally selected ExportJSON, then a read-only dialog snapshot timed out; its local failure PNG is excluded. The stack doctor stayed healthy.",
+    "Recordings are normal control-openhands recordings; no pause/resume or clock manipulation. CLI itself compresses unchanged-frame time as reported per clip.",
+    "Live evidence covers the four named consumers in standalone Local Canvas, Neutral/Light+/DeepSea, desktop and phone. No authenticated Cloud, ACP, all-five-theme or arbitrary embedded-host visual pass is claimed."
+  ],
+  "summary": {
+    "pairedMeasurements": 24,
+    "trackLayoutDifferences": 0,
+    "genuineRuns": 4,
+    "finishActionEvents": 4,
+    "otherActionEvents": 0,
+    "browserPageErrors": 0,
+    "browserAppErrors": 0,
+    "selectedScreenshots": 48,
+    "selectedRawClips": 4,
+    "formulaCheckedBars": 96
+  },
+  "comparisonNote": "Same 18 px track \u00b7 Real run durations differ.",
+  "comparisonScope": {
+    "fixedTrackHeightPx": 18,
+    "trackWidthPx": 16,
+    "barWidthPx": 4,
+    "linkHitTargetPx": [
+      8,
+      18
+    ],
+    "independentRunData": true,
+    "pixelEquivalenceClaim": false,
+    "perBarHeightEqualityClaim": false,
+    "barDurationComparisonMeaning": "Hit-target dimensions, widths and status colors are retained. Fixture run URLs and durations naturally differ across phases."
+  },
+  "pairedMeasurements": [
+    {
+      "name": "neutral-desktop-dashboard-grid",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 988.5,
+        "y": 419.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 988.5,
+        "y": 419.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "neutral-desktop-dashboard-list",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 1316,
+        "y": 353,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 1316,
+        "y": 353,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "neutral-desktop-home-pinned",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 825.5,
+        "y": 661.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 825.5,
+        "y": 661.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "neutral-desktop-home-row",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 1195.5,
+        "y": 920.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 1195.5,
+        "y": 920.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "neutral-phone-dashboard-grid",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 756,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 756,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "neutral-phone-dashboard-list",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 264,
+        "y": 670,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 264,
+        "y": 670,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "neutral-phone-home-pinned",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 506.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 506.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "neutral-phone-home-row",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 310,
+        "y": 765.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 310,
+        "y": 765.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "light-plus-desktop-dashboard-grid",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 988.5,
+        "y": 419.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 988.5,
+        "y": 419.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "light-plus-desktop-dashboard-list",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 1316,
+        "y": 353,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 1316,
+        "y": 353,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "light-plus-desktop-home-pinned",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 825.5,
+        "y": 661.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 825.5,
+        "y": 661.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "light-plus-desktop-home-row",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 1195.5,
+        "y": 920.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 1195.5,
+        "y": 920.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "light-plus-phone-dashboard-grid",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 756,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 756,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "light-plus-phone-dashboard-list",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 264,
+        "y": 670,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 264,
+        "y": 670,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "light-plus-phone-home-pinned",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 506.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 506.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "light-plus-phone-home-row",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 310,
+        "y": 765.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 310,
+        "y": 765.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(22, 130, 93)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "deepsea-desktop-dashboard-grid",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 988.5,
+        "y": 419.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 988.5,
+        "y": 419.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "deepsea-desktop-dashboard-list",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 1316,
+        "y": 353,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 1316,
+        "y": 353,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "deepsea-desktop-home-pinned",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 825.5,
+        "y": 661.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 825.5,
+        "y": 661.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "deepsea-desktop-home-row",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 1195.5,
+        "y": 920.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 1195.5,
+        "y": 920.5,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 1440,
+          "height": 1000
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "deepsea-phone-dashboard-grid",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 756,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 756,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "deepsea-phone-dashboard-list",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 264,
+        "y": 670,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 264,
+        "y": 670,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "deepsea-phone-home-pinned",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 506.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 330,
+        "y": 506.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    },
+    {
+      "name": "deepsea-phone-home-row",
+      "before": {
+        "height": 18,
+        "width": 16,
+        "x": 310,
+        "y": 765.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+            "height": 11,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "11px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "after": {
+        "height": 18,
+        "width": 16,
+        "x": 310,
+        "y": 765.3125,
+        "cssHeight": "18px",
+        "alignItems": "flex-end",
+        "display": "flex",
+        "count": 2,
+        "ariaLabel": "2 recent runs",
+        "bars": [
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          },
+          {
+            "label": "Successful",
+            "href": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+            "height": 10,
+            "width": 4,
+            "linkHeight": 18,
+            "linkWidth": 8,
+            "color": "rgb(31, 189, 83)",
+            "transform": "none",
+            "cssHeight": "10px"
+          }
+        ],
+        "pageHorizontalOverflow": false,
+        "viewport": {
+          "width": 390,
+          "height": 844
+        }
+      },
+      "differences": {},
+      "barDurationComparison": [
+        {
+          "index": 0,
+          "beforeHeight": 11,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        },
+        {
+          "index": 1,
+          "beforeHeight": 10,
+          "afterHeight": 10,
+          "sameWidthAndTargetAndColor": true,
+          "durationFormulaCorrectBoth": true
+        }
+      ]
+    }
+  ],
+  "selectedArtifacts": [
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-deepsea-desktop-dashboard-grid.png",
+      "sourceFilename": "after-deepsea-desktop-dashboard-grid.png",
+      "sha256": "1234253a8817e4a7190c0408a47f1f80a92a231927182c3230c4fb90266de57c",
+      "bytes": 104271,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-deepsea-desktop-dashboard-list.png",
+      "sourceFilename": "after-deepsea-desktop-dashboard-list.png",
+      "sha256": "e24a91c0be56e5b33b88445236af6d453a1827f599981e31617d5078826504dc",
+      "bytes": 90844,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-deepsea-desktop-home-pinned.png",
+      "sourceFilename": "after-deepsea-desktop-home-pinned.png",
+      "sha256": "98f12322c5622a47ca8a0a31a4e816d0e71cbcdf2b5e07fa084e6ad265dde661",
+      "bytes": 126303,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-deepsea-desktop-home-row.png",
+      "sourceFilename": "after-deepsea-desktop-home-row.png",
+      "sha256": "98f12322c5622a47ca8a0a31a4e816d0e71cbcdf2b5e07fa084e6ad265dde661",
+      "bytes": 126303,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-deepsea-phone-dashboard-grid.png",
+      "sourceFilename": "after-deepsea-phone-dashboard-grid.png",
+      "sha256": "3215c50c5f7b5718d3089018a620f0e489979fd15ab56c67158253bac21fe647",
+      "bytes": 52039,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-deepsea-phone-dashboard-list.png",
+      "sourceFilename": "after-deepsea-phone-dashboard-list.png",
+      "sha256": "d9a6f80bbbcc37f17404a2075efd88459f041a49b7020b80c58aa3f53769bab0",
+      "bytes": 41949,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-deepsea-phone-home-pinned.png",
+      "sourceFilename": "after-deepsea-phone-home-pinned.png",
+      "sha256": "28161557c10848b1428bd937aa321012a58d9731af161bfd4eb8cfff4e8f72f4",
+      "bytes": 46392,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-deepsea-phone-home-row.png",
+      "sourceFilename": "after-deepsea-phone-home-row.png",
+      "sha256": "28161557c10848b1428bd937aa321012a58d9731af161bfd4eb8cfff4e8f72f4",
+      "bytes": 46392,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-light-plus-desktop-dashboard-grid.png",
+      "sourceFilename": "after-light-plus-desktop-dashboard-grid.png",
+      "sha256": "4e264a6685d76cace321c1607605bbfdae06d9c9f96f35e1cb6b1a4e0a4fc3ad",
+      "bytes": 92548,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-light-plus-desktop-dashboard-list.png",
+      "sourceFilename": "after-light-plus-desktop-dashboard-list.png",
+      "sha256": "177a8b95c4ca22a654186ca22b534d8bc765716b0271df56bc38306909dfa1e6",
+      "bytes": 81000,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-light-plus-desktop-home-pinned.png",
+      "sourceFilename": "after-light-plus-desktop-home-pinned.png",
+      "sha256": "3e816dab36127a74abdf2779dea54038be7e99ff6557324ba190b1eb4387d23a",
+      "bytes": 110020,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-light-plus-desktop-home-row.png",
+      "sourceFilename": "after-light-plus-desktop-home-row.png",
+      "sha256": "3ff178fbb663f8754e30dad233ecfb56ac6de667cdaf790e06ae3378b94ceb15",
+      "bytes": 110044,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-light-plus-phone-dashboard-grid.png",
+      "sourceFilename": "after-light-plus-phone-dashboard-grid.png",
+      "sha256": "e2993469857c9b30006f662f4b26b5295b7a6ed0f329e83a6f6486d8629b96a8",
+      "bytes": 44063,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-light-plus-phone-dashboard-list.png",
+      "sourceFilename": "after-light-plus-phone-dashboard-list.png",
+      "sha256": "e7041d0c5d2d53c52dd42ecef3cee3e8f11519b58e36eabb2c9dc3706d535da9",
+      "bytes": 36263,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-light-plus-phone-home-pinned.png",
+      "sourceFilename": "after-light-plus-phone-home-pinned.png",
+      "sha256": "43374eae8e1ada41e6432d461fbc77dd428ed3b833988e83164b5bf4b385a1d0",
+      "bytes": 38302,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-light-plus-phone-home-row.png",
+      "sourceFilename": "after-light-plus-phone-home-row.png",
+      "sha256": "43374eae8e1ada41e6432d461fbc77dd428ed3b833988e83164b5bf4b385a1d0",
+      "bytes": 38302,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-neutral-desktop-dashboard-grid.png",
+      "sourceFilename": "after-neutral-desktop-dashboard-grid.png",
+      "sha256": "2c5cacadf399443fdd98bcf646e84fd954ed9d55e94aa30b88ec595d7176a59d",
+      "bytes": 91946,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-neutral-desktop-dashboard-list.png",
+      "sourceFilename": "after-neutral-desktop-dashboard-list.png",
+      "sha256": "098ac67b5720a057ba9658bc402ca046f5ffaec3ef018be44f4ee37d8517cf8d",
+      "bytes": 79890,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-neutral-desktop-home-pinned.png",
+      "sourceFilename": "after-neutral-desktop-home-pinned.png",
+      "sha256": "3f4ae84d5d29e1dc7095620b155e65d9ffcc7528593cd72fb2f6ed4465e3c4f9",
+      "bytes": 110109,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-neutral-desktop-home-row.png",
+      "sourceFilename": "after-neutral-desktop-home-row.png",
+      "sha256": "bbe810b81903946d381df4fd7db6b8f2898fb207fc6045c6e2e304e0cc1ba7cc",
+      "bytes": 110076,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-neutral-phone-dashboard-grid.png",
+      "sourceFilename": "after-neutral-phone-dashboard-grid.png",
+      "sha256": "745f88537444e8ff1069abd83d0a36789450ac50843f530467553e3da0ea0adb",
+      "bytes": 43871,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-neutral-phone-dashboard-list.png",
+      "sourceFilename": "after-neutral-phone-dashboard-list.png",
+      "sha256": "e5df22c63ebe704261e4576354aadfaa7eb2da540d78755615ca1bed4e2537be",
+      "bytes": 35804,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-neutral-phone-home-pinned.png",
+      "sourceFilename": "after-neutral-phone-home-pinned.png",
+      "sha256": "8e17937b7fc2a19b2066d63911c2e4d05549f08caac844bad5f6247687b2b50d",
+      "bytes": 39201,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/after-neutral-phone-home-row.png",
+      "sourceFilename": "after-neutral-phone-home-row.png",
+      "sha256": "8e17937b7fc2a19b2066d63911c2e4d05549f08caac844bad5f6247687b2b50d",
+      "bytes": 39201,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "path": "automation-activity-track-after-desktop-raw.mp4",
+      "sourceFilename": "after-sparkline-desktop.mp4",
+      "sha256": "17304a7cd56b73aaa099a8060374b806a875c3c2e6bfe6efaf990e9a3be8499c",
+      "bytes": 442892,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "durationSeconds": 9.4,
+      "cliRecording": {
+        "seconds": 9.4,
+        "recordedSeconds": 9.2,
+        "size": "1440x1000",
+        "fps": 10,
+        "captures": 91,
+        "changes": 47,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "path": "automation-activity-track-after-phone-raw.mp4",
+      "sourceFilename": "after-sparkline-phone.mp4",
+      "sha256": "bb28542ba5b41fc94194279e36b18d83d6f2dc2545be4bfb383978af667cd624",
+      "bytes": 82018,
+      "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "buildFingerprint": "9f5f735176ee22ac",
+      "dimensions": [
+        390,
+        844
+      ],
+      "durationSeconds": 4.1,
+      "cliRecording": {
+        "seconds": 4.1,
+        "recordedSeconds": 4.1,
+        "size": "390x844",
+        "fps": 10,
+        "captures": 40,
+        "changes": 17,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-deepsea-desktop-dashboard-grid.png",
+      "sourceFilename": "before-deepsea-desktop-dashboard-grid.png",
+      "sha256": "68bab23c50809422aa09ec5a44761ab0d0b9750c9df0722131d5d276f3b47803",
+      "bytes": 104920,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-deepsea-desktop-dashboard-list.png",
+      "sourceFilename": "before-deepsea-desktop-dashboard-list.png",
+      "sha256": "f6e9f99251a7d97e6299a4281186ce7a8352ecb9c15c6e41002d757f68c1f4f2",
+      "bytes": 91098,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-deepsea-desktop-home-pinned.png",
+      "sourceFilename": "before-deepsea-desktop-home-pinned.png",
+      "sha256": "76e250cb7fd2827181e1d8581ededf8890c78638f3a1e139a530a039c7902cb4",
+      "bytes": 126318,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-deepsea-desktop-home-row.png",
+      "sourceFilename": "before-deepsea-desktop-home-row.png",
+      "sha256": "76e250cb7fd2827181e1d8581ededf8890c78638f3a1e139a530a039c7902cb4",
+      "bytes": 126318,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-deepsea-phone-dashboard-grid.png",
+      "sourceFilename": "before-deepsea-phone-dashboard-grid.png",
+      "sha256": "337bbf902f3ff9e62d2ee3a410ee89f8b7fb478efa306293e7917f9e6ef8c8f6",
+      "bytes": 52295,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-deepsea-phone-dashboard-list.png",
+      "sourceFilename": "before-deepsea-phone-dashboard-list.png",
+      "sha256": "6449463f0de08c61bdec8344a35b0513e589890b7c85f367de2f1a77a7b3de1a",
+      "bytes": 41984,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-deepsea-phone-home-pinned.png",
+      "sourceFilename": "before-deepsea-phone-home-pinned.png",
+      "sha256": "9b78dfca632ef21f7b9e9efd4fe98999c6e62e5e558dedfd142a2c01fb6800a9",
+      "bytes": 46831,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-deepsea-phone-home-row.png",
+      "sourceFilename": "before-deepsea-phone-home-row.png",
+      "sha256": "0ea535ecb5569ded28e89d7aa50cca803738a6ab50818710b2f695892bd2130c",
+      "bytes": 46810,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-light-plus-desktop-dashboard-grid.png",
+      "sourceFilename": "before-light-plus-desktop-dashboard-grid.png",
+      "sha256": "6eb52ad3e58fc7d6c04bcf8a38c8444b011bb0ffff597b821853e580b2176e0b",
+      "bytes": 93088,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-light-plus-desktop-dashboard-list.png",
+      "sourceFilename": "before-light-plus-desktop-dashboard-list.png",
+      "sha256": "108c3ce9346696865d62e5735bab8dd63043c6261c2024c93234fcf3a6f8a766",
+      "bytes": 81098,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-light-plus-desktop-home-pinned.png",
+      "sourceFilename": "before-light-plus-desktop-home-pinned.png",
+      "sha256": "29bdabe1d7082061c58eae926dfa76041406b6d48304d9866a13bcfd98c89f53",
+      "bytes": 109874,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-light-plus-desktop-home-row.png",
+      "sourceFilename": "before-light-plus-desktop-home-row.png",
+      "sha256": "85c74e1eee8887d899b62e4d6fc2560e69175dc2c895fb21c41144d12dfc523f",
+      "bytes": 109898,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-light-plus-phone-dashboard-grid.png",
+      "sourceFilename": "before-light-plus-phone-dashboard-grid.png",
+      "sha256": "7fc929264834a64ededefac7e5bd5e0614551b356c890a2baef8121e3b213084",
+      "bytes": 44409,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-light-plus-phone-dashboard-list.png",
+      "sourceFilename": "before-light-plus-phone-dashboard-list.png",
+      "sha256": "8f78663e20850d16ba6eed49a3b7f060d729946ae394a4d188ed6d44f08b2e8c",
+      "bytes": 36257,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-light-plus-phone-home-pinned.png",
+      "sourceFilename": "before-light-plus-phone-home-pinned.png",
+      "sha256": "f9d9ce84c93fcd7972878d417f1e2fe99a11968fce49dc48af20c76a49ca511e",
+      "bytes": 38663,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-light-plus-phone-home-row.png",
+      "sourceFilename": "before-light-plus-phone-home-row.png",
+      "sha256": "f9d9ce84c93fcd7972878d417f1e2fe99a11968fce49dc48af20c76a49ca511e",
+      "bytes": 38663,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-neutral-desktop-dashboard-grid-2.png",
+      "sourceFilename": "before-neutral-desktop-dashboard-grid-2.png",
+      "sha256": "9f3e93574a464eb89750cd2ab9e89858509adb28a0f2e5f2e027680a0d91fc28",
+      "bytes": 92281,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-neutral-desktop-dashboard-list-2.png",
+      "sourceFilename": "before-neutral-desktop-dashboard-list-2.png",
+      "sha256": "375db8a61d99d71b3cd1288126dacfe32054fba05f93ca13c0405ea6494d2b00",
+      "bytes": 79923,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-neutral-desktop-home-pinned.png",
+      "sourceFilename": "before-neutral-desktop-home-pinned.png",
+      "sha256": "d1552675b27b4edea95742e4680e9056143e7309b90fc106d02401312d61ae50",
+      "bytes": 110023,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-neutral-desktop-home-row.png",
+      "sourceFilename": "before-neutral-desktop-home-row.png",
+      "sha256": "536b28f31d73cb446d2797980e130dbaac2c0c71f0fbd364da845ba94cb59819",
+      "bytes": 110032,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-neutral-phone-dashboard-grid.png",
+      "sourceFilename": "before-neutral-phone-dashboard-grid.png",
+      "sha256": "60a21686a1d25ced76238f33596bf25500db04a9bbc157e8c1033e36cb7ac60a",
+      "bytes": 44098,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-neutral-phone-dashboard-list.png",
+      "sourceFilename": "before-neutral-phone-dashboard-list.png",
+      "sha256": "fe2932b633e4f0c207d93eb71977a4c9d32d644c9e8491a204136a66cc956ec2",
+      "bytes": 35827,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-neutral-phone-home-pinned.png",
+      "sourceFilename": "before-neutral-phone-home-pinned.png",
+      "sha256": "2791591795a6ee4ff2183cb75796e4d7115cf3de1b13638c5029bf612efc52be",
+      "bytes": 39564,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "path": "automation-activity-track-evidence/before-neutral-phone-home-row.png",
+      "sourceFilename": "before-neutral-phone-home-row.png",
+      "sha256": "2791591795a6ee4ff2183cb75796e4d7115cf3de1b13638c5029bf612efc52be",
+      "bytes": 39564,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "path": "automation-activity-track-before-desktop-raw.mp4",
+      "sourceFilename": "before-sparkline-desktop.mp4",
+      "sha256": "02b9bd6c88254a8d89e43d5bd9c63f17c6da7a28dfbb40f6692dd556f78b61bc",
+      "bytes": 370772,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "durationSeconds": 11.8,
+      "cliRecording": {
+        "seconds": 11.8,
+        "recordedSeconds": 11.6,
+        "size": "1440x1000",
+        "fps": 10,
+        "captures": 64,
+        "changes": 35,
+        "misses": 1,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "path": "automation-activity-track-before-phone-raw.mp4",
+      "sourceFilename": "before-sparkline-phone.mp4",
+      "sha256": "74d9f57fd57173fda465651ab3a2cf92b927d779e1ad8dfc81d134a2982a167c",
+      "bytes": 81761,
+      "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "buildFingerprint": "a151f5302526efe6",
+      "dimensions": [
+        390,
+        844
+      ],
+      "durationSeconds": 3.9,
+      "cliRecording": {
+        "seconds": 3.9,
+        "recordedSeconds": 3.9,
+        "size": "390x844",
+        "fps": 10,
+        "captures": 39,
+        "changes": 17,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    }
+  ],
+  "supersededArtifacts": [
+    {
+      "sourceFilename": "before-running-grid.png",
+      "sha256": "ef4c40df25a165d4b2e707d76276a2660cd20261cbf8d873bafc3b9cf7c99953",
+      "publication": "Excluded from selected film assets and ZIP; exploratory capture only."
+    },
+    {
+      "sourceFilename": "1792625269802.png",
+      "sha256": "cc938eeca71e4444e4c7adda271c3a6e3998bd072864aec1c86ccbfe34619e55",
+      "publication": "Excluded from selected film assets and ZIP; exploratory capture only."
+    },
+    {
+      "sourceFilename": "1792625385776.png",
+      "sha256": "938c39c3f9ac5991021356e2cad04dd3671c9f0665783017ddfd0a68d0b96042",
+      "publication": "Excluded from selected film assets and ZIP; exploratory capture only."
+    },
+    {
+      "sourceFilename": "before-neutral-desktop-dashboard-list.png",
+      "sha256": "66f9dad02f56f294af08dff9d75d48570c1b1841d562014a8d5eb8aacac2cb94",
+      "publication": "Excluded from selected film assets and ZIP; exploratory capture only."
+    },
+    {
+      "sourceFilename": "before-neutral-desktop-dashboard-grid.png",
+      "sha256": "870269572aaab4f9c5ac66d9c91006df039be143ab93727306bed5e818ffc4f3",
+      "publication": "Excluded from selected film assets and ZIP; exploratory capture only."
+    }
+  ],
+  "cleanup": {
+    "before": {
+      "fixtureDeleted": true,
+      "remainingFixtureAutomations": 0,
+      "browserStopped": true,
+      "launcherStopped": true,
+      "ports": {
+        "ingress": "closed",
+        "agentServer": "closed",
+        "automation": "closed",
+        "frontend": "closed",
+        "vscode": "closed"
+      },
+      "privatePurged": true,
+      "evidenceFilesBeforePurge": 33,
+      "evidenceFilesAfterPurge": 33,
+      "retainedEvidenceVerified": true,
+      "ok": true
+    },
+    "after": {
+      "fixtureDeleted": true,
+      "remainingFixtureAutomations": 0,
+      "browserStopped": true,
+      "launcherStopped": true,
+      "ports": {
+        "ingress": "closed",
+        "agentServer": "closed",
+        "automation": "closed",
+        "frontend": "closed",
+        "vscode": "closed"
+      },
+      "privatePurged": true,
+      "evidenceFilesBeforePurge": 28,
+      "evidenceFilesAfterPurge": 28,
+      "retainedEvidenceVerified": true,
+      "ok": true
+    }
+  },
+  "diagnostics": {
+    "before": {
+      "pageErrors": 0,
+      "appErrors": 0,
+      "warnings": 0
+    },
+    "after": {
+      "pageErrors": 0,
+      "appErrors": 0,
+      "warnings": 0
+    }
+  },
+  "before": {
+    "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+    "buildFingerprint": "a151f5302526efe6",
+    "pins": {
+      "agentServer": "1.56.0",
+      "agentCanvas": "1.29.0",
+      "automation": "1.22.0"
+    },
+    "versions": {
+      "agentServer": "1.56.0",
+      "sdk": "1.56.0"
+    },
+    "sourceSha256": "64f1ea2887898670ce3ef310705cc4a12a1321b4dbef4190545ab199f09b138b",
+    "sourceFiles": {
+      "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx": "64f1ea2887898670ce3ef310705cc4a12a1321b4dbef4190545ab199f09b138b",
+      "src/components/features/home/featured-automations/automation-run-activity-metrics.ts": "3cbce7b642deaf9a9db3962cd4e5c319620ad4e6c3c28bbcf505cce64a2ac921",
+      "package-lock.json": "c8736896d0c9ff7a7ddca9cba1bb199f46be9d2b46190c62a7fd464663ddc147",
+      "config/defaults.json": "b99dfd6b696560494d8a91f3eac1cc0cccd58b24dc1bd1a84ba5a069274eeffc"
+    },
+    "lockfileSha256": "c8736896d0c9ff7a7ddca9cba1bb199f46be9d2b46190c62a7fd464663ddc147",
+    "defaultsSha256": "b99dfd6b696560494d8a91f3eac1cc0cccd58b24dc1bd1a84ba5a069274eeffc",
+    "sourceHashesIndependentlyVerified": true,
+    "fixtureRuns": [
+      {
+        "fixtureRunId": "1c5cc63d-91dd-404a-a17f-cc85100edabb",
+        "durationMs": 42866.965000000004,
+        "expectedBarHeightPx": 11
+      },
+      {
+        "fixtureRunId": "6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+        "durationMs": 35691.748,
+        "expectedBarHeightPx": 10
+      }
+    ],
+    "actionAudit": [
+      {
+        "fixtureRunId": "6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+        "actionEventCount": 1,
+        "actionTools": [
+          "finish"
+        ],
+        "otherActionToolCount": 0
+      },
+      {
+        "fixtureRunId": "1c5cc63d-91dd-404a-a17f-cc85100edabb",
+        "actionEventCount": 1,
+        "actionTools": [
+          "finish"
+        ],
+        "otherActionToolCount": 0
+      }
+    ],
+    "checks": [
+      {
+        "name": "dashboard-grid-tooltip",
+        "result": {
+          "ok": true,
+          "source": "role=tooltip",
+          "text": "Successful\nLast run\n3m ago\nDuration\n43s\n\nReplied with the single word \"Ready\" as requested; no tools were run to modify anything."
+        }
+      },
+      {
+        "name": "dashboard-list-deeplink",
+        "fixtureRunPath": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+        "highlightVisible": {
+          "ok": true,
+          "visible": true
+        }
+      },
+      {
+        "name": "dashboard-grid-deeplink",
+        "fixtureRunPath": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+        "highlightVisible": {
+          "ok": true,
+          "visible": true
+        }
+      },
+      {
+        "name": "home-pinned-deeplink",
+        "fixtureRunPath": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+        "highlightVisible": {
+          "ok": true,
+          "visible": true
+        }
+      },
+      {
+        "name": "home-row-deeplink",
+        "fixtureRunPath": "/automations/84b63bd2-7f01-4cdf-b841-06f3ab9c38c8?run=1c5cc63d-91dd-404a-a17f-cc85100edabb",
+        "highlightVisible": {
+          "ok": true,
+          "visible": true
+        }
+      }
+    ],
+    "measurementsFile": "automation-activity-track-before-measurements.json",
+    "measurementsSha256": "80d6a17d5b962263d106a8ac9517e1036a324ab989a6ed67f2cdff75326e1f02"
+  },
+  "after": {
+    "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+    "buildFingerprint": "9f5f735176ee22ac",
+    "pins": {
+      "agentServer": "1.56.0",
+      "agentCanvas": "1.29.0",
+      "automation": "1.22.0"
+    },
+    "versions": {
+      "agentServer": "1.56.0",
+      "sdk": "1.56.0"
+    },
+    "sourceSha256": "c95c98be8d8de58b283bbedf65da98376d89b6d4ea9f31764c1242be7e91182c",
+    "sourceFiles": {
+      "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx": "c95c98be8d8de58b283bbedf65da98376d89b6d4ea9f31764c1242be7e91182c",
+      "src/components/features/home/featured-automations/automation-run-activity-metrics.ts": "3cbce7b642deaf9a9db3962cd4e5c319620ad4e6c3c28bbcf505cce64a2ac921",
+      "package-lock.json": "c8736896d0c9ff7a7ddca9cba1bb199f46be9d2b46190c62a7fd464663ddc147",
+      "config/defaults.json": "b99dfd6b696560494d8a91f3eac1cc0cccd58b24dc1bd1a84ba5a069274eeffc"
+    },
+    "lockfileSha256": "c8736896d0c9ff7a7ddca9cba1bb199f46be9d2b46190c62a7fd464663ddc147",
+    "defaultsSha256": "b99dfd6b696560494d8a91f3eac1cc0cccd58b24dc1bd1a84ba5a069274eeffc",
+    "sourceHashesIndependentlyVerified": true,
+    "fixtureRuns": [
+      {
+        "fixtureRunId": "0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+        "durationMs": 24065.733,
+        "expectedBarHeightPx": 10
+      },
+      {
+        "fixtureRunId": "f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+        "durationMs": 22180.048,
+        "expectedBarHeightPx": 10
+      }
+    ],
+    "actionAudit": [
+      {
+        "fixtureRunId": "f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+        "actionEventCount": 1,
+        "actionTools": [
+          "finish"
+        ],
+        "otherActionToolCount": 0
+      },
+      {
+        "fixtureRunId": "0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+        "actionEventCount": 1,
+        "actionTools": [
+          "finish"
+        ],
+        "otherActionToolCount": 0
+      }
+    ],
+    "checks": [
+      {
+        "name": "dashboard-grid-tooltip",
+        "result": {
+          "ok": true,
+          "source": "role=tooltip",
+          "text": "Successful\nLast run\nJust now\nDuration\n24s\n\nReplied \"Ready\" as requested and ran no tools."
+        }
+      },
+      {
+        "name": "dashboard-list-deeplink",
+        "fixtureRunPath": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+        "highlightVisible": {
+          "ok": true,
+          "visible": true
+        }
+      },
+      {
+        "name": "dashboard-grid-deeplink",
+        "fixtureRunPath": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+        "highlightVisible": {
+          "ok": true,
+          "visible": true
+        }
+      },
+      {
+        "name": "home-pinned-deeplink",
+        "fixtureRunPath": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+        "highlightVisible": {
+          "ok": true,
+          "visible": true
+        }
+      },
+      {
+        "name": "home-row-deeplink",
+        "fixtureRunPath": "/automations/1118f01b-4116-4986-b5aa-59dd5e5c5e79?run=0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+        "highlightVisible": {
+          "ok": true,
+          "visible": true
+        }
+      }
+    ],
+    "measurementsFile": "automation-activity-track-after-measurements.json",
+    "measurementsSha256": "6e513c7cbd84c8a67ca99bae322f71beec12f7393a8543e1a99d62954d52ee69"
+  },
+  "comparisonFile": "automation-activity-track-comparison.json",
+  "comparisonSha256": "1b531e95f05f06b4fef674a570274c64aed8ffac4910594f3e3d3e52cef86068",
+  "derivedDetails": [
+    {
+      "phase": "before",
+      "file": "automation-activity-track-before-pinned-card-detail.png",
+      "sha256": "e7ce6afcc54d0f1f16be604d5ed0e8d68b5038b8d953be9e79dc00cf812037ba",
+      "parent": "automation-activity-track-evidence/before-light-plus-phone-home-pinned.png",
+      "parentSha256": "f9d9ce84c93fcd7972878d417f1e2fe99a11968fce49dc48af20c76a49ca511e",
+      "cropPixels": [
+        15,
+        398,
+        349,
+        239
+      ],
+      "note": "Lossless crop of the actual pinned automation card, including the real activity bars. No UI added or repainted."
+    },
+    {
+      "phase": "after",
+      "file": "automation-activity-track-after-pinned-card-detail.png",
+      "sha256": "0c8a1224b77da0ee730a49f8f1976ecd71ece41e3267f26cc92a1f12b76b6473",
+      "parent": "automation-activity-track-evidence/after-light-plus-phone-home-pinned.png",
+      "parentSha256": "43374eae8e1ada41e6432d461fbc77dd428ed3b833988e83164b5bf4b385a1d0",
+      "cropPixels": [
+        15,
+        398,
+        349,
+        239
+      ],
+      "note": "Lossless crop of the actual pinned automation card, including the real activity bars. No UI added or repainted."
+    }
+  ]
+}

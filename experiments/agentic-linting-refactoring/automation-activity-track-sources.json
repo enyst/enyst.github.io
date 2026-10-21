@@ -1,0 +1,496 @@
+{
+  "beforeRevision": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+  "afterRevision": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+  "builds": {
+    "before": "a151f5302526efe6",
+    "after": "9f5f735176ee22ac"
+  },
+  "agentServer": "1.56.0",
+  "sdk": "1.56.0",
+  "implementation": {
+    "layoutOnly": true,
+    "intendedVisualRedesign": false,
+    "sourcePath": "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx",
+    "change": "Move the fixed 18px sparkline track height from an inline declaration to the CSS recipe. Dynamic per-bar height calculation is unchanged."
+  },
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18788",
+  "captureProvenance": "automation-activity-track-capture-provenance.json",
+  "captureProvenanceSha256": "2e998c5645ebafaba3bb806a925afc64d488279a8c656e5671a67e3e44592367",
+  "evidenceDownload": "automation-activity-track-evidence.zip",
+  "evidenceDownloadSha256": "7a5fe3964d8ca584fd62a588dabce8a83f29c1532a685a346c723cfcc46c5ff2",
+  "scope": {
+    "consumers": [
+      "Dashboard grid",
+      "Dashboard list",
+      "Home pinned card",
+      "Home activity row"
+    ],
+    "themes": [
+      "OpenHands-Neutral",
+      "Light+",
+      "OpenHands-DeepSea"
+    ],
+    "viewports": [
+      "1440\u00d71000 desktop",
+      "390\u00d7844 phone"
+    ],
+    "pairedMeasurements": 24,
+    "selectedScreenshots": 48,
+    "selectedRawClips": 4,
+    "layoutOnly": true
+  },
+  "comparisonScope": {
+    "fixedTrackHeightPx": 18,
+    "trackWidthPx": 16,
+    "barWidthPx": 4,
+    "linkHitTargetPx": [
+      8,
+      18
+    ],
+    "independentRunData": true,
+    "pixelEquivalenceClaim": false,
+    "perBarHeightEqualityClaim": false,
+    "barDurationComparisonMeaning": "Hit-target dimensions, widths and status colors are retained. Fixture run URLs and durations naturally differ across phases."
+  },
+  "comparisonNote": "Same 18 px track \u00b7 Real run durations differ.",
+  "realRunDurations": {
+    "before": [
+      {
+        "fixtureRunId": "1c5cc63d-91dd-404a-a17f-cc85100edabb",
+        "durationMs": 42866.965000000004,
+        "expectedBarHeightPx": 11
+      },
+      {
+        "fixtureRunId": "6d85b967-4575-49d3-9d3a-39a4eb08f8e3",
+        "durationMs": 35691.748,
+        "expectedBarHeightPx": 10
+      }
+    ],
+    "after": [
+      {
+        "fixtureRunId": "0b2a9cb3-d454-43c0-84a2-80b1a5959bdf",
+        "durationMs": 24065.733,
+        "expectedBarHeightPx": 10
+      },
+      {
+        "fixtureRunId": "f94845ab-23db-43f6-a48a-42cb20eaa8e2",
+        "durationMs": 22180.048,
+        "expectedBarHeightPx": 10
+      }
+    ]
+  },
+  "limits": [
+    "Layout-only lint refactor: same18px track retained. Dynamic per-bar height code is unchanged.",
+    "Independent real runs have naturally different durations, summaries and IDs. Per-run heights are compared against actual duration formula, not asserted identical across phases.",
+    "Initial Before read-only capture attempts had an input-text selector mismatch and an output-field handling error. Two early grid/list PNGs, two selector-failure PNGs and an initial running screenshot are retained locally but excluded from publication; no app or harness source was edited.",
+    "The first transient deep-link/log inspection accidentally selected ExportJSON, then a read-only dialog snapshot timed out; its local failure PNG is excluded. The stack doctor stayed healthy.",
+    "Recordings are normal control-openhands recordings; no pause/resume or clock manipulation. CLI itself compresses unchanged-frame time as reported per clip.",
+    "Live evidence covers the four named consumers in standalone Local Canvas, Neutral/Light+/DeepSea, desktop and phone. No authenticated Cloud, ACP, all-five-theme or arbitrary embedded-host visual pass is claimed."
+  ],
+  "cleanup": {
+    "before": {
+      "fixtureDeleted": true,
+      "remainingFixtureAutomations": 0,
+      "browserStopped": true,
+      "launcherStopped": true,
+      "ports": {
+        "ingress": "closed",
+        "agentServer": "closed",
+        "automation": "closed",
+        "frontend": "closed",
+        "vscode": "closed"
+      },
+      "privatePurged": true,
+      "evidenceFilesBeforePurge": 33,
+      "evidenceFilesAfterPurge": 33,
+      "retainedEvidenceVerified": true,
+      "ok": true
+    },
+    "after": {
+      "fixtureDeleted": true,
+      "remainingFixtureAutomations": 0,
+      "browserStopped": true,
+      "launcherStopped": true,
+      "ports": {
+        "ingress": "closed",
+        "agentServer": "closed",
+        "automation": "closed",
+        "frontend": "closed",
+        "vscode": "closed"
+      },
+      "privatePurged": true,
+      "evidenceFilesBeforePurge": 28,
+      "evidenceFilesAfterPurge": 28,
+      "retainedEvidenceVerified": true,
+      "ok": true
+    }
+  },
+  "diagnostics": {
+    "before": {
+      "pageErrors": 0,
+      "appErrors": 0,
+      "warnings": 0
+    },
+    "after": {
+      "pageErrors": 0,
+      "appErrors": 0,
+      "warnings": 0
+    }
+  },
+  "page": "https://enyst.github.io/arch/agentic-linting-refactoring.html#automation-activity-track-film",
+  "directDownload": "https://enyst.github.io/experiments/agentic-linting-refactoring/automation-activity-track-before-after.mp4",
+  "title": "Automation activity track",
+  "recipeSha256": "f7c27d38774ede7b5948f4227050f25d0f104d07e53742f88c4bb06db95446ef",
+  "film": {
+    "file": "automation-activity-track-before-after.mp4",
+    "dimensions": [
+      1440,
+      1120
+    ],
+    "durationSeconds": 31.4,
+    "framesPerSecond": 20,
+    "source": "Authentic control-openhands browser receipts. Complete app viewports are established before any explicitly labeled actual screenshot Detail crops. Title cards and banners are editorial labels, not execution proof.",
+    "scenes": [
+      {
+        "phase": "before",
+        "label": "Before \u00b7 Inline height",
+        "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+        "servedBuildFingerprint": "a151f5302526efe6",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "kind": "recording",
+        "publicSourcePath": "automation-activity-track-before-desktop-raw.mp4",
+        "subtitle": "Neutral \u00b7 Desktop excerpt \u00b7 Original playback",
+        "caption": "Before: actual desktop excerpt, original source seconds 0\u20136. Original CLI playback timing; no editorial speed change. Same 18 px track; real run durations differ.",
+        "scope": "Actual complete viewport retained. Source clip timing and any CLI timing behavior are documented in capture provenance; full original is downloadable.",
+        "source": "automation-activity-track-before-desktop-raw.mp4",
+        "sourceSha256": "02b9bd6c88254a8d89e43d5bd9c63f17c6da7a28dfbb40f6692dd556f78b61bc",
+        "sourceBytes": 370772,
+        "sourceDimensions": [
+          1440,
+          1000
+        ],
+        "timelineSeconds": [
+          1.4,
+          7.4
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": 11.8,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 0.0
+      },
+      {
+        "phase": "after",
+        "label": "After \u00b7 CSS height",
+        "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+        "servedBuildFingerprint": "9f5f735176ee22ac",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "kind": "recording",
+        "publicSourcePath": "automation-activity-track-after-desktop-raw.mp4",
+        "subtitle": "Neutral \u00b7 Desktop excerpt \u00b7 Original playback",
+        "caption": "After: actual desktop excerpt, original source seconds 0\u20136. Original CLI playback timing; no editorial speed change. Same 18 px track; real run durations differ.",
+        "scope": "Actual complete viewport retained. Source clip timing and any CLI timing behavior are documented in capture provenance; full original is downloadable.",
+        "source": "automation-activity-track-after-desktop-raw.mp4",
+        "sourceSha256": "17304a7cd56b73aaa099a8060374b806a875c3c2e6bfe6efaf990e9a3be8499c",
+        "sourceBytes": 442892,
+        "sourceDimensions": [
+          1440,
+          1000
+        ],
+        "timelineSeconds": [
+          7.4,
+          13.4
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": 9.4,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 0.0
+      },
+      {
+        "phase": "before",
+        "label": "Before \u00b7 Inline height",
+        "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+        "servedBuildFingerprint": "a151f5302526efe6",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "kind": "recording",
+        "publicSourcePath": "automation-activity-track-before-phone-raw.mp4",
+        "subtitle": "Neutral \u00b7 Phone \u00b7 Complete viewport",
+        "caption": "Before: complete actual phone recording. Original CLI playback timing; no editorial speed change. Same 18 px track; real run durations differ.",
+        "scope": "Actual complete viewport retained. Source clip timing and any CLI timing behavior are documented in capture provenance; full original is downloadable.",
+        "source": "automation-activity-track-before-phone-raw.mp4",
+        "sourceSha256": "74d9f57fd57173fda465651ab3a2cf92b927d779e1ad8dfc81d134a2982a167c",
+        "sourceBytes": 81761,
+        "sourceDimensions": [
+          390,
+          844
+        ],
+        "timelineSeconds": [
+          13.4,
+          17.3
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": 3.9,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 0.0
+      },
+      {
+        "phase": "after",
+        "label": "After \u00b7 CSS height",
+        "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+        "servedBuildFingerprint": "9f5f735176ee22ac",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "kind": "recording",
+        "publicSourcePath": "automation-activity-track-after-phone-raw.mp4",
+        "subtitle": "Neutral \u00b7 Phone \u00b7 Complete viewport",
+        "caption": "After: complete actual phone recording. Original CLI playback timing; no editorial speed change. Same 18 px track; real run durations differ.",
+        "scope": "Actual complete viewport retained. Source clip timing and any CLI timing behavior are documented in capture provenance; full original is downloadable.",
+        "source": "automation-activity-track-after-phone-raw.mp4",
+        "sourceSha256": "bb28542ba5b41fc94194279e36b18d83d6f2dc2545be4bfb383978af667cd624",
+        "sourceBytes": 82018,
+        "sourceDimensions": [
+          390,
+          844
+        ],
+        "timelineSeconds": [
+          17.3,
+          21.4
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": 4.1,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 0.0
+      },
+      {
+        "phase": "before",
+        "label": "Before \u00b7 Inline height",
+        "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+        "servedBuildFingerprint": "a151f5302526efe6",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "kind": "screenshot",
+        "publicSourcePath": "automation-activity-track-evidence/before-light-plus-phone-home-pinned.png",
+        "subtitle": "Light+ \u00b7 Full phone context",
+        "caption": "Before: actual Light+ phone context with pinned card and activity row. The fixed track remains 18 pixels; independent run durations differ.",
+        "scope": "Actual full-viewport screenshot hold, before any detail crop.",
+        "source": "automation-activity-track-evidence/before-light-plus-phone-home-pinned.png",
+        "sourceSha256": "f9d9ce84c93fcd7972878d417f1e2fe99a11968fce49dc48af20c76a49ca511e",
+        "sourceBytes": 38663,
+        "sourceDimensions": [
+          390,
+          844
+        ],
+        "timelineSeconds": [
+          21.4,
+          23.4
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 2.0
+      },
+      {
+        "phase": "after",
+        "label": "After \u00b7 CSS height",
+        "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+        "servedBuildFingerprint": "9f5f735176ee22ac",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "kind": "screenshot",
+        "publicSourcePath": "automation-activity-track-evidence/after-light-plus-phone-home-pinned.png",
+        "subtitle": "Light+ \u00b7 Full phone context",
+        "caption": "After: actual Light+ phone context with pinned card and activity row. The fixed track remains 18 pixels; independent run durations differ.",
+        "scope": "Actual full-viewport screenshot hold, before any detail crop.",
+        "source": "automation-activity-track-evidence/after-light-plus-phone-home-pinned.png",
+        "sourceSha256": "43374eae8e1ada41e6432d461fbc77dd428ed3b833988e83164b5bf4b385a1d0",
+        "sourceBytes": 38302,
+        "sourceDimensions": [
+          390,
+          844
+        ],
+        "timelineSeconds": [
+          23.4,
+          25.4
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 2.0
+      },
+      {
+        "phase": "before",
+        "label": "Before \u00b7 Inline height",
+        "head": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+        "servedBuildFingerprint": "a151f5302526efe6",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "kind": "screenshot",
+        "publicSourcePath": "automation-activity-track-before-pinned-card-detail.png",
+        "subtitle": "Detail \u00b7 Same 18 px track \u00b7 Real run durations differ",
+        "caption": "Before: Same 18 px track \u00b7 Real run durations differ. Actual pinned-card crop; Before bars measure 11/10 px and After bars 10/10 px, matching genuine run durations.",
+        "actualDetailCrop": true,
+        "detailOf": "automation-activity-track-evidence/before-light-plus-phone-home-pinned.png",
+        "detailOfSha256": "f9d9ce84c93fcd7972878d417f1e2fe99a11968fce49dc48af20c76a49ca511e",
+        "detailCropPixels": [
+          15,
+          398,
+          349,
+          239
+        ],
+        "scope": "Actual screenshot detail after full context; 18px track unchanged, duration-driven bars intentionally not asserted equal.",
+        "source": "automation-activity-track-before-pinned-card-detail.png",
+        "sourceSha256": "e7ce6afcc54d0f1f16be604d5ed0e8d68b5038b8d953be9e79dc00cf812037ba",
+        "sourceBytes": 17677,
+        "sourceDimensions": [
+          349,
+          239
+        ],
+        "timelineSeconds": [
+          25.4,
+          28.4
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Actual screenshot detail crop, proportionally enlarged below a separate editorial banner; full viewport established earlier.",
+        "stillOrHeldSeconds": 3.0
+      },
+      {
+        "phase": "after",
+        "label": "After \u00b7 CSS height",
+        "head": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+        "servedBuildFingerprint": "9f5f735176ee22ac",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "kind": "screenshot",
+        "publicSourcePath": "automation-activity-track-after-pinned-card-detail.png",
+        "subtitle": "Detail \u00b7 Same 18 px track \u00b7 Real run durations differ",
+        "caption": "After: Same 18 px track \u00b7 Real run durations differ. Actual pinned-card crop; Before bars measure 11/10 px and After bars 10/10 px, matching genuine run durations.",
+        "actualDetailCrop": true,
+        "detailOf": "automation-activity-track-evidence/after-light-plus-phone-home-pinned.png",
+        "detailOfSha256": "43374eae8e1ada41e6432d461fbc77dd428ed3b833988e83164b5bf4b385a1d0",
+        "detailCropPixels": [
+          15,
+          398,
+          349,
+          239
+        ],
+        "scope": "Actual screenshot detail after full context; 18px track unchanged, duration-driven bars intentionally not asserted equal.",
+        "source": "automation-activity-track-after-pinned-card-detail.png",
+        "sourceSha256": "0c8a1224b77da0ee730a49f8f1976ecd71ece41e3267f26cc92a1f12b76b6473",
+        "sourceBytes": 17289,
+        "sourceDimensions": [
+          349,
+          239
+        ],
+        "timelineSeconds": [
+          28.4,
+          31.4
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Actual screenshot detail crop, proportionally enlarged below a separate editorial banner; full viewport established earlier.",
+        "stillOrHeldSeconds": 3.0
+      }
+    ],
+    "chapters": [
+      {
+        "from": 0,
+        "to": 1.4,
+        "kind": "presentation-title",
+        "caption": "Automation activity track"
+      },
+      {
+        "from": 1.4,
+        "to": 7.4,
+        "kind": "recording",
+        "caption": "Before: actual desktop excerpt, original source seconds 0\u20136. Original CLI playback timing; no editorial speed change. Same 18 px track; real run durations differ."
+      },
+      {
+        "from": 7.4,
+        "to": 13.4,
+        "kind": "recording",
+        "caption": "After: actual desktop excerpt, original source seconds 0\u20136. Original CLI playback timing; no editorial speed change. Same 18 px track; real run durations differ."
+      },
+      {
+        "from": 13.4,
+        "to": 17.3,
+        "kind": "recording",
+        "caption": "Before: complete actual phone recording. Original CLI playback timing; no editorial speed change. Same 18 px track; real run durations differ."
+      },
+      {
+        "from": 17.3,
+        "to": 21.4,
+        "kind": "recording",
+        "caption": "After: complete actual phone recording. Original CLI playback timing; no editorial speed change. Same 18 px track; real run durations differ."
+      },
+      {
+        "from": 21.4,
+        "to": 23.4,
+        "kind": "screenshot",
+        "caption": "Before: actual Light+ phone context with pinned card and activity row. The fixed track remains 18 pixels; independent run durations differ."
+      },
+      {
+        "from": 23.4,
+        "to": 25.4,
+        "kind": "screenshot",
+        "caption": "After: actual Light+ phone context with pinned card and activity row. The fixed track remains 18 pixels; independent run durations differ."
+      },
+      {
+        "from": 25.4,
+        "to": 28.4,
+        "kind": "screenshot",
+        "caption": "Before: Same 18 px track \u00b7 Real run durations differ. Actual pinned-card crop; Before bars measure 11/10 px and After bars 10/10 px, matching genuine run durations."
+      },
+      {
+        "from": 28.4,
+        "to": 31.4,
+        "kind": "screenshot",
+        "caption": "After: Same 18 px track \u00b7 Real run durations differ. Actual pinned-card crop; Before bars measure 11/10 px and After bars 10/10 px, matching genuine run durations."
+      }
+    ],
+    "ambience": {
+      "origin": "Original synthesized ambient pad; no external samples or provider.",
+      "frequenciesHz": [
+        174.61,
+        220,
+        261.63
+      ],
+      "amplitude": 0.004,
+      "fadeInSeconds": 1.5,
+      "fadeOutSeconds": 2,
+      "meanDbfs": -52.5,
+      "peakDbfs": -42.9,
+      "applicationAudio": false
+    }
+  },
+  "preview": {
+    "file": "automation-activity-track-before-after.gif",
+    "durationSeconds": 30.0,
+    "dimensions": [
+      864,
+      672
+    ],
+    "audio": false,
+    "limitation": "Scaled silent preview; use the MP4 or original screenshots for small UI details."
+  },
+  "files": {
+    "automation-activity-track-before-after.mp4": {
+      "sha256": "2d6ece4cc61a19dc59816ea7e4fbe075241c2ae546fec1f4cd29e2aa1c3108a9",
+      "bytes": 1092156
+    },
+    "automation-activity-track-poster.jpg": {
+      "sha256": "c987b5de0e30bd2a703c2e9f618694a210f00aaa423794ad519250dcec1802bf",
+      "bytes": 86828
+    },
+    "automation-activity-track-captions.vtt": {
+      "sha256": "c134ca144ba23c8194c87df3e3c4bb1809f18b8e6d9d50af7de6fbda0f3b4338",
+      "bytes": 1536
+    },
+    "automation-activity-track-before-after.gif": {
+      "sha256": "bfe10140e1571e7ba161606ffc6de17a9044ee52b76eac9754d613bc413be962",
+      "bytes": 1312754
+    }
+  }
+}
