@@ -1,0 +1,543 @@
+{
+  "beforeRevision": "630e587a0de0b4106173ba0d39ac865d60a51a5a",
+  "afterRevision": "bde133fb5e75019021bbf603c62567ea4aa3a741",
+  "builds": {
+    "before": "8e676f49549e7308",
+    "after": "d6a9fbc5aa60245d"
+  },
+  "agentServer": "1.56.0",
+  "sdk": "1.56.0",
+  "implementation": {
+    "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18763",
+    "sourcePath": "src/components/features/conversation/conversation-main/chat-interface-wrapper.tsx",
+    "layoutOnly": true,
+    "intendedVisualRedesign": false
+  },
+  "captureProvenance": "overview-column-width-capture-provenance.json",
+  "captureProvenanceSha256": "74100441f5a100d466cfe4bbe7312950a71af19081a18437492163b6005e4352",
+  "evidenceDownload": "overview-column-width-evidence.zip",
+  "evidenceDownloadSha256": "a77dfad7ceb4b92a53d0959230ea932ca969b82c78b1c0b45ff5a092a89393e9",
+  "scope": {
+    "host": "standalone Local Agent Canvas",
+    "themes": [
+      "OpenHands-Neutral",
+      "Light+",
+      "OpenHands-DeepSea"
+    ],
+    "pairedCases": 14,
+    "selectedOriginals": 23,
+    "pairedCasesWithZeroDifferences": 14,
+    "outerAndInnerWidthPixels": 268,
+    "cardWidthPixels": 240,
+    "responsiveKnownBug": "#16792 reproduced in both phases; not a pass or fix."
+  },
+  "limits": [
+    "Existing #16792: at phone/tablet sizes the overview toggle can say Hide overview / pressed=true while no overview column or card is rendered. Reproduced in both phases, not counted as a pass or changed by this layout-only patch.",
+    "Baseline overview error ledger inherits the prior preview mode transitions (#17567); fresh overview After run has its own error ledger.",
+    "Baseline responsive recording first toggles the persisted overview state off. A separate original phone-toggle recording shows it pressed on with no card. Select the actually-on baseline screenshot for the known-bug comparison.",
+    "Layout-only migration from an inline declaration to a Tailwind/CSS-owned property; the film demonstrates retained behavior, not a visual redesign.",
+    "Representative live evidence covers Local standalone Canvas in Neutral, Light+ and DeepSea, plus the recorded viewport cases. No all-five-theme, authenticated Cloud, ACP or arbitrary embedded-host visual pass is claimed."
+  ],
+  "diagnostics": {
+    "before": {
+      "pageErrors": 3,
+      "appErrors": 3,
+      "warnings": 0,
+      "distinctMessages": [
+        "TextModel got disposed before DiffEditorWidget model got reset"
+      ]
+    },
+    "after": {
+      "pageErrors": 0,
+      "appErrors": 0,
+      "warnings": 0,
+      "distinctMessages": []
+    }
+  },
+  "cleanup": {
+    "before": {
+      "stoppedAt": "2026-10-21T12:04:06.807Z",
+      "browserStopped": true,
+      "launcherStopped": true,
+      "ports": {
+        "ingress": "closed",
+        "agentServer": "closed",
+        "automation": "closed",
+        "frontend": "closed",
+        "vscode": "closed"
+      },
+      "privatePurged": true,
+      "evidenceFilesBeforePurge": 28,
+      "evidenceFilesAfterPurge": 28,
+      "ok": true
+    },
+    "after": {
+      "stoppedAt": "2026-10-21T12:10:14.144Z",
+      "browserStopped": true,
+      "launcherStopped": true,
+      "ports": {
+        "ingress": "closed",
+        "agentServer": "closed",
+        "automation": "closed",
+        "frontend": "closed",
+        "vscode": "closed"
+      },
+      "privatePurged": true,
+      "evidenceFilesBeforePurge": 11,
+      "evidenceFilesAfterPurge": 11,
+      "ok": true
+    }
+  },
+  "page": "https://enyst.github.io/arch/agentic-linting-refactoring.html#overview-column-width-film",
+  "directDownload": "https://enyst.github.io/experiments/agentic-linting-refactoring/overview-column-width-before-after.mp4",
+  "responsiveKnownBug": {
+    "issue": "#16792",
+    "result": "Reproduced in both phases; not fixed or counted as a pass",
+    "before": {
+      "pressed": "true",
+      "label": "Hide overview",
+      "columnCount": 0,
+      "panelCount": 0
+    },
+    "after": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "column": null,
+      "inner": null,
+      "panel": null,
+      "toggle": {
+        "label": "Hide overview",
+        "pressed": "true"
+      },
+      "rightPanelPressed": "false",
+      "pageHorizontalOverflow": false
+    },
+    "selectedBeforeScreenshot": "overview-column-width-evidence/before-phone-toggled-actually-on.png",
+    "selectedAfterScreenshot": "overview-column-width-evidence/overview-after-phone-toggled-on.png",
+    "stateAssociationNote": "The baseline -toggled-on and -toggled-actually-on screenshots have identical encoded bytes. Their associated read-only DOM receipts identify different toggle states. Selection ties the image to the pressed-on state; no distinct replacement pixels or pixel change is claimed."
+  },
+  "title": "Overview column width",
+  "recipeSha256": "8a3939621599ede446df7776d37367e785839949b029906883533f829f9c5cd0",
+  "film": {
+    "file": "overview-column-width-before-after.mp4",
+    "dimensions": [
+      1440,
+      1120
+    ],
+    "durationSeconds": 33.2,
+    "framesPerSecond": 20,
+    "source": "Authentic control-openhands browser receipts. Complete app viewports are established before any explicitly labeled actual screenshot Detail crops. Title cards and banners are editorial labels, not execution proof.",
+    "scenes": [
+      {
+        "phase": "before",
+        "head": "630e587a0de0b4106173ba0d39ac865d60a51a5a",
+        "servedBuildFingerprint": "8e676f49549e7308",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "Before \u00b7 Inline width",
+        "kind": "recording",
+        "publicSourcePath": "overview-column-width-before-desktop-raw.mp4",
+        "subtitle": "Neutral \u00b7 Desktop \u00b7 Same 268 px column",
+        "caption": "Before: entire actual desktop recording; opening, closing and right-panel mutual exclusion retain the measured 268-pixel overview column.",
+        "scope": "Entire original normal-speed CLI recording. No pause/resume or speed changes; the CLI holds its final frame.",
+        "source": "overview-column-width-before-desktop-raw.mp4",
+        "sourceSha256": "e54ad6bc56a6dfe66aee7bea3262bd8232dfc53d15c09cc4f4c93274f06952d8",
+        "sourceBytes": 143857,
+        "sourceDimensions": [
+          1440,
+          1000
+        ],
+        "timelineSeconds": [
+          1.4,
+          7.0
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": 5.6,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 0.0
+      },
+      {
+        "phase": "after",
+        "head": "bde133fb5e75019021bbf603c62567ea4aa3a741",
+        "servedBuildFingerprint": "d6a9fbc5aa60245d",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "After \u00b7 CSS width",
+        "kind": "recording",
+        "publicSourcePath": "overview-column-width-after-desktop-raw.mp4",
+        "subtitle": "Neutral \u00b7 Desktop \u00b7 Same 268 px column",
+        "caption": "After: entire actual desktop recording; opening, closing and right-panel mutual exclusion retain the measured 268-pixel overview column.",
+        "scope": "Entire original normal-speed CLI recording. No pause/resume or speed changes; the CLI holds its final frame.",
+        "source": "overview-column-width-after-desktop-raw.mp4",
+        "sourceSha256": "43b06d3ea5f35fc3d5177c8b007a66904499726051a42ca9df63552348168aec",
+        "sourceBytes": 140892,
+        "sourceDimensions": [
+          1440,
+          1000
+        ],
+        "timelineSeconds": [
+          7.0,
+          12.6
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": 5.6,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 0.0
+      },
+      {
+        "phase": "before",
+        "head": "630e587a0de0b4106173ba0d39ac865d60a51a5a",
+        "servedBuildFingerprint": "8e676f49549e7308",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "Before \u00b7 Inline width",
+        "kind": "recording",
+        "publicSourcePath": "overview-column-width-before-responsive-raw.mp4",
+        "subtitle": "Responsive layout \u00b7 Normal speed",
+        "caption": "Before: entire actual responsive recording; desktop, narrow, threshold and phone states are preserved. Known phone issue #16792 remains separate from passing geometry checks.",
+        "scope": "Entire original normal-speed CLI recording. No pause/resume or speed changes; the CLI holds its final frame.",
+        "source": "overview-column-width-before-responsive-raw.mp4",
+        "sourceSha256": "c524d1a5b5df7d04e6cca714c8cf58c7984bf7f4a647e700a70c87019ae80e3c",
+        "sourceBytes": 113558,
+        "sourceDimensions": [
+          1440,
+          1000
+        ],
+        "timelineSeconds": [
+          12.6,
+          17.1
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": 4.5,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 0.0
+      },
+      {
+        "phase": "after",
+        "head": "bde133fb5e75019021bbf603c62567ea4aa3a741",
+        "servedBuildFingerprint": "d6a9fbc5aa60245d",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "After \u00b7 CSS width",
+        "kind": "recording",
+        "publicSourcePath": "overview-column-width-after-responsive-raw.mp4",
+        "subtitle": "Responsive layout \u00b7 Normal speed",
+        "caption": "After: entire actual responsive recording; desktop, narrow, threshold and phone states are preserved. Known phone issue #16792 remains separate from passing geometry checks.",
+        "scope": "Entire original normal-speed CLI recording. No pause/resume or speed changes; the CLI holds its final frame.",
+        "source": "overview-column-width-after-responsive-raw.mp4",
+        "sourceSha256": "42958993979be410b742f795362467bc54a99b58cde409add73cf3fbb30d80bd",
+        "sourceBytes": 110969,
+        "sourceDimensions": [
+          1440,
+          1000
+        ],
+        "timelineSeconds": [
+          17.1,
+          21.6
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": 4.5,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 0.0
+      },
+      {
+        "phase": "before",
+        "head": "630e587a0de0b4106173ba0d39ac865d60a51a5a",
+        "servedBuildFingerprint": "8e676f49549e7308",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "Before \u00b7 Inline width",
+        "kind": "screenshot",
+        "publicSourcePath": "overview-column-width-evidence/before-light-plus-desktop-open.png",
+        "subtitle": "Light+ \u00b7 Full context \u00b7 268 px column",
+        "caption": "Before: matched full context in Light+; inner and outer columns measure 268 pixels and the visible card measures 240 pixels.",
+        "scope": "Matched actual full-viewport screenshot hold.",
+        "source": "overview-column-width-evidence/before-light-plus-desktop-open.png",
+        "sourceSha256": "fe40890deda08c9b697949ae7580e6f3ec2d445428e9766376bdb5d2c5369a41",
+        "sourceBytes": 73436,
+        "sourceDimensions": [
+          1440,
+          1000
+        ],
+        "timelineSeconds": [
+          21.6,
+          23.6
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 2.0
+      },
+      {
+        "phase": "after",
+        "head": "bde133fb5e75019021bbf603c62567ea4aa3a741",
+        "servedBuildFingerprint": "d6a9fbc5aa60245d",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "After \u00b7 CSS width",
+        "kind": "screenshot",
+        "publicSourcePath": "overview-column-width-evidence/overview-after-light-plus-desktop-open.png",
+        "subtitle": "Light+ \u00b7 Full context \u00b7 268 px column",
+        "caption": "After: matched full context in Light+; inner and outer columns measure 268 pixels and the visible card measures 240 pixels.",
+        "scope": "Matched actual full-viewport screenshot hold.",
+        "source": "overview-column-width-evidence/overview-after-light-plus-desktop-open.png",
+        "sourceSha256": "bc9a4bcd87929f1bd5d73f368409bd1cf09156e07a16bed981277446055dd571",
+        "sourceBytes": 72255,
+        "sourceDimensions": [
+          1440,
+          1000
+        ],
+        "timelineSeconds": [
+          23.6,
+          25.6
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 2.0
+      },
+      {
+        "phase": "before",
+        "head": "630e587a0de0b4106173ba0d39ac865d60a51a5a",
+        "servedBuildFingerprint": "8e676f49549e7308",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "Before \u00b7 Inline width",
+        "kind": "screenshot",
+        "publicSourcePath": "overview-column-width-before-column-detail.png",
+        "subtitle": "Detail \u00b7 Same 268 px column \u00b7 Light+",
+        "caption": "Before: actual overview detail; the column stays 268 pixels and the card stays 240 pixels. The patch moves the inner width declaration to CSS.",
+        "scope": "Actual screenshot detail after full context; no UI synthesized.",
+        "actualDetailCrop": true,
+        "detailOf": "overview-column-width-evidence/before-light-plus-desktop-open.png",
+        "detailOfSha256": "fe40890deda08c9b697949ae7580e6f3ec2d445428e9766376bdb5d2c5369a41",
+        "detailCropPixels": [
+          1172,
+          40,
+          268,
+          160
+        ],
+        "source": "overview-column-width-before-column-detail.png",
+        "sourceSha256": "93e1d15b63a94af45c666b6872bfe0f8a5df7d2a2649054e9eedee7e29958c6b",
+        "sourceBytes": 7976,
+        "sourceDimensions": [
+          268,
+          160
+        ],
+        "timelineSeconds": [
+          25.6,
+          27.6
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Actual screenshot detail crop, proportionally enlarged below a separate editorial banner; full viewport established earlier.",
+        "stillOrHeldSeconds": 2.0
+      },
+      {
+        "phase": "after",
+        "head": "bde133fb5e75019021bbf603c62567ea4aa3a741",
+        "servedBuildFingerprint": "d6a9fbc5aa60245d",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "After \u00b7 CSS width",
+        "kind": "screenshot",
+        "publicSourcePath": "overview-column-width-after-column-detail.png",
+        "subtitle": "Detail \u00b7 Same 268 px column \u00b7 Light+",
+        "caption": "After: actual overview detail; the column stays 268 pixels and the card stays 240 pixels. The patch moves the inner width declaration to CSS.",
+        "scope": "Actual screenshot detail after full context; no UI synthesized.",
+        "actualDetailCrop": true,
+        "detailOf": "overview-column-width-evidence/overview-after-light-plus-desktop-open.png",
+        "detailOfSha256": "bc9a4bcd87929f1bd5d73f368409bd1cf09156e07a16bed981277446055dd571",
+        "detailCropPixels": [
+          1172,
+          40,
+          268,
+          160
+        ],
+        "source": "overview-column-width-after-column-detail.png",
+        "sourceSha256": "93e1d15b63a94af45c666b6872bfe0f8a5df7d2a2649054e9eedee7e29958c6b",
+        "sourceBytes": 7976,
+        "sourceDimensions": [
+          268,
+          160
+        ],
+        "timelineSeconds": [
+          27.6,
+          29.6
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Actual screenshot detail crop, proportionally enlarged below a separate editorial banner; full viewport established earlier.",
+        "stillOrHeldSeconds": 2.0
+      },
+      {
+        "phase": "before",
+        "head": "630e587a0de0b4106173ba0d39ac865d60a51a5a",
+        "servedBuildFingerprint": "8e676f49549e7308",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "Before \u00b7 Inline width",
+        "kind": "screenshot",
+        "publicSourcePath": "overview-column-width-evidence/before-phone-toggled-actually-on.png",
+        "subtitle": "Phone \u00b7 Known #16792 \u00b7 Still absent",
+        "caption": "Before: known issue #16792 remains: toggle pressed on, overview card absent. This is a reproduced limitation, not a passing phone result or a fix.",
+        "scope": "Matched actual full-viewport screenshot hold.",
+        "source": "overview-column-width-evidence/before-phone-toggled-actually-on.png",
+        "sourceSha256": "9276492305145046d6b3a78f8b14b0fb550958756639a8d8d5f579678318d483",
+        "sourceBytes": 23242,
+        "sourceDimensions": [
+          390,
+          844
+        ],
+        "timelineSeconds": [
+          29.6,
+          31.4
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 1.8
+      },
+      {
+        "phase": "after",
+        "head": "bde133fb5e75019021bbf603c62567ea4aa3a741",
+        "servedBuildFingerprint": "d6a9fbc5aa60245d",
+        "agentServer": "1.56.0",
+        "sdk": "1.56.0",
+        "label": "After \u00b7 CSS width",
+        "kind": "screenshot",
+        "publicSourcePath": "overview-column-width-evidence/overview-after-phone-toggled-on.png",
+        "subtitle": "Phone \u00b7 Known #16792 \u00b7 Still absent",
+        "caption": "After: known issue #16792 remains: toggle pressed on, overview card absent. This is a reproduced limitation, not a passing phone result or a fix.",
+        "scope": "Matched actual full-viewport screenshot hold.",
+        "source": "overview-column-width-evidence/overview-after-phone-toggled-on.png",
+        "sourceSha256": "9012a25b5520f8f2b4a34508de2c7a71e66918d7baa18dc9fa7efe6108ef746b",
+        "sourceBytes": 23060,
+        "sourceDimensions": [
+          390,
+          844
+        ],
+        "timelineSeconds": [
+          31.4,
+          33.2
+        ],
+        "selectedSourceStartSeconds": 0.0,
+        "sourceDurationSeconds": null,
+        "presentation": "Full real viewport, proportionally fitted below a separate editorial banner.",
+        "stillOrHeldSeconds": 1.8
+      }
+    ],
+    "chapters": [
+      {
+        "from": 0,
+        "to": 1.4,
+        "kind": "presentation-title",
+        "caption": "Overview column width"
+      },
+      {
+        "from": 1.4,
+        "to": 7.0,
+        "kind": "recording",
+        "caption": "Before: entire actual desktop recording; opening, closing and right-panel mutual exclusion retain the measured 268-pixel overview column."
+      },
+      {
+        "from": 7.0,
+        "to": 12.6,
+        "kind": "recording",
+        "caption": "After: entire actual desktop recording; opening, closing and right-panel mutual exclusion retain the measured 268-pixel overview column."
+      },
+      {
+        "from": 12.6,
+        "to": 17.1,
+        "kind": "recording",
+        "caption": "Before: entire actual responsive recording; desktop, narrow, threshold and phone states are preserved. Known phone issue #16792 remains separate from passing geometry checks."
+      },
+      {
+        "from": 17.1,
+        "to": 21.6,
+        "kind": "recording",
+        "caption": "After: entire actual responsive recording; desktop, narrow, threshold and phone states are preserved. Known phone issue #16792 remains separate from passing geometry checks."
+      },
+      {
+        "from": 21.6,
+        "to": 23.6,
+        "kind": "screenshot",
+        "caption": "Before: matched full context in Light+; inner and outer columns measure 268 pixels and the visible card measures 240 pixels."
+      },
+      {
+        "from": 23.6,
+        "to": 25.6,
+        "kind": "screenshot",
+        "caption": "After: matched full context in Light+; inner and outer columns measure 268 pixels and the visible card measures 240 pixels."
+      },
+      {
+        "from": 25.6,
+        "to": 27.6,
+        "kind": "screenshot",
+        "caption": "Before: actual overview detail; the column stays 268 pixels and the card stays 240 pixels. The patch moves the inner width declaration to CSS."
+      },
+      {
+        "from": 27.6,
+        "to": 29.6,
+        "kind": "screenshot",
+        "caption": "After: actual overview detail; the column stays 268 pixels and the card stays 240 pixels. The patch moves the inner width declaration to CSS."
+      },
+      {
+        "from": 29.6,
+        "to": 31.400000000000002,
+        "kind": "screenshot",
+        "caption": "Before: known issue #16792 remains: toggle pressed on, overview card absent. This is a reproduced limitation, not a passing phone result or a fix."
+      },
+      {
+        "from": 31.400000000000002,
+        "to": 33.2,
+        "kind": "screenshot",
+        "caption": "After: known issue #16792 remains: toggle pressed on, overview card absent. This is a reproduced limitation, not a passing phone result or a fix."
+      }
+    ],
+    "ambience": {
+      "origin": "Original synthesized ambient pad; no external samples or provider.",
+      "frequenciesHz": [
+        174.61,
+        220,
+        261.63
+      ],
+      "amplitude": 0.004,
+      "fadeInSeconds": 1.5,
+      "fadeOutSeconds": 2,
+      "meanDbfs": -52.7,
+      "peakDbfs": -42.9,
+      "applicationAudio": false
+    }
+  },
+  "preview": {
+    "file": "overview-column-width-before-after.gif",
+    "durationSeconds": 31.75,
+    "dimensions": [
+      864,
+      672
+    ],
+    "audio": false,
+    "limitation": "Scaled silent preview; use the MP4 or original screenshots for small UI details."
+  },
+  "files": {
+    "overview-column-width-before-after.mp4": {
+      "sha256": "603d808aa8688e404ff8a469cfb4f716311bbb3dcabafd1a92264e7d3468741d",
+      "bytes": 986180
+    },
+    "overview-column-width-poster.jpg": {
+      "sha256": "6ae82969d6d5537897f4d3f82ed1dc10f1d0e23b834e3d29530051d7824210ca",
+      "bytes": 58928
+    },
+    "overview-column-width-captions.vtt": {
+      "sha256": "5a329603fdec291d5442b0d6a40c8a70b6c2135c12ba9d9f14156f7427094321",
+      "bytes": 1821
+    },
+    "overview-column-width-before-after.gif": {
+      "sha256": "f73534d07812c02d68cddbcaaf36e8ef75b5b4b763daab3055b792bf733f70bb",
+      "bytes": 1178126
+    }
+  }
+}
