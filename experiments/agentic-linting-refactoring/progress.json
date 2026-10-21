@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-21T12:23:47Z",
+  "checkedAt": "2026-10-21T23:51:00.118495+00:00",
   "displayTimeZone": "Europe/Stockholm",
-  "main": "630e587a0de0b4106173ba0d39ac865d60a51a5a",
+  "main": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
   "shadcnLintVersion": "0.2.1",
   "pullRequests": [
     {
@@ -2586,18 +2586,16 @@
       "state": "OPEN",
       "mergedAt": null,
       "url": "https://github.com/OpenHands/OpenHands/pull/18762",
-      "headRefOid": "499ddf307010062beac5dfa30ac85f49083bbe88",
+      "headRefOid": "0876b39f76b314d1a8fcc5bc71c8730f36664e19",
       "headRefName": "astra/lint-markdown-preview-height",
       "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
-      ],
-      "checkedAt": "2026-10-21T12:23:47Z",
+      "requestedReviewers": [],
+      "checkedAt": "2026-10-21T23:51:00.118495+00:00",
       "issue": 18757,
       "verification": {
         "configuredInlineStyleWarningsBefore": 1,
         "configuredInlineStyleWarningsAfter": 0,
-        "focusedTestsPassed": 17,
+        "focusedTestsPassed": 23,
         "typecheckPassed": true,
         "prettierPassed": true,
         "appBuildPassed": true,
@@ -2606,7 +2604,7 @@
         "ownershipNote": "Preserves the shared Markdown/editor cap constant and existing scrolling owner.",
         "liveAffectedStateVerified": true,
         "mediaStatus": "Final film/GIF/poster/captions/provenance/ZIP packet published. Film, GIF and original MP4 downloads return HTTP 200 with matching full SHA-256 values. Required media-description validation passes.",
-        "readiness": "Ready and open with eight checks passed, six skipped and no failed or pending checks. Initial all-hands-bot review requested and pending; no approval or merge is claimed.",
+        "readiness": "Ready, open and approved at exact test-only follow-up 0876b39f76b314d1a8fcc5bc71c8730f36664e19. Eight current checks pass, six skip, none failed or pending. Bot approved after the user-authorized new review; no merge performed or claimed.",
         "independentImplementationReview": "CLEAR at exact 499ddf307010062beac5dfa30ac85f49083bbe88; source and compiled CSS review, not a GitHub bot approval.",
         "evidenceCheckedAt": "2026-10-21T12:13:34Z",
         "source": "markdown-preview-cap-sources.json",
@@ -2703,14 +2701,16 @@
           "evidenceDownloadSha256": "6dd5b4bd99af026932b61e7612c201d967ee338c4e5bc9a9e41c3dbec404442e"
         },
         "sourceSha256": "3538768151eeb99440a914805aa1af4f478010c316f9a034436443d09553f553",
-        "reviewStatus": "Initial all-hands-bot review requested at 2026-10-21T12:22:51.243954+00:00 and verified pending at this snapshot.",
+        "reviewStatus": "Original COMMENTED testing finding answered and resolved. After green CI, the user-authorized new bot review was requested at 2026-10-21T23:38:08.145901+00:00. all-hands-bot approved exact 0876b39f76 at 2026-10-21T23:43:44Z (22 October 01:43 Stockholm), confirming no material gaps remain.",
         "mediaPublication": {
           "commit": "f6829d1fbe8baf5ce310f60a40440d60678beb27",
           "url": "https://github.com/enyst/enyst.github.io/commit/f6829d1fbe8baf5ce310f60a40440d60678beb27",
           "published": true,
           "filmGifAndOriginalMp4HttpStatus": 200,
           "fullDownloadSha256Verified": true
-        }
+        },
+        "focusedTestsScope": "Three diff-viewer suites, including a functional compiled CSS-contract guard; this supersedes the 17-test implementation receipt without changing the captured product source.",
+        "recordedSourceHead": "499ddf307010062beac5dfa30ac85f49083bbe88"
       },
       "latestChecks": {
         "pass": 8,
@@ -2718,111 +2718,189 @@
         "pending": 0,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18762/checks",
-        "note": "Both Ubuntu and Windows test/build jobs and required media-description validation pass at the unchanged exact head. All other checks pass or skip as expected."
+        "note": "Current exact-head Ubuntu/Windows and required media-description checks pass before the explicitly requested new bot review."
       },
-      "reviewDecision": "REVIEW_REQUIRED",
-      "reviews": [],
+      "reviewDecision": "APPROVED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABTcoz9A",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nOnly `src/components/features/diff-viewer/file-diff-viewer.tsx` changes. This is Canvas-owned presentation code, so it belongs in `OpenHands/OpenHands`; no Agent Server contract, dependency direction, or durable state is touched. The recipe matches what `editor-container.tsx` already does for `--editor-height`, so it is consistent with the repository's established mechanism.\n\n## Verified on `499ddf3070`\n\n- Base `630e587a0d` raised one `shadcn/no-inline-styles` warning (`Inline style sets maxHeight`) at the replaced line; this head raises zero `shadcn/*` findings on the file.\n- The built app CSS contains `.max-h-\\(--markdown-preview-max-height\\){max-height:var(--markdown-preview-max-height)}`, so the class resolves and the cap is not silently dropped.\n- `max-h-(--...)` avoids `shadcn/no-arbitrary-values`, which the bracket form `max-h-[var(--...)]` does trigger (checked against the configured plugin).\n- `MAX_DIFF_EDITOR_HEIGHT_PX` remains the single owner of `600` (one definition, one clamp consumer, one writer of the variable); `twMerge` keeps the new class; `overflow-auto` and `prose-invert` are unchanged, so short/long preview and scrolling behavior are preserved.\n- `test-and-build (ubuntu)` and `test-and-build (windows)` pass on this head; the 12:00 `Validate PR description` failure is superseded by two passing runs at 12:21 and the rollup is now SUCCESS.\n\n## Acceptance criteria (linked issue #18757)\n\n- [x] The preview no longer sets `maxHeight` inline; the cap is carried by one owned custom property read through a static class.\n- [x] No `shadcn/no-inline-styles` finding for this file, and no new finding under any other `shadcn/*` rule.\n- [x] The cap is defined in exactly one place (`MAX_DIFF_EDITOR_HEIGHT_PX === 600`, no duplicated literal).\n- [x] Real Canvas before/after evidence for short and long Markdown across Old/New previews and Diff mode at desktop and phone widths.\n- [ ] A functional CSS-contract test asserting the generated rule resolves `max-height` from the owned custom property.\n\n## Finding\n\nThe code change itself is correct and verified; the one unmet criterion is the CSS-contract test. See the inline comment: the class string and the custom-property key are two independent literals whose pairing nothing in this repository validates, so that test is the only guard against a silent loss of the cap.\n\n\ud83d\udd04 CHANGES REQUESTED",
+          "submittedAt": "2026-10-21T13:00:53Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "499ddf307010062beac5dfa30ac85f49083bbe88"
+          }
+        },
+        {
+          "id": "PRR_kwDOLfkiw88AAAABTjsLYQ",
+          "author": {
+            "login": "enyst"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "",
+          "submittedAt": "2026-10-21T23:26:15Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "COMMENTED",
+          "commit": {
+            "oid": "0876b39f76b314d1a8fcc5bc71c8730f36664e19"
+          }
+        },
+        {
+          "id": "PRR_kwDOLfkiw88AAAABTjzTHA",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nCanvas-owned presentation code plus its test, so this belongs in `OpenHands/OpenHands`. No Agent Server contract, dependency direction, or durable state is touched. The recipe matches the existing `--editor-height` mechanism in `editor-container.tsx`.\n\n## Verified on `0876b39f7`\n\n- Production code is byte-identical to the previously reviewed `499ddf3070`; the new commit is test-only (51 added / 5 removed in `__tests__/components/features/diff-viewer/file-diff-viewer.test.tsx`).\n- The previous blocking finding \u2014 the reader class and the writer custom-property key being two unguarded literals \u2014 is resolved. The added case renders the real component, takes the `max-h-*` candidates off the rendered `markdown-preview` element, compiles the real `src/tailwind.css`, extracts the property from the generated `max-height: var(...)` declaration, and asserts the same element supplies `MAX_DIFF_EDITOR_HEIGHT_PX`. Both sides are read from the render, so neither name is duplicated in the test.\n- I confirmed the guard is not vacuous by re-running its logic with fresh compilers: renaming only the reader, renaming only the writer, removing the cap utility, and changing the cap to 900 px each make it fail; the real pairing passes.\n- `shadcn/*` reports zero findings on both changed files; Prettier is clean; the three diff-viewer suites pass 23/23 locally.\n- `test-and-build (ubuntu)` and `test-and-build (windows)` pass on this head, and the status rollup is SUCCESS.\n\n## Acceptance criteria (linked issue #18757, still `ready-for-dev` / `priority:low`)\n\n- [x] The preview no longer sets `maxHeight` inline; the cap is carried by one owned custom property read through a static class.\n- [x] No `shadcn/no-inline-styles` finding for this file, and no new finding under any other `shadcn/*` rule.\n- [x] The cap is defined in exactly one place (`MAX_DIFF_EDITOR_HEIGHT_PX === 600`, no duplicated literal).\n- [x] A functional CSS-contract test asserts the generated rule resolves `max-height` from the owned custom property rather than mirroring a class string.\n- [x] Real Canvas before/after evidence for short and long Markdown across Old/New previews and Diff mode at desktop and phone widths.\n\nNo material correctness, security, compatibility, or evidence gaps remain. The prior review thread is resolved.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-21T23:43:44Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "0876b39f76b314d1a8fcc5bc71c8730f36664e19"
+          }
+        }
+      ],
       "reviewRequestedAt": "2026-10-21T12:22:51.243954+00:00",
       "checkDetails": [
         {
           "bucket": "pass",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39598904409/job/119218115403",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693412797/job/119544897560",
           "name": "pr-title / Apply conventional-type label",
           "state": "SUCCESS"
         },
         {
           "bucket": "pass",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39598912723/job/119218099763",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693412797/job/119544865308",
+          "name": "pr-title / Lint PR title (conventional)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693412318/job/119544863863",
           "name": "Validate PR description",
           "state": "SUCCESS"
         },
         {
           "bucket": "pass",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39598912712/job/119218099629",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693412322/job/119544862719",
           "name": "Verify skill isolation",
           "state": "SUCCESS"
         },
         {
           "bucket": "pass",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39598904409/job/119218073039",
-          "name": "pr-title / Lint PR title (conventional)",
-          "state": "SUCCESS"
-        },
-        {
-          "bucket": "skipping",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165867/job/119208965787",
-          "name": "Consolidate Build Information",
-          "state": "SKIPPED"
-        },
-        {
-          "bucket": "pass",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165999/job/119208935425",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693382877/job/119544794196",
           "name": "test-and-build (windows)",
           "state": "SUCCESS"
         },
         {
           "bucket": "pass",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165999/job/119208935373",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693382877/job/119544794246",
           "name": "test-and-build (ubuntu)",
           "state": "SUCCESS"
         },
         {
           "bucket": "pass",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165999/job/119208893228",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693382877/job/119544762933",
           "name": "prepare-test-matrix",
           "state": "SUCCESS"
         },
         {
-          "bucket": "pass",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165574/job/119208894496",
-          "name": "check-pr-artifacts",
-          "state": "SUCCESS"
-        },
-        {
           "bucket": "skipping",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165999/job/119208895874",
-          "name": "live-e2e",
-          "state": "SKIPPED"
-        },
-        {
-          "bucket": "skipping",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165867/job/119208896782",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693382899/job/119544765128",
           "name": "Merge Multi-Arch Manifests",
           "state": "SKIPPED"
         },
         {
           "bucket": "skipping",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165574/job/119208898205",
-          "name": "cleanup-after-merge",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693382877/job/119544764954",
+          "name": "live-e2e",
           "state": "SKIPPED"
         },
         {
           "bucket": "skipping",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165867/job/119208895561",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693382899/job/119544765030",
           "name": "Build & Push (${{ matrix.arch }})",
           "state": "SKIPPED"
         },
         {
           "bucket": "skipping",
-          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596165867/job/119208897193",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693382899/job/119544765859",
+          "name": "Consolidate Build Information",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693382899/job/119544766738",
           "name": "Update PR description with Docker image",
           "state": "SKIPPED"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693376593/job/119544744201",
+          "name": "check-pr-artifacts",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693376593/job/119544745660",
+          "name": "cleanup-after-merge",
+          "state": "SKIPPED"
         }
-      ]
+      ],
+      "mergeCommit": null,
+      "reviewFollowUp": {
+        "headRefOid": "0876b39f76b314d1a8fcc5bc71c8730f36664e19",
+        "productSourceChanged": false,
+        "focusedTestsPassed": 23,
+        "finding": "Guard against silently losing the Markdown preview max-height when the CSS reader or custom-property writer drifts.",
+        "mutationChecks": [
+          "Changing the CSS reader fails the new contract test.",
+          "Changing the custom-property writer fails the new contract test.",
+          "Removing the max-height cap fails the new contract test."
+        ],
+        "reply": "https://github.com/OpenHands/OpenHands/pull/18762#discussion_r4343018059",
+        "resolvedThreadId": "PRRT_kwDOLfkiw86uxjBL",
+        "threadResolved": true,
+        "reReviewExplicitlyRequestedByUser": true,
+        "reReviewRequested": true,
+        "mediaNote": "Existing film remains pinned to the actual recorded 499ddf3070 product head; this follow-up changes tests only.",
+        "reReviewRequestedAt": "2026-10-21T23:38:08.145901+00:00",
+        "reReviewRequestVerified": true,
+        "approval": {
+          "reviewer": "all-hands-bot",
+          "state": "APPROVED",
+          "submittedAt": "2026-10-21T23:43:44Z",
+          "reviewedHead": "0876b39f76b314d1a8fcc5bc71c8730f36664e19",
+          "url": "https://github.com/OpenHands/OpenHands/pull/18762#pullrequestreview-5607576348",
+          "botMutationChecks": [
+            "Reader mismatch fails.",
+            "Writer mismatch fails.",
+            "Removing the cap utility fails.",
+            "Changing the cap to 900 px fails."
+          ],
+          "note": "The bot independently verified these four mutations. Production source is byte-identical to the recorded 499ddf3070 head. Approval does not imply merge."
+        }
+      }
     },
     {
       "number": 18763,
       "title": "refactor(layout): express overview width in CSS",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-21T23:22:38Z",
       "url": "https://github.com/OpenHands/OpenHands/pull/18763",
       "headRefOid": "bde133fb5e75019021bbf603c62567ea4aa3a741",
       "headRefName": "astra/lint-overview-column-width",
       "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
-      ],
-      "checkedAt": "2026-10-21T12:23:47Z",
+      "requestedReviewers": [],
+      "checkedAt": "2026-10-21T23:28:29.804590+00:00",
       "issue": 18758,
       "verification": {
         "configuredInlineStyleWarningsBefore": 1,
@@ -2836,7 +2914,7 @@
         "ownershipNote": "Preserves the existing outer Framer Motion width animation.",
         "liveAffectedStateVerified": true,
         "mediaStatus": "Final film/GIF/poster/captions/provenance/ZIP packet published. Film, GIF and original MP4 downloads return HTTP 200 with matching full SHA-256 values. Required media-description validation passes.",
-        "readiness": "Ready and open with eight checks passed, six skipped and no failed or pending checks. Initial all-hands-bot review requested and pending; no approval or merge is claimed.",
+        "readiness": "Merged by the maintainer at 2026-10-21T23:22:38Z (22 October 01:22 Stockholm) after bot approval. The recorded live-evidence head and existing media are unchanged.",
         "independentImplementationReview": "CLEAR at exact bde133fb5e75019021bbf603c62567ea4aa3a741; source and compiled CSS review, not a GitHub bot approval.",
         "evidenceCheckedAt": "2026-10-21T12:13:34Z",
         "source": "overview-column-width-sources.json",
@@ -2935,14 +3013,15 @@
           "evidenceDownloadSha256": "a77dfad7ceb4b92a53d0959230ea932ca969b82c78b1c0b45ff5a092a89393e9"
         },
         "sourceSha256": "2d8be77e36d2b60e2c5fbb63e2f05d4f40f6d9a08bca34c8a56209b8fd9042fa",
-        "reviewStatus": "Initial all-hands-bot review requested at 2026-10-21T12:22:53.777144+00:00 and verified pending at this snapshot.",
+        "reviewStatus": "Bot approved; maintainer merged as ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8. No merge by this update.",
         "mediaPublication": {
           "commit": "f6829d1fbe8baf5ce310f60a40440d60678beb27",
           "url": "https://github.com/enyst/enyst.github.io/commit/f6829d1fbe8baf5ce310f60a40440d60678beb27",
           "published": true,
           "filmGifAndOriginalMp4HttpStatus": 200,
           "fullDownloadSha256Verified": true
-        }
+        },
+        "recordedSourceHead": "bde133fb5e75019021bbf603c62567ea4aa3a741"
       },
       "latestChecks": {
         "pass": 8,
@@ -2950,10 +3029,26 @@
         "pending": 0,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18763/checks",
-        "note": "Both Ubuntu and Windows test/build jobs and required media-description validation pass at the unchanged exact head. All other checks pass or skip as expected."
+        "note": "Preserved pre-merge green-check receipt at the recorded head; this lifecycle update verifies the merged state and SHA."
       },
-      "reviewDecision": "REVIEW_REQUIRED",
-      "reviews": [],
+      "reviewDecision": "APPROVED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABTchSiA",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope gate\n\n`src/components/features/conversation/conversation-main/chat-interface-wrapper.tsx` is Agent Canvas UI/presentation, which `OpenHands/OpenHands` owns per `AGENTS.md` and `.agents/skills/custom-codereview-guide.md`. The change touches no Agent Server, Cloud, automation, or extension contract, and does not alter the dependency direction. In scope; technical review follows.\n\n## What changed\n\nThe inner overview column moved from `w-full` + `style={{ width: CONVERSATION_OVERVIEW_COLUMN_WIDTH_PX }}` to `w-(--conversation-overview-column-width)` + an inline CSS custom property holding the same `CONVERSATION_OVERVIEW_COLUMN_WIDTH_PX` value. The outer Framer Motion width animation, the visibility threshold, and the overview/panel exclusion are untouched.\n\n## Behavior equivalence (verified against the workspace, not the description)\n\n- Base: React appends `px` to the numeric `width`, so the element resolved to `268px`, and the inline declaration already outranked the `w-full` class it sat next to. Head: the utility compiles to `width: var(--conversation-overview-column-width)` and the same element sets that variable inline to `268px`, so the resolved width is unchanged.\n- I confirmed the utility is actually emitted by the Tailwind v4.3.3 build in both outputs: `build/assets/root-*.css` and `dist/styles.css` both contain `[data-agent-server-ui] .w-\\(--conversation-overview-column-width\\){width:var(--conversation-overview-column-width)}`. The `[data-agent-server-ui]` scoping matches every other utility in these stylesheets, so the class applies in standalone and embedded Canvas alike.\n- `--conversation-overview-column-width` is a new name with a single writer (this element) and no other occurrence in the repository, so there is no collision or inheritance hazard. It follows the existing component-local variable convention (`--editor-height` in `diff-viewer/editor-container.tsx`).\n\n## Acceptance checklist for #18758 (`ready-for-dev`, `priority:low`, still open)\n\n- **Remove the configured inline-style warning** \u2014 met. The remaining inline `style` carries only a CSS custom property, which is exactly the accepted shape in `__tests__/scripts/inline-styles-lint.test.ts` (`'<div style={{ \"--progress\": width }} />'` \u2192 no warning). The CI Lint step passes.\n- **Existing tests, type checks, builds pass** \u2014 met. I ran the wrapper and overview-toggle suites on this head: 11 tests pass. CI `test-and-build (ubuntu)` and `(windows)` are `success`, with Lint, Test, Build app, and Build library steps all green. My local `npm run build` and `npm run build:lib` both succeed.\n- **Real Canvas Before/After evidence** \u2014 met. The body's provenance JSON pins `beforeRevision` to `630e587a0d` (the merge base of this head) and `afterRevision` to `bde133fb5e`, identifies standalone Local Canvas with Agent Server/SDK 1.56.0, and records the paired column/card measurements and the panel exclusion. The linked media resolves.\n- **Keep #16792 out of this migration and report the real baseline** \u2014 met. The body states the phone toggle-without-card failure is reproduced in both phases and explicitly declines to claim a fix.\n\n## Notes (non-blocking)\n\nThe head still carries one stale `Validate PR description` failure from 12:00:30Z, but the same check re-ran for this identical SHA at 12:21:18Z and passed; the PR-level status rollup is `SUCCESS`. That earlier run reflects the pre-update description, not the current head.\n\nThis change is presentation-only: no prompt, tool-selection, conversation-payload, or evaluation path is touched, so there is no eval risk to flag.\n\nI could not reproduce the ESLint and `tsc` runs locally (both exhaust this container's memory limit), so the zero-warning claim and type check rest on the passing CI steps above plus my own build and test runs.\n\n\u2705 APPROVED",
+          "submittedAt": "2026-10-21T12:52:13Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "bde133fb5e75019021bbf603c62567ea4aa3a741"
+          }
+        }
+      ],
       "reviewRequestedAt": "2026-10-21T12:22:53.777144+00:00",
       "checkDetails": [
         {
@@ -3037,6 +3132,304 @@
         {
           "bucket": "skipping",
           "link": "https://github.com/OpenHands/OpenHands/actions/runs/39596178324/job/119208937310",
+          "name": "Update PR description with Docker image",
+          "state": "SKIPPED"
+        }
+      ],
+      "mergeCommit": {
+        "oid": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8"
+      }
+    },
+    {
+      "number": 18788,
+      "title": "refactor(automations): express the activity track height in CSS",
+      "state": "OPEN",
+      "mergedAt": null,
+      "url": "https://github.com/OpenHands/OpenHands/pull/18788",
+      "headRefOid": "e89f502061bc89ddb7811352a471b13d4c5126d5",
+      "headRefName": "astra/lint-automation-sparkline-height",
+      "baseRefOid": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "draft": false,
+      "requestedReviewers": [
+        "all-hands-bot"
+      ],
+      "checkedAt": "2026-10-21T23:49:58.309910+00:00",
+      "issue": 18787,
+      "verification": {
+        "configuredFileWarningsBefore": 8,
+        "configuredFileWarningsAfter": 7,
+        "configuredInlineStyleWarningsBefore": 2,
+        "configuredInlineStyleWarningsAfter": 1,
+        "removedWarnings": 1,
+        "remainingWarningsNote": "Six arbitrary-value findings and the duration-derived per-bar inline height remain unchanged.",
+        "focusedTestsPassed": 34,
+        "focusedSuites": 4,
+        "restoredSparklineTestsPassed": 11,
+        "typecheckPassed": true,
+        "prettierPassed": true,
+        "appBuildPassed": true,
+        "libraryBuildPassed": true,
+        "compiledCssContract": "Static h-(--automation-run-activity-track-height) reads the numeric custom property supplied by existing AUTOMATION_RUN_ACTIVITY_TRACK_PX; track remains 18 px in app and library CSS.",
+        "mutationChecks": [
+          "Reader mismatch fails the CSS-contract guard.",
+          "Writer mismatch fails the CSS-contract guard.",
+          "Removing the height class fails the CSS-contract guard."
+        ],
+        "ownershipNote": "Existing 18 px track owner is preserved. Duration-derived per-bar height and its runtime ownership are unchanged.",
+        "liveAffectedStateVerified": true,
+        "mediaStatus": "Final matching film/GIF/poster/captions/provenance/ZIP packet published in 0f8803ceee6d8a5dc0786018386aac267c19d492. Immutable film/GIF downloads return HTTP 200 with matching full SHA-256 values. Required media-description validation passes.",
+        "readiness": "Ready and open at unchanged e89f502061bc89ddb7811352a471b13d4c5126d5, with matching published media, eight current checks passed, six skipped and none failed or pending. Initial all-hands-bot review is requested and pending; no approval or merge claimed.",
+        "limits": "No lint suppressions, dependency, lock, API or durable-state changes.",
+        "independentImplementationReview": "CLEAR at exact e89f502061bc89ddb7811352a471b13d4c5126d5; separate from the completed real-UI evidence and the pending GitHub bot review.",
+        "evidenceCheckedAt": "2026-10-21T23:36:56.650787+00:00",
+        "recordedSourceHeads": {
+          "before": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+          "after": "e89f502061bc89ddb7811352a471b13d4c5126d5"
+        },
+        "pairedChecks": 24,
+        "pairedGeometryDifferences": 0,
+        "selectedArtifacts": {
+          "total": 52,
+          "png": 48,
+          "rawClips": 4
+        },
+        "consumers": [
+          "Dashboard grid",
+          "Dashboard list",
+          "Home pinned card",
+          "Home activity row"
+        ],
+        "themes": [
+          "OpenHands-Neutral",
+          "Light+",
+          "OpenHands-DeepSea"
+        ],
+        "viewports": [
+          {
+            "width": 1440,
+            "height": 1000
+          },
+          {
+            "width": 390,
+            "height": 844
+          }
+        ],
+        "buildFingerprints": {
+          "before": "a151f5302526efe6",
+          "after": "9f5f735176ee22ac"
+        },
+        "versions": {
+          "agentServer": "1.56.0",
+          "sdk": "1.56.0",
+          "automation": "1.22.0",
+          "agentCanvas": "1.29.0",
+          "browser": "Google Chrome"
+        },
+        "model": {
+          "name": "deepseek-flash",
+          "genuineRuns": 4,
+          "runsPerPhase": 2,
+          "finishActionEvents": 4,
+          "otherActionEvents": 0,
+          "note": "Each independent genuine run ends with a finish action; no terminal, file, browser or external action tools ran."
+        },
+        "measuredGeometry": {
+          "trackWidthPx": 16,
+          "trackHeightPx": 18,
+          "barsPerTrack": 2,
+          "barWidthPx": 4,
+          "linkWidthPx": 8,
+          "linkHeightPx": 18,
+          "horizontalPageOverflow": false
+        },
+        "durationDerivedBars": {
+          "formulaChecks": 96,
+          "beforeDurationsSeconds": [
+            42.867,
+            35.692
+          ],
+          "afterDurationsSeconds": [
+            24.066,
+            22.18
+          ],
+          "beforeBarHeightsPx": [
+            11,
+            10
+          ],
+          "afterBarHeightsPx": [
+            10,
+            10
+          ],
+          "note": "Independent actual runs have naturally different durations, IDs and summaries. Bar heights are verified against each run duration; equal heights or identical pixels are not claimed."
+        },
+        "functionalDeepLinks": {
+          "total": 8,
+          "perPhase": 4,
+          "tooltipCheckedOnDesktop": true
+        },
+        "pageErrors": 0,
+        "appErrors": 0,
+        "cleanup": {
+          "fixturesDeleted": true,
+          "allOwnedStacksStopped": true,
+          "privateStatePurged": true,
+          "ownedPortsClosed": true,
+          "ownedPortCount": 10
+        },
+        "captureManifestSha256": "06cb3c433fa16714768d3659c808f2fde0dbf6d3bd84fe3cf0575f527f0c3bb9",
+        "limitations": [
+          "Independent actual runs differ in duration, summaries and IDs. Only fixed track geometry is paired for equality; every dynamic bar follows its own real duration formula.",
+          "Early read-only selector/output handling attempts and one accidental Export JSON interaction produced local diagnostic screenshots excluded from publication; no product or verification source was modified.",
+          "Normal control-openhands recordings use the CLI unchanged-frame compression; no pause/resume or clock manipulation."
+        ],
+        "source": "automation-activity-track-sources.json",
+        "sourceSha256": "dd5fce4847a8e4d21e1400dbc6dd16c1e03ea30e0f0a659ea4c8ab20c511e8bc",
+        "media": {
+          "film": "automation-activity-track-before-after.mp4",
+          "durationSeconds": 31.4,
+          "dimensions": [
+            1440,
+            1120
+          ],
+          "files": {
+            "automation-activity-track-before-after.mp4": {
+              "sha256": "2d6ece4cc61a19dc59816ea7e4fbe075241c2ae546fec1f4cd29e2aa1c3108a9",
+              "bytes": 1092156
+            },
+            "automation-activity-track-poster.jpg": {
+              "sha256": "c987b5de0e30bd2a703c2e9f618694a210f00aaa423794ad519250dcec1802bf",
+              "bytes": 86828
+            },
+            "automation-activity-track-captions.vtt": {
+              "sha256": "c134ca144ba23c8194c87df3e3c4bb1809f18b8e6d9d50af7de6fbda0f3b4338",
+              "bytes": 1536
+            },
+            "automation-activity-track-before-after.gif": {
+              "sha256": "bfe10140e1571e7ba161606ffc6de17a9044ee52b76eac9754d613bc413be962",
+              "bytes": 1312754
+            }
+          },
+          "captureProvenance": "automation-activity-track-capture-provenance.json",
+          "captureProvenanceSha256": "2e998c5645ebafaba3bb806a925afc64d488279a8c656e5671a67e3e44592367",
+          "evidenceDownload": "automation-activity-track-evidence.zip",
+          "evidenceDownloadSha256": "7a5fe3964d8ca584fd62a588dabce8a83f29c1532a685a346c723cfcc46c5ff2",
+          "ambience": {
+            "origin": "Original synthesized ambient pad; no external samples or provider.",
+            "frequenciesHz": [
+              174.61,
+              220,
+              261.63
+            ],
+            "amplitude": 0.004,
+            "fadeInSeconds": 1.5,
+            "fadeOutSeconds": 2,
+            "meanDbfs": -52.5,
+            "peakDbfs": -42.9,
+            "applicationAudio": false
+          }
+        },
+        "mediaPublication": {
+          "commit": "0f8803ceee6d8a5dc0786018386aac267c19d492",
+          "url": "https://github.com/enyst/enyst.github.io/commit/0f8803ceee6d8a5dc0786018386aac267c19d492",
+          "published": true,
+          "immutableFilmAndGifHttpStatus": 200,
+          "fullDownloadSha256Verified": true
+        },
+        "reviewStatus": "Initial all-hands-bot review requested after green current CI at 2026-10-21T23:49:16.143763+00:00 and verified pending. No bot approval claimed."
+      },
+      "reviewDecision": "REVIEW_REQUIRED",
+      "reviews": [],
+      "reviewRequestedAt": "2026-10-21T23:49:16.143763+00:00",
+      "latestChecks": {
+        "pass": 8,
+        "skip": 6,
+        "pending": 0,
+        "failed": 0,
+        "url": "https://github.com/OpenHands/OpenHands/pull/18788/checks",
+        "note": "Current exact-head Ubuntu/Windows, required media-description and other effective checks pass before the initial all-hands-bot review request."
+      },
+      "checkDetails": [
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39695661203/job/119552326758",
+          "name": "pr-title / Apply conventional-type label",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39695662011/job/119552288538",
+          "name": "Validate PR description",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39695661985/job/119552288656",
+          "name": "Verify skill isolation",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39695661203/job/119552286000",
+          "name": "pr-title / Lint PR title (conventional)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693779062/job/119546134768",
+          "name": "test-and-build (ubuntu)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693779062/job/119546134903",
+          "name": "test-and-build (windows)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693778900/job/119546108221",
+          "name": "check-pr-artifacts",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693779062/job/119546107583",
+          "name": "prepare-test-matrix",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693779062/job/119546109028",
+          "name": "live-e2e",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693779065/job/119546109773",
+          "name": "Merge Multi-Arch Manifests",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693778900/job/119546109895",
+          "name": "cleanup-after-merge",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693779065/job/119546109009",
+          "name": "Build & Push (${{ matrix.arch }})",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693779065/job/119546109789",
+          "name": "Consolidate Build Information",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/39693779065/job/119546110585",
           "name": "Update PR description with Docker image",
           "state": "SKIPPED"
         }
@@ -3388,6 +3781,63 @@
         "The two new static-dimension proposals each remove one scoped inline-style warning on a separate branch. Neither is a measured integrated-main reduction.",
         "All four earlier main audits, the original lintAudit, existing proposal audits and the completed approvalWatch remain unchanged."
       ]
+    },
+    {
+      "completedAt": "2026-10-21T23:29:56.463161+00:00",
+      "sourceCommit": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+      "shadcnLintVersion": "0.2.1",
+      "command": "npm run lint",
+      "machineCommand": "./node_modules/.bin/eslint src --format json --output-file eslint.json",
+      "commandNote": "Read-only exact integrated-main audit after the overview merge. Reuses the existing exact-lock npm ci install, with the same committed lockfile and no source or rule changes. Full lint, typecheck, formatting and machine ESLint pass. Preview and sparkline remain separate proposals.",
+      "files": 1419,
+      "filesWithDiagnostics": 193,
+      "errors": 0,
+      "warnings": 617,
+      "rules": {
+        "shadcn/no-arbitrary-values": {
+          "warnings": 517,
+          "files": 177
+        },
+        "shadcn/no-inline-styles": {
+          "warnings": 82,
+          "files": 41
+        },
+        "shadcn/no-raw-colors": {
+          "warnings": 18,
+          "files": 4
+        }
+      },
+      "source": "main-lint-audit-2026-10-22-ea2f42bf6e.json",
+      "sourceSha256": "c16d1d6eee9eedb9985feb9802334c4036b6ec76e1009750c0cee39aa1912ce9",
+      "comparison": {
+        "priorExactSha": "630e587a0de0b4106173ba0d39ac865d60a51a5a",
+        "priorTotals": {
+          "filesLinted": 1417,
+          "filesWithDiagnostics": 194,
+          "errors": 0,
+          "warnings": 618,
+          "fatalErrors": 0,
+          "fixableErrors": 0,
+          "fixableWarnings": 0
+        },
+        "warningDelta": -1,
+        "comparisonMethod": "Match repository-relative file, rule, diagnostic category and cited utility/property, ignoring line movement and nearest-token suggestion changes, preserving multiplicity.",
+        "diagnosticDelta": [
+          {
+            "kind": "removed",
+            "file": "src/components/features/conversation/conversation-main/chat-interface-wrapper.tsx",
+            "ruleId": "shadcn/no-inline-styles",
+            "messageId": "inlineStyle",
+            "utilityOrMessagePrefix": "Inline style sets width",
+            "count": 1
+          }
+        ]
+      },
+      "coverageNotes": [
+        "Only normalized diagnostic delta from the prior 618-warning main audit is one removed overview-column inline-width finding.",
+        "All five prior main audit objects, twelve proposal audit objects, the original lintAudit and completed approvalWatch remain unchanged.",
+        "The eighteen palette warnings remain four managed-agent focus, two budget and twelve start-task findings; no reachability or policy prerequisite is changed."
+      ]
     }
   ],
   "relatedWork": {
@@ -3585,21 +4035,18 @@
     }
   },
   "statusSnapshotCoverage": {
-    "previousCohortCheckedAt": "2026-10-19T23:19:31Z",
-    "previousCohortCount": 41,
+    "previousCohortCheckedAt": "2026-10-21T12:23:47Z",
+    "previousCohortCount": 43,
     "freshPullRequests": [
-      18762,
-      18763
+      18788
     ],
     "mergedSincePreviousSnapshot": [
-      18694,
-      18696
+      18763
     ],
-    "existingOpenLifecycleVerified": [
-      18520,
-      18533
+    "updatedPullRequests": [
+      18762
     ],
-    "note": "The original 39 PR objects retain their dated metadata. Health dots and Markdown alerts have verified 20 October merge receipts; their recording source heads and media remain unchanged. The current cohort adds ready Markdown preview cap and overview inner-width proposals at unchanged exact heads, each with eight checks passed, six skipped, matching published films and an initial all-hands-bot review requested and pending. Budget remains open and non-draft; managed-agent focus remains draft. Finished approvalWatch is unchanged, with no resumed monitor or new merge performed."
+    "note": "Only the two recent layout proposal lifecycle entries are refreshed. All older proposal objects, five earlier main audits, twelve proposal audits, source media and the completed approval watch are unchanged. The historical 618-warning audit stays attached to 630e587a0d. A new full exact-main audit at ea2f42bf6e records zero errors and 617 warnings, appending a sixth audit without altering the prior five. New independent sparkline #18788 is ready with authentic published media, green current CI and its initial bot review requested and pending. The preview follow-up is green and bot-approved after its explicitly authorized new review; it remains open. No merge is performed by this update."
   },
   "approvalWatch": {
     "startedAt": "2026-10-19T02:49:08Z",
@@ -3683,35 +4130,75 @@
         "markdownMediaStatus": "Final 53.8-second packet reviewed and published, with successful PR media-description validation.",
         "note": "All historical media bytes and recording source heads are unchanged; two new film sections include the existing pair of MP4 download links."
       }
+    },
+    {
+      "checkedAt": "2026-10-21T12:23:47Z",
+      "cohortCount": 43,
+      "coverage": {
+        "previousCohortCheckedAt": "2026-10-19T23:19:31Z",
+        "previousCohortCount": 41,
+        "freshPullRequests": [
+          18762,
+          18763
+        ],
+        "mergedSincePreviousSnapshot": [
+          18694,
+          18696
+        ],
+        "existingOpenLifecycleVerified": [
+          18520,
+          18533
+        ],
+        "note": "The original 39 PR objects retain their dated metadata. Health dots and Markdown alerts have verified 20 October merge receipts; their recording source heads and media remain unchanged. The current cohort adds ready Markdown preview cap and overview inner-width proposals at unchanged exact heads, each with eight checks passed, six skipped, matching published films and an initial all-hands-bot review requested and pending. Budget remains open and non-draft; managed-agent focus remains draft. Finished approvalWatch is unchanged, with no resumed monitor or new merge performed."
+      },
+      "cohortCounts": {
+        "total": 43,
+        "merged": 39,
+        "openNonDraft": 3,
+        "draft": 1,
+        "note": "Markdown preview cap and overview inner width are ready with green current checks, published matching films and initial all-hands-bot reviews requested and pending. The third open non-draft proposal is the existing budget cleanup with its separate policy gate. The remaining managed-agent draft retains its authorized-resource/live-evidence prerequisite."
+      },
+      "mediaSnapshot": {
+        "historicalFilmsRetained": 27,
+        "historicalMp4DownloadLinksRetained": 54,
+        "newPreviewFilm": "markdown-preview-cap-before-after.mp4",
+        "newOverviewFilm": "overview-column-width-before-after.mp4",
+        "newProposalMediaStatus": "Both final matching film/GIF/poster/captions/provenance/ZIP packets are published in f6829d1fbe8baf5ce310f60a40440d60678beb27. Film, GIF and original MP4 downloads return HTTP 200 and match full SHA-256 values. Required media-description checks pass for both ready PRs.",
+        "totalFilms": 29,
+        "totalMp4DownloadLinks": 58,
+        "note": "All 27 earlier film sections, 54 earlier MP4 download links, media bytes and exact recording source heads are retained. The two new film sections each have both MP4 download links. The completed approvalWatch stays closed.",
+        "publishedMediaCommit": "f6829d1fbe8baf5ce310f60a40440d60678beb27"
+      }
     }
   ],
   "currentCohortCounts": {
-    "total": 43,
-    "merged": 39,
+    "total": 44,
+    "merged": 40,
     "openNonDraft": 3,
     "draft": 1,
-    "note": "Markdown preview cap and overview inner width are ready with green current checks, published matching films and initial all-hands-bot reviews requested and pending. The third open non-draft proposal is the existing budget cleanup with its separate policy gate. The remaining managed-agent draft retains its authorized-resource/live-evidence prerequisite."
+    "note": "Overview width #18763 is merged. Markdown preview #18762 has the requested test guard, green exact-head CI and bot approval after the user-authorized new review; it remains open. Sparkline #18788 is ready with published authentic media, green exact-head CI and its initial bot review requested and pending. Budget cleanup remains the third open non-draft proposal; managed-agent focus remains the existing draft prerequisite."
   },
   "currentMediaSnapshot": {
-    "historicalFilmsRetained": 27,
-    "historicalMp4DownloadLinksRetained": 54,
-    "newPreviewFilm": "markdown-preview-cap-before-after.mp4",
-    "newOverviewFilm": "overview-column-width-before-after.mp4",
-    "newProposalMediaStatus": "Both final matching film/GIF/poster/captions/provenance/ZIP packets are published in f6829d1fbe8baf5ce310f60a40440d60678beb27. Film, GIF and original MP4 downloads return HTTP 200 and match full SHA-256 values. Required media-description checks pass for both ready PRs.",
-    "totalFilms": 29,
-    "totalMp4DownloadLinks": 58,
-    "note": "All 27 earlier film sections, 54 earlier MP4 download links, media bytes and exact recording source heads are retained. The two new film sections each have both MP4 download links. The completed approvalWatch stays closed.",
-    "publishedMediaCommit": "f6829d1fbe8baf5ce310f60a40440d60678beb27"
+    "historicalFilmsRetained": 29,
+    "historicalMp4DownloadLinksRetained": 58,
+    "newSparklineFilm": "automation-activity-track-before-after.mp4",
+    "newProposalMediaStatus": "Final matching 31.4-second film/GIF/poster/captions/provenance/ZIP packet is published at 0f8803ceee6d8a5dc0786018386aac267c19d492. Immutable film/GIF downloads return HTTP 200 with matching full SHA-256 values; required media-description validation passes. The new section brings the page to 30 films and 60 MP4 download links.",
+    "totalFilms": 30,
+    "totalMp4DownloadLinks": 60,
+    "note": "All29 earlier film tags,58 earlier MP4 download links, old media bytes and exact recording heads are retained. New activity-track section has both MP4 download anchors. All earlier public source manifests remain unchanged.",
+    "publishedMediaCommit": "0f8803ceee6d8a5dc0786018386aac267c19d492"
   },
   "nextSteps": [
     {
       "order": 1,
-      "scope": "Complete bot and maintainer review of the two ready layout batches; both have green current checks, matching published films and initial bot reviews requested and pending",
+      "scope": "Maintainer decision on the ready, green and bot-approved Markdown preview test-guard follow-up; no merge performed by this update",
       "pullRequests": [
-        18762,
-        18763
+        18762
       ],
-      "measuredMainWarnings": 618
+      "historicalMeasuredMainWarnings": 618,
+      "historicalMeasuredMain": "630e587a0de0b4106173ba0d39ac865d60a51a5a",
+      "measuredMainWarnings": 617,
+      "measuredMain": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8"
     },
     {
       "order": 2,
@@ -3726,16 +4213,28 @@
     },
     {
       "order": 3,
-      "scope": "Consider the next static automation-run sparkline track height separately",
+      "scope": "Complete bot and maintainer review of the ready independent activity-track proposal",
       "file": "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx",
       "warnings": 1,
       "owner": "AUTOMATION_RUN_ACTIVITY_TRACK_PX",
       "valuePx": 18,
-      "note": "The track is static; duration-derived per-bar heights retain separate runtime ownership. No implementation included."
+      "note": "Ready #18788 passes 34 focused tests and drops target-file lint eight to seven warnings. Actual 24 fixed-geometry pairs match; final film and source packet are published. Current exact-head CI is green (eight passed, six skipped), and the initial all-hands-bot review is requested and pending. Duration-derived bar heights follow their own genuine run data.",
+      "issue": 18787,
+      "pullRequests": [
+        18788
+      ],
+      "independentImplementationReview": {
+        "verdict": "CLEAR",
+        "reviewedHead": "e89f502061bc89ddb7811352a471b13d4c5126d5"
+      }
     },
     {
       "order": 4,
       "scope": "Re-audit exact integrated main after any later merges; preserve dynamic/renderer ownership and seven exact color exceptions before stronger enforcement"
     }
-  ]
+  ],
+  "lifecycleMain": {
+    "oid": "ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8",
+    "note": "Integrated main after the overview merge has now been re-audited: zero errors and 617 warnings. The prior 618-warning audit remains attached to 630e587a0d."
+  }
 }

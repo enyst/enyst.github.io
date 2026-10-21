@@ -544,3 +544,86 @@ selected-original ZIP. Film, GIF and original MP4 downloads return HTTP 200 with
 matching full SHA-256 values. Media were published in Notebook commit
 `f6829d1fbe8baf5ce310f60a40440d60678beb27`; both PRs are ready and their initial
 bot reviews are requested, with no approval or merge claimed.
+
+
+## Layout merge and review follow-up — 22 October 2026
+
+Overview width [#18763](https://github.com/OpenHands/OpenHands/pull/18763)
+merged at `2026-10-21T23:22:38Z` (22 October 01:22 Stockholm) as
+`ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8`, after bot approval. Its film
+and source manifest remain pinned to the actual recorded `bde133fb5e` head.
+
+Markdown preview [#18762](https://github.com/OpenHands/OpenHands/pull/18762)
+now has test-only follow-up `0876b39f76b314d1a8fcc5bc71c8730f36664e19`. The
+original bot review verified the implementation but requested a functional
+CSS-contract guard. All 23 focused diff-viewer tests pass; mutations of the CSS
+reader, custom-property writer and removal of the cap each fail the new test.
+The [inline finding is answered](https://github.com/OpenHands/OpenHands/pull/18762#discussion_r4343018059)
+and the solved thread is resolved. Current exact-head CI is green: eight passed, six skipped and none failed
+or pending, including Ubuntu, Windows and required media-description validation.
+The new all-hands-bot review explicitly requested by the user was requested at
+`2026-10-21T23:38:08.145901+00:00` (22 October 01:38 Stockholm). The bot
+[approved exact `0876b39f76`](https://github.com/OpenHands/OpenHands/pull/18762#pullrequestreview-5607576348)
+at `2026-10-21T23:43:44Z` (01:43 Stockholm), confirming the old finding is
+resolved and no material gaps remain. It independently verified four guard
+mutations fail: reader mismatch, writer mismatch, removed cap utility and
+a 900 px cap. The PR remains open; this update performs no merge. The 34.6-second film still records product head `499ddf3070`;
+the test follow-up does not change the captured product source.
+
+The current 44-proposal cohort is **40 merged, three open non-draft and one draft**.
+The separate 18 px sparkline-track batch is in progress under
+[issue #18787](https://github.com/OpenHands/OpenHands/issues/18787), with 34
+focused tests passing. Ready [#18788](https://github.com/OpenHands/OpenHands/pull/18788)
+at `e89f502061bc89ddb7811352a471b13d4c5126d5` removes one target-file warning
+(eight to seven, zero errors) and passes typecheck, formatting and app/library
+builds. Its compiled CSS-contract guard fails reader mismatch, writer mismatch
+and removed-class mutations. Actual `control-openhands` capture now verifies 24 fixed-geometry pairs with
+zero differences across Dashboard grid/list and Home pinned card/activity row,
+desktop/phone and Neutral/Light+/DeepSea. Tracks remain 16 × 18 px with two 4 px
+bars and 8 × 18 px link targets. Eight actual bar deep links work. The 48 selected
+PNGs and four original clips accompany the published film. The PR is ready at
+its unchanged exact head, with eight checks passed, six skipped and none failed
+or pending. Its initial all-hands-bot review was requested at
+`2026-10-21T23:49:16.143763+00:00` (22 October 01:49 Stockholm) and is pending. Four independent genuine DeepSeek Flash runs used
+only finish actions and produced zero browser/app errors. Their natural durations
+differ: Before 42.867/35.692 seconds yields 11/10 px bars; After 24.066/22.180
+seconds yields 10/10 px bars. All 96 individual bar-height formula checks pass.
+No identical-pixel or equal dynamic-bar-height claim is made. Both fixtures are
+deleted, both owned stacks stopped, all ten ports closed and private state purged. Duration-derived bar heights retain their runtime owner.
+
+A fresh complete main audit at `ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8`
+now records **0 errors and 617 warnings across 1,419 linted files**, with
+diagnostics in 193 files: 517 arbitrary-value findings, 82 inline-style findings
+and 18 palette findings. Full lint, configured machine ESLint, typecheck and
+formatting pass. The sole normalized diagnostic change from the previous
+618-warning audit is the merged overview-column width finding. The public
+`main-lint-audit-2026-10-22-ea2f42bf6e.json` has SHA-256
+`c16d1d6eee9eedb9985feb9802334c4036b6ec76e1009750c0cee39aa1912ce9`.
+The earlier 618-warning audit remains pinned to `630e587a0d`. All five previous
+main audit objects and twelve proposal audit objects are preserved unchanged;
+the new audit is a sixth entry. All 29 films/58 MP4 download links, original
+recording heads, prior proposal metadata, the completed approval watch and
+existing prerequisite records remain. No preview or sparkline proposal reduction
+is counted on integrated main.
+
+
+## Automation activity-track film — 22 October 2026
+
+The new `automation-activity-track-*` packet compares exact merged main
+`ea2f42bf6e` with proposal `e89f502061`. The approved 31.4-second 1440 × 1120
+film is assembled, with clear Before/After labels, normal six-second
+desktop excerpts per phase, complete 3.9/4.1-second phone clips and actual
+Light+ pinned-card details. Its caption says “Same 18 px track · Real run
+durations differ.” Tiny original ambience accompanies the film. The source
+manifest, silent GIF, poster, captions and selected-original ZIP are finalized
+and published in `0f8803ceee6d8a5dc0786018386aac267c19d492`. Immutable
+film/GIF downloads return HTTP 200 and match full SHA-256 values. The PR is
+ready at its unchanged exact head, with eight checks passed, six skipped and
+none failed or pending, including required media-description validation. Its
+initial all-hands-bot review is requested and pending. Ambience measures −52.5 dBFS mean and
+−42.9 dBFS peak. The film SHA-256 is
+`2d6ece4cc61a19dc59816ea7e4fbe075241c2ae546fec1f4cd29e2aa1c3108a9`;
+the source manifest SHA-256 is
+`dd5fce4847a8e4d21e1400dbc6dd16c1e03ea30e0f0a659ea4c8ab20c511e8bc`.
+The added page section preserves all 29 previous films and 58 MP4 download
+links, bringing the page to 30 films and 60 MP4 download links.
