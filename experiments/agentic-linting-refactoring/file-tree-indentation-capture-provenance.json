@@ -1,0 +1,1514 @@
+{
+  "schemaVersion": 1,
+  "subject": "File tree indentation",
+  "repository": "OpenHands/OpenHands",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18804",
+  "authoritativeManifestSha256": "a738f983a055c9cf7e511f08372ff09198cd4bb19a2a3e7b875700eccb115b6b",
+  "implementation": {
+    "layoutOnly": true,
+    "intendedVisualRedesign": false,
+    "sourcePath": "src/components/features/files-tab/tree-node.tsx",
+    "change": "Move depth indentation from inline declarations to the CSS recipe. Folder padding remains 8 + depth × 12 px; files add 16 px."
+  },
+  "before": {
+    "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+    "buildFingerprint": "c73929d5131944fc",
+    "cliNodeVersion": "v24.22.1",
+    "builtThisRun": true,
+    "pins": {
+      "agentServer": "1.56.0",
+      "agentCanvas": "1.30.0",
+      "automation": "1.22.0"
+    },
+    "versions": {
+      "agentServer": "1.56.0",
+      "sdk": "1.56.0"
+    },
+    "browserEnvironment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "language": "en-US",
+      "devicePixelRatio": 1,
+      "fontFamily": "-apple-system, \"SF Pro\", \"system-ui\", \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Fira Sans\", \"Droid Sans\", \"Helvetica Neue\", sans-serif",
+      "reducedMotion": false
+    },
+    "sourceFiles": {
+      "src/components/features/sidebar/sidebar.tsx": "025a3e51bc921a4873bdd48c2712983396ab98a295d625b32e0e6b3021a57a52",
+      "src/components/features/files-tab/tree-node.tsx": "544e0f2e2fbc53a59205c08e6fc2b73744e3eabc089da99bc86ae5fa61c728f2",
+      "src/components/features/files-tab/file-tree-view.tsx": "7a046c2e8c5be7be56eea8c49ff718d316bc265795da45b262b8cf3b1479b935",
+      "src/components/features/plugins/plugin-files-section.tsx": "aa472f2491e6a471cc83abd76cf10c8bd74acf156d51e9a2349fe0be3b9f3acb",
+      "package-lock.json": "abee923c414e2767f3648ae00eea4e65beba167d0ac01335fba6676041fb5d55",
+      "config/defaults.json": "e215f74945bec196bddbef4adce88f6e5de1d1cc3c633355d23cc8a71dacc44e",
+      ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "2c1b46e6244a09c742d6503f33378dc6741f40f46ba5df5810df0411818c34b8",
+      ".agents/skills/verify-openhands/scripts/browser-daemon.mjs": "d2c978bf28bf5fc7313175f624ec2085e84f8841907f01fae3fdd500545c8d8d"
+    },
+    "families": {
+      "tree": {
+        "measurementsFile": "file-tree-indentation-before-tree-measurements.json",
+        "controls": [
+          {
+            "name": "neutral-desktop-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "neutral-desktop-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "neutral-phone-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "neutral-phone-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "light-plus-desktop-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "light-plus-desktop-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "light-plus-phone-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "light-plus-phone-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "deepsea-desktop-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "deepsea-desktop-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "deepsea-phone-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "deepsea-phone-expand-restores-selected",
+            "selected": "true"
+          }
+        ],
+        "diagnostics": {
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0
+        },
+        "measurementsSha256": "91c49df42cd4d9d9f39896ee1c6fe1fd0785f9eb7b2cdaaffd612411278baaea",
+        "fixture": {
+          "name": "lint-tree-layout",
+          "head": "8edeb8a0c8d9c8536f41fcbce6d5059e66560b87",
+          "files": {
+            "README.md": "e6bd0daaff03c719ab7f60e230bbd74ee506acd2991349c12c49195624813215",
+            "app/index.ts": "01133073fab8b5f3df697b8b26c88c2e0929d4a7d5f7a860f1b73408030b0a7b",
+            "src/test_calc.py": "390fd35dd01f299e7d29b184a434d956bf83b7b209bc2b03026567b9edce532e",
+            "src/calc.py": "ba1a531f581d2e6094e978ed6f7aca7a8d92eeb62c6e7ad73ee692f7f18bc772",
+            "app/components/view.ts": "557e2aeef437a438b9203365004c18459d014520e82c8dd72acb7dfd67c54833",
+            "app/components/nested/leaf.ts": "140721064a516ebfe714fd622b161e6d250175f9d98987e7579a3b8a670712e3"
+          }
+        },
+        "actionEventCount": 0,
+        "cleanup": {
+          "browserStopped": true,
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "privatePurged": true,
+          "ok": true,
+          "retainedEvidenceVerified": true,
+          "evidenceFilesBeforePurge": 38,
+          "evidenceFilesAfterPurge": 38
+        }
+      },
+      "plugin": {
+        "measurementsFile": "file-tree-indentation-before-plugin-measurements.json",
+        "controls": [
+          {
+            "name": "neutral-desktop-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "neutral-desktop-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "neutral-phone-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "neutral-phone-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "light-plus-desktop-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "light-plus-desktop-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "light-plus-phone-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "light-plus-phone-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "deepsea-desktop-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "deepsea-desktop-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "deepsea-phone-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "deepsea-phone-folder-collapse",
+            "descendantCount": 0
+          }
+        ],
+        "diagnostics": {
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0
+        },
+        "measurementsSha256": "3ca14ffb5d7f3b20ea7fc67349d95deaf4adfabb21b26f1f421ec8880c5765ce",
+        "cleanup": {
+          "browserStopped": true,
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "privatePurged": true,
+          "ok": true,
+          "retainedEvidenceVerified": true,
+          "evidenceFilesBeforePurge": 38,
+          "evidenceFilesAfterPurge": 38
+        }
+      }
+    },
+    "sourceHashesIndependentlyVerified": true
+  },
+  "after": {
+    "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+    "buildFingerprint": "8b2236968d5f6516",
+    "cliNodeVersion": "v24.22.1",
+    "builtThisRun": true,
+    "pins": {
+      "agentServer": "1.56.0",
+      "agentCanvas": "1.30.0",
+      "automation": "1.22.0"
+    },
+    "versions": {
+      "agentServer": "1.56.0",
+      "sdk": "1.56.0"
+    },
+    "browserEnvironment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "language": "en-US",
+      "devicePixelRatio": 1,
+      "fontFamily": "-apple-system, \"SF Pro\", \"system-ui\", \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Fira Sans\", \"Droid Sans\", \"Helvetica Neue\", sans-serif",
+      "reducedMotion": false
+    },
+    "sourceFiles": {
+      "src/components/features/sidebar/sidebar.tsx": "025a3e51bc921a4873bdd48c2712983396ab98a295d625b32e0e6b3021a57a52",
+      "src/components/features/files-tab/tree-node.tsx": "04ddf633c629f8721a6fa71dbe7b72f746757293d155c15b6a58e5859fa3e9ae",
+      "src/components/features/files-tab/file-tree-view.tsx": "7a046c2e8c5be7be56eea8c49ff718d316bc265795da45b262b8cf3b1479b935",
+      "src/components/features/plugins/plugin-files-section.tsx": "aa472f2491e6a471cc83abd76cf10c8bd74acf156d51e9a2349fe0be3b9f3acb",
+      "package-lock.json": "abee923c414e2767f3648ae00eea4e65beba167d0ac01335fba6676041fb5d55",
+      "config/defaults.json": "e215f74945bec196bddbef4adce88f6e5de1d1cc3c633355d23cc8a71dacc44e",
+      ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "2c1b46e6244a09c742d6503f33378dc6741f40f46ba5df5810df0411818c34b8",
+      ".agents/skills/verify-openhands/scripts/browser-daemon.mjs": "d2c978bf28bf5fc7313175f624ec2085e84f8841907f01fae3fdd500545c8d8d"
+    },
+    "families": {
+      "tree": {
+        "measurementsFile": "file-tree-indentation-after-tree-measurements.json",
+        "controls": [
+          {
+            "name": "neutral-desktop-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "neutral-desktop-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "neutral-phone-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "neutral-phone-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "light-plus-desktop-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "light-plus-desktop-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "light-plus-phone-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "light-plus-phone-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "deepsea-desktop-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "deepsea-desktop-expand-restores-selected",
+            "selected": "true"
+          },
+          {
+            "name": "deepsea-phone-collapse",
+            "descendantCount": 0,
+            "expanded": "false"
+          },
+          {
+            "name": "deepsea-phone-expand-restores-selected",
+            "selected": "true"
+          }
+        ],
+        "diagnostics": {
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0
+        },
+        "measurementsSha256": "91c49df42cd4d9d9f39896ee1c6fe1fd0785f9eb7b2cdaaffd612411278baaea",
+        "fixture": {
+          "name": "lint-tree-layout",
+          "head": "8edeb8a0c8d9c8536f41fcbce6d5059e66560b87",
+          "files": {
+            "README.md": "e6bd0daaff03c719ab7f60e230bbd74ee506acd2991349c12c49195624813215",
+            "app/index.ts": "01133073fab8b5f3df697b8b26c88c2e0929d4a7d5f7a860f1b73408030b0a7b",
+            "src/test_calc.py": "390fd35dd01f299e7d29b184a434d956bf83b7b209bc2b03026567b9edce532e",
+            "src/calc.py": "ba1a531f581d2e6094e978ed6f7aca7a8d92eeb62c6e7ad73ee692f7f18bc772",
+            "app/components/view.ts": "557e2aeef437a438b9203365004c18459d014520e82c8dd72acb7dfd67c54833",
+            "app/components/nested/leaf.ts": "140721064a516ebfe714fd622b161e6d250175f9d98987e7579a3b8a670712e3"
+          }
+        },
+        "actionEventCount": 0,
+        "cleanup": {
+          "browserStopped": true,
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "privatePurged": true,
+          "ok": true,
+          "retainedEvidenceVerified": true,
+          "evidenceFilesBeforePurge": 49,
+          "evidenceFilesAfterPurge": 49
+        }
+      },
+      "plugin": {
+        "measurementsFile": "file-tree-indentation-after-plugin-measurements.json",
+        "controls": [
+          {
+            "name": "neutral-desktop-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "neutral-desktop-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "neutral-phone-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "neutral-phone-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "light-plus-desktop-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "light-plus-desktop-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "light-plus-phone-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "light-plus-phone-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "deepsea-desktop-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "deepsea-desktop-folder-collapse",
+            "descendantCount": 0
+          },
+          {
+            "name": "deepsea-phone-selected-file-toggle-off",
+            "contentCount": 0
+          },
+          {
+            "name": "deepsea-phone-folder-collapse",
+            "descendantCount": 0
+          }
+        ],
+        "diagnostics": {
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0
+        },
+        "measurementsSha256": "b64f38ca7347bab299f61ce08150e376b31e6c5d5f23d7bd86be593455c416a5",
+        "cleanup": {
+          "browserStopped": true,
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "privatePurged": true,
+          "ok": true,
+          "retainedEvidenceVerified": true,
+          "evidenceFilesBeforePurge": 49,
+          "evidenceFilesAfterPurge": 49
+        }
+      }
+    },
+    "sourceHashesIndependentlyVerified": true
+  },
+  "summary": {
+    "workspaceStatePairs": 24,
+    "workspaceRawDifferences": 0,
+    "pluginDesktopStatePairs": 6,
+    "pluginDesktopRawDifferences": 0,
+    "pluginPhoneStatePairs": 6,
+    "pluginPhoneStatesWithDocumentedRowYShift": 6,
+    "documentedPluginPhoneRowYShiftPx": 16,
+    "rawStatePairs": 36,
+    "rawStatePairsWithDifferences": 6,
+    "indentationAndContentContractPairs": 36,
+    "changedIndentationAndContentContractPairs": 0,
+    "controlPairs": 24,
+    "changedControlPairs": 0,
+    "folderBasePx": 8,
+    "perDepthPx": 12,
+    "additionalFilePx": 16,
+    "actionEventCountPerPhase": 0
+  },
+  "limitations": [
+    "The source recordings retain original control-openhands playback timing, with no editorial speed change. CLI summary duration is rounded; exact container duration, frame count and capture counters are recorded for every original. Video is evidence of the control sequence, not a finer-grained timing instrument.",
+    "Coverage is standalone Local Canvas in Neutral, Light+ and DeepSea at 1440×1000 desktop and 390×844 phone. No Cloud, ACP, all-five-theme or arbitrary embedded-host pass is claimed.",
+    "Editorial labels and title cards are distinct from real app viewports. Actual UI pixels, including normal displayed temporary paths, are unretouched; public JSON omits local machine paths.",
+    "Initial After captures with the expanded Getting started checklist are superseded. Final selected sources use the real UI to collapse the checklist before replay.",
+    "Real conversation titles, Thinking content and elapsed labels differ naturally between bounded DeepSeek turns. No pixel-identity claim is made.",
+    "In all six plugin-phone states, the After run-cache path wraps into four lines versus three Before. It adds 16 px above the tree. Raw row-Y differences are retained; relative indentation, row width/height/X, colors, selection, file content and controls match.",
+    "The 30 fps film duplicates frames from the 15 fps source recordings. It adds no motion samples and makes no finer timing claim. The full workspace-phone clips are available as originals; the short film selects the plugin-phone clips."
+  ],
+  "selectedArtifacts": [
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/before-deepsea-desktop-deep-file-selected.png",
+      "sourceFilename": "before-deepsea-desktop-deep-file-selected.png",
+      "sha256": "e90a620ac0022682e20a4b993eb0ab852e43329802b9abed804f5a07c4fcb7f2",
+      "bytes": 84732,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/before-deepsea-phone-deep-file-selected.png",
+      "sourceFilename": "before-deepsea-phone-deep-file-selected.png",
+      "sha256": "e7a8f8afc1a5ff816d5911592b4ddbed2629946d50fec1c2261843e69a74dc41",
+      "bytes": 27109,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/before-light-plus-desktop-deep-file-selected.png",
+      "sourceFilename": "before-light-plus-desktop-deep-file-selected.png",
+      "sha256": "a7d26bbcfc4df4f605b194dc1b05702a0ac2bf201cba1437a2ac94df53c57b44",
+      "bytes": 74044,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/before-light-plus-phone-deep-file-selected.png",
+      "sourceFilename": "before-light-plus-phone-deep-file-selected.png",
+      "sha256": "3ce5370d9e3b34211809701cbe08704835da98e6cbb7c82a275c06702637fb2f",
+      "bytes": 23228,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/before-neutral-desktop-deep-file-selected.png",
+      "sourceFilename": "before-neutral-desktop-deep-file-selected.png",
+      "sha256": "a826f84378aef71042751ce0e2a391bd46ec00a74f31caac6413f20a053e294a",
+      "bytes": 74166,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/before-neutral-desktop-folder-collapsed.png",
+      "sourceFilename": "before-neutral-desktop-folder-collapsed.png",
+      "sha256": "9efe8624c2d1fda23b1cf9eb33049dfd9e29e147c777ab0f551a0dc07f627f5a",
+      "bytes": 70751,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/before-neutral-phone-deep-file-selected.png",
+      "sourceFilename": "before-neutral-phone-deep-file-selected.png",
+      "sha256": "fec740ade47f9b5037e5b72c6f679db82ff8b29a19e6510441ca9563b2fffea2",
+      "bytes": 23827,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/before-neutral-phone-folder-collapsed.png",
+      "sourceFilename": "before-neutral-phone-folder-collapsed.png",
+      "sha256": "a115724c6774deb391340b02d82cc839d5f16e1363eb76c864aa16db52a7acc4",
+      "bytes": 20976,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "recording",
+      "path": "file-tree-indentation-before-tree-desktop-raw.mp4",
+      "sourceFilename": "before-tree-desktop.mp4",
+      "sha256": "db844c04c463cd881f9ff1aad6e469f191e8a40714c25d5a8200d405d9c7359c",
+      "bytes": 63956,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "durationSeconds": 4.0,
+      "sourceFrameRate": "15/1",
+      "sourceFrameCount": 60,
+      "cliRecording": {
+        "seconds": 4,
+        "recordedSeconds": 3.8,
+        "size": "1440x1000",
+        "fps": 15,
+        "captures": 57,
+        "changes": 23,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "before",
+      "family": "tree",
+      "kind": "recording",
+      "path": "file-tree-indentation-before-tree-phone-raw.mp4",
+      "sourceFilename": "before-tree-phone.mp4",
+      "sha256": "396a5203b207c2835ba94f1904053414cc37a4e5bc7efd5a4e72004179174d9f",
+      "bytes": 40110,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ],
+      "durationSeconds": 4.0,
+      "sourceFrameRate": "15/1",
+      "sourceFrameCount": 60,
+      "cliRecording": {
+        "seconds": 4,
+        "recordedSeconds": 3.8,
+        "size": "390x844",
+        "fps": 15,
+        "captures": 57,
+        "changes": 23,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-deepsea-desktop-manifest.png",
+      "sourceFilename": "before-deepsea-desktop-manifest.png",
+      "sha256": "32ead88da17361829b285e03734321877da84949f4ce18f81005e9a477c408d5",
+      "bytes": 183865,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-deepsea-desktop-nested-skill.png",
+      "sourceFilename": "before-deepsea-desktop-nested-skill.png",
+      "sha256": "8c1ec60a79dbe6425066a55b25c52a556964e6bfe175d89204acba538cecceea",
+      "bytes": 173958,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-deepsea-phone-manifest.png",
+      "sourceFilename": "before-deepsea-phone-manifest.png",
+      "sha256": "e6148fe3686489aa613962f3e18168573f32acf686d979c18d74d38565505600",
+      "bytes": 65738,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-deepsea-phone-nested-skill.png",
+      "sourceFilename": "before-deepsea-phone-nested-skill.png",
+      "sha256": "ee32128d340beb9d5033133369f3ca263df7e12166e7c09639e7afe70b081215",
+      "bytes": 62766,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-light-plus-desktop-manifest.png",
+      "sourceFilename": "before-light-plus-desktop-manifest.png",
+      "sha256": "1db4837b39188523803522ef5f497b2a9cfa9295a8211abdebb2aca90a48ef52",
+      "bytes": 153081,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-light-plus-desktop-nested-skill.png",
+      "sourceFilename": "before-light-plus-desktop-nested-skill.png",
+      "sha256": "c416196cb339aea5ab51638e050d732c71a982fecb69923a796eccd4c4147817",
+      "bytes": 145343,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-light-plus-phone-manifest.png",
+      "sourceFilename": "before-light-plus-phone-manifest.png",
+      "sha256": "e68f450c578492f41553f01a16d377fb1feead945d2870a96debdf3c1719f56f",
+      "bytes": 54909,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-light-plus-phone-nested-skill.png",
+      "sourceFilename": "before-light-plus-phone-nested-skill.png",
+      "sha256": "66aaceb0fa2f0902b7cb33c8b4b7950106a511bfc0e84052f7feaf862bbe297d",
+      "bytes": 52100,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-neutral-desktop-manifest.png",
+      "sourceFilename": "before-neutral-desktop-manifest.png",
+      "sha256": "8be8a267defcd851f7e406969a1fe0eedabf5cc77a7373b6688e70c776c72c17",
+      "bytes": 154509,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-neutral-desktop-nested-skill.png",
+      "sourceFilename": "before-neutral-desktop-nested-skill.png",
+      "sha256": "6e36009346d274add0dfade237e3d32fdc0bab9adb67b415adc3f55ae4f6d822",
+      "bytes": 142828,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-neutral-phone-manifest.png",
+      "sourceFilename": "before-neutral-phone-manifest.png",
+      "sha256": "648e68da3d4d5e01d5758ec5e782fb34040387bdef7cdd95aaa0e9e57192e887",
+      "bytes": 55349,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/before-neutral-phone-nested-skill.png",
+      "sourceFilename": "before-neutral-phone-nested-skill.png",
+      "sha256": "1bee2e20bb6c23e63a8b1ce8c09a6c59a4851ae7f885cbfbf5ca99f1ffde5fcd",
+      "bytes": 51457,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "recording",
+      "path": "file-tree-indentation-before-plugin-desktop-raw.mp4",
+      "sourceFilename": "before-plugin-tree-desktop.mp4",
+      "sha256": "b8b534838fbbb9b4abd8ace90192c1f89588166c10841cab6fdac63774a478c8",
+      "bytes": 192540,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "durationSeconds": 3.2,
+      "sourceFrameRate": "15/1",
+      "sourceFrameCount": 48,
+      "cliRecording": {
+        "seconds": 3.2,
+        "recordedSeconds": 3.1,
+        "size": "1440x1000",
+        "fps": 15,
+        "captures": 42,
+        "changes": 8,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "before",
+      "family": "plugin",
+      "kind": "recording",
+      "path": "file-tree-indentation-before-plugin-phone-raw.mp4",
+      "sourceFilename": "before-plugin-tree-phone.mp4",
+      "sha256": "87e70ea6445ceb22ebf9713c63e4cd8695f83f9a38884952dd7b732a69db2c7c",
+      "bytes": 125816,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ],
+      "durationSeconds": 2.666667,
+      "sourceFrameRate": "15/1",
+      "sourceFrameCount": 40,
+      "cliRecording": {
+        "seconds": 2.7,
+        "recordedSeconds": 2.4,
+        "size": "390x844",
+        "fps": 15,
+        "captures": 35,
+        "changes": 8,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/after-deepsea-desktop-deep-file-selected-2.png",
+      "sourceFilename": "after-deepsea-desktop-deep-file-selected-2.png",
+      "sha256": "b9e4a51fe85cdca3d29372f4c4171d1a3c72f25c75d6c546d52832cb544e0f3f",
+      "bytes": 84306,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/after-deepsea-phone-deep-file-selected-2.png",
+      "sourceFilename": "after-deepsea-phone-deep-file-selected-2.png",
+      "sha256": "e7a8f8afc1a5ff816d5911592b4ddbed2629946d50fec1c2261843e69a74dc41",
+      "bytes": 27109,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/after-light-plus-desktop-deep-file-selected-2.png",
+      "sourceFilename": "after-light-plus-desktop-deep-file-selected-2.png",
+      "sha256": "3f41b2b1dd9a230b2e94b6fc01e503881df1372b1e33b65258b52544a9f17566",
+      "bytes": 73661,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/after-light-plus-phone-deep-file-selected-2.png",
+      "sourceFilename": "after-light-plus-phone-deep-file-selected-2.png",
+      "sha256": "3ce5370d9e3b34211809701cbe08704835da98e6cbb7c82a275c06702637fb2f",
+      "bytes": 23228,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/after-neutral-desktop-deep-file-selected-2.png",
+      "sourceFilename": "after-neutral-desktop-deep-file-selected-2.png",
+      "sha256": "cac445c0f031ba70e3149ab6dfcbe464f5f2d00dae8967cb1a6f8dc8348023b9",
+      "bytes": 73890,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/after-neutral-desktop-folder-collapsed-2.png",
+      "sourceFilename": "after-neutral-desktop-folder-collapsed-2.png",
+      "sha256": "0a67f6e42e3240853740f394ccc3e2749fbdf96e59c8e1d7ad8be2b2ffaad733",
+      "bytes": 70467,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/after-neutral-phone-deep-file-selected-2.png",
+      "sourceFilename": "after-neutral-phone-deep-file-selected-2.png",
+      "sha256": "fec740ade47f9b5037e5b72c6f679db82ff8b29a19e6510441ca9563b2fffea2",
+      "bytes": 23827,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/tree/after-neutral-phone-folder-collapsed-2.png",
+      "sourceFilename": "after-neutral-phone-folder-collapsed-2.png",
+      "sha256": "a115724c6774deb391340b02d82cc839d5f16e1363eb76c864aa16db52a7acc4",
+      "bytes": 20976,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "recording",
+      "path": "file-tree-indentation-after-tree-desktop-raw.mp4",
+      "sourceFilename": "after-tree-desktop-2.mp4",
+      "sha256": "83330234e30f4a601cd83efe63e9ac9950cbe132ec4a4b892b3a6566f7364578",
+      "bytes": 63407,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "durationSeconds": 4.666667,
+      "sourceFrameRate": "15/1",
+      "sourceFrameCount": 70,
+      "cliRecording": {
+        "seconds": 4.7,
+        "recordedSeconds": 3.7,
+        "size": "1440x1000",
+        "fps": 15,
+        "captures": 56,
+        "changes": 41,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "after",
+      "family": "tree",
+      "kind": "recording",
+      "path": "file-tree-indentation-after-tree-phone-raw.mp4",
+      "sourceFilename": "after-tree-phone-2.mp4",
+      "sha256": "f9a5e07d40768e4fa66288169d57471ee4926a41f0c88eab48457c0be84db88e",
+      "bytes": 41614,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ],
+      "durationSeconds": 6.666667,
+      "sourceFrameRate": "15/1",
+      "sourceFrameCount": 100,
+      "cliRecording": {
+        "seconds": 6.7,
+        "recordedSeconds": 6.5,
+        "size": "390x844",
+        "fps": 15,
+        "captures": 80,
+        "changes": 22,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-deepsea-desktop-manifest-2.png",
+      "sourceFilename": "after-deepsea-desktop-manifest-2.png",
+      "sha256": "4894c75dc4d60166acb146d28d221b69839dc0334ab909b14417b8a415bd8396",
+      "bytes": 183364,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-deepsea-desktop-nested-skill-2.png",
+      "sourceFilename": "after-deepsea-desktop-nested-skill-2.png",
+      "sha256": "b77b5f74c2ebb598073d7d0d79cddfc58acc89ee18f9e31f25f807461ea32339",
+      "bytes": 173404,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-deepsea-phone-manifest-2.png",
+      "sourceFilename": "after-deepsea-phone-manifest-2.png",
+      "sha256": "59bfa09c6380c5c6f929403f28271a5a7c836f806c3094363b15b15fe98a6a7c",
+      "bytes": 63370,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-deepsea-phone-nested-skill-2.png",
+      "sourceFilename": "after-deepsea-phone-nested-skill-2.png",
+      "sha256": "2bbec8cc1edc134758bf159836ee31452b77f77c427eabdbbfdd138035b3289c",
+      "bytes": 62537,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-light-plus-desktop-manifest-2.png",
+      "sourceFilename": "after-light-plus-desktop-manifest-2.png",
+      "sha256": "3572f04aba51a1b7c4801ccef6b5d1d02a4bceeb5c2c583a858d3d610c0932a4",
+      "bytes": 152826,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-light-plus-desktop-nested-skill-2.png",
+      "sourceFilename": "after-light-plus-desktop-nested-skill-2.png",
+      "sha256": "04773d22ce8bc68e190e093211e012b57ce632a72cd476dade1705e8634f9493",
+      "bytes": 145087,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-light-plus-phone-manifest-2.png",
+      "sourceFilename": "after-light-plus-phone-manifest-2.png",
+      "sha256": "fb05151297fc8499f5bb5e1ca03557c82eb5365dc160a61c99ce88923bf9603b",
+      "bytes": 52651,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-light-plus-phone-nested-skill-2.png",
+      "sourceFilename": "after-light-plus-phone-nested-skill-2.png",
+      "sha256": "1d9448aab9105bc5c2ff5c359e07f3c14928c4b9b9fe91685282eb761a479e3d",
+      "bytes": 51933,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-neutral-desktop-manifest-2.png",
+      "sourceFilename": "after-neutral-desktop-manifest-2.png",
+      "sha256": "80d2324ca99b8dfed69cf01573317c68ae5f2dd6158acb6f01729db3b42d280d",
+      "bytes": 154269,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-neutral-desktop-nested-skill-2.png",
+      "sourceFilename": "after-neutral-desktop-nested-skill-2.png",
+      "sha256": "70106f3e0b10f672b933cf871c34ceb5203ee080f7f1c836687df1c799c781c3",
+      "bytes": 142585,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-neutral-phone-manifest-2.png",
+      "sourceFilename": "after-neutral-phone-manifest-2.png",
+      "sha256": "76995bc8092359eb694d76069f485fbdbfae8c46c2bd490e07d45e3c83513d13",
+      "bytes": 52987,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "screenshot",
+      "path": "file-tree-indentation-evidence/plugin/after-neutral-phone-nested-skill-2.png",
+      "sourceFilename": "after-neutral-phone-nested-skill-2.png",
+      "sha256": "a7d40621a3297109fb4397ddb9933790a081174e7df2d8463c8c0da7806510ce",
+      "bytes": 51369,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "recording",
+      "path": "file-tree-indentation-after-plugin-desktop-raw.mp4",
+      "sourceFilename": "after-plugin-tree-desktop-2.mp4",
+      "sha256": "f737b9a0bbdf71bcefdb9222a78bc5df39f08221be7fd22dfd96b44dfd45ff32",
+      "bytes": 203153,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "durationSeconds": 3.0,
+      "sourceFrameRate": "15/1",
+      "sourceFrameCount": 45,
+      "cliRecording": {
+        "seconds": 3,
+        "recordedSeconds": 2.7,
+        "size": "1440x1000",
+        "fps": 15,
+        "captures": 40,
+        "changes": 9,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "after",
+      "family": "plugin",
+      "kind": "recording",
+      "path": "file-tree-indentation-after-plugin-phone-raw.mp4",
+      "sourceFilename": "after-plugin-tree-phone-2.mp4",
+      "sha256": "f5d417d8e3aa80e72fb52d1b3185471c287058f14945a1156b6875864b79d35a",
+      "bytes": 118092,
+      "head": "290c2368052c2c54f67c95c421390b9e45356b72",
+      "buildFingerprint": "8b2236968d5f6516",
+      "dimensions": [
+        390,
+        844
+      ],
+      "durationSeconds": 2.8,
+      "sourceFrameRate": "15/1",
+      "sourceFrameCount": 42,
+      "cliRecording": {
+        "seconds": 2.8,
+        "recordedSeconds": 2.5,
+        "size": "390x844",
+        "fps": 15,
+        "captures": 37,
+        "changes": 9,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    }
+  ],
+  "derivedDetails": [
+    {
+      "phase": "before",
+      "file": "file-tree-indentation-before-files-detail.png",
+      "sha256": "db579eab902d68f5651a487a2e63e60fdf445619c0497a1c1265925a5c8cc102",
+      "parent": "file-tree-indentation-evidence/tree/before-light-plus-desktop-deep-file-selected.png",
+      "parentSha256": "a7d26bbcfc4df4f605b194dc1b05702a0ac2bf201cba1437a2ac94df53c57b44",
+      "cropPixels": [
+        870,
+        100,
+        570,
+        250
+      ],
+      "note": "Lossless crop of actual Files tree and selected-file preview. No UI added or repainted."
+    },
+    {
+      "phase": "after",
+      "file": "file-tree-indentation-after-files-detail.png",
+      "sha256": "db579eab902d68f5651a487a2e63e60fdf445619c0497a1c1265925a5c8cc102",
+      "parent": "file-tree-indentation-evidence/tree/after-light-plus-desktop-deep-file-selected-2.png",
+      "parentSha256": "3f41b2b1dd9a230b2e94b6fc01e503881df1372b1e33b65258b52544a9f17566",
+      "cropPixels": [
+        870,
+        100,
+        570,
+        250
+      ],
+      "note": "Lossless crop of actual Files tree and selected-file preview. No UI added or repainted."
+    }
+  ],
+  "supersededArtifacts": [
+    {
+      "family": "tree",
+      "sourceFilename": "after-neutral-desktop-deep-file-selected.png",
+      "sha256": "0641ef480154a02954aa70e013c320d445d3dbae479ef18ad4ff1464b32e56d7",
+      "bytes": 88975,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "tree",
+      "sourceFilename": "after-neutral-desktop-folder-collapsed.png",
+      "sha256": "18801f3d6e41048dd31acfb7519447c2ccf9ca75bdf41f41384404aad5e3b9af",
+      "bytes": 85743,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "tree",
+      "sourceFilename": "after-neutral-phone-deep-file-selected.png",
+      "sha256": "fec740ade47f9b5037e5b72c6f679db82ff8b29a19e6510441ca9563b2fffea2",
+      "bytes": 23827,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "tree",
+      "sourceFilename": "after-neutral-phone-folder-collapsed.png",
+      "sha256": "a115724c6774deb391340b02d82cc839d5f16e1363eb76c864aa16db52a7acc4",
+      "bytes": 20976,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "tree",
+      "sourceFilename": "after-light-plus-desktop-deep-file-selected.png",
+      "sha256": "5f4a491f54654da3022ec7cdd552cb7f49366f5e0ec65cdc700805765f911f51",
+      "bytes": 88782,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "tree",
+      "sourceFilename": "after-light-plus-phone-deep-file-selected.png",
+      "sha256": "3ce5370d9e3b34211809701cbe08704835da98e6cbb7c82a275c06702637fb2f",
+      "bytes": 23228,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "tree",
+      "sourceFilename": "after-deepsea-desktop-deep-file-selected.png",
+      "sha256": "ffb42b8a188cc9c5dfa2eb377ce3d46f4f47ede31c2cc68583a928d2407dbac3",
+      "bytes": 100589,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "tree",
+      "sourceFilename": "after-deepsea-phone-deep-file-selected.png",
+      "sha256": "e7a8f8afc1a5ff816d5911592b4ddbed2629946d50fec1c2261843e69a74dc41",
+      "bytes": 27109,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "tree",
+      "sourceFilename": "after-tree-desktop.mp4",
+      "sha256": "55df7af681a73b06845b6de0ab65450ae57b68321e186b4183e8205fc860c864",
+      "bytes": 69658,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "tree",
+      "sourceFilename": "after-tree-phone.mp4",
+      "sha256": "1935a770dbc67627008fd602f199854f83a46e2f011c987cb8c01bbd372b6fb7",
+      "bytes": 40779,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-neutral-desktop-manifest.png",
+      "sha256": "58ed7d77a9830f505fb1c29ee83e1f63963703150e808ad10754894d9fd7e93c",
+      "bytes": 166526,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-neutral-desktop-nested-skill.png",
+      "sha256": "955a867183d4fc214fa6b43d87d1672cf2d19410b582a024289b61144eaa6e82",
+      "bytes": 154513,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-neutral-phone-manifest.png",
+      "sha256": "76995bc8092359eb694d76069f485fbdbfae8c46c2bd490e07d45e3c83513d13",
+      "bytes": 52987,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-neutral-phone-nested-skill.png",
+      "sha256": "a7d40621a3297109fb4397ddb9933790a081174e7df2d8463c8c0da7806510ce",
+      "bytes": 51369,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-light-plus-desktop-manifest.png",
+      "sha256": "2ebd5f17b0418097f3b74b40788c4e1dc64787c9a66fab62be949e4f92ae734a",
+      "bytes": 165681,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-light-plus-desktop-nested-skill.png",
+      "sha256": "4db4d6a27c831cf9ac512e1d2054ef10fb0a06231d38c3d4dc8e4608419dfb30",
+      "bytes": 157910,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-light-plus-phone-manifest.png",
+      "sha256": "fb05151297fc8499f5bb5e1ca03557c82eb5365dc160a61c99ce88923bf9603b",
+      "bytes": 52651,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-light-plus-phone-nested-skill.png",
+      "sha256": "1d9448aab9105bc5c2ff5c359e07f3c14928c4b9b9fe91685282eb761a479e3d",
+      "bytes": 51933,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-deepsea-desktop-manifest.png",
+      "sha256": "0b13015d857cf7e1c80b6d30e338005b62cf43932c5cc1f632c4bdfac50e360c",
+      "bytes": 197733,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-deepsea-desktop-nested-skill.png",
+      "sha256": "ec5a07c0101914b9200477f44fe0113f88c1ed46b1f94c959bbf5624d24b50f6",
+      "bytes": 188212,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-deepsea-phone-manifest.png",
+      "sha256": "59bfa09c6380c5c6f929403f28271a5a7c836f806c3094363b15b15fe98a6a7c",
+      "bytes": 63370,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-deepsea-phone-nested-skill.png",
+      "sha256": "2bbec8cc1edc134758bf159836ee31452b77f77c427eabdbbfdd138035b3289c",
+      "bytes": 62537,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-plugin-tree-desktop.mp4",
+      "sha256": "38011ac7c93b0e4c0cbfea644e5f19a375f68f918b3b5bbeb3a181681596231a",
+      "bytes": 205608,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "plugin",
+      "sourceFilename": "after-plugin-tree-phone.mp4",
+      "sha256": "1e9744521817cc19d30b5e720c2642cc18b6f6f0045d30f74f43c9524c91354a",
+      "bytes": 114127,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    }
+  ],
+  "comparisonFile": "file-tree-indentation-comparison.json",
+  "comparisonSha256": "bf33e539070ae7cf68946c74bff61361650e8ae6488c465bb9f9b9c2919e2904",
+  "conditions": [
+    "Actual Chrome controlled through the unmodified control-openhands CLI. No mocks, interception or response injection.",
+    "Independent before/after builds at the exact recorded source heads.",
+    "Same configured behavior retained; no intended visual redesign."
+  ]
+}
