@@ -627,3 +627,103 @@ the source manifest SHA-256 is
 `dd5fce4847a8e4d21e1400dbc6dd16c1e03ea30e0f0a659ea4c8ab20c511e8bc`.
 The added page section preserves all 29 previous films and 58 MP4 download
 links, bringing the page to 30 films and 60 MP4 download links.
+
+
+## Next small ownership batches — 22 October 2026
+
+The maintainer merged Markdown preview #18762 at `2026-10-22T01:40:11Z`
+as `20bb37e39d7268bfd176f54b3d2e461d3b2ada57`, then activity track #18788 at
+`01:40:46Z` as `70b8f9069dec3d1c39a04d755521ebe6bd252aab` (03:40 Stockholm).
+Both had bot approval and green exact-head CI. Their captured product heads,
+media hashes and limits remain unchanged. This update performs no merge.
+
+A fresh locked install, full lint, typecheck, formatting and machine ESLint
+pass at exact main `70b8f9069d`: **0 errors and 615 warnings across 1,419 files**,
+with diagnostics in 192 files — 517 arbitrary-value, 80 inline-style and 18
+palette findings. Only the two merged preview/track findings disappear from
+the prior 617-warning inventory. Main also includes unrelated Canvas 1.30,
+extensions 0.33 release and Mars opt-in changes. The public
+`main-lint-audit-2026-10-22-70b8f9069d.json` has SHA-256
+`8df2711affa0ca96c803da644331b17fb662c37f6870123854568f3b831cce58`.
+All six earlier main audit objects and twelve proposal audits remain unchanged.
+
+Two independent ready proposals each remove two scoped inline-style findings:
+
+- [Sidebar #18805](https://github.com/OpenHands/OpenHands/pull/18805), issue
+  #18803, at `546e76f1e1809899fdbef98412c5da633435c329`: the existing 250 ms
+  `MOBILE_DRAWER_TRANSITION_MS` still owns CSS duration and the removal timer.
+  Thirty focused tests pass; all four reader/writer/removed-utility/early-timer
+  mutations fail. Target lint drops four warnings to two, with zero errors.
+- [Tree #18804](https://github.com/OpenHands/OpenHands/pull/18804), issue
+  #18802, at `290c2368052c2c54f67c95c421390b9e45356b72`: the same 8 px base,
+  12 px per depth and 16 px file offset feed a static padding reader. Thirty-two
+  tests pass, including the real CSS contract and native Space/Enter behavior.
+  All six folder/file reader/writer/removed-utility mutations fail. Target lint
+  drops two warnings to zero; app/library CSS and ESM/CommonJS wiring pass.
+
+Typecheck, formatting, app/library builds and independent implementation reviews
+pass for both. Each has **eight current checks passed, six skipped, none failed
+or pending**, including Ubuntu, Windows and required media-description validation.
+Initial all-hands-bot reviews were requested after green CI and verified pending
+at `2026-10-22T03:42:42.017175+00:00` for tree and `03:42:47.088784+00:00` for
+sidebar (05:42 Stockholm). Neither new proposal is approved or merged here.
+Their unmerged reductions are not counted in main's 615-warning total.
+
+### Authentic runtime evidence
+
+Sidebar: six style/layout pairs and fifteen control/route pairs match across
+Neutral/Light+/DeepSea, 1440 × 1000 desktop and 390 × 844 phone. Close, Escape,
+backdrop and navigation preserve outcomes. CSS duration is exactly 250 ms;
+sampled visible closing intervals span 236–238 ms Before and 237–246 ms After.
+These are DOM-presence samples, not exact timer-start or every-frame timing.
+Actual reduced-motion preference is false. Forced emulation is unavailable in
+the normal CLI, so no forced live pass is claimed; its compiled contract is tested.
+The selected sidebar source set is 18 PNGs and two original clips.
+
+Tree: all 36 indentation/content contracts and 24 control pairs match across Files
+root through depth three and plugin manifest/nested skill. Thirty raw geometry
+pairs match exactly; six plugin-phone pairs retain a 16 px absolute row-y offset
+because the actual After run-cache path wraps to four lines versus three Before.
+Relative indentation, row size/x, colors, selection/content and controls match.
+Raw offsets remain; no 36-pair zero-geometry-difference or pixel-identity claim
+is made. Two bounded actual DeepSeek Flash turns provide the conversation
+context; zero ActionEvents are recorded. Titles, Thinking and elapsed labels
+differ naturally. The selected tree source set is 40 PNGs and eight raw clips.
+
+Final source sets match the collapsed Getting started card through actual UI
+controls and reset open files through normal close buttons. Initial expanded-card
+captures are superseded and excluded. Real production Canvas 1.30.0, Local Agent
+Server/SDK 1.56.0, automation 1.22.0 and Chrome run through unchanged
+`control-openhands`. Captured baseline 70b8f9069d/build c73929d5131944fc,
+sidebar 546e76f1e1/build dfdde6888d0dedfd and tree 290c236805/build 8b2236968d5f6516
+remain exact. All four owned runs are stopped, private state purged and owned
+ports closed. Zero browser/app errors are recorded. No mocks or verifier edits.
+
+### Films and preservation
+
+`mobile-sidebar-duration-*` is 26.2 seconds at 25 fps, keeping the full 6.32/6.48-second
+phone clips. `file-tree-indentation-*` is 31.8 seconds at 30 fps, keeping complete
+Files/plugin desktop and plugin-phone clips plus actual Light+ context/detail
+crops. Source 15 fps frames are duplicated without a speed change. Both films are
+1440 × 1120 with tiny original ambience (means −52.9/−52.6 dBFS; peak −42.9 dBFS).
+The 58 original PNGs, ten complete raw clips and two actual lossless tree-detail
+PNGs remain downloadable with source hashes and sanitized provenance.
+
+All final MP4/GIF/poster/captions/source/provenance/ZIP packets are published in
+Notebook commit `9d241d3ada0d621d7f794f36413700801563197c`. All 25 critical
+immutable files return HTTP 200 and match full SHA-256 values. All six live Pages
+film/GIF/ZIP downloads also return 200 with matching hashes; Pages MP4s have
+`video/mp4` Content-Type. Raw GitHub MP4 downloads use `application/octet-stream`.
+Sidebar film SHA-256 is
+`b15579730a1cb2ec01cfa218e508dcc6fce797b4369111fc1141720100fe1d1d`;
+source manifest is `14402ea14b1cbc8fb5439c28340890a458fd899039c4dbdb65cfdf5b9ff17ca0`.
+Tree film is `df3479189febf3545420d7a824b27a2d6a0dbafe3d3b76be378d02dc29c0912f`;
+source manifest is `366905a74b6d507ba4777f271c20701cac1d18086ca388352bfa57b40679b7bb`.
+
+The 46-proposal cohort is **42 merged, three open non-draft and one draft**.
+Budget #18533 remains open/non-draft; managed-agent focus #18520 remains draft.
+Their bodies and prerequisites are unchanged. All 30 earlier films/60 download
+anchors, 561 prior non-doc assets, attribution history, unaffected prior proposal
+objects, earlier audits, recorded heads and the finished approval watch are
+preserved. The two additional sections bring the page to **32 films/64 MP4 download
+links**. Earlier README text remains an unchanged published prefix.
