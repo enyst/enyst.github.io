@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-23T06:27:02.615342+00:00",
+  "checkedAt": "2026-10-23T06:38:58.021657+00:00",
   "displayTimeZone": "Europe/Stockholm",
   "main": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
   "shadcnLintVersion": "0.2.1",
@@ -4025,13 +4025,27 @@
       "headRefName": "astra/lint-onboarding-slide-offset",
       "baseRefOid": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
       "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
-      ],
-      "checkedAt": "2026-10-23T06:27:02.615342+00:00",
+      "requestedReviewers": [],
+      "checkedAt": "2026-10-23T06:38:58.021657+00:00",
       "issue": 18854,
-      "reviewDecision": "REVIEW_REQUIRED",
-      "reviews": [],
+      "reviewDecision": "APPROVED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABT0NJew",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nBelongs in `OpenHands/OpenHands`: the change is confined to Canvas onboarding presentation (`src/components/features/onboarding/onboarding-modal.tsx`) plus its test. No Agent Server contract, SDK, automation, or extension surface is touched, and the dependency direction is respected.\n\n## What I verified on `edf5f19e87`\n\n**Behavior equivalence.** `Slide` keeps `(index - currentStep) * 100` as the numeric owner and now publishes it as `--onboarding-slide-offset`, consumed by the static utility `translate-x-(--onboarding-slide-offset)`. I compiled `src/tailwind.css` with the repo's pinned `@tailwindcss/node` 4.3.3 and the emitted rule is:\n\n```css\n.translate-x-\\(--onboarding-slide-offset\\){--tw-translate-x:var(--onboarding-slide-offset);translate:var(--tw-translate-x) var(--tw-translate-y)}\n.transition-transform{transition-property:transform, translate, scale, rotate; ...}\n.duration-300{--tw-duration:300ms; transition-duration:300ms}\n```\n\nThe individual `translate` property is geometrically equivalent to the previous `translateX(...)` for pure translation, and the already-present `transition-transform` utility covers `translate`, so the 300 ms ease-out transition, active-slide flow height, `pointer-events-none absolute inset-0` inactive positioning, `data-testid`/`data-active`/`aria-hidden`, and the phase logic are all unchanged. `npm run build` emits the utility into `build/assets/root-*.css`, so the class is not tree-shaken out of the production stylesheet.\n\n**Lint contract.** Using the real `@shadcn/lint` 0.2.1 plugin, the head file reports 0 `shadcn/no-inline-styles` findings, versus 1 on the base (`3083e1aa16`, line 93, \"Inline style sets transform\"). The single remaining warning on head is the pre-existing `max-h-[90vh]` `no-arbitrary-values` finding, exactly as the description states. This matches the repository's established mechanism (`--file-tree-row-indent` + `pl-(...)` in `files-tab/tree-node.tsx`; `--editor-height` in `diff-viewer/editor-container.tsx`).\n\n**Tests and CI.** All 34 tests in `__tests__/components/onboarding/onboarding-modal.test.tsx` pass locally on this head. The new `createSlideOffsetAssertion` helper is a functional CSS contract test, not a mirrored class string: it follows the property reader out of the compiled stylesheet to the value owned by each render, so a reader or writer rename breaks it. CI `test-and-build (ubuntu)` and `(windows)` are green on `edf5f19e87`; the only non-passing entries are `skipping` jobs that do not apply to PRs.\n\n## Acceptance criteria checklist (issue #18854, currently `ready-for-dev`)\n\n- [x] No `shadcn/no-inline-styles` finding for the changed file; no new findings elsewhere.\n- [x] Inline style attribute carries only a numeric custom property; production CSS contains the resolving rule.\n- [x] Slide `i` is offset `(i - k) * 100%`, asserted through emitted CSS plus rendered values.\n- [x] 300 ms ease-out transition, active-only flow participation, inactive absolute/pointer-none, and unchanged `data-testid`/`data-active`/`aria-hidden`.\n- [x] Three-phase and four-phase flows keep their logical phases, including the Cloud-login collapse case; agent selection, Next, Back, Skip and launch are unchanged.\n- [x] Change confined to the offset expression; no telemetry, persistence, copy, dependency, lint-policy, or verify-skill edits (`Verify skill isolation` check passes).\n- [x] Before/after running-Canvas video linked and resolvable (HTTP 200), covering Next and Back across desktop and phone layouts.\n\nNo material correctness, security, compatibility, or architecture findings. The `translate`-vs-`transform` switch relies on Tailwind v4's core translate utilities, which this repository already uses (for example `conversation-name-context-menu.tsx`), so it introduces no new browser-support baseline.\n\n✅ APPROVED",
+          "submittedAt": "2026-10-23T06:36:00Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "edf5f19e877b33130e9f42d94ed793e05f7deb0d"
+          }
+        }
+      ],
       "verification": {
         "configuredFileWarningsBefore": 2,
         "configuredFileWarningsAfter": 1,
@@ -4045,7 +4059,7 @@
         "independentImplementationReview": "No material findings at exact recorded proposal head.",
         "liveAffectedStateVerified": true,
         "mediaStatus": "Final matching packet published at immutable Notebook 0e6de40f0560d2327bfbde40d80f95ff51013844. Critical raw downloads return HTTP 200 with matching full SHA-256 values.",
-        "readiness": "Ready and open at unchanged recorded head, eight checks passed, six skipped and none failed or pending. Initial all-hands-bot review requested and verified pending; no approval or merge claimed.",
+        "readiness": "Ready and open at unchanged recorded head, eight checks passed, six skipped and none failed or pending. All-hands-bot approved exact head at 2026-10-23T06:36:00Z with no material or inline findings. No merge claimed.",
         "limits": "No dependency, lockfile, API, durable-state, lint suppression, rule-severity, specification, verifier or map changes.",
         "compiledCssContract": "Native translate-x-(--onboarding-slide-offset) reads the unchanged phase-derived percentage; 300 ms duration and active/inactive positioning are preserved.",
         "ownershipNote": "Active phase formula remains the numeric owner; Next/Back, phase collapse, telemetry and persistence are unchanged.",
@@ -4090,7 +4104,7 @@
         },
         "source": "onboarding-slide-offset-sources.json",
         "sourceSha256": "da65fc8de53148fbe50b3da821325da7d6c9ebd204962f97ee8d1215b6279a46",
-        "reviewStatus": "Initial all-hands-bot review requested after green CI; request verified and no review submitted at this snapshot.",
+        "reviewStatus": "APPROVED by all-hands-bot at 2026-10-23T06:36:00Z on edf5f19e877b33130e9f42d94ed793e05f7deb0d; no material correctness, security, compatibility or architecture findings and no inline comments.",
         "media": {
           "film": "onboarding-slide-offset-before-after.mp4",
           "durationSeconds": 25.92,
@@ -4160,6 +4174,12 @@
           "requiredDescriptionValidation": "PASS",
           "livePagesDeploymentVerified": false,
           "note": "Immutable raw critical downloads are verified. Live Pages deployment is checked separately after the final document push."
+        },
+        "botApproval": {
+          "submittedAt": "2026-10-23T06:36:00Z",
+          "head": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+          "url": "https://github.com/OpenHands/OpenHands/pull/18856#pullrequestreview-5624777083",
+          "inlineComments": 0
         }
       },
       "latestChecks": {
@@ -5381,7 +5401,7 @@
       18805
     ],
     "existingOpenLifecycleVerified": [],
-    "note": "Only sidebar/tree lifecycle metadata is refreshed; all 44 other prior proposal objects, seven prior main audits, twelve prior proposal audits, 32 prior video elements and 64 download anchors, 654 prior assets/source heads, the README prefix and completed approval watch remain unchanged. Both new independent proposals are ready with authentic published media, green exact-head CI (eight passed, six skipped each), and initial bot reviews requested and pending. The recorded main audit remains 611 warnings at 3083e1aa16; newer upstream main a832d9a285 has not been re-audited. Neither branch reduction is counted in the audit."
+    "note": "Only sidebar/tree lifecycle metadata is refreshed; all 44 other prior proposal objects, seven prior main audits, twelve prior proposal audits, 32 prior video elements and 64 download anchors, 654 prior assets/source heads, the README prefix and completed approval watch remain unchanged. Both new independent proposals are ready with authentic published media, green exact-head CI (eight passed, six skipped each), onboarding bot approval on exact head and the initial automation bar-height bot review pending. The recorded main audit remains 611 warnings at 3083e1aa16; newer upstream main a832d9a285 has not been re-audited. Neither branch reduction is counted in the audit."
   },
   "approvalWatch": {
     "startedAt": "2026-10-19T02:49:08Z",
@@ -5585,7 +5605,7 @@
     "merged": 44,
     "openNonDraft": 3,
     "draft": 1,
-    "note": "Sidebar #18805 and tree #18804 are merged. Onboarding #18856 and automation bar heights #18857 are ready with authentic published media, green exact-head CI and initial bot reviews requested and pending. Budget #18533 remains open non-draft; managed-agent focus #18520 remains draft with its recorded prerequisite."
+    "note": "Sidebar #18805 and tree #18804 are merged. Onboarding #18856 and automation bar heights #18857 are ready with authentic published media, green exact-head CI; onboarding is bot-approved on exact head while automation bar heights awaits its initial bot review. Budget #18533 remains open non-draft; managed-agent focus #18520 remains draft with its recorded prerequisite."
   },
   "currentMediaSnapshot": {
     "historicalFilmsRetained": 32,
@@ -5602,7 +5622,7 @@
   "nextSteps": [
     {
       "order": 1,
-      "scope": "Complete bot and maintainer review of the two ready independent proposals; both have authentic published media, green current CI and initial bot reviews requested and pending",
+      "scope": "Complete maintainer review of bot-approved onboarding and bot/maintainer review of automation bar heights; both remain ready with authentic published media and green current CI",
       "pullRequests": [
         18856,
         18857
@@ -5640,7 +5660,7 @@
           11
         ]
       },
-      "note": "Both proposals are ready with authentic affected-state evidence, matching published media, clear independent implementation reviews, eight current checks passed and six skipped. Initial bot reviews are requested and pending. Numeric owners and documented limits are preserved; independent branch reductions are not integrated."
+      "note": "Both proposals are ready with authentic affected-state evidence, matching published media, clear independent implementation reviews, eight current checks passed and six skipped. Onboarding is bot-approved on its exact head; the initial automation bar-height bot review is pending. Numeric owners and documented limits are preserved; independent branch reductions are not integrated."
     },
     {
       "order": 4,

@@ -731,7 +731,7 @@ links**. Earlier README text remains an unchanged published prefix.
 
 ## 23 October 2026: phase offsets and duration-owned bar heights
 
-Snapshot `2026-10-23T06:27:02.615342+00:00` (Stockholm display time). The maintainer merged tree
+Snapshot `2026-10-23T06:38:58.021657+00:00` (Stockholm display time). The maintainer merged tree
 [#18804](https://github.com/OpenHands/OpenHands/pull/18804) at 07:18 Stockholm as
 `f0254fd6a3e5d891e998da0293162ff872a6868f`, then sidebar
 [#18805](https://github.com/OpenHands/OpenHands/pull/18805) at 07:19 as
@@ -782,8 +782,10 @@ peak −42.4). The packet includes 64 PNGs, ten full raw clips and 83 ZIP member
 are published at [immutable Notebook `0e6de40f05`](https://github.com/enyst/enyst.github.io/commit/0e6de40f0560d2327bfbde40d80f95ff51013844).
 Critical downloads return HTTP 200 with full SHA-256 matches. Film SHA-256:
 `c5ff711e39f8cf7ec8779aeb4880a41f9127a33af3fb9b550de8f56bf2dbcfd2`.
-Eight checks pass, six skip; the initial all-hands-bot request is verified and
-pending. The PR is ready; no approval or merge is claimed.
+Eight checks pass and six skip. [All-hands-bot approved exact head `edf5f19e87`](https://github.com/OpenHands/OpenHands/pull/18856#pullrequestreview-5624777083)
+on 23 October at `2026-10-23T06:36:00Z` (08:36 Stockholm), with no material
+correctness, security, compatibility or architecture findings and no inline comments.
+The PR remains ready and open. Automation bar heights still awaits its initial bot review.
 
 ### Automation bar heights: ready with matching published evidence
 
