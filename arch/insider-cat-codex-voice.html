@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Codex","llm":null,"date":"2026-10-23","role":"editor"}]} -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -8,13 +9,15 @@
   <link rel="stylesheet" href="../arch.css">
   <style>
     .shell { max-width:960px; }
-    a { overflow-wrap:anywhere; text-underline-offset:3px; }
+    a { color:var(--teal); overflow-wrap:anywhere; text-underline-offset:3px; }
     p, li { line-height:1.75; }
     code { overflow-wrap:anywhere; }
     .table-wrap { overflow-x:auto; margin:24px 0; }
-    table { margin:0; }
+    .shell table { margin:0; font-size:14px; }
+    .shell th { font-size:14px; text-transform:none; letter-spacing:0; }
     td, th { vertical-align:top; }
-    .flow { display:grid; gap:12px; padding:24px; border:1px solid var(--border); border-left:3px solid var(--teal); background:var(--card); }
+    .shell .callout { border:1px solid var(--border); border-radius:var(--border-radius); }
+    .flow { display:grid; gap:12px; padding:24px; border:1px solid var(--border); background:var(--card); }
     .flow p { margin:0; }
     .source { color:var(--muted); font-size:14px; }
     details { margin-top:32px; padding:18px; border:1px solid var(--border); border-radius:8px; }
@@ -27,7 +30,7 @@
   <main class="shell">
     <a class="back" href="insider-cat.html#voice">← Insider Cat: Voice</a>
     <h1>Codex provides Voice.<br>OpenHands does the work.</h1>
-    <p class="meta">Current implementation reviewed <time datetime="2026-09-20">20 September 2026</time>. Earlier September 15–16 research and trials are preserved below.</p>
+    <p class="meta">Real-provider evidence reviewed <time datetime="2026-09-20">20 September 2026</time>; playback controls updated <time datetime="2026-10-23">23 October 2026</time>. The <a href="insider-cat.html#october-23-refresh">23 October source refresh</a> records branch integration and automated checks separately. Earlier September research and trials are preserved below.</p>
     <div class="callout"><p><strong>The current bridge forwards an explicit Voice handoff directly to the saved OpenHands Cat.</strong> It does not wait for a second reasoning model to choose an integration tool. Codex handles the experimental authenticated audio connection; the saved Cat owns tools, approvals, history, execution, and results.</p></div>
 
     <h2 id="direct-handoff">Current path: one bound Cat, direct handoff</h2>
@@ -41,7 +44,7 @@
     <p>The Codex thread uses <code>dynamicTools: []</code> alongside restrictions on other tool sources. The pinned app-server can still create a background turn: <code>clientManagedHandoffs</code> suppresses automatic outbound answers, not incoming background work. That turn has no tools and neither dispatches requests nor supplies the saved OpenHands answer. This restriction is essential; forwarding a notification while leaving an independently capable Codex agent active would have two execution owners.</p>
     <p>The browser does not resubmit Codex transcripts or tool events. The separate public OpenAI Realtime API path still uses a browser <code>send_to_insider</code> tool bridge. Its events and credentials are different. Public GPT-Live delegation metadata is also a different protocol: do not substitute it for the pinned Codex <code>input_transcript</code> contract.</p>
     <p><strong>There is still a Voice-model boundary.</strong> Live must emit a handoff. Direct speech from initial history is not proof that a request was saved in OpenHands. The new bridge removes the additional tool-choice failure after a handoff arrives; it does not guarantee that every spoken utterance will produce a handoff.</p>
-    <p class="source">Published implementation: <a href="https://github.com/enyst/agent-sdk/blob/02a51ae46744aa5a7c27067179502ceffb404610/openhands-agent-server/openhands/agent_server/codex_voice.py">Codex Voice broker</a> and <a href="https://github.com/enyst/agent-sdk/blob/02a51ae46744aa5a7c27067179502ceffb404610/tests/agent_server/test_codex_voice.py">handoff and lifecycle tests</a>. Equivalent tested worktree change: <code>957c1c584</code>.</p>
+    <p class="source">September implementation snapshot: <a href="https://github.com/enyst/agent-sdk/blob/02a51ae46744aa5a7c27067179502ceffb404610/openhands-agent-server/openhands/agent_server/codex_voice.py">Codex Voice broker</a> and <a href="https://github.com/enyst/agent-sdk/blob/02a51ae46744aa5a7c27067179502ceffb404610/tests/agent_server/test_codex_voice.py">handoff and lifecycle tests</a>. Equivalent tested worktree change: <code>957c1c584</code>. Later source revisions and their check scope are listed in the <a href="insider-cat.html#october-23-refresh">October maintenance record</a>.</p>
 
     <h2 id="agent-capabilities">The Cat uses normal OpenHands tools and skills</h2>
     <p>The real worker is the saved OpenHands Cat. A September 20 inspection of the Cat that could not count conversations found an earlier bare fixture with an empty configured tool list and no client tools. Its reasoning and finish tools remained, but it lacked the normal terminal tool. Voice had reached the correct agent; its saved configuration needed repair. The absence of a dedicated inventory tool was not the blocker.</p>
@@ -52,6 +55,10 @@
     <p>A handoff ID is admitted at most once within a call; this is not a claim of global exactly-once execution across crashes or new calls. Repeated or conflicting handoffs and overlapping work are bounded. An uncertain outcome is kept distinct from a request rejected before submission.</p>
     <p><code>request_not_sent</code> identifies a rejection before admission; <code>relay_failed</code> tells the user to inspect the saved outcome before retrying; <code>connection_failed</code> covers transport and protocol failures. Accepted append-and-run work is shielded from call cleanup. End closes Voice and its temporary relay, not the accepted OpenHands task.</p>
     <p>Opening the same Cat’s regular Canvas conversation preserves the connected peer. New Cat creates a new saved owner on the next typed send. Switching Cat or backend ends the old call. Condensation keeps the Cat ID but ends the old call so the next session loads current context. Long answers use a labelled spoken excerpt while the complete answer stays saved.</p>
+
+    <h2 id="playback-controls">Playback controls, updated 23 October</h2>
+    <p>The App now offers <strong>Stop speaking</strong> for Codex calls. It mutes and pauses the browser audio element until the person selects <strong>Resume audio</strong>. The call, microphone state, and accepted OpenHands work continue; this is local playback suppression, not a Codex speech-cancellation operation. Polling and late audio-track events do not automatically resume playback. Resume audio can expose ongoing speech and does not ask for a new answer.</p>
+    <p>The separate OpenAI API transport still sends <code>response.cancel</code> and <code>output_audio_buffer.clear</code>. These controls and their tests are recorded in <a href="https://github.com/enyst/insider/pull/3">App PR #3</a>, merged into the development branch as <a href="https://github.com/enyst/insider/commit/4ea3a5a02d6fc5e8ffc7be266a3beb8e2e78c1ac"><code>4ea3a5a</code></a>. This source update is separate from the dated live speech evidence below.</p>
 
     <h2 id="current-verification">Direct-path verification, September 19–20</h2>
     <p>A real WebRTC call with generated speech produced a saved user request and OpenHands answer, then returned that answer as spoken audio. A fresh call on the same Cat recalled the saved test word, saved the new question and answer, and spoke the correct word. Both used the existing Codex sign-in and a Luna/high OpenHands Cat. These are two observed end-to-end requests across two calls, not a promise of universal delegation.</p>
@@ -129,7 +136,7 @@
     <p>This separation follows an executable test: an empty <code>mcp_servers</code> override still inherited a configured local MCP server, even with empty environments. The restricted fixture exposed only <code>send_to_insider</code> to the model. A dedicated configuration, feature restrictions, and a version check are required for this prototype; prompt instructions alone do not establish that boundary.</p>
     <p>If no suitable existing session is available, sign in normally in the dedicated home. On the server machine, run <code>CODEX_HOME=/path/to/insider-codex-home codex login --device-auth</code>, then use that same directory for <code>OH_CODEX_VOICE_HOME</code>. The device flow lets the user finish sign-in on an iPad through <a href="https://auth.openai.com/codex/device">OpenAI’s device sign-in page</a>. Ordinary browser login uses a localhost callback, which normally points at the wrong machine when opened on a different device. Keep the generated one-time code private.</p>
     <p>Short saved replies can be spoken in full. Long replies use an excerpt from the beginning and explicitly say that the full answer is saved in the conversation. The durable answer is never shortened to fit speech. Live captions are transient; they are not a second saved transcript.</p>
-    <p>Codex mode offers microphone mute and End call. Its current app-server protocol has no verified speech-only interruption operation, so the App hides the separate Stop speaking button for this provider. Spoken stop, spoken hangup, real microphone handling, and provider voice quality still require their own live validation.</p>
+    <p>In the September 16 prototype, Codex mode offered microphone mute and End call, and hid Stop speaking because the app-server protocol had no verified speech-only interruption operation. The <a href="#playback-controls">October local playback control</a> supersedes that UI limitation without claiming provider cancellation. Spoken stop, spoken hangup, real microphone handling, and provider voice quality still require their own live validation.</p>
 
     <h2 id="verification">Local verification on September 16</h2>
     <p>In the earlier fixture checks, the actual installed app-server ran behind the actual Agent Server and Insider App. Only the provider endpoints, model replies, and microphone input were substituted. Browser peer statistics showed audio packets in both directions and an actively playing silent audio stream. Those fixture checks used no physical microphone, real provider session, or real account credential.</p>
