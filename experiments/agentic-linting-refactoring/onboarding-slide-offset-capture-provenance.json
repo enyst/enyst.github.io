@@ -1,0 +1,1024 @@
+{
+  "schemaVersion": 1,
+  "subject": "Onboarding slide offset",
+  "repository": "https://github.com/OpenHands/OpenHands",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18856",
+  "implementation": {
+    "sourcePath": "src/components/features/onboarding/onboarding-modal.tsx",
+    "layoutOnly": true,
+    "intendedVisualRedesign": false,
+    "change": "Move the computed slide offset from inline translateX transform to a CSS recipe using native translate. Phase offset arithmetic and configured 300 ms duration are retained."
+  },
+  "before": {
+    "head": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+    "buildFingerprint": "e702ca2a7aca7a47",
+    "runId": "lint-oct23-before",
+    "builtThisRun": true,
+    "versions": {
+      "agentCanvas": "1.32.0",
+      "agentServer": "1.58.1",
+      "sdk": "1.58.1",
+      "automation": "1.25.1",
+      "extensions": "0.35.0",
+      "node": "24.22.1",
+      "npm": "11.12.1"
+    },
+    "packageLockSha256": "8240e2e3024d723be7a34e7dcc2309d9e04a4a0de0587d00849ef2a673883e7f",
+    "sourceFiles": {
+      "src/components/features/onboarding/onboarding-modal.tsx": "b23dc208f9e2453ad947c34f894599aa3bca93653bb29d7c694d62d02df73171",
+      "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx": "c95c98be8d8de58b283bbedf65da98376d89b6d4ea9f31764c1242be7e91182c",
+      "src/components/features/home/featured-automations/automation-run-activity-metrics.ts": "3cbce7b642deaf9a9db3962cd4e5c319620ad4e6c3c28bbcf505cce64a2ac921",
+      ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "280a0fa8b5c9ad8c721fde72a586edcade4fc17496b2d1d5fe48129e2e323212"
+    },
+    "startedAt": "2026-10-23T05:31:48.974Z",
+    "readyAt": "2026-10-23T05:32:26.712Z",
+    "cleanupReceipt": "before-cleanup.json",
+    "cleanupReceiptSourceSha256": "98a345014bcd5552337e7904e204d8e0b4366b2c2b6c3bd7cb9dbf46225271a3"
+  },
+  "after": {
+    "head": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+    "buildFingerprint": "fa7f57783f9a371d",
+    "runId": "lint-oct23-onboarding-after",
+    "builtThisRun": true,
+    "versions": {
+      "agentCanvas": "1.32.0",
+      "agentServer": "1.58.1",
+      "sdk": "1.58.1",
+      "automation": "1.25.1",
+      "extensions": "0.35.0",
+      "node": "24.22.1",
+      "npm": "11.12.1"
+    },
+    "packageLockSha256": "8240e2e3024d723be7a34e7dcc2309d9e04a4a0de0587d00849ef2a673883e7f",
+    "sourceFiles": {
+      "src/components/features/onboarding/onboarding-modal.tsx": "9a62674be674d9ac83ddeab67e743cba0c4c1dee1c0fb942df413510212437f5",
+      "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx": "c95c98be8d8de58b283bbedf65da98376d89b6d4ea9f31764c1242be7e91182c",
+      "src/components/features/home/featured-automations/automation-run-activity-metrics.ts": "3cbce7b642deaf9a9db3962cd4e5c319620ad4e6c3c28bbcf505cce64a2ac921",
+      ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "280a0fa8b5c9ad8c721fde72a586edcade4fc17496b2d1d5fe48129e2e323212"
+    },
+    "startedAt": "2026-10-23T05:53:16.734Z",
+    "readyAt": "2026-10-23T05:53:25.791Z",
+    "cleanupReceipt": "after-onboarding-cleanup.json",
+    "cleanupReceiptSourceSha256": "41c7c702026236ba096a1d2ac5e0d678cbe05f421588ec47f5d5cbb7b31324db"
+  },
+  "conditions": {
+    "themes": [
+      "OpenHands-Neutral",
+      "OpenHands-DeepSea",
+      "Neo",
+      "Light+",
+      "SolarizedLight"
+    ],
+    "viewports": [
+      "1440×1000 desktop",
+      "390×844 phone"
+    ],
+    "selectedScreenshots": 64,
+    "selectedRawClips": 10,
+    "backend": "Local",
+    "reducedMotion": false,
+    "configuredCssDurationMs": 300,
+    "gettingStartedPreviewState": "expanded"
+  },
+  "limitations": [
+    "Actual healthy Local first-run has three phases. Genuine Next/Back plus documented preview Hello/Back cover the changed shared slide. Four-phase backend addition/4-to-3 collapse is covered by existing functional unit and compiled CSS guards, not claimed as live backend-down/public authentication proof.",
+    "Before transform matrices and After individual CSS translate are normalized through actual element rectangles; transform text identity is not expected.",
+    "0.3s is configured computed CSS duration; asynchronous saves, capture sampling and wall-clock video timing are not claimed exact or identical.",
+    "No model configured, no model calls or credentials entered.",
+    "The standalone Local captures cover all five current themes at desktop 1440×1000 and phone 390×844. No Cloud, ACP or arbitrary embedded-host UI pass is claimed.",
+    "Getting started remains expanded behind every preview capture in both phases. Fresh first-run captures are separately labelled and establish only their genuine Agent/Setup sequence.",
+    "Actual UI pixels are unretouched. Separate editorial banners identify ownership and capture mode; all complete original clips and selected full-viewport PNGs are downloadable.",
+    "This change moves style ownership without claiming a performance improvement or literal whole-screen pixel identity. All source clips are 25 fps; output retains original playback timing without motion interpolation."
+  ],
+  "selectedArtifacts": [
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-first-run-agent.png",
+      "sourceSha256": "894a33e9f8b3c5d509877c8faffb27e2eb97a618d1a5cbdef41dcb9db66ce000",
+      "bytes": 51459,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-first-run-setup.png",
+      "sourceSha256": "f4cad1b9fc5880f3c1d0045c2847c27ec9bf3c410d85b09b9983c7b8a84294ad",
+      "bytes": 40829,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neutral-desktop-hello-preview.png",
+      "sourceSha256": "afabf9254e83548320dc99fc7f0fc20eaf890842c0490b74fed1d0b809f918af",
+      "bytes": 120189,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neutral-desktop-setup-preview.png",
+      "sourceSha256": "51b525583ba82b2ab1e2a3b7a40dffa7e299e42dde7a34f37e8052064943c670",
+      "bytes": 93040,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neutral-desktop-agent-preview.png",
+      "sourceSha256": "ad8db3abc6a8945f4346810746a65a3219f79d2830d945f6ecb79629c01f9e89",
+      "bytes": 102487,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neutral-phone-hello-preview.png",
+      "sourceSha256": "e482a6fb84c1293d010abf2f721f5a53f98a8bece45f88c421d4e541a7017953",
+      "bytes": 47592,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neutral-phone-setup-preview.png",
+      "sourceSha256": "47fa4535828ad1628b6cd8d02e933ec3ae0ad7d35730834c49ea06c67ea9f5da",
+      "bytes": 32755,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neutral-phone-agent-preview.png",
+      "sourceSha256": "f3dbf506cdd80ae5d94876d939a32566c432225c6ab93a8d3bf321bc04ada585",
+      "bytes": 42285,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-deepsea-desktop-hello-preview.png",
+      "sourceSha256": "8b8c8d0a59aa987fa60563559bb08c1af437a9f2283dae8032076e4c9d8a09b8",
+      "bytes": 142662,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-deepsea-desktop-setup-preview.png",
+      "sourceSha256": "d3c3d3c132336e3f8c6fa169659e3f43e5acc1ed4ac9cae1c0733b34362d13f0",
+      "bytes": 111812,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-deepsea-desktop-agent-preview.png",
+      "sourceSha256": "a3e3bd1b46673bd3a81e1e30208f6c742a8b8e7493a3fb9616704dd9b17779d9",
+      "bytes": 124184,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-deepsea-phone-hello-preview.png",
+      "sourceSha256": "43bc7abc7528d49d6baa4265d1f49719e94d473c6203cf7830a2470cbf436c5a",
+      "bytes": 58188,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-deepsea-phone-setup-preview.png",
+      "sourceSha256": "c86ffaddee0b23f04bf461c51d6b1b459e0db366aff692fb07b284eee2335888",
+      "bytes": 39093,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-deepsea-phone-agent-preview.png",
+      "sourceSha256": "028f452f2be3d1f9bb73dcc8c30d24db6303e76f1df51a8ae7a6de45e0e84e3a",
+      "bytes": 51550,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neo-desktop-hello-preview.png",
+      "sourceSha256": "afabf9254e83548320dc99fc7f0fc20eaf890842c0490b74fed1d0b809f918af",
+      "bytes": 120189,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neo-desktop-setup-preview.png",
+      "sourceSha256": "51b525583ba82b2ab1e2a3b7a40dffa7e299e42dde7a34f37e8052064943c670",
+      "bytes": 93040,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neo-desktop-agent-preview.png",
+      "sourceSha256": "ad8db3abc6a8945f4346810746a65a3219f79d2830d945f6ecb79629c01f9e89",
+      "bytes": 102487,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neo-phone-hello-preview.png",
+      "sourceSha256": "e482a6fb84c1293d010abf2f721f5a53f98a8bece45f88c421d4e541a7017953",
+      "bytes": 47592,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neo-phone-setup-preview.png",
+      "sourceSha256": "47fa4535828ad1628b6cd8d02e933ec3ae0ad7d35730834c49ea06c67ea9f5da",
+      "bytes": 32755,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neo-phone-agent-preview.png",
+      "sourceSha256": "f3dbf506cdd80ae5d94876d939a32566c432225c6ab93a8d3bf321bc04ada585",
+      "bytes": 42285,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-light-plus-desktop-hello-preview.png",
+      "sourceSha256": "3775e1b3da6cee5726c27a86df2dcd0361f113079518e267f8a4cca16373794f",
+      "bytes": 122496,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-light-plus-desktop-setup-preview.png",
+      "sourceSha256": "a6657b9204f067d6696be07c5db463b6eb332bbcedef72cd6928235319a6f9ab",
+      "bytes": 96262,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-light-plus-desktop-agent-preview.png",
+      "sourceSha256": "313c2aac12c17249dc32c9cd60e559503eb2fbcdd29fccdff661e9ce6a69dc68",
+      "bytes": 106422,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-light-plus-phone-hello-preview.png",
+      "sourceSha256": "95275397b9013e80b42a7c8af7b7cf03af89937226894a2ced526ab3f1378561",
+      "bytes": 49158,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-light-plus-phone-setup-preview.png",
+      "sourceSha256": "a199ac8ab20874fd10d2af99802868f9b0653510d026b0c064d1cd10adf6962d",
+      "bytes": 34522,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-light-plus-phone-agent-preview.png",
+      "sourceSha256": "af91a4933f43c8ef9af16373763cef5c4b184b161c22ff9118fa3d1860095066",
+      "bytes": 44297,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-solarized-light-desktop-hello-preview.png",
+      "sourceSha256": "093c4a148882986e69949b2aaefccda0fe9197ada60f3c7ee131b3ba0cbab8fe",
+      "bytes": 138724,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-solarized-light-desktop-setup-preview.png",
+      "sourceSha256": "d9cf1ee7adea431fff0b0b93217c58c6edaa3c4884d609c8ba874280082b0c6c",
+      "bytes": 109773,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-solarized-light-desktop-agent-preview.png",
+      "sourceSha256": "1e8329bca9cda682d95bfbf56020935dc4612e9194a2edb9d17ae90580732ebc",
+      "bytes": 120548,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-solarized-light-phone-hello-preview.png",
+      "sourceSha256": "b67e82af82dcdfed8fbbba53cba424c477aa5837859f6b7fae6120049e974460",
+      "bytes": 57407,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-solarized-light-phone-setup-preview.png",
+      "sourceSha256": "3b4e89ecb8f8d07ee528df5d1bde673b7627a2676397f9d9c3f555c1f317e9eb",
+      "bytes": 39666,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/before/before-solarized-light-phone-agent-preview.png",
+      "sourceSha256": "b037d2956db8c82f07f5a7533445f3624cdb5389f2679b8b0ff5e77eb5a61235",
+      "bytes": 51107,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/before/before-first-run-next-back.mp4",
+      "sourceSha256": "c2c0a31836f04a47ae990e727c15e118d84e74e3a6b17c990b971a0dbabe8e1f",
+      "bytes": 100470,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47"
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neutral-desktop-preview-back-next.mp4",
+      "sourceSha256": "2afe44f0bb3b54533d40fdfcda5e2b2e7e11224281a2016445fd27fb6305fb5b",
+      "bytes": 204002,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47"
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/before/before-openhands-neutral-phone-preview-back-next.mp4",
+      "sourceSha256": "4410678c80924173aedb37d5f364176b7382b15a0422349841169e020499df94",
+      "bytes": 169023,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47"
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/before/before-light-plus-desktop-preview-back-next.mp4",
+      "sourceSha256": "b77504b9875f54bec376f16e37ba0beb4ec8d90a3bbf0724f307b980973fac6f",
+      "bytes": 206068,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47"
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/before/before-light-plus-phone-preview-back-next.mp4",
+      "sourceSha256": "3f111f78b7aebd0e1d6873dab9f281d6f8e37dc571e7a07b922e955616dada74",
+      "bytes": 166022,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47"
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-first-run-agent.png",
+      "sourceSha256": "894a33e9f8b3c5d509877c8faffb27e2eb97a618d1a5cbdef41dcb9db66ce000",
+      "bytes": 51459,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-first-run-setup.png",
+      "sourceSha256": "1503651c9522348187d4f199d323c95d0bfc941381401648b39cbfc6f7d8c271",
+      "bytes": 40820,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neutral-desktop-hello-preview.png",
+      "sourceSha256": "afabf9254e83548320dc99fc7f0fc20eaf890842c0490b74fed1d0b809f918af",
+      "bytes": 120189,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neutral-desktop-setup-preview.png",
+      "sourceSha256": "51b525583ba82b2ab1e2a3b7a40dffa7e299e42dde7a34f37e8052064943c670",
+      "bytes": 93040,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neutral-desktop-agent-preview.png",
+      "sourceSha256": "ad8db3abc6a8945f4346810746a65a3219f79d2830d945f6ecb79629c01f9e89",
+      "bytes": 102487,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neutral-phone-hello-preview.png",
+      "sourceSha256": "e482a6fb84c1293d010abf2f721f5a53f98a8bece45f88c421d4e541a7017953",
+      "bytes": 47592,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neutral-phone-setup-preview.png",
+      "sourceSha256": "47fa4535828ad1628b6cd8d02e933ec3ae0ad7d35730834c49ea06c67ea9f5da",
+      "bytes": 32755,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neutral-phone-agent-preview.png",
+      "sourceSha256": "f3dbf506cdd80ae5d94876d939a32566c432225c6ab93a8d3bf321bc04ada585",
+      "bytes": 42285,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-deepsea-desktop-hello-preview.png",
+      "sourceSha256": "8b8c8d0a59aa987fa60563559bb08c1af437a9f2283dae8032076e4c9d8a09b8",
+      "bytes": 142662,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-deepsea-desktop-setup-preview.png",
+      "sourceSha256": "d3c3d3c132336e3f8c6fa169659e3f43e5acc1ed4ac9cae1c0733b34362d13f0",
+      "bytes": 111812,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-deepsea-desktop-agent-preview.png",
+      "sourceSha256": "a3e3bd1b46673bd3a81e1e30208f6c742a8b8e7493a3fb9616704dd9b17779d9",
+      "bytes": 124184,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-deepsea-phone-hello-preview.png",
+      "sourceSha256": "43bc7abc7528d49d6baa4265d1f49719e94d473c6203cf7830a2470cbf436c5a",
+      "bytes": 58188,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-deepsea-phone-setup-preview.png",
+      "sourceSha256": "c86ffaddee0b23f04bf461c51d6b1b459e0db366aff692fb07b284eee2335888",
+      "bytes": 39093,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-deepsea-phone-agent-preview.png",
+      "sourceSha256": "028f452f2be3d1f9bb73dcc8c30d24db6303e76f1df51a8ae7a6de45e0e84e3a",
+      "bytes": 51550,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neo-desktop-hello-preview.png",
+      "sourceSha256": "afabf9254e83548320dc99fc7f0fc20eaf890842c0490b74fed1d0b809f918af",
+      "bytes": 120189,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neo-desktop-setup-preview.png",
+      "sourceSha256": "51b525583ba82b2ab1e2a3b7a40dffa7e299e42dde7a34f37e8052064943c670",
+      "bytes": 93040,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neo-desktop-agent-preview.png",
+      "sourceSha256": "ad8db3abc6a8945f4346810746a65a3219f79d2830d945f6ecb79629c01f9e89",
+      "bytes": 102487,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neo-phone-hello-preview.png",
+      "sourceSha256": "e482a6fb84c1293d010abf2f721f5a53f98a8bece45f88c421d4e541a7017953",
+      "bytes": 47592,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neo-phone-setup-preview.png",
+      "sourceSha256": "47fa4535828ad1628b6cd8d02e933ec3ae0ad7d35730834c49ea06c67ea9f5da",
+      "bytes": 32755,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neo-phone-agent-preview.png",
+      "sourceSha256": "f3dbf506cdd80ae5d94876d939a32566c432225c6ab93a8d3bf321bc04ada585",
+      "bytes": 42285,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-light-plus-desktop-hello-preview.png",
+      "sourceSha256": "3775e1b3da6cee5726c27a86df2dcd0361f113079518e267f8a4cca16373794f",
+      "bytes": 122496,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-light-plus-desktop-setup-preview.png",
+      "sourceSha256": "a6657b9204f067d6696be07c5db463b6eb332bbcedef72cd6928235319a6f9ab",
+      "bytes": 96262,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-light-plus-desktop-agent-preview.png",
+      "sourceSha256": "313c2aac12c17249dc32c9cd60e559503eb2fbcdd29fccdff661e9ce6a69dc68",
+      "bytes": 106422,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-light-plus-phone-hello-preview.png",
+      "sourceSha256": "95275397b9013e80b42a7c8af7b7cf03af89937226894a2ced526ab3f1378561",
+      "bytes": 49158,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-light-plus-phone-setup-preview.png",
+      "sourceSha256": "a199ac8ab20874fd10d2af99802868f9b0653510d026b0c064d1cd10adf6962d",
+      "bytes": 34522,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-light-plus-phone-agent-preview.png",
+      "sourceSha256": "af91a4933f43c8ef9af16373763cef5c4b184b161c22ff9118fa3d1860095066",
+      "bytes": 44297,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-solarized-light-desktop-hello-preview.png",
+      "sourceSha256": "f58cab5e877ce684b37fd764fd67ad72a35481cbdde28714f742bb6974bae7b7",
+      "bytes": 138917,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-solarized-light-desktop-setup-preview.png",
+      "sourceSha256": "eead5f4d6db426bac214dab1bede1a15613b8bb4e5fb5ff4dc100b308fda6504",
+      "bytes": 109823,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-solarized-light-desktop-agent-preview.png",
+      "sourceSha256": "b024753a5ea1c4cbf1e2ad70f0156e9f38d2d35bbfad6589c5bdc4f8ef8aa3f3",
+      "bytes": 120635,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-solarized-light-phone-hello-preview.png",
+      "sourceSha256": "b67e82af82dcdfed8fbbba53cba424c477aa5837859f6b7fae6120049e974460",
+      "bytes": 57407,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-solarized-light-phone-setup-preview.png",
+      "sourceSha256": "3b4e89ecb8f8d07ee528df5d1bde673b7627a2676397f9d9c3f555c1f317e9eb",
+      "bytes": 39666,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "onboarding-slide-offset-evidence/after/after-solarized-light-phone-agent-preview.png",
+      "sourceSha256": "b037d2956db8c82f07f5a7533445f3624cdb5389f2679b8b0ff5e77eb5a61235",
+      "bytes": 51107,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/after/after-first-run-next-back.mp4",
+      "sourceSha256": "f9c13615d97f6362f009ba3e4644425321dec77e8ecf8c443e4f355d48b60388",
+      "bytes": 115099,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d"
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neutral-desktop-preview-back-next.mp4",
+      "sourceSha256": "3ec1c8e7d8ee9b283356bb46ba3ce04c1deb690359e7468f226eb58d6a5f34ad",
+      "bytes": 229256,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d"
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/after/after-openhands-neutral-phone-preview-back-next.mp4",
+      "sourceSha256": "0ad717af4fe73df894d174b5b881bf429901db8b7b9fa47fc253de2492ec6a8c",
+      "bytes": 167213,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d"
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/after/after-light-plus-desktop-preview-back-next.mp4",
+      "sourceSha256": "e3d2bbf0a11e6031df4722cbc55d206e0f33f3eb42119e5e59c799317e296be5",
+      "bytes": 225233,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d"
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "onboarding-slide-offset-evidence/after/after-light-plus-phone-preview-back-next.mp4",
+      "sourceSha256": "f7f645ad6cf28121226d98a8ae804aad1ba91124c0aefa77da1ca3a54c74d1b4",
+      "bytes": 173116,
+      "sourceRevision": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "servedBuildFingerprint": "fa7f57783f9a371d"
+    }
+  ],
+  "receiptHandling": "PNG and MP4 sources are byte-for-byte copies. Public receipt JSON removes local capture paths and local URLs; original receipt hashes are retained.",
+  "privateReceiptSha256": {
+    "before": "7b1dc831ec68d5fb99eb388c9bd86b3c88cb34138e49df2d4388d55b707d8cd8",
+    "after": "802a21c531123b90b902863058d3f0956f7f67d2f56a5a7de61b42734385037e"
+  },
+  "comparisonFile": "onboarding-slide-offset-comparison.json",
+  "comparisonSha256": "22d24b230950e1ccffeb144ed5114eb804494641c0c949986fdc91df8183fcf0"
+}
