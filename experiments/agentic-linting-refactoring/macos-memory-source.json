@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-19T02:20:44.808223+00:00",
+  "repository": "OpenHands/OpenHands",
+  "issue": 18644,
+  "pullRequest": 18645,
+  "baseCommit": "83c9b64af66fae23a64aa07de6a3706cdab1144c",
+  "fixCommit": "743f204fd4c845a93d11fff3f8b973c65ecd6ade",
+  "scope": "Independent verification-skill maintenance only; product sources unchanged from base.",
+  "environment": {
+    "os": "macOS27.0.1",
+    "node": "24.19.0",
+    "libuv": "1.52.1",
+    "physicalMemoryGiB": 24
+  },
+  "guard": {
+    "defaultMinimumMiB": 2000,
+    "overrideUsed": false
+  },
+  "before": {
+    "readingsAndActualOutput": "macos-memory-before.json",
+    "actualExitCode": 3,
+    "observation": "Native available memory exceeded the threshold, but the original guard used unused pages and refused before any services started."
+  },
+  "after": {
+    "nativeReadingBeforeLaunch": {
+      "at": "2026-10-19T02:18:19.662Z",
+      "node": "v24.19.0",
+      "libuv": "1.52.1",
+      "unusedBytes": 689061888,
+      "availableBytes": 8609562624
+    },
+    "actualLaunchExitCode": 0,
+    "doctor": "macos-memory-after-doctor.json",
+    "doctorPassed": true,
+    "screenshot": "macos-memory-launch-after.png",
+    "servedBuildFingerprint": "124ec80fd014f88b",
+    "backend": {
+      "agentServer": "1.55.1",
+      "automation": "1.20.1"
+    },
+    "observation": "Real isolated Agent Server, automation, frontend and ingress started with default threshold; doctor passed auth/health/build identity/browser checks."
+  },
+  "regressionChecks": {
+    "red": "Four Darwin cases failed before the one-line production change; Linux and fallback cases already passed.",
+    "green": "100/100 tests across the two verification JS suites.",
+    "syntaxAndDiff": "passed"
+  },
+  "limits": [
+    "Memory snapshots are adjacent measurements, not simultaneous or a guarantee of future capacity.",
+    "Native available memory is an estimate including reclaimable pages; memory-pressure percentages were not converted to bytes.",
+    "Older native runtimes may retain a conservative unused-memory reading.",
+    "The failing preflight has no running-Canvas screenshot because it does not start the app.",
+    "The after screenshot proves startup, not an LLM response or onboarding success.",
+    "The run was used for the separate status-class baseline capture and then fully stopped; the browser, launcher and all owned service ports were confirmed closed."
+  ],
+  "assets": [
+    {
+      "path": "macos-memory-launch-after.png",
+      "bytes": 99317,
+      "sha256": "a208accf4e3db9b8f5d7320046878264085752f355f199d85fdb7a91a45002eb"
+    },
+    {
+      "path": "macos-memory-before.json",
+      "bytes": 832,
+      "sha256": "e5fed1f5796d738ff6d0c263b973b917c1f6c9631022afeb80c483bece019086"
+    },
+    {
+      "path": "macos-memory-before.txt",
+      "bytes": 243,
+      "sha256": "bd4d80916a7ec1c24e6fb8c056c2f10d300c00a4214e861215610d39c027fe5e"
+    },
+    {
+      "path": "macos-memory-after-doctor.json",
+      "bytes": 1341,
+      "sha256": "4494e3cbab3ee12da8c5d2fd88e2d3f4157903a1359d5bd4a8f79cde9b8619ea"
+    }
+  ],
+  "cleanup": {
+    "completed": true,
+    "browserStopped": true,
+    "launcherStopped": true,
+    "ports": {
+      "ingress": "closed",
+      "agentServer": "closed",
+      "automation": "closed",
+      "frontend": "closed",
+      "vscode": "closed"
+    },
+    "privateStatePurged": true
+  },
+  "currentPullRequestStatus": {
+    "checkedAt": "2026-10-19T02:43:28+00:00",
+    "state": "OPEN",
+    "draft": false,
+    "headCommit": "743f204fd4c845a93d11fff3f8b973c65ecd6ade",
+    "reviewDecision": "REVIEW_REQUIRED",
+    "requestedReviewers": [
+      "all-hands-bot"
+    ],
+    "currentChecks": {
+      "passed": 13,
+      "skipped": 2,
+      "pending": 0,
+      "failed": 0
+    },
+    "note": "Initial bot review requested after current checks passed. This metadata update makes no additional review request."
+  },
+  "currentCheckDetails": [
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39191066760/job/117863774413",
+      "name": "Verify skill isolation",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39191066944/job/117863775168",
+      "name": "Validate PR description",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462281/job/117860251081",
+      "name": "Update PR description with Docker image",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462281/job/117860214644",
+      "name": "Consolidate Build Information",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462281/job/117860066604",
+      "name": "Merge Multi-Arch Manifests",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462734/job/117858888331",
+      "name": "pr-title / Apply conventional-type label",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462302/job/117858880000",
+      "name": "test-and-build (windows)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462302/job/117858880133",
+      "name": "test-and-build (ubuntu)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462281/job/117858851852",
+      "name": "Build & Push (arm64)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462734/job/117858854518",
+      "name": "pr-title / Lint PR title (conventional)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462302/job/117858852011",
+      "name": "prepare-test-matrix",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462312/job/117858852998",
+      "name": "check-pr-artifacts",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462281/job/117858852152",
+      "name": "Build & Push (amd64)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "skipping",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462312/job/117858854519",
+      "name": "cleanup-after-merge",
+      "state": "SKIPPED"
+    },
+    {
+      "bucket": "skipping",
+      "link": "https://github.com/OpenHands/OpenHands/actions/runs/39189462302/job/117858853384",
+      "name": "live-e2e",
+      "state": "SKIPPED"
+    }
+  ]
+}

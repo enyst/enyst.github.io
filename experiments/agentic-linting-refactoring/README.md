@@ -271,3 +271,459 @@ The SDK proposal remains unmerged and unreleased. It does not populate
 REST/WebSocket metrics, followed by client and Canvas integration, are still
 required. Live meter capture remains blocked by the normal launcher memory
 guard. All 23 films, source assets, and historical lint audits are unchanged.
+
+## Fresh main audit and three small drafts — 2026-10-19T01:21:26+00:00
+
+The new integrated-main audit at `83c9b64af66fae23a64aa07de6a3706cdab1144c`
+records zero errors and 616 warnings: 521 arbitrary values in 176 files,
+89 inline styles in 45 files, and six reported palette colors in two files.
+`main-lint-audit-2026-10-19-83c9b64af6.json` is the full public, relative-path audit.
+The original `lintAudit` and two older main audits remain unchanged.
+
+The reported six are not the complete color backlog. The proposed five-owner
+scan in [#18643](https://github.com/OpenHands/OpenHands/pull/18643) exposes
+34 additional genuine palette declarations, for 40 under that scope. The broad
+all-string probe's 46 includes six unrelated or valid-token findings. Seven
+exact legacy-token exceptions remain necessary, and arbitrary hexadecimal
+colors are owned by the separate arbitrary-value rule. No severity is promoted.
+
+[#18641](https://github.com/OpenHands/OpenHands/pull/18641) replaces four
+inline status colors with exact existing classes; 35 focused tests and local
+type/app/library checks pass.
+[#18642](https://github.com/OpenHands/OpenHands/pull/18642) moves two chooser
+slide styles to static utilities; 30 focused tests pass and a real recording
+is in progress. The five-owner scan passes five focused tests and changes no UI.
+All three remain draft: CI is running and description validation is red.
+No live affected-state pass is claimed from read-only API probes.
+
+The cohort now contains 39 proposals: 34 merged, one open non-draft and four
+drafts. Only the three new entries were refreshed in this update; the original
+36 retain their 18 October status snapshot. Existing budget work, all 23 films,
+media hashes and recording source heads are preserved.
+
+## Class-map scan ready for review — 2026-10-19T01:46:02+00:00
+
+[#18643](https://github.com/OpenHands/OpenHands/pull/18643) is ready at
+`65828a3d51b91cc93ebdd3bb0519cdffd5a80b11`: all 13 current checks pass,
+two are skipped, and the initial all-hands-bot review is requested and pending.
+Its CI summary remains tooling evidence; no Canvas rendering claim is added.
+The cohort has 34 merged, two open non-draft and three draft proposals.
+The status-class and chooser-slide drafts still need matching live captures
+under the normal launcher memory guard. Their existing check snapshots, the
+original 36-PR snapshot, historical audits, budget work and all 23 films remain
+unchanged.
+
+## 19 October 2026 — macOS verification launcher prerequisite
+
+PR [#18645](https://github.com/OpenHands/OpenHands/pull/18645), issue [#18644](https://github.com/OpenHands/OpenHands/issues/18644): original unused-memory guard refuses a real run despite native available memory above the unchanged 2,000 MiB threshold. Verification-only fix `743f204fd4c845a93d11fff3f8b973c65ecd6ade` passes 100 tests and launches the actual stack with doctor passing. `macos-memory-source.json` records original output, after doctor output, reviewed screenshot and exact hashes. UI captures can now proceed; CI remains pending. This prerequisite is outside the 39-proposal lint cohort.
+
+## Status-color film published and scan approved — 2026-10-19T02:30:23+00:00
+
+The 24th film, `status-classes-before-after.mp4`, shows the same colors before
+and after [#18641](https://github.com/OpenHands/OpenHands/pull/18641): actual
++3/-1 git counts, an actual 404 toast and a real backend-disconnection CircleX.
+It has clear Before/After labels, quiet original ambience, a same-origin MP4
+download for Slack, a silent GIF, poster and captions. `status-classes-source.json`
+records product heads 83c9b64af6/6e93317744 separately from the baseline
+verification harness 743f204fd4, both SDK 1.55.1 runs, crops, hashes and limits.
+Matching capture is complete, while the PR remains draft until its separate
+media/readiness update. Only the five approved film files were added.
+
+[#18643](https://github.com/OpenHands/OpenHands/pull/18643) now has all-hands-bot
+approval on 65828a3d51 and no pending reviewer. The original 36-PR snapshot,
+all historical audits, budget work and all 23 prior films remain unchanged.
+The independent launcher [#18645](https://github.com/OpenHands/OpenHands/pull/18645)
+remains draft, with 12 checks passed, one pending and two skipped in its last
+CI snapshot. Its capture run is fully stopped and all owned ports closed;
+only cleanup metadata changed in `macos-memory-source.json`.
+
+## Chooser film published; status colors ready — 2026-10-19T02:38:28+00:00
+
+The 25th main film, `backend-chooser-before-after.mp4`, preserves the full
+70.54-second desktop and phone recordings at 1× speed, adding short chapter
+cards, uniform letterboxing and tiny original ambience. The page has a
+same-origin MP4 download for Slack, an eight-second excerpt GIF, poster,
+captions and `backend-chooser-provenance.json`. All eight authentic originals
+are copied byte-for-byte under `backend-chooser-raw/`; reduced-motion clips
+are linked separately and clearly labelled. No credential, provisioning or
+managed-agent execution is claimed.
+
+Matching capture for [#18642](https://github.com/OpenHands/OpenHands/pull/18642)
+is complete; the PR remains draft until its independent media/readiness update.
+[#18641](https://github.com/OpenHands/OpenHands/pull/18641) is ready at
+6e93317744, with 13 current checks passed, two skipped and its initial
+all-hands-bot review requested. The scan #18643 remains approved; launcher
+#18645 retains its last Ubuntu-pending snapshot. All 24 prior films, historical
+audits, original 36-PR snapshot, budget work and launcher proof are unchanged.
+
+## Final readiness snapshot — 2026-10-19T02:43:28+00:00
+
+All four current PRs are ready, each with 13 checks passed and two skipped;
+there are no current failed or pending checks. Status colors #18641, chooser
+slides #18642 and independent launcher repair #18645 each have their initial
+all-hands-bot review requested and pending. The class-map scan #18643 remains
+approved at 65828a3d51 with no pending reviewer. All heads are unchanged.
+
+The 39-proposal lint cohort now contains 34 merged, four open non-draft and
+one draft. Launcher #18645 remains separate at 743f204fd4. Its capture run
+is fully stopped, all owned ports closed and private run state purged.
+Both published UI MP4s were independently served as HTTP 200 video/mp4 with
+SHA-256 values matching their manifests. All 25 main films, original 36 dated
+entries, historical audits, budget work, capture limits and media bytes remain
+unchanged. This update makes no PR changes or review requests.
+
+## Fresh main audit and two palette batches — 20 October 2026
+
+The actual full lint command passes at exact main `8d39305538c1d17a30cbe477e57a0e18fcee7d95`:
+**0 errors and 645 warnings across 1,408 linted files**. The breakdown is
+522 arbitrary-value findings in 177 files, 83 inline-style findings in 42 files,
+and 40 palette findings in seven files. Another 47 hardcoded-color messages
+belong to the arbitrary-value total. Typecheck and formatting pass.
+`main-lint-audit-2026-10-20-8d39305538.json` preserves all active messages with relative paths, exact
+commands and runtime versions; its SHA-256 is
+`62315fdf08d20d0484ea2d180a94c5e393f4df3eb2f1a86cbe8aa3a857c84a0d`.
+The 616-warning audit at 83c9b64af6 remains unchanged dated history, alongside
+the earlier audits. The new proposals do not change that 645-warning main result.
+
+[#18694](https://github.com/OpenHands/OpenHands/pull/18694), issue
+[#18693](https://github.com/OpenHands/OpenHands/issues/18693), removes two fixed
+failure-dot palette classes at `123afde75d2c94caff4b3a0e31fae2b461d20857`. It is ready with eight checks
+passed, six skipped and all-hands-bot approval at this exact head. The PR remains open. All 112 focused tests
+pass. The 54.2-second
+`health-dots-before-after.mp4`, silent GIF, poster, captions, source manifest
+and original-capture ZIP preserve the actual missing-command MCP and stopped
+secondary-backend paths. Forty paired captures span five themes and both
+viewports using Agent Server/SDK 1.56.0. Baseline contrast already passed 3:1;
+minimum sampled nontext contrast changes from 3.107 to 3.774:1. Eight superseded
+wrong-cause light-theme screenshots are explicitly excluded. No model turn,
+authenticated Cloud/ACP session or custom embedded-host visual pass is claimed.
+
+[#18696](https://github.com/OpenHands/OpenHands/pull/18696), issue
+[#18695](https://github.com/OpenHands/OpenHands/issues/18695), removes twenty
+palette warnings through five alert-owned roles at `e2c79483dd4fda6099686ee4b165d79cef4e5937`. Five families,
+labels, icons and parsing remain; quieter 5% tints and contrast body ink cover
+nested alerts. The actual Files prose regression first reproduced 3.376:1
+Solarized emphasis, then passed with scoped emphasis/headings/code/kbd/caption/
+marker roles; bold links retain link ink and ordinary Markdown is unchanged.
+All 69 focused tests and full local lint pass with 0 errors and 625 warnings.
+Independent implementation review is clear. Actual Before/After capture spans
+five themes, desktop/phone and agent chat, user Markdown and Files previews.
+The `markdown-alerts-*` film, GIF, poster, captions, provenance, paired matrix
+and 140-image evidence ZIP are assembled. The 53.8-second film is 1440 × 1120,
+with quiet original ambience. Selected live title/icon contrast improves from
+1.003:1 to at least 4.558:1; body/emphasis reaches at least 8.520:1 and links
+at least 4.848:1. Both platform jobs and media-description validation pass:
+eight checks passed and six skipped. The initial bot review is requested and
+pending; no approval or merge is claimed.
+
+Both capture stacks are stopped, all owned ports closed and private run state
+purged. Recording heads and final hashes belong to their source manifests.
+All 25 earlier films, their 50 MP4 download links, historical audits, original 39
+PR objects, budget records and completed approvalWatch are retained. The cohort
+currently has 41 proposals: 37 merged, 3 open non-draft and 1 draft. Both new
+proposals are ready with green current checks. All-hands-bot approved the health
+dots at exact `123afde75d`; its initial Markdown review is pending. The existing non-draft budget policy case is separate from these
+two batches; the remaining draft requires authorized DigitalOcean evidence.
+
+Twelve start-task badge/indicator palette findings are currently unreachable
+through an ordinary Local or Cloud launch: `useStartTasks` returns `[]`, and
+its selector excludes READY/ERROR. Restoring real list data and deciding
+terminal-state visibility is separate product work before live evidence.
+Managed-agent focus retains its authorized DigitalOcean-resource prerequisite;
+budget-meter cleanup retains its existing description-policy gate and separate
+SDK/client/Canvas integration path. A next independent style candidate is the
+Markdown diff-preview's one 600 px `maxHeight` warning; preserve the shared
+`MAX_DIFF_EDITOR_HEIGHT_PX` owner and verify its real old/new view before changing it.
+
+
+## Integrated main and two ready layout batches — 21 October 2026
+
+The fresh exact-main audit at `630e587a0de0b4106173ba0d39ac865d60a51a5a`
+passes the full lint command with **0 errors and 618 warnings across 1,417 linted
+files**, with diagnostics in 194 files: 517 arbitrary-value findings in 177 files,
+83 inline-style findings in 42 files, and 18 palette findings in four files.
+The 47 additional hardcoded-color findings across 20 files are included in the
+arbitrary-value total. Typecheck and formatting pass.
+`main-lint-audit-2026-10-21-630e587a0d.json` preserves all active messages,
+relative paths, commands and runtime versions. Its SHA-256 is
+`781fa6883e4c194b5ef2b72445ed14fa598bd35793c3c10b5504360a5bd574b0`.
+The original audit and all four earlier main audits remain unchanged.
+
+Health dots [#18694](https://github.com/OpenHands/OpenHands/pull/18694) merged
+on 20 October at `2026-10-20T19:13:45Z` as
+`3c1cb1a6551464001c46988648a2dad9c32107f7`; Markdown alerts
+[#18696](https://github.com/OpenHands/OpenHands/pull/18696) merged at
+`2026-10-20T19:13:24Z` as `87b9496342c935b7fc35db29d2384cab9e49e425`.
+Their 22 removed palette findings account for part of the 27-warning reduction
+from the historical 645-warning audit. Seven arbitrary-value warnings disappeared
+with the old automation setup prompt stack, offset by two new profile-picker
+warnings. The merged films keep their exact captured heads and media hashes.
+
+Two new independent ready batches each remove one configured inline-style warning:
+
+- [#18762](https://github.com/OpenHands/OpenHands/pull/18762), issue
+  [#18757](https://github.com/OpenHands/OpenHands/issues/18757), uses a static
+  `max-height` utility consuming a numeric custom property backed by the existing
+  600 px `MAX_DIFF_EDITOR_HEIGHT_PX` owner. Exact head
+  `499ddf307010062beac5dfa30ac85f49083bbe88` passes 17 existing focused tests,
+  typecheck, formatting, app/library builds and the compiled scoped CSS check.
+- [#18763](https://github.com/OpenHands/OpenHands/pull/18763), issue
+  [#18758](https://github.com/OpenHands/OpenHands/issues/18758), uses a static
+  width utility consuming the existing 268 px
+  `CONVERSATION_OVERVIEW_COLUMN_WIDTH_PX` owner through a numeric custom property.
+  Exact head `bde133fb5e75019021bbf603c62567ea4aa3a741` preserves the outer Framer
+  Motion animation and passes 11 focused tests, typecheck, formatting, app/library
+  builds and the compiled CSS check.
+
+An independent review of the code and emitted CSS is clear at both exact heads.
+Matching actual `control-openhands` Before/After checks are complete and both film
+packets are published. Each PR is ready at its unchanged exact head, with eight
+checks passed, six skipped and no failed or pending checks, including successful
+media-description validation. The initial all-hands-bot reviews were requested on
+21 October and are pending. These scoped branch results do not change the
+separately measured integrated-main count of 618.
+
+The current cohort has **43 proposals: 39 merged, three open non-draft and one
+draft**. The existing non-draft budget cleanup retains its policy gate and
+SDK/client/Canvas prerequisites. Managed-agent focus retains its authorized
+DigitalOcean-resource and live-evidence prerequisites. The twelve remaining
+start-task palette findings still lack an ordinary Local/Cloud launch path:
+`useStartTasks` returns `[]` and excludes READY/ERROR. All original 39 PR objects,
+the completed `approvalWatch`, 27 existing films and their 54 MP4 download links
+are preserved. The previous 41-proposal snapshot remains dated history.
+
+The next independent small candidate is the static 18 px automation-run
+sparkline track, owned by `AUTOMATION_RUN_ACTIVITY_TRACK_PX`. Verify its real
+card/list consumers before migrating it; duration-derived per-bar heights
+retain separate runtime ownership. Seven exact legacy-token exceptions and
+other dynamic, renderer and accessibility owners remain part of the staged audit.
+
+
+## Static-style live evidence — 21 October 2026
+
+The Markdown preview packet, `markdown-preview-cap-*`, compares exact main
+`630e587a0d` with `499ddf3070`: sixteen geometry/scrolling pairs have no differences,
+and twelve pairs also preserve captured text excerpts/button states. Real uncommitted
+and historical old/new Markdown plus Diff mode are exercised in Chrome at
+1440 × 1000 and 390 × 844, with representative Neutral, Light+ and DeepSea checks.
+Long previews stay 600 px high; short desktop previews measure 185/221 px and the
+phone preview 209 px. Real scroll positions reach 800/700 px with no horizontal
+page overflow. The selected packet contains 20 PNGs and four original clips.
+Four initial After theme screenshots raced rendering and are replaced by settled,
+verified captures. Existing Monaco disposal issue #17567 occurred in both phases:
+three baseline events, including a discarded recording attempt, and two After
+events, with no other captured page-error message. It is outside this patch.
+
+The overview packet, `overview-column-width-*`, compares the same main with
+`bde133fb5e`: fourteen paired semantic/layout checks have no differences. The
+visible inner/outer columns stay 268 px wide around a 240 px card; opening,
+closing and side-panel exclusion are preserved. Width checks cover 1440, 1100,
+1024 and 390 px, with representative Neutral, Light+ and DeepSea checks. The
+selected packet contains 18 PNGs and five original clips; one initial baseline
+phone screenshot is superseded for state proof by a separately recorded pressed-on
+DOM measurement. Existing #16792 reproduces in both phases: the phone/tablet toggle can be pressed while no
+overview card is rendered. That state is not counted as a visible-column pass
+or a fix. The fresh overview After run has zero page errors.
+
+Both packets use real Local Agent Server/SDK 1.56.0, automation 1.22.0 and Canvas
+1.29.0 through `control-openhands` and Google Chrome. Build fingerprints are
+`8e676f49549e7308` Before, `5eaccd708ea64185` preview After, and
+`d6a9fbc5aa60245d` overview After. Bounded DeepSeek Flash responses used no tools
+and recorded zero ActionEvents. No mocks or verifier source/driver edits were
+used. All three owned stacks are stopped, private run state is purged and owned
+ports are closed. The `*-sources.json` manifests preserve these checks and limits;
+final MP4/GIF/poster/captions and selected-original ZIP packets are assembled.
+
+
+The published preview film is 34.6 seconds and the overview film 33.2 seconds,
+both 1440 × 1120 H.264/AAC exports with tiny original synthesized ambience. The
+page retains all 27 earlier films/54 MP4 download links; these two new sections
+bring it to 29 films/58 links. Each `*-sources.json` records the final named media
+hashes and bytes, with capture provenance, paired measurements, a silent GIF and
+selected-original ZIP. Film, GIF and original MP4 downloads return HTTP 200 with
+matching full SHA-256 values. Media were published in Notebook commit
+`f6829d1fbe8baf5ce310f60a40440d60678beb27`; both PRs are ready and their initial
+bot reviews are requested, with no approval or merge claimed.
+
+
+## Layout merge and review follow-up — 22 October 2026
+
+Overview width [#18763](https://github.com/OpenHands/OpenHands/pull/18763)
+merged at `2026-10-21T23:22:38Z` (22 October 01:22 Stockholm) as
+`ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8`, after bot approval. Its film
+and source manifest remain pinned to the actual recorded `bde133fb5e` head.
+
+Markdown preview [#18762](https://github.com/OpenHands/OpenHands/pull/18762)
+now has test-only follow-up `0876b39f76b314d1a8fcc5bc71c8730f36664e19`. The
+original bot review verified the implementation but requested a functional
+CSS-contract guard. All 23 focused diff-viewer tests pass; mutations of the CSS
+reader, custom-property writer and removal of the cap each fail the new test.
+The [inline finding is answered](https://github.com/OpenHands/OpenHands/pull/18762#discussion_r4343018059)
+and the solved thread is resolved. Current exact-head CI is green: eight passed, six skipped and none failed
+or pending, including Ubuntu, Windows and required media-description validation.
+The new all-hands-bot review explicitly requested by the user was requested at
+`2026-10-21T23:38:08.145901+00:00` (22 October 01:38 Stockholm). The bot
+[approved exact `0876b39f76`](https://github.com/OpenHands/OpenHands/pull/18762#pullrequestreview-5607576348)
+at `2026-10-21T23:43:44Z` (01:43 Stockholm), confirming the old finding is
+resolved and no material gaps remain. It independently verified four guard
+mutations fail: reader mismatch, writer mismatch, removed cap utility and
+a 900 px cap. The PR remains open; this update performs no merge. The 34.6-second film still records product head `499ddf3070`;
+the test follow-up does not change the captured product source.
+
+The current 44-proposal cohort is **40 merged, three open non-draft and one draft**.
+The separate 18 px sparkline-track batch is in progress under
+[issue #18787](https://github.com/OpenHands/OpenHands/issues/18787), with 34
+focused tests passing. Ready [#18788](https://github.com/OpenHands/OpenHands/pull/18788)
+at `e89f502061bc89ddb7811352a471b13d4c5126d5` removes one target-file warning
+(eight to seven, zero errors) and passes typecheck, formatting and app/library
+builds. Its compiled CSS-contract guard fails reader mismatch, writer mismatch
+and removed-class mutations. Actual `control-openhands` capture now verifies 24 fixed-geometry pairs with
+zero differences across Dashboard grid/list and Home pinned card/activity row,
+desktop/phone and Neutral/Light+/DeepSea. Tracks remain 16 × 18 px with two 4 px
+bars and 8 × 18 px link targets. Eight actual bar deep links work. The 48 selected
+PNGs and four original clips accompany the published film. The PR is ready at
+its unchanged exact head, with eight checks passed, six skipped and none failed
+or pending. Its initial all-hands-bot review was requested at
+`2026-10-21T23:49:16.143763+00:00` (22 October 01:49 Stockholm) and is pending. Four independent genuine DeepSeek Flash runs used
+only finish actions and produced zero browser/app errors. Their natural durations
+differ: Before 42.867/35.692 seconds yields 11/10 px bars; After 24.066/22.180
+seconds yields 10/10 px bars. All 96 individual bar-height formula checks pass.
+No identical-pixel or equal dynamic-bar-height claim is made. Both fixtures are
+deleted, both owned stacks stopped, all ten ports closed and private state purged. Duration-derived bar heights retain their runtime owner.
+
+A fresh complete main audit at `ea2f42bf6e6c58ab1a2f753df7c3912b37c9a6d8`
+now records **0 errors and 617 warnings across 1,419 linted files**, with
+diagnostics in 193 files: 517 arbitrary-value findings, 82 inline-style findings
+and 18 palette findings. Full lint, configured machine ESLint, typecheck and
+formatting pass. The sole normalized diagnostic change from the previous
+618-warning audit is the merged overview-column width finding. The public
+`main-lint-audit-2026-10-22-ea2f42bf6e.json` has SHA-256
+`c16d1d6eee9eedb9985feb9802334c4036b6ec76e1009750c0cee39aa1912ce9`.
+The earlier 618-warning audit remains pinned to `630e587a0d`. All five previous
+main audit objects and twelve proposal audit objects are preserved unchanged;
+the new audit is a sixth entry. All 29 films/58 MP4 download links, original
+recording heads, prior proposal metadata, the completed approval watch and
+existing prerequisite records remain. No preview or sparkline proposal reduction
+is counted on integrated main.
+
+
+## Automation activity-track film — 22 October 2026
+
+The new `automation-activity-track-*` packet compares exact merged main
+`ea2f42bf6e` with proposal `e89f502061`. The approved 31.4-second 1440 × 1120
+film is assembled, with clear Before/After labels, normal six-second
+desktop excerpts per phase, complete 3.9/4.1-second phone clips and actual
+Light+ pinned-card details. Its caption says “Same 18 px track · Real run
+durations differ.” Tiny original ambience accompanies the film. The source
+manifest, silent GIF, poster, captions and selected-original ZIP are finalized
+and published in `0f8803ceee6d8a5dc0786018386aac267c19d492`. Immutable
+film/GIF downloads return HTTP 200 and match full SHA-256 values. The PR is
+ready at its unchanged exact head, with eight checks passed, six skipped and
+none failed or pending, including required media-description validation. Its
+initial all-hands-bot review is requested and pending. Ambience measures −52.5 dBFS mean and
+−42.9 dBFS peak. The film SHA-256 is
+`2d6ece4cc61a19dc59816ea7e4fbe075241c2ae546fec1f4cd29e2aa1c3108a9`;
+the source manifest SHA-256 is
+`dd5fce4847a8e4d21e1400dbc6dd16c1e03ea30e0f0a659ea4c8ab20c511e8bc`.
+The added page section preserves all 29 previous films and 58 MP4 download
+links, bringing the page to 30 films and 60 MP4 download links.
+
+
+## Next small ownership batches — 22 October 2026
+
+The maintainer merged Markdown preview #18762 at `2026-10-22T01:40:11Z`
+as `20bb37e39d7268bfd176f54b3d2e461d3b2ada57`, then activity track #18788 at
+`01:40:46Z` as `70b8f9069dec3d1c39a04d755521ebe6bd252aab` (03:40 Stockholm).
+Both had bot approval and green exact-head CI. Their captured product heads,
+media hashes and limits remain unchanged. This update performs no merge.
+
+A fresh locked install, full lint, typecheck, formatting and machine ESLint
+pass at exact main `70b8f9069d`: **0 errors and 615 warnings across 1,419 files**,
+with diagnostics in 192 files — 517 arbitrary-value, 80 inline-style and 18
+palette findings. Only the two merged preview/track findings disappear from
+the prior 617-warning inventory. Main also includes unrelated Canvas 1.30,
+extensions 0.33 release and Mars opt-in changes. The public
+`main-lint-audit-2026-10-22-70b8f9069d.json` has SHA-256
+`8df2711affa0ca96c803da644331b17fb662c37f6870123854568f3b831cce58`.
+All six earlier main audit objects and twelve proposal audits remain unchanged.
+
+Two independent ready proposals each remove two scoped inline-style findings:
+
+- [Sidebar #18805](https://github.com/OpenHands/OpenHands/pull/18805), issue
+  #18803, at `546e76f1e1809899fdbef98412c5da633435c329`: the existing 250 ms
+  `MOBILE_DRAWER_TRANSITION_MS` still owns CSS duration and the removal timer.
+  Thirty focused tests pass; all four reader/writer/removed-utility/early-timer
+  mutations fail. Target lint drops four warnings to two, with zero errors.
+- [Tree #18804](https://github.com/OpenHands/OpenHands/pull/18804), issue
+  #18802, at `290c2368052c2c54f67c95c421390b9e45356b72`: the same 8 px base,
+  12 px per depth and 16 px file offset feed a static padding reader. Thirty-two
+  tests pass, including the real CSS contract and native Space/Enter behavior.
+  All six folder/file reader/writer/removed-utility mutations fail. Target lint
+  drops two warnings to zero; app/library CSS and ESM/CommonJS wiring pass.
+
+Typecheck, formatting, app/library builds and independent implementation reviews
+pass for both. Each has **eight current checks passed, six skipped, none failed
+or pending**, including Ubuntu, Windows and required media-description validation.
+Initial all-hands-bot reviews were requested after green CI and verified pending
+at `2026-10-22T03:42:42.017175+00:00` for tree and `03:42:47.088784+00:00` for
+sidebar (05:42 Stockholm). Neither new proposal is approved or merged here.
+Their unmerged reductions are not counted in main's 615-warning total.
+
+### Authentic runtime evidence
+
+Sidebar: six style/layout pairs and fifteen control/route pairs match across
+Neutral/Light+/DeepSea, 1440 × 1000 desktop and 390 × 844 phone. Close, Escape,
+backdrop and navigation preserve outcomes. CSS duration is exactly 250 ms;
+sampled visible closing intervals span 236–238 ms Before and 237–246 ms After.
+These are DOM-presence samples, not exact timer-start or every-frame timing.
+Actual reduced-motion preference is false. Forced emulation is unavailable in
+the normal CLI, so no forced live pass is claimed; its compiled contract is tested.
+The selected sidebar source set is 18 PNGs and two original clips.
+
+Tree: all 36 indentation/content contracts and 24 control pairs match across Files
+root through depth three and plugin manifest/nested skill. Thirty raw geometry
+pairs match exactly; six plugin-phone pairs retain a 16 px absolute row-y offset
+because the actual After run-cache path wraps to four lines versus three Before.
+Relative indentation, row size/x, colors, selection/content and controls match.
+Raw offsets remain; no 36-pair zero-geometry-difference or pixel-identity claim
+is made. Two bounded actual DeepSeek Flash turns provide the conversation
+context; zero ActionEvents are recorded. Titles, Thinking and elapsed labels
+differ naturally. The selected tree source set is 40 PNGs and eight raw clips.
+
+Final source sets match the collapsed Getting started card through actual UI
+controls and reset open files through normal close buttons. Initial expanded-card
+captures are superseded and excluded. Real production Canvas 1.30.0, Local Agent
+Server/SDK 1.56.0, automation 1.22.0 and Chrome run through unchanged
+`control-openhands`. Captured baseline 70b8f9069d/build c73929d5131944fc,
+sidebar 546e76f1e1/build dfdde6888d0dedfd and tree 290c236805/build 8b2236968d5f6516
+remain exact. All four owned runs are stopped, private state purged and owned
+ports closed. Zero browser/app errors are recorded. No mocks or verifier edits.
+
+### Films and preservation
+
+`mobile-sidebar-duration-*` is 26.2 seconds at 25 fps, keeping the full 6.32/6.48-second
+phone clips. `file-tree-indentation-*` is 31.8 seconds at 30 fps, keeping complete
+Files/plugin desktop and plugin-phone clips plus actual Light+ context/detail
+crops. Source 15 fps frames are duplicated without a speed change. Both films are
+1440 × 1120 with tiny original ambience (means −52.9/−52.6 dBFS; peak −42.9 dBFS).
+The 58 original PNGs, ten complete raw clips and two actual lossless tree-detail
+PNGs remain downloadable with source hashes and sanitized provenance.
+
+All final MP4/GIF/poster/captions/source/provenance/ZIP packets are published in
+Notebook commit `9d241d3ada0d621d7f794f36413700801563197c`. All 25 critical
+immutable files return HTTP 200 and match full SHA-256 values. All six live Pages
+film/GIF/ZIP downloads also return 200 with matching hashes; Pages MP4s have
+`video/mp4` Content-Type. Raw GitHub MP4 downloads use `application/octet-stream`.
+Sidebar film SHA-256 is
+`b15579730a1cb2ec01cfa218e508dcc6fce797b4369111fc1141720100fe1d1d`;
+source manifest is `14402ea14b1cbc8fb5439c28340890a458fd899039c4dbdb65cfdf5b9ff17ca0`.
+Tree film is `df3479189febf3545420d7a824b27a2d6a0dbafe3d3b76be378d02dc29c0912f`;
+source manifest is `366905a74b6d507ba4777f271c20701cac1d18086ca388352bfa57b40679b7bb`.
+
+The 46-proposal cohort is **42 merged, three open non-draft and one draft**.
+Budget #18533 remains open/non-draft; managed-agent focus #18520 remains draft.
+Their bodies and prerequisites are unchanged. All 30 earlier films/60 download
+anchors, 561 prior non-doc assets, attribution history, unaffected prior proposal
+objects, earlier audits, recorded heads and the finished approval watch are
+preserved. The two additional sections bring the page to **32 films/64 MP4 download
+links**. Earlier README text remains an unchanged published prefix.

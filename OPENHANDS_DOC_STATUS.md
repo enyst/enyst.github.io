@@ -16,6 +16,23 @@ The linked issues and PRs own current CI/test status; physical-device audio rema
 
 ## Current explanations
 
+- [Keep DigitalOcean connected](arch/keep-digitalocean-connected.html): 20 October
+  2026 merge of smolpaws's and Claude Code's 19 October proposals, with Engel's
+  decisions: one host bridge, OAuth with PKCE kept in the OS keychain, a cookie
+  derived from the session key, DigitalOcean-aware restore, and agents using the
+  admin-type session key on the active team. The opening principle is “People log in.
+  Agents use keys”; no new key types or permissions. New-browser owner approval
+  is a release check. Loopback handling and user-created admin keys have follow-up
+  records (smolpaws-hf5n, smolpaws-wmaj). Browser behavior and the agent path
+  were driven live with `control-openhands` at 8d39305; connecting a session and a
+  real OAuth exchange were not possible in the sandbox. The two earlier URLs
+  redirect here.
+
+- [Automation profile launch](arch/automation-profile-launch.html): 19 October 2026
+  reading of automation #600's fourth design. Separates reported preset/profile-store
+  failures from proposed dispatch-time creation and the enterprise tools/secrets gate.
+  Public source contracts checked; no fresh live-run or deployment verification.
+
 - [Checking the Agent SDK from outside](arch/agent-sdk-external-contract.html):
   9 October 2026 snapshot of the merged external verifier, the confirmed manual
   Cloud run, and the controls needed before periodic checks. The Cloud

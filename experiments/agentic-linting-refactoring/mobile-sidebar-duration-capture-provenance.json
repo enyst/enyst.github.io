@@ -1,0 +1,703 @@
+{
+  "schemaVersion": 1,
+  "subject": "Mobile sidebar duration",
+  "repository": "OpenHands/OpenHands",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18805",
+  "authoritativeManifestSha256": "476c7ca71def9388923d4535cb534d4e28ba004c2b04e166f2e4f00be465d6db",
+  "implementation": {
+    "layoutOnly": true,
+    "intendedVisualRedesign": false,
+    "sourcePath": "src/components/features/sidebar/sidebar.tsx",
+    "change": "Move drawer and backdrop transition duration from inline declarations to the CSS recipe. The configured 250 ms duration and closing cleanup behavior are retained."
+  },
+  "before": {
+    "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+    "buildFingerprint": "c73929d5131944fc",
+    "cliNodeVersion": "v24.22.1",
+    "builtThisRun": true,
+    "pins": {
+      "agentServer": "1.56.0",
+      "agentCanvas": "1.30.0",
+      "automation": "1.22.0"
+    },
+    "versions": {
+      "agentServer": "1.56.0",
+      "sdk": "1.56.0"
+    },
+    "browserEnvironment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "language": "en-US",
+      "devicePixelRatio": 1,
+      "fontFamily": "-apple-system, \"SF Pro\", \"system-ui\", \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Fira Sans\", \"Droid Sans\", \"Helvetica Neue\", sans-serif",
+      "reducedMotion": false
+    },
+    "sourceFiles": {
+      "src/components/features/sidebar/sidebar.tsx": "025a3e51bc921a4873bdd48c2712983396ab98a295d625b32e0e6b3021a57a52",
+      "src/components/features/files-tab/tree-node.tsx": "544e0f2e2fbc53a59205c08e6fc2b73744e3eabc089da99bc86ae5fa61c728f2",
+      "src/components/features/files-tab/file-tree-view.tsx": "7a046c2e8c5be7be56eea8c49ff718d316bc265795da45b262b8cf3b1479b935",
+      "src/components/features/plugins/plugin-files-section.tsx": "aa472f2491e6a471cc83abd76cf10c8bd74acf156d51e9a2349fe0be3b9f3acb",
+      "package-lock.json": "abee923c414e2767f3648ae00eea4e65beba167d0ac01335fba6676041fb5d55",
+      "config/defaults.json": "e215f74945bec196bddbef4adce88f6e5de1d1cc3c633355d23cc8a71dacc44e",
+      ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "2c1b46e6244a09c742d6503f33378dc6741f40f46ba5df5810df0411818c34b8",
+      ".agents/skills/verify-openhands/scripts/browser-daemon.mjs": "d2c978bf28bf5fc7313175f624ec2085e84f8841907f01fae3fdd500545c8d8d"
+    },
+    "families": {
+      "sidebar": {
+        "measurementsFile": "mobile-sidebar-duration-before-sidebar-measurements.json",
+        "controls": [
+          {
+            "name": "neutral-close-button",
+            "detached": true
+          },
+          {
+            "name": "neutral-escape",
+            "detached": true
+          },
+          {
+            "name": "neutral-backdrop",
+            "detached": true
+          },
+          {
+            "name": "neutral-navigation",
+            "detached": true
+          },
+          {
+            "name": "neutral-navigation-url",
+            "route": "/automations"
+          },
+          {
+            "name": "light-plus-close-button",
+            "detached": true
+          },
+          {
+            "name": "light-plus-escape",
+            "detached": true
+          },
+          {
+            "name": "light-plus-backdrop",
+            "detached": true
+          },
+          {
+            "name": "light-plus-navigation",
+            "detached": true
+          },
+          {
+            "name": "light-plus-navigation-url",
+            "route": "/automations"
+          },
+          {
+            "name": "deepsea-close-button",
+            "detached": true
+          },
+          {
+            "name": "deepsea-escape",
+            "detached": true
+          },
+          {
+            "name": "deepsea-backdrop",
+            "detached": true
+          },
+          {
+            "name": "deepsea-navigation",
+            "detached": true
+          },
+          {
+            "name": "deepsea-navigation-url",
+            "route": "/automations"
+          }
+        ],
+        "diagnostics": {
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0
+        },
+        "measurementsSha256": "8422cf092ef284288183f252666087fb6e3748665fbeceaef5628c464585956f",
+        "cleanup": {
+          "browserStopped": true,
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "privatePurged": true,
+          "ok": true,
+          "retainedEvidenceVerified": true,
+          "evidenceFilesBeforePurge": 38,
+          "evidenceFilesAfterPurge": 38
+        }
+      }
+    },
+    "sourceHashesIndependentlyVerified": true
+  },
+  "after": {
+    "head": "546e76f1e1809899fdbef98412c5da633435c329",
+    "buildFingerprint": "dfdde6888d0dedfd",
+    "cliNodeVersion": "v24.22.1",
+    "builtThisRun": false,
+    "pins": {
+      "agentServer": "1.56.0",
+      "agentCanvas": "1.30.0",
+      "automation": "1.22.0"
+    },
+    "versions": {
+      "agentServer": "1.56.0",
+      "sdk": "1.56.0"
+    },
+    "browserEnvironment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+      "language": "en-US",
+      "devicePixelRatio": 1,
+      "fontFamily": "-apple-system, \"SF Pro\", \"system-ui\", \"Segoe UI\", Roboto, Oxygen, Ubuntu, Cantarell, \"Fira Sans\", \"Droid Sans\", \"Helvetica Neue\", sans-serif",
+      "reducedMotion": false
+    },
+    "sourceFiles": {
+      "src/components/features/sidebar/sidebar.tsx": "552c8e878a5385263998217864a3d69755ab231f7853b636f16bc6511980db5a",
+      "src/components/features/files-tab/tree-node.tsx": "544e0f2e2fbc53a59205c08e6fc2b73744e3eabc089da99bc86ae5fa61c728f2",
+      "src/components/features/files-tab/file-tree-view.tsx": "7a046c2e8c5be7be56eea8c49ff718d316bc265795da45b262b8cf3b1479b935",
+      "src/components/features/plugins/plugin-files-section.tsx": "aa472f2491e6a471cc83abd76cf10c8bd74acf156d51e9a2349fe0be3b9f3acb",
+      "package-lock.json": "abee923c414e2767f3648ae00eea4e65beba167d0ac01335fba6676041fb5d55",
+      "config/defaults.json": "e215f74945bec196bddbef4adce88f6e5de1d1cc3c633355d23cc8a71dacc44e",
+      ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "2c1b46e6244a09c742d6503f33378dc6741f40f46ba5df5810df0411818c34b8",
+      ".agents/skills/verify-openhands/scripts/browser-daemon.mjs": "d2c978bf28bf5fc7313175f624ec2085e84f8841907f01fae3fdd500545c8d8d"
+    },
+    "families": {
+      "sidebar": {
+        "measurementsFile": "mobile-sidebar-duration-after-sidebar-measurements.json",
+        "controls": [
+          {
+            "name": "neutral-close-button",
+            "detached": true
+          },
+          {
+            "name": "neutral-escape",
+            "detached": true
+          },
+          {
+            "name": "neutral-backdrop",
+            "detached": true
+          },
+          {
+            "name": "neutral-navigation",
+            "detached": true
+          },
+          {
+            "name": "neutral-navigation-url",
+            "route": "/automations"
+          },
+          {
+            "name": "light-plus-close-button",
+            "detached": true
+          },
+          {
+            "name": "light-plus-escape",
+            "detached": true
+          },
+          {
+            "name": "light-plus-backdrop",
+            "detached": true
+          },
+          {
+            "name": "light-plus-navigation",
+            "detached": true
+          },
+          {
+            "name": "light-plus-navigation-url",
+            "route": "/automations"
+          },
+          {
+            "name": "deepsea-close-button",
+            "detached": true
+          },
+          {
+            "name": "deepsea-escape",
+            "detached": true
+          },
+          {
+            "name": "deepsea-backdrop",
+            "detached": true
+          },
+          {
+            "name": "deepsea-navigation",
+            "detached": true
+          },
+          {
+            "name": "deepsea-navigation-url",
+            "route": "/automations"
+          }
+        ],
+        "diagnostics": {
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0
+        },
+        "measurementsSha256": "8422cf092ef284288183f252666087fb6e3748665fbeceaef5628c464585956f",
+        "cleanup": {
+          "browserStopped": true,
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "privatePurged": true,
+          "ok": true,
+          "retainedEvidenceVerified": true,
+          "evidenceFilesBeforePurge": 11,
+          "evidenceFilesAfterPurge": 11
+        }
+      }
+    },
+    "sourceHashesIndependentlyVerified": true
+  },
+  "summary": {
+    "computedStyleAndLayoutPairs": 6,
+    "changedComputedStyleAndLayoutPairs": 0,
+    "controlAndRoutePairs": 15,
+    "changedControlAndRoutePairs": 0,
+    "closeOutcomesPerPhase": 12,
+    "configuredCssDurationMs": 250,
+    "observerVisibleClosingSegmentsMs": {
+      "before": [
+        236,
+        238
+      ],
+      "after": [
+        237,
+        246
+      ]
+    }
+  },
+  "limitations": [
+    "The source recordings retain original control-openhands playback timing, with no editorial speed change. CLI summary duration is rounded; exact container duration, frame count and capture counters are recorded for every original. Video is evidence of the control sequence, not a finer-grained timing instrument.",
+    "Coverage is standalone Local Canvas in Neutral, Light+ and DeepSea at 1440×1000 desktop and 390×844 phone. No Cloud, ACP, all-five-theme or arbitrary embedded-host pass is claimed.",
+    "Editorial labels and title cards are distinct from real app viewports. Actual UI pixels, including normal displayed temporary paths, are unretouched; public JSON omits local machine paths.",
+    "Initial After captures with the expanded Getting started checklist are superseded. Final selected sources use the real UI to collapse the checklist before replay.",
+    "The configured drawer and backdrop CSS duration is 0.25 s. Observer-visible hidden-but-mounted segments are sampled DOM presence after the actual timer has started; they are not exact elapsed mount intervals or measurements of every animation frame.",
+    "Forced reduced-motion emulation is unavailable through the normal CLI. The captures record the actual reduced-motion preference as false. Source clips use the supported 25 fps maximum; early aborted attempts are excluded."
+  ],
+  "selectedArtifacts": [
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/before-deepsea-desktop-rail.png",
+      "sourceFilename": "before-deepsea-desktop-rail.png",
+      "sha256": "46355ceb4023467c1509d8675c65f0fefffd07d03f5aac59e563ff840985ea6c",
+      "bytes": 99080,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/before-deepsea-phone-closed-after-navigation.png",
+      "sourceFilename": "before-deepsea-phone-closed-after-navigation.png",
+      "sha256": "a659ca617bcccd9f6fbe9eca2d5bc57e7c2595f84ccfadce6d9be68f589076e1",
+      "bytes": 59725,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/before-deepsea-phone-open.png",
+      "sourceFilename": "before-deepsea-phone-open.png",
+      "sha256": "75f25c19d28cee7539e968ae593f825934f938f1bc78ecbabaa0f8b197c79a06",
+      "bytes": 27616,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/before-light-plus-desktop-rail.png",
+      "sourceFilename": "before-light-plus-desktop-rail.png",
+      "sha256": "2c5c75eaa9253ec54be65488a2f6b92d21560b2877557b95f9e1285894feba9e",
+      "bytes": 85080,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/before-light-plus-phone-closed-after-navigation.png",
+      "sourceFilename": "before-light-plus-phone-closed-after-navigation.png",
+      "sha256": "cf7f99db5edfd13839a4d2ccaec2ca219aa9732d4fd2f4c73c3a289c34283c57",
+      "bytes": 49542,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/before-light-plus-phone-open.png",
+      "sourceFilename": "before-light-plus-phone-open.png",
+      "sha256": "f24cd4ba382c6271884ec540e2d554f155835e50b8b7587dfcf6fa5a8e492ae6",
+      "bytes": 23827,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/before-neutral-desktop-rail-3.png",
+      "sourceFilename": "before-neutral-desktop-rail-3.png",
+      "sha256": "c879bb5651f046f180135697b75aff84e748066529b093c51e939897a736a28c",
+      "bytes": 85050,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/before-neutral-phone-closed-after-navigation.png",
+      "sourceFilename": "before-neutral-phone-closed-after-navigation.png",
+      "sha256": "9794dcf19d56a61b366339e5f9c05051a202e80497712217c4e52287b10d9020",
+      "bytes": 48848,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/before-neutral-phone-open.png",
+      "sourceFilename": "before-neutral-phone-open.png",
+      "sha256": "ab649017fee647ed3f5f999032dc8e96a21f13cc213eca204e4ca004abdceadf",
+      "bytes": 23602,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "family": "sidebar",
+      "kind": "recording",
+      "path": "mobile-sidebar-duration-before-sidebar-phone-raw.mp4",
+      "sourceFilename": "before-sidebar-phone-transitions.mp4",
+      "sha256": "60265df195b42c63a6c6f9aa31c8dcd0431810caa6575c9f4dee5b50c0716cdd",
+      "bytes": 190162,
+      "head": "70b8f9069dec3d1c39a04d755521ebe6bd252aab",
+      "buildFingerprint": "c73929d5131944fc",
+      "dimensions": [
+        390,
+        844
+      ],
+      "durationSeconds": 6.32,
+      "sourceFrameRate": "25/1",
+      "sourceFrameCount": 158,
+      "cliRecording": {
+        "seconds": 6.3,
+        "recordedSeconds": 6.1,
+        "size": "390x844",
+        "fps": 25,
+        "captures": 144,
+        "changes": 29,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/after-deepsea-desktop-rail.png",
+      "sourceFilename": "after-deepsea-desktop-rail.png",
+      "sha256": "32892e1ded00ce7a582c810aed928c3bbb12d2d1e561be1b5d4370fa88d3050c",
+      "bytes": 99337,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/after-deepsea-phone-closed-after-navigation.png",
+      "sourceFilename": "after-deepsea-phone-closed-after-navigation.png",
+      "sha256": "7687d868d02c03d61f72446e51e139dad56f8dbf47d3b087b43a1a23dad0fc1a",
+      "bytes": 60319,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/after-deepsea-phone-open.png",
+      "sourceFilename": "after-deepsea-phone-open.png",
+      "sha256": "a3b6c1e92cba638b35ad3af23f89e001829423e9f1d54c808c86cd1e465c4e54",
+      "bytes": 27639,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/after-light-plus-desktop-rail.png",
+      "sourceFilename": "after-light-plus-desktop-rail.png",
+      "sha256": "4a29141484559a50331887fd5271a82acfc2a14cc44c1cb44ac28d4b22b1fe5f",
+      "bytes": 85173,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/after-light-plus-phone-closed-after-navigation.png",
+      "sourceFilename": "after-light-plus-phone-closed-after-navigation.png",
+      "sha256": "1c948829b83ba2eee9c53ac547219cf0baba034dd01a4245efef1f94cedb914d",
+      "bytes": 49799,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/after-light-plus-phone-open.png",
+      "sourceFilename": "after-light-plus-phone-open.png",
+      "sha256": "c231fc3f27a2899f8edf024af27adffe2740e8af3605e671aaf959539c28d773",
+      "bytes": 23908,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/after-neutral-desktop-rail.png",
+      "sourceFilename": "after-neutral-desktop-rail.png",
+      "sha256": "95a32de7047c7e75917aa50ea6a2ab4091aa7b234eb70980bed6f440fbfb4b60",
+      "bytes": 85193,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/after-neutral-phone-closed-after-navigation.png",
+      "sourceFilename": "after-neutral-phone-closed-after-navigation.png",
+      "sha256": "181e726514a99db9661978353a33fa47449d9f99807c7a01d97671cefc16bbf9",
+      "bytes": 48987,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "screenshot",
+      "path": "mobile-sidebar-duration-evidence/sidebar/after-neutral-phone-open.png",
+      "sourceFilename": "after-neutral-phone-open.png",
+      "sha256": "608f0e4d9503cf9710a088c63eec7d15fb6b5119432769c8a1093930f402a1e8",
+      "bytes": 23624,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "family": "sidebar",
+      "kind": "recording",
+      "path": "mobile-sidebar-duration-after-sidebar-phone-raw.mp4",
+      "sourceFilename": "after-sidebar-phone-transitions.mp4",
+      "sha256": "4dbac2d2e2a6c5b275e259566aa8bd784bc3c3f1197bd3bc625efca332f8ca31",
+      "bytes": 203254,
+      "head": "546e76f1e1809899fdbef98412c5da633435c329",
+      "buildFingerprint": "dfdde6888d0dedfd",
+      "dimensions": [
+        390,
+        844
+      ],
+      "durationSeconds": 6.48,
+      "sourceFrameRate": "25/1",
+      "sourceFrameCount": 162,
+      "cliRecording": {
+        "seconds": 6.5,
+        "recordedSeconds": 6.2,
+        "size": "390x844",
+        "fps": 25,
+        "captures": 149,
+        "changes": 53,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0
+      }
+    }
+  ],
+  "derivedDetails": [],
+  "supersededArtifacts": [
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-neutral-desktop-rail.png",
+      "sha256": "110d84821fe9170e2accbca80d6e4beb89d9b0b920b9b6e17d40bcac02c28317",
+      "bytes": 99444,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-neutral-phone-open.png",
+      "sha256": "f1008146f38810d8957bbcd0bc028fd67056a4213467a866eeb73d9fc6b11c45",
+      "bytes": 35924,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-neutral-phone-closed-after-navigation.png",
+      "sha256": "181e726514a99db9661978353a33fa47449d9f99807c7a01d97671cefc16bbf9",
+      "bytes": 48987,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-light-plus-desktop-rail.png",
+      "sha256": "b6f177a998807c998fab6cdae72ed03d625e3b14737d1838ee274dad5fee8f1d",
+      "bytes": 99647,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-light-plus-phone-open.png",
+      "sha256": "a6e484a295f4d33b99fd386c7972c7786bc6237d6fb7a06d78828ec4fb0de37b",
+      "bytes": 36105,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-light-plus-phone-closed-after-navigation.png",
+      "sha256": "1c948829b83ba2eee9c53ac547219cf0baba034dd01a4245efef1f94cedb914d",
+      "bytes": 49799,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-deepsea-desktop-rail.png",
+      "sha256": "d3f7d9be7f973272321c61b665a5b85aeaae0e6c9215c79045f2da3ed1023638",
+      "bytes": 116117,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-deepsea-phone-open.png",
+      "sha256": "e0941e3027188c9961cfe1f0f80cda6b3fc272c0efd319d061fd12f7e22f5cf1",
+      "bytes": 42950,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    },
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-deepsea-phone-closed-after-navigation.png",
+      "sha256": "7687d868d02c03d61f72446e51e139dad56f8dbf47d3b087b43a1a23dad0fc1a",
+      "bytes": 60319,
+      "sharesBytesWithSelectedArtifact": true,
+      "publication": "Initial capture association excluded from film, selected originals and evidence ZIP; initial After checklist state differed. A separately selected corrected capture may contain identical pixels where the checklist is not visible."
+    },
+    {
+      "family": "sidebar",
+      "sourceFilename": "after-sidebar-phone-transitions.mp4",
+      "sha256": "0827cb7187fd37f5c2cea120edc7d4ad7b89362a77063e88a4358d11489ed66b",
+      "bytes": 242397,
+      "sharesBytesWithSelectedArtifact": false,
+      "publication": "Excluded from film, selected originals and evidence ZIP; initial After checklist state differed."
+    }
+  ],
+  "comparisonFile": "mobile-sidebar-duration-comparison.json",
+  "comparisonSha256": "c880532e7f730b5ff4b6cdd85e288cebedc18bd8b2fbda2397c99a1b8346b02f",
+  "conditions": [
+    "Actual Chrome controlled through the unmodified control-openhands CLI. No mocks, interception or response injection.",
+    "Independent before/after builds at the exact recorded source heads.",
+    "Same configured behavior retained; no intended visual redesign."
+  ]
+}
