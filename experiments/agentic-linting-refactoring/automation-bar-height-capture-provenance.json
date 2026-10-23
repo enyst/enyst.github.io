@@ -1,0 +1,1065 @@
+{
+  "schemaVersion": 1,
+  "subject": "Automation bar height",
+  "repository": "https://github.com/OpenHands/OpenHands",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18857",
+  "implementation": {
+    "sourcePath": "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx",
+    "layoutOnly": true,
+    "intendedVisualRedesign": false,
+    "change": "Move each duration-owned numeric height into --automation-run-bar-height and the CSS recipe. The existing duration function,1s in-flight timer,18px track,4px bar,8px link,tooltips and run navigation remain owned by the same code paths."
+  },
+  "before": {
+    "head": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+    "buildFingerprint": "e702ca2a7aca7a47",
+    "runId": "lint-oct23-before",
+    "builtThisRun": true,
+    "versions": {
+      "agentCanvas": "1.32.0",
+      "agentServer": "1.58.1",
+      "sdk": "1.58.1",
+      "automation": "1.25.1",
+      "extensions": "0.35.0",
+      "node": "24.22.1",
+      "npm": "11.12.1"
+    },
+    "packageLockSha256": "8240e2e3024d723be7a34e7dcc2309d9e04a4a0de0587d00849ef2a673883e7f",
+    "sourceFiles": {
+      "src/components/features/onboarding/onboarding-modal.tsx": "b23dc208f9e2453ad947c34f894599aa3bca93653bb29d7c694d62d02df73171",
+      "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx": "c95c98be8d8de58b283bbedf65da98376d89b6d4ea9f31764c1242be7e91182c",
+      "src/components/features/home/featured-automations/automation-run-activity-metrics.ts": "3cbce7b642deaf9a9db3962cd4e5c319620ad4e6c3c28bbcf505cce64a2ac921",
+      ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "280a0fa8b5c9ad8c721fde72a586edcade4fc17496b2d1d5fe48129e2e323212"
+    },
+    "startedAt": "2026-10-23T05:31:48.974Z",
+    "readyAt": "2026-10-23T05:32:26.712Z",
+    "additionalCaptureRuns": {
+      "supplementalBeforeGrowth": {
+        "runId": "lint-oct23-before-growth",
+        "revision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+        "buildId": "e702ca2a7aca7a47",
+        "builtThisRun": false,
+        "mode": "local",
+        "startedAt": "2026-10-23T05:56:41.532Z",
+        "readyAt": "2026-10-23T05:56:50.584Z",
+        "pins": {
+          "agentServer": "1.58.1",
+          "agentCanvas": "1.32.0",
+          "automation": "1.25.1"
+        },
+        "versions": {
+          "agentServer": "1.58.1",
+          "sdk": "1.58.1"
+        },
+        "ports": {
+          "ingress": 19560,
+          "agentServer": 19561,
+          "automation": 19562,
+          "frontend": 19563,
+          "vscode": 20561
+        },
+        "node": "24.22.1",
+        "npm": "11.12.1",
+        "extensions": "0.35.0",
+        "packageLockSha256": "8240e2e3024d723be7a34e7dcc2309d9e04a4a0de0587d00849ef2a673883e7f",
+        "sourceFiles": {
+          "src/components/features/onboarding/onboarding-modal.tsx": "b23dc208f9e2453ad947c34f894599aa3bca93653bb29d7c694d62d02df73171",
+          "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx": "c95c98be8d8de58b283bbedf65da98376d89b6d4ea9f31764c1242be7e91182c",
+          "src/components/features/home/featured-automations/automation-run-activity-metrics.ts": "3cbce7b642deaf9a9db3962cd4e5c319620ad4e6c3c28bbcf505cce64a2ac921",
+          ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "280a0fa8b5c9ad8c721fde72a586edcade4fc17496b2d1d5fe48129e2e323212"
+        }
+      }
+    },
+    "artifactBuildOverrides": {
+      "growth-before-visible-running.png": {
+        "captureRun": "lint-oct23-before-growth",
+        "servedBuildFingerprint": "e702ca2a7aca7a47",
+        "builtThisRun": false,
+        "captureRole": "Matched Running growth"
+      },
+      "growth-before-running-after-growth.png": {
+        "captureRun": "lint-oct23-before-growth",
+        "servedBuildFingerprint": "e702ca2a7aca7a47",
+        "builtThisRun": false,
+        "captureRole": "Matched Running growth"
+      },
+      "growth-before-running-growth.mp4": {
+        "captureRun": "lint-oct23-before-growth",
+        "servedBuildFingerprint": "e702ca2a7aca7a47",
+        "builtThisRun": false,
+        "captureRole": "Matched Running growth"
+      }
+    }
+  },
+  "after": {
+    "head": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+    "buildFingerprint": "1379495a41a2bc43",
+    "runId": "lint-oct23-sparkline-after",
+    "builtThisRun": true,
+    "versions": {
+      "agentCanvas": "1.32.0",
+      "agentServer": "1.58.1",
+      "sdk": "1.58.1",
+      "automation": "1.25.1",
+      "extensions": "0.35.0",
+      "node": "24.22.1",
+      "npm": "11.12.1"
+    },
+    "packageLockSha256": "8240e2e3024d723be7a34e7dcc2309d9e04a4a0de0587d00849ef2a673883e7f",
+    "sourceFiles": {
+      "src/components/features/onboarding/onboarding-modal.tsx": "b23dc208f9e2453ad947c34f894599aa3bca93653bb29d7c694d62d02df73171",
+      "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx": "f6c211b367e1e3e68ca94e5266287cb7f7e593f2248e5527c47c6c7d6969d8a7",
+      "src/components/features/home/featured-automations/automation-run-activity-metrics.ts": "3cbce7b642deaf9a9db3962cd4e5c319620ad4e6c3c28bbcf505cce64a2ac921",
+      ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "280a0fa8b5c9ad8c721fde72a586edcade4fc17496b2d1d5fe48129e2e323212"
+    },
+    "startedAt": "2026-10-23T06:00:23.968Z",
+    "readyAt": "2026-10-23T06:00:33.022Z",
+    "additionalCaptureRuns": {
+      "matchedAfterGrowth": {
+        "runId": "lint-oct23-after-growth",
+        "revision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+        "buildId": "1379495a41a2bc43",
+        "builtThisRun": false,
+        "mode": "local",
+        "startedAt": "2026-10-23T06:06:49.420Z",
+        "readyAt": "2026-10-23T06:06:57.008Z",
+        "pins": {
+          "agentServer": "1.58.1",
+          "agentCanvas": "1.32.0",
+          "automation": "1.25.1"
+        },
+        "versions": {
+          "agentServer": "1.58.1",
+          "sdk": "1.58.1"
+        },
+        "ports": {
+          "ingress": 19580,
+          "agentServer": 19581,
+          "automation": 19582,
+          "frontend": 19583,
+          "vscode": 20581
+        },
+        "node": "24.22.1",
+        "npm": "11.12.1",
+        "extensions": "0.35.0",
+        "packageLockSha256": "8240e2e3024d723be7a34e7dcc2309d9e04a4a0de0587d00849ef2a673883e7f",
+        "sourceFiles": {
+          "src/components/features/onboarding/onboarding-modal.tsx": "b23dc208f9e2453ad947c34f894599aa3bca93653bb29d7c694d62d02df73171",
+          "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx": "f6c211b367e1e3e68ca94e5266287cb7f7e593f2248e5527c47c6c7d6969d8a7",
+          "src/components/features/home/featured-automations/automation-run-activity-metrics.ts": "3cbce7b642deaf9a9db3962cd4e5c319620ad4e6c3c28bbcf505cce64a2ac921",
+          ".agents/skills/verify-openhands/scripts/control-openhands.mjs": "280a0fa8b5c9ad8c721fde72a586edcade4fc17496b2d1d5fe48129e2e323212"
+        }
+      }
+    },
+    "artifactBuildOverrides": {
+      "growth-after-visible-running.png": {
+        "captureRun": "lint-oct23-after-growth",
+        "servedBuildFingerprint": "1379495a41a2bc43",
+        "builtThisRun": false,
+        "captureRole": "Matched Running growth"
+      },
+      "growth-after-running-after-growth.png": {
+        "captureRun": "lint-oct23-after-growth",
+        "servedBuildFingerprint": "1379495a41a2bc43",
+        "builtThisRun": false,
+        "captureRole": "Matched Running growth"
+      },
+      "growth-after-running-growth.mp4": {
+        "captureRun": "lint-oct23-after-growth",
+        "servedBuildFingerprint": "1379495a41a2bc43",
+        "builtThisRun": false,
+        "captureRole": "Matched Running growth"
+      },
+      "after-visible-running.png": {
+        "captureRun": "lint-oct23-sparkline-after",
+        "servedBuildFingerprint": "1379495a41a2bc43",
+        "builtThisRun": true,
+        "captureRole": "Separate Solarized four-run context; excluded from matched film"
+      },
+      "after-running-after-growth.png": {
+        "captureRun": "lint-oct23-sparkline-after",
+        "servedBuildFingerprint": "1379495a41a2bc43",
+        "builtThisRun": true,
+        "captureRole": "Separate Solarized four-run context; excluded from matched film"
+      },
+      "after-running-growth.mp4": {
+        "captureRun": "lint-oct23-sparkline-after",
+        "servedBuildFingerprint": "1379495a41a2bc43",
+        "builtThisRun": true,
+        "captureRole": "Separate Solarized four-run context; excluded from matched film"
+      }
+    }
+  },
+  "conditions": {
+    "themes": [
+      "OpenHands-Neutral",
+      "OpenHands-DeepSea",
+      "Neo",
+      "Light+",
+      "SolarizedLight"
+    ],
+    "viewports": [
+      "1440×1000 desktop",
+      "390×844 phone"
+    ],
+    "consumers": [
+      "Dashboard grid",
+      "Dashboard list",
+      "Home pinned",
+      "Home recent"
+    ],
+    "coverage": "All five themes cover shared dashboard grid at both widths; all four consumers cover Neutral at both widths.",
+    "backend": "Local",
+    "matchedRunningContext": "Fresh one-run Neutral histories with expanded Getting started at1440×1000.",
+    "timerIntervalMs": 1000,
+    "trackHeightPx": 18,
+    "barWidthPx": 4,
+    "linkWidthPx": 8,
+    "selectedScreenshots": 48,
+    "selectedRawClips": 8,
+    "cleanupRuns": 5
+  },
+  "limitations": [
+    "Actual Before/After run durations vary. Each observed CSS bar height is checked against its own real server timestamps and the unchanged source-owned logarithmic mapping.",
+    "In-flight reads allow one existing 1-second component tick plus sampling overhead; exact callback/recording times are not equated.",
+    "Five themes at desktop and phone are represented on the shared dashboard grid component; all four consumers have Neutral desktop/phone navigation and layout coverage.",
+    "6px/15px clamps are unit-contract coverage. The original Pending clip genuinely observes unknown-duration11px fallback; a separate exact-base supplemental run proves visible Running growth. No synthetic run rows or timestamps were created.",
+    "First plain script exited without the required SDK callback and is excluded from completion proof. Real SDK LocalWorkspace context exits supplied canonical worker callbacks; server owns completion timestamps.",
+    "Initial SDK `uv run --with` installed136 cached packages for the first three Before runs. Later Before inflight and all After runs reuse the already-installed pinned AS/SDK1.58.1 interpreter through offline no-project/no-sync uv execution. No production manifest/lock changes.",
+    "Interrupted pointer-clear recordings and a rejected absolute entrypoint arrangement are excluded; no product or verification-driver changes were made.",
+    "Eight real keyboard Enter navigations per phase reach each bar target URL. Persisted highlight enumeration is empty; no visible selected-row highlight proof is claimed.",
+    "Matched Running film uses separate fresh Neutral one-run histories and expanded Getting started at1440×1000 on both phases. Earlier After Solarized Light/four-run/collapsed-checklist motion is retained as separate context evidence and excluded from the matched film.",
+    "Optional raw cssHeight probe queried unused --automation-run-activity-bar-height; no actual writer value is inferred from that empty probe. Runtime verification uses actual computed height and source mapping/compiled CSS guards.",
+    "No LLM calls, model keys, external account or Cloud runtime used.",
+    "Actual UI pixels are unretouched. Complete source MP4s and selected original full-viewport PNGs are downloadable. Editorial labels and explicitly labelled crops are outside the original UI.",
+    "All source clips use25fps containers and their original playback timing. Video and external DOM-read elapsed times do not establish exact internal1s timer scheduling or imply a performance change.",
+    "Before and After genuine fixture durations and source run identifiers differ. Whole-screen pixel identity and identical dynamic bar heights are not claimed."
+  ],
+  "selectedArtifacts": [
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-light-plus-desktop-dashboard-grid.png",
+      "sourceSha256": "260016dabea1d99deb4de9c46ac4ba5751722e2ddb9ad9ad8136a4a7636cbccd",
+      "bytes": 67297,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-light-plus-phone-dashboard-grid.png",
+      "sourceSha256": "c07677cba585144e0a9e1fa86b7f0a493773d435e38cfc6816d57052873624de",
+      "bytes": 41171,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-deepsea-desktop-dashboard-grid.png",
+      "sourceSha256": "3993da2e3711c6a40d2c31dd4efe7146f85c8f70074b3afa028f542f7997f3f5",
+      "bytes": 75556,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-deepsea-phone-dashboard-grid.png",
+      "sourceSha256": "97a15954f1cbe5fb779443020c65ad1453258441c61e3b01dd519973a7f1378c",
+      "bytes": 48346,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neo-desktop-dashboard-grid.png",
+      "sourceSha256": "718e11d62e5e9075cfc561f028878de1671f173ea7ecf327402eabfd45babec3",
+      "bytes": 66664,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neo-phone-dashboard-grid.png",
+      "sourceSha256": "d01f44901d85c65d5a2c25caa8ca19d4449c2c801534b719bf859f3517474a14",
+      "bytes": 40821,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-desktop-dashboard-grid-4.png",
+      "sourceSha256": "718e11d62e5e9075cfc561f028878de1671f173ea7ecf327402eabfd45babec3",
+      "bytes": 66664,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-desktop-dashboard-list-4.png",
+      "sourceSha256": "559c6e3bd7541f516c5417736a83788a48eb1baff3de5f5b89429ebb0a585830",
+      "bytes": 61627,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-desktop-home-pinned-4.png",
+      "sourceSha256": "91e585fcc631c5b8a954be64904125a288e0c04d90ec48b81543cd2400639028",
+      "bytes": 88535,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-desktop-home-recent-3.png",
+      "sourceSha256": "97bd59534289161c391e9c64fabd8a5084c73f3a2c49c6c1e1d24e6cee51273f",
+      "bytes": 90634,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-phone-dashboard-grid-2.png",
+      "sourceSha256": "f58271932baa41c3881cd5695165e11582e593cd9710b3541338dfaee0fb4759",
+      "bytes": 40884,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-phone-dashboard-list-2.png",
+      "sourceSha256": "4c7215c1d2c1762a7cefe49071561936570d1e3273b77026e1779bfc0cedf445",
+      "bytes": 36291,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-phone-home-pinned-3.png",
+      "sourceSha256": "0020a96bcd1c5886d6ec9d37855bd10632abba3e152d47cd2f5d07ef5e6b741b",
+      "bytes": 38860,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-phone-home-recent-2.png",
+      "sourceSha256": "0020a96bcd1c5886d6ec9d37855bd10632abba3e152d47cd2f5d07ef5e6b741b",
+      "bytes": 38860,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-solarized-light-desktop-dashboard-grid.png",
+      "sourceSha256": "5163e7ec2adba325dbc32ba187f01bc49dfe317d3e5c375cdfa0891680cd4a25",
+      "bytes": 72903,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-solarized-light-phone-dashboard-grid.png",
+      "sourceSha256": "247aff9cf7fc9af2456e3d1109213d095e49479caaf7d3cef9ea805b82fd3758",
+      "bytes": 46092,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-phone-grid-tooltip-2.png",
+      "sourceSha256": "6f0998305daab709c9dba2c27d05754a0edd11f0aad1f7ed9b58422b5ff6b98e",
+      "bytes": 46496,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-desktop-pinned-tooltip-3.png",
+      "sourceSha256": "14769af311e3a643816dea0af18f9509e2f30c2929eea1b1df72b8ab103e5603",
+      "bytes": 96567,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-desktop-grid-tooltip-4.png",
+      "sourceSha256": "0c42748668a3b3289aa3b1afb6c91b4b3a3ebbc86bcdc1bd5ec6b1b51a5c7dc1",
+      "bytes": 78892,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-phone-pinned-tooltip-2.png",
+      "sourceSha256": "03c4bacae16239b18e5de21a0434f4baa9444aaca7a138d9d895ad1c26476cd5",
+      "bytes": 42888,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-inflight-running.png",
+      "sourceSha256": "98ff75666cc4f71e370636dc54c51bd1b357522fdac1f5bac21da363464a2f06",
+      "bytes": 64713,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/before-final-completed.png",
+      "sourceSha256": "74848228ff3787dc51d97a9e74061a1cf0b162362a081739a6119eaed354e542",
+      "bytes": 66551,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/growth-before-visible-running.png",
+      "sourceSha256": "6dc2c26471e0a8e6363deb5ece356e6b9600c4682dd30ffd6c8c4858b553c798",
+      "bytes": 80153,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before-growth",
+      "builtThisRun": false,
+      "captureRole": "Matched Running growth",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/before/growth-before-running-after-growth.png",
+      "sourceSha256": "b97254049ac8425762e560fd9a93346887b11f7dea633a23de17e3aa161aadbb",
+      "bytes": 80276,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before-growth",
+      "builtThisRun": false,
+      "captureRole": "Matched Running growth",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-desktop-four-consumers-2.mp4",
+      "sourceSha256": "837e4fd6e31903482e46b8d6df86f5d3f9dfbfad241b881e85a5e0917f9d84da",
+      "bytes": 575704,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "automation-bar-height-evidence/before/before-openhands-neutral-phone-four-consumers.mp4",
+      "sourceSha256": "2a30904a3ba9ecbe8462ac132bb0335564928dbfb396a7545aa391776413abfc",
+      "bytes": 633376,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "automation-bar-height-evidence/before/before-inflight-ticks.mp4",
+      "sourceSha256": "3ad202fb8ff0ccf98d66263d73ee94fac096a45d8f7a3fdc71d1b3fe32d4eb95",
+      "bytes": 80746,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before",
+      "builtThisRun": true
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "automation-bar-height-evidence/before/growth-before-running-growth.mp4",
+      "sourceSha256": "7df8e0758552a05f2e93c3b687f443371b48d62934fca0227ac90db3c1f31a99",
+      "bytes": 96104,
+      "sourceRevision": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+      "servedBuildFingerprint": "e702ca2a7aca7a47",
+      "captureRun": "lint-oct23-before-growth",
+      "builtThisRun": false,
+      "captureRole": "Matched Running growth"
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-desktop-dashboard-grid.png",
+      "sourceSha256": "c12fea398d461bf87f33748df6decb0df9ae143af1991a4bf4f70e1fa5b1efbc",
+      "bytes": 66710,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-desktop-grid-tooltip.png",
+      "sourceSha256": "6cd1f2ce88f0cba5de06dc5077a182df14c33d5bddce1bba6f5fb829813191ae",
+      "bytes": 78831,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-desktop-dashboard-list.png",
+      "sourceSha256": "c1246a0b54ac61181080725d806a5d404a9dfcd8cb0020e884cd06ef5ad72101",
+      "bytes": 61460,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-desktop-home-pinned.png",
+      "sourceSha256": "c1d009cbc3db3028a67c40c9c3cb0d0c5465028f3a7056650cca731a12d17430",
+      "bytes": 90639,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-desktop-pinned-tooltip.png",
+      "sourceSha256": "6c02efa9a4af563acba11d018fcc9bca168da03ef02a70d0399fd6e1f0cba2dc",
+      "bytes": 95813,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-desktop-home-recent.png",
+      "sourceSha256": "c1d009cbc3db3028a67c40c9c3cb0d0c5465028f3a7056650cca731a12d17430",
+      "bytes": 90639,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-phone-dashboard-grid.png",
+      "sourceSha256": "88deed258318ced9ce4331c74af97bddd8977f09ae4410c8edc41833438cdc4c",
+      "bytes": 40937,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-phone-grid-tooltip.png",
+      "sourceSha256": "bf47385d016e7c1a34b8e25d8939a9a82a6c02b845cafac9a0f0e83fee41900b",
+      "bytes": 47526,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-phone-dashboard-list.png",
+      "sourceSha256": "29696e6efe69ad770b05666e015aedc9acdd60fbbdc0c53f63d75f1a49de61fa",
+      "bytes": 36416,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-phone-home-pinned.png",
+      "sourceSha256": "28c0ef0f7dad5be7263b5f5e31e8f6a2558520e2867cccd930f811b6c6e52667",
+      "bytes": 38874,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-phone-pinned-tooltip.png",
+      "sourceSha256": "3e66d6cee496c9f0ef6f9eea5aae3eb50d73196164a2265f4ffe16d5b82fc20c",
+      "bytes": 42242,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-phone-home-recent.png",
+      "sourceSha256": "28c0ef0f7dad5be7263b5f5e31e8f6a2558520e2867cccd930f811b6c6e52667",
+      "bytes": 38874,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-deepsea-desktop-dashboard-grid.png",
+      "sourceSha256": "41b646135c3c925f3604bea886e171b912e29db5c59e0b1624c3b21595f08330",
+      "bytes": 75660,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-deepsea-phone-dashboard-grid.png",
+      "sourceSha256": "68237578bc6eafabe707d33c19dd114cd7aaf0132f82c7d2f97b8e7d61a3e977",
+      "bytes": 48364,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neo-desktop-dashboard-grid.png",
+      "sourceSha256": "c12fea398d461bf87f33748df6decb0df9ae143af1991a4bf4f70e1fa5b1efbc",
+      "bytes": 66710,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-openhands-neo-phone-dashboard-grid.png",
+      "sourceSha256": "88deed258318ced9ce4331c74af97bddd8977f09ae4410c8edc41833438cdc4c",
+      "bytes": 40937,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-light-plus-desktop-dashboard-grid.png",
+      "sourceSha256": "64df8c9a78627e27c231a65206ba4b0e2e39330397493c6340e6683260efd698",
+      "bytes": 67173,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-light-plus-phone-dashboard-grid.png",
+      "sourceSha256": "6302dd38d8ea418796f08a0406c589ee0ecc25aa9bfa47f3d0cfce13565b78a1",
+      "bytes": 41159,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-solarized-light-desktop-dashboard-grid.png",
+      "sourceSha256": "a2ad8a09b36d5a451c7be315d5e3783bd4d05018933bf3ec6fe76d321edbc493",
+      "bytes": 72982,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-solarized-light-phone-dashboard-grid.png",
+      "sourceSha256": "9fa4869729c1c5ed8a74c068da007ce610c6579415705a7aa9416005ef82d619",
+      "bytes": 46099,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/growth-after-visible-running.png",
+      "sourceSha256": "c29a8d61b81db34ac9a7db9cd20961ae56c2472c4e67bb51cd532687c9de9093",
+      "bytes": 80282,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-after-growth",
+      "builtThisRun": false,
+      "captureRole": "Matched Running growth",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/growth-after-running-after-growth.png",
+      "sourceSha256": "7633e6e13e6a0f29e552d8931a26cfe1e5cd2a8486968b5c9ffff4f16979510c",
+      "bytes": 80268,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-after-growth",
+      "builtThisRun": false,
+      "captureRole": "Matched Running growth",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-visible-running.png",
+      "sourceSha256": "0cd49880122d2528c349ea91dd3fac7d0fe5e17e78fd08c5a349b5d3d890e2d3",
+      "bytes": 73945,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "captureRole": "Separate Solarized four-run context; excluded from matched film",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "automation-bar-height-evidence/after/after-running-after-growth.png",
+      "sourceSha256": "1d70fddc7935c25fb7e5d22b8a5b438146a3ae25cb4a327df28cb35cb1eb626a",
+      "bytes": 73929,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "captureRole": "Separate Solarized four-run context; excluded from matched film",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-desktop-four-consumers.mp4",
+      "sourceSha256": "04b4c0f1bf6a78774bd5b3c722be8d3d955ed55dafbd5967787158de97ce3d71",
+      "bytes": 355112,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "automation-bar-height-evidence/after/after-openhands-neutral-phone-four-consumers.mp4",
+      "sourceSha256": "6436d15743a120ba628de05df16146dd343c96e691f4676144f624e566cb6996",
+      "bytes": 612442,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "automation-bar-height-evidence/after/growth-after-running-growth.mp4",
+      "sourceSha256": "cb8d245e43f75482f1094afb6cdc8312faab02daa8001266ac28c2b01f2ccf2f",
+      "bytes": 96194,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-after-growth",
+      "builtThisRun": false,
+      "captureRole": "Matched Running growth"
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "automation-bar-height-evidence/after/after-running-growth.mp4",
+      "sourceSha256": "e8905b1e1bc91c79b141920f25be1ffdf540e1a3442024e8798ed1f1dd72d83b",
+      "bytes": 78901,
+      "sourceRevision": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "servedBuildFingerprint": "1379495a41a2bc43",
+      "captureRun": "lint-oct23-sparkline-after",
+      "builtThisRun": true,
+      "captureRole": "Separate Solarized four-run context; excluded from matched film"
+    }
+  ],
+  "receiptHandling": "PNG and MP4 sources are byte-for-byte copies. Public receipt JSON removes local capture paths and local URLs; original receipt hashes are retained.",
+  "privateReceiptSha256": {
+    "before": "1975c4080c1aa099111269d7d4bec6449c0fcdd44e2907fe4e8b9a258f9fffb0",
+    "after": "f0999ea56d24b594a3418e5d53d672691e5d703965b1e2956d65275dd4d151ea"
+  },
+  "comparisonFile": "automation-bar-height-comparison.json",
+  "comparisonSha256": "413b9ee0b1ebfbecceb7ab58d69da15f416bdd03b30be0cf72c509d5b6871d60",
+  "authoritativeManifestSha256": "9783b2b7fc45315fc1b8ab230c4e3bed199d810b27c7742dee5f7283ccb106c4",
+  "previewTiming": "Preview samples the complete film at8fps. Explicit GIF frame delays retain full elapsed playback; a60ms final still hold aligns the32.56s total. No motion interpolation."
+}
