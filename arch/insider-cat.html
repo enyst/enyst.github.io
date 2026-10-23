@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Codex","llm":null,"date":"2026-10-23","role":"editor"}]} -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -113,7 +114,7 @@
       <p class="eyebrow">Agent Canvas · Apps · behavior and architecture</p>
       <h1>Insider Cat</h1>
       <p>A sibling of SmolPaws inside Agent Canvas: one saved OpenHands agent, with a Cat-shaped place to talk, type, and find your work.</p>
-      <p class="meta">Updated <time datetime="2026-10-19">19 October 2026</time>. <span class="status">Development implementation · review pending</span></p>
+      <p class="meta">Updated <time datetime="2026-10-23">23 October 2026</time>. <span class="status">Development implementation · review pending</span></p>
     </header>
     <div class="callout"><p><strong>Voice is a way to reach the Cat. OpenHands does the work.</strong> The selected Cat has a durable conversation, agent configuration, tools, and approval policy on Agent Server. The Voice connection carries requests and speaks saved results; it does not replace that agent or grant it access to every conversation in Canvas.</p></div>
 
@@ -385,7 +386,7 @@
     <p>The separate public Realtime API path uses <code>gpt-realtime-2.1</code> and a server-held OpenAI API key. Its Voice model calls <code>send_to_insider</code>; the App forwards that request through the Cat’s normal conversation API and waits for confirmed run completion. This tool belongs to the Voice bridge, not the Cat’s own toolbox. This transport retains fixture coverage; it needs its own live provider validation.</p>
     <p>The server selects the transport. Codex uses its dedicated, tested sign-in/configuration path; an OpenAI API key belongs to the public API path. Neither substitutes the other’s credential automatically. No provider credential is sent to the browser.</p>
     <h3>Controls and failures</h3>
-    <p>Both transports offer Mute and End call. The API transport also exposes Stop speaking; the Codex App hides that action because its inspected app-server protocol has no verified speech-only interruption operation. Ending speech is separate from stopping agent work.</p>
+    <p>Both transports offer Mute, End call, and Stop speaking. On the OpenAI API transport, Stop speaking cancels the speech response and clears its output buffer. On Codex, it silences local playback until the person selects Resume audio; it does not cancel speech at the provider, request another answer, or change the microphone state. Resuming can make ongoing speech audible. Neither action cancels work already accepted by OpenHands. This updates the September behavior: <a href="https://github.com/enyst/insider/pull/3">App PR #3</a> added the Codex playback control to the development branch on 20 October.</p>
     <p><code>request_not_sent</code> means the bridge rejected the request before admission. <code>relay_failed</code> means the saved outcome needs inspection, and must not encourage a blind retry. <code>connection_failed</code> reports a connection or protocol problem. A busy Cat can reject a new spoken request while an earlier accepted request continues.</p>
 
     <h2 id="apps">Install the matching components</h2>
@@ -416,6 +417,19 @@
     <p>The earlier exploration drew on Amp’s <a href="https://ampcode.com/docs/puck">Puck</a> for the distinction between a companion conversation and worker threads, and <a href="https://ampcode.com/news/talk-to-puck">Talk to Puck</a> for Voice handing work to a real agent. ElevenLabs remains an alternative to evaluate later. Neither is a dependency of the current App. Provider comparisons in the <a href="../voice-landscape.html">voice landscape</a> are dated research, not current installation guarantees.</p>
 
     <h2 id="sources">Evidence, history, and limits</h2>
+    <h3 id="october-23-refresh">23 October: current main and playback controls</h3>
+    <p>The open development PRs were checked again against their current main branches. Canvas and Agent Server received new merge commits; the App already contained its unchanged main and now includes the local Codex playback controls from <a href="https://github.com/enyst/insider/pull/3">App PR #3</a>.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Repository</th><th>Recorded head and included main</th><th>Fresh local checks</th></tr></thead>
+      <tbody>
+        <tr><td>Insider App</td><td><a href="https://github.com/enyst/insider/commit/a412782c98518aef692013f6c763a6d3bda3d4a9"><code>a412782</code></a>; main <a href="https://github.com/enyst/insider/commit/521362c2f19ac840f0dec971da353b08e6c90792"><code>521362c</code></a> was already included.</td><td>136 tests passed across 10 files. Rebuilding reproduced the committed bundle unchanged. The new maintenance commit updates the README; the tested source includes the 20 October playback change.</td></tr>
+        <tr><td>Canvas</td><td><a href="https://github.com/OpenHands/OpenHands/commit/5d2fbc2cf0decbf8ff0794d35153c08d479a3b55"><code>5d2fbc2c</code></a> includes main <a href="https://github.com/OpenHands/OpenHands/commit/6be67b820bc3272ed50e19d16d6f97e981c443ef"><code>6be67b82</code></a>.</td><td>418 focused tests passed across 21 files, with one existing TODO; a later two-commit main update passed another 60 tests across its two affected automation files. Translation checks, lint and type checking, app and library builds, and commit hooks passed. Lint reported no errors and 618 warnings.</td></tr>
+        <tr><td>Agent Server / SDK</td><td><a href="https://github.com/OpenHands/software-agent-sdk/commit/c99daf37f8221f741b3364817e8678378931166e"><code>c99daf37</code></a> merges main <a href="https://github.com/OpenHands/software-agent-sdk/commit/60192ed54db73ac658ac1a07462916126c32d3a0"><code>60192ed5</code></a> (1.58.1).</td><td>380 focused Python tests and 397 TypeScript tests passed. Required hooks, type checks, lint, build, formatting, pinned schema, and merged OpenAPI checks passed.</td></tr>
+      </tbody>
+    </table></div>
+    <p>Canvas now launches local conversations through agent profiles. The merged branch retains Insider instructions and runtime context, Cat identity, new/resume behavior, and condensation draft handling alongside upstream archive and missing-runtime states. The SDK merge uses upstream’s typed HTTP 409 response when condensation is unavailable, while retaining condenser-only execution. No App contract adaptation was needed.</p>
+    <p><a href="https://github.com/enyst/insider/pull/4">App PR #4</a>, a separate follow-up for stale Voice deliveries, remained open and was not folded into this refresh. Its implementation and verification are separate from the results above.</p>
+    <p><strong>Validation boundary:</strong> this refresh checked source integration, automated behavior, and the documentation in a browser. It did not restart the Insider stack or repeat real-provider or physical-device Voice tests. The linked PRs own their current CI state; September’s live audio observations remain historical evidence.</p>
     <h3 id="october-main-refresh">19 October: update from main</h3>
     <p>The implementation branches now include the main revisions checked on 19 October. The App already contained its current main; Canvas and Agent Server received merge commits. The earlier notebook work was merged in <a href="https://github.com/enyst/enyst.github.io/pull/9">notebook PR #9</a>; this dated entry continues that record.</p>
     <div class="table-wrap"><table>
