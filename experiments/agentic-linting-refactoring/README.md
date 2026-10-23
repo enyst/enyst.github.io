@@ -727,3 +727,123 @@ anchors, 561 prior non-doc assets, attribution history, unaffected prior proposa
 objects, earlier audits, recorded heads and the finished approval watch are
 preserved. The two additional sections bring the page to **32 films/64 MP4 download
 links**. Earlier README text remains an unchanged published prefix.
+
+
+## 23 October 2026: phase offsets and duration-owned bar heights
+
+Snapshot `2026-10-23T06:27:02.615342+00:00` (Stockholm display time). The maintainer merged tree
+[#18804](https://github.com/OpenHands/OpenHands/pull/18804) at 07:18 Stockholm as
+`f0254fd6a3e5d891e998da0293162ff872a6868f`, then sidebar
+[#18805](https://github.com/OpenHands/OpenHands/pull/18805) at 07:19 as
+`3083e1aa1660bd45769b01e5ad5ded0b6c4be302`. Both unchanged recorded heads
+received all-hands-bot approval on 22 October with no inline findings. Their
+historical media and verification remain pinned to their recorded source heads.
+
+Audited main `3083e1aa16` passes locked installation, full lint, typecheck,
+formatting and machine ESLint: **611 warnings, zero errors, 1,420 linted files,
+191 diagnostic files**. Inventory: 517 arbitrary values in 177 files, 76 inline
+styles in 38 files and 18 palette findings in four files. The
+[public audit](main-lint-audit-2026-10-23-3083e1aa16.json) has SHA-256
+`4a2db83d8e6807621eacae3e9c54677e7adb75d9fa5fc69fd71453a8e4fa01fc`.
+The sidebar/tree merges remove four inline findings. An unrelated automation
+prompt width replaces one arbitrary-width diagnostic with another, without
+changing that rule’s count. Both new branches independently remove one warning;
+neither is integrated in the 611-warning measurement.
+
+### Onboarding offsets: ready with matching published evidence
+
+[PR #18856](https://github.com/OpenHands/OpenHands/pull/18856), issue #18854,
+at `edf5f19e877b33130e9f42d94ed793e05f7deb0d`, moves the phase-derived percentage
+to `--onboarding-slide-offset` and native `translate-x-(--onboarding-slide-offset)`.
+The phase formula, active/inactive positioning, Next/Back handlers and configured
+300 ms transition are unchanged. All 34 tests pass; three reader/writer/removed
+reader mutations fail. Target lint falls from two warnings to one, retaining the
+existing arbitrary max height. Typecheck, formatting, app/library builds and real
+emitted CSS checks pass; independent implementation review found no material issue.
+The standalone onboarding route is not a public library JavaScript consumer.
+
+All **43 paired geometry states match** across genuine healthy Local first-run
+Next/Back and documented preview routes in all five themes, at desktop 1440 × 1000
+and phone 390 × 844. Healthy Local has three phases; four-phase backend addition
+and four-to-three collapse remain existing unit/CSS-contract coverage. No live
+backend-down, public authentication or exact wall-clock animation-time claim.
+Before transform matrices and After individual translate are normalized using
+actual rectangles. No model or credentials are used; zero browser/app errors.
+Both owned runs stopped, private state purged and owned ports closed.
+
+Exact source/build: Before `3083e1aa16` / `e702ca2a7aca7a47`; After `edf5f19e87` /
+`fa7f57783f9a371d`. Production Canvas 1.32.0, Agent Server/SDK 1.58.1,
+automation 1.25.1, extensions 0.35.0 and Chrome use unchanged `control-openhands`.
+The 25.92-second, 25 fps, 1440 × 1120 H.264/AAC film retains full original selected
+clips without speed changes, with quiet original ambience (mean −52.5 dBFS,
+peak −42.4). The packet includes 64 PNGs, ten full raw clips and 83 ZIP members.
+[Sources](onboarding-slide-offset-sources.json), [MP4](onboarding-slide-offset-before-after.mp4),
+[GIF](onboarding-slide-offset-before-after.gif) and [original evidence](onboarding-slide-offset-evidence.zip)
+are published at [immutable Notebook `0e6de40f05`](https://github.com/enyst/enyst.github.io/commit/0e6de40f0560d2327bfbde40d80f95ff51013844).
+Critical downloads return HTTP 200 with full SHA-256 matches. Film SHA-256:
+`c5ff711e39f8cf7ec8779aeb4880a41f9127a33af3fb9b550de8f56bf2dbcfd2`.
+Eight checks pass, six skip; the initial all-hands-bot request is verified and
+pending. The PR is ready; no approval or merge is claimed.
+
+### Automation bar heights: ready with matching published evidence
+
+[PR #18857](https://github.com/OpenHands/OpenHands/pull/18857), issue #18855,
+at `087e91d34a9ac8ee5954e8e741774ccf7cc1713d`, feeds the existing duration result
+to `--automation-run-bar-height` and native `h-(--automation-run-bar-height)`.
+The duration helper, 6/15/11 px metrics, one-second timer and 18 px track retain
+their owners. All 47 tests across seven suites pass; four reader/writer/removed
+reader/timer mutations fail. Target lint falls seven warnings to six; independent
+full branch lint passes at 610. Typecheck, formatting, builds and real emitted
+CSS/app JavaScript checks pass. This route-owned component is not exported in
+public library JavaScript. Independent implementation review found no material issue.
+
+All **182 computed-height/duration checks pass** against each run’s own server
+timestamps and unchanged mapping. Five themes cover the common Dashboard grid
+at desktop/phone; Neutral desktop/phone covers all four app consumers. Eight real
+keyboard Enter navigations per phase reach target URLs. No visible selected-row
+highlight proof is claimed. Genuine matched Running grows **7 → 8 → 9 px** on both
+phases in fresh one-run Neutral 1440 × 1000 captures with Getting started expanded.
+The initial 12.48-second Before clip is authentic Pending/unknown **11 px fallback**,
+not growth. Earlier After Solarized/four-run/collapsed-card motion is separate
+context coverage, excluded from the matched film. The 6/15 px clamps remain unit
+coverage. No synthetic statuses, timestamps, run rows, LLM calls or credentials.
+
+Real bounded SDK LocalWorkspace workers send canonical callbacks; the server owns
+completion timestamps. A plain exit-zero setup attempt without the callback is
+excluded from completion proof. Original phases build fingerprints
+`e702ca2a7aca7a47` Before and `1379495a41a2bc43` After. Matched growth reuses those
+exact assets with `builtThisRun: false`. All four sparkline runs stopped, private
+state purged and owned ports closed. Correct final custom-property writer and
+computed height both read 11 px after actual completion. An earlier optional probe
+queried an unused property and supplies no writer proof. Actual computed heights,
+the unchanged map and compiled reader/writer guards supply the contract.
+The frozen film is **32.56 seconds**, 814 frames at 25 fps, 1440 × 1120,
+H.264/yuv420p with AAC and fast start. Original quiet ambience measures −52.5 dBFS
+mean and −42.5 peak. The matching packet includes 48 original PNGs, eight full
+raw clips and a 68-member ZIP, with full source hashes and decoded-media checks.
+The valid silent GIF represents all 260 samples at 8 fps; identical holds merge
+into 229 encoded frames, with an explicit final 60 ms still hold to retain the
+32.56-second elapsed playback. No motion interpolation.
+[Sources](automation-bar-height-sources.json), [comparison](automation-bar-height-comparison.json),
+[MP4](automation-bar-height-before-after.mp4), [GIF](automation-bar-height-before-after.gif)
+and [original evidence](automation-bar-height-evidence.zip) are published at
+[immutable Notebook `5658681094`](https://github.com/enyst/enyst.github.io/commit/5658681094b9e28ba0a30f8e7d40e26d83d9fc75).
+Critical raw downloads return HTTP 200 with full SHA-256 matches.
+Film SHA-256: `ad8d16a702e8db7fefb16f5c45d8b3dd8b0f9083e2178236e6c4da2aa5c85c62`.
+All eight current checks pass and six skip, including code CI and required media
+description validation. The unchanged proposal head is ready; its initial
+all-hands-bot request is verified and pending, with no review submitted yet.
+No approval or merge is claimed. Live Pages deployment remains unverified here
+and is checked separately after the final document push.
+
+### Preservation
+
+The **48-proposal cohort has 44 merged, three open non-draft and one draft**.
+Budget #18533 and managed-agent focus #18520 retain their existing records and
+prerequisites. All 44 unaffected prior proposal objects, seven prior main audits,
+twelve prior proposal audits, 32 films/64 download anchors, 654 old assets
+(114,840,526 bytes), exact recording heads and the finished approval watch are
+preserved. The two new sections add two films/four download anchors: **34 films/68 MP4
+download links**. All 88 published onboarding assets and 73 published automation assets remain unchanged. This README’s earlier published text is an unchanged byte prefix.
+
+Upstream main advanced during capture to `a832d9a2850ffd8c12c14597a545b454f349ff42`. The 611-warning audit remains pinned to `3083e1aa16`; the newer lifecycle revision has not been re-audited. Proposal heads, media sources and their CI receipts are unchanged.
