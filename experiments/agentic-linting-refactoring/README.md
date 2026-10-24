@@ -1089,3 +1089,19 @@ open non-draft, three drafts**. Exact-main remains 609 warnings/0 errors at
 are stopped/private-purged, and all five reused core ports are independently
 confirmed closed. Full source/operational limits and earlier README history
 remain preserved.
+
+
+## Ready checkpoint · live film anchors verified
+
+Asset commit `aa301cf0f30bdc3e992454ae244989d78538e59d` and media snapshot
+`ef5d54c22340ddf6d73921f1c54470257bbd4c33` are published. All 10 critical raw
+downloads passed HTTP 200/full SHA; all 15 live Pages files passed HTTP/full
+SHA/MIME, including both own film anchors. #18908 and #18909 are ready/open at
+unchanged heads, with **eight passed checks/six skipped each**. Initial
+all-hands-bot requests are verified pending; no approval or merge is claimed.
+The cohort is **52: 48 merged, three open non-draft, one draft**. All 36 earlier
+films/72 downloads are retained, with **38 films/76 MP4 anchors total**.
+Source/capture heads, all media bytes and audit history remain unchanged.
+Independent readiness closure passes. Separate resize issue #18910 has exact
+published baseline PNG/geometry proof and is ready-for-dev; native resize and
+phone #16792 limits remain unchanged.
