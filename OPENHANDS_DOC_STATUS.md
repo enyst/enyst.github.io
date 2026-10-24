@@ -7,11 +7,12 @@ Beads owns task status; the site explains dated architecture, decisions and plan
 
 ## Insider Voice integration
 
-The 5 October 2026 maintenance pass follows SDK [#5180](https://github.com/OpenHands/software-agent-sdk/pull/5180),
+The 23 October 2026 source refresh follows SDK [#5180](https://github.com/OpenHands/software-agent-sdk/pull/5180),
 Canvas [#17558](https://github.com/OpenHands/OpenHands/pull/17558), and Insider [#2](https://github.com/enyst/insider/pull/2).
 [SDK issue #5515](https://github.com/OpenHands/software-agent-sdk/issues/5515) tracks the shared acceptance criteria;
 [Canvas issue #17557](https://github.com/OpenHands/OpenHands/issues/17557) tracks host behavior.
-[The Insider page](arch/insider-cat.html#october-validation) separates the fresh validation from September's provider observations.
+[The Insider page](arch/insider-cat.html#october-23-refresh) separates branch integration and automated checks from September's provider observations, and retains the earlier 5 and 19 October maintenance notes.
+The current controls include Codex local playback suppression and Resume audio from App [#3](https://github.com/enyst/insider/pull/3); the separate stale-delivery follow-up [#4](https://github.com/enyst/insider/pull/4) was not included in this refresh.
 The linked issues and PRs own current CI/test status; physical-device audio remains a separate validation task.
 
 ## Current explanations
@@ -39,8 +40,8 @@ The linked issues and PRs own current CI/test status; physical-device audio rema
   automation is disabled. The [testing strategy](arch/openhands-sdk-architecture-testing.html)
   remains the broader plan. The [merged evaluation](https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud)
   owns the dated evidence; this page does not report live run status.
-- [Insider Cat](arch/insider-cat.html): September 20 App behavior, Cat interface,
-  conversation continuity, and normal OpenHands tools and skills. The
+- [Insider Cat](arch/insider-cat.html): the September implementation and 23 October
+  control update, Cat interface, conversation continuity, and normal OpenHands tools and skills. The
   [Voice implementation note](arch/insider-cat-codex-voice.html) records a real
   spoken request invoking the API skill and querying the owning backend through
   the terminal, then returning the saved answer as speech. Dedicated inventory

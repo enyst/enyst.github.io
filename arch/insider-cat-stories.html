@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Codex","llm":null,"date":"2026-10-23","role":"editor"}]} -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -14,6 +15,7 @@
     .shell { max-width:900px; }
     a { color:var(--teal); text-underline-offset:3px; overflow-wrap:anywhere; }
     p, li { font-size:1rem; }
+    .shell .callout { border:1px solid var(--border); border-radius:var(--border-radius); }
     .callout p { font-size:1rem; }
     h3 { text-transform:none; letter-spacing:0; font-size:1rem; }
     .scenario { border-top:1px solid var(--border); margin-top:30px; padding-top:12px; }
@@ -28,7 +30,7 @@
 <main class="shell">
   <a class="back" href="insider-cat.html">← Insider Cat: code, architecture, and sources</a>
   <h1>The Cat, from your side</h1>
-  <p class="meta">Behavior scenarios · updated 20 September 2026</p>
+  <p class="meta">Behavior scenarios · controls updated 23 October 2026; live Voice evidence remains dated September 19–20.</p>
   <div class="callout"><p>Insider Cat is <strong>a saved OpenHands agent inside Agent Canvas</strong>, with a Cat-shaped page and optional Voice. The <a href="insider-cat.html#look">current interface</a> has one Talk control and a compact companion while navigating elsewhere. <a href="insider-cat-codex-voice.html#direct-handoff">Codex Voice hands requests directly to that saved Cat</a>; the separate OpenAI API path uses a browser tool bridge. Both depend on the Cat’s actual configured tools. Normal terminal access and OpenHands skills can use the backend API; bespoke coordination tools are optional. Physical iPad audio checks remain outstanding.</p></div>
 
   <section class="scenario" id="find">
@@ -69,7 +71,7 @@
   <section class="scenario" id="interrupt">
     <p class="label">06 · Correct and interrupt</p>
     <h2>“Stop. I meant the other project.”</h2>
-    <p><strong>Current Voice:</strong> Mute and End call affect the audio connection, not accepted OpenHands work. Stop speaking is available on the OpenAI API transport; the Codex path hides that unsupported control. A typed worker selection is explicit, but the Codex session starts from saved Cat context and does not receive that board selection.</p>
+    <p><strong>Current Voice:</strong> Mute changes microphone input; End call closes the audio connection. Neither cancels accepted OpenHands work. Stop speaking cancels speech on the OpenAI API transport. With Codex it silences local playback until Resume audio, while leaving the microphone and agent work unchanged. Resuming can make ongoing speech audible; it does not request a new answer. A typed worker selection is explicit, but the Codex session starts from saved Cat context and does not receive that board selection.</p>
     <p><strong>Recommended:</strong> “stop” during a spoken reply stops speech first. Preserve useful worker execution unless the person asks to cancel it. Before applying the corrected target, check whether the original action has already started; never silently execute the same request twice. Show Mute, End call, and Stop task as different actions.</p>
   </section>
 
