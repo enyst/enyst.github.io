@@ -849,3 +849,119 @@ preserved. The two new sections add two films/four download anchors: **34 films/
 download links**. All 88 published onboarding assets and 73 published automation assets remain unchanged. This README’s earlier published text is an unchanged byte prefix.
 
 Upstream main advanced during capture to `a832d9a2850ffd8c12c14597a545b454f349ff42`. The 611-warning audit remains pinned to `3083e1aa16`; the newer lifecycle revision has not been re-audited. Proposal heads, media sources and their CI receipts are unchanged.
+
+
+## 24 October lifecycle and exact-main audit
+
+Onboarding offsets [#18856](https://github.com/OpenHands/OpenHands/pull/18856)
+merged at 06:59:47 UTC as `3dce57817d13db6572dd50c1e5436d0ffe397fd0`.
+Automation bar heights [#18857](https://github.com/OpenHands/OpenHands/pull/18857)
+merged at 07:00:37 UTC as `084a4106040a0d64a02ac04eecf88ea8a8a8f31b`.
+Both bot and maintainer approvals are retained in `progress.json`, including
+their exact review bodies, submitted times and commit identities. Recording
+heads, historical checks and published media remain attached to the captured
+source revisions.
+
+The existing cohort is **48 proposals: 46 merged, one open non-draft and one
+draft**. All 46 other proposal objects, eight earlier main audits, fourteen
+proposal audits, 34 video elements, 68 MP4 download anchors, 816 experiment
+assets and the completed approval watch are preserved. This README's entire
+earlier content remains an unchanged byte prefix.
+
+Fresh exact integrated main **`084a410604` passes with 0 errors and 612 warnings**
+across 1,425 linted files, with diagnostics in 193 files: 520 arbitrary-value,
+74 inline-style and 18 palette findings. The two merged inline findings are
+removed; three unrelated arbitrary-value findings are added, for a net +1.
+Fresh committed-lock installation, full lint, typecheck, formatting and machine
+ESLint all pass. The [complete public audit](main-lint-audit-2026-10-24-084a410604.json)
+is copied unchanged, SHA-256 `a928b8c551bd68d76e8d8cdbb0572f841a65c16aa3fa7c1c554f86b32dcfb5d0`.
+The earlier 611-warning audit and all earlier audit objects remain unchanged.
+Any later lifecycle tip must be recorded separately from the exact audit source.
+No new proposal ID, readiness claim or film is added here.
+
+
+## New draft ownership batches · 24 October
+
+Backend panel height [#18902](https://github.com/OpenHands/OpenHands/pull/18902),
+issue [#18900](https://github.com/OpenHands/OpenHands/issues/18900), is a draft at
+`c183f4bc3cd3d024b8438e43a8de5be90503d3b9`. The positive measured height, observer,
+nested `auto` fallback, height-only 300 ms transition and reduced-motion behavior
+retain their owners. Local checks pass 31 focused tests, typecheck, formatting
+and app/library CSS; target-file warnings fall 13 → 11 (one inline-style and one
+arbitrary-value finding). Its [specific Notebook section](../../arch/agentic-linting-refactoring.html#backend-panel-height-film)
+currently records pending evidence.
+
+Files tree width [#18903](https://github.com/OpenHands/OpenHands/pull/18903),
+issue [#18901](https://github.com/OpenHands/OpenHands/issues/18901), is a draft at
+`ab650488ed6a9db47bdc14b9682458a2fdc1683f`. The real resize hook, 224 px default,
+160–480 px bounds and storage/persistence remain unchanged. Local checks pass
+51 tests across five suites, typecheck, formatting and app/library CSS and
+JavaScript wiring; target-file warnings fall 3 → 2 (one inline-style finding).
+Its [specific Notebook section](../../arch/agentic-linting-refactoring.html#files-tree-width-film)
+currently records pending evidence.
+
+Independent code review passes with low code risk and no material findings.
+Overall approval remains pending authentic matched runtime evidence and required
+current-head CI/PR gates. Both PRs remain **draft**, CI has started, and no bot
+review is requested. No final media, runtime-version set, publication result or
+final CI counts are claimed. The exact-main audit remains **612 warnings and
+0 errors at `084a410604`**; independent draft reductions are not integrated.
+
+The cohort is now **50 proposals: 46 merged, one open non-draft and three
+drafts**. All 48 existing proposal objects, nine measured main audits, fourteen
+earlier proposal audits, all 34 films and 68 MP4 download anchors, prior source
+assets, the completed approval watch and existing prerequisites are preserved.
+This addition creates two text-only feature anchors; no video tag or media path
+is added. The final PR media updates must link each draft's own Notebook
+feature/video anchor.
+
+
+## Completed matching films · drafts retained
+
+Both matching Before/After packets are frozen and root-approved. Backend panel
+height has 12 named paired settled-height samples with zero observed geometry
+difference; Files tree width has 13 named paired width samples with zero
+observed difference. Source heads are Before `084a410604`/build
+`bd00d766c4f403c3`, Backend After `c183f4bc3c`/`19aafc29ca5edbc4`, and Files
+After `ab650488ed`/`bf128a3fcf7cd316`.
+
+[Backend panel height](../../arch/agentic-linting-refactoring.html#backend-panel-height-film)
+is 45.60 seconds (1,140 frames at 25 fps); its packet has 32 PNGs, four full raw
+MP4s and 43 ZIP members. The 47 assets are published at immutable Notebook
+`a877fcbbdcf4674ad4b36b01c138f234bb377f45`; five critical raw downloads return
+HTTP 200 with matching SHA-256 values. Numeric measured ownership, normal
+height-only transition and actual reduced-motion transition-property none are
+verified. Initial/zero and nested-unmeasured fallback remain unit/CSS coverage.
+The pre-existing white DigitalOcean heading on Light+ is retained in the full
+raw packet, outside the central film's contrast claim.
+
+[Files tree width](../../arch/agentic-linting-refactoring.html#files-tree-width-film)
+is 59.92 seconds (1,498 frames at 25 fps); its packet has 28 PNGs, four full raw
+MP4s and 39 ZIP members. Its 43 assets are published at immutable Notebook
+`73d4225fa15ed071a5d06e8bf79a185d1f2bb0c2`; five critical raw downloads return
+HTTP 200 with matching full SHA-256 values. Desktop widths 224/324/480/160, reload and restore keep
+the actual calc.py preview selected. Phone 224/160, reload/restore and Back are
+verified; 480 px phone fit is not claimed. One After phone capture miss and a
+2.624-second screenshot delay are disclosed without inferring the missing
+interval. The After phone excerpt includes the actual 224 px restoration.
+
+Both films are 1440 × 1120, H.264 limited-range yuv420p/AAC with fast start,
+captions, poster previews and very quiet original ambience. No new GIF is
+provided. The range metadata repair for Files preserves all 1,498 decoded YUV
+frames, AAC elementary bytes and the reviewed RGB gate frames; it changes no
+UI content. All complete originals and source/coverage limits are downloadable.
+
+Both PRs remain **draft**, with **no bot review requested**. The actual films and specific feature
+anchors are attached while draft. Current code and media-description CI pass:
+eight checks passed and six skipped each, none pending or failed. The honest
+draft/media Notebook snapshot must be published and its live feature anchors
+verified before readiness and initial bot requests. The cohort remains **50: 46 merged, one open non-draft, three drafts**.
+All 34 earlier films and 68 download anchors are unchanged; two new sections
+bring the page to **36 films and 72 MP4 download anchors**. The exact-main audit
+remains 612 warnings and 0 errors at `084a410604`; draft reductions are separate.
+
+Runtime: real Canvas 1.33.0, Agent Server/SDK 1.58.1, automation 1.25.1, Node
+24.22.1/npm 11.12.1, identical real --mars-web configuration. No authentication
+or model message was submitted, no agent started, and zero ActionEvents were
+recorded. All three owned runs stopped, private state was purged, and all five
+reused core ports closed. Earlier README text remains an unchanged byte prefix.

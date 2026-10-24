@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-23T06:38:58.021657+00:00",
+  "checkedAt": "2026-10-24T08:01:38.027860+00:00",
   "displayTimeZone": "Europe/Stockholm",
-  "main": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+  "main": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
   "shadcnLintVersion": "0.2.1",
   "pullRequests": [
     {
@@ -4018,15 +4018,15 @@
     {
       "number": 18856,
       "title": "refactor(onboarding): express slide offsets in CSS",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-24T06:59:47Z",
       "url": "https://github.com/OpenHands/OpenHands/pull/18856",
-      "headRefOid": "edf5f19e877b33130e9f42d94ed793e05f7deb0d",
+      "headRefOid": "b174b2da681fd2972fe3d2e8f0d6092804addbab",
       "headRefName": "astra/lint-onboarding-slide-offset",
       "baseRefOid": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
       "draft": false,
       "requestedReviewers": [],
-      "checkedAt": "2026-10-23T06:38:58.021657+00:00",
+      "checkedAt": "2026-10-24T07:10:21Z",
       "issue": 18854,
       "reviewDecision": "APPROVED",
       "reviews": [
@@ -4038,6 +4038,21 @@
           "authorAssociation": "MEMBER",
           "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Scope\n\nBelongs in `OpenHands/OpenHands`: the change is confined to Canvas onboarding presentation (`src/components/features/onboarding/onboarding-modal.tsx`) plus its test. No Agent Server contract, SDK, automation, or extension surface is touched, and the dependency direction is respected.\n\n## What I verified on `edf5f19e87`\n\n**Behavior equivalence.** `Slide` keeps `(index - currentStep) * 100` as the numeric owner and now publishes it as `--onboarding-slide-offset`, consumed by the static utility `translate-x-(--onboarding-slide-offset)`. I compiled `src/tailwind.css` with the repo's pinned `@tailwindcss/node` 4.3.3 and the emitted rule is:\n\n```css\n.translate-x-\\(--onboarding-slide-offset\\){--tw-translate-x:var(--onboarding-slide-offset);translate:var(--tw-translate-x) var(--tw-translate-y)}\n.transition-transform{transition-property:transform, translate, scale, rotate; ...}\n.duration-300{--tw-duration:300ms; transition-duration:300ms}\n```\n\nThe individual `translate` property is geometrically equivalent to the previous `translateX(...)` for pure translation, and the already-present `transition-transform` utility covers `translate`, so the 300 ms ease-out transition, active-slide flow height, `pointer-events-none absolute inset-0` inactive positioning, `data-testid`/`data-active`/`aria-hidden`, and the phase logic are all unchanged. `npm run build` emits the utility into `build/assets/root-*.css`, so the class is not tree-shaken out of the production stylesheet.\n\n**Lint contract.** Using the real `@shadcn/lint` 0.2.1 plugin, the head file reports 0 `shadcn/no-inline-styles` findings, versus 1 on the base (`3083e1aa16`, line 93, \"Inline style sets transform\"). The single remaining warning on head is the pre-existing `max-h-[90vh]` `no-arbitrary-values` finding, exactly as the description states. This matches the repository's established mechanism (`--file-tree-row-indent` + `pl-(...)` in `files-tab/tree-node.tsx`; `--editor-height` in `diff-viewer/editor-container.tsx`).\n\n**Tests and CI.** All 34 tests in `__tests__/components/onboarding/onboarding-modal.test.tsx` pass locally on this head. The new `createSlideOffsetAssertion` helper is a functional CSS contract test, not a mirrored class string: it follows the property reader out of the compiled stylesheet to the value owned by each render, so a reader or writer rename breaks it. CI `test-and-build (ubuntu)` and `(windows)` are green on `edf5f19e87`; the only non-passing entries are `skipping` jobs that do not apply to PRs.\n\n## Acceptance criteria checklist (issue #18854, currently `ready-for-dev`)\n\n- [x] No `shadcn/no-inline-styles` finding for the changed file; no new findings elsewhere.\n- [x] Inline style attribute carries only a numeric custom property; production CSS contains the resolving rule.\n- [x] Slide `i` is offset `(i - k) * 100%`, asserted through emitted CSS plus rendered values.\n- [x] 300 ms ease-out transition, active-only flow participation, inactive absolute/pointer-none, and unchanged `data-testid`/`data-active`/`aria-hidden`.\n- [x] Three-phase and four-phase flows keep their logical phases, including the Cloud-login collapse case; agent selection, Next, Back, Skip and launch are unchanged.\n- [x] Change confined to the offset expression; no telemetry, persistence, copy, dependency, lint-policy, or verify-skill edits (`Verify skill isolation` check passes).\n- [x] Before/after running-Canvas video linked and resolvable (HTTP 200), covering Next and Back across desktop and phone layouts.\n\nNo material correctness, security, compatibility, or architecture findings. The `translate`-vs-`transform` switch relies on Tailwind v4's core translate utilities, which this repository already uses (for example `conversation-name-context-menu.tsx`), so it introduces no new browser-support baseline.\n\n✅ APPROVED",
           "submittedAt": "2026-10-23T06:36:00Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "b174b2da681fd2972fe3d2e8f0d6092804addbab"
+          }
+        },
+        {
+          "id": "PRR_kwDOLfkiw88AAAABT0zCxQ",
+          "author": {
+            "login": "VascoSch92"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "LGTM",
+          "submittedAt": "2026-10-23T07:49:30Z",
           "includesCreatedEdit": false,
           "reactionGroups": [],
           "state": "APPROVED",
@@ -4059,7 +4074,7 @@
         "independentImplementationReview": "No material findings at exact recorded proposal head.",
         "liveAffectedStateVerified": true,
         "mediaStatus": "Final matching packet published at immutable Notebook 0e6de40f0560d2327bfbde40d80f95ff51013844. Critical raw downloads return HTTP 200 with matching full SHA-256 values.",
-        "readiness": "Ready and open at unchanged recorded head, eight checks passed, six skipped and none failed or pending. All-hands-bot approved exact head at 2026-10-23T06:36:00Z with no material or inline findings. No merge claimed.",
+        "readiness": "Merged at 2026-10-24T06:59:47Z as 3dce57817d13db6572dd50c1e5436d0ffe397fd0; bot and maintainer approvals are retained in reviews. Recorded media/test heads remain unchanged.",
         "limits": "No dependency, lockfile, API, durable-state, lint suppression, rule-severity, specification, verifier or map changes.",
         "compiledCssContract": "Native translate-x-(--onboarding-slide-offset) reads the unchanged phase-derived percentage; 300 ms duration and active/inactive positioning are preserved.",
         "ownershipNote": "Active phase formula remains the numeric owner; Next/Back, phase collapse, telemetry and persistence are unchanged.",
@@ -4104,7 +4119,7 @@
         },
         "source": "onboarding-slide-offset-sources.json",
         "sourceSha256": "da65fc8de53148fbe50b3da821325da7d6c9ebd204962f97ee8d1215b6279a46",
-        "reviewStatus": "APPROVED by all-hands-bot at 2026-10-23T06:36:00Z on edf5f19e877b33130e9f42d94ed793e05f7deb0d; no material correctness, security, compatibility or architecture findings and no inline comments.",
+        "reviewStatus": "Bot and maintainer approved on 23 October; exact review bodies, submitted times and commit identities are retained in reviews.",
         "media": {
           "film": "onboarding-slide-offset-before-after.mp4",
           "durationSeconds": 25.92,
@@ -4188,7 +4203,7 @@
         "pending": 0,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18856/checks",
-        "note": "Current exact-head code CI and media-description validation pass; normal fork-only jobs are skipped."
+        "note": "Historical pre-merge checks at the recorded media source head; retained unchanged as evidence, not claimed as a final merge-head CI receipt."
       },
       "checkDetails": [
         {
@@ -4278,25 +4293,62 @@
       ],
       "mergeable": "UNKNOWN",
       "initialBotReviewRequestedThisRun": true,
-      "reviewRequestVerifiedAt": "2026-10-23T06:27:02.615342+00:00"
+      "reviewRequestVerifiedAt": "2026-10-23T06:27:02.615342+00:00",
+      "mergeCommit": {
+        "oid": "3dce57817d13db6572dd50c1e5436d0ffe397fd0"
+      },
+      "lifecycleSource": {
+        "checkedAt": "2026-10-24T07:10:21Z",
+        "note": "Verified merge and review lifecycle receipt. Recording source heads and historical checks remain separate.",
+        "mergeHead": "b174b2da681fd2972fe3d2e8f0d6092804addbab"
+      }
     },
     {
       "number": 18857,
       "title": "refactor(automations): express run bar heights in CSS",
-      "state": "OPEN",
-      "mergedAt": null,
+      "state": "MERGED",
+      "mergedAt": "2026-10-24T07:00:37Z",
       "url": "https://github.com/OpenHands/OpenHands/pull/18857",
-      "headRefOid": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d",
+      "headRefOid": "8cf3e5ca688e3404dfbe87b81d08ef53a8d01158",
       "headRefName": "astra/lint-sparkline-bar-height",
       "baseRefOid": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
       "draft": false,
-      "requestedReviewers": [
-        "all-hands-bot"
-      ],
-      "checkedAt": "2026-10-23T06:27:02.615342+00:00",
+      "requestedReviewers": [],
+      "checkedAt": "2026-10-24T07:10:21Z",
       "issue": 18855,
-      "reviewDecision": "REVIEW_REQUIRED",
-      "reviews": [],
+      "reviewDecision": "APPROVED",
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABT0TbiQ",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\n## Summary\n\nReviewed the exact head `087e91d34a9ac8ee5954e8e741774ccf7cc1713d` (detached checkout). The change is in scope for this repository (Canvas UI presentation) and reuses the mechanism already established for the activity track in #18788: a static Tailwind custom-property utility (`h-(--automation-run-bar-height)`) reading a single numeric custom property written on the element, replacing the last `shadcn/no-inline-styles` `height` finding in this component. No dependency, API, lint-severity or suppression changes; only `automation-run-activity-sparkline.tsx` and its test file change.\n\n## Verification performed on this head\n\n- CI for the exact head: `test-and-build (ubuntu)` and `test-and-build (windows)` success (lint, test, build, build:lib, `npm pack --dry-run`), `Validate PR description` success, `Verify skill isolation` success.\n- Focused suite `__tests__/components/features/home/automation-run-activity-sparkline.test.ts` -> 13 passed; consumer suites `automation-card.test.tsx` + `automation-list-row.test.tsx` -> 12 passed; `__tests__/scripts/inline-styles-lint.test.ts` -> 2 passed.\n- Compiled the production stylesheet with `@tailwindcss/node`: the class emits `.h-\\(--automation-run-bar-height\\) { height: var(--automation-run-bar-height); }`, so the reader (utility) and the writer (inline custom property) match.\n- Read the full diff against merge base `3083e1aa16`: the duration helper, the `6 / 11 / 15 px` bounds and fallback, the 1 s in-flight timer, the 18 px track, bar width, wider link hit target, per-status colors, tooltip, hover/focus classes and deep links are unchanged.\n\n## Acceptance-criteria checklist (issue #18855)\n\n- [x] Rendered height still equals `durationMsToSparklineBarHeightPx(duration)`; the bar no longer carries an inline `height` and instead supplies its numeric value through a custom property consumed by a static utility.\n- [x] Mapping, bounds and unknown-duration fallback unchanged (`automation-run-activity-metrics.ts` untouched).\n- [x] Completed runs keep their heights; missing/invalid timestamps render the fallback (covered by the new rendered-height test).\n- [x] In-flight bars still update through the existing 1 s timer; the new tick test asserts no update before 1 s and a duration-derived update at 1 s.\n- [x] Dashboard grid/list and home pinned/running cards keep the 18 px track, bar width, hit target, status colors, tooltip and `/automations/<id>?run=<runId>` links; only the bar's height mechanism changed.\n- [x] Hover/focus growth and reduced-motion classes unchanged.\n- [x] No `no-inline-styles` finding for the bar height, no new disable comments or severity changes; lint is green in CI.\n- [x] The compiled production-CSS contract test is extended to actually rendered bar values, binding the emitted height rule to the custom property written on the bar.\n- [x] `typecheck`, `test`, `build` and `build:lib` pass (CI).\n- [x] Verification-skill and feature-map files untouched; the PR description carries before/after Canvas media (GIF/MP4, 32.56 s total, matching the described duration).\n\nNo material correctness, security, compatibility, or architecture findings.\n\n✅ APPROVED\n",
+          "submittedAt": "2026-10-23T06:49:21Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "8cf3e5ca688e3404dfbe87b81d08ef53a8d01158"
+          }
+        },
+        {
+          "id": "PRR_kwDOLfkiw88AAAABT0zSXA",
+          "author": {
+            "login": "VascoSch92"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "LGTM",
+          "submittedAt": "2026-10-23T07:49:56Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "087e91d34a9ac8ee5954e8e741774ccf7cc1713d"
+          }
+        }
+      ],
       "verification": {
         "configuredFileWarningsBefore": 7,
         "configuredFileWarningsAfter": 6,
@@ -4310,7 +4362,7 @@
         "independentImplementationReview": "No material findings at exact recorded proposal head.",
         "liveAffectedStateVerified": true,
         "mediaStatus": "Final matching packet published at immutable Notebook 5658681094b9e28ba0a30f8e7d40e26d83d9fc75. Critical raw downloads return HTTP 200 with matching full SHA-256 values.",
-        "readiness": "Ready and open at unchanged recorded head, eight checks passed, six skipped and none failed or pending. Initial all-hands-bot review requested and verified pending; no approval or merge claimed.",
+        "readiness": "Merged at 2026-10-24T07:00:37Z as 084a4106040a0d64a02ac04eecf88ea8a8a8f31b; bot and maintainer approvals are retained in reviews. Recorded media/test heads remain unchanged.",
         "limits": "No dependency, lockfile, API, durable-state, lint suppression, rule-severity, specification, verifier or map changes.",
         "compiledCssContract": "Native h-(--automation-run-bar-height) reads the unchanged duration helper result.",
         "ownershipNote": "6/15/11 px metrics, 18 px track, one-second running timer, status colors, links, tooltips and hover/focus/reduced-motion rules retain existing owners.",
@@ -4513,7 +4565,7 @@
           "livePagesDeploymentVerified": false,
           "note": "Immutable raw critical downloads are verified. Live Pages deployment is checked separately after the final document push."
         },
-        "reviewStatus": "Initial all-hands-bot review requested after green CI; request verified and no review submitted at this snapshot."
+        "reviewStatus": "Bot and maintainer approved on 23 October; exact review bodies, submitted times and commit identities are retained in reviews."
       },
       "latestChecks": {
         "pass": 8,
@@ -4521,7 +4573,7 @@
         "pending": 0,
         "failed": 0,
         "url": "https://github.com/OpenHands/OpenHands/pull/18857/checks",
-        "note": "Current exact-head code CI and media-description validation pass; normal fork-only jobs are skipped."
+        "note": "Historical pre-merge checks at the recorded media source head; retained unchanged as evidence, not claimed as a final merge-head CI receipt."
       },
       "checkDetails": [
         {
@@ -4609,9 +4661,591 @@
           "state": "SKIPPED"
         }
       ],
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "initialBotReviewRequestedThisRun": true,
-      "reviewRequestVerifiedAt": "2026-10-23T06:27:02.615342+00:00"
+      "reviewRequestVerifiedAt": "2026-10-23T06:27:02.615342+00:00",
+      "mergeCommit": {
+        "oid": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b"
+      },
+      "lifecycleSource": {
+        "checkedAt": "2026-10-24T07:10:21Z",
+        "note": "Verified merge and review lifecycle receipt. Recording source heads and historical checks remain separate.",
+        "mergeHead": "8cf3e5ca688e3404dfbe87b81d08ef53a8d01158"
+      }
+    },
+    {
+      "number": 18902,
+      "title": "refactor(backends): express measured panel height in CSS",
+      "state": "OPEN",
+      "mergedAt": null,
+      "url": "https://github.com/OpenHands/OpenHands/pull/18902",
+      "headRefOid": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "headRefName": "astra/lint-backend-panel-height",
+      "baseRefOid": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "draft": true,
+      "requestedReviewers": [],
+      "checkedAt": "2026-10-24T08:01:38.027860+00:00",
+      "issue": 18900,
+      "reviewDecision": null,
+      "reviews": [],
+      "verification": {
+        "typecheckPassed": true,
+        "prettierPassed": true,
+        "appBuildPassed": true,
+        "libraryBuildPassed": true,
+        "appAndLibraryCssVerified": true,
+        "independentImplementationReview": {
+          "codeVerdict": "PASS",
+          "risk": "LOW",
+          "materialFindings": [],
+          "overallState": "COMMENT_PENDING_GATES",
+          "note": "Code review only. Authentic affected-state runtime evidence and required exact-head CI/PR gates remain pending; no GitHub approval is claimed."
+        },
+        "liveAffectedStateVerified": true,
+        "mediaStatus": "Final matching film, poster, captions, comparison and complete raw-source packet are published; five critical immutable downloads return HTTP 200 with matching full SHA-256 values. Live Notebook feature-anchor verification is pending.",
+        "readiness": "Draft with authentic matching media published and current CI green: eight passed, six skipped, none pending or failed. Live Notebook feature-anchor verification remains pending before readiness. No bot review requested.",
+        "reviewStatus": "No bot request or submitted approval is recorded for this draft.",
+        "notebookFeatureUrl": "https://enyst.github.io/arch/agentic-linting-refactoring.html#backend-panel-height-film",
+        "implementationReceiptSha256": "1681905f64c313ec98e48065f32c6092dd8dd407532a039dcede049bf9049aa8",
+        "scopeLimits": "No specification, verifier, feature-map, dependency, API, lint-policy or shared-state changes.",
+        "configuredFileWarningsBefore": 13,
+        "configuredFileWarningsAfter": 11,
+        "removedWarnings": 2,
+        "removedByRule": {
+          "shadcn/no-inline-styles": 1,
+          "shadcn/no-arbitrary-values": 1
+        },
+        "focusedTestsPassed": 31,
+        "focusedTestFilesPassed": 2,
+        "compiledCssContract": "Static narrow utility locally resets the custom property to auto, consumes only a positive measured px height and owns height-only transition-property. Existing 300 ms ease and reduced-motion classes remain.",
+        "ownershipNote": "Positive measurement guard, state and ResizeObserver/disconnect logic unchanged; local auto default prevents an unmeasured nested wrapper inheriting an ancestor height.",
+        "consumerBoundary": [
+          "AnimatedPanelHeight inner wrapper around selected AddBackendChooser panel: Cloud/Advanced; Agent-server Local/Remote guidance; optional Providers card.",
+          "AnimatedPanelHeight outer wrapper around AddBackendAddModeBody slide rail, including provider-connect form and Back.",
+          "Backend selector AddBackendModal, Sidebar AddBackendModal, ManageBackendsModal add entry, and root.tsx locked-cloud first-run BackendFormModal mode=add.",
+          "BackendFormModal edit mode and CheckBackendStep BackendConnectionOptions do not use the changed wrapper."
+        ],
+        "sourceFiles": [
+          "__tests__/components/backends/add-backend-modal.test.tsx",
+          "src/components/features/backends/backend-form-modal.tsx",
+          "src/tailwind.css"
+        ],
+        "evidenceCheckedAt": "2026-10-24T07:57:13.962915+00:00",
+        "recordedSourceHeads": {
+          "before": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+          "after": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9"
+        },
+        "buildFingerprints": {
+          "before": "bd00d766c4f403c3",
+          "after": "19aafc29ca5edbc4"
+        },
+        "versions": {
+          "agentCanvas": "1.33.0",
+          "agentServer": "1.58.1",
+          "sdk": "1.58.1",
+          "automation": "1.25.1",
+          "node": "24.22.1",
+          "npm": "11.12.1"
+        },
+        "source": "backend-panel-height-sources.json",
+        "sourceSha256": "57010b8bee7f082b0c392c2261db1d3209cf4ca7bf93608c89eb097f1804bd75",
+        "authoritativePrivateEvidenceSha256": "fb8d6e3c03ef4ec1deb4f3dc92de391a06a0da9bb3259174e745647aff826dd5",
+        "pairedNamedStateSamples": 12,
+        "maximumObservedSettledGeometryDifferencePx": 0.0,
+        "stableFieldDifferences": [],
+        "selectedArtifacts": {
+          "png": 32,
+          "rawClips": 4,
+          "zipMembers": 43,
+          "publicAssetCount": 47
+        },
+        "media": {
+          "film": "backend-panel-height-before-after.mp4",
+          "poster": "backend-panel-height-poster.jpg",
+          "captions": "backend-panel-height-captions.vtt",
+          "source": "backend-panel-height-sources.json",
+          "comparison": "backend-panel-height-comparison.json",
+          "evidenceZip": "backend-panel-height-evidence.zip",
+          "durationSeconds": 45.6,
+          "dimensions": [
+            1440,
+            1120
+          ],
+          "framesPerSecond": 25,
+          "frames": 1140,
+          "format": {
+            "videoCodec": "h264",
+            "pixelFormat": "yuv420p",
+            "colorRange": "tv",
+            "audioCodec": "aac",
+            "fastStart": true
+          },
+          "files": {
+            "backend-panel-height-capture-provenance.json": {
+              "sha256": "339dd45c75d5fc916266f267a4cc7de4f59adcfa6b2ffef33e79806723e4c8ef",
+              "bytes": 34547
+            },
+            "backend-panel-height-comparison.json": {
+              "sha256": "11cbb9402617424c4da850c72365904f6a12b10d6cf06dfd2a8971d439640d35",
+              "bytes": 23704
+            },
+            "backend-panel-height-before-after.mp4": {
+              "sha256": "590dfda2189af72dbe5f3f3465823a2c4c49ff792d5c444d021d3882031b75be",
+              "bytes": 3001280
+            },
+            "backend-panel-height-evidence.zip": {
+              "sha256": "7dc23e1a1d19fe64e270bbed6285591af844111eb7fbb04cd7bef5b472d13a70",
+              "bytes": 4540812
+            },
+            "backend-panel-height-poster.jpg": {
+              "sha256": "e79e3c2ef1435e3b04c37fcd98143eb65842ed88660821b43fb2d614a2ec6a14",
+              "bytes": 84849
+            },
+            "backend-panel-height-captions.vtt": {
+              "sha256": "ebfc04cab04db6acdedf09931603412c02e5e9a2ebc6396feff63e76d87ac63a",
+              "bytes": 969
+            },
+            "backend-panel-height-sources.json": {
+              "sha256": "57010b8bee7f082b0c392c2261db1d3209cf4ca7bf93608c89eb097f1804bd75",
+              "bytes": 12347
+            }
+          },
+          "preview": "Poster only; no GIF is provided."
+        },
+        "runtimeLimits": [
+          "No model message or agent run was submitted. Files arrangement uses the documented genuine idle Agent/LLM object targeting unavailable loopback, dummy key, tools=[], autotitle=false.",
+          "No authentication, Cloud/provider connection or provider key was attempted.",
+          "Actual videos provide visual motion; CLI mutation --observe captures text/state rather than a numeric animation trajectory.",
+          "Recordings remain 25 fps normal action timing. The recorder trims unchanged initial lead-in and holds a final still for one second. Overall clip duration is not a performance comparison.",
+          "Raw source videos and screenshots are retained; private intermediate recording frame directories were purged with owned browser profiles and keys.",
+          "No verifier, map, spec, fixture-driver or repository source was edited by this evidence task.",
+          "Undefined/zero measurement and an unmeasured panel nested inside a measured ancestor were not forced through live DOM; focused unit/compiled CSS checks own those fallback cases.",
+          "Before desktop contains an approximately 15-second operator pause before provider selection; After proceeds continuously. This does not compare performance.",
+          "Early three Before theme remote-expanded frames were mid-interpolation; authoritative representative stills are named remote-settled.",
+          "The DigitalOcean provider heading appears white on the Light+ form in both phases; no full provider text contrast pass is claimed."
+        ],
+        "cleanup": {
+          "allThreeOwnedRunsStopped": true,
+          "privateStatePurged": true,
+          "fiveReusedCorePortsClosed": true,
+          "noAgentStarted": true,
+          "actionEvents": 0
+        },
+        "observedContract": {
+          "reader": "After both nested wrappers have empty inline height and actual --add-backend-panel-height numeric px values; computed geometry resolves at sampled measurements.",
+          "normalMotion": {
+            "transitionProperty": "height",
+            "transitionDuration": "0.3s",
+            "transitionTimingFunction": "cubic-bezier(0.4, 0, 0.2, 1)"
+          },
+          "reducedMotion": "Explicit CLI media preference reduce was enabled on both phases, matchMedia true, both wrappers transitionProperty none, then restored no-preference. Computed duration remains 0.3s; the property suppresses transition.",
+          "entryPoints": [
+            "Backend selector → Add Backend",
+            "Manage backends → Add Backend"
+          ],
+          "providerRail": "Providers → DigitalOcean form → Back, no credentials or Connect submitted.",
+          "phoneControls": "Real modal scrolling exposed disabled Connect at x44.5/y748.765625/301×36, inside 390×844 viewport after Local scrollTop54 and Remote scrollTop106 in both phases.",
+          "representativeThemes": [
+            "OpenHands-Neutral",
+            "OpenHands-DeepSea",
+            "OpenHands-Neo",
+            "Light+",
+            "Solarized Light"
+          ]
+        },
+        "mediaPublication": {
+          "commit": "a877fcbbdcf4674ad4b36b01c138f234bb377f45",
+          "criticalDownloadsChecked": 5,
+          "allCriticalHttp200AndSha256Matched": true,
+          "liveNotebookFeatureAnchorVerified": false
+        }
+      },
+      "latestChecks": {
+        "pass": 8,
+        "skip": 6,
+        "pending": 0,
+        "failed": 0,
+        "checkedAt": "2026-10-24T07:59:38.269020+00:00",
+        "url": "https://github.com/OpenHands/OpenHands/pull/18902/checks",
+        "note": "Current code checks and final media-description validation pass; normal fork-only jobs are skipped. The PR remains draft pending live Notebook feature-anchor verification."
+      },
+      "initialBotReviewRequestedThisRun": false,
+      "checkDetails": [
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40076029689/job/120819453410",
+          "name": "pr-title / Apply conventional-type label",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40076029390/job/120819434491",
+          "name": "Verify skill isolation",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40076029689/job/120819435229",
+          "name": "pr-title / Lint PR title (conventional)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40076029357/job/120819434444",
+          "name": "Validate PR description",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025057/job/120813440756",
+          "name": "test-and-build (windows)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025057/job/120813440785",
+          "name": "test-and-build (ubuntu)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025008/job/120813426527",
+          "name": "check-pr-artifacts",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025057/job/120813426280",
+          "name": "prepare-test-matrix",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025063/job/120813427640",
+          "name": "Merge Multi-Arch Manifests",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025063/job/120813427355",
+          "name": "Build & Push (${{ matrix.arch }})",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025063/job/120813427791",
+          "name": "Consolidate Build Information",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025008/job/120813427475",
+          "name": "cleanup-after-merge",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025057/job/120813427112",
+          "name": "live-e2e",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074025063/job/120813427964",
+          "name": "Update PR description with Docker image",
+          "state": "SKIPPED"
+        }
+      ],
+      "mergeable": "MERGEABLE"
+    },
+    {
+      "number": 18903,
+      "title": "refactor(files): express tree resize width in CSS",
+      "state": "OPEN",
+      "mergedAt": null,
+      "url": "https://github.com/OpenHands/OpenHands/pull/18903",
+      "headRefOid": "ab650488ed6a9db47bdc14b9682458a2fdc1683f",
+      "headRefName": "astra/lint-files-tree-width",
+      "baseRefOid": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "draft": true,
+      "requestedReviewers": [],
+      "checkedAt": "2026-10-24T08:01:38.027860+00:00",
+      "issue": 18901,
+      "reviewDecision": null,
+      "reviews": [],
+      "verification": {
+        "typecheckPassed": true,
+        "prettierPassed": true,
+        "appBuildPassed": true,
+        "libraryBuildPassed": true,
+        "appAndLibraryCssVerified": true,
+        "independentImplementationReview": {
+          "codeVerdict": "PASS",
+          "risk": "LOW",
+          "materialFindings": [],
+          "overallState": "COMMENT_PENDING_GATES",
+          "note": "Code review only. Authentic affected-state runtime evidence and required exact-head CI/PR gates remain pending; no GitHub approval is claimed."
+        },
+        "liveAffectedStateVerified": true,
+        "mediaStatus": "Final matching film, poster, captions, comparison and complete raw-source packet are published; five critical immutable downloads return HTTP 200 with matching full SHA-256 values. Live Notebook feature-anchor verification is pending.",
+        "readiness": "Draft with authentic matching media published and current CI green: eight passed, six skipped, none pending or failed. Live Notebook feature-anchor verification remains pending before readiness. No bot review requested.",
+        "reviewStatus": "No bot request or submitted approval is recorded for this draft.",
+        "notebookFeatureUrl": "https://enyst.github.io/arch/agentic-linting-refactoring.html#files-tree-width-film",
+        "implementationReceiptSha256": "13801abd3e4ca1f4743e1c3788960d20727160e057e0b3b3ff32b9f739f4d6d6",
+        "scopeLimits": "No specification, verifier, feature-map, dependency, API, lint-policy or shared-state changes.",
+        "configuredFileWarningsBefore": 3,
+        "configuredFileWarningsAfter": 2,
+        "removedWarnings": 1,
+        "removedByRule": {
+          "shadcn/no-inline-styles": 1
+        },
+        "focusedTestsPassed": 51,
+        "focusedTestFilesPassed": 5,
+        "compiledCssContract": "Native w-(--files-tab-tree-width) reads the same numeric px writer in actual app/library CSS and lazy/public JavaScript wiring.",
+        "ownershipNote": "Real resize hook, 224 px default, 160–480 px clamps, storage key, mouseup persistence and collapse/restore behavior remain unchanged.",
+        "consumerBoundary": {
+          "sharedPath": "FilesTab is lazy-loaded by ConversationTabContent after backend/agent/conversation selection; same reader for Local/Cloud, OpenHands/ACP, standard/planning/delegated paths.",
+          "desktopAndPhone": "ConversationMain desktop drawer and ConversationView/conversation-panel phone entry points share this route presentation; routing untouched.",
+          "publicLibrary": "Indirectly reachable through public root ConversationMain/ConversationView, not directly exported from files domain barrel. Actual dist/index.js exports both; dynamic import of dist/routes/files-tab.js retained.",
+          "compiledCss": "Actual build/assets/root-CGfMIsLo.css and dist/styles.css emit the scoped [data-agent-server-ui] width reader. App lazy Files chunk plus library ES/CJS route emit matching px writer.",
+          "hostIndependence": "Direct var() reader and explicit px writer use no rem or host --spacing arithmetic; no browser computed-layout claim is made here."
+        },
+        "sourceFiles": [
+          "src/routes/files-tab.tsx",
+          "__tests__/routes/files-tab.test.tsx"
+        ],
+        "evidenceCheckedAt": "2026-10-24T07:57:13.962915+00:00",
+        "recordedSourceHeads": {
+          "before": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+          "after": "ab650488ed6a9db47bdc14b9682458a2fdc1683f"
+        },
+        "buildFingerprints": {
+          "before": "bd00d766c4f403c3",
+          "after": "bf128a3fcf7cd316"
+        },
+        "versions": {
+          "agentCanvas": "1.33.0",
+          "agentServer": "1.58.1",
+          "sdk": "1.58.1",
+          "automation": "1.25.1",
+          "node": "24.22.1",
+          "npm": "11.12.1"
+        },
+        "source": "files-tree-width-sources.json",
+        "sourceSha256": "4be071c22ebf8d5af20f8ac11b15fbaa4c423488f99d2087075e8643b7bdd164",
+        "authoritativePrivateEvidenceSha256": "233f77b2bd1a44775312e27f050585a9dc001ff26eb3b986f9be6ab4b2edf3e9",
+        "pairedNamedStateSamples": 13,
+        "maximumObservedSettledGeometryDifferencePx": 0,
+        "stableFieldDifferences": [],
+        "selectedArtifacts": {
+          "png": 28,
+          "rawClips": 4,
+          "zipMembers": 39,
+          "publicAssetCount": 43
+        },
+        "media": {
+          "film": "files-tree-width-before-after.mp4",
+          "poster": "files-tree-width-poster.jpg",
+          "captions": "files-tree-width-captions.vtt",
+          "source": "files-tree-width-sources.json",
+          "comparison": "files-tree-width-comparison.json",
+          "evidenceZip": "files-tree-width-evidence.zip",
+          "durationSeconds": 59.92,
+          "dimensions": [
+            1440,
+            1120
+          ],
+          "framesPerSecond": 25,
+          "frames": 1498,
+          "format": {
+            "videoCodec": "h264",
+            "pixelFormat": "yuv420p",
+            "colorRange": "tv",
+            "audioCodec": "aac",
+            "fastStart": true
+          },
+          "files": {
+            "files-tree-width-evidence.zip": {
+              "sha256": "110318b3b8bbec8b9ec08e0c3ff6e76f533e14a7e6899029f290a659f723a670",
+              "bytes": 1681470
+            },
+            "files-tree-width-before-after.mp4": {
+              "sha256": "cd2bfa2274fe2eea7229b5eb3823900c4498b1b3b46db9345507dc357280dc97",
+              "bytes": 1989706
+            },
+            "files-tree-width-captions.vtt": {
+              "sha256": "11ba31274328af46c084352ee4f3f12b8ea92b318aedc7968adb6b1e8484e376",
+              "bytes": 1579
+            },
+            "files-tree-width-sources.json": {
+              "sha256": "4be071c22ebf8d5af20f8ac11b15fbaa4c423488f99d2087075e8643b7bdd164",
+              "bytes": 17263
+            },
+            "files-tree-width-comparison.json": {
+              "sha256": "13503daacd23593d0f1bbb347057f116aa3f33259cde9facdc6465f11a215360",
+              "bytes": 16379
+            },
+            "files-tree-width-poster.jpg": {
+              "sha256": "febc5d8f3f25281e603e606f6129e5d006d9cb5217841c9f98f3859a8294b826",
+              "bytes": 71068
+            },
+            "files-tree-width-capture-provenance.json": {
+              "sha256": "d4dbe207759c985a3f0e64ea0e11d0bd453899e17c58daf5be5d1ac152a41c42",
+              "bytes": 32494
+            }
+          },
+          "preview": "Poster only; no GIF is provided."
+        },
+        "runtimeLimits": [
+          "No model message or agent run was submitted. Files arrangement uses the documented genuine idle Agent/LLM object targeting unavailable loopback, dummy key, tools=[], autotitle=false.",
+          "No authentication, Cloud/provider connection or provider key was attempted.",
+          "Actual videos provide visual motion; CLI mutation --observe captures text/state rather than a numeric animation trajectory.",
+          "Recordings remain 25 fps normal action timing. The recorder trims unchanged initial lead-in and holds a final still for one second. Overall clip duration is not a performance comparison.",
+          "Raw source videos and screenshots are retained; private intermediate recording frame directories were purged with owned browser profiles and keys.",
+          "No verifier, map, spec, fixture-driver or repository source was edited by this evidence task.",
+          "Phone checks deliberately use the existing usable 160/224px tree widths; no claim that480px fits a phone.",
+          "Paired fixture roots are separate owned run paths with the same basename and file content. Relative age text may differ; no whole-page pixel identity claim.",
+          "Host font/spacing independence is covered by the implementation owner’s compiled CSS tests; this live task does not force host overrides.",
+          "Files After phone recorder reports one capture miss (179 captures/90 changes, output13.4s, recorded12.4s). A screenshot at the unchanged reloaded160px state took2.624s; no exact missed-frame interval or zero-miss capture is claimed. Root/media reviewed source contacts before cleanup."
+        ],
+        "cleanup": {
+          "allThreeOwnedRunsStopped": true,
+          "privateStatePurged": true,
+          "fiveReusedCorePortsClosed": true,
+          "noAgentStarted": true,
+          "actionEvents": 0
+        },
+        "observedContract": {
+          "desktopWidthsPx": [
+            224,
+            324,
+            480,
+            160
+          ],
+          "reloadedWidthPx": 160,
+          "treeCollapseRestoreWidthPx": 160,
+          "restoredWidthPx": 224,
+          "desktopDrawerPx": 569,
+          "desktopDrawerStoredPercent": "50",
+          "phone": "Light+ 390×844 real /panel entry; 224→160, collapse/restore, reload160, restore224 and Back; main Files bbox390×804 at y40, inside viewport, no page horizontal overflow at160.",
+          "selectedFile": "src/calc.py",
+          "selectedFileContent": "def add(a, b):\n    return a + b\n",
+          "fixtureBasename": "qa-width-workspace",
+          "title": "Files width check",
+          "agentState": "idle with zero total events and zero ActionEvents before and after; no messages submitted",
+          "reader": "After actual --files-tab-tree-width numeric px property and empty inline width; computed width and bounding box follow hook output.",
+          "representativeThemes": [
+            "OpenHands-Neutral",
+            "OpenHands-DeepSea",
+            "OpenHands-Neo",
+            "Light+",
+            "Solarized Light"
+          ]
+        },
+        "mediaPublication": {
+          "commit": "73d4225fa15ed071a5d06e8bf79a185d1f2bb0c2",
+          "criticalDownloadsChecked": 5,
+          "allCriticalHttp200AndSha256Matched": true,
+          "liveNotebookFeatureAnchorVerified": false
+        }
+      },
+      "latestChecks": {
+        "pass": 8,
+        "skip": 6,
+        "pending": 0,
+        "failed": 0,
+        "checkedAt": "2026-10-24T07:59:38.269020+00:00",
+        "url": "https://github.com/OpenHands/OpenHands/pull/18903/checks",
+        "note": "Current code checks and final media-description validation pass; normal fork-only jobs are skipped. The PR remains draft pending live Notebook feature-anchor verification."
+      },
+      "initialBotReviewRequestedThisRun": false,
+      "checkDetails": [
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40076103458/job/120819685057",
+          "name": "pr-title / Apply conventional-type label",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40076103458/job/120819662101",
+          "name": "pr-title / Lint PR title (conventional)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40076103252/job/120819661506",
+          "name": "Validate PR description",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40076103389/job/120819662361",
+          "name": "Verify skill isolation",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100917/job/120813694548",
+          "name": "Update PR description with Docker image",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100917/job/120813692426",
+          "name": "Build & Push (${{ matrix.arch }})",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100870/job/120813679021",
+          "name": "test-and-build (ubuntu)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100870/job/120813679025",
+          "name": "test-and-build (windows)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100850/job/120813661141",
+          "name": "check-pr-artifacts",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100870/job/120813660348",
+          "name": "prepare-test-matrix",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100917/job/120813661899",
+          "name": "Merge Multi-Arch Manifests",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100917/job/120813662347",
+          "name": "Consolidate Build Information",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100870/job/120813661574",
+          "name": "live-e2e",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40074100850/job/120813662351",
+          "name": "cleanup-after-merge",
+          "state": "SKIPPED"
+        }
+      ],
+      "mergeable": "MERGEABLE"
     }
   ],
   "lintAudit": {
@@ -4833,6 +5467,41 @@
         }
       },
       "note": "Independent proposal-head result only; not subtracted from the separately measured integrated-main total."
+    },
+    {
+      "reportedAt": "2026-10-24T07:29:50.488882+00:00",
+      "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18902",
+      "sourceCommit": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "baseCommit": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "scope": "Configured target-file diagnostics at the changed presentation owner",
+      "errors": 0,
+      "warningsBefore": 13,
+      "warningsAfter": 11,
+      "rules": {
+        "shadcn/no-inline-styles": {
+          "warningsRemoved": 1
+        },
+        "shadcn/no-arbitrary-values": {
+          "warningsRemoved": 1
+        }
+      },
+      "note": "Independent draft proposal-head result only. Full-source lint was not rerun by the implementor; this reduction is not subtracted from the separately measured 612-warning exact-main audit."
+    },
+    {
+      "reportedAt": "2026-10-24T07:29:50.488882+00:00",
+      "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18903",
+      "sourceCommit": "ab650488ed6a9db47bdc14b9682458a2fdc1683f",
+      "baseCommit": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "scope": "Configured target-file diagnostics at the changed presentation owner",
+      "errors": 0,
+      "warningsBefore": 3,
+      "warningsAfter": 2,
+      "rules": {
+        "shadcn/no-inline-styles": {
+          "warningsRemoved": 1
+        }
+      },
+      "note": "Independent draft proposal-head result only. Full-source lint was not rerun by the implementor; this reduction is not subtracted from the separately measured 612-warning exact-main audit."
     }
   ],
   "mainLintAudits": [
@@ -5193,6 +5862,93 @@
         "New onboarding and bar-height branches each remove one scoped inline-style warning; neither is counted as an integrated-main reduction.",
         "The eighteen palette findings and their existing prerequisite records remain unchanged."
       ]
+    },
+    {
+      "completedAt": "2026-10-24T07:07:30.381840+00:00",
+      "sourceCommit": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "shadcnLintVersion": "0.2.1",
+      "command": "npm ci --ignore-scripts && npm run lint",
+      "machineCommand": "./node_modules/.bin/eslint src --format json --output-file eslint.json",
+      "commandNote": "Fresh exact-lock install and read-only exact integrated-main audit after onboarding and automation bar-height merges. Full lint, typecheck, formatting and machine ESLint pass. Later lifecycle tips and follow-up proposals are separate.",
+      "files": 1425,
+      "filesWithDiagnostics": 193,
+      "errors": 0,
+      "warnings": 612,
+      "rules": {
+        "shadcn/no-arbitrary-values": {
+          "warnings": 520,
+          "files": 179
+        },
+        "shadcn/no-inline-styles": {
+          "warnings": 74,
+          "files": 36
+        },
+        "shadcn/no-raw-colors": {
+          "warnings": 18,
+          "files": 4
+        }
+      },
+      "source": "main-lint-audit-2026-10-24-084a410604.json",
+      "sourceSha256": "a928b8c551bd68d76e8d8cdbb0572f841a65c16aa3fa7c1c554f86b32dcfb5d0",
+      "comparison": {
+        "priorExactSha": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+        "priorPublicAuditSha256": "4a2db83d8e6807621eacae3e9c54677e7adb75d9fa5fc69fd71453a8e4fa01fc",
+        "priorTotals": {
+          "filesLinted": 1420,
+          "filesWithDiagnostics": 191,
+          "errors": 0,
+          "warnings": 611,
+          "fatalErrors": 0
+        },
+        "warningDelta": 1,
+        "comparisonMethod": "Match repository-relative file, rule, diagnostic category and cited utility/property, ignoring line movement and nearest-token suggestion changes, preserving multiplicity.",
+        "diagnosticDelta": [
+          {
+            "kind": "removed",
+            "file": "src/components/features/home/featured-automations/automation-run-activity-sparkline.tsx",
+            "ruleId": "shadcn/no-inline-styles",
+            "messageId": "inlineStyle",
+            "utilityOrMessagePrefix": "Inline style sets height",
+            "count": 1
+          },
+          {
+            "kind": "removed",
+            "file": "src/components/features/onboarding/onboarding-modal.tsx",
+            "ruleId": "shadcn/no-inline-styles",
+            "messageId": "inlineStyle",
+            "utilityOrMessagePrefix": "Inline style sets transform",
+            "count": 1
+          },
+          {
+            "kind": "added",
+            "file": "src/components/features/automations/built-in-integration-choice-modal.tsx",
+            "ruleId": "shadcn/no-arbitrary-values",
+            "messageId": "arbitraryValue",
+            "utilityOrMessagePrefix": "w-[92vw]",
+            "count": 1
+          },
+          {
+            "kind": "added",
+            "file": "src/components/shared/horizontal-scroll-fade.tsx",
+            "ruleId": "shadcn/no-arbitrary-values",
+            "messageId": "arbitraryValue",
+            "utilityOrMessagePrefix": "from-[var(--oh-scroll-fade-from,var(--oh-color-base))]",
+            "count": 2
+          }
+        ],
+        "pinChanges": {
+          "canvas": {
+            "before": "1.32.0",
+            "after": "1.33.0"
+          }
+        }
+      },
+      "coverageNotes": [
+        "Two merged inline-style findings are removed: onboarding slide transform and automation run bar height.",
+        "Three arbitrary-value findings were added elsewhere: integration-choice modal w-[92vw] and two horizontal-scroll-fade from-var utilities; net warning delta is +1.",
+        "All eight earlier main audits and fourteen proposal audits retain their exact earlier content.",
+        "Audit source is exact 084a410604; do not attribute these counts to a later lifecycle tip. No follow-up proposal reduction is included."
+      ]
     }
   ],
   "relatedWork": {
@@ -5390,18 +6146,16 @@
     }
   },
   "statusSnapshotCoverage": {
-    "previousCohortCheckedAt": "2026-10-22T03:45:22.295052+00:00",
-    "previousCohortCount": 46,
-    "freshPullRequests": [
-      18856,
-      18857
+    "previousCohortCheckedAt": "2026-10-24T07:29:50.488882+00:00",
+    "previousCohortCount": 50,
+    "freshPullRequests": [],
+    "updatedPullRequests": [
+      18902,
+      18903
     ],
-    "mergedSincePreviousSnapshot": [
-      18804,
-      18805
-    ],
+    "mergedSincePreviousSnapshot": [],
     "existingOpenLifecycleVerified": [],
-    "note": "Only sidebar/tree lifecycle metadata is refreshed; all 44 other prior proposal objects, seven prior main audits, twelve prior proposal audits, 32 prior video elements and 64 download anchors, 654 prior assets/source heads, the README prefix and completed approval watch remain unchanged. Both new independent proposals are ready with authentic published media, green exact-head CI (eight passed, six skipped each), onboarding bot approval on exact head and the initial automation bar-height bot review pending. The recorded main audit remains 611 warnings at 3083e1aa16; newer upstream main a832d9a285 has not been re-audited. Neither branch reduction is counted in the audit."
+    "note": "Only the two current draft verification/media entries are refreshed. All 48 prior proposal objects, nine measured main audits, sixteen proposal audits, 34 earlier video elements and 68 earlier MP4 download anchors, 7072 original non-document files including 816 experiment assets, the README byte prefix, related prerequisites and completed approval watch are preserved. Two approved matching films add four download anchors. Both PRs remain draft with no bot request; current code/media-description CI pass, while live Notebook anchor checks remain pending. Exact-main 084a410604 remains independently measured at 612 warnings and zero errors."
   },
   "approvalWatch": {
     "startedAt": "2026-10-19T02:49:08Z",
@@ -5598,37 +6352,173 @@
         "publishedMediaCommit": "9d241d3ada0d621d7f794f36413700801563197c",
         "note": "All 30 prior film tags and source/track children, 60 prior MP4 download anchors, 561 prior non-doc assets and exact source heads remain unchanged. The two additional film sections each have both MP4 download anchors."
       }
+    },
+    {
+      "checkedAt": "2026-10-23T06:38:58.021657+00:00",
+      "cohortCount": 48,
+      "coverage": {
+        "previousCohortCheckedAt": "2026-10-22T03:45:22.295052+00:00",
+        "previousCohortCount": 46,
+        "freshPullRequests": [
+          18856,
+          18857
+        ],
+        "mergedSincePreviousSnapshot": [
+          18804,
+          18805
+        ],
+        "existingOpenLifecycleVerified": [],
+        "note": "Only sidebar/tree lifecycle metadata is refreshed; all 44 other prior proposal objects, seven prior main audits, twelve prior proposal audits, 32 prior video elements and 64 download anchors, 654 prior assets/source heads, the README prefix and completed approval watch remain unchanged. Both new independent proposals are ready with authentic published media, green exact-head CI (eight passed, six skipped each), onboarding bot approval on exact head and the initial automation bar-height bot review pending. The recorded main audit remains 611 warnings at 3083e1aa16; newer upstream main a832d9a285 has not been re-audited. Neither branch reduction is counted in the audit."
+      },
+      "cohortCounts": {
+        "total": 48,
+        "merged": 44,
+        "openNonDraft": 3,
+        "draft": 1,
+        "note": "Sidebar #18805 and tree #18804 are merged. Onboarding #18856 and automation bar heights #18857 are ready with authentic published media, green exact-head CI; onboarding is bot-approved on exact head while automation bar heights awaits its initial bot review. Budget #18533 remains open non-draft; managed-agent focus #18520 remains draft with its recorded prerequisite."
+      },
+      "mediaSnapshot": {
+        "historicalFilmsRetained": 32,
+        "historicalMp4DownloadLinksRetained": 64,
+        "newOnboardingFilm": "onboarding-slide-offset-before-after.mp4",
+        "newAutomationBarFilm": "automation-bar-height-before-after.mp4",
+        "totalFilms": 34,
+        "totalMp4DownloadLinks": 68,
+        "publishedOnboardingMediaCommit": "0e6de40f0560d2327bfbde40d80f95ff51013844",
+        "publishedAutomationBarMediaCommit": "5658681094b9e28ba0a30f8e7d40e26d83d9fc75",
+        "newProposalMediaStatus": "Both final matching packets are published. Critical immutable raw downloads return HTTP 200 with full SHA-256 matches; required media-description validation passes for both ready PRs. Live Pages deployment is not yet verified at this snapshot.",
+        "note": "All 32 prior video elements, their source/track children, 64 prior MP4 download anchors and 654 prior assets remain unchanged. All 88 onboarding and 73 automation assets retain their published bytes. Two new video sections add four MP4 download anchors."
+      },
+      "lifecycleMain": {
+        "oid": "a832d9a2850ffd8c12c14597a545b454f349ff42",
+        "checkedAt": "2026-10-23T06:34:24.448102+00:00",
+        "auditedOid": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
+        "note": "Upstream main advanced during capture. The 611-warning, zero-error audit remains pinned to 3083e1aa1660bd45769b01e5ad5ded0b6c4be302; this newer lifecycle revision has not been lint-audited. Proposal and recording heads remain unchanged."
+      }
+    },
+    {
+      "checkedAt": "2026-10-24T07:13:07.311244+00:00",
+      "cohortCount": 48,
+      "coverage": {
+        "previousCohortCheckedAt": "2026-10-23T06:38:58.021657+00:00",
+        "previousCohortCount": 48,
+        "freshPullRequests": [],
+        "mergedSincePreviousSnapshot": [
+          18856,
+          18857
+        ],
+        "existingOpenLifecycleVerified": [],
+        "note": "Only onboarding and automation-bar lifecycle metadata is refreshed from verified merge/review receipts. All 46 other proposal objects, eight prior main audits, fourteen prior proposal audits, all 34 video elements and 68 MP4 download anchors, 816 prior experiment assets, the README byte prefix and completed approval watch are preserved. Fresh exact-084a410604 audit records zero errors and 612 warnings, independently measured with the committed lock/configuration; the 611-warning audit remains dated history at 3083e1aa16. One new unchanged public audit asset is added. New proposal IDs, films and readiness are not yet recorded."
+      },
+      "cohortCounts": {
+        "total": 48,
+        "merged": 46,
+        "openNonDraft": 1,
+        "draft": 1,
+        "note": "Onboarding #18856 and automation bar heights #18857 merged on 24 October after bot and maintainer approvals. Budget #18533 remains the recorded open non-draft proposal; managed-agent focus #18520 remains the recorded draft with its existing prerequisite."
+      },
+      "mediaSnapshot": {
+        "historicalFilmsRetained": 32,
+        "historicalMp4DownloadLinksRetained": 64,
+        "newOnboardingFilm": "onboarding-slide-offset-before-after.mp4",
+        "newAutomationBarFilm": "automation-bar-height-before-after.mp4",
+        "totalFilms": 34,
+        "totalMp4DownloadLinks": 68,
+        "publishedOnboardingMediaCommit": "0e6de40f0560d2327bfbde40d80f95ff51013844",
+        "publishedAutomationBarMediaCommit": "5658681094b9e28ba0a30f8e7d40e26d83d9fc75",
+        "newProposalMediaStatus": "Both final matching packets are published. Critical immutable raw downloads return HTTP 200 with full SHA-256 matches; required media-description validation passes for both ready PRs. Live Pages deployment is not yet verified at this snapshot.",
+        "note": "All 34 existing video elements, their source/track children, 68 MP4 download anchors and 816 experiment assets retain their published bytes and recorded source heads. This preparation adds no film or media asset."
+      },
+      "lifecycleMain": {
+        "oid": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+        "checkedAt": "2026-10-24T07:13:07.311244+00:00",
+        "auditedOid": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+        "note": "The merge receipts establish integrated main through 084a410604 after both recorded merges. The fresh audit records zero errors and 612 warnings at that exact revision. This is not a claim that it remains the latest upstream tip; any later lifecycle revision must be recorded separately."
+      }
+    },
+    {
+      "checkedAt": "2026-10-24T07:29:50.488882+00:00",
+      "cohortCount": 50,
+      "coverage": {
+        "previousCohortCheckedAt": "2026-10-24T07:13:07.311244+00:00",
+        "previousCohortCount": 48,
+        "freshPullRequests": [
+          18902,
+          18903
+        ],
+        "mergedSincePreviousSnapshot": [],
+        "existingOpenLifecycleVerified": [],
+        "note": "Two draft proposal objects and their scoped target-file audits are appended. All 48 existing proposal objects, nine measured main audits, fourteen earlier proposal audits, all 34 video elements and 68 MP4 download anchors, 816 prior experiment assets plus the unchanged fresh-audit asset, the README byte prefix, related prerequisites and completed approval watch remain unchanged. New draft runtime capture, final media and exact-head CI/PR gates are pending. Independent draft reductions are not counted in the 612-warning audit at exact 084a410604."
+      },
+      "cohortCounts": {
+        "total": 50,
+        "merged": 46,
+        "openNonDraft": 1,
+        "draft": 3,
+        "note": "Backend panel height #18902 and Files tree width #18903 are drafts with CI started and authentic matched runtime/media evidence pending. No bot review is requested. Budget #18533 remains the recorded open non-draft proposal; managed-agent focus #18520 remains the existing draft prerequisite."
+      },
+      "mediaSnapshot": {
+        "historicalFilmsRetained": 32,
+        "historicalMp4DownloadLinksRetained": 64,
+        "newOnboardingFilm": "onboarding-slide-offset-before-after.mp4",
+        "newAutomationBarFilm": "automation-bar-height-before-after.mp4",
+        "totalFilms": 34,
+        "totalMp4DownloadLinks": 68,
+        "publishedOnboardingMediaCommit": "0e6de40f0560d2327bfbde40d80f95ff51013844",
+        "publishedAutomationBarMediaCommit": "5658681094b9e28ba0a30f8e7d40e26d83d9fc75",
+        "newProposalMediaStatus": "Both final matching packets are published. Critical immutable raw downloads return HTTP 200 with full SHA-256 matches; required media-description validation passes for both ready PRs. Live Pages deployment is not yet verified at this snapshot.",
+        "note": "All 34 existing video elements, source/track children, 68 MP4 download anchors and previous media/source bytes are unchanged. The two draft feature anchors contain pending-evidence text only; no new media file or video element is added.",
+        "pendingDraftEvidence": [
+          {
+            "pullRequest": 18902,
+            "featureAnchor": "backend-panel-height-film",
+            "status": "capture and final media pending"
+          },
+          {
+            "pullRequest": 18903,
+            "featureAnchor": "files-tree-width-film",
+            "status": "capture and final media pending"
+          }
+        ]
+      },
+      "lifecycleMain": {
+        "oid": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+        "checkedAt": "2026-10-24T07:13:07.311244+00:00",
+        "auditedOid": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+        "note": "The merge receipts establish integrated main through 084a410604 after both recorded merges. The fresh audit records zero errors and 612 warnings at that exact revision. This is not a claim that it remains the latest upstream tip; any later lifecycle revision must be recorded separately."
+      }
     }
   ],
   "currentCohortCounts": {
-    "total": 48,
-    "merged": 44,
-    "openNonDraft": 3,
-    "draft": 1,
-    "note": "Sidebar #18805 and tree #18804 are merged. Onboarding #18856 and automation bar heights #18857 are ready with authentic published media, green exact-head CI; onboarding is bot-approved on exact head while automation bar heights awaits its initial bot review. Budget #18533 remains open non-draft; managed-agent focus #18520 remains draft with its recorded prerequisite."
+    "total": 50,
+    "merged": 46,
+    "openNonDraft": 1,
+    "draft": 3,
+    "note": "Backend panel height #18902 and Files tree width #18903 remain drafts with approved matching authentic evidence, published media and green current CI: eight passed and six skipped each. Live Notebook feature-anchor verification is pending before readiness; no bot review is requested. Budget #18533 and managed-agent focus #18520 retain their existing status and prerequisite records."
   },
   "currentMediaSnapshot": {
-    "historicalFilmsRetained": 32,
-    "historicalMp4DownloadLinksRetained": 64,
-    "newOnboardingFilm": "onboarding-slide-offset-before-after.mp4",
-    "newAutomationBarFilm": "automation-bar-height-before-after.mp4",
-    "totalFilms": 34,
-    "totalMp4DownloadLinks": 68,
-    "publishedOnboardingMediaCommit": "0e6de40f0560d2327bfbde40d80f95ff51013844",
-    "publishedAutomationBarMediaCommit": "5658681094b9e28ba0a30f8e7d40e26d83d9fc75",
-    "newProposalMediaStatus": "Both final matching packets are published. Critical immutable raw downloads return HTTP 200 with full SHA-256 matches; required media-description validation passes for both ready PRs. Live Pages deployment is not yet verified at this snapshot.",
-    "note": "All 32 prior video elements, their source/track children, 64 prior MP4 download anchors and 654 prior assets remain unchanged. All 88 onboarding and 73 automation assets retain their published bytes. Two new video sections add four MP4 download anchors."
+    "historicalFilmsRetained": 34,
+    "historicalMp4DownloadLinksRetained": 68,
+    "newBackendPanelHeightFilm": "backend-panel-height-before-after.mp4",
+    "newFilesTreeWidthFilm": "files-tree-width-before-after.mp4",
+    "totalFilms": 36,
+    "totalMp4DownloadLinks": 72,
+    "publishedBackendMediaCommit": "a877fcbbdcf4674ad4b36b01c138f234bb377f45",
+    "newProposalMediaStatus": "Both matching packets are published, with five critical immutable raw downloads per packet returning HTTP 200 and matching full SHA-256 values. Current code and media-description CI pass: eight checks passed, six skipped each. Both PRs remain draft with no bot requests until the specific live Notebook feature anchors are verified.",
+    "note": "All 34 prior video elements and their source/track children, 68 prior MP4 download anchors and original media/source bytes are unchanged. Two new film sections use posters, captions and two MP4 download anchors each; no new GIF is claimed.",
+    "publishedFilesMediaCommit": "73d4225fa15ed071a5d06e8bf79a185d1f2bb0c2"
   },
   "nextSteps": [
     {
       "order": 1,
-      "scope": "Complete maintainer review of bot-approved onboarding and bot/maintainer review of automation bar heights; both remain ready with authentic published media and green current CI",
+      "scope": "Publish this honest draft/media snapshot and verify both specific live Notebook feature anchors; only then mark the PRs ready and request their initial bot reviews",
       "pullRequests": [
-        18856,
-        18857
+        18902,
+        18903
       ],
-      "measuredMainWarnings": 611,
-      "measuredMain": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302"
+      "measuredMainWarnings": 612,
+      "measuredMain": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "note": "Both specific feature links and final poster/film media are attached to the draft descriptions, which pass current required validation. Both PRs remain draft with no bot request until the live-anchor gate passes. Independent branch reductions remain separate from exact-main counts."
     },
     {
       "order": 2,
@@ -5643,7 +6533,7 @@
     },
     {
       "order": 3,
-      "scope": "Preserve separate numeric owners for onboarding slide offsets and automation run bar heights",
+      "scope": "Preserve separate numeric owners and exact recorded evidence after the onboarding slide-offset and automation run bar-height merges",
       "onboarding": {
         "pullRequest": 18856,
         "warningsRemoved": 1,
@@ -5660,7 +6550,7 @@
           11
         ]
       },
-      "note": "Both proposals are ready with authentic affected-state evidence, matching published media, clear independent implementation reviews, eight current checks passed and six skipped. Onboarding is bot-approved on its exact head; the initial automation bar-height bot review is pending. Numeric owners and documented limits are preserved; independent branch reductions are not integrated."
+      "note": "Both proposals merged on 24 October after bot and maintainer approvals. Their recorded media heads, numeric owners, coverage limits and historical checks are preserved. The exact-084 integrated-main audit independently confirms the two removed inline findings."
     },
     {
       "order": 4,
@@ -5668,9 +6558,9 @@
     }
   ],
   "lifecycleMain": {
-    "oid": "a832d9a2850ffd8c12c14597a545b454f349ff42",
-    "checkedAt": "2026-10-23T06:34:24.448102+00:00",
-    "auditedOid": "3083e1aa1660bd45769b01e5ad5ded0b6c4be302",
-    "note": "Upstream main advanced during capture. The 611-warning, zero-error audit remains pinned to 3083e1aa1660bd45769b01e5ad5ded0b6c4be302; this newer lifecycle revision has not been lint-audited. Proposal and recording heads remain unchanged."
+    "oid": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+    "checkedAt": "2026-10-24T08:01:38.027860+00:00",
+    "auditedOid": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+    "note": "Upstream main was rechecked for this media/draft snapshot and still matches the exact audited source 084a410604: 612 warnings and zero errors. Independent proposal reductions are not integrated."
   }
 }
