@@ -1,0 +1,2607 @@
+{
+  "schema": "paired-lint-ui-evidence-v1",
+  "area": "overview",
+  "result": "pass-reachable-preservation-with-preexisting-live-limitations",
+  "before": {
+    "schema": "lint-ui-evidence-v1",
+    "phase": "before",
+    "status": "complete-stopped",
+    "source": {
+      "path": "odie",
+      "head": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "clean": true,
+      "lockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+      "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+      "verifierTreeSha256": "1d1c1b5907056e75c40f7979587dcf6f1960d7af30ae9e172d1b3d416f79294a",
+      "mapSha256": {
+        "F02-app-shell.md": "1a02d3d65a16ed25efe655cf7a364f75eb04eef63d7385d044beb25726d403da",
+        "F07-conversation-page.md": "428668b6906eb2aedbefa05c5a6bfb5f073bc17b3c1e82e91beb738ed1494a38",
+        "F08-workspace-files-and-changes.md": "7bde667c315ec10b8f4dee2bb22a894a2892ec062e92f9641372ec113683cc83",
+        "F27-workspace-tools.md": "22d58717c2aa2d2d72ed4667e87ad9dbbca025d8d2c28609ad32ea6d29559a6f"
+      },
+      "buildTreeSha256": "2b0c94647b5296f519789d5645399daba3d3645f6501a9ae8135bf01649aae62",
+      "sourceSha256": {
+        "src/components/features/sidebar/sidebar-layout.ts": "b2818b96c353d761616dd906db1ee227bd71bae21b771ba4cf42cc57e8078471",
+        "src/components/features/sidebar/sidebar-rail-body.tsx": "989ec7bfe68293fe370094f68f7b118b765326fa4de79bc3f63d857b4819aa3f",
+        "src/components/features/conversation/conversation-overview-drawer.tsx": "0c0865fbc59ec602561241fc83ee88b3b48a54c4fbe1c27b563e9a9feafbc12c",
+        "src/tailwind.css": "482870f5b5bbf14f5a3a90f917b219469da9577ef6f7855a03468f8da2396a66"
+      }
+    },
+    "run": {
+      "runId": "before",
+      "repo": "odie",
+      "revision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "buildId": "0d613af38d4884d7",
+      "builtThisRun": true,
+      "mode": "local",
+      "baseUrl": "Local Canvas",
+      "ports": {
+        "ingress": 18800,
+        "agentServer": 18801,
+        "automation": 18802,
+        "frontend": 18803,
+        "vscode": 19801
+      },
+      "startedAt": "2026-10-24T09:19:15.288Z",
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "overrides": {
+        "OH_AGENT_SERVER_VERSION": "1.58.1",
+        "OH_AUTOMATION_VERSION": "1.25.1",
+        "MARS_WEB": "1"
+      },
+      "launcherPid": 29423,
+      "launcherPgid": 29423,
+      "versions": {
+        "agentServer": "1.58.1",
+        "sdk": "1.58.1"
+      },
+      "readyAt": "2026-10-24T09:19:39.420Z",
+      "browserPid": 29777,
+      "stoppedAt": "2026-10-24T09:32:22.601Z"
+    },
+    "runtime": {
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override1.25.1 matches committed pin; health endpoint reports status without independent version field"
+    },
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T09:32:18Z",
+        "elapsedSeconds": 3.712,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "before",
+          "browser": {
+            "stopped": true,
+            "pid": 29777
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 52,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 52,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:32:22Z",
+        "elapsedSeconds": 0.043,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T09:19:15.288Z"
+        }
+      }
+    ],
+    "measurements": [
+      {
+        "timestamp": "2026-10-24T09:23:03Z",
+        "query": [
+          "testid=conversation-overview-drawer"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 1026.984375,
+            "y": 0,
+            "width": 413.015625,
+            "height": 1000
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 420,
+            "clientWidth": 413,
+            "scrollHeight": 1000,
+            "clientHeight": 1000
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:20Z",
+        "query": [
+          "({outer:(e=>({width:getComputedStyle(e).width,box:e.getBoundingClientRect().toJSON(),inline:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration,easing:getComputedStyle(e).transitionTimingFunction,inner:{width:getComputedStyle(e.firstElementChild).width,inline:e.firstElementChild.getAttribute('style')}}))(document.querySelector('[data-testid=conversation-overview-drawer]')),handles:[...document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]')].map(e=>({html:e.outerHTML,box:e.getBoundingClientRect().toJSON()})),stored:localStorage.getItem('conversation-overview-drawer-width')})"
+        ],
+        "value": {
+          "outer": {
+            "width": "420px",
+            "box": {
+              "x": 1020,
+              "y": 0,
+              "width": 420,
+              "height": 1000,
+              "top": 0,
+              "right": 1440,
+              "bottom": 1000,
+              "left": 1020
+            },
+            "inline": "width: 420px; transition-property: width, transform, opacity;",
+            "transition": "width, transform, opacity",
+            "duration": "0.3s",
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "inner": {
+              "width": "420px",
+              "inline": "width: 420px;"
+            }
+          },
+          "handles": [
+            {
+              "html": "<div data-testid=\"conversation-overview-drawer-resize-handle\"><div class=\"relative z-10 w-0 shrink-0 self-stretch\" aria-hidden=\"true\"><div class=\"absolute inset-y-0 left-1/2 w-3 min-w-3 -translate-x-1/2 cursor-ew-resize\"></div><div class=\"pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 transition-colors bg-transparent\" aria-hidden=\"true\"></div></div></div>",
+              "box": {
+                "x": 1020,
+                "y": 0,
+                "width": 0,
+                "height": 1000,
+                "top": 0,
+                "right": 1020,
+                "bottom": 1000,
+                "left": 1020
+              }
+            }
+          ],
+          "stored": "420"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:52Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:52Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:53Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:54Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:55Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "true",
+          "width": 0,
+          "inline": "width: 0px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 0,
+          "content": 0,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:56Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:58Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:59Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "true",
+          "width": 0,
+          "inline": "width: 0px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 0,
+          "content": 0,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:24:30Z",
+        "query": [
+          "(() => {let e=document.querySelector('[data-testid=conversation-overview-drawer-resize-handle]');return [...e.querySelectorAll('*')].map(n=>({class:n.className,rect:n.getBoundingClientRect().toJSON(),height:getComputedStyle(n).height,display:getComputedStyle(n).display,pointer:getComputedStyle(n).pointerEvents,atTop:document.elementFromPoint(n.getBoundingClientRect().x+6,0)?.outerHTML.slice(0,250)}))})()"
+        ],
+        "value": [
+          {
+            "class": "relative z-10 w-0 shrink-0 self-stretch",
+            "rect": {
+              "x": 1020,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 1020,
+              "bottom": 0,
+              "left": 1020
+            },
+            "height": "0px",
+            "display": "block",
+            "pointer": "auto",
+            "atTop": "<header class=\"flex h-10 min-h-10 shrink-0 items-center gap-1.5 border-b border-border py-1 pl-1 pr-4\"><button type=\"button\" data-testid=\"conversation-overview-drawer-close\" aria-label=\"Close\" class=\"inline-flex size-7 shrink-0 cursor-pointer items-c"
+          },
+          {
+            "class": "absolute inset-y-0 left-1/2 w-3 min-w-3 -translate-x-1/2 cursor-ew-resize",
+            "rect": {
+              "x": 1014,
+              "y": 0,
+              "width": 12,
+              "height": 0,
+              "top": 0,
+              "right": 1026,
+              "bottom": 0,
+              "left": 1014
+            },
+            "height": "0px",
+            "display": "block",
+            "pointer": "auto",
+            "atTop": "<div class=\"flex h-full flex-col overflow-hidden border-l border-border bg-base-secondary\" style=\"width: 420px;\"><aside data-testid=\"conversation-overview-drawer-content\" aria-label=\"Pull Requests\" class=\"flex w-full min-h-0 flex-col overflow-hidden "
+          },
+          {
+            "class": "pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 transition-colors bg-transparent",
+            "rect": {
+              "x": 1019.5,
+              "y": 0,
+              "width": 1,
+              "height": 0,
+              "top": 0,
+              "right": 1020.5,
+              "bottom": 0,
+              "left": 1019.5
+            },
+            "height": "0px",
+            "display": "block",
+            "pointer": "none",
+            "atTop": "<header class=\"flex h-10 min-h-10 shrink-0 items-center gap-1.5 border-b border-border py-1 pl-1 pr-4\"><button type=\"button\" data-testid=\"conversation-overview-drawer-close\" aria-label=\"Close\" class=\"inline-flex size-7 shrink-0 cursor-pointer items-c"
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-24T09:24:30Z",
+        "query": [
+          "testid=conversation-overview-drawer-resize-handle >> .cursor-ew-resize"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 1014,
+            "y": 0,
+            "width": 12,
+            "height": 0
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 12,
+            "clientWidth": 12,
+            "scrollHeight": 0,
+            "clientHeight": 0
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:24:31Z",
+        "query": [
+          "({width:document.querySelector('[data-testid=conversation-overview-drawer]').getBoundingClientRect().width,stored:localStorage.getItem('conversation-overview-drawer-width')})"
+        ],
+        "value": {
+          "width": 420,
+          "stored": "420"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:24:52Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-deepsea",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:24:55Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neo",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:24:59Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:02Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "solarized-light",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:06Z",
+        "query": [
+          "({viewport:[innerWidth,innerHeight],toggle:document.querySelector('[data-testid=conversation-overview-toggle]').getAttribute('aria-label'),panelCount:document.querySelectorAll('[data-testid=conversation-overview-panel]').length,ellipsisCount:document.querySelectorAll('[data-testid=conversation-overview-ellipsis]').length,drawerContentCount:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,pageWidth:document.documentElement.scrollWidth})"
+        ],
+        "value": {
+          "viewport": [
+            390,
+            844
+          ],
+          "toggle": "Hide overview",
+          "panelCount": 0,
+          "ellipsisCount": 0,
+          "drawerContentCount": 0,
+          "pageWidth": 390
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:47Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:48Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "true",
+          "width": 0,
+          "inline": "width: 0px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 0,
+          "content": 0,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:51Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "width: 420px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:52Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "true",
+          "width": 0,
+          "inline": "width: 0px; transition-property: width, transform, opacity;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": "width: 420px;",
+          "reader": "",
+          "handle": 0,
+          "content": 0,
+          "bodyWidth": 1440
+        }
+      }
+    ],
+    "recordings": [
+      {
+        "timestamp": "2026-10-24T09:25:06Z",
+        "elapsedSeconds": 0.157,
+        "args": [
+          "browser",
+          "record",
+          "stop"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "path": "light-plus-phone-overview-blocked.mp4",
+          "seconds": 1.2,
+          "recordedSeconds": 1.1,
+          "size": "390x844",
+          "fps": 25,
+          "captures": 25,
+          "changes": 4,
+          "misses": 0,
+          "capped": false,
+          "cutSeconds": 0,
+          "url": "Local Canvas/conversations/e854abe8-9043-484c-908a-271c36e50376"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:52Z",
+        "elapsedSeconds": 0.459,
+        "args": [
+          "browser",
+          "record",
+          "stop"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "path": "neutral-desktop-open-close.mp4",
+          "seconds": 6.5,
+          "recordedSeconds": 6.1,
+          "size": "1440x1000",
+          "fps": 25,
+          "captures": 143,
+          "changes": 71,
+          "misses": 0,
+          "capped": false,
+          "cutSeconds": 0,
+          "url": "Local Canvas/conversations/e854abe8-9043-484c-908a-271c36e50376"
+        }
+      }
+    ],
+    "controlOutcomes": [
+      {
+        "timestamp": "2026-10-24T09:19:41Z",
+        "elapsedSeconds": 2.71,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=0d613af38d4884d7 run=0d613af38d4884d7 revision=fee10e3d2909",
+            "checkout build inputs unchanged since launch: launch=0d613af38d4884d7 now=0d613af38d4884d7",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=first-run-onboarding-screen,onboarding-modal,telemetry-consent-form pageErrors=0 testidsInDom=187 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:19:59Z",
+        "elapsedSeconds": 0.062,
+        "args": [
+          "browser",
+          "media",
+          "--reduced-motion",
+          "no-preference"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "plays": [],
+          "reducedMotion": "no-preference"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:20:45Z",
+        "elapsedSeconds": 0.063,
+        "args": [
+          "browser",
+          "errors",
+          "--clear"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:20:52Z",
+        "elapsedSeconds": 0.061,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:21:45Z",
+        "elapsedSeconds": 2.414,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=0d613af38d4884d7 run=0d613af38d4884d7 revision=fee10e3d2909",
+            "checkout build inputs unchanged since launch: launch=0d613af38d4884d7 now=0d613af38d4884d7",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=65 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:22:34Z",
+        "elapsedSeconds": 2.439,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=0d613af38d4884d7 run=0d613af38d4884d7 revision=fee10e3d2909",
+            "checkout build inputs unchanged since launch: launch=0d613af38d4884d7 now=0d613af38d4884d7",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=65 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:22:36Z",
+        "elapsedSeconds": 0.068,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:22:50Z",
+        "elapsedSeconds": 0.067,
+        "args": [
+          "conversation",
+          "status",
+          "e854abe8-9043-484c-908a-271c36e50376"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "id": "e854abe8-9043-484c-908a-271c36e50376",
+          "title": null,
+          "status": "idle",
+          "model": "openai/gpt-4o",
+          "workspace": "qa-overview-workspace",
+          "updatedAt": "2026-10-24T09:22:36.850128Z"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:22:50Z",
+        "elapsedSeconds": 0.063,
+        "args": [
+          "conversation",
+          "events",
+          "e854abe8-9043-484c-908a-271c36e50376",
+          "--from-start"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "total": 0,
+          "pages": 1,
+          "more": false,
+          "count": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:51Z",
+        "elapsedSeconds": 0.065,
+        "args": [
+          "browser",
+          "errors",
+          "--clear"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {
+            "external:http-error": 2,
+            "external:console.error": 2
+          },
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": [
+            {
+              "ts": "2026-10-24T09:20:46.448Z",
+              "kind": "http-error",
+              "page": "Local Canvas/mcp",
+              "appOrigin": false,
+              "url": "https://cdn.simpleicons.org/superhuman/FFFFFF",
+              "method": "GET",
+              "status": 404
+            },
+            {
+              "ts": "2026-10-24T09:20:46.448Z",
+              "kind": "console.error",
+              "page": "Local Canvas/mcp",
+              "appOrigin": false,
+              "message": "Failed to load resource: the server responded with a status of 404 ()",
+              "url": "https://cdn.simpleicons.org/superhuman/FFFFFF"
+            },
+            {
+              "ts": "2026-10-24T09:21:48.530Z",
+              "kind": "http-error",
+              "page": "Local Canvas/mcp",
+              "appOrigin": false,
+              "url": "https://cdn.simpleicons.org/superhuman/FFFFFF",
+              "method": "GET",
+              "status": 404
+            },
+            {
+              "ts": "2026-10-24T09:21:48.530Z",
+              "kind": "console.error",
+              "page": "Local Canvas/mcp",
+              "appOrigin": false,
+              "message": "Failed to load resource: the server responded with a status of 404 ()",
+              "url": "https://cdn.simpleicons.org/superhuman/FFFFFF"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:23:59Z",
+        "elapsedSeconds": 0.059,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:24:26Z",
+        "elapsedSeconds": 2.686,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=0d613af38d4884d7 run=0d613af38d4884d7 revision=fee10e3d2909",
+            "checkout build inputs unchanged since launch: launch=0d613af38d4884d7 now=0d613af38d4884d7",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=83 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:06Z",
+        "elapsedSeconds": 0.06,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:06Z",
+        "elapsedSeconds": 0.059,
+        "args": [
+          "conversation",
+          "events",
+          "e854abe8-9043-484c-908a-271c36e50376",
+          "--from-start"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "total": 0,
+          "pages": 1,
+          "more": false,
+          "count": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:52Z",
+        "elapsedSeconds": 0.083,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:25:52Z",
+        "elapsedSeconds": 0.076,
+        "args": [
+          "conversation",
+          "events",
+          "e854abe8-9043-484c-908a-271c36e50376",
+          "--from-start"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "total": 0,
+          "pages": 1,
+          "more": false,
+          "count": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:27:35Z",
+        "elapsedSeconds": 2.582,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=0d613af38d4884d7 run=0d613af38d4884d7 revision=fee10e3d2909",
+            "checkout build inputs unchanged since launch: launch=0d613af38d4884d7 now=0d613af38d4884d7",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=83 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:29:51Z",
+        "elapsedSeconds": 2.571,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=0d613af38d4884d7 run=0d613af38d4884d7 revision=fee10e3d2909",
+            "checkout build inputs unchanged since launch: launch=0d613af38d4884d7 now=0d613af38d4884d7",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=83 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:30:57Z",
+        "elapsedSeconds": 2.592,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=0d613af38d4884d7 run=0d613af38d4884d7 revision=fee10e3d2909",
+            "checkout build inputs unchanged since launch: launch=0d613af38d4884d7 now=0d613af38d4884d7",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=83 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:31:40Z",
+        "elapsedSeconds": 0.072,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      }
+    ],
+    "operationalErrors": [
+      {
+        "timestamp": "2026-10-24T09:21:22Z",
+        "elapsedSeconds": 0.106,
+        "args": [
+          "browser",
+          "click",
+          "testid=command-menu-trigger"
+        ],
+        "exitCode": 1,
+        "result": {
+          "ok": false,
+          "error": "locator.click: Error: strict mode violation: getByTestId('command-menu-trigger') resolved to 2 elements:\n    1) <button type=\"button\" aria-label=\"Search commands\" data-testid=\"command-menu-trigger\" class=\"flex h-9 min-h-9 min-w-0 items-center rounded-md transition-none motion-reduce:transition-none text-sm leading-5 w-full group gap-0 px-0 overflow-visible bg-transparent hover:bg-transparent cursor-pointer\">…</button> aka locator('button').filter({ hasText: /^Search commands$/ })\n    2) <button type=\"button\" aria-label=\"Search commands\" data-testid=\"command-menu-trigger\" class=\"flex h-9 min-h-9 min-w-0 items-center rounded-md transition-none motion-reduce:transition-none text-sm leading-5 w-full gap-2 px-2.5 overflow-hidden group justify-between border border-border-subtle bg-surface/50 hover:border-border hover:bg-surface-raised\">…</button> aka getByTestId('sidebar-mobile-drawer').getByTestId('command-menu-trigger')\n\nCall log:\n\u001b[2m  - waiting for getByTestId('command-menu-trigger')\u001b[22m\n",
+          "hint": "Several elements match. Scope it (`testid=dialog >> role=button[name=\"Save\"]`) or add `>> nth=0` after checking `browser testids`.",
+          "url": "Local Canvas/conversations",
+          "failureScreenshot": "1792833682930.png"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:21:50Z",
+        "elapsedSeconds": 30.115,
+        "args": [
+          "browser",
+          "click",
+          "testid=sidebar-collapse-toggle"
+        ],
+        "exitCode": 1,
+        "result": {
+          "ok": false,
+          "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('sidebar-collapse-toggle')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" aria-pressed=\"true\" aria-label=\"Expand sidebar\" data-testid=\"sidebar-collapse-toggle\" class=\"absolute left-1/2 top-1/2 hidden h-7 w-7 -translate-x-1/2 -translate-y-1/2 md:inline-flex items-center justify-center rounded-md transition-none motion-reduce:transition-none cursor-pointer text-muted hover:text-contrast hover:bg-surface-raised opacity-0 pointer-events-none\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <svg width=\"34\" height=\"22\" fill=\"none\" viewBox=\"0 0 148 100\" xmlns=\"http://www.w3.org/2000/svg\" class=\"shrink-0 text-contrast [&_path[fill=white]]:fill-current max-w-none\">…</svg> from <div class=\"flex h-full w-full items-center justify-start pl-2.5 transition-opacity duration-150\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m",
+          "hint": "Not found in time. Inspect the current page with `browser snapshot` or `browser testids`, then retry; check `browser errors` for crashes.",
+          "url": "Local Canvas/conversations",
+          "failureScreenshot": "1792833740666.png"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:29:59Z",
+        "elapsedSeconds": 30.122,
+        "args": [
+          "browser",
+          "bbox",
+          "role=main"
+        ],
+        "exitCode": 1,
+        "result": {
+          "ok": false,
+          "error": "locator.boundingBox: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('main')\u001b[22m\n",
+          "hint": "Not found in time. Inspect the current page with `browser snapshot` or `browser testids`, then retry; check `browser errors` for crashes.",
+          "url": "Local Canvas/customize",
+          "failureScreenshot": "1792834229537.png"
+        }
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "light-plus-desktop-420.png",
+        "sha256": "34ca7b7d030146cd0e3b07bf614cf7f0bdd003a6e0699ba07bcae7ab689fc2ff",
+        "bytes": 58023,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-overview-blocked.mp4",
+        "sha256": "409d6b6132509697e0855e2bd8e6a11f7ef98c45a87592716c040e418cc233ac",
+        "bytes": 11947,
+        "kind": "mp4"
+      },
+      {
+        "path": "light-plus-phone-overview-blocked.png",
+        "sha256": "247bdb9067b233be02f23526cce9f1c5300a957ba1a64d3da0b25f252c78c859",
+        "bytes": 18406,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-closed-outer0-inner420.png",
+        "sha256": "ee19c12b8fde4c40295a9634b64e9fccdc1d17edecf24a0af58c05119ca20f65",
+        "bytes": 49435,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-drag-noop-420.png",
+        "sha256": "8d5755a52546eb8f78340158f3d55c447887f5808a4f4ce2d034dd5e624023f0",
+        "bytes": 60136,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-escape-closed.png",
+        "sha256": "1c1b98da395ccf5fc425d0076a83e41d745692dd40af101cb49c78fd3813a86d",
+        "bytes": 49316,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-native-escape-closed.png",
+        "sha256": "eff3df9c36c1b09756c4cadca00b5fe47e48af24e7a1562ea360bc91f4d0eca8",
+        "bytes": 49191,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-open-420.png",
+        "sha256": "178847defa8deab25fcfa98310c3a069fa6d2ceb37818a62c869e47ce653adda",
+        "bytes": 57605,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-open-close.mp4",
+        "sha256": "5c47f8cd61e64b2677c184c526c9c44f377e580109c64a867459fa3c3e50f74d",
+        "bytes": 193204,
+        "kind": "mp4"
+      },
+      {
+        "path": "neutral-desktop-overview-menu.png",
+        "sha256": "0003adf9c43e8bd2ceac7246f32110a4280118bbef364386a592c03da54bd24d",
+        "bytes": 56434,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-reloaded-420.png",
+        "sha256": "ef7fdb3468204a4a9540e5121464e04806da40c5d9a09d4e12f75a73c3d632ce",
+        "bytes": 57409,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-reopened-420.png",
+        "sha256": "15f95bc46479d4528d919649b058fe2cccefe3e8ceed3eff0880ea03104e0164",
+        "bytes": 57607,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-settled-420.png",
+        "sha256": "52a49f9e35cd4747f0c0652c89014cd814701bedb9d92d9ea8ed2418e2ae3572",
+        "bytes": 57487,
+        "kind": "png"
+      },
+      {
+        "path": "openhands-deepsea-desktop-420.png",
+        "sha256": "e9bb8710cc0aa05de1dd6dab2b22f0c63a8d89a09d2f6ce8240944e0ddb648b2",
+        "bytes": 64244,
+        "kind": "png"
+      },
+      {
+        "path": "openhands-neo-desktop-420.png",
+        "sha256": "3b97926d215cd0bb9416a1d2417cc32b3abf0c4b64968762e8e6326fb4e82793",
+        "bytes": 57324,
+        "kind": "png"
+      },
+      {
+        "path": "solarized-light-desktop-420.png",
+        "sha256": "03b3e9dfe497bcc664d81f5fefba6a56d49e6e1ff60d3c2d2ced71a268c951fb",
+        "bytes": 62671,
+        "kind": "png"
+      }
+    ],
+    "context": {
+      "desktop": {
+        "theme": "OpenHands-Neutral",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "motionPreference": "no-preference",
+        "bridge": "real --mars-web enabled",
+        "llm": "unconfigured; no connect/login submitted"
+      },
+      "overview": {
+        "conversation": "Overview width check; genuine idle; no messages",
+        "fixtureBasename": "qa-overview-workspace",
+        "openWidths": [
+          420,
+          420
+        ],
+        "closedWidths": [
+          0,
+          420
+        ],
+        "storedWidth": "420",
+        "transitionProperty": "width, transform, opacity",
+        "duration": "0.3s",
+        "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "realPointerGrip": [
+          12,
+          0
+        ],
+        "events": 0
+      },
+      "phone": {
+        "theme": "Light+",
+        "viewport": [
+          390,
+          844
+        ],
+        "sidebar": "unchanged expanded drawer smoke",
+        "overview": "Known#16792:Hide overview label,0panel/ellipsis/content, no entry point",
+        "conversation": "One owned idle row titled Overview width check; sidebar desktop captures precede arrangement and remain empty."
+      }
+    },
+    "limits": [
+      "No real credentials, login, provider connection or model invocation used.",
+      "Idle API arrangement uses documented F08 offline Agent/LLM object:loopback unavailable endpoint,dummy key,tools[],autotitlefalse; zero events.",
+      "No verifier,map,fixture-driver definitions,product source,DOM or browser storage directly edited by evidence task. Fixture data is arranged through the documented CLI; theme/sidebar changes use real UI.",
+      "Real overview pointer resize/clamps/live isDragging are blocked by the preexisting12x0px pointer grip; no pass claim. Hook/unit/compiledCSS coverage belongs to implementation owner.",
+      "Phone overview entry remains blocked by known#16792; unchanged mobile branch unit coverage is separate.",
+      "All5themes are representative desktop states, not a full scenario/theme/viewport Cartesian pass.",
+      "Raw video25fps normal action timing; recorder trims initial unchanged lead-in and holds final still1s; durations do not compare performance.",
+      "Misleading intended-width filenames from first no-op drag attempt remain procedural only; selected evidence labels actual420."
+    ],
+    "scope": "shared-before",
+    "sourceGate": {
+      "approvedBy": "root",
+      "condition": "Root inspected raw stills and theme/temporal boards; settled Customize bbox0,60,390,266 captured09:31:35; all selected evidence retained.",
+      "approved": true
+    },
+    "excludedProceduralCaptureCount": 0,
+    "publicSelectionNote": "Only final selected captures are included. Failed, transitional and intended-width procedural originals remain private."
+  },
+  "after": {
+    "schema": "lint-ui-evidence-v1",
+    "phase": "overview-after",
+    "status": "complete-stopped",
+    "source": {
+      "path": "odie",
+      "head": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "clean": true,
+      "lockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+      "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+      "verifierTreeSha256": "1d1c1b5907056e75c40f7979587dcf6f1960d7af30ae9e172d1b3d416f79294a",
+      "mapSha256": {
+        "F02-app-shell.md": "1a02d3d65a16ed25efe655cf7a364f75eb04eef63d7385d044beb25726d403da",
+        "F07-conversation-page.md": "428668b6906eb2aedbefa05c5a6bfb5f073bc17b3c1e82e91beb738ed1494a38",
+        "F08-workspace-files-and-changes.md": "7bde667c315ec10b8f4dee2bb22a894a2892ec062e92f9641372ec113683cc83",
+        "F27-workspace-tools.md": "22d58717c2aa2d2d72ed4667e87ad9dbbca025d8d2c28609ad32ea6d29559a6f"
+      },
+      "buildTreeSha256": "b7ad10bfd62b025c1b59f810badb73859952ead9647deb18f7dca248919e3818",
+      "sourceSha256": {
+        "src/components/features/sidebar/sidebar-layout.ts": "b2818b96c353d761616dd906db1ee227bd71bae21b771ba4cf42cc57e8078471",
+        "src/components/features/sidebar/sidebar-rail-body.tsx": "989ec7bfe68293fe370094f68f7b118b765326fa4de79bc3f63d857b4819aa3f",
+        "src/components/features/conversation/conversation-overview-drawer.tsx": "7789d72c98704a672154b71c0d305495e67f4481a8edfb58cf9097fcff964fe9",
+        "src/tailwind.css": "ce7938950dfc9c7a313fb7a970a12639fda6c91bd5a7a3e9b1a9d011d17c41bf"
+      }
+    },
+    "run": {
+      "runId": "overview-after",
+      "repo": "odie",
+      "revision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "buildId": "c67b70a90d8ab8ee",
+      "builtThisRun": true,
+      "mode": "local",
+      "baseUrl": "Local Canvas",
+      "ports": {
+        "ingress": 18800,
+        "agentServer": 18801,
+        "automation": 18802,
+        "frontend": 18803,
+        "vscode": 19801
+      },
+      "startedAt": "2026-10-24T09:37:03.895Z",
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "overrides": {
+        "OH_AGENT_SERVER_VERSION": "1.58.1",
+        "OH_AUTOMATION_VERSION": "1.25.1",
+        "MARS_WEB": "1"
+      },
+      "launcherPid": 37168,
+      "launcherPgid": 37168,
+      "versions": {
+        "agentServer": "1.58.1",
+        "sdk": "1.58.1"
+      },
+      "readyAt": "2026-10-24T09:37:09.964Z",
+      "browserPid": 37202,
+      "stoppedAt": "2026-10-24T09:44:47.060Z"
+    },
+    "runtime": {
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override1.25.1 matches committed pin; health endpoint reports status without independent version field"
+    },
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T09:44:43Z",
+        "elapsedSeconds": 3.41,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "overview-after",
+          "browser": {
+            "stopped": true,
+            "pid": 37202
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 16,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 16,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:44:47Z",
+        "elapsedSeconds": 0.042,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "overview-after",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T09:37:03.895Z"
+        }
+      }
+    ],
+    "measurements": [
+      {
+        "timestamp": "2026-10-24T09:39:20Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "--conversation-overview-drawer-width: 420px;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": null,
+          "reader": "420px",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:21Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "true",
+          "width": 0,
+          "inline": "--conversation-overview-drawer-width: 420px;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": null,
+          "reader": "420px",
+          "handle": 0,
+          "content": 0,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:24Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "--conversation-overview-drawer-width: 420px;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": null,
+          "reader": "420px",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:24Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neutral",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "true",
+          "width": 0,
+          "inline": "--conversation-overview-drawer-width: 420px;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": null,
+          "reader": "420px",
+          "handle": 0,
+          "content": 0,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:56Z",
+        "query": [
+          "testid=conversation-overview-drawer-resize-handle >> .cursor-ew-resize"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 1014,
+            "y": 0,
+            "width": 12,
+            "height": 0
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 12,
+            "clientWidth": 12,
+            "scrollHeight": 0,
+            "clientHeight": 0
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:56Z",
+        "query": [
+          "(() => {let e=document.querySelector('[data-testid=conversation-overview-drawer-resize-handle]');return {wrapper:e.getBoundingClientRect().toJSON(),children:[...e.querySelectorAll('*')].map(n=>({rect:n.getBoundingClientRect().toJSON(),height:getComputedStyle(n).height,display:getComputedStyle(n).display})),drawer:{outerInline:document.querySelector('[data-testid=conversation-overview-drawer]').getAttribute('style'),innerInline:document.querySelector('[data-testid=conversation-overview-drawer]').firstElementChild.getAttribute('style'),dataResizing:document.querySelector('[data-testid=conversation-overview-drawer]').getAttribute('data-resizing')}}})()"
+        ],
+        "value": {
+          "wrapper": {
+            "x": 1020,
+            "y": 0,
+            "width": 0,
+            "height": 1000,
+            "top": 0,
+            "right": 1020,
+            "bottom": 1000,
+            "left": 1020
+          },
+          "children": [
+            {
+              "rect": {
+                "x": 1020,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 1020,
+                "bottom": 0,
+                "left": 1020
+              },
+              "height": "0px",
+              "display": "block"
+            },
+            {
+              "rect": {
+                "x": 1014,
+                "y": 0,
+                "width": 12,
+                "height": 0,
+                "top": 0,
+                "right": 1026,
+                "bottom": 0,
+                "left": 1014
+              },
+              "height": "0px",
+              "display": "block"
+            },
+            {
+              "rect": {
+                "x": 1019.5,
+                "y": 0,
+                "width": 1,
+                "height": 0,
+                "top": 0,
+                "right": 1020.5,
+                "bottom": 0,
+                "left": 1019.5
+              },
+              "height": "0px",
+              "display": "block"
+            }
+          ],
+          "drawer": {
+            "outerInline": "--conversation-overview-drawer-width: 420px;",
+            "innerInline": null,
+            "dataResizing": null
+          }
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:57Z",
+        "query": [
+          "({width:document.querySelector('[data-testid=conversation-overview-drawer]').getBoundingClientRect().width,innerWidth:document.querySelector('[data-testid=conversation-overview-drawer]').firstElementChild.getBoundingClientRect().width,stored:localStorage.getItem('conversation-overview-drawer-width'),reader:getComputedStyle(document.querySelector('[data-testid=conversation-overview-drawer]')).getPropertyValue('--conversation-overview-drawer-width')})"
+        ],
+        "value": {
+          "width": 420,
+          "innerWidth": 420,
+          "stored": "420",
+          "reader": "420px"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:40:00Z",
+        "query": [
+          "({width:document.querySelector('[data-testid=conversation-overview-drawer]').getBoundingClientRect().width,stored:localStorage.getItem('conversation-overview-drawer-width')})"
+        ],
+        "value": {
+          "width": 420,
+          "stored": "420"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:40:29Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-deepsea",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "--conversation-overview-drawer-width: 420px;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": null,
+          "reader": "420px",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:40:33Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "openhands-neo",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "--conversation-overview-drawer-width: 420px;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": null,
+          "reader": "420px",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:40:36Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "--conversation-overview-drawer-width: 420px;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": null,
+          "reader": "420px",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:40:40Z",
+        "query": [
+          "(() => { let e=document.querySelector('[data-testid=conversation-overview-drawer]'),i=e?.firstElementChild;return {theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],stored:localStorage.getItem('conversation-overview-drawer-width'),hidden:e?.getAttribute('aria-hidden'),width:e?.getBoundingClientRect().width,inline:e?.getAttribute('style'),transition:e&&getComputedStyle(e).transitionProperty,duration:e&&getComputedStyle(e).transitionDuration,easing:e&&getComputedStyle(e).transitionTimingFunction,innerWidth:i?.getBoundingClientRect().width,innerInline:i?.getAttribute('style'),reader:e&&getComputedStyle(e).getPropertyValue('--conversation-overview-drawer-width'),handle:document.querySelectorAll('[data-testid=conversation-overview-drawer-resize-handle]').length,content:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,bodyWidth:document.documentElement.scrollWidth} })()"
+        ],
+        "value": {
+          "theme": "solarized-light",
+          "viewport": [
+            1440,
+            1000
+          ],
+          "stored": "420",
+          "hidden": "false",
+          "width": 420,
+          "inline": "--conversation-overview-drawer-width: 420px;",
+          "transition": "width, transform, opacity",
+          "duration": "0.3s",
+          "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "innerWidth": 420,
+          "innerInline": null,
+          "reader": "420px",
+          "handle": 1,
+          "content": 1,
+          "bodyWidth": 1440
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:40:44Z",
+        "query": [
+          "({viewport:[innerWidth,innerHeight],toggle:document.querySelector('[data-testid=conversation-overview-toggle]').getAttribute('aria-label'),panelCount:document.querySelectorAll('[data-testid=conversation-overview-panel]').length,ellipsisCount:document.querySelectorAll('[data-testid=conversation-overview-ellipsis]').length,drawerContentCount:document.querySelectorAll('[data-testid=conversation-overview-drawer-content]').length,pageWidth:document.documentElement.scrollWidth})"
+        ],
+        "value": {
+          "viewport": [
+            390,
+            844
+          ],
+          "toggle": "Hide overview",
+          "panelCount": 0,
+          "ellipsisCount": 0,
+          "drawerContentCount": 0,
+          "pageWidth": 390
+        }
+      }
+    ],
+    "recordings": [
+      {
+        "timestamp": "2026-10-24T09:39:25Z",
+        "elapsedSeconds": 0.323,
+        "args": [
+          "browser",
+          "record",
+          "stop"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "path": "neutral-desktop-open-close.mp4",
+          "seconds": 6.3,
+          "recordedSeconds": 5.8,
+          "size": "1440x1000",
+          "fps": 25,
+          "captures": 138,
+          "changes": 74,
+          "misses": 0,
+          "capped": false,
+          "cutSeconds": 0,
+          "url": "Local Canvas/conversations/b53e99de-24a3-4c05-811a-d6bfee2d2d20"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:40:44Z",
+        "elapsedSeconds": 0.124,
+        "args": [
+          "browser",
+          "record",
+          "stop"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "path": "light-plus-phone-overview-blocked.mp4",
+          "seconds": 1.2,
+          "recordedSeconds": 1,
+          "size": "390x844",
+          "fps": 25,
+          "captures": 24,
+          "changes": 4,
+          "misses": 0,
+          "capped": false,
+          "cutSeconds": 0,
+          "url": "Local Canvas/conversations/b53e99de-24a3-4c05-811a-d6bfee2d2d20"
+        }
+      }
+    ],
+    "controlOutcomes": [
+      {
+        "timestamp": "2026-10-24T09:38:09Z",
+        "elapsedSeconds": 2.599,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "overview-after",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=c67b70a90d8ab8ee run=c67b70a90d8ab8ee revision=a3ddc1b35f39",
+            "checkout build inputs unchanged since launch: launch=c67b70a90d8ab8ee now=c67b70a90d8ab8ee",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=first-run-onboarding-screen,onboarding-modal,telemetry-consent-form pageErrors=0 testidsInDom=187 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:38:15Z",
+        "elapsedSeconds": 0.068,
+        "args": [
+          "browser",
+          "media",
+          "--reduced-motion",
+          "no-preference"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "plays": [],
+          "reducedMotion": "no-preference"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:38:48Z",
+        "elapsedSeconds": 0.061,
+        "args": [
+          "conversation",
+          "status",
+          "b53e99de-24a3-4c05-811a-d6bfee2d2d20"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "id": "b53e99de-24a3-4c05-811a-d6bfee2d2d20",
+          "title": null,
+          "status": "idle",
+          "model": "openai/gpt-4o",
+          "workspace": "qa-overview-workspace",
+          "updatedAt": "2026-10-24T09:38:15.911274Z"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:38:48Z",
+        "elapsedSeconds": 0.061,
+        "args": [
+          "conversation",
+          "events",
+          "b53e99de-24a3-4c05-811a-d6bfee2d2d20",
+          "--from-start"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "total": 0,
+          "pages": 1,
+          "more": false,
+          "count": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:25Z",
+        "elapsedSeconds": 0.059,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:25Z",
+        "elapsedSeconds": 0.061,
+        "args": [
+          "conversation",
+          "events",
+          "b53e99de-24a3-4c05-811a-d6bfee2d2d20",
+          "--from-start"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "total": 0,
+          "pages": 1,
+          "more": false,
+          "count": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:53Z",
+        "elapsedSeconds": 2.637,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "overview-after",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=c67b70a90d8ab8ee run=c67b70a90d8ab8ee revision=a3ddc1b35f39",
+            "checkout build inputs unchanged since launch: launch=c67b70a90d8ab8ee now=c67b70a90d8ab8ee",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=83 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:39:57Z",
+        "elapsedSeconds": 2.586,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "overview-after",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=c67b70a90d8ab8ee run=c67b70a90d8ab8ee revision=a3ddc1b35f39",
+            "checkout build inputs unchanged since launch: launch=c67b70a90d8ab8ee now=c67b70a90d8ab8ee",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=83 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:40:44Z",
+        "elapsedSeconds": 0.066,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:40:44Z",
+        "elapsedSeconds": 0.059,
+        "args": [
+          "conversation",
+          "events",
+          "b53e99de-24a3-4c05-811a-d6bfee2d2d20",
+          "--from-start"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "total": 0,
+          "pages": 1,
+          "more": false,
+          "count": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:41:13Z",
+        "elapsedSeconds": 0.06,
+        "args": [
+          "conversation",
+          "status",
+          "b53e99de-24a3-4c05-811a-d6bfee2d2d20"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "id": "b53e99de-24a3-4c05-811a-d6bfee2d2d20",
+          "title": "Overview width check",
+          "status": "idle",
+          "model": "openai/gpt-4o",
+          "workspace": "qa-overview-workspace",
+          "updatedAt": "2026-10-24T09:38:50.367137Z"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:41:13Z",
+        "elapsedSeconds": 0.058,
+        "args": [
+          "conversation",
+          "events",
+          "b53e99de-24a3-4c05-811a-d6bfee2d2d20",
+          "--kinds",
+          "ActionEvent",
+          "--from-start"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "total": 0,
+          "pages": 1,
+          "more": false,
+          "count": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:41:13Z",
+        "elapsedSeconds": 2.609,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "overview-after",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=c67b70a90d8ab8ee run=c67b70a90d8ab8ee revision=a3ddc1b35f39",
+            "checkout build inputs unchanged since launch: launch=c67b70a90d8ab8ee now=c67b70a90d8ab8ee",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1, chosen by OH_AGENT_SERVER_VERSION (default pin 1.58.1)",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=83 (hidden included)"
+          ]
+        }
+      }
+    ],
+    "operationalErrors": [
+      {
+        "timestamp": "2026-10-24T09:38:50Z",
+        "elapsedSeconds": 5.114,
+        "args": [
+          "browser",
+          "wait",
+          "text=Conversation title updated successfully",
+          "--state",
+          "hidden",
+          "--timeout",
+          "5000"
+        ],
+        "exitCode": 1,
+        "result": {
+          "ok": false,
+          "error": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Conversation title updated successfully').first() to be hidden\u001b[22m\n\u001b[2m    14 × locator resolved to visible <span class=\"[word-break:break-word] [overflow-wrap:anywhere]\">Conversation title updated successfully</span>\u001b[22m\n",
+          "hint": "Not found in time. Inspect the current page with `browser snapshot` or `browser testids`, then retry; check `browser errors` for crashes.",
+          "url": "Local Canvas/conversations/b53e99de-24a3-4c05-811a-d6bfee2d2d20",
+          "failureScreenshot": "1792834735430.png"
+        }
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "light-plus-desktop-420.png",
+        "sha256": "abe36212b9bda4fc0b88a24d8ee134c219d9eba57ce8e162f13e0f547426726d",
+        "bytes": 58035,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-overview-blocked.mp4",
+        "sha256": "10750ed53479d5a39f01e5f12162387509b6cf4fb568d6802f8fcbfdc98e9bf6",
+        "bytes": 11858,
+        "kind": "mp4"
+      },
+      {
+        "path": "light-plus-phone-overview-blocked.png",
+        "sha256": "247bdb9067b233be02f23526cce9f1c5300a957ba1a64d3da0b25f252c78c859",
+        "bytes": 18406,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-closed-outer0-inner420.png",
+        "sha256": "96b5301663a7e3ab876896fca0890203992031a6900dde413fbb09231e77adca",
+        "bytes": 49624,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-drag-noop-420.png",
+        "sha256": "8d5755a52546eb8f78340158f3d55c447887f5808a4f4ce2d034dd5e624023f0",
+        "bytes": 60136,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-native-escape-closed.png",
+        "sha256": "f50b2e6a9c991ed7836c18548d3e4a4b4a3a8d4fb1c157cd2beb2173211c0d03",
+        "bytes": 49404,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-open-420.png",
+        "sha256": "eeb5ef37420e61f64136a4c4af0fcbba0086e86634d5fa18352aa4ee754bb288",
+        "bytes": 57775,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-open-close.mp4",
+        "sha256": "aea8938beb82bcc04335e3f2e8a993537d457217298eb705c827f71645edc5cf",
+        "bytes": 204819,
+        "kind": "mp4"
+      },
+      {
+        "path": "neutral-desktop-overview-menu.png",
+        "sha256": "b4d4424b1a5e5886c06eeab46ef7062e7315045b5eaa1e71436fd2b7d4bad378",
+        "bytes": 56586,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-reloaded-420.png",
+        "sha256": "58c755f0b1ca8d69dbc3aa3f9dce75387da09b7343170389da3a1a629f4a2838",
+        "bytes": 57640,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-reopened-420.png",
+        "sha256": "24f4b9f74990dba840112205c152e78f16b6dfa4b771302620975f8999bce637",
+        "bytes": 57781,
+        "kind": "png"
+      },
+      {
+        "path": "openhands-deepsea-desktop-420.png",
+        "sha256": "e9bb8710cc0aa05de1dd6dab2b22f0c63a8d89a09d2f6ce8240944e0ddb648b2",
+        "bytes": 64244,
+        "kind": "png"
+      },
+      {
+        "path": "openhands-neo-desktop-420.png",
+        "sha256": "f63edcf95808a66550b3e1c12460bd3accdb9ab45082dbd6ed00410f439d17d6",
+        "bytes": 57336,
+        "kind": "png"
+      },
+      {
+        "path": "solarized-light-desktop-420.png",
+        "sha256": "03b3e9dfe497bcc664d81f5fefba6a56d49e6e1ff60d3c2d2ced71a268c951fb",
+        "bytes": 62671,
+        "kind": "png"
+      }
+    ],
+    "context": {
+      "desktop": {
+        "theme": "OpenHands-Neutral",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "motionPreference": "no-preference",
+        "bridge": "real --mars-web enabled",
+        "llm": "unconfigured; no connect/login submitted"
+      },
+      "overview": {
+        "conversation": "Overview width check; genuine idle; no messages",
+        "fixtureBasename": "qa-overview-workspace",
+        "openWidths": [
+          420,
+          420
+        ],
+        "closedWidths": [
+          0,
+          420
+        ],
+        "storedWidth": "420",
+        "transitionProperty": "width, transform, opacity",
+        "duration": "0.3s",
+        "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "realPointerGrip": [
+          12,
+          0
+        ],
+        "events": 0
+      },
+      "phone": {
+        "theme": "Light+",
+        "viewport": [
+          390,
+          844
+        ],
+        "sidebar": "unchanged expanded drawer smoke",
+        "overview": "Known#16792:Hide overview label,0panel/ellipsis/content, no entry point",
+        "conversation": "One owned idle row titled Overview width check; sidebar desktop captures precede arrangement and remain empty."
+      }
+    },
+    "limits": [
+      "No real credentials, login, provider connection or model invocation used.",
+      "Idle API arrangement uses documented F08 offline Agent/LLM object:loopback unavailable endpoint,dummy key,tools[],autotitlefalse; zero events.",
+      "No verifier,map,fixture-driver definitions,product source,DOM or browser storage directly edited by evidence task. Fixture data is arranged through the documented CLI; theme/sidebar changes use real UI.",
+      "Real overview pointer resize/clamps/live isDragging are blocked by the preexisting12x0px pointer grip; no pass claim. Hook/unit/compiledCSS coverage belongs to implementation owner.",
+      "Phone overview entry remains blocked by known#16792; unchanged mobile branch unit coverage is separate.",
+      "All5themes are representative desktop states, not a full scenario/theme/viewport Cartesian pass.",
+      "Raw video25fps normal action timing; recorder trims initial unchanged lead-in and holds final still1s; durations do not compare performance.",
+      "Misleading intended-width filenames from first no-op drag attempt remain procedural only; selected evidence labels actual420."
+    ],
+    "scope": "overview-drawer-css",
+    "sourceGate": {
+      "approved": true,
+      "approvedBy": "root",
+      "condition": "Root viewed raw Neutral420 open/0-420 closed/Light+420, paired all5themes, After temporal and paired blocker boards; final source/build/doctor unchanged."
+    },
+    "excludedProceduralCaptureCount": 0,
+    "publicSelectionNote": "Only final selected captures are included. Failed, transitional and intended-width procedural originals remain private."
+  },
+  "comparability": {
+    "sameLauncherConfiguration": "Production Local Agent Server and automation; --mars-web; owned installed Google Chrome private profile; no mocks",
+    "samePins": true,
+    "sameNodeNpm": true,
+    "sameBrowser": true,
+    "sameLock": true,
+    "sameVerifier": true,
+    "sameMaps": true,
+    "desktopViewport": [
+      1440,
+      1000
+    ],
+    "phoneViewport": [
+      390,
+      844
+    ],
+    "phoneTheme": "Light+",
+    "motionPreference": "no-preference"
+  },
+  "sourceGates": {
+    "before": {
+      "approvedBy": "root",
+      "condition": "Root inspected raw stills and theme/temporal boards; settled Customize bbox0,60,390,266 captured09:31:35; all selected evidence retained.",
+      "approved": true
+    },
+    "after": {
+      "approved": true,
+      "approvedBy": "root",
+      "condition": "Root viewed raw Neutral420 open/0-420 closed/Light+420, paired all5themes, After temporal and paired blocker boards; final source/build/doctor unchanged."
+    }
+  },
+  "limits": [
+    "No model message, tool invocation, real provider key, sign-in, paid API or paid resource was used.",
+    "Only owned isolated run processes/profiles/private state were stopped or purged; exported PNGs, MP4s, hashes and logs survive.",
+    "No verifier, maps, fixture definitions, product source, DOM or browser storage was directly edited. CLI API arrangement created only genuine idle conversation preconditions.",
+    "Recordings are25fps normal action timing, with recorder lead-in trimming and1s final hold. Durations are not a performance comparison.",
+    "Relative age text and timing of the recommended-automation strip may vary; no whole-page pixel identity is claimed.",
+    "All5themes are representative states, not an exhaustive cross-product.",
+    "No live520px drag,300/640px clamp, or live isDragging transition pass is claimed. Implementation unit/compiled CSS tests cover those hook/selector states separately.",
+    "Phone mobile content branch remains unchanged; unit coverage is separate from the blocked real entry point."
+  ],
+  "observedContract": {
+    "defaultOpenOuterInnerPx": [
+      420,
+      420
+    ],
+    "closedOuterInnerPx": [
+      0,
+      420
+    ],
+    "reopenedAndReloadedPx": 420,
+    "storedWidth": "420",
+    "transitionProperty": "width, transform, opacity",
+    "duration": "0.3s",
+    "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+    "closeMethods": [
+      "Real close button",
+      "Native Escape"
+    ],
+    "reader": "After uses actual --conversation-overview-drawer-width:420px with no inline width/transition; inner computed width420px, outer closes0px while inner remains420px.",
+    "state": "Genuine idle conversation;0total events and0ActionEvents before and after.",
+    "livePointerResize": "BLOCKED preexisting: wrapper0x1000, ResizeHandle root0x0, pointer target12x0. Native drag remains420px on healthy baseline and after.",
+    "phone": "BLOCKED known#16792:Hide overview toggle label but0panel/ellipsis/content; no route to target.",
+    "themes": [
+      "OpenHands-Neutral",
+      "OpenHands-DeepSea",
+      "OpenHands-Neo",
+      "Light+",
+      "Solarized Light"
+    ]
+  },
+  "operationalNotes": [
+    "After a5s toast-hidden preparation wait timed out; the toast expired before selected captures; failure retained procedurally and doctor rerun healthy.",
+    "Selected Before and After overview movies report0capture misses."
+  ],
+  "preexistingResizeProof": "overview-drawer-resize-blocker.json",
+  "originalPrivateManifestSha256": "74f4d4514a5b261c4de83c4eca9d2b70eaa6dd5f055d1700ca882aaf61271eb0"
+}

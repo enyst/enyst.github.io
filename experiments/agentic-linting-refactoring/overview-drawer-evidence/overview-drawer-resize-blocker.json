@@ -1,0 +1,163 @@
+{
+  "baselineHead": "fee10e3d2909ebbf9950578575b1ee011492171e",
+  "buildId": "0d613af38d4884d7",
+  "agentServer": "1.58.1",
+  "automation": "1.25.1",
+  "viewport": [
+    1440,
+    1000
+  ],
+  "theme": "OpenHands-Neutral",
+  "actualScreenshot": "before/neutral-desktop-drag-noop-420.png",
+  "geometry": [
+    {
+      "class": "relative z-10 w-0 shrink-0 self-stretch",
+      "rect": {
+        "x": 1020,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "right": 1020,
+        "bottom": 0,
+        "left": 1020
+      },
+      "height": "0px",
+      "display": "block",
+      "pointer": "auto",
+      "atTop": "<header class=\"flex h-10 min-h-10 shrink-0 items-center gap-1.5 border-b border-border py-1 pl-1 pr-4\"><button type=\"button\" data-testid=\"conversation-overview-drawer-close\" aria-label=\"Close\" class=\"inline-flex size-7 shrink-0 cursor-pointer items-c"
+    },
+    {
+      "class": "absolute inset-y-0 left-1/2 w-3 min-w-3 -translate-x-1/2 cursor-ew-resize",
+      "rect": {
+        "x": 1014,
+        "y": 0,
+        "width": 12,
+        "height": 0,
+        "top": 0,
+        "right": 1026,
+        "bottom": 0,
+        "left": 1014
+      },
+      "height": "0px",
+      "display": "block",
+      "pointer": "auto",
+      "atTop": "<div class=\"flex h-full flex-col overflow-hidden border-l border-border bg-base-secondary\" style=\"width: 420px;\"><aside data-testid=\"conversation-overview-drawer-content\" aria-label=\"Pull Requests\" class=\"flex w-full min-h-0 flex-col overflow-hidden "
+    },
+    {
+      "class": "pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 transition-colors bg-transparent",
+      "rect": {
+        "x": 1019.5,
+        "y": 0,
+        "width": 1,
+        "height": 0,
+        "top": 0,
+        "right": 1020.5,
+        "bottom": 0,
+        "left": 1019.5
+      },
+      "height": "0px",
+      "display": "block",
+      "pointer": "none",
+      "atTop": "<header class=\"flex h-10 min-h-10 shrink-0 items-center gap-1.5 border-b border-border py-1 pl-1 pr-4\"><button type=\"button\" data-testid=\"conversation-overview-drawer-close\" aria-label=\"Close\" class=\"inline-flex size-7 shrink-0 cursor-pointer items-c"
+    }
+  ],
+  "beforeAndAfterDrag": {
+    "width": 420,
+    "storedWidth": "420"
+  },
+  "healthyDoctorTimestamp": "2026-10-24T09:24:26Z",
+  "nativeRetry": {
+    "selector": "testid=conversation-overview-drawer-resize-handle >> .cursor-ew-resize",
+    "by": [
+      -100,
+      0
+    ],
+    "steps": 40
+  },
+  "recipe": [
+    "Launch current main via control-openhands; doctor healthy; onboard --skip; viewport desktop1440x1000",
+    "Arrange genuine idle Agent conversation via documented F08 recipe:unavailable loopback LLM,qa-not-real dummy key,tools[],autotitlefalse; no message or event",
+    "Navigate conversation; click conversation-overview-toggle; click conversation-overview-ellipsis; click conversation-overview-menu-open-git-pull_requests",
+    "Observe default420px outer and inner drawer; the plain fixture has no git repository, so PullRequests shows its real connection warning",
+    "Measure real DOM boxes: wrapper0x1000; inner ResizeHandle root0x0; pointergrip12x0",
+    "Native browser drag grip by-100,0 with40steps; width/storedremain420; doctor healthy; retry same result"
+  ],
+  "expected": "The visible left edge should expose a nonzero-height pointer target so normal dragging resizes the drawer.",
+  "actual": "Target has zero height; pointer hits content/header. Real drag cannot enter isDragging or change420px width.",
+  "scope": "Preexisting baseline product issue. Refactor verification does not fix it or claim pointer/clamp coverage.",
+  "events": 0,
+  "pageErrors": 0,
+  "appErrors": 0,
+  "syntheticState": false,
+  "afterConfirmation": {
+    "head": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+    "buildId": "c67b70a90d8ab8ee",
+    "geometry": {
+      "wrapper": {
+        "x": 1020,
+        "y": 0,
+        "width": 0,
+        "height": 1000,
+        "top": 0,
+        "right": 1020,
+        "bottom": 1000,
+        "left": 1020
+      },
+      "children": [
+        {
+          "rect": {
+            "x": 1020,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 1020,
+            "bottom": 0,
+            "left": 1020
+          },
+          "height": "0px",
+          "display": "block"
+        },
+        {
+          "rect": {
+            "x": 1014,
+            "y": 0,
+            "width": 12,
+            "height": 0,
+            "top": 0,
+            "right": 1026,
+            "bottom": 0,
+            "left": 1014
+          },
+          "height": "0px",
+          "display": "block"
+        },
+        {
+          "rect": {
+            "x": 1019.5,
+            "y": 0,
+            "width": 1,
+            "height": 0,
+            "top": 0,
+            "right": 1020.5,
+            "bottom": 0,
+            "left": 1019.5
+          },
+          "height": "0px",
+          "display": "block"
+        }
+      ],
+      "drawer": {
+        "outerInline": "--conversation-overview-drawer-width: 420px;",
+        "innerInline": null,
+        "dataResizing": null
+      }
+    },
+    "nativeDragAndHealthyRetry": "Both remain420px; stored420. No live data-resizing state was observed or claimed.",
+    "actualScreenshot": "after/neutral-desktop-drag-noop-420.png"
+  },
+  "originalPrivateProofSha256": "c4befffc9c70a52aa68ee70818d49865237971ba4c8494277dad4bf48e5d1471",
+  "issue": "https://github.com/OpenHands/OpenHands/issues/18910",
+  "actualScreenshotSha256": "8d5755a52546eb8f78340158f3d55c447887f5808a4f4ce2d034dd5e624023f0"
+}

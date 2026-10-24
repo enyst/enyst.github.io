@@ -1,0 +1,932 @@
+{
+  "schemaVersion": 1,
+  "subject": "Overview drawer",
+  "repository": "https://github.com/OpenHands/OpenHands",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18909",
+  "implementation": {
+    "before": "Drawer outer and inner widths and the transition property are supplied inline.",
+    "after": "Typed custom-property values feed CSS width and transition readers while native open/close geometry and the default 420px width are preserved.",
+    "owners": [
+      "src/components/features/conversation/conversation-overview-drawer.tsx",
+      "src/tailwind.css"
+    ]
+  },
+  "before": {
+    "head": "fee10e3d2909ebbf9950578575b1ee011492171e",
+    "buildFingerprint": "0d613af38d4884d7",
+    "builtThisRun": true,
+    "runId": "before",
+    "versions": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "reportedRuntime": {
+        "agentServer": "1.58.1",
+        "sdk": "1.58.1"
+      },
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override1.25.1 matches committed pin; health endpoint reports status without independent version field"
+    },
+    "sourceHashes": {
+      "src/components/features/sidebar/sidebar-layout.ts": "b2818b96c353d761616dd906db1ee227bd71bae21b771ba4cf42cc57e8078471",
+      "src/components/features/sidebar/sidebar-rail-body.tsx": "989ec7bfe68293fe370094f68f7b118b765326fa4de79bc3f63d857b4819aa3f",
+      "src/components/features/conversation/conversation-overview-drawer.tsx": "0c0865fbc59ec602561241fc83ee88b3b48a54c4fbe1c27b563e9a9feafbc12c",
+      "src/tailwind.css": "482870f5b5bbf14f5a3a90f917b219469da9577ef6f7855a03468f8da2396a66"
+    },
+    "packageLockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+    "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+    "verifierTreeSha256": "1d1c1b5907056e75c40f7979587dcf6f1960d7af30ae9e172d1b3d416f79294a",
+    "featureMapSha256": {
+      "F02-app-shell.md": "1a02d3d65a16ed25efe655cf7a364f75eb04eef63d7385d044beb25726d403da",
+      "F07-conversation-page.md": "428668b6906eb2aedbefa05c5a6bfb5f073bc17b3c1e82e91beb738ed1494a38",
+      "F08-workspace-files-and-changes.md": "7bde667c315ec10b8f4dee2bb22a894a2892ec062e92f9641372ec113683cc83",
+      "F27-workspace-tools.md": "22d58717c2aa2d2d72ed4667e87ad9dbbca025d8d2c28609ad32ea6d29559a6f"
+    },
+    "buildTreeSha256": "2b0c94647b5296f519789d5645399daba3d3645f6501a9ae8135bf01649aae62",
+    "captureStatus": "complete-stopped",
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T09:32:18Z",
+        "elapsedSeconds": 3.712,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "before",
+          "browser": {
+            "stopped": true,
+            "pid": 29777
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 52,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 52,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:32:22Z",
+        "elapsedSeconds": 0.043,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T09:19:15.288Z"
+        }
+      }
+    ]
+  },
+  "after": {
+    "head": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+    "buildFingerprint": "c67b70a90d8ab8ee",
+    "builtThisRun": true,
+    "runId": "overview-after",
+    "versions": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "reportedRuntime": {
+        "agentServer": "1.58.1",
+        "sdk": "1.58.1"
+      },
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override1.25.1 matches committed pin; health endpoint reports status without independent version field"
+    },
+    "sourceHashes": {
+      "src/components/features/sidebar/sidebar-layout.ts": "b2818b96c353d761616dd906db1ee227bd71bae21b771ba4cf42cc57e8078471",
+      "src/components/features/sidebar/sidebar-rail-body.tsx": "989ec7bfe68293fe370094f68f7b118b765326fa4de79bc3f63d857b4819aa3f",
+      "src/components/features/conversation/conversation-overview-drawer.tsx": "7789d72c98704a672154b71c0d305495e67f4481a8edfb58cf9097fcff964fe9",
+      "src/tailwind.css": "ce7938950dfc9c7a313fb7a970a12639fda6c91bd5a7a3e9b1a9d011d17c41bf"
+    },
+    "packageLockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+    "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+    "verifierTreeSha256": "1d1c1b5907056e75c40f7979587dcf6f1960d7af30ae9e172d1b3d416f79294a",
+    "featureMapSha256": {
+      "F02-app-shell.md": "1a02d3d65a16ed25efe655cf7a364f75eb04eef63d7385d044beb25726d403da",
+      "F07-conversation-page.md": "428668b6906eb2aedbefa05c5a6bfb5f073bc17b3c1e82e91beb738ed1494a38",
+      "F08-workspace-files-and-changes.md": "7bde667c315ec10b8f4dee2bb22a894a2892ec062e92f9641372ec113683cc83",
+      "F27-workspace-tools.md": "22d58717c2aa2d2d72ed4667e87ad9dbbca025d8d2c28609ad32ea6d29559a6f"
+    },
+    "buildTreeSha256": "b7ad10bfd62b025c1b59f810badb73859952ead9647deb18f7dca248919e3818",
+    "captureStatus": "complete-stopped",
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T09:44:43Z",
+        "elapsedSeconds": 3.41,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "overview-after",
+          "browser": {
+            "stopped": true,
+            "pid": 37202
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 16,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 16,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T09:44:47Z",
+        "elapsedSeconds": 0.042,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "overview-after",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T09:37:03.895Z"
+        }
+      }
+    ]
+  },
+  "conditions": {
+    "before": {
+      "desktop": {
+        "theme": "OpenHands-Neutral",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "motionPreference": "no-preference",
+        "bridge": "real --mars-web enabled",
+        "llm": "unconfigured; no connect/login submitted"
+      },
+      "overview": {
+        "conversation": "Overview width check; genuine idle; no messages",
+        "fixtureBasename": "qa-overview-workspace",
+        "openWidths": [
+          420,
+          420
+        ],
+        "closedWidths": [
+          0,
+          420
+        ],
+        "storedWidth": "420",
+        "transitionProperty": "width, transform, opacity",
+        "duration": "0.3s",
+        "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "realPointerGrip": [
+          12,
+          0
+        ],
+        "events": 0
+      },
+      "phone": {
+        "theme": "Light+",
+        "viewport": [
+          390,
+          844
+        ],
+        "sidebar": "unchanged expanded drawer smoke",
+        "overview": "Known#16792:Hide overview label,0panel/ellipsis/content, no entry point",
+        "conversation": "One owned idle row titled Overview width check; sidebar desktop captures precede arrangement and remain empty."
+      }
+    },
+    "after": {
+      "desktop": {
+        "theme": "OpenHands-Neutral",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "motionPreference": "no-preference",
+        "bridge": "real --mars-web enabled",
+        "llm": "unconfigured; no connect/login submitted"
+      },
+      "overview": {
+        "conversation": "Overview width check; genuine idle; no messages",
+        "fixtureBasename": "qa-overview-workspace",
+        "openWidths": [
+          420,
+          420
+        ],
+        "closedWidths": [
+          0,
+          420
+        ],
+        "storedWidth": "420",
+        "transitionProperty": "width, transform, opacity",
+        "duration": "0.3s",
+        "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "realPointerGrip": [
+          12,
+          0
+        ],
+        "events": 0
+      },
+      "phone": {
+        "theme": "Light+",
+        "viewport": [
+          390,
+          844
+        ],
+        "sidebar": "unchanged expanded drawer smoke",
+        "overview": "Known#16792:Hide overview label,0panel/ellipsis/content, no entry point",
+        "conversation": "One owned idle row titled Overview width check; sidebar desktop captures precede arrangement and remain empty."
+      }
+    },
+    "mainFilm": "Changed desktop path only; phone remains separately scoped smoke or documented blocker."
+  },
+  "limitations": [
+    "This compares the specified genuine revisions and selected observed paths. It does not claim global pixel identity, exhaustive UI coverage, or a speed/performance improvement.",
+    "Recordings use their existing 25 fps cadence without editorial speed changes. The recorder caps an initial unchanged lead-in at one second and holds the final still at least one second. Capture-clock and encoded durations are retained per source.",
+    "Labelled detail scenes are actual source crops after full-viewport context leads. Held screenshots are labelled as stills in captions and provenance; full unmodified selected PNGs and MP4s remain downloadable.",
+    "No model message, real credentials, login, provider connection, paid API or paid resource was used. The genuine unconfigured-model warning remains visible.",
+    "Representative all-five-theme screenshots do not imply every scenario/theme/viewport combination was tested.",
+    "Live native resize is blocked by the preexisting 12×0px pointer grip: the real drag is a no-op and width/storage remain 420px. Issue https://github.com/OpenHands/OpenHands/issues/18910 owns this bug; it is not fixed here.",
+    "This film verifies native opening, closing, reopening, reload and Escape at the actual 420px default, with outer 0px/inner 420px when closed. It does not claim live resize, clamp or isDragging coverage at other widths. Focused unit/compiled-CSS validation is separate.",
+    "Phone Overview entry remains blocked by known #16792. Its real blocked state is retained in the packet; no changed phone-path pass is claimed.",
+    "Erroneous intended-width filenames and the procedural resize recording are excluded; the selected bug PNG and proof JSON report actual 420px."
+  ],
+  "selectedArtifacts": [
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/light-plus-desktop-420.png",
+      "sourceSha256": "34ca7b7d030146cd0e3b07bf614cf7f0bdd003a6e0699ba07bcae7ab689fc2ff",
+      "bytes": 58023,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:24:59Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/light-plus-phone-overview-blocked.png",
+      "sourceSha256": "247bdb9067b233be02f23526cce9f1c5300a957ba1a64d3da0b25f252c78c859",
+      "bytes": 18406,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:06Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/neutral-desktop-closed-outer0-inner420.png",
+      "sourceSha256": "ee19c12b8fde4c40295a9634b64e9fccdc1d17edecf24a0af58c05119ca20f65",
+      "bytes": 49435,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:48Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/neutral-desktop-drag-noop-420.png",
+      "sourceSha256": "8d5755a52546eb8f78340158f3d55c447887f5808a4f4ce2d034dd5e624023f0",
+      "bytes": 60136,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:24:31Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/neutral-desktop-escape-closed.png",
+      "sourceSha256": "1c1b98da395ccf5fc425d0076a83e41d745692dd40af101cb49c78fd3813a86d",
+      "bytes": 49316,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:23:59Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/neutral-desktop-native-escape-closed.png",
+      "sourceSha256": "eff3df9c36c1b09756c4cadca00b5fe47e48af24e7a1562ea360bc91f4d0eca8",
+      "bytes": 49191,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:52Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/neutral-desktop-open-420.png",
+      "sourceSha256": "178847defa8deab25fcfa98310c3a069fa6d2ceb37818a62c869e47ce653adda",
+      "bytes": 57605,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:47Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/neutral-desktop-overview-menu.png",
+      "sourceSha256": "0003adf9c43e8bd2ceac7246f32110a4280118bbef364386a592c03da54bd24d",
+      "bytes": 56434,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:46Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/neutral-desktop-reloaded-420.png",
+      "sourceSha256": "ef7fdb3468204a4a9540e5121464e04806da40c5d9a09d4e12f75a73c3d632ce",
+      "bytes": 57409,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:51Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/neutral-desktop-reopened-420.png",
+      "sourceSha256": "15f95bc46479d4528d919649b058fe2cccefe3e8ceed3eff0880ea03104e0164",
+      "bytes": 57607,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:49Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/neutral-desktop-settled-420.png",
+      "sourceSha256": "52a49f9e35cd4747f0c0652c89014cd814701bedb9d92d9ea8ed2418e2ae3572",
+      "bytes": 57487,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:23:20Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/openhands-deepsea-desktop-420.png",
+      "sourceSha256": "e9bb8710cc0aa05de1dd6dab2b22f0c63a8d89a09d2f6ce8240944e0ddb648b2",
+      "bytes": 64244,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:24:52Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/openhands-neo-desktop-420.png",
+      "sourceSha256": "3b97926d215cd0bb9416a1d2417cc32b3abf0c4b64968762e8e6326fb4e82793",
+      "bytes": 57324,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:24:55Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/before/solarized-light-desktop-420.png",
+      "sourceSha256": "03b3e9dfe497bcc664d81f5fefba6a56d49e6e1ff60d3c2d2ced71a268c951fb",
+      "bytes": 62671,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:03Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "overview-drawer-evidence/before/light-plus-phone-overview-blocked.mp4",
+      "sourceSha256": "409d6b6132509697e0855e2bd8e6a11f7ef98c45a87592716c040e418cc233ac",
+      "bytes": 11947,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:06Z",
+      "sourceDurationSeconds": 1.16,
+      "sourceFps": "25/1",
+      "dimensions": [
+        390,
+        844
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "light-plus-phone-overview-blocked.mp4",
+        "seconds": 1.2,
+        "recordedSeconds": 1.1,
+        "size": "390x844",
+        "fps": 25,
+        "captures": 25,
+        "changes": 4,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations/e854abe8-9043-484c-908a-271c36e50376"
+      }
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "overview-drawer-evidence/before/neutral-desktop-open-close.mp4",
+      "sourceSha256": "5c47f8cd61e64b2677c184c526c9c44f377e580109c64a867459fa3c3e50f74d",
+      "bytes": 193204,
+      "sourceRevision": "fee10e3d2909ebbf9950578575b1ee011492171e",
+      "servedBuildFingerprint": "0d613af38d4884d7",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T09:25:52Z",
+      "sourceDurationSeconds": 6.52,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "neutral-desktop-open-close.mp4",
+        "seconds": 6.5,
+        "recordedSeconds": 6.1,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 143,
+        "changes": 71,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations/e854abe8-9043-484c-908a-271c36e50376"
+      }
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/light-plus-desktop-420.png",
+      "sourceSha256": "abe36212b9bda4fc0b88a24d8ee134c219d9eba57ce8e162f13e0f547426726d",
+      "bytes": 58035,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:40:36Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/light-plus-phone-overview-blocked.png",
+      "sourceSha256": "247bdb9067b233be02f23526cce9f1c5300a957ba1a64d3da0b25f252c78c859",
+      "bytes": 18406,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:40:43Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/neutral-desktop-closed-outer0-inner420.png",
+      "sourceSha256": "96b5301663a7e3ab876896fca0890203992031a6900dde413fbb09231e77adca",
+      "bytes": 49624,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:39:21Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/neutral-desktop-drag-noop-420.png",
+      "sourceSha256": "8d5755a52546eb8f78340158f3d55c447887f5808a4f4ce2d034dd5e624023f0",
+      "bytes": 60136,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:39:57Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/neutral-desktop-native-escape-closed.png",
+      "sourceSha256": "f50b2e6a9c991ed7836c18548d3e4a4b4a3a8d4fb1c157cd2beb2173211c0d03",
+      "bytes": 49404,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:39:25Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/neutral-desktop-open-420.png",
+      "sourceSha256": "eeb5ef37420e61f64136a4c4af0fcbba0086e86634d5fa18352aa4ee754bb288",
+      "bytes": 57775,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:39:20Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/neutral-desktop-overview-menu.png",
+      "sourceSha256": "b4d4424b1a5e5886c06eeab46ef7062e7315045b5eaa1e71436fd2b7d4bad378",
+      "bytes": 56586,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:39:19Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/neutral-desktop-reloaded-420.png",
+      "sourceSha256": "58c755f0b1ca8d69dbc3aa3f9dce75387da09b7343170389da3a1a629f4a2838",
+      "bytes": 57640,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:39:24Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/neutral-desktop-reopened-420.png",
+      "sourceSha256": "24f4b9f74990dba840112205c152e78f16b6dfa4b771302620975f8999bce637",
+      "bytes": 57781,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:39:22Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/openhands-deepsea-desktop-420.png",
+      "sourceSha256": "e9bb8710cc0aa05de1dd6dab2b22f0c63a8d89a09d2f6ce8240944e0ddb648b2",
+      "bytes": 64244,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:40:29Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/openhands-neo-desktop-420.png",
+      "sourceSha256": "f63edcf95808a66550b3e1c12460bd3accdb9ab45082dbd6ed00410f439d17d6",
+      "bytes": 57336,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:40:33Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "overview-drawer-evidence/after/solarized-light-desktop-420.png",
+      "sourceSha256": "03b3e9dfe497bcc664d81f5fefba6a56d49e6e1ff60d3c2d2ced71a268c951fb",
+      "bytes": 62671,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:40:40Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "overview-drawer-evidence/after/light-plus-phone-overview-blocked.mp4",
+      "sourceSha256": "10750ed53479d5a39f01e5f12162387509b6cf4fb568d6802f8fcbfdc98e9bf6",
+      "bytes": 11858,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:40:44Z",
+      "sourceDurationSeconds": 1.16,
+      "sourceFps": "25/1",
+      "dimensions": [
+        390,
+        844
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "light-plus-phone-overview-blocked.mp4",
+        "seconds": 1.2,
+        "recordedSeconds": 1,
+        "size": "390x844",
+        "fps": 25,
+        "captures": 24,
+        "changes": 4,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations/b53e99de-24a3-4c05-811a-d6bfee2d2d20"
+      }
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "overview-drawer-evidence/after/neutral-desktop-open-close.mp4",
+      "sourceSha256": "aea8938beb82bcc04335e3f2e8a993537d457217298eb705c827f71645edc5cf",
+      "bytes": 204819,
+      "sourceRevision": "a3ddc1b35f39268bc34e4d1ca221e6de93d17a73",
+      "servedBuildFingerprint": "c67b70a90d8ab8ee",
+      "captureRun": "overview-after",
+      "builtThisRun": true,
+      "capturePhase": "overview-after",
+      "captureRunId": "overview-after",
+      "captureTimestamp": "2026-10-24T09:39:25Z",
+      "sourceDurationSeconds": 6.32,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "neutral-desktop-open-close.mp4",
+        "seconds": 6.3,
+        "recordedSeconds": 5.8,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 138,
+        "changes": 74,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations/b53e99de-24a3-4c05-811a-d6bfee2d2d20"
+      }
+    }
+  ],
+  "receiptHandling": "PNG and MP4 sources are byte-for-byte copies. Public receipt JSON removes local capture paths and local URLs; original receipt hashes are retained.",
+  "privateReceiptSha256": {
+    "before": "1331497e90da81993efc9b27a02a4a9ec1f35dc3c646775375201ecc8f3c7fe6",
+    "after": "48de27775f4d208b741fcfadbeb0c6b1f2164b3bc70b33d11aea10eaf5f08fd5"
+  },
+  "comparisonFile": "overview-drawer-comparison.json",
+  "comparisonSha256": "c03c0b6c3599f1828236bc39fa33871ac9219ab287e44f27e150855602f5cb9e",
+  "authoritativeManifestSha256": "74f4d4514a5b261c4de83c4eca9d2b70eaa6dd5f055d1700ca882aaf61271eb0"
+}
