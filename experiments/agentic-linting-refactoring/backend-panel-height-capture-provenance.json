@@ -1,0 +1,967 @@
+{
+  "schemaVersion": 1,
+  "subject": "Backend panel height",
+  "repository": "https://github.com/OpenHands/OpenHands",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18902",
+  "implementation": {
+    "before": "Measured panel height is applied as an inline height declaration.",
+    "after": "The same measured height is forwarded through --add-backend-panel-height; the named CSS rule owns height and its transition property.",
+    "owner": "src/components/features/backends/backend-form-modal.tsx and src/tailwind.css"
+  },
+  "before": {
+    "head": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+    "buildFingerprint": "bd00d766c4f403c3",
+    "builtThisRun": true,
+    "runId": "before",
+    "versions": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "reportedRuntime": {
+        "agentServer": "1.58.1",
+        "sdk": "1.58.1"
+      },
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automation": "Committed launcher pin 1.25.1; /api/automation/health reports status only, no independent version field."
+    },
+    "sourceHashes": {
+      "src/components/features/backends/backend-form-modal.tsx": "0235d5f7353a5eb6707baaf787fc94cf34f597b81718d82733e756d4679f369c",
+      "src/routes/files-tab.tsx": "b112d931f4788fb874ec1e6a2bed8ef22d295a5ef6b52ed54de252dcf122cce5",
+      "src/tailwind.css": "228833cb4153cf3b1a97eca7b254b19360aa5840193130c1a4e0959a33e2b4b8"
+    },
+    "packageLockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+    "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+    "verifierTreeSha256": "6158572df08cd649eed2afaaeb29bb8072085cdeb0f33bc41dd6ea3466aa5971",
+    "featureMapSha256": {
+      "F25-backends-and-cloud.md": "2e92d09a49c02b5238b75401f16c749dd2196c41a39195b296906c94337d8274",
+      "F08-workspace-files-and-changes.md": "7bde667c315ec10b8f4dee2bb22a894a2892ec062e92f9641372ec113683cc83"
+    },
+    "buildTreeSha256": "0e2c8d84b1719e49bc7c122af0c03575504188af90f6bdbe4991c74ff51c8987",
+    "captureStatus": "complete-stopped",
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T07:30:30Z",
+        "elapsedSeconds": 3.467,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "before",
+          "browser": {
+            "stopped": true,
+            "pid": 1208
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 38,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 38,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:30:33Z",
+        "elapsedSeconds": 0.045,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T07:17:58.977Z"
+        }
+      }
+    ]
+  },
+  "after": {
+    "head": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+    "buildFingerprint": "19aafc29ca5edbc4",
+    "builtThisRun": true,
+    "runId": "backend-after",
+    "versions": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "reportedRuntime": {
+        "agentServer": "1.58.1",
+        "sdk": "1.58.1"
+      },
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automation": "Committed launcher pin 1.25.1; /api/automation/health reports status only, no independent version field."
+    },
+    "sourceHashes": {
+      "src/components/features/backends/backend-form-modal.tsx": "dc3d09e44f57bf872cf3a4333a6432fcdd7dcb736b51da99f087dc3be12c16be",
+      "src/routes/files-tab.tsx": "b112d931f4788fb874ec1e6a2bed8ef22d295a5ef6b52ed54de252dcf122cce5",
+      "src/tailwind.css": "482870f5b5bbf14f5a3a90f917b219469da9577ef6f7855a03468f8da2396a66"
+    },
+    "packageLockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+    "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+    "verifierTreeSha256": "6158572df08cd649eed2afaaeb29bb8072085cdeb0f33bc41dd6ea3466aa5971",
+    "featureMapSha256": {
+      "F25-backends-and-cloud.md": "2e92d09a49c02b5238b75401f16c749dd2196c41a39195b296906c94337d8274",
+      "F08-workspace-files-and-changes.md": "7bde667c315ec10b8f4dee2bb22a894a2892ec062e92f9641372ec113683cc83"
+    },
+    "buildTreeSha256": "3763021aa65023e7230d7c6bb85441fbbe70fbe11cdfd1d7a370008a00f90b87",
+    "captureStatus": "complete-stopped",
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T07:36:18Z",
+        "elapsedSeconds": 3.963,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "backend-after",
+          "browser": {
+            "stopped": true,
+            "pid": 14874
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 18,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 18,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:36:22Z",
+        "elapsedSeconds": 0.043,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "backend-after",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T07:31:02.606Z"
+        }
+      }
+    ]
+  },
+  "conditions": {
+    "desktop": {
+      "theme": "OpenHands-Neutral",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "sidebar": "expanded",
+      "gettingStarted": "collapsed, 0 complete",
+      "conversations": "empty",
+      "bridge": "real --mars-web enabled",
+      "llm": "unconfigured; no connect/login submitted"
+    },
+    "phone": {
+      "theme": "Light+",
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    "phoneSidebar": "open drawer",
+    "phoneChecklist": "collapsed, 0 complete",
+    "comparison": "Cloud Advanced, Local/Remote guidance, DigitalOcean form, Manage Backends entry, and reduced-motion samples; film focuses on Cloud/Local/Remote disclosure behavior."
+  },
+  "limitations": [
+    "This evidence compares the specified genuine Before and After revisions; it is not a claim of pixel identity, exhaustive UI coverage, or a speed/performance improvement.",
+    "The central film is curated from labelled source intervals at 25 fps without editorial speed changes. Complete original PNGs and MP4s are in the ZIP.",
+    "The source recorder caps an unchanged initial lead-in at one second and holds the final frame at least one second. Per-source capture-clock and encoded durations are retained; these can differ without changing action intervals.",
+    "No credentials, provider connection, login submission, or model invocation was used. The genuine unconfigured-model banner remains visible.",
+    "Undefined/zero initial height fallback was not forced in the real UI; consult focused code/test validation separately.",
+    "Reduced motion was exercised through browser media emulation; both actual height wrappers reported transition none in Before and After.",
+    "The Light+ DigitalOcean panel heading has preexisting white text on a light surface in both revisions. No claim is made that all provider text passes contrast checks; that segment is omitted from the central film.",
+    "Representative settled theme stills cover Neutral, DeepSea, Neo, Solarized Light and Light+; early transitional theme stills are excluded from the packet."
+  ],
+  "selectedArtifacts": [
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/light-plus-phone-cloud-expanded.png",
+      "sourceSha256": "86ed2c0eaaefe47e1cbe1cb0a86990da44dd2c631cf76e81a1491ab2ea19372e",
+      "bytes": 55101,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:22:26Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/light-plus-phone-local-expanded.png",
+      "sourceSha256": "583052eaa9d9a3e6586eadce4f81d6073793020dda3952b47d09373006492129",
+      "bytes": 50536,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:22:30Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/light-plus-phone-local-scrolled-controls.png",
+      "sourceSha256": "beecfece2a116f12fff69ff6249eb2a673942684bff72d1fa29a126f515700a1",
+      "bytes": 48564,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:30:13Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/light-plus-phone-manage-add.png",
+      "sourceSha256": "e103872df5c3181e58b199b4fd12da1dddf120457b849ebd3c377e85c4b90a77",
+      "bytes": 53005,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:22:40Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/light-plus-phone-provider.png",
+      "sourceSha256": "b6b01ebd91d219168d528cc967c4648942397bad1521d21c2bb518cc24385800",
+      "bytes": 40504,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:22:37Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/light-plus-phone-remote-expanded.png",
+      "sourceSha256": "dd1db161af1a99ebb45a2312a02d1eb50b77029dd666f8596b11a6106bf67b34",
+      "bytes": 58397,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:22:33Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/light-plus-phone-remote-scrolled-controls.png",
+      "sourceSha256": "37029d5482314d832bd85b4f72cd0fb16d88fb27c92068ed1b00fb82eddaa872",
+      "bytes": 53737,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:30:15Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/neutral-cloud-expanded.png",
+      "sourceSha256": "b1ea5746e3acb741f01f425f6c0e81ff57185f19092b73ab6dacaf8b265b79ee",
+      "bytes": 103512,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:20:36Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/neutral-cloud-initial.png",
+      "sourceSha256": "93c91e964a862a73fcdf78edcda816069a62dfdc8671b8cdc34ae52fa07aac25",
+      "bytes": 94215,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:19:37Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/neutral-local-expanded.png",
+      "sourceSha256": "80c507ae93a7dfb543937cb77fa967f0a6b9893305cf30f619f3a4cef125ec67",
+      "bytes": 96950,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:20:41Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/neutral-manage-add-advanced.png",
+      "sourceSha256": "7aee60c670a47b01836f015e3816023d4550729e7f1c850f53fa69f650727583",
+      "bytes": 96602,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:21:11Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/neutral-provider-form.png",
+      "sourceSha256": "72cbff56a42ca1624e9e47fa8c618e82f9e8be79aa76cd57ab0223135d69ef3c",
+      "bytes": 82663,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:21:07Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/neutral-remote-expanded.png",
+      "sourceSha256": "20b161734d4f913d7a3c581653bae61c606ad16c866e04ae59ca7c613fd2192e",
+      "bytes": 102555,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:20:45Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/openhands-deepsea-remote-settled.png",
+      "sourceSha256": "1cf6ee67758b923229c3a8ff6e44ded6b3588451a894c9676626344dd193b3e3",
+      "bytes": 122048,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:23:11Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/openhands-neo-remote-settled.png",
+      "sourceSha256": "20b161734d4f913d7a3c581653bae61c606ad16c866e04ae59ca7c613fd2192e",
+      "bytes": 102555,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:23:16Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/before/solarized-light-remote-settled.png",
+      "sourceSha256": "9769192add28abd33505c237e5de3becac0029b7bf221c9ad6a3262921aeff7a",
+      "bytes": 117170,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:23:21Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "backend-panel-height-evidence/before/light-plus-phone-disclosures.mp4",
+      "sourceSha256": "2fb1c0bc5e1ee47c6b7cae65f69f73745dbb2ed487125c0ceb970b43db7b28d3",
+      "bytes": 468622,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:22:40Z",
+      "sourceDurationSeconds": 16.8,
+      "sourceFps": "25/1",
+      "dimensions": [
+        390,
+        844
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "light-plus-phone-disclosures.mp4",
+        "seconds": 16.8,
+        "recordedSeconds": 40,
+        "size": "390x844",
+        "fps": 25,
+        "captures": 958,
+        "changes": 150,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations",
+        "framesDir": "1792826520438"
+      }
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "backend-panel-height-evidence/before/neutral-desktop-disclosures.mp4",
+      "sourceSha256": "4fb41b6b8df10b163c8cfa3ee8c18456b38296b32f24bfbde6eeec2523744eb0",
+      "bytes": 665720,
+      "sourceRevision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "servedBuildFingerprint": "bd00d766c4f403c3",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T07:21:11Z",
+      "sourceDurationSeconds": 37.08,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "neutral-desktop-disclosures.mp4",
+        "seconds": 37.1,
+        "recordedSeconds": 37.1,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 877,
+        "changes": 145,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations",
+        "framesDir": "1792826434810"
+      }
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/light-plus-phone-cloud-expanded.png",
+      "sourceSha256": "22240affc34b1f5e2a136a8edc4a213a2946de06decb2555b32970a58cc33d2f",
+      "bytes": 55099,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:21Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/light-plus-phone-local-expanded.png",
+      "sourceSha256": "583052eaa9d9a3e6586eadce4f81d6073793020dda3952b47d09373006492129",
+      "bytes": 50536,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:25Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/light-plus-phone-local-scrolled-controls.png",
+      "sourceSha256": "beecfece2a116f12fff69ff6249eb2a673942684bff72d1fa29a126f515700a1",
+      "bytes": 48564,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:59Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/light-plus-phone-manage-add.png",
+      "sourceSha256": "e103872df5c3181e58b199b4fd12da1dddf120457b849ebd3c377e85c4b90a77",
+      "bytes": 53005,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:35Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/light-plus-phone-provider.png",
+      "sourceSha256": "fbf744daac5ad87d7d46abb83bc375d54b0f9633fd91ad4282f145b787ff81b4",
+      "bytes": 40502,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:32Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/light-plus-phone-remote-expanded.png",
+      "sourceSha256": "dd1db161af1a99ebb45a2312a02d1eb50b77029dd666f8596b11a6106bf67b34",
+      "bytes": 58397,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:28Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/light-plus-phone-remote-scrolled-controls.png",
+      "sourceSha256": "37029d5482314d832bd85b4f72cd0fb16d88fb27c92068ed1b00fb82eddaa872",
+      "bytes": 53737,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:34:01Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/neutral-cloud-expanded.png",
+      "sourceSha256": "b1ea5746e3acb741f01f425f6c0e81ff57185f19092b73ab6dacaf8b265b79ee",
+      "bytes": 103512,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:32:20Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/neutral-cloud-initial.png",
+      "sourceSha256": "41cdb25a234cd7acb651df7db69dc84e815a484c71c3e4a850eb43f9e3a98b3a",
+      "bytes": 94222,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:32:18Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/neutral-local-expanded.png",
+      "sourceSha256": "070edf7f037203578e9b503615ab10eb9358c3acd511c0fbcb063f60ebe99760",
+      "bytes": 96956,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:32:24Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/neutral-manage-add-advanced.png",
+      "sourceSha256": "7aee60c670a47b01836f015e3816023d4550729e7f1c850f53fa69f650727583",
+      "bytes": 96602,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:32:40Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/neutral-provider-form.png",
+      "sourceSha256": "6015118e50899ee60fb17862a617f684df374630a28c84cb39de45687cb0e3ff",
+      "bytes": 82670,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:32:36Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/neutral-remote-expanded.png",
+      "sourceSha256": "979d6daa3b463f73aa0476ae624fca80cc44a2906e6cae239ca3e37911268a63",
+      "bytes": 102561,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:32:29Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/openhands-deepsea-remote-settled.png",
+      "sourceSha256": "1cf6ee67758b923229c3a8ff6e44ded6b3588451a894c9676626344dd193b3e3",
+      "bytes": 122048,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:05Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/openhands-neo-remote-settled.png",
+      "sourceSha256": "20b161734d4f913d7a3c581653bae61c606ad16c866e04ae59ca7c613fd2192e",
+      "bytes": 102555,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:10Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "backend-panel-height-evidence/after/solarized-light-remote-settled.png",
+      "sourceSha256": "9769192add28abd33505c237e5de3becac0029b7bf221c9ad6a3262921aeff7a",
+      "bytes": 117170,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:15Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "backend-panel-height-evidence/after/light-plus-phone-disclosures.mp4",
+      "sourceSha256": "f6ba4ee4b5fb32a13337d5eb423cf70f3eb09fa1fb3d4fb49c0a20dcdf3822bf",
+      "bytes": 457378,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:33:35Z",
+      "sourceDurationSeconds": 15.92,
+      "sourceFps": "25/1",
+      "dimensions": [
+        390,
+        844
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "light-plus-phone-disclosures.mp4",
+        "seconds": 15.9,
+        "recordedSeconds": 15.3,
+        "size": "390x844",
+        "fps": 25,
+        "captures": 367,
+        "changes": 147,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations",
+        "framesDir": "1792827200368"
+      }
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "backend-panel-height-evidence/after/neutral-desktop-disclosures.mp4",
+      "sourceSha256": "f2935aa908b8cd262e57ca93cb4110802bfdf42f4ae3abb27eee5d6416254ea0",
+      "bytes": 565744,
+      "sourceRevision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "servedBuildFingerprint": "19aafc29ca5edbc4",
+      "captureRun": "backend-after",
+      "builtThisRun": true,
+      "capturePhase": "backend-after",
+      "captureRunId": "backend-after",
+      "captureTimestamp": "2026-10-24T07:32:40Z",
+      "sourceDurationSeconds": 22.12,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "neutral-desktop-disclosures.mp4",
+        "seconds": 22.1,
+        "recordedSeconds": 22.1,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 529,
+        "changes": 277,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations",
+        "framesDir": "1792827138622"
+      }
+    }
+  ],
+  "receiptHandling": "PNG and MP4 sources are byte-for-byte copies. Public receipt JSON removes local capture paths and local URLs; original receipt hashes are retained.",
+  "privateReceiptSha256": {
+    "before": "b3851d38091a77951e2a18432bfb9b7f1732c9069e2fef8e62f632db51ee5013",
+    "after": "1d9a79e56183b03c5f63b6b183e90361aaa95ddce396c412532ec22dfaa90cb8"
+  },
+  "comparisonFile": "backend-panel-height-comparison.json",
+  "comparisonSha256": "11cbb9402617424c4da850c72365904f6a12b10d6cf06dfd2a8971d439640d35",
+  "authoritativeManifestSha256": "fb8d6e3c03ef4ec1deb4f3dc92de391a06a0da9bb3259174e745647aff826dd5"
+}

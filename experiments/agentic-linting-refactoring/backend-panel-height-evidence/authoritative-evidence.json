@@ -1,0 +1,2820 @@
+{
+  "schema": "paired-lint-ui-evidence-v1",
+  "area": "backend",
+  "result": "pass-observed-user-paths",
+  "before": {
+    "schema": "lint-ui-evidence-v1",
+    "phase": "before",
+    "status": "complete-stopped",
+    "source": {
+      "path": "odie",
+      "head": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "clean": true,
+      "lockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+      "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+      "verifierTreeSha256": "6158572df08cd649eed2afaaeb29bb8072085cdeb0f33bc41dd6ea3466aa5971",
+      "mapSha256": {
+        "F25-backends-and-cloud.md": "2e92d09a49c02b5238b75401f16c749dd2196c41a39195b296906c94337d8274",
+        "F08-workspace-files-and-changes.md": "7bde667c315ec10b8f4dee2bb22a894a2892ec062e92f9641372ec113683cc83"
+      },
+      "buildTreeSha256": "0e2c8d84b1719e49bc7c122af0c03575504188af90f6bdbe4991c74ff51c8987",
+      "sourceSha256": {
+        "src/components/features/backends/backend-form-modal.tsx": "0235d5f7353a5eb6707baaf787fc94cf34f597b81718d82733e756d4679f369c",
+        "src/routes/files-tab.tsx": "b112d931f4788fb874ec1e6a2bed8ef22d295a5ef6b52ed54de252dcf122cce5",
+        "src/tailwind.css": "228833cb4153cf3b1a97eca7b254b19360aa5840193130c1a4e0959a33e2b4b8"
+      }
+    },
+    "run": {
+      "runId": "before",
+      "repo": "odie",
+      "revision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+      "buildId": "bd00d766c4f403c3",
+      "builtThisRun": true,
+      "mode": "local",
+      "baseUrl": "Local Canvas",
+      "ports": {
+        "ingress": 18800,
+        "agentServer": 18801,
+        "automation": 18802,
+        "frontend": 18803,
+        "vscode": 19801
+      },
+      "startedAt": "2026-10-24T07:17:58.977Z",
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "overrides": {
+        "MARS_WEB": "1"
+      },
+      "launcherPid": 208,
+      "launcherPgid": 208,
+      "versions": {
+        "agentServer": "1.58.1",
+        "sdk": "1.58.1"
+      },
+      "readyAt": "2026-10-24T07:18:30.629Z",
+      "browserPid": 1208,
+      "stoppedAt": "2026-10-24T07:30:33.778Z"
+    },
+    "runtime": {
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automation": "Committed launcher pin 1.25.1; /api/automation/health reports status only, no independent version field."
+    },
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T07:30:30Z",
+        "elapsedSeconds": 3.467,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "before",
+          "browser": {
+            "stopped": true,
+            "pid": 1208
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 38,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 38,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:30:33Z",
+        "elapsedSeconds": 0.045,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "084a4106040a0d64a02ac04eecf88ea8a8a8f31b",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T07:17:58.977Z"
+        }
+      }
+    ],
+    "commandLog": "before-commands.jsonl",
+    "measurements": [
+      {
+        "timestamp": "2026-10-24T07:20:34Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],checklistExpanded:document.querySelector('button[aria-label=\"Expand checklist\"]')!==null,panels:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,contentHeight:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration,easing:getComputedStyle(e).transitionTimingFunction})),modalCount:document.querySelectorAll('[data-testid=add-backend-modal]').length,advanced:document.querySelector('[data-testid=add-backend-advanced-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": null,
+          "viewport": [
+            1440,
+            1000
+          ],
+          "checklistExpanded": true,
+          "panels": [
+            {
+              "height": 378,
+              "contentHeight": 378,
+              "style": "height: 378px;",
+              "transition": "height",
+              "duration": "0.3s",
+              "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+            },
+            {
+              "height": 216,
+              "contentHeight": 216,
+              "style": "height: 216px;",
+              "transition": "height",
+              "duration": "0.3s",
+              "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+            }
+          ],
+          "modalCount": 1,
+          "advanced": "false"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:20:36Z",
+        "query": [
+          "[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')}))"
+        ],
+        "value": [
+          {
+            "height": 424.75,
+            "content": 424.75,
+            "style": "height: 424.75px;"
+          },
+          {
+            "height": 262.75,
+            "content": 262.75,
+            "style": "height: 262.75px;"
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-24T07:20:41Z",
+        "query": [
+          "[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')}))"
+        ],
+        "value": [
+          {
+            "height": 648,
+            "content": 648,
+            "style": "height: 648px;"
+          },
+          {
+            "height": 486,
+            "content": 486,
+            "style": "height: 486px;"
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-24T07:20:45Z",
+        "query": [
+          "[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')}))"
+        ],
+        "value": [
+          {
+            "height": 696,
+            "content": 696,
+            "style": "height: 696px;"
+          },
+          {
+            "height": 534,
+            "content": 534,
+            "style": "height: 534px;"
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-24T07:21:07Z",
+        "query": [
+          "[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')}))"
+        ],
+        "value": [
+          {
+            "height": 406.5,
+            "content": 406.5,
+            "style": "height: 406.5px;"
+          },
+          {
+            "height": 98,
+            "content": 98,
+            "style": "height: 98px;"
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-24T07:21:49Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')})),remoteExpanded:document.querySelector('[data-testid=add-backend-remote-guidance-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "openhands-deepsea",
+          "wrappers": [
+            {
+              "height": 526.78125,
+              "content": 696,
+              "style": "height: 696px;"
+            },
+            {
+              "height": 534,
+              "content": 534,
+              "style": "height: 534px;"
+            }
+          ],
+          "remoteExpanded": "true"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:21:49Z",
+        "query": [
+          "testid=add-backend-modal"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 360,
+            "y": 186.046875,
+            "width": 720,
+            "height": 627.90625
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 718,
+            "clientWidth": 718,
+            "scrollHeight": 626,
+            "clientHeight": 626
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:21:53Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')})),remoteExpanded:document.querySelector('[data-testid=add-backend-remote-guidance-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "openhands-neo",
+          "wrappers": [
+            {
+              "height": 527.09375,
+              "content": 696,
+              "style": "height: 696px;"
+            },
+            {
+              "height": 534,
+              "content": 534,
+              "style": "height: 534px;"
+            }
+          ],
+          "remoteExpanded": "true"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:21:53Z",
+        "query": [
+          "testid=add-backend-modal"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 360,
+            "y": 174.390625,
+            "width": 720,
+            "height": 651.203125
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 718,
+            "clientWidth": 718,
+            "scrollHeight": 649,
+            "clientHeight": 649
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:21:57Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')})),remoteExpanded:document.querySelector('[data-testid=add-backend-remote-guidance-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "solarized-light",
+          "wrappers": [
+            {
+              "height": 522.625,
+              "content": 696,
+              "style": "height: 696px;"
+            },
+            {
+              "height": 534,
+              "content": 534,
+              "style": "height: 534px;"
+            }
+          ],
+          "remoteExpanded": "true"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:21:57Z",
+        "query": [
+          "testid=add-backend-modal"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 360,
+            "y": 187.5,
+            "width": 720,
+            "height": 625
+          },
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 718,
+            "clientWidth": 718,
+            "scrollHeight": 623,
+            "clientHeight": 623
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:00Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],modal:document.querySelectorAll('[data-testid=add-backend-modal]').length,drawer:!!document.querySelector('[data-testid=sidebar-mobile-drawer]'),wrappers:document.querySelectorAll('[data-testid=add-backend-panel-height]').length,advanced:document.querySelector('[data-testid=add-backend-advanced-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "modal": 1,
+          "drawer": true,
+          "wrappers": 2,
+          "advanced": "false"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:26Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 523.5,
+              "content": 523.5,
+              "style": "height: 523.5px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 285.5,
+              "content": 285.5,
+              "style": "height: 285.5px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-advanced-toggle",
+              "expanded": "true"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:26Z",
+        "query": [
+          "testid=add-backend-modal"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 19.5,
+            "y": 135.25,
+            "width": 351,
+            "height": 573.5
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 349,
+            "clientWidth": 349,
+            "scrollHeight": 572,
+            "clientHeight": 572
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:27Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 454,
+              "content": 454,
+              "style": "height: 454px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 216,
+              "content": 216,
+              "style": "height: 216px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-advanced-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:28Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 620,
+              "content": 620,
+              "style": "height: 620px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 382,
+              "content": 382,
+              "style": "height: 382px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-local-guidance-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:29Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 780,
+              "content": 780,
+              "style": "height: 780px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 542,
+              "content": 542,
+              "style": "height: 542px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-local-guidance-toggle",
+              "expanded": "true"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:30Z",
+        "query": [
+          "testid=add-backend-modal"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 19.5,
+            "y": 33.765625,
+            "width": 351,
+            "height": 776.46875
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 349,
+            "clientWidth": 349,
+            "scrollHeight": 828,
+            "clientHeight": 774
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:31Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 620,
+              "content": 620,
+              "style": "height: 620px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 382,
+              "content": 382,
+              "style": "height: 382px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-local-guidance-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:32Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 620,
+              "content": 620,
+              "style": "height: 620px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 382,
+              "content": 382,
+              "style": "height: 382px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-remote-guidance-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:33Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 832,
+              "content": 832,
+              "style": "height: 832px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 594,
+              "content": 594,
+              "style": "height: 594px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-remote-guidance-toggle",
+              "expanded": "true"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:33Z",
+        "query": [
+          "testid=add-backend-modal"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 19.5,
+            "y": 33.765625,
+            "width": 351,
+            "height": 776.46875
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 349,
+            "clientWidth": 349,
+            "scrollHeight": 880,
+            "clientHeight": 774
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:35Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 620,
+              "content": 620,
+              "style": "height: 620px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 382,
+              "content": 382,
+              "style": "height: 382px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-remote-guidance-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:36Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 336,
+              "content": 336,
+              "style": "height: 336px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 98,
+              "content": 98,
+              "style": "height: 98px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:37Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 448.75,
+              "content": 448.75,
+              "style": "height: 448.75px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 98,
+              "content": 98,
+              "style": "height: 98px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:40Z",
+        "query": [
+          "({reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,transition:getComputedStyle(e).transitionProperty}))})"
+        ],
+        "value": {
+          "reduced": true,
+          "wrappers": [
+            {
+              "height": 523.5,
+              "transition": "none"
+            },
+            {
+              "height": 285.5,
+              "transition": "none"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:40Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 454,
+              "content": 454,
+              "style": "height: 454px;",
+              "transition": "none",
+              "duration": "0.3s"
+            },
+            {
+              "height": 216,
+              "content": 216,
+              "style": "height: 216px;",
+              "transition": "none",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-advanced-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:23:11Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')})),remoteExpanded:document.querySelector('[data-testid=add-backend-remote-guidance-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "openhands-deepsea",
+          "wrappers": [
+            {
+              "height": 696,
+              "content": 696,
+              "style": "height: 696px;"
+            },
+            {
+              "height": 534,
+              "content": 534,
+              "style": "height: 534px;"
+            }
+          ],
+          "remoteExpanded": "true"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:23:16Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')})),remoteExpanded:document.querySelector('[data-testid=add-backend-remote-guidance-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "openhands-neo",
+          "wrappers": [
+            {
+              "height": 696,
+              "content": 696,
+              "style": "height: 696px;"
+            },
+            {
+              "height": 534,
+              "content": 534,
+              "style": "height: 534px;"
+            }
+          ],
+          "remoteExpanded": "true"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:23:21Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')})),remoteExpanded:document.querySelector('[data-testid=add-backend-remote-guidance-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "solarized-light",
+          "wrappers": [
+            {
+              "height": 696,
+              "content": 696,
+              "style": "height: 696px;"
+            },
+            {
+              "height": 534,
+              "content": 534,
+              "style": "height: 534px;"
+            }
+          ],
+          "remoteExpanded": "true"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:30:13Z",
+        "query": [
+          "testid=add-backend-modal >> role=button[name=\"Connect\"][exact]"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 44.5,
+            "y": 748.765625,
+            "width": 301,
+            "height": 36
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 299,
+            "clientWidth": 299,
+            "scrollHeight": 34,
+            "clientHeight": 34
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:30:15Z",
+        "query": [
+          "testid=add-backend-modal >> role=button[name=\"Connect\"][exact]"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 44.5,
+            "y": 748.765625,
+            "width": 301,
+            "height": 36
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 299,
+            "clientWidth": 299,
+            "scrollHeight": 34,
+            "clientHeight": 34
+          },
+          "pageHorizontalOverflow": false
+        }
+      }
+    ],
+    "recordings": [
+      {
+        "timestamp": "2026-10-24T07:21:11Z",
+        "elapsedSeconds": 1.384,
+        "args": [
+          "browser",
+          "record",
+          "stop",
+          "--keep-frames"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "path": "neutral-desktop-disclosures.mp4",
+          "seconds": 37.1,
+          "recordedSeconds": 37.1,
+          "size": "1440x1000",
+          "fps": 25,
+          "captures": 877,
+          "changes": 145,
+          "misses": 0,
+          "capped": false,
+          "cutSeconds": 0,
+          "url": "Local Canvas/conversations",
+          "framesDir": "1792826434810"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:40Z",
+        "elapsedSeconds": 0.312,
+        "args": [
+          "browser",
+          "record",
+          "stop",
+          "--keep-frames"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "path": "light-plus-phone-disclosures.mp4",
+          "seconds": 16.8,
+          "recordedSeconds": 40,
+          "size": "390x844",
+          "fps": 25,
+          "captures": 958,
+          "changes": 150,
+          "misses": 0,
+          "capped": false,
+          "cutSeconds": 0,
+          "url": "Local Canvas/conversations",
+          "framesDir": "1792826520438"
+        }
+      }
+    ],
+    "controlOutcomes": [
+      {
+        "timestamp": "2026-10-24T07:19:06Z",
+        "elapsedSeconds": 2.764,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [local]/node [local]/agent",
+            "launcher is this run's agent-canvas: [local]/node [local]/agent",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=bd00d766c4f403c3 run=bd00d766c4f403c3 revision=084a4106040a",
+            "checkout build inputs unchanged since launch: launch=bd00d766c4f403c3 now=bd00d766c4f403c3",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1 pin=1.58.1",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=first-run-onboarding-screen,onboarding-modal,telemetry-consent-form pageErrors=0 testidsInDom=187 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:40Z",
+        "elapsedSeconds": 0.075,
+        "args": [
+          "browser",
+          "media",
+          "--reduced-motion",
+          "reduce"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "plays": [],
+          "reducedMotion": "reduce"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:22:40Z",
+        "elapsedSeconds": 0.067,
+        "args": [
+          "browser",
+          "media",
+          "--reduced-motion",
+          "no-preference"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "plays": [],
+          "reducedMotion": "no-preference"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:23:36Z",
+        "elapsedSeconds": 0.062,
+        "args": [
+          "conversation",
+          "status",
+          "945c00ce-9cc4-42c0-be04-7a614c770f02"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "id": "945c00ce-9cc4-42c0-be04-7a614c770f02",
+          "title": null,
+          "status": "idle",
+          "model": "openai/gpt-4o",
+          "workspace": "qa-width-workspace",
+          "updatedAt": "2026-10-24T07:23:22.805867Z"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:23:36Z",
+        "elapsedSeconds": 0.062,
+        "args": [
+          "conversation",
+          "events",
+          "945c00ce-9cc4-42c0-be04-7a614c770f02",
+          "--kinds",
+          "ActionEvent",
+          "--from-start"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "total": 0,
+          "pages": 1,
+          "more": false,
+          "count": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:24:25Z",
+        "elapsedSeconds": 2.618,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [local]/node [local]/agent",
+            "launcher is this run's agent-canvas: [local]/node [local]/agent",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=bd00d766c4f403c3 run=bd00d766c4f403c3 revision=084a4106040a",
+            "checkout build inputs unchanged since launch: launch=bd00d766c4f403c3 now=bd00d766c4f403c3",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1 pin=1.58.1",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=83 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:27:27Z",
+        "elapsedSeconds": 0.057,
+        "args": [
+          "conversation",
+          "events",
+          "945c00ce-9cc4-42c0-be04-7a614c770f02",
+          "--kinds",
+          "ActionEvent",
+          "--from-start"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "total": 0,
+          "pages": 1,
+          "more": false,
+          "count": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:27:28Z",
+        "elapsedSeconds": 0.056,
+        "args": [
+          "conversation",
+          "status",
+          "945c00ce-9cc4-42c0-be04-7a614c770f02"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "id": "945c00ce-9cc4-42c0-be04-7a614c770f02",
+          "title": "Files width check",
+          "status": "idle",
+          "model": "openai/gpt-4o",
+          "workspace": "qa-width-workspace",
+          "updatedAt": "2026-10-24T07:24:52.993425Z"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:27:28Z",
+        "elapsedSeconds": 0.055,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:30:27Z",
+        "elapsedSeconds": 2.602,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=bd00d766c4f403c3 run=bd00d766c4f403c3 revision=084a4106040a",
+            "checkout build inputs unchanged since launch: launch=bd00d766c4f403c3 now=bd00d766c4f403c3",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1 pin=1.58.1",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=83 (hidden included)"
+          ]
+        }
+      }
+    ],
+    "errors": [
+      {
+        "timestamp": "2026-10-24T07:23:38Z",
+        "elapsedSeconds": 30.102,
+        "args": [
+          "browser",
+          "click",
+          "testid=file-tree-dir-src"
+        ],
+        "exitCode": 1,
+        "result": {
+          "ok": false,
+          "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('file-tree-dir-src')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" aria-expanded=\"false\" data-testid=\"file-tree-dir-src\" class=\"flex w-full items-center gap-1.5 py-1 pr-2 pl-(--file-tree-row-indent) text-left text-sm text-contrast hover:bg-tertiary cursor-pointer\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not stable\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is not stable\u001b[22m\n\u001b[2m  2 × retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m",
+          "hint": "Not found in time. Inspect the current page with `browser snapshot` or `browser testids`, then retry; check `browser errors` for crashes.",
+          "url": "Local Canvas/conversations/945c00ce-9cc4-42c0-be04-7a614c770f02",
+          "failureScreenshot": "1792826648258.png"
+        }
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "light-plus-phone-cloud-expanded.png",
+        "sha256": "86ed2c0eaaefe47e1cbe1cb0a86990da44dd2c631cf76e81a1491ab2ea19372e",
+        "bytes": 55101,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-disclosures.mp4",
+        "sha256": "2fb1c0bc5e1ee47c6b7cae65f69f73745dbb2ed487125c0ceb970b43db7b28d3",
+        "bytes": 468622,
+        "kind": "mp4"
+      },
+      {
+        "path": "light-plus-phone-local-expanded.png",
+        "sha256": "583052eaa9d9a3e6586eadce4f81d6073793020dda3952b47d09373006492129",
+        "bytes": 50536,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-local-scrolled-controls.png",
+        "sha256": "beecfece2a116f12fff69ff6249eb2a673942684bff72d1fa29a126f515700a1",
+        "bytes": 48564,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-manage-add.png",
+        "sha256": "e103872df5c3181e58b199b4fd12da1dddf120457b849ebd3c377e85c4b90a77",
+        "bytes": 53005,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-provider.png",
+        "sha256": "b6b01ebd91d219168d528cc967c4648942397bad1521d21c2bb518cc24385800",
+        "bytes": 40504,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-remote-expanded.png",
+        "sha256": "dd1db161af1a99ebb45a2312a02d1eb50b77029dd666f8596b11a6106bf67b34",
+        "bytes": 58397,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-remote-scrolled-controls.png",
+        "sha256": "37029d5482314d832bd85b4f72cd0fb16d88fb27c92068ed1b00fb82eddaa872",
+        "bytes": 53737,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-cloud-expanded.png",
+        "sha256": "b1ea5746e3acb741f01f425f6c0e81ff57185f19092b73ab6dacaf8b265b79ee",
+        "bytes": 103512,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-cloud-initial.png",
+        "sha256": "93c91e964a862a73fcdf78edcda816069a62dfdc8671b8cdc34ae52fa07aac25",
+        "bytes": 94215,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-disclosures.mp4",
+        "sha256": "4fb41b6b8df10b163c8cfa3ee8c18456b38296b32f24bfbde6eeec2523744eb0",
+        "bytes": 665720,
+        "kind": "mp4"
+      },
+      {
+        "path": "neutral-local-expanded.png",
+        "sha256": "80c507ae93a7dfb543937cb77fa967f0a6b9893305cf30f619f3a4cef125ec67",
+        "bytes": 96950,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-manage-add-advanced.png",
+        "sha256": "7aee60c670a47b01836f015e3816023d4550729e7f1c850f53fa69f650727583",
+        "bytes": 96602,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-provider-form.png",
+        "sha256": "72cbff56a42ca1624e9e47fa8c618e82f9e8be79aa76cd57ab0223135d69ef3c",
+        "bytes": 82663,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-remote-expanded.png",
+        "sha256": "20b161734d4f913d7a3c581653bae61c606ad16c866e04ae59ca7c613fd2192e",
+        "bytes": 102555,
+        "kind": "png"
+      },
+      {
+        "path": "openhands-deepsea-remote-settled.png",
+        "sha256": "1cf6ee67758b923229c3a8ff6e44ded6b3588451a894c9676626344dd193b3e3",
+        "bytes": 122048,
+        "kind": "png"
+      },
+      {
+        "path": "openhands-neo-remote-settled.png",
+        "sha256": "20b161734d4f913d7a3c581653bae61c606ad16c866e04ae59ca7c613fd2192e",
+        "bytes": 102555,
+        "kind": "png"
+      },
+      {
+        "path": "solarized-light-remote-settled.png",
+        "sha256": "9769192add28abd33505c237e5de3becac0029b7bf221c9ad6a3262921aeff7a",
+        "bytes": 117170,
+        "kind": "png"
+      }
+    ],
+    "context": {
+      "backendDesktop": {
+        "theme": "OpenHands-Neutral",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "sidebar": "expanded",
+        "gettingStarted": "collapsed, 0 complete",
+        "conversations": "empty",
+        "bridge": "real --mars-web enabled",
+        "llm": "unconfigured; no connect/login submitted"
+      },
+      "phone": {
+        "theme": "Light+",
+        "viewport": [
+          390,
+          844
+        ]
+      },
+      "baselinePreconditionCorrection": "Early field checklistExpanded=true tested presence of Expand checklist, which actually means collapsed."
+    },
+    "limits": [
+      "No credentials, login, provider connection or model invocation used.",
+      "Undefined/zero initial measurement fallback is not forced in real UI; belongs to focused unit/build coverage.",
+      "Recordings are 25 fps; recorder trims unchanged initial lead-in to one second and final still hold to one second; no action speed change.",
+      "Early three theme remote-expanded screenshots were captured during outer wrapper interpolation; authoritative representative stills are remote-settled."
+    ],
+    "scope": "shared-before"
+  },
+  "after": {
+    "schema": "lint-ui-evidence-v1",
+    "phase": "backend-after",
+    "status": "complete-stopped",
+    "source": {
+      "path": "odie",
+      "head": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "clean": true,
+      "lockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+      "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+      "verifierTreeSha256": "6158572df08cd649eed2afaaeb29bb8072085cdeb0f33bc41dd6ea3466aa5971",
+      "mapSha256": {
+        "F25-backends-and-cloud.md": "2e92d09a49c02b5238b75401f16c749dd2196c41a39195b296906c94337d8274",
+        "F08-workspace-files-and-changes.md": "7bde667c315ec10b8f4dee2bb22a894a2892ec062e92f9641372ec113683cc83"
+      },
+      "buildTreeSha256": "3763021aa65023e7230d7c6bb85441fbbe70fbe11cdfd1d7a370008a00f90b87",
+      "sourceSha256": {
+        "src/components/features/backends/backend-form-modal.tsx": "dc3d09e44f57bf872cf3a4333a6432fcdd7dcb736b51da99f087dc3be12c16be",
+        "src/routes/files-tab.tsx": "b112d931f4788fb874ec1e6a2bed8ef22d295a5ef6b52ed54de252dcf122cce5",
+        "src/tailwind.css": "482870f5b5bbf14f5a3a90f917b219469da9577ef6f7855a03468f8da2396a66"
+      }
+    },
+    "run": {
+      "runId": "backend-after",
+      "repo": "odie",
+      "revision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+      "buildId": "19aafc29ca5edbc4",
+      "builtThisRun": true,
+      "mode": "local",
+      "baseUrl": "Local Canvas",
+      "ports": {
+        "ingress": 18800,
+        "agentServer": 18801,
+        "automation": 18802,
+        "frontend": 18803,
+        "vscode": 19801
+      },
+      "startedAt": "2026-10-24T07:31:02.606Z",
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "overrides": {
+        "MARS_WEB": "1"
+      },
+      "launcherPid": 14815,
+      "launcherPgid": 14815,
+      "versions": {
+        "agentServer": "1.58.1",
+        "sdk": "1.58.1"
+      },
+      "readyAt": "2026-10-24T07:31:11.660Z",
+      "browserPid": 14874,
+      "stoppedAt": "2026-10-24T07:36:22.837Z"
+    },
+    "runtime": {
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automation": "Committed launcher pin 1.25.1; /api/automation/health reports status only, no independent version field."
+    },
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T07:36:18Z",
+        "elapsedSeconds": 3.963,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "backend-after",
+          "browser": {
+            "stopped": true,
+            "pid": 14874
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 18,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 18,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:36:22Z",
+        "elapsedSeconds": 0.043,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "backend-after",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "c183f4bc3cd3d024b8438e43a8de5be90503d3b9",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T07:31:02.606Z"
+        }
+      }
+    ],
+    "commandLog": "backend-after-commands.jsonl",
+    "measurements": [
+      {
+        "timestamp": "2026-10-24T07:32:16Z",
+        "query": [
+          "new Promise(resolve=>setTimeout(()=>resolve(({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],checklistCollapsed:!!document.querySelector('button[aria-label=\"Expand checklist\"]'),panels:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,inlineHeight:e.style.height,numericWriter:e.style.getPropertyValue('--add-backend-panel-height'),computedWriter:getComputedStyle(e).getPropertyValue('--add-backend-panel-height'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration,easing:getComputedStyle(e).transitionTimingFunction})),advanced:document.querySelector('[data-testid=add-backend-advanced-toggle]').getAttribute('aria-expanded')})),1500))"
+        ],
+        "value": {
+          "theme": null,
+          "viewport": [
+            1440,
+            1000
+          ],
+          "checklistCollapsed": true,
+          "panels": [
+            {
+              "height": 378,
+              "content": 378,
+              "inlineHeight": "",
+              "numericWriter": "378px",
+              "computedWriter": "378px",
+              "transition": "height",
+              "duration": "0.3s",
+              "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+            },
+            {
+              "height": 216,
+              "content": 216,
+              "inlineHeight": "",
+              "numericWriter": "216px",
+              "computedWriter": "216px",
+              "transition": "height",
+              "duration": "0.3s",
+              "easing": "cubic-bezier(0.4, 0, 0.2, 1)"
+            }
+          ],
+          "advanced": "false"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:32:20Z",
+        "query": [
+          "[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')}))"
+        ],
+        "value": [
+          {
+            "height": 424.75,
+            "content": 424.75,
+            "style": "--add-backend-panel-height: 424.75px;"
+          },
+          {
+            "height": 262.75,
+            "content": 262.75,
+            "style": "--add-backend-panel-height: 262.75px;"
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-24T07:32:24Z",
+        "query": [
+          "[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')}))"
+        ],
+        "value": [
+          {
+            "height": 648,
+            "content": 648,
+            "style": "--add-backend-panel-height: 648px;"
+          },
+          {
+            "height": 486,
+            "content": 486,
+            "style": "--add-backend-panel-height: 486px;"
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-24T07:32:29Z",
+        "query": [
+          "[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')}))"
+        ],
+        "value": [
+          {
+            "height": 696,
+            "content": 696,
+            "style": "--add-backend-panel-height: 696px;"
+          },
+          {
+            "height": 534,
+            "content": 534,
+            "style": "--add-backend-panel-height: 534px;"
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-24T07:32:36Z",
+        "query": [
+          "[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')}))"
+        ],
+        "value": [
+          {
+            "height": 406.5,
+            "content": 406.5,
+            "style": "--add-backend-panel-height: 406.5px;"
+          },
+          {
+            "height": 98,
+            "content": 98,
+            "style": "--add-backend-panel-height: 98px;"
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-24T07:33:05Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')})),remoteExpanded:document.querySelector('[data-testid=add-backend-remote-guidance-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "openhands-deepsea",
+          "wrappers": [
+            {
+              "height": 696,
+              "content": 696,
+              "style": "--add-backend-panel-height: 696px;"
+            },
+            {
+              "height": 534,
+              "content": 534,
+              "style": "--add-backend-panel-height: 534px;"
+            }
+          ],
+          "remoteExpanded": "true"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:10Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')})),remoteExpanded:document.querySelector('[data-testid=add-backend-remote-guidance-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "openhands-neo",
+          "wrappers": [
+            {
+              "height": 696,
+              "content": 696,
+              "style": "--add-backend-panel-height: 696px;"
+            },
+            {
+              "height": 534,
+              "content": 534,
+              "style": "--add-backend-panel-height: 534px;"
+            }
+          ],
+          "remoteExpanded": "true"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:15Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style')})),remoteExpanded:document.querySelector('[data-testid=add-backend-remote-guidance-toggle]').getAttribute('aria-expanded')})"
+        ],
+        "value": {
+          "theme": "solarized-light",
+          "wrappers": [
+            {
+              "height": 696,
+              "content": 696,
+              "style": "--add-backend-panel-height: 696px;"
+            },
+            {
+              "height": 534,
+              "content": 534,
+              "style": "--add-backend-panel-height: 534px;"
+            }
+          ],
+          "remoteExpanded": "true"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:20Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],checklistCollapsed:!!document.querySelector('button[aria-label=\"Expand checklist\"]'),modalCount:document.querySelectorAll('[data-testid=add-backend-modal]').length,drawer:!!document.querySelector('[data-testid=sidebar-mobile-drawer]'),wrappers:document.querySelectorAll('[data-testid=add-backend-panel-height]').length,advanced:document.querySelector('[data-testid=add-backend-advanced-toggle]').getAttribute('aria-expanded'),conversationRows:document.querySelectorAll('[data-testid=conversation-card]').length})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "checklistCollapsed": true,
+          "modalCount": 1,
+          "drawer": true,
+          "wrappers": 2,
+          "advanced": "false",
+          "conversationRows": 0
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:21Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 523.5,
+              "content": 523.5,
+              "style": "--add-backend-panel-height: 523.5px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 285.5,
+              "content": 285.5,
+              "style": "--add-backend-panel-height: 285.5px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-advanced-toggle",
+              "expanded": "true"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:21Z",
+        "query": [
+          "testid=add-backend-modal"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 19.5,
+            "y": 135.25,
+            "width": 351,
+            "height": 573.5
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 349,
+            "clientWidth": 349,
+            "scrollHeight": 572,
+            "clientHeight": 572
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:22Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 454,
+              "content": 454,
+              "style": "--add-backend-panel-height: 454px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 216,
+              "content": 216,
+              "style": "--add-backend-panel-height: 216px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-advanced-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:23Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 620,
+              "content": 620,
+              "style": "--add-backend-panel-height: 620px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 382,
+              "content": 382,
+              "style": "--add-backend-panel-height: 382px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-local-guidance-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:25Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 780,
+              "content": 780,
+              "style": "--add-backend-panel-height: 780px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 542,
+              "content": 542,
+              "style": "--add-backend-panel-height: 542px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-local-guidance-toggle",
+              "expanded": "true"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:25Z",
+        "query": [
+          "testid=add-backend-modal"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 19.5,
+            "y": 33.765625,
+            "width": 351,
+            "height": 776.46875
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 349,
+            "clientWidth": 349,
+            "scrollHeight": 828,
+            "clientHeight": 774
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:26Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 620,
+              "content": 620,
+              "style": "--add-backend-panel-height: 620px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 382,
+              "content": 382,
+              "style": "--add-backend-panel-height: 382px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-local-guidance-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:27Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 620,
+              "content": 620,
+              "style": "--add-backend-panel-height: 620px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 382,
+              "content": 382,
+              "style": "--add-backend-panel-height: 382px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-remote-guidance-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:28Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 832,
+              "content": 832,
+              "style": "--add-backend-panel-height: 832px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 594,
+              "content": 594,
+              "style": "--add-backend-panel-height: 594px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-remote-guidance-toggle",
+              "expanded": "true"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:28Z",
+        "query": [
+          "testid=add-backend-modal"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 19.5,
+            "y": 33.765625,
+            "width": 351,
+            "height": 776.46875
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 349,
+            "clientWidth": 349,
+            "scrollHeight": 880,
+            "clientHeight": 774
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:30Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 620,
+              "content": 620,
+              "style": "--add-backend-panel-height: 620px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 382,
+              "content": 382,
+              "style": "--add-backend-panel-height: 382px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-remote-guidance-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:31Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 336,
+              "content": 336,
+              "style": "--add-backend-panel-height: 336px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 98,
+              "content": 98,
+              "style": "--add-backend-panel-height: 98px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:32Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 448.75,
+              "content": 448.75,
+              "style": "--add-backend-panel-height: 448.75px;",
+              "transition": "height",
+              "duration": "0.3s"
+            },
+            {
+              "height": 98,
+              "content": 98,
+              "style": "--add-backend-panel-height: 98px;",
+              "transition": "height",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:35Z",
+        "query": [
+          "({reduced:matchMedia('(prefers-reduced-motion: reduce)').matches,wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,transition:getComputedStyle(e).transitionProperty}))})"
+        ],
+        "value": {
+          "reduced": true,
+          "wrappers": [
+            {
+              "height": 523.5,
+              "transition": "none"
+            },
+            {
+              "height": 285.5,
+              "transition": "none"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:36Z",
+        "query": [
+          "({theme:localStorage.getItem('openhands-color-theme'),viewport:[innerWidth,innerHeight],wrappers:[...document.querySelectorAll('[data-testid=add-backend-panel-height]')].map(e=>({height:e.getBoundingClientRect().height,content:e.firstElementChild.getBoundingClientRect().height,style:e.getAttribute('style'),transition:getComputedStyle(e).transitionProperty,duration:getComputedStyle(e).transitionDuration})),disclosures:[...document.querySelectorAll('[data-testid$=guidance-toggle],[data-testid=add-backend-advanced-toggle]')].map(e=>({id:e.dataset.testid,expanded:e.getAttribute('aria-expanded')}))})"
+        ],
+        "value": {
+          "theme": "light-plus",
+          "viewport": [
+            390,
+            844
+          ],
+          "wrappers": [
+            {
+              "height": 454,
+              "content": 454,
+              "style": "--add-backend-panel-height: 454px;",
+              "transition": "none",
+              "duration": "0.3s"
+            },
+            {
+              "height": 216,
+              "content": 216,
+              "style": "--add-backend-panel-height: 216px;",
+              "transition": "none",
+              "duration": "0.3s"
+            }
+          ],
+          "disclosures": [
+            {
+              "id": "add-backend-advanced-toggle",
+              "expanded": "false"
+            }
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:59Z",
+        "query": [
+          "testid=add-backend-modal >> role=button[name=\"Connect\"][exact]"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 44.5,
+            "y": 748.765625,
+            "width": 301,
+            "height": 36
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 299,
+            "clientWidth": 299,
+            "scrollHeight": 34,
+            "clientHeight": 34
+          },
+          "pageHorizontalOverflow": false
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:34:01Z",
+        "query": [
+          "testid=add-backend-modal >> role=button[name=\"Connect\"][exact]"
+        ],
+        "value": {
+          "ok": true,
+          "box": {
+            "x": 44.5,
+            "y": 748.765625,
+            "width": 301,
+            "height": 36
+          },
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "insideViewport": true,
+          "overflow": {
+            "scrollWidth": 299,
+            "clientWidth": 299,
+            "scrollHeight": 34,
+            "clientHeight": 34
+          },
+          "pageHorizontalOverflow": false
+        }
+      }
+    ],
+    "recordings": [
+      {
+        "timestamp": "2026-10-24T07:32:40Z",
+        "elapsedSeconds": 0.84,
+        "args": [
+          "browser",
+          "record",
+          "stop",
+          "--keep-frames"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "path": "neutral-desktop-disclosures.mp4",
+          "seconds": 22.1,
+          "recordedSeconds": 22.1,
+          "size": "1440x1000",
+          "fps": 25,
+          "captures": 529,
+          "changes": 277,
+          "misses": 0,
+          "capped": false,
+          "cutSeconds": 0,
+          "url": "Local Canvas/conversations",
+          "framesDir": "1792827138622"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:35Z",
+        "elapsedSeconds": 0.293,
+        "args": [
+          "browser",
+          "record",
+          "stop",
+          "--keep-frames"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "path": "light-plus-phone-disclosures.mp4",
+          "seconds": 15.9,
+          "recordedSeconds": 15.3,
+          "size": "390x844",
+          "fps": 25,
+          "captures": 367,
+          "changes": 147,
+          "misses": 0,
+          "capped": false,
+          "cutSeconds": 0,
+          "url": "Local Canvas/conversations",
+          "framesDir": "1792827200368"
+        }
+      }
+    ],
+    "controlOutcomes": [
+      {
+        "timestamp": "2026-10-24T07:32:09Z",
+        "elapsedSeconds": 2.657,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "backend-after",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=19aafc29ca5edbc4 run=19aafc29ca5edbc4 revision=c183f4bc3cd3",
+            "checkout build inputs unchanged since launch: launch=19aafc29ca5edbc4 now=19aafc29ca5edbc4",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1 pin=1.58.1",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=first-run-onboarding-screen,onboarding-modal,telemetry-consent-form pageErrors=0 testidsInDom=187 (hidden included)"
+          ]
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:35Z",
+        "elapsedSeconds": 0.068,
+        "args": [
+          "browser",
+          "media",
+          "--reduced-motion",
+          "reduce"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "plays": [],
+          "reducedMotion": "reduce"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:33:36Z",
+        "elapsedSeconds": 0.058,
+        "args": [
+          "browser",
+          "media",
+          "--reduced-motion",
+          "no-preference"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "plays": [],
+          "reducedMotion": "no-preference"
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:34:02Z",
+        "elapsedSeconds": 0.061,
+        "args": [
+          "conversation",
+          "list"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "count": 0,
+          "conversations": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:34:02Z",
+        "elapsedSeconds": 0.057,
+        "args": [
+          "browser",
+          "errors",
+          "--app-only"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "since": "last clear",
+          "summary": {},
+          "pageErrors": 0,
+          "appErrors": 0,
+          "warnings": 0,
+          "events": []
+        }
+      },
+      {
+        "timestamp": "2026-10-24T07:36:16Z",
+        "elapsedSeconds": 2.643,
+        "args": [
+          "doctor"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "backend-after",
+          "baseUrl": "Local Canvas",
+          "failed": [],
+          "warnings": [
+            "LLM configured: model=gpt-5.6 without an API key: `control-openhands llm preset deepseek`"
+          ],
+          "passed": [
+            "launcher process group alive: [process identity verified; argv omitted]",
+            "launcher is this run's agent-canvas: [process identity verified; argv omitted]",
+            "port ingress:18800 listening: open",
+            "port agentServer:18801 listening: open",
+            "port automation:18802 listening: open",
+            "port frontend:18803 listening: open",
+            "served build matches this checkout's build inputs: served=19aafc29ca5edbc4 run=19aafc29ca5edbc4 revision=c183f4bc3cd3",
+            "checkout build inputs unchanged since launch: launch=19aafc29ca5edbc4 now=19aafc29ca5edbc4",
+            "unauthenticated API rejected: status=401",
+            "authenticated settings readable: status=200",
+            "agent-server reachable: version=1.58.1",
+            "agent-server matches pin: server=1.58.1 pin=1.58.1",
+            "agent-server meets the UI minimum: server=1.58.1 minimum=1.55.0",
+            "automation healthy: status=200",
+            "Managed Agents web bridge mounted (--mars-web): GET /mars/health status=200 {\"ok\":true,\"authRequired\":true}",
+            "UI loads without page errors: markers=home-chat-launcher pageErrors=0 testidsInDom=77 (hidden included)"
+          ]
+        }
+      }
+    ],
+    "errors": [],
+    "artifacts": [
+      {
+        "path": "light-plus-phone-cloud-expanded.png",
+        "sha256": "22240affc34b1f5e2a136a8edc4a213a2946de06decb2555b32970a58cc33d2f",
+        "bytes": 55099,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-disclosures.mp4",
+        "sha256": "f6ba4ee4b5fb32a13337d5eb423cf70f3eb09fa1fb3d4fb49c0a20dcdf3822bf",
+        "bytes": 457378,
+        "kind": "mp4"
+      },
+      {
+        "path": "light-plus-phone-local-expanded.png",
+        "sha256": "583052eaa9d9a3e6586eadce4f81d6073793020dda3952b47d09373006492129",
+        "bytes": 50536,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-local-scrolled-controls.png",
+        "sha256": "beecfece2a116f12fff69ff6249eb2a673942684bff72d1fa29a126f515700a1",
+        "bytes": 48564,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-manage-add.png",
+        "sha256": "e103872df5c3181e58b199b4fd12da1dddf120457b849ebd3c377e85c4b90a77",
+        "bytes": 53005,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-provider.png",
+        "sha256": "fbf744daac5ad87d7d46abb83bc375d54b0f9633fd91ad4282f145b787ff81b4",
+        "bytes": 40502,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-remote-expanded.png",
+        "sha256": "dd1db161af1a99ebb45a2312a02d1eb50b77029dd666f8596b11a6106bf67b34",
+        "bytes": 58397,
+        "kind": "png"
+      },
+      {
+        "path": "light-plus-phone-remote-scrolled-controls.png",
+        "sha256": "37029d5482314d832bd85b4f72cd0fb16d88fb27c92068ed1b00fb82eddaa872",
+        "bytes": 53737,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-cloud-expanded.png",
+        "sha256": "b1ea5746e3acb741f01f425f6c0e81ff57185f19092b73ab6dacaf8b265b79ee",
+        "bytes": 103512,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-cloud-initial.png",
+        "sha256": "41cdb25a234cd7acb651df7db69dc84e815a484c71c3e4a850eb43f9e3a98b3a",
+        "bytes": 94222,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-desktop-disclosures.mp4",
+        "sha256": "f2935aa908b8cd262e57ca93cb4110802bfdf42f4ae3abb27eee5d6416254ea0",
+        "bytes": 565744,
+        "kind": "mp4"
+      },
+      {
+        "path": "neutral-local-expanded.png",
+        "sha256": "070edf7f037203578e9b503615ab10eb9358c3acd511c0fbcb063f60ebe99760",
+        "bytes": 96956,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-manage-add-advanced.png",
+        "sha256": "7aee60c670a47b01836f015e3816023d4550729e7f1c850f53fa69f650727583",
+        "bytes": 96602,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-provider-form.png",
+        "sha256": "6015118e50899ee60fb17862a617f684df374630a28c84cb39de45687cb0e3ff",
+        "bytes": 82670,
+        "kind": "png"
+      },
+      {
+        "path": "neutral-remote-expanded.png",
+        "sha256": "979d6daa3b463f73aa0476ae624fca80cc44a2906e6cae239ca3e37911268a63",
+        "bytes": 102561,
+        "kind": "png"
+      },
+      {
+        "path": "openhands-deepsea-remote-settled.png",
+        "sha256": "1cf6ee67758b923229c3a8ff6e44ded6b3588451a894c9676626344dd193b3e3",
+        "bytes": 122048,
+        "kind": "png"
+      },
+      {
+        "path": "openhands-neo-remote-settled.png",
+        "sha256": "20b161734d4f913d7a3c581653bae61c606ad16c866e04ae59ca7c613fd2192e",
+        "bytes": 102555,
+        "kind": "png"
+      },
+      {
+        "path": "solarized-light-remote-settled.png",
+        "sha256": "9769192add28abd33505c237e5de3becac0029b7bf221c9ad6a3262921aeff7a",
+        "bytes": 117170,
+        "kind": "png"
+      }
+    ],
+    "context": {
+      "backendDesktop": {
+        "theme": "OpenHands-Neutral",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "sidebar": "expanded",
+        "gettingStarted": "collapsed, 0 complete",
+        "conversations": "empty",
+        "bridge": "real --mars-web enabled",
+        "llm": "unconfigured; no connect/login submitted"
+      },
+      "phone": {
+        "theme": "Light+",
+        "viewport": [
+          390,
+          844
+        ]
+      }
+    },
+    "limits": [
+      "No credentials, login, provider connection or model invocation used.",
+      "Undefined/zero initial measurement fallback is not forced in real UI; belongs to focused unit/build coverage.",
+      "Recordings are 25 fps; recorder trims unchanged initial lead-in to one second and final still hold to one second; no action speed change."
+    ],
+    "scope": "backend-height"
+  },
+  "sourceGates": {
+    "before": "Root approved all Before static/temporal/phone/theme source contacts while live.",
+    "after": "Root approved paired static/temporal/phone/theme source contacts while live."
+  },
+  "comparability": {
+    "sameLauncherConfiguration": "real Local AS, automation, production app; --mars-web; isolated installed Google Chrome binary, no mocks",
+    "sameNodeNpm": true,
+    "samePins": true,
+    "sameLock": true,
+    "sameVerifierMain": true,
+    "sameVerifierTree": true,
+    "sameMaps": true
+  },
+  "sharedOperationalExceptions": [
+    "Initial Before launch preflight omitted uvx PATH; corrected installed PATH before any stack was created.",
+    "A sandboxed doctor could not reach owned IPC; authoritative doctor ran with approved local access and passed.",
+    "One Before Files preparation click selected the already-active Files tab and closed the drawer; captured failure, healthy doctor, reload and one corrected retry. This is separate from app/page error counts."
+  ],
+  "limits": [
+    "No model message or agent run was submitted. Files arrangement uses the documented genuine idle Agent/LLM object targeting unavailable loopback, dummy key, tools=[], autotitle=false.",
+    "No authentication, Cloud/provider connection or provider key was attempted.",
+    "Actual videos provide visual motion; CLI mutation --observe captures text/state rather than a numeric animation trajectory.",
+    "Recordings remain 25 fps normal action timing. The recorder trims unchanged initial lead-in and holds a final still for one second. Overall clip duration is not a performance comparison.",
+    "Raw source videos and screenshots are retained; private intermediate recording frame directories were purged with owned browser profiles and keys.",
+    "No verifier, map, spec, fixture-driver or repository source was edited by this evidence task.",
+    "Undefined/zero measurement and an unmeasured panel nested inside a measured ancestor were not forced through live DOM; focused unit/compiled CSS checks own those fallback cases.",
+    "Before desktop contains an approximately 15-second operator pause before provider selection; After proceeds continuously. This does not compare performance.",
+    "Early three Before theme remote-expanded frames were mid-interpolation; authoritative representative stills are named remote-settled.",
+    "The DigitalOcean provider heading appears white on the Light+ form in both phases; no full provider text contrast pass is claimed."
+  ],
+  "pairedSettledHeights": [
+    {
+      "viewport": "desktop",
+      "state": "Cloud collapsed",
+      "beforeOuterInnerPx": [
+        378,
+        216
+      ],
+      "afterOuterInnerPx": [
+        378,
+        216
+      ]
+    },
+    {
+      "viewport": "desktop",
+      "state": "Cloud Advanced expanded",
+      "beforeOuterInnerPx": [
+        424.75,
+        262.75
+      ],
+      "afterOuterInnerPx": [
+        424.75,
+        262.75
+      ]
+    },
+    {
+      "viewport": "desktop",
+      "state": "Local guidance expanded",
+      "beforeOuterInnerPx": [
+        648,
+        486
+      ],
+      "afterOuterInnerPx": [
+        648,
+        486
+      ]
+    },
+    {
+      "viewport": "desktop",
+      "state": "Remote guidance expanded",
+      "beforeOuterInnerPx": [
+        696,
+        534
+      ],
+      "afterOuterInnerPx": [
+        696,
+        534
+      ]
+    },
+    {
+      "viewport": "desktop",
+      "state": "DigitalOcean form outer rail",
+      "beforeOuterInnerPx": [
+        406.5,
+        98
+      ],
+      "afterOuterInnerPx": [
+        406.5,
+        98
+      ]
+    },
+    {
+      "viewport": "phone Light+",
+      "state": "Cloud collapsed",
+      "beforeOuterInnerPx": [
+        454,
+        216
+      ],
+      "afterOuterInnerPx": [
+        454,
+        216
+      ]
+    },
+    {
+      "viewport": "phone Light+",
+      "state": "Cloud Advanced expanded",
+      "beforeOuterInnerPx": [
+        523.5,
+        285.5
+      ],
+      "afterOuterInnerPx": [
+        523.5,
+        285.5
+      ]
+    },
+    {
+      "viewport": "phone Light+",
+      "state": "Local/Remote collapsed",
+      "beforeOuterInnerPx": [
+        620,
+        382
+      ],
+      "afterOuterInnerPx": [
+        620,
+        382
+      ]
+    },
+    {
+      "viewport": "phone Light+",
+      "state": "Local expanded",
+      "beforeOuterInnerPx": [
+        780,
+        542
+      ],
+      "afterOuterInnerPx": [
+        780,
+        542
+      ]
+    },
+    {
+      "viewport": "phone Light+",
+      "state": "Remote expanded",
+      "beforeOuterInnerPx": [
+        832,
+        594
+      ],
+      "afterOuterInnerPx": [
+        832,
+        594
+      ]
+    },
+    {
+      "viewport": "phone Light+",
+      "state": "Providers chooser",
+      "beforeOuterInnerPx": [
+        336,
+        98
+      ],
+      "afterOuterInnerPx": [
+        336,
+        98
+      ]
+    },
+    {
+      "viewport": "phone Light+",
+      "state": "DigitalOcean form outer rail",
+      "beforeOuterInnerPx": [
+        448.75,
+        98
+      ],
+      "afterOuterInnerPx": [
+        448.75,
+        98
+      ]
+    }
+  ],
+  "observedContract": {
+    "reader": "After both nested wrappers have empty inline height and actual --add-backend-panel-height numeric px values; computed geometry resolves at sampled measurements.",
+    "normalMotion": {
+      "transitionProperty": "height",
+      "transitionDuration": "0.3s",
+      "transitionTimingFunction": "cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    "reducedMotion": "Explicit CLI media preference reduce was enabled on both phases, matchMedia true, both wrappers transitionProperty none, then restored no-preference. Computed duration remains 0.3s; the property suppresses transition.",
+    "entryPoints": [
+      "Backend selector → Add Backend",
+      "Manage backends → Add Backend"
+    ],
+    "providerRail": "Providers → DigitalOcean form → Back, no credentials or Connect submitted.",
+    "phoneControls": "Real modal scrolling exposed disabled Connect at x44.5/y748.765625/301×36, inside 390×844 viewport after Local scrollTop54 and Remote scrollTop106 in both phases.",
+    "representativeThemes": [
+      "OpenHands-Neutral",
+      "OpenHands-DeepSea",
+      "OpenHands-Neo",
+      "Light+",
+      "Solarized Light"
+    ]
+  }
+}
