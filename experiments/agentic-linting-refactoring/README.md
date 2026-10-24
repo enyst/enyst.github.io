@@ -965,3 +965,15 @@ Runtime: real Canvas 1.33.0, Agent Server/SDK 1.58.1, automation 1.25.1, Node
 or model message was submitted, no agent started, and zero ActionEvents were
 recorded. All three owned runs stopped, private state was purged, and all five
 reused core ports closed. Earlier README text remains an unchanged byte prefix.
+
+
+## Ready for review · 24 October
+
+The published draft/media snapshot `689a013069ff681b04810839cb67e6d33c29c251`
+passed all 15 live Pages HTTP/hash/MIME checks, including both specific film
+anchors. #18902 and #18903 are now ready and open at their unchanged recorded
+heads, with eight checks passed and six skipped each. Initial all-hands-bot
+review requests are verified pending; no approval or merge is claimed.
+The cohort is **50: 46 merged, three open non-draft and one draft**. All
+**36 films and 72 MP4 download anchors**, media/source bytes, prior history
+and the exact-main 612-warning audit remain unchanged.
