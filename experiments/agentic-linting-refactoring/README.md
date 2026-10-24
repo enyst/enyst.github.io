@@ -977,3 +977,115 @@ review requests are verified pending; no approval or merge is claimed.
 The cohort is **50: 46 merged, three open non-draft and one draft**. All
 **36 films and 72 MP4 download anchors**, media/source bytes, prior history
 and the exact-main 612-warning audit remain unchanged.
+
+
+## Next wave baseline · merged ownership batches
+
+Backend panel height #18902 merged at `2026-10-24T08:23:56Z` as
+`7b452520613fdf71771fc10285ed0df1ceef8697`; Files tree width #18903 merged at
+`2026-10-24T09:13:15Z` as `fee10e3d2909ebbf9950578575b1ee011492171e`. Exact
+bot approvals and merge lifecycle are retained in `progress.json`. The films
+keep their original `c183f4bc3c` and `ab650488ed` capture heads.
+
+The cohort is **50: 48 merged, one open non-draft, one draft**. All 36 video
+elements, 72 MP4 download anchors, prior proposal/audit objects, recording
+identities, media/source bytes, related prerequisites and completed approval
+watch are preserved. Earlier README content remains an unchanged byte prefix.
+
+Fresh exact main **`fee10e3d29` passes with 0 errors and 609 warnings** across
+1,425 linted files (193 with diagnostics): 519 arbitrary-value, 72 inline-style
+and 18 palette findings. The [full public audit](main-lint-audit-2026-10-24-fee10e3d29.json)
+records exactly three removed findings and none added from `084a410604`.
+SHA-256: `a242caaa2b9ac66d64dd81ba15cd3ad059fa3ffab9e6f89b142f6937495687dc`. Full lint, machine
+ESLint, typecheck and formatting pass. The existing exact-lock installation was
+reused after identity checks; no install, resolver, network or stack was run.
+All nine earlier main and sixteen proposal audits remain unchanged.
+
+Sidebar stacking and desktop overview-drawer width are the next separate
+candidate scopes; no new PR IDs, frozen films or live claims are recorded.
+Each actual matching film section must be published and its own Notebook
+anchor verified live before readiness and the initial bot review request.
+
+
+## New Sidebar and Overview drafts
+
+Sidebar stacking [#18908](https://github.com/OpenHands/OpenHands/pull/18908),
+issue #18906, is a draft at `6654969d173f8df8f17ce3221715e48124f42ab1`.
+Two z-[1] spellings become z-1, with the same literal scoped z-index:1 in actual
+app/library CSS. All 26 existing tests and type/format checks pass; target
+arbitrary-value findings fall 4→2. Its [specific section](../../arch/agentic-linting-refactoring.html#sidebar-stacking-film)
+contains pending evidence text only.
+
+Overview drawer sizing [#18909](https://github.com/OpenHands/OpenHands/pull/18909),
+issue #18907, is a draft at `a3ddc1b35f39268bc34e4d1ca221e6de93d17a73`.
+The unchanged width hook supplies numeric px values to static width/transition
+readers. All 24 tests across three files and type/format/app/library checks
+pass; two baseline contract tests failed before the change. Independent full
+branch lint is 605 warnings/0 errors, removing three inline-style and one
+arbitrary-value finding. Static emitted-CSS contracts cover host font 32px and
+spacing 3rem; this is not a live Canvas host-override claim.
+
+A genuine baseline 12×0px native grip remains at 420px after drag and a healthy
+doctor/retry. [Separate issue #18910](https://github.com/OpenHands/OpenHands/issues/18910)
+records this pre-existing hit-area defect; public capture proof is pending.
+Real drag, clamps and persistence after drag are blocked. Unit and actual
+compiled-CSS contracts cover the hook/transition path. Independent review
+found no CSS-refactor regression and no hit-area-fix prerequisite. Existing
+phone issue #16792 remains separate; the mobile branch is unchanged. The
+[Overview feature section](../../arch/agentic-linting-refactoring.html#overview-drawer-film)
+contains pending evidence text only.
+
+Independent code review passes with low risk and no material findings. Both
+PRs remain **draft**, with CI started, matching After/final media pending and
+**no bot review requested**. No final CI counts, frozen packet or matched live
+pass is claimed. The cohort is **52: 48 merged, one open non-draft, three drafts**.
+All 50 earlier proposal objects, ten main audits, sixteen prior proposal audits,
+36 films and 72 MP4 anchors, media/source bytes and earlier history are retained.
+Independent branch reductions are not integrated: exact `fee10e3d29` remains
+**609 warnings and 0 errors**. Each actual film section must be published and
+its own live anchor verified before readiness and the initial bot request.
+
+
+## Frozen media/draft checkpoint · publication pending
+
+Both independent source/asset gates pass. The 93 packet assets and exact-main
+audit are prepared in local asset commit `aa301cf0f30bdc3e992454ae244989d78538e59d`.
+Nothing is published or publicly HTTP-verified at this checkpoint. Both PRs
+remain **draft**, with **no bot request**. Last actual CI is **seven passed, one
+media-description failure, six skipped each**; final attachment/validation is
+pending. Root will publish assets and this draft snapshot together, verify raw
+downloads and each own live film anchor, then attach published media and pass
+description CI before readiness and initial bot review.
+
+The [Sidebar film](../../arch/agentic-linting-refactoring.html#sidebar-stacking-film)
+is 24.76 seconds, 619 frames at 25 fps; 50 assets include 34 PNGs/four raw MP4s
+(38 selected originals) and 46 ZIP members. Exact source/build identities are
+`fee10e3d29`/`0d613af38d4884d7` and `6654969d17`/`6687c3c31260b0e6`. Its one
+paired computed sample has zero stable-field differences. Glyph/background/dot
+stacking is preserved; phone evidence is unchanged expanded-path smoke.
+One Before desktop capture miss and source timing limits remain disclosed.
+Film SHA-256: `da0e447bce16e33506455f4822c0ca6dc2af8edaefdbd31184f0424c9421d4e6`.
+
+The [Overview film](../../arch/agentic-linting-refactoring.html#overview-drawer-film)
+is 20.84 seconds, 521 frames at 25 fps; 43 assets include 26 PNGs/four raw MP4s
+(30 originals: 16 Before/14 After) and 39 ZIP members. Its proof-pointer correction
+and dependent metadata/ZIP hashes passed the refreshed independent gate.
+Final ZIP SHA-256: `b5f5224c1ac1167483caaf7d9ac000571a88d3400ae6b3bb6224c172acc2f113`.
+Film SHA-256: `d054345e1da07acc8178ca5172c5166a8af30a50e62044bfb4d14dd7d7ab4886`.
+Source/build identities are `fee10e3d29`/`0d613af38d4884d7` and
+`a3ddc1b35f`/`c67b70a90d8ab8ee`. Nine paired computed samples have zero stable
+field/width differences at actual 420 px open/close/reopen/reload/Escape; outer 0 px
+and inner 420 px remain when closed. Native resize remains blocked by the
+unchanged 12×0 px grip, #18910. Other widths, clamps, isDragging and after-drag
+persistence have unit/build coverage only. Phone entry remains blocked by
+#16792; no live phone-path pass is claimed. Sanitized proof JSON and actual
+Before/After bug screenshots are included in the packet.
+
+Both films have 1440×1120 H.264 limited-range yuv420p/AAC, fast start, poster and
+captions; no new GIF. The page is **38 films/76 MP4 anchors**, preserving all 36
+earlier video elements/72 download anchors. The cohort is **52: 48 merged, one
+open non-draft, three drafts**. Exact-main remains 609 warnings/0 errors at
+`fee10e3d29`; independent branch reductions are separate. All three owned runs
+are stopped/private-purged, and all five reused core ports are independently
+confirmed closed. Full source/operational limits and earlier README history
+remain preserved.
