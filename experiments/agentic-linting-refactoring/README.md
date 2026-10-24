@@ -1105,3 +1105,82 @@ Source/capture heads, all media bytes and audit history remain unchanged.
 Independent readiness closure passes. Separate resize issue #18910 has exact
 published baseline PNG/geometry proof and is ready-for-dev; native resize and
 phone #16792 limits remain unchanged.
+
+
+## Oct 25 coherent domain draft checkpoint
+
+Sidebar #18908 merged at `2026-10-24T22:32:15Z` as
+`51f634fd980b618e348a0fae4ebcee62d5fa52a5`; Overview #18909 merged at
+`2026-10-24T22:36:17Z` as `1abbd4b41544dd8a74b19ff3359029537bbaa41b`.
+Their original capture heads and films remain unchanged. Current metadata
+confirms older #18520 is open/non-draft at
+`aef5a5591ded4ebb01d08a05ef3925884581f2e5`; its evidence, prerequisites and
+user text are retained. #18533 remains open/non-draft unchanged.
+
+Exact-main `1abbd4b415` passes with **603 warnings, 0 errors**: 516 arbitrary,
+69 inline and 18 palette findings. Six findings were removed and none added
+versus fee10e3d29. All earlier audit objects remain unchanged; the new public
+audit is `main-lint-audit-2026-10-25-1abbd4b415.json`.
+
+Automation aliases #18917 at `e69074d21b86d1aaaa9887fb3dde366d2659add2`
+removes 77 branch findings (target 115→38); full branch lint 526/0, 67 tests and
+14/14 actual app/library emitted CSS pairs pass. Dropdown controls #18918 at
+`92cc0b57fab00cebed9f065999f1255e27bc5255` removes 18 target inline findings;
+97 tests pass with six existing todo cases. Compiled sr-only retains real
+controls and equivalent hidden geometry, with clip-path rather than literal
+old clip identity. Matching live evidence and frozen packets are pending.
+
+Both new PRs remain **draft**; no final green/readiness/bot request is claimed.
+The cohort is **54: 50 merged, two open non-draft, two drafts**. All 38 existing
+films/76 downloads and their source identities are retained. No new video,
+media filename or public/live claim is added. Coherent domain batches have
+no arbitrary PR size/count limit. Each own film anchor must be published and
+verified live before readiness and the initial bot review. Portal coordinates
+remain deferred because distinct owners/body-portal scope require separate
+review. Earlier README text remains an unchanged byte prefix.
+
+
+## Frozen Oct25 media · drafts retained
+
+Both matching packets are complete/frozen, visually approved and copied locally.
+Automation is 27.64 seconds/691 frames, 47 assets, 32 PNGs/two raw MP4s and 43 ZIP
+members. Dropdown is 24.64 seconds/616 frames, 24 assets, 10 PNGs/two raw MP4s
+and 20 ZIP members. Both are 1440×1120 at 25 fps, H.264 yuv420p/AAC with fast start,
+posters, VTT and quiet original ambience (mean −52.5 dBFS); no new GIF. All 46
+selected originals retain their exact bytes; owned three runs are stopped,
+private state purged and independent port checks confirm closure.
+
+[Automation film](../../arch/agentic-linting-refactoring.html#automation-theme-aliases-film):
+11 authority observations, but 10 strict screenshot-associated comparisons,
+zero stable color/DOM differences; two Solarized relative saved-age-label
+widths differ. Nine of 14 class recipes are live, five compiler-only. Visible
+phone form limits are retained; no full settled Entrypoint/model/provider or
+edit-agent proof. Film SHA-256:
+`7a31a63b3184b3945820bde65a0f3e73bf6ea9c3a29f7d4f64b59190c833d853`.
+
+[Dropdown film](../../arch/agentic-linting-refactoring.html#dropdown-hidden-controls-film):
+two matched desktop stable samples and intentional sampled clip rect→auto plus
+compiled clip-path:inset(50%). Baseline live clipPath was not sampled; literal
+CSS identity is not claimed. Phone is unchanged visible-trigger smoke only;
+the hidden desktop duplicate query is excluded from phone geometry. Film SHA:
+`7f97f508161b717e5c653fa083ae31989918c720ab61f7fce9499b1f9eb80ad3`.
+
+Both PRs remain **draft**, with no initial bot request. Root-reported current CI
+is 18917: 7 passed/1 media-description failure/6 skipped; 18918: 6 passed/1 pending/
+1 media-description failure/6 skipped. Asset commit/public HTTP/live own-anchor
+and final current CI gates remain pending; no green/ready/publication claim.
+The cohort stays **54: 50 merged, 2 open non-draft, 2 drafts**. All 38 earlier films
+and 76 MP4 anchors are preserved; totals become **40 films/80 MP4 anchors**.
+Exact-main remains 603/0; independent branch reductions stay separate.
+
+
+## Local asset commit checkpoint
+
+Independent frozen-asset gate PASS is bound to local commit
+`ef22c28aa21e9fb5796773c78d358ac3a00b553a` (72 new packet/audit files). It is
+not published yet; public HTTP and own live film-anchor checks remain pending.
+Current CI for **both** drafts is seven passed checks, one expected
+media-description failure, six skipped and zero pending code checks. The older
+checkpoint above is retained as history. Both PRs remain draft/NoBot until
+actual publication, current description and live-anchor receipts are supplied.
+All 40 film elements/80 MP4 anchors and source/media identities are unchanged.
