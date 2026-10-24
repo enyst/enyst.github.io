@@ -1,0 +1,430 @@
+{
+  "title": "Dropdown hidden controls",
+  "beforeRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+  "afterRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+  "builds": {
+    "before": "4f9d5a4fab9f2c85",
+    "after": "cd4e9b7965bca919"
+  },
+  "versions": {
+    "before": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "reportedRuntime": null,
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override 1.25.1 matches committed pin; health endpoint status has no independent version field."
+    },
+    "after": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "reportedRuntime": null,
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override 1.25.1 matches committed pin; health endpoint status has no independent version field."
+    }
+  },
+  "implementation": {
+    "before": "The shared Dropdown primitive applies the visually-hidden contract inline to its hidden real input and toggle button.",
+    "after": "The same two native controls use compiled sr-only CSS, preserving1px geometry, clipping, semantic wiring and existing interaction paths.",
+    "owners": [
+      "src/ui/dropdown/dropdown.tsx"
+    ],
+    "preserved": "Native Downshift controls, tab index/ARIA relationships, hidden-trigger popovers, ordinary visible-trigger search/selection and phone paths."
+  },
+  "scope": {
+    "before": {
+      "production": "Real Local Canvas with Agent Server 1.58.1, automation 1.25.1, --mars-web, installed Chrome private isolated profile. No route interception, DOM mutation, mocks, or source changes.",
+      "dropdown": "Collapsed hidden-trigger popup via native hover and Manage click; visible-trigger search/no-options/ArrowDownEnter select Local; phone drawer is unchanged visible-trigger smoke. No programmatic focus of hidden input.",
+      "phone": "390×844 real expanded drawer and visible-trigger dropdown smoke; same Neutral theme.",
+      "model": "Unconfigured; no conversation/model/tool execution.",
+      "media": "Original PNG/MP4 bytes retained;25fps native recording preserves action timing, not a speed comparison. Recorder trims still lead-in and adds final hold."
+    },
+    "after": {
+      "production": "Real Local Canvas with Agent Server 1.58.1, automation 1.25.1, --mars-web, installed Chrome private isolated profile. No route interception, DOM mutation, mocks, or source changes.",
+      "dropdown": "Collapsed hidden-trigger popup via native hover and Manage click; visible-trigger search/no-options/ArrowDownEnter select Local; phone drawer is unchanged visible-trigger smoke. No programmatic focus of hidden input.",
+      "phone": "390×844 real expanded drawer and visible-trigger dropdown smoke; same Neutral theme.",
+      "model": "Unconfigured; no conversation/model/tool execution.",
+      "media": "Original PNG/MP4 bytes retained;25fps native recording preserves action timing, not a speed comparison. Recorder trims still lead-in and adds final hold."
+    },
+    "mainFilm": "Selected genuine form/dropdown paths; separate notes distinguish changed and unchanged branches."
+  },
+  "comparisonSummary": "2 named computed samples paired, with 0 stable-field differences, 0 disclosed geometry differences and 2 separately disclosed clipping-mechanism observations. Read comparison JSON for scope; source clip lengths and relative time text are not performance or identity claims.",
+  "limits": [
+    "Appearance-preserving refactor of existing styles. This compares the specified genuine revisions and selected observed paths, with no claim of global pixel identity, exhaustive UI coverage or speed improvement.",
+    "Native recordings retain their existing frame cadence without editorial speed changes. Recorder lead-in/hold behavior and any capture misses are retained per original source. Selected excerpts are labelled; all selected complete originals remain downloadable.",
+    "Full viewport context precedes labelled detail crops. Held PNGs are labelled as stills in captions and provenance; no recorded motion is implied.",
+    "No model message, real provider credentials, paid API/resource, real webhook delivery or automation execution was used. Any genuine unconfigured-model or public-webhook warning is preserved.",
+    "Dropdown captures use Neutral; no all-five-theme dropdown coverage is claimed.",
+    "Only two matched desktop computed samples support control geometry. A phone-viewport query matched a hidden desktop duplicate and is excluded from visible-phone geometry claims; the original observation is retained and labelled.",
+    "Clipping moves from inline clip:rect(0,0,0,0) to compiled clip-path:inset(50%). This is equivalent empty painted clipping, not literal declaration identity. Baseline live clipPath was not sampled; actual legacy clip was.",
+    "The changed path is the hidden-trigger input and toggle in the collapsed backend popover. Ordinary visible-trigger keyboard/search and phone views are explicitly unchanged-path smoke.",
+    "No hidden input was programmatically focused to invent a keyboard path. Only native visible controls were used for the observed keyboard selection."
+  ],
+  "captureProvenance": "dropdown-hidden-controls-capture-provenance.json",
+  "captureProvenanceSha256": "ba44171a5c437bf3459cfd8cab7273ed7c523d8b2bb0a8fcbce61911bd3a029d",
+  "evidenceDownload": "dropdown-hidden-controls-evidence.zip",
+  "evidenceDownloadSha256": "6592d6782e7c4630da4c5d4ebbe76fa8b237b8da594ab2701f8713cae4e180c8",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18918",
+  "film": {
+    "dimensions": [
+      1440,
+      1120
+    ],
+    "fps": 25,
+    "durationSeconds": 24.64,
+    "scenes": [
+      {
+        "phase": "before",
+        "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+        "kind": "screenshot",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/before/neutral-desktop-hidden-popup.png",
+        "label": "Before · Inline hiding",
+        "subtitle": "Collapsed backend menu · Full context",
+        "caption": "Before: Real Neutral1440×1000 collapsed sidebar backend popup. Hidden native controls remain hidden. Authentic PNG held 2 seconds.",
+        "view": "Collapsed backend menu · Full context",
+        "cropDisclosure": "Full original viewport below the separate editorial header.",
+        "sourceSha256": "802817b464a065a0334f396239c2fcf9ed83a46fb699ae8a0a7b4b76eab63a8e",
+        "sourceBytes": 75987,
+        "sourceDurationSeconds": null,
+        "sourceFps": null,
+        "timelineSeconds": [
+          0,
+          2.0
+        ],
+        "presentationDurationSeconds": 2.0,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": null,
+        "sourceSelectedRangeSeconds": null,
+        "fullOriginalSelected": false,
+        "fullOriginalTimelineSelected": false,
+        "fullOriginalViewportSelected": true,
+        "sourcePlaybackNote": "Authentic PNG held for the stated presentation duration. A still has no source time range; no recorded motion is implied."
+      },
+      {
+        "phase": "before",
+        "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+        "kind": "recording",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/before/neutral-desktop-hidden-dropdown.mp4",
+        "label": "Before · Inline hiding",
+        "subtitle": "Native menu path · Full context",
+        "caption": "Before: Actual hover popup, Manage backends action and dismissal. Complete native recording at its existing cadence, with no editorial speed change.",
+        "view": "Native menu path · Full context",
+        "cropDisclosure": "Full original viewport below the separate editorial header.",
+        "sourceSha256": "98d20c3b069bc523d4c38ad636f760e4d6d823a84af4c2488d139cea81cc3bab",
+        "sourceBytes": 114270,
+        "sourceDurationSeconds": 3.92,
+        "sourceFps": 25.0,
+        "timelineSeconds": [
+          2.0,
+          5.92
+        ],
+        "presentationDurationSeconds": 3.92,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": 0,
+        "sourceSelectedRangeSeconds": [
+          0,
+          3.92
+        ],
+        "fullOriginalSelected": true,
+        "fullOriginalTimelineSelected": true,
+        "fullOriginalViewportSelected": true,
+        "sourcePlaybackNote": "Selected MP4 interval presented at its existing frame cadence. Recorder caps an initial static lead-in at 1 second and holds the final frame at least 1 second; action intervals retain capture timing. Presentation repeats frames only for output cadence; no motion interpolation."
+      },
+      {
+        "phase": "before",
+        "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+        "kind": "screenshot",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/before/neutral-desktop-hidden-popup.png",
+        "label": "Before · Inline hiding",
+        "subtitle": "Detail · Hidden controls stay hidden",
+        "caption": "Before: Actual lower-left source detail. Native controls retain their1px clipped contract; readable menu options are unchanged. Authentic PNG held 2.4 seconds.",
+        "view": "Detail · Hidden controls stay hidden",
+        "cropDisclosure": "Actual source crop x0/y730/450×270px, fitted below separate editorial header.",
+        "crop": [
+          0,
+          730,
+          450,
+          270
+        ],
+        "sourceSha256": "802817b464a065a0334f396239c2fcf9ed83a46fb699ae8a0a7b4b76eab63a8e",
+        "sourceBytes": 75987,
+        "sourceDurationSeconds": null,
+        "sourceFps": null,
+        "timelineSeconds": [
+          5.92,
+          8.32
+        ],
+        "presentationDurationSeconds": 2.4,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": null,
+        "sourceSelectedRangeSeconds": null,
+        "fullOriginalSelected": false,
+        "fullOriginalTimelineSelected": false,
+        "fullOriginalViewportSelected": false,
+        "sourcePlaybackNote": "Authentic PNG held for the stated presentation duration. A still has no source time range; no recorded motion is implied."
+      },
+      {
+        "phase": "before",
+        "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+        "kind": "screenshot",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/before/neutral-desktop-visible-keyboard-selected.png",
+        "label": "Before · Inline hiding",
+        "subtitle": "Visible trigger · Unchanged branch",
+        "caption": "Before: Actual selected Local state on the ordinary visible trigger. Native keyboard steps are separately logged; this held still does not demonstrate motion or timing. Authentic PNG held 2 seconds.",
+        "view": "Visible trigger · Unchanged branch",
+        "cropDisclosure": "Full original viewport below the separate editorial header.",
+        "sourceSha256": "c43ddf34e122b4f8577b8719e70f9c1ff63b15ccd4ad16b393ee9a9b3453a2b6",
+        "sourceBytes": 84996,
+        "sourceDurationSeconds": null,
+        "sourceFps": null,
+        "timelineSeconds": [
+          8.32,
+          10.32
+        ],
+        "presentationDurationSeconds": 2.0,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": null,
+        "sourceSelectedRangeSeconds": null,
+        "fullOriginalSelected": false,
+        "fullOriginalTimelineSelected": false,
+        "fullOriginalViewportSelected": true,
+        "sourcePlaybackNote": "Authentic PNG held for the stated presentation duration. A still has no source time range; no recorded motion is implied."
+      },
+      {
+        "phase": "before",
+        "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+        "kind": "screenshot",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/before/neutral-phone-visible-dropdown.png",
+        "label": "Before · Inline hiding",
+        "subtitle": "Phone · Unchanged visible branch",
+        "caption": "Before: Actual390×844 Neutral expanded mobile backend dropdown; unchanged-path smoke, not a new hidden-control phone claim. Authentic PNG held 2 seconds.",
+        "view": "Phone · Unchanged visible branch",
+        "cropDisclosure": "Full original viewport below the separate editorial header.",
+        "sourceSha256": "65c6682cd31c7c350475fce7df26cfbf56fdaaaab9e99c958be04c7d8f423f57",
+        "sourceBytes": 26030,
+        "sourceDurationSeconds": null,
+        "sourceFps": null,
+        "timelineSeconds": [
+          10.32,
+          12.32
+        ],
+        "presentationDurationSeconds": 2.0,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": null,
+        "sourceSelectedRangeSeconds": null,
+        "fullOriginalSelected": false,
+        "fullOriginalTimelineSelected": false,
+        "fullOriginalViewportSelected": true,
+        "sourcePlaybackNote": "Authentic PNG held for the stated presentation duration. A still has no source time range; no recorded motion is implied."
+      },
+      {
+        "phase": "after",
+        "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+        "kind": "screenshot",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/after/neutral-desktop-hidden-popup.png",
+        "label": "After · Compiled hiding",
+        "subtitle": "Collapsed backend menu · Full context",
+        "caption": "After: Real Neutral1440×1000 collapsed sidebar backend popup. Hidden native controls remain hidden. Authentic PNG held 2 seconds.",
+        "view": "Collapsed backend menu · Full context",
+        "cropDisclosure": "Full original viewport below the separate editorial header.",
+        "sourceSha256": "afd3e40bd9ef1350db9f952042060eb2d9efd6410d56d4120db38b48c942c153",
+        "sourceBytes": 75986,
+        "sourceDurationSeconds": null,
+        "sourceFps": null,
+        "timelineSeconds": [
+          12.32,
+          14.32
+        ],
+        "presentationDurationSeconds": 2.0,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": null,
+        "sourceSelectedRangeSeconds": null,
+        "fullOriginalSelected": false,
+        "fullOriginalTimelineSelected": false,
+        "fullOriginalViewportSelected": true,
+        "sourcePlaybackNote": "Authentic PNG held for the stated presentation duration. A still has no source time range; no recorded motion is implied."
+      },
+      {
+        "phase": "after",
+        "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+        "kind": "recording",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/after/neutral-desktop-hidden-dropdown.mp4",
+        "label": "After · Compiled hiding",
+        "subtitle": "Native menu path · Full context",
+        "caption": "After: Actual hover popup, Manage backends action and dismissal. Complete native recording at its existing cadence, with no editorial speed change.",
+        "view": "Native menu path · Full context",
+        "cropDisclosure": "Full original viewport below the separate editorial header.",
+        "sourceSha256": "fe554a99a33401c6995eba32f1ad3a6d151626d5b2d29a74c25eee3167086c5d",
+        "sourceBytes": 115694,
+        "sourceDurationSeconds": 3.92,
+        "sourceFps": 25.0,
+        "timelineSeconds": [
+          14.32,
+          18.24
+        ],
+        "presentationDurationSeconds": 3.92,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": 0,
+        "sourceSelectedRangeSeconds": [
+          0,
+          3.92
+        ],
+        "fullOriginalSelected": true,
+        "fullOriginalTimelineSelected": true,
+        "fullOriginalViewportSelected": true,
+        "sourcePlaybackNote": "Selected MP4 interval presented at its existing frame cadence. Recorder caps an initial static lead-in at 1 second and holds the final frame at least 1 second; action intervals retain capture timing. Presentation repeats frames only for output cadence; no motion interpolation."
+      },
+      {
+        "phase": "after",
+        "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+        "kind": "screenshot",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/after/neutral-desktop-hidden-popup.png",
+        "label": "After · Compiled hiding",
+        "subtitle": "Detail · Hidden controls stay hidden",
+        "caption": "After: Actual lower-left source detail. Native controls retain their1px clipped contract; readable menu options are unchanged. Authentic PNG held 2.4 seconds.",
+        "view": "Detail · Hidden controls stay hidden",
+        "cropDisclosure": "Actual source crop x0/y730/450×270px, fitted below separate editorial header.",
+        "crop": [
+          0,
+          730,
+          450,
+          270
+        ],
+        "sourceSha256": "afd3e40bd9ef1350db9f952042060eb2d9efd6410d56d4120db38b48c942c153",
+        "sourceBytes": 75986,
+        "sourceDurationSeconds": null,
+        "sourceFps": null,
+        "timelineSeconds": [
+          18.24,
+          20.64
+        ],
+        "presentationDurationSeconds": 2.4,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": null,
+        "sourceSelectedRangeSeconds": null,
+        "fullOriginalSelected": false,
+        "fullOriginalTimelineSelected": false,
+        "fullOriginalViewportSelected": false,
+        "sourcePlaybackNote": "Authentic PNG held for the stated presentation duration. A still has no source time range; no recorded motion is implied."
+      },
+      {
+        "phase": "after",
+        "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+        "kind": "screenshot",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/after/neutral-desktop-visible-keyboard-selected.png",
+        "label": "After · Compiled hiding",
+        "subtitle": "Visible trigger · Unchanged branch",
+        "caption": "After: Actual selected Local state on the ordinary visible trigger. Native keyboard steps are separately logged; this held still does not demonstrate motion or timing. Authentic PNG held 2 seconds.",
+        "view": "Visible trigger · Unchanged branch",
+        "cropDisclosure": "Full original viewport below the separate editorial header.",
+        "sourceSha256": "c43ddf34e122b4f8577b8719e70f9c1ff63b15ccd4ad16b393ee9a9b3453a2b6",
+        "sourceBytes": 84996,
+        "sourceDurationSeconds": null,
+        "sourceFps": null,
+        "timelineSeconds": [
+          20.64,
+          22.64
+        ],
+        "presentationDurationSeconds": 2.0,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": null,
+        "sourceSelectedRangeSeconds": null,
+        "fullOriginalSelected": false,
+        "fullOriginalTimelineSelected": false,
+        "fullOriginalViewportSelected": true,
+        "sourcePlaybackNote": "Authentic PNG held for the stated presentation duration. A still has no source time range; no recorded motion is implied."
+      },
+      {
+        "phase": "after",
+        "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+        "kind": "screenshot",
+        "publicSourcePath": "dropdown-hidden-controls-evidence/after/neutral-phone-visible-dropdown.png",
+        "label": "After · Compiled hiding",
+        "subtitle": "Phone · Unchanged visible branch",
+        "caption": "After: Actual390×844 Neutral expanded mobile backend dropdown; unchanged-path smoke, not a new hidden-control phone claim. Authentic PNG held 2 seconds.",
+        "view": "Phone · Unchanged visible branch",
+        "cropDisclosure": "Full original viewport below the separate editorial header.",
+        "sourceSha256": "cb04d0b6682b1ff4b62028d98d2fbaf743a99b19af3879cf5fb4646e8a2b0d41",
+        "sourceBytes": 26022,
+        "sourceDurationSeconds": null,
+        "sourceFps": null,
+        "timelineSeconds": [
+          22.64,
+          24.64
+        ],
+        "presentationDurationSeconds": 2.0,
+        "editorialSpeedChange": false,
+        "sourceStartSeconds": null,
+        "sourceSelectedRangeSeconds": null,
+        "fullOriginalSelected": false,
+        "fullOriginalTimelineSelected": false,
+        "fullOriginalViewportSelected": true,
+        "sourcePlaybackNote": "Authentic PNG held for the stated presentation duration. A still has no source time range; no recorded motion is implied."
+      }
+    ],
+    "ambience": {
+      "origin": "Original synthesized ambient pad; no external samples or provider.",
+      "frequenciesHz": [
+        174.61,
+        220,
+        261.63
+      ],
+      "amplitude": 0.004,
+      "normalizationGain": 1.250945,
+      "fadeInSeconds": 1.5,
+      "fadeOutSeconds": 2,
+      "meanDbfs": -52.5,
+      "peakDbfs": -42.5,
+      "applicationAudio": false
+    },
+    "encodingNote": "Each scene is independently decoded, then concatenated in one continuous H264 encode with 2-second keyframes; no stream-copy video concatenation.",
+    "recipeSha256": "30e1fdb514f4a0f66b4696d37ca9975ca12c56adb6585ad3b8f9d2e9a81d9e1d"
+  },
+  "preview": {
+    "file": "dropdown-hidden-controls-poster.jpg",
+    "dimensions": [
+      1440,
+      1120
+    ],
+    "type": "poster",
+    "audio": false,
+    "limitation": "Still poster. Play or download the MP4 for the genuine backend dropdown interactions; the hidden controls remain visually hidden."
+  },
+  "files": {
+    "dropdown-hidden-controls-capture-provenance.json": {
+      "sha256": "ba44171a5c437bf3459cfd8cab7273ed7c523d8b2bb0a8fcbce61911bd3a029d",
+      "bytes": 21597
+    },
+    "dropdown-hidden-controls-captions.vtt": {
+      "sha256": "c8633f2a7cf725433cb56b1b56c6893055123a659af6b5d54795175239a77c4e",
+      "bytes": 1923
+    },
+    "dropdown-hidden-controls-comparison.json": {
+      "sha256": "681a7ead9fe40ccbc7360dc7191569b67ed8e17a2657272b302265b2c4649a5c",
+      "bytes": 22436
+    },
+    "dropdown-hidden-controls-evidence.zip": {
+      "sha256": "6592d6782e7c4630da4c5d4ebbe76fa8b237b8da594ab2701f8713cae4e180c8",
+      "bytes": 858322
+    },
+    "dropdown-hidden-controls-poster.jpg": {
+      "sha256": "1699477d3b749485615efc5123d82a8734a6d5fc9318a890f10e6a5469a9429e",
+      "bytes": 90150
+    },
+    "dropdown-hidden-controls-before-after.mp4": {
+      "sha256": "7f97f508161b717e5c653fa083ae31989918c720ab61f7fce9499b1f9eb80ad3",
+      "bytes": 1430384
+    }
+  }
+}

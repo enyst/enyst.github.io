@@ -1,0 +1,502 @@
+{
+  "schemaVersion": 1,
+  "subject": "Dropdown hidden controls",
+  "repository": "https://github.com/OpenHands/OpenHands",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18918",
+  "implementation": {
+    "before": "The shared Dropdown primitive applies the visually-hidden contract inline to its hidden real input and toggle button.",
+    "after": "The same two native controls use compiled sr-only CSS, preserving1px geometry, clipping, semantic wiring and existing interaction paths.",
+    "owners": [
+      "src/ui/dropdown/dropdown.tsx"
+    ],
+    "preserved": "Native Downshift controls, tab index/ARIA relationships, hidden-trigger popovers, ordinary visible-trigger search/selection and phone paths."
+  },
+  "before": {
+    "head": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+    "buildFingerprint": "4f9d5a4fab9f2c85",
+    "builtThisRun": true,
+    "runId": "before",
+    "versions": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "reportedRuntime": null,
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override 1.25.1 matches committed pin; health endpoint status has no independent version field."
+    },
+    "sourceHashes": {
+      "src/components/features/automations/setup/automation-setup-panel.tsx": "313fe2f007aa0b811979ba45531571626dc1de5bd7da1754288ac719751b280f",
+      "src/components/features/automations/setup/automation-setup-prompt-stack.tsx": "df5364c5e0da1b0f7a2f697dc79568e12d5257d03ca0b1a7afd06baafd4a699f",
+      "src/routes/automation-setup-new.tsx": "f49be56ee35ec31c0d27557cec9610410f0f224b55d912cec478fd5f174f244b",
+      "src/ui/dropdown/dropdown.tsx": "ce107e70e4610c8426c3d88197e81873f254700a12a853010c6f905635ee2d57",
+      "src/tailwind.css": "ce7938950dfc9c7a313fb7a970a12639fda6c91bd5a7a3e9b1a9d011d17c41bf",
+      "eslint.config.js": "4fbd7c967d161864d9d7df9956017d8784794905c3fa7bd2ad24b1acceb72184",
+      "package.json": "cae3c60b82ddb412a8a86b19ee2f9498505814e8c0a6327924c4876825492ea4",
+      "package-lock.json": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9"
+    },
+    "packageLockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+    "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+    "verifierTreeSha256": "1d1c1b5907056e75c40f7979587dcf6f1960d7af30ae9e172d1b3d416f79294a",
+    "featureMapSha256": {
+      "F28-automation-setup-page.md": "16a28d16f02b86ed1bb20320a767db237a7aa1cbef83aaae20f0377dbf3d167c",
+      "F22-automation-creation.md": "3c9ff2b383cacf793a3a8baf75478c7d1115625bd629efd9fe53c47baf6c1299",
+      "F23-automation-detail.md": "c332ac455ea07af3b07769eb72950ff025f3986d09a045ecef3096a0d566238b",
+      "F25-backends-and-cloud.md": "2e92d09a49c02b5238b75401f16c749dd2196c41a39195b296906c94337d8274"
+    },
+    "buildTreeSha256": null,
+    "captureStatus": "complete-stopped",
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T23:04:46Z",
+        "elapsedSeconds": 4.218,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "before",
+          "browser": {
+            "stopped": true,
+            "pid": 86271
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 28,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 28,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T23:04:50Z",
+        "elapsedSeconds": 0.043,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T22:57:20.134Z"
+        }
+      }
+    ]
+  },
+  "after": {
+    "head": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+    "buildFingerprint": "cd4e9b7965bca919",
+    "builtThisRun": true,
+    "runId": "dropdown-after",
+    "versions": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "reportedRuntime": null,
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override 1.25.1 matches committed pin; health endpoint status has no independent version field."
+    },
+    "sourceHashes": {
+      "src/components/features/automations/setup/automation-setup-panel.tsx": "313fe2f007aa0b811979ba45531571626dc1de5bd7da1754288ac719751b280f",
+      "src/components/features/automations/setup/automation-setup-prompt-stack.tsx": "df5364c5e0da1b0f7a2f697dc79568e12d5257d03ca0b1a7afd06baafd4a699f",
+      "src/routes/automation-setup-new.tsx": "f49be56ee35ec31c0d27557cec9610410f0f224b55d912cec478fd5f174f244b",
+      "src/ui/dropdown/dropdown.tsx": "85b74c3d5a61aa2b97aa87434ad8fb1cc059a21d15b362cc96df727c37d9e377",
+      "src/tailwind.css": "ce7938950dfc9c7a313fb7a970a12639fda6c91bd5a7a3e9b1a9d011d17c41bf",
+      "eslint.config.js": "4fbd7c967d161864d9d7df9956017d8784794905c3fa7bd2ad24b1acceb72184",
+      "package.json": "cae3c60b82ddb412a8a86b19ee2f9498505814e8c0a6327924c4876825492ea4",
+      "package-lock.json": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9"
+    },
+    "packageLockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+    "verifierMainSha256": "a710d4ae75b8572c6eb96f3614bed158cc32f858195871eed5ff9f720bb79cf7",
+    "verifierTreeSha256": "1d1c1b5907056e75c40f7979587dcf6f1960d7af30ae9e172d1b3d416f79294a",
+    "featureMapSha256": {
+      "F28-automation-setup-page.md": "16a28d16f02b86ed1bb20320a767db237a7aa1cbef83aaae20f0377dbf3d167c",
+      "F22-automation-creation.md": "3c9ff2b383cacf793a3a8baf75478c7d1115625bd629efd9fe53c47baf6c1299",
+      "F23-automation-detail.md": "c332ac455ea07af3b07769eb72950ff025f3986d09a045ecef3096a0d566238b",
+      "F25-backends-and-cloud.md": "2e92d09a49c02b5238b75401f16c749dd2196c41a39195b296906c94337d8274"
+    },
+    "buildTreeSha256": null,
+    "captureStatus": "complete-stopped",
+    "cleanup": [
+      {
+        "timestamp": "2026-10-24T23:11:33Z",
+        "elapsedSeconds": 3.406,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "dropdown-after",
+          "browser": {
+            "stopped": true,
+            "pid": 93571
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 6,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 6,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-24T23:11:36Z",
+        "elapsedSeconds": 0.039,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "dropdown-after",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-24T23:09:36.311Z"
+        }
+      }
+    ]
+  },
+  "conditions": {
+    "before": {
+      "production": "Real Local Canvas with Agent Server 1.58.1, automation 1.25.1, --mars-web, installed Chrome private isolated profile. No route interception, DOM mutation, mocks, or source changes.",
+      "dropdown": "Collapsed hidden-trigger popup via native hover and Manage click; visible-trigger search/no-options/ArrowDownEnter select Local; phone drawer is unchanged visible-trigger smoke. No programmatic focus of hidden input.",
+      "phone": "390×844 real expanded drawer and visible-trigger dropdown smoke; same Neutral theme.",
+      "model": "Unconfigured; no conversation/model/tool execution.",
+      "media": "Original PNG/MP4 bytes retained;25fps native recording preserves action timing, not a speed comparison. Recorder trims still lead-in and adds final hold."
+    },
+    "after": {
+      "production": "Real Local Canvas with Agent Server 1.58.1, automation 1.25.1, --mars-web, installed Chrome private isolated profile. No route interception, DOM mutation, mocks, or source changes.",
+      "dropdown": "Collapsed hidden-trigger popup via native hover and Manage click; visible-trigger search/no-options/ArrowDownEnter select Local; phone drawer is unchanged visible-trigger smoke. No programmatic focus of hidden input.",
+      "phone": "390×844 real expanded drawer and visible-trigger dropdown smoke; same Neutral theme.",
+      "model": "Unconfigured; no conversation/model/tool execution.",
+      "media": "Original PNG/MP4 bytes retained;25fps native recording preserves action timing, not a speed comparison. Recorder trims still lead-in and adds final hold."
+    },
+    "mainFilm": "Selected genuine form/dropdown paths; separate notes distinguish changed and unchanged branches."
+  },
+  "limitations": [
+    "Appearance-preserving refactor of existing styles. This compares the specified genuine revisions and selected observed paths, with no claim of global pixel identity, exhaustive UI coverage or speed improvement.",
+    "Native recordings retain their existing frame cadence without editorial speed changes. Recorder lead-in/hold behavior and any capture misses are retained per original source. Selected excerpts are labelled; all selected complete originals remain downloadable.",
+    "Full viewport context precedes labelled detail crops. Held PNGs are labelled as stills in captions and provenance; no recorded motion is implied.",
+    "No model message, real provider credentials, paid API/resource, real webhook delivery or automation execution was used. Any genuine unconfigured-model or public-webhook warning is preserved.",
+    "Dropdown captures use Neutral; no all-five-theme dropdown coverage is claimed.",
+    "Only two matched desktop computed samples support control geometry. A phone-viewport query matched a hidden desktop duplicate and is excluded from visible-phone geometry claims; the original observation is retained and labelled.",
+    "Clipping moves from inline clip:rect(0,0,0,0) to compiled clip-path:inset(50%). This is equivalent empty painted clipping, not literal declaration identity. Baseline live clipPath was not sampled; actual legacy clip was.",
+    "The changed path is the hidden-trigger input and toggle in the collapsed backend popover. Ordinary visible-trigger keyboard/search and phone views are explicitly unchanged-path smoke.",
+    "No hidden input was programmatically focused to invent a keyboard path. Only native visible controls were used for the observed keyboard selection."
+  ],
+  "selectedArtifacts": [
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/before/neutral-desktop-hidden-popup.png",
+      "sourceSha256": "802817b464a065a0334f396239c2fcf9ed83a46fb699ae8a0a7b4b76eab63a8e",
+      "bytes": 75987,
+      "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+      "servedBuildFingerprint": "4f9d5a4fab9f2c85",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T23:02:00Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/before/neutral-desktop-manage-backends.png",
+      "sourceSha256": "58ddce2803422ab561a2032aca6e330e6e73cbd104f81a06ad5d36bb250dc2e9",
+      "bytes": 57731,
+      "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+      "servedBuildFingerprint": "4f9d5a4fab9f2c85",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T23:02:01Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/before/neutral-desktop-visible-empty-search.png",
+      "sourceSha256": "472c9d17f7295f2cff1fb2cca3c49a268e621509888faaf2de9cf1f68fe04389",
+      "bytes": 88183,
+      "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+      "servedBuildFingerprint": "4f9d5a4fab9f2c85",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T23:02:04Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/before/neutral-desktop-visible-keyboard-selected.png",
+      "sourceSha256": "c43ddf34e122b4f8577b8719e70f9c1ff63b15ccd4ad16b393ee9a9b3453a2b6",
+      "bytes": 84996,
+      "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+      "servedBuildFingerprint": "4f9d5a4fab9f2c85",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T23:02:04Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/before/neutral-phone-visible-dropdown.png",
+      "sourceSha256": "65c6682cd31c7c350475fce7df26cfbf56fdaaaab9e99c958be04c7d8f423f57",
+      "bytes": 26030,
+      "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+      "servedBuildFingerprint": "4f9d5a4fab9f2c85",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T23:03:07Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "dropdown-hidden-controls-evidence/before/neutral-desktop-hidden-dropdown.mp4",
+      "sourceSha256": "98d20c3b069bc523d4c38ad636f760e4d6d823a84af4c2488d139cea81cc3bab",
+      "bytes": 114270,
+      "sourceRevision": "1abbd4b41544dd8a74b19ff3359029537bbaa41b",
+      "servedBuildFingerprint": "4f9d5a4fab9f2c85",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "capturePhase": "before",
+      "captureRunId": "before",
+      "captureTimestamp": "2026-10-24T23:02:02Z",
+      "sourceDurationSeconds": 3.92,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "neutral-desktop-hidden-dropdown.mp4",
+        "seconds": 3.9,
+        "recordedSeconds": 3,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 72,
+        "changes": 17,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations"
+      }
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/after/neutral-desktop-hidden-popup.png",
+      "sourceSha256": "afd3e40bd9ef1350db9f952042060eb2d9efd6410d56d4120db38b48c942c153",
+      "bytes": 75986,
+      "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+      "servedBuildFingerprint": "cd4e9b7965bca919",
+      "captureRun": "dropdown-after",
+      "builtThisRun": true,
+      "capturePhase": "dropdown-after",
+      "captureRunId": "dropdown-after",
+      "captureTimestamp": "2026-10-24T23:10:37Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/after/neutral-desktop-manage-backends.png",
+      "sourceSha256": "58ddce2803422ab561a2032aca6e330e6e73cbd104f81a06ad5d36bb250dc2e9",
+      "bytes": 57731,
+      "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+      "servedBuildFingerprint": "cd4e9b7965bca919",
+      "captureRun": "dropdown-after",
+      "builtThisRun": true,
+      "capturePhase": "dropdown-after",
+      "captureRunId": "dropdown-after",
+      "captureTimestamp": "2026-10-24T23:10:39Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/after/neutral-desktop-visible-empty-search.png",
+      "sourceSha256": "472c9d17f7295f2cff1fb2cca3c49a268e621509888faaf2de9cf1f68fe04389",
+      "bytes": 88183,
+      "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+      "servedBuildFingerprint": "cd4e9b7965bca919",
+      "captureRun": "dropdown-after",
+      "builtThisRun": true,
+      "capturePhase": "dropdown-after",
+      "captureRunId": "dropdown-after",
+      "captureTimestamp": "2026-10-24T23:10:42Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/after/neutral-desktop-visible-keyboard-selected.png",
+      "sourceSha256": "c43ddf34e122b4f8577b8719e70f9c1ff63b15ccd4ad16b393ee9a9b3453a2b6",
+      "bytes": 84996,
+      "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+      "servedBuildFingerprint": "cd4e9b7965bca919",
+      "captureRun": "dropdown-after",
+      "builtThisRun": true,
+      "capturePhase": "dropdown-after",
+      "captureRunId": "dropdown-after",
+      "captureTimestamp": "2026-10-24T23:10:42Z",
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "dropdown-hidden-controls-evidence/after/neutral-phone-visible-dropdown.png",
+      "sourceSha256": "cb04d0b6682b1ff4b62028d98d2fbaf743a99b19af3879cf5fb4646e8a2b0d41",
+      "bytes": 26022,
+      "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+      "servedBuildFingerprint": "cd4e9b7965bca919",
+      "captureRun": "dropdown-after",
+      "builtThisRun": true,
+      "capturePhase": "dropdown-after",
+      "captureRunId": "dropdown-after",
+      "captureTimestamp": "2026-10-24T23:10:43Z",
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "dropdown-hidden-controls-evidence/after/neutral-desktop-hidden-dropdown.mp4",
+      "sourceSha256": "fe554a99a33401c6995eba32f1ad3a6d151626d5b2d29a74c25eee3167086c5d",
+      "bytes": 115694,
+      "sourceRevision": "92cc0b57fab00cebed9f065999f1255e27bc5255",
+      "servedBuildFingerprint": "cd4e9b7965bca919",
+      "captureRun": "dropdown-after",
+      "builtThisRun": true,
+      "capturePhase": "dropdown-after",
+      "captureRunId": "dropdown-after",
+      "captureTimestamp": "2026-10-24T23:10:40Z",
+      "sourceDurationSeconds": 3.92,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "neutral-desktop-hidden-dropdown.mp4",
+        "seconds": 3.9,
+        "recordedSeconds": 3,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 72,
+        "changes": 19,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/conversations"
+      }
+    }
+  ],
+  "receiptHandling": "PNG and MP4 sources are byte-for-byte copies. Public receipt JSON removes local capture paths and local URLs; original receipt hashes are retained.",
+  "privateReceiptSha256": {
+    "before": "6d6442e79a2ddd257a103c810a1c6fafac3397c418ec1d38d44b15f5f23e672e",
+    "after": "3833a9062b9f7c7c7cbbbca38b579c11be3eb2564f4cea2c267d687f8a8b4d74"
+  },
+  "comparisonFile": "dropdown-hidden-controls-comparison.json",
+  "comparisonSha256": "681a7ead9fe40ccbc7360dc7191569b67ed8e17a2657272b302265b2c4649a5c",
+  "authoritativeManifestSha256": "3ecba615a27c7b7a28758243b53dbd88325531bfcf4a0cc5a0ba08c87993557f"
+}
