@@ -1184,3 +1184,25 @@ media-description failure, six skipped and zero pending code checks. The older
 checkpoint above is retained as history. Both PRs remain draft/NoBot until
 actual publication, current description and live-anchor receipts are supplied.
 All 40 film elements/80 MP4 anchors and source/media identities are unchanged.
+
+
+## Final READY checkpoint · verification pinned to media snapshot C
+
+Asset B `ef22c28aa21e9fb5796773c78d358ac3a00b553a` and media docs C
+`a914cb127d13cf720e4d483ec481212876532d53` are published. All 11 critical raw
+files pass HTTP 200/full SHA; all 15 live Pages files pass HTTP/full SHA and
+expected MIME, including both own film anchors. Existing designated Chrome
+shows readable After playback at 0:17/0:27 for automation and 0:18/0:24 for
+dropdown, with visible Slack links. Files were verified by HTTP, not browser
+download clicks. These checks apply to C; root verifies final READY docs D
+after its later publication.
+
+Both #18917/#18918 are **ready/open at unchanged heads**, with effective CI
+**8 passed/6 skipped/0 pending/0 failed**, including fresh ready-event
+description validation. Initial all-hands-bot requests were verified pending
+after green; no prior review, approval or merge is claimed. HUMAN prefixes were
+byte-preserved. The cohort is **54: 50 merged/4 open non-draft/0 draft**.
+All 40 film elements/80 MP4 anchors, corrected source/media bytes and stated
+coverage limits remain unchanged. Exact-main stays 603/0; independent 77+18
+proposal reductions remain separate. The user chooses merging; no merge,
+release or watch is performed here.
