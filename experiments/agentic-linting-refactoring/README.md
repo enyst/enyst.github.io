@@ -1206,3 +1206,91 @@ All 40 film elements/80 MP4 anchors, corrected source/media bytes and stated
 coverage limits remain unchanged. Exact-main stays 603/0; independent 77+18
 proposal reductions remain separate. The user chooses merging; no merge,
 release or watch is performed here.
+
+
+## 25 October continuation · draft evidence checkpoint
+
+Prior #18917 merged at `2026-10-25T02:20:45Z` as
+`74323b544c151669b3cdd88fb950942a29beda55`; #18918 merged at
+`2026-10-25T02:21:19Z` as `b185939d3dec3b203b0651c675f175ee5b4ed43e`.
+These are 03:20 and 03:21 Stockholm after the DST change; original capture heads
+and all 40 whole film elements/80 MP4 anchors remain unchanged.
+
+Exact main `c5612599307c0bc44e21ed25c97e2a542e194b32` now has **508 warnings/0 errors**:
+439 arbitrary values, 51 inline styles and 18 palette findings. The
+[public audit](main-lint-audit-2026-10-25-c561259930.json) records exactly 95 removed and none
+added versus 1abbd4b415; SHA-256 `26aac3a5821323c5277f2f7789863827b6f3ab992b604e0ce856b4d74a822279`.
+Full lint, machine ESLint, typecheck and formatting pass using the committed
+lock and existing verified install; no dependency resolution/install ran.
+
+New **draft** [#18933](https://github.com/OpenHands/OpenHands/pull/18933) uses
+17 existing profile theme aliases across six files at `2c4e9e6bd9533d84245f92a66ab732a2a35b255b`.
+All 90 tests, app/library builds and five emitted full-class pairs pass;
+independent branch lint is491/0. Known Solarized keyless-note contrast #18546
+(2.58:1) and the public embedded AddModels body-portal gap remain inherited.
+New **draft** [#18934](https://github.com/OpenHands/OpenHands/pull/18934) gives
+twelve preview bindings two compiled owners at `e0eee4cc154875c759d6f346495afce69118a79e`.
+All 34 existing tests/full lint/builds pass, independent branch lint496/0;
+independent actual twelve-property cascade proof is still ongoing.
+These branch reductions remain separate from integrated main508/0.
+Matching evidence and current source CI are in progress; no frozen new movie,
+public HTTP, readiness or initial bot request is claimed. Own film anchors
+`profile-theme-aliases-film` and `file-preview-theme-film` must be published
+and verified before readiness and initial review. No arbitrary batch size/count cap.
+
+The cohort is **56: 52 merged/2 open non-draft/2 draft**. Current read-only
+#18520 evidence confirms open/non-draft, CLEAN/MERGEABLE, bot-approved at
+unchanged `aef5a5591d`, CI8 passed/6 skipped and no review requests. Its latest
+bot approval accepts candid fixture-backed appearance evidence: a real-account
+empty state plus forty focus measurements across five themes/two viewports.
+The earlier static-only record and original source identities remain history.
+Fixture proof does not establish DigitalOcean authentication, billing or
+resource lifecycle; issue18517 still requests authenticated affected states
+and is not ready-for-dev. No duplicate DO source work is needed.
+SDK5603 and budget18533 are explicitly **parked by the user**; their records,
+prerequisites and user text remain unchanged, with no new SDK status work.
+
+
+## 25 October continuation · frozen MEDIA/DRAFT checkpoint
+
+The [profile theme film](../../arch/agentic-linting-refactoring.html#profile-theme-aliases-film)
+and [Markdown preview film](../../arch/agentic-linting-refactoring.html#file-preview-theme-film)
+are complete locally. Both native players have posters/captions, visible Slack
+downloads, complete-original ZIPs and relative source/comparison links. All forty
+earlier whole players/eighty MP4 anchors retain their bytes; totals are
+**42 films/84 MP4 downloads**. No new GIF.
+
+Local-only asset B `11dd5ab4dd01504b1f0fd881377d9551539ff6c1` contains
+123 packet assets plus the exact-main audit. It is not yet published. Frozen
+profile packet: 48.64 seconds, 59 PNGs/four native clips, 72 ZIP members; film
+SHA `a2808a9dec0c43e0238fa9947214b7952f81026e978a277281d7b4092aeed277`.
+Frozen Files packet: 38.4 seconds, 32 PNGs/two native clips, 43 ZIP members; film
+SHA `a431e990bf5c7946adfb0e9760696991f67b6e20c354df617c8cb2a8eda971d1`.
+Both are H.264/yuv420p/AAC, 25 fps with fast start, and quiet original ambience
+averaging −52.5 dB. Independent code/live/frozen-asset gates and root visual
+review pass; no public HTTP or live-anchor verification is claimed yet.
+
+Source/builds are c561259930/dfd39a7c2f6aec0a before, profile
+2c4e9e6bd9/b38c7801a740f06a and Files e0eee4cc15/b5f49973c55d0d72 after.
+All 23 profile computed states and eleven desktop Files states match. Five
+themes and representative 390 px phone originals are included. Files phone
+uses native Hide file tree on both revisions; three matching Before stills
+come from a supplemental same-baseline/build run. Phone Rich/table visual
+smoke lacks paired baseline hidden-tree computed measurements. Host overrides,
+embedded hosts and absent sanitized caption/kbd/lead descendants retain
+compiled-contract coverage; Files actual twelve-property proof passes across
+32 scenarios. Genuine filesystem reads use the existing adapter, with zero
+agent prompts/model calls/turns. Solarized keyless-note issue #18546 (2.58:1),
+Cloud/older-backend/bound-provider and embedded AddModels limits remain. Four
+existing profile warnings remain outside the color-only batch; no claim that
+all four lack aliases. No pixel identity, contrast or phone-layout fix claimed.
+
+Both #18933/#18934 remain **draft/NoBot**. Actual 11:05 UTC source-CI receipt
+records **7 passed/1 media-description failure/6 skipped/0 pending** each.
+Root publishes B plus media docs C, verifies immutable raw and own live film
+anchors, attaches media and closes required checks before readiness/initial
+bot review. Cohort remains **56: 52 merged/2 open non-draft/2 drafts**.
+Main remains **508/0**; independent17+12 branch reductions and branch491/496
+counts are separate. All 97 originals and old source identities are retained;
+owned runs are stopped/private-purged and core ports independently closed.
+SDK5603 and budget18533 remain user-parked, with their records unchanged.
