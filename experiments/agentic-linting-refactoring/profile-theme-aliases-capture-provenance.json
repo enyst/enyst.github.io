@@ -1,0 +1,1590 @@
+{
+  "schemaVersion": 1,
+  "subject": "Profile theme aliases",
+  "repository": "https://github.com/OpenHands/OpenHands",
+  "pullRequest": "https://github.com/OpenHands/OpenHands/pull/18933",
+  "implementation": {
+    "before": "Settings repeat17 arbitrary CSS-variable color recipes across six model-profile files.",
+    "after": "The same existing profile/theme owners are expressed by five named semantic aliases; no new color, layout, state or API behavior.",
+    "owners": [
+      "src/components/features/settings/llm-profiles/add-models-modal.tsx",
+      "src/components/features/settings/meta-llm-profiles/meta-llm-settings-view.tsx",
+      "src/components/features/settings/meta-llm-profiles/meta-profile-actions-menu.tsx",
+      "src/components/features/settings/meta-llm-profiles/meta-profile-editor.tsx",
+      "src/components/features/settings/meta-llm-profiles/meta-profile-row.tsx",
+      "src/routes/meta-llm-settings.tsx"
+    ],
+    "compiledContract": "Independent actual app/library proof covers all five aliases, including hover and scoped selector/declaration/layer contracts; attached proof has10 app/library contracts."
+  },
+  "before": {
+    "head": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+    "buildFingerprint": "dfd39a7c2f6aec0a",
+    "builtThisRun": true,
+    "runId": "before",
+    "versions": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override 1.25.1 matches committed pin; health endpoint status has no independent version field."
+    },
+    "sourceHashes": {
+      "src/components/features/settings/llm-profiles/add-models-modal.tsx": "0dc54dcec4ec329b3e9c7d212da53f78f5c90b078f45994a6a15de098b0d719d",
+      "src/components/features/settings/meta-llm-profiles/meta-llm-settings-view.tsx": "e31f29d2d252ff335bb9570a513ef13c80f1cf28aaac3ab18a69f8d4b926e8aa",
+      "src/components/features/settings/meta-llm-profiles/meta-profile-actions-menu.tsx": "46e3ea6f5afcfbe5c6aec1065433960f76cedbc73e15960e77ee4fd372712d55",
+      "src/components/features/settings/meta-llm-profiles/meta-profile-editor.tsx": "9e410b418c17c4f80c6efa6c554d0744f3245711bd4629b6b54952636b206bdb",
+      "src/components/features/settings/meta-llm-profiles/meta-profile-row.tsx": "a335ba7e5a93f037b343e1db96a7bb5c518dca24691373227c4b612cdbe58554",
+      "src/routes/meta-llm-settings.tsx": "3db16f596619bb4b765e956c7616d93ebae29cf349510bac94492ee9e60a2e0f",
+      "src/components/features/files-tab/file-content-viewer.tsx": "d6bd534ba87d0572f16e78c38c98ca750e0e008fa4e10e736a0a6d6dda95b1f8",
+      "src/tailwind.css": "ce7938950dfc9c7a313fb7a970a12639fda6c91bd5a7a3e9b1a9d011d17c41bf",
+      "eslint.config.js": "4fbd7c967d161864d9d7df9956017d8784794905c3fa7bd2ad24b1acceb72184",
+      "package.json": "cae3c60b82ddb412a8a86b19ee2f9498505814e8c0a6327924c4876825492ea4",
+      "package-lock.json": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9"
+    },
+    "packageLockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+    "verifierMainSha256": "641e006680dbc0cb80a499207c6b04c694792f7f163f0328979ab4bb2dab264d",
+    "verifierTreeSha256": "2f2d3d060cd18043680256634ca88dc8cff94a1b8371d263b7fd6dd24c855f83",
+    "featureMapSha256": {
+      "F08-workspace-files-and-changes.md": "8f4485d8383d2565a67948b56981a64b06bdecd584eb5aab40e710b657bd2ed3",
+      "F10-llm-profiles.md": "4f00c1d7769730235f3351636920cc9017421e5e1b1cc7311af5752cb3df7527",
+      "F12-model-router.md": "dd5d32c3f7880f98bfe92b064393985003f2ec76df2afa67cd575c4369ac65e2"
+    },
+    "captureStatus": "complete-stopped",
+    "cleanup": [
+      {
+        "timestamp": "2026-10-25T10:53:17Z",
+        "elapsedSeconds": 6.192,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "before",
+          "browser": {
+            "stopped": true,
+            "pid": 44277
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 50,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 50,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-25T10:53:24Z",
+        "elapsedSeconds": 0.057,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "before",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-25T10:43:53.734Z"
+        }
+      }
+    ],
+    "supplementalSources": []
+  },
+  "after": {
+    "head": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+    "buildFingerprint": "b38c7801a740f06a",
+    "builtThisRun": true,
+    "runId": "profiles-after",
+    "versions": {
+      "pins": {
+        "agentServer": "1.58.1",
+        "agentCanvas": "1.33.0",
+        "automation": "1.25.1"
+      },
+      "node": "v24.22.1",
+      "npm": "11.12.1",
+      "chromeBinary": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "automationVersionEvidence": "Explicit launch override 1.25.1 matches committed pin; health endpoint status has no independent version field."
+    },
+    "sourceHashes": {
+      "src/components/features/settings/llm-profiles/add-models-modal.tsx": "4f77a0fe7c0971e964ad79d4bc688c70f35419af6a49545c5e8c499e9399d1a3",
+      "src/components/features/settings/meta-llm-profiles/meta-llm-settings-view.tsx": "86dbcece94e4589b44413a57a775d6621d93f520d8337eed85efb36da4065fda",
+      "src/components/features/settings/meta-llm-profiles/meta-profile-actions-menu.tsx": "017705b48e16d22be40eedd28dd8d15219a0fb996f9d4a37e763633e0d3511a1",
+      "src/components/features/settings/meta-llm-profiles/meta-profile-editor.tsx": "7eafa580f3083cd7e308449c77a85aed58c07b703baa7747fb20a6ad7ae03383",
+      "src/components/features/settings/meta-llm-profiles/meta-profile-row.tsx": "015fa09128412f712046c64af3cf758f15ab22cac707ac090985524dcdf54906",
+      "src/routes/meta-llm-settings.tsx": "2a1bfb88f020ef0087df3db0b96a12c231e2b5b4cdeaa13c6b19fef5f2531f96",
+      "src/components/features/files-tab/file-content-viewer.tsx": "d6bd534ba87d0572f16e78c38c98ca750e0e008fa4e10e736a0a6d6dda95b1f8",
+      "src/tailwind.css": "ce7938950dfc9c7a313fb7a970a12639fda6c91bd5a7a3e9b1a9d011d17c41bf",
+      "eslint.config.js": "4fbd7c967d161864d9d7df9956017d8784794905c3fa7bd2ad24b1acceb72184",
+      "package.json": "cae3c60b82ddb412a8a86b19ee2f9498505814e8c0a6327924c4876825492ea4",
+      "package-lock.json": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9"
+    },
+    "packageLockSha256": "522afc3fcc5bcccaf684da96138aa455d824e1ac9e6cf0244db74d209795b0e9",
+    "verifierMainSha256": "641e006680dbc0cb80a499207c6b04c694792f7f163f0328979ab4bb2dab264d",
+    "verifierTreeSha256": "2f2d3d060cd18043680256634ca88dc8cff94a1b8371d263b7fd6dd24c855f83",
+    "featureMapSha256": {
+      "F08-workspace-files-and-changes.md": "8f4485d8383d2565a67948b56981a64b06bdecd584eb5aab40e710b657bd2ed3",
+      "F10-llm-profiles.md": "4f00c1d7769730235f3351636920cc9017421e5e1b1cc7311af5752cb3df7527",
+      "F12-model-router.md": "dd5d32c3f7880f98bfe92b064393985003f2ec76df2afa67cd575c4369ac65e2"
+    },
+    "captureStatus": "complete-stopped",
+    "cleanup": [
+      {
+        "timestamp": "2026-10-25T10:57:21Z",
+        "elapsedSeconds": 3.423,
+        "args": [
+          "stop",
+          "--purge-private"
+        ],
+        "exitCode": 0,
+        "result": {
+          "run": "profiles-after",
+          "browser": {
+            "stopped": true,
+            "pid": 59384
+          },
+          "launcherStopped": true,
+          "ports": {
+            "ingress": "closed",
+            "agentServer": "closed",
+            "automation": "closed",
+            "frontend": "closed",
+            "vscode": "closed"
+          },
+          "evidenceFiles": 31,
+          "privatePurged": true,
+          "evidenceFilesAfterPurge": 31,
+          "ok": true
+        }
+      },
+      {
+        "timestamp": "2026-10-25T10:57:24Z",
+        "elapsedSeconds": 0.041,
+        "args": [
+          "status"
+        ],
+        "exitCode": 0,
+        "result": {
+          "ok": true,
+          "run": "profiles-after",
+          "baseUrl": "Local Canvas",
+          "mode": "local",
+          "revision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+          "launcherAlive": false,
+          "browserAlive": false,
+          "ports": {
+            "ingress": 18800,
+            "agentServer": 18801,
+            "automation": 18802,
+            "frontend": 18803,
+            "vscode": 19801
+          },
+          "versions": {
+            "agentServer": "1.58.1",
+            "sdk": "1.58.1"
+          },
+          "startedAt": "2026-10-25T10:55:44.052Z"
+        }
+      }
+    ],
+    "supplementalSources": []
+  },
+  "conditions": {
+    "before": {
+      "production": "Real production Local Canvas, Agent Server1.58.1, automation1.25.1, --mars-web, installed Google Chrome in owned private profile. No route interception, DOM mutation, frontend mocks or source edits.",
+      "profiles": "Empty state, Custom create helpers, save valid QA-only router with classifier free text and no provider connection, list/menu/Edit/Cancel. Add Models Moonshot keyless chooser; select all enables Add and clearing disables Add. No model validation, completion or bulk-profile creation.",
+      "files": "Actual owned Markdown bytes served from real workspace via an idle offline conversation, zero messages and no model calls. Rich/Plain toggle, prose-invert in dark themes, semantic descendant colors, native horizontal table scrolling and inherited fade.",
+      "phone": "390x844 actual settings forms and dedicated /panel route. Initial file-tree-open narrow preview excluded from publication in favor of follow-up native Hide file tree captures. No phone layout change claimed.",
+      "media": "Original PNG/MP4 retained;25fps normal action timing, no speed or pixel-identity claim. Recorder trims still lead-in and adds final hold."
+    },
+    "after": {
+      "production": "Real production Local Canvas, Agent Server1.58.1, automation1.25.1, --mars-web, installed Google Chrome in owned private profile. No route interception, DOM mutation, frontend mocks or source edits.",
+      "profiles": "Empty state, Custom create helpers, save valid QA-only router with classifier free text and no provider connection, list/menu/Edit/Cancel. Add Models Moonshot keyless chooser; select all enables Add and clearing disables Add. No model validation, completion or bulk-profile creation.",
+      "phone": "390x844 actual settings create/edit/list/menu and keyless chooser. Inherited narrow form layout is unchanged; only visibly shown areas claimed.",
+      "media": "Original PNG/MP4 retained;25fps normal action timing, no speed or pixel-identity claim. Recorder trims still lead-in and adds final hold."
+    },
+    "mainFilm": "Genuine standalone Local UI, selected observed paths only; actual source crops follow full viewport context.",
+    "supplementalBeforePhone": null
+  },
+  "limitations": [
+    "Appearance-preserving refactor. Native captures compare the specified exact source revisions and named observed paths, without global pixel identity, exhaustive UI coverage or performance claims.",
+    "Both Before and After styles are compiled CSS; no inline-style migration is claimed.",
+    "Selected complete originals retain existing timing and bytes. The recorder caps still lead-in and holds its final frame; source clock/misses are preserved. Editorial still holds and actual crops are explicitly labelled, with full context before detail.",
+    "Five built-in themes have representative stills, plus390×844 phone views; no claim of every state/theme/viewport combination.",
+    "No model prompt, completion or agent turn was run. No real provider credential, paid resource, webhook delivery or automation dispatch was used.",
+    "Library/host CSS contracts are compiled evidence; live capture uses standalone Local Canvas only.",
+    "Known Solarized Light keyless helper contrast issue #18546 remains. These edits preserve existing values and do not claim a readability/contrast fix.",
+    "Cloud organization, unsupported older-backend and bound-provider connection branches are not live coverage; static compiled contracts cover the aliases.",
+    "The standalone Add Models body portal is inside the scoped body. Embedded-host Add Models portal behavior remains an existing separate coverage gap; no live embedded claim.",
+    "Keyless Moonshot selection only enables/disables Add. No bulk profiles were created, model validated or completion requested. The QA-only router is saved but never executed."
+  ],
+  "selectedArtifacts": [
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/deepsea-desktop-actions-hover.png",
+      "sourceSha256": "6cd7dcf0d240a78da6b20b521450135b913000a36bad628e7318f76b06679bad",
+      "bytes": 104235,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:16Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/deepsea-desktop-create-lower.png",
+      "sourceSha256": "a79e4fd6908883bad719389a228d7c9358300f301017ffa6d019383917ce0014",
+      "bytes": 139664,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:17Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/deepsea-desktop-create-upper.png",
+      "sourceSha256": "a79e4fd6908883bad719389a228d7c9358300f301017ffa6d019383917ce0014",
+      "bytes": 139664,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:16Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/deepsea-desktop-keyless-chooser.png",
+      "sourceSha256": "9102ce541a82d4e6b0ea31b2e520b5ecb56e5d3fd20784688ab4d9912eef50fb",
+      "bytes": 114915,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:18Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/light-desktop-actions-hover.png",
+      "sourceSha256": "0beb6ea4b320287e6fe247aafe4bf0688e10c1be80e29d4cca15346ca40734a5",
+      "bytes": 93854,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:27Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/light-desktop-create-lower.png",
+      "sourceSha256": "33858909d9c2e814b96c82cc07814ac6ae8396b0581abc6af1b9af1004217952",
+      "bytes": 124691,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:27Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/light-desktop-create-upper.png",
+      "sourceSha256": "33858909d9c2e814b96c82cc07814ac6ae8396b0581abc6af1b9af1004217952",
+      "bytes": 124691,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:27Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/light-desktop-keyless-chooser.png",
+      "sourceSha256": "82734ccd00ae2888e6252de8f77426c1ed0dcc96b6eb0330373fae54e7f23e30",
+      "bytes": 100013,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:29Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neo-desktop-actions-hover.png",
+      "sourceSha256": "ba76abfefed4fbc5a13bea2d643241daf36a2a720814a301faffd7b932b2770c",
+      "bytes": 92541,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:21Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neo-desktop-create-lower.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:22Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neo-desktop-create-upper.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:22Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neo-desktop-keyless-chooser.png",
+      "sourceSha256": "ce776830b0aa7a4678c1d50ae2d279a51d346e07e1604be04c4a7766e5b061f6",
+      "bytes": 97790,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:24Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-desktop-actions-hover.png",
+      "sourceSha256": "ba76abfefed4fbc5a13bea2d643241daf36a2a720814a301faffd7b932b2770c",
+      "bytes": 92541,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:10Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-desktop-actions.png",
+      "sourceSha256": "38bf3ab8c412f3f2f7597bc2f5c2c3afa6dd62db5cd72b18f77a67612bf3a398",
+      "bytes": 92483,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:48:44Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-desktop-create-blank.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:45:51Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-desktop-create-filled.png",
+      "sourceSha256": "1b6adda44d77d114e1e3b65030188ebbe5bfdee8fd588bf456c7a433dd2fb6b4",
+      "bytes": 120890,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:46:25Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-desktop-create-lower.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:11Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-desktop-create-upper.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:11Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-desktop-empty.png",
+      "sourceSha256": "b7ec2760f7abe5a1932d5f9f7d079d23f679311fc3ff4bbadaeb8ae765bb9ce6",
+      "bytes": 92825,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:45:25Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-desktop-keyless-chooser.png",
+      "sourceSha256": "ce776830b0aa7a4678c1d50ae2d279a51d346e07e1604be04c4a7766e5b061f6",
+      "bytes": 97790,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:12Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-desktop-list.png",
+      "sourceSha256": "ba472f3ae65964b710ce88f8b589ce57ab517b725b3c5a67f49da478a2620d1f",
+      "bytes": 91354,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:48:50Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-phone-actions.png",
+      "sourceSha256": "c160edd76ff47b219d547fe224d58d1c415d71f32ee7796d79334fe608db159e",
+      "bytes": 33572,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:37Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-phone-edit-lower.png",
+      "sourceSha256": "4ba3d7fe81e4cb223158e19a8d2ab029487703b8abab486f539b3cd0347e7c88",
+      "bytes": 43202,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:38Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-phone-edit-upper.png",
+      "sourceSha256": "f6c10940788131f696f5bf48301503b55b9d086c2d4d8d10b38c26f9a768b545",
+      "bytes": 42996,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:37Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-phone-keyless-chooser.png",
+      "sourceSha256": "e5e08f25d3253138eaddd65f6d53f7f8079427ad7ea6fb87f85ec47dc0c27304",
+      "bytes": 34325,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:39Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/neutral-phone-list.png",
+      "sourceSha256": "2f958c5eb7efc4eeac5e81e0cada7033908fb667a3af5f9697dc105e0e6f02b2",
+      "bytes": 31617,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:37Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/solarized-desktop-actions-hover.png",
+      "sourceSha256": "68f3dbeaf2ed978ad70c7676a033fc7c951ca970c77b84d69104190f7dd2fd20",
+      "bytes": 101846,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:32Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/solarized-desktop-create-lower.png",
+      "sourceSha256": "8b6b4e3028adfebac67522f5559cbb9aafd0150fb211fcfa5997074123e3f458",
+      "bytes": 136018,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:33Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/solarized-desktop-create-upper.png",
+      "sourceSha256": "8b6b4e3028adfebac67522f5559cbb9aafd0150fb211fcfa5997074123e3f458",
+      "bytes": 136018,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:32Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/before/solarized-desktop-keyless-chooser.png",
+      "sourceSha256": "9b5b17f7c33494b55b8314e594da2281bd58ef0cfeb35ad19a31ca3a7329510f",
+      "bytes": 110644,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:50:34Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "profile-theme-aliases-evidence/before/native-keyless-chooser.mp4",
+      "sourceSha256": "125e6f6887f1ba4505d9d1a139f40d6fb053bb8ca1f96083ebc19f5622a61aa0",
+      "bytes": 159573,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:51:06Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "sourceDurationSeconds": 7.92,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "native-keyless-chooser.mp4",
+        "seconds": 7.9,
+        "recordedSeconds": 7.8,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 186,
+        "changes": 15,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/settings/llm"
+      }
+    },
+    {
+      "phase": "before",
+      "kind": "recording",
+      "file": "profile-theme-aliases-evidence/before/native-router-edit-actions.mp4",
+      "sourceSha256": "bac51c27ce51beca17db267ad088e668dd301a19dbd6bde70d5651f2019ba969",
+      "bytes": 95935,
+      "sourceRevision": "c5612599307c0bc44e21ed25c97e2a542e194b32",
+      "servedBuildFingerprint": "dfd39a7c2f6aec0a",
+      "captureRun": "before",
+      "builtThisRun": true,
+      "editorialPhase": "before",
+      "capturePhase": "before",
+      "captureTimestamp": "2026-10-25T10:49:32Z",
+      "phaseManifestSha256": "c41e0129ae3710f700692100275062385687d7b2f9438ac1559961b100c3d65c",
+      "supplementalCapture": false,
+      "sourceDurationSeconds": 8.08,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "native-router-edit-actions.mp4",
+        "seconds": 8.1,
+        "recordedSeconds": 8.2,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 196,
+        "changes": 11,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/settings/meta-llm"
+      }
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/deepsea-desktop-actions-hover.png",
+      "sourceSha256": "6cd7dcf0d240a78da6b20b521450135b913000a36bad628e7318f76b06679bad",
+      "bytes": 104235,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:43Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/deepsea-desktop-create-lower.png",
+      "sourceSha256": "a79e4fd6908883bad719389a228d7c9358300f301017ffa6d019383917ce0014",
+      "bytes": 139664,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:44Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/deepsea-desktop-create-upper.png",
+      "sourceSha256": "a79e4fd6908883bad719389a228d7c9358300f301017ffa6d019383917ce0014",
+      "bytes": 139664,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:44Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/deepsea-desktop-keyless-chooser.png",
+      "sourceSha256": "9102ce541a82d4e6b0ea31b2e520b5ecb56e5d3fd20784688ab4d9912eef50fb",
+      "bytes": 114915,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:45Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/light-desktop-actions-hover.png",
+      "sourceSha256": "0beb6ea4b320287e6fe247aafe4bf0688e10c1be80e29d4cca15346ca40734a5",
+      "bytes": 93854,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:56Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/light-desktop-create-lower.png",
+      "sourceSha256": "33858909d9c2e814b96c82cc07814ac6ae8396b0581abc6af1b9af1004217952",
+      "bytes": 124691,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:57Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/light-desktop-create-upper.png",
+      "sourceSha256": "33858909d9c2e814b96c82cc07814ac6ae8396b0581abc6af1b9af1004217952",
+      "bytes": 124691,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:57Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/light-desktop-keyless-chooser.png",
+      "sourceSha256": "82734ccd00ae2888e6252de8f77426c1ed0dcc96b6eb0330373fae54e7f23e30",
+      "bytes": 100013,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:58Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neo-desktop-actions-hover.png",
+      "sourceSha256": "ba76abfefed4fbc5a13bea2d643241daf36a2a720814a301faffd7b932b2770c",
+      "bytes": 92541,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:50Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neo-desktop-create-lower.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:51Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neo-desktop-create-upper.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:50Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neo-desktop-keyless-chooser.png",
+      "sourceSha256": "ce776830b0aa7a4678c1d50ae2d279a51d346e07e1604be04c4a7766e5b061f6",
+      "bytes": 97790,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:52Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-desktop-actions-hover.png",
+      "sourceSha256": "ba76abfefed4fbc5a13bea2d643241daf36a2a720814a301faffd7b932b2770c",
+      "bytes": 92541,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:38Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-desktop-create-blank.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:24Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-desktop-create-filled.png",
+      "sourceSha256": "1b6adda44d77d114e1e3b65030188ebbe5bfdee8fd588bf456c7a433dd2fb6b4",
+      "bytes": 120890,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:24Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-desktop-create-lower.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:39Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-desktop-create-upper.png",
+      "sourceSha256": "e861e4bb62faa4d6d14706eef6c1ec439a3e09b53e51309636c4c4423a758b42",
+      "bytes": 122781,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:38Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-desktop-empty.png",
+      "sourceSha256": "b7ec2760f7abe5a1932d5f9f7d079d23f679311fc3ff4bbadaeb8ae765bb9ce6",
+      "bytes": 92825,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:24Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-desktop-keyless-chooser.png",
+      "sourceSha256": "ce776830b0aa7a4678c1d50ae2d279a51d346e07e1604be04c4a7766e5b061f6",
+      "bytes": 97790,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:40Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-desktop-list.png",
+      "sourceSha256": "ba472f3ae65964b710ce88f8b589ce57ab517b725b3c5a67f49da478a2620d1f",
+      "bytes": 91354,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:26Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-phone-actions.png",
+      "sourceSha256": "c160edd76ff47b219d547fe224d58d1c415d71f32ee7796d79334fe608db159e",
+      "bytes": 33572,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:07Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-phone-edit-lower.png",
+      "sourceSha256": "4ba3d7fe81e4cb223158e19a8d2ab029487703b8abab486f539b3cd0347e7c88",
+      "bytes": 43202,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:07Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-phone-edit-upper.png",
+      "sourceSha256": "f6c10940788131f696f5bf48301503b55b9d086c2d4d8d10b38c26f9a768b545",
+      "bytes": 42996,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:07Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-phone-keyless-chooser.png",
+      "sourceSha256": "e5e08f25d3253138eaddd65f6d53f7f8079427ad7ea6fb87f85ec47dc0c27304",
+      "bytes": 34325,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:09Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/neutral-phone-list.png",
+      "sourceSha256": "2f958c5eb7efc4eeac5e81e0cada7033908fb667a3af5f9697dc105e0e6f02b2",
+      "bytes": 31617,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:07Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        390,
+        844
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/solarized-desktop-actions-hover.png",
+      "sourceSha256": "68f3dbeaf2ed978ad70c7676a033fc7c951ca970c77b84d69104190f7dd2fd20",
+      "bytes": 101846,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:02Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/solarized-desktop-create-lower.png",
+      "sourceSha256": "8b6b4e3028adfebac67522f5559cbb9aafd0150fb211fcfa5997074123e3f458",
+      "bytes": 136018,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:02Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/solarized-desktop-create-upper.png",
+      "sourceSha256": "8b6b4e3028adfebac67522f5559cbb9aafd0150fb211fcfa5997074123e3f458",
+      "bytes": 136018,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:02Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "screenshot",
+      "file": "profile-theme-aliases-evidence/after/solarized-desktop-keyless-chooser.png",
+      "sourceSha256": "9b5b17f7c33494b55b8314e594da2281bd58ef0cfeb35ad19a31ca3a7329510f",
+      "bytes": 110644,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:04Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "dimensions": [
+        1440,
+        1000
+      ]
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "profile-theme-aliases-evidence/after/native-keyless-chooser.mp4",
+      "sourceSha256": "d4f13312d5b9318ca00d19a8d1bd5bae517ae3e5a7690874c4833f240bcc030f",
+      "bytes": 156076,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:57:18Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "sourceDurationSeconds": 7.8,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "native-keyless-chooser.mp4",
+        "seconds": 7.8,
+        "recordedSeconds": 7.8,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 190,
+        "changes": 14,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/settings/llm"
+      }
+    },
+    {
+      "phase": "after",
+      "kind": "recording",
+      "file": "profile-theme-aliases-evidence/after/native-router-edit-actions.mp4",
+      "sourceSha256": "8904737bc1c217d174b4687532a091d2527ce4effb550c1ef4f1a7bce2f64d68",
+      "bytes": 95118,
+      "sourceRevision": "2c4e9e6bd9533d84245f92a66ab732a2a35b255b",
+      "servedBuildFingerprint": "b38c7801a740f06a",
+      "captureRun": "profiles-after",
+      "builtThisRun": true,
+      "editorialPhase": "after",
+      "capturePhase": "profiles-after",
+      "captureTimestamp": "2026-10-25T10:56:34Z",
+      "phaseManifestSha256": "28e406aab7210b9dca98393c8a5390f1731cf0c683d2aeb20a77d23682f8ebe2",
+      "supplementalCapture": false,
+      "sourceDurationSeconds": 8.04,
+      "sourceFps": "25/1",
+      "dimensions": [
+        1440,
+        1000
+      ],
+      "recorderInitialStaticLeadInMaxSeconds": 1,
+      "recorderFinalHoldMinSeconds": 1,
+      "captureClock": {
+        "ok": true,
+        "path": "native-router-edit-actions.mp4",
+        "seconds": 8,
+        "recordedSeconds": 8.2,
+        "size": "1440x1000",
+        "fps": 25,
+        "captures": 195,
+        "changes": 15,
+        "misses": 0,
+        "capped": false,
+        "cutSeconds": 0,
+        "url": "Local Canvas/settings/meta-llm"
+      }
+    }
+  ],
+  "receiptHandling": "PNG and MP4 sources are byte-for-byte copies. Public receipt JSON removes local capture paths and local URLs; original receipt hashes are retained.",
+  "privateReceiptSha256": {
+    "before": "9552b25e275a5ba12f8ce2f0d7294d7e8c586e8911587b2044e0a617f409e66b",
+    "after": "02bb114ccbe5874fc43950eea16b0d0a3878298cb51bea1da2059a275b0b6f2d"
+  },
+  "comparisonFile": "profile-theme-aliases-comparison.json",
+  "comparisonSha256": "401fdbbe4b5c2bc5b8bce7268b5371bd436d214ef4b4b06fa98bf94154038ec1",
+  "authoritativeManifestSha256": "f99078a20bc80f2f98e181305a8f20bdfd8462465f54f5d76c9f77bd375c801d"
+}
