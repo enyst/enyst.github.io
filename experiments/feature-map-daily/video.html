@@ -1,0 +1,349 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-10-25","role":"author"}]} -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Feature Map Daily — film</title>
+<style>
+  html, body { margin: 0; background: #0f1115; }
+  canvas { display: block; width: 100vw; height: auto; max-width: 1920px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// Feature Map Daily: one daily pass of the OpenHands Agent Canvas feature map,
+// and one change it verified (#18870, masked secret values).
+// renderFrame(t) draws any moment; the live before/after recordings are
+// composited into the two empty panels by render.mjs (see CLIPS below).
+const W = 1920, H = 1080;
+const cv = document.getElementById('c'), g = cv.getContext('2d');
+
+const C = {
+  bg: '#0f1115', panel: '#171a21', line: '#2a2f3a', ink: '#ece9e4', muted: '#9aa1ab', dim: '#5d6470',
+  amber: '#e5a65a', teal: '#6bbfab', green: '#7cc47f', red: '#e76a5e', violet: '#b39ddb', gold: '#e8d36a',
+  slate: '#7e8794', blue: '#7aa7e0',
+};
+const SERIF = '"Instrument Serif", Georgia, serif', SANS = '"DM Sans", system-ui, sans-serif', MONO = '"JetBrains Mono", monospace';
+
+// ---- data (map after the 24 Oct 2026 pass, PR OpenHands/OpenHands#18904) ----
+const FAMILIES = [
+  ['F01', 22, 'First run'], ['F02', 28, 'App shell'], ['F03', 45, 'Home'], ['F04', 41, 'Conversation list'],
+  ['F05', 26, 'Composer'], ['F06', 37, 'Agent activity'], ['F07', 25, 'Conversation page'], ['F08', 34, 'Files & changes'],
+  ['F09', 26, 'Settings shell'], ['F10', 34, 'LLM profiles'], ['F11', 21, 'Providers'], ['F12', 25, 'Model router'],
+  ['F13', 25, 'Agent profiles'], ['F14', 13, 'Secrets'], ['F15', 24, 'Agent behavior'], ['F16', 21, 'App settings'],
+  ['F17', 33, 'MCP servers'], ['F18', 22, 'Skills'], ['F19', 25, 'Plugins'], ['F20', 24, 'Canvas apps'],
+  ['F21', 35, 'Automations'], ['F22', 31, 'Creating automations'], ['F23', 42, 'Automation detail'], ['F24', 26, 'Git Sync'],
+  ['F25', 33, 'Backends & Cloud'], ['F26', 35, 'Launcher modes'], ['F27', 30, 'Workspace tools'], ['F28', 15, 'Setup page'],
+];
+const TOTAL = FAMILIES.reduce((s, f) => s + f[1], 0); // 798
+const AFFECTED = ['F01', 'F03', 'F05', 'F06', 'F07', 'F14', 'F25', 'F26'];
+const PRS = ['#18702', '#18865', '#18849', '#18176', '#18870', '#18853', '#18852', '#16420', '#18680', '#18856', '#18857'];
+const RESULTS = [
+  ['pass', 71, C.green, 'the behavior matches the map'],
+  ['fail', 4, C.red, 'something new is wrong: triage, file, fix'],
+  ['xfail', 4, C.violet, 'a known bug still reproduces, as the map expects'],
+  ['xpass', 0, C.gold, 'a known bug stopped reproducing: find the fix, update the map'],
+  ['blocked', 1, C.slate, 'a prerequisite is missing (account, OS, hardware)'],
+  ['not-run', 4, C.dim, 'out of time or out of scope, and said so'],
+];
+const F14_ROWS = ['F14.list', 'F14.create', 'F14.create-validation', 'F14.edit', 'F14.delete', 'F14.agent-access', 'F14.phone',
+  'F14.form-back', 'F14.rename', 'F14.edit-value', 'F14.delete-escape', 'F14.value-reveal', 'F14.agent-request'];
+const CODE = [
+  ['# a daily delta pass, as the CLI runs it', 'c'],
+  ['BASE   = map baseline                   ', 'k', '# main@<sha> in the map index'],
+  ['TARGET = git rev-parse origin/main', 'k'],
+  ['families = map affected --base BASE    ', 'k', '# F01 F03 F05 F06 F07 F14 F25 F26'],
+  ['RUN = launch --new ; doctor             ', 'k', '# isolated stack: agent server, automation, UI'],
+  ['llm preset deepseek ; onboard --skip', 'k'],
+  ['for row in rows(families) + closed_issue_rows:', 'f'],
+  ['    browser goto /settings/secrets', 'b'],
+  ['    browser click  testid=add-secret-button', 'b'],
+  ['    browser fill   testid=value-input  qa-dummy-value-123', 'b'],
+  ['    browser eval   "input.tagName, input.type"   ', 'b', '# INPUT password'],
+  ['    browser click  role=button[name="Show secret"]', 'b'],
+  ['    browser screenshot --feature F14.value-reveal', 'b'],
+  ['    evidence add --feature row.id --result pass|fail|blocked', 'b'],
+  ['for bug in bug list: bug run bug.id --attempts 2   ', 'f', '# xfail / xpass'],
+  ['evidence report ; map baseline --set TARGET ; stop', 'k'],
+];
+
+// ---- timeline (seconds) ----
+const T = {
+  title: [0, 6], map: [6, 20], daily: [20, 34], results: [34, 50], zoom: [50, 62],
+  story: [62, 74.5], settings: [74.5, 90.5], card: [90.5, 104.5], code: [104.5, 118.5], end: [118.5, 125],
+};
+window.DURATION = 125;
+// Panels the live recordings go into (render.mjs reads this). Each clip is cut
+// just before its Save click, and its last (typed) frame holds.
+window.CLIPS = [
+  { file: 'clips/settings-before.mp4', cut: 6.3, crop: [660, 20, 850, 450], box: [60, 236, 880, 466], at: 75.2 },
+  { file: 'clips/settings-after.mp4', cut: 10.6, crop: [660, 20, 850, 450], box: [980, 236, 880, 466], at: 75.2 },
+  { file: 'clips/card-before.mp4', cut: 5.3, crop: [570, 215, 760, 450], box: [60, 222, 880, 521], at: 91.2 },
+  { file: 'clips/card-after.mp4', cut: 8.4, crop: [570, 215, 760, 450], box: [980, 222, 880, 521], at: 91.2 },
+];
+
+// ---- helpers ----
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const ease = k => (k = clamp(k), k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const out = k => 1 - Math.pow(1 - clamp(k), 3);
+const prog = (t, a, d) => clamp((t - a) / d);
+// fade in after `a` for `d`, fade out before `b` for `d`
+const window_ = (t, [a, b], d = 0.6) => Math.min(prog(t, a, d), 1 - prog(t, b - d, d));
+function text(s, x, y, { font = SANS, size = 32, weight = 400, color = C.ink, align = 'left', alpha = 1, italic = false, base = 'alphabetic' } = {}) {
+  g.save(); g.globalAlpha *= alpha; g.fillStyle = color; g.textAlign = align; g.textBaseline = base;
+  g.font = `${italic ? 'italic ' : ''}${weight} ${size}px ${font}`; g.fillText(s, x, y); g.restore();
+}
+function width(s, size, font = SANS, weight = 400) { g.save(); g.font = `${weight} ${size}px ${font}`; const w = g.measureText(s).width; g.restore(); return w; }
+function rrect(x, y, w, h, r, fill, stroke, lw = 2) {
+  g.beginPath(); g.roundRect(x, y, w, h, r);
+  if (fill) { g.fillStyle = fill; g.fill(); }
+  if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw; g.stroke(); }
+}
+function kicker(s, alpha, color = C.amber) { text(s.toUpperCase(), 120, 118, { font: MONO, size: 22, weight: 600, color, alpha }); }
+function heading(s, alpha, y = 178) { text(s, 120, y, { font: SERIF, size: 58, alpha }); }
+function caption(lines, alpha, y = 960, size = 28) {
+  lines.forEach((l, i) => text(l, 120, y + i * (size + 12), { size, color: C.muted, alpha }));
+}
+
+// Map grid geometry: 28 columns of dots, 3 wide.
+const COLS = { x0: 150, pitch: 60, y0: 330, dot: 10, gap: 4, per: 3 };
+function dotXY(fi, k) {
+  const col = k % COLS.per, row = Math.floor(k / COLS.per);
+  return [COLS.x0 + fi * COLS.pitch + col * (COLS.dot + COLS.gap), COLS.y0 + row * (COLS.dot + COLS.gap)];
+}
+function hash(i) { const s = Math.sin(i * 12.9898) * 43758.5453; return s - Math.floor(s); }
+
+function drawGrid(t, { sweep = 1, daily = 0, zoomF14 = 0, labels = 1 } = {}) {
+  let idx = 0;
+  FAMILIES.forEach(([id, n], fi) => {
+    const hit = AFFECTED.includes(id);
+    for (let k = 0; k < n; k++, idx++) {
+      const [x, y] = dotXY(fi, k);
+      // sweep: the full pass lights every dot, left to right
+      const on = clamp((sweep * (FAMILIES.length + 4) - fi - hash(idx) * 3) / 2);
+      let col = C.dim, a = 0.35 + 0.65 * on;
+      if (on > 0) col = C.teal;
+      if (daily > 0) {
+        const d = clamp(daily * 1.6 - (hit ? hash(idx) * 0.6 : 0));
+        if (hit) { col = mix(C.teal, C.amber, d); a = 1; }
+        else { a = lerp(a, 0.22, clamp(daily * 2)); }
+      }
+      if (zoomF14 > 0 && id !== 'F14') a *= 1 - zoomF14;
+      g.globalAlpha = a; g.fillStyle = col;
+      g.beginPath(); g.arc(x + COLS.dot / 2, y + COLS.dot / 2, COLS.dot / 2, 0, Math.PI * 2); g.fill();
+    }
+    g.globalAlpha = 1;
+    const lx = COLS.x0 + fi * COLS.pitch + 19;
+    const la = labels * (zoomF14 > 0 && id !== 'F14' ? 1 - zoomF14 : 1);
+    text(id, lx, COLS.y0 - 22, { font: MONO, size: 15, align: 'center', color: daily > 0.3 && hit ? C.amber : C.muted, alpha: la });
+  });
+}
+function mix(a, b, k) {
+  const p = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
+  const [x, y] = [p(a), p(b)];
+  return `rgb(${x.map((v, i) => Math.round(lerp(v, y[i], k))).join(',')})`;
+}
+
+// ---- scenes ----
+function sceneTitle(t) {
+  const a = window_(t, T.title, 0.9);
+  // a faint field of all 798 dots behind the title
+  g.save(); g.globalAlpha = 0.22 * a; g.translate(0, 470); drawGrid(t, { sweep: out(prog(t, 0.3, 4)), labels: 0 }); g.restore();
+  text('Feature Map Daily', W / 2, 430, { font: SERIF, size: 150, align: 'center', alpha: a * out(prog(t, 0.2, 1.2)) });
+  text('One day in the life of the OpenHands Agent Canvas feature map', W / 2, 510, { size: 34, color: C.muted, align: 'center', alpha: a * out(prog(t, 1.0, 1.2)) });
+  text('verify-openhands  ·  daily pass of 24 October 2026  ·  example: PR #18870', W / 2, 570, { font: MONO, size: 22, color: C.amber, align: 'center', alpha: a * out(prog(t, 1.8, 1.2)) });
+}
+
+function sceneMap(t) {
+  const a = window_(t, T.map);
+  kicker('the map', a); heading('28 families, 798 behaviors a user can see', a);
+  drawGrid(t, { sweep: ease(prog(t, 9.5, 7)), labels: a });
+  // counter
+  const n = Math.round(TOTAL * ease(prog(t, 9.5, 7)));
+  text(String(n), 1800, 800, { font: SERIF, size: 96, align: 'right', alpha: a });
+  text('behaviors driven live', 1800, 840, { size: 24, color: C.muted, align: 'right', alpha: a });
+  caption([
+    'Each dot is one behavior, with a recipe an agent runs in a real browser on a fresh local stack.',
+    prog(t, 9.5, 0.5) > 0 ? 'A full pass drives every dot. It runs weekly, and before a release.' : '',
+  ], a);
+}
+
+function sceneDaily(t) {
+  const a = window_(t, T.daily);
+  kicker('the daily pass', a); heading('Only what changed since yesterday', a);
+  // merged PR chips flow in at the top-right
+  PRS.forEach((p, i) => {
+    const k = out(prog(t, 21 + i * 0.25, 0.8));
+    const x = 1060 + (i % 6) * 128, y = 222 + Math.floor(i / 6) * 40;
+    rrect(x, y - 26, 116, 34, 17, p === '#18870' ? 'rgba(229,166,90,0.18)' : C.panel, p === '#18870' ? C.amber : C.line, 1.5);
+    g.globalAlpha = 1;
+    text(p, x + 58, y - 3, { font: MONO, size: 17, align: 'center', color: p === '#18870' ? C.amber : C.muted, alpha: a * k });
+  });
+  text('11 merged PRs  →  map affected  →  8 families', 120, 262, { font: MONO, size: 24, color: C.ink, alpha: a * out(prog(t, 23.5, 1)) });
+  drawGrid(t, { sweep: 1, daily: ease(prog(t, 24, 3)), labels: a });
+  caption([
+    'A daily pass drives every behavior the merged code can touch, re-checks rows whose issues closed,',
+    'smoke-tests one row in every other family, and goes deep on four more families in rotation.',
+  ], a * out(prog(t, 26, 1)));
+}
+
+function sceneResults(t) {
+  const a = window_(t, T.results);
+  kicker('what the pass recorded', a); heading('84 checks, each with a result and evidence', a);
+  const x0 = 360, y0 = 300, bw = 700 / 71;
+  RESULTS.forEach(([name, n, col, desc], i) => {
+    const k = out(prog(t, 35.5 + i * 0.9, 1.2)), y = y0 + i * 100;
+    text(name, x0 - 30, y + 30, { font: MONO, size: 30, weight: 600, align: 'right', color: col, alpha: a * clamp(k * 2) });
+    const w = Math.max(n * bw * k, n === 0 ? 0 : 6);
+    rrect(x0, y + 4, Math.max(w, 2), 36, 6, col);
+    if (n === 0) rrect(x0, y + 4, 6, 36, 3, null, col, 2);
+    text(String(Math.round(n * k)), x0 + Math.max(w, 6) + 18, y + 33, { font: SERIF, size: 40, alpha: a * clamp(k * 2) });
+    text(desc, 1200, y + 31, { size: 24, color: C.muted, alpha: a * clamp(k * 2 - 0.5) });
+  });
+  caption(['Totals across the TARGET ledgers of the 24 October pass (OpenHands PR #18904).',
+    'A known bug is written into the map as a block that expects it: it reports xfail until someone fixes it.'], a * out(prog(t, 41, 1)), 940);
+}
+
+function sceneZoom(t) {
+  const a = window_(t, T.zoom);
+  const z = ease(prog(t, 50.3, 3));
+  // zoom the grid toward the F14 column
+  const fi = 13, cx = COLS.x0 + fi * COLS.pitch + 19, cy = COLS.y0 + 50;
+  const s = lerp(1, 4.2, z);
+  g.save(); g.globalAlpha = a * (1 - clamp((t - 53) / 1));
+  g.translate(lerp(cx, 300, z), lerp(cy, 560, z)); g.scale(s, s); g.translate(-cx, -cy);
+  drawGrid(t, { sweep: 1, daily: 1, zoomF14: z });
+  g.restore();
+  kicker('zoom in: F14 · Secrets', a * out(prog(t, 52.5, 0.8)));
+  heading('13 behaviors, one of them new that day', a * out(prog(t, 52.5, 0.8)));
+  // the F14 rows as a list
+  const la = a * out(prog(t, 53.2, 1));
+  F14_ROWS.forEach((id, i) => {
+    const k = out(prog(t, 53.4 + i * 0.12, 0.6)), y = 270 + i * 50;
+    const hi = id === 'F14.value-reveal', glow = hi ? out(prog(t, 55.5, 1)) : 0;
+    if (hi) rrect(560, y - 34, 1300, 48, 10, `rgba(229,166,90,${0.16 * glow})`, glow > 0 ? C.amber : null, 2);
+    g.fillStyle = hi && glow > 0 ? C.amber : C.teal; g.globalAlpha = la * k;
+    g.beginPath(); g.arc(590, y - 10, 7, 0, Math.PI * 2); g.fill(); g.globalAlpha = 1;
+    text(id, 615, y, { font: MONO, size: 26, color: hi ? C.ink : C.muted, alpha: la * k, weight: hi ? 600 : 400 });
+    if (hi) text('new row: masked password input with a Show / Hide secret button',
+      1110, y, { size: 22, color: C.amber, alpha: la * glow });
+  });
+}
+
+function card(x, y, w, h, kick, title, lines, alpha, color) {
+  g.save(); g.globalAlpha = alpha;
+  rrect(x, y, w, h, 16, C.panel, color, 2);
+  text(kick, x + 28, y + 46, { font: MONO, size: 19, color, weight: 600 });
+  text(title, x + 28, y + 98, { font: SERIF, size: 40 });
+  lines.forEach((l, i) => text(l, x + 28, y + 150 + i * 38, { size: 23, color: C.muted }));
+  g.restore();
+}
+function sceneStory(t) {
+  const a = window_(t, T.story);
+  kicker('the example', a); heading('A secret you could read over someone’s shoulder', a);
+  const k1 = out(prog(t, 62.6, 0.9)), k2 = out(prog(t, 64.6, 0.9)), k3 = out(prog(t, 67.2, 0.9));
+  card(120, 250, 530, 360, '23 OCT · ISSUE #18869', 'Reported', [
+    'Agent-requested secret entry', 'displays credentials in plain text.', 'Filed for Graham Neubig;', 'triaged ready-for-dev.'], a * k1, C.red);
+  card(695, 250, 530, 360, '23 OCT · PR #18870', 'Fixed in 35 minutes', [
+    'One shared form for the agent’s', 'request card and Settings.', '+127 −29 · 10 files', 'approved twice, merged 12:50'], a * k2, C.blue);
+  card(1270, 250, 530, 360, '24 OCT · DAILY PASS #18904', 'Mapped and proven', [
+    'map affected → F14', 'new row F14.value-reveal,', 'driven live, desktop and phone,', 're-run by an independent agent'], a * k3, C.amber);
+  [[655, 430], [1230, 430]].forEach(([x, y], i) => {
+    const k = [k2, k3][i]; g.globalAlpha = a * k; g.strokeStyle = C.dim; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(x - 4, y); g.lineTo(x + 30, y); g.stroke();
+    g.beginPath(); g.moveTo(x + 30, y); g.lineTo(x + 20, y - 8); g.lineTo(x + 20, y + 8); g.closePath(); g.fillStyle = C.dim; g.fill(); g.globalAlpha = 1;
+  });
+  // the diff
+  const kd = a * out(prog(t, 69.2, 1));
+  rrect(120, 660, 1680, 150, 14, '#12151b', C.line, 1.5); g.globalAlpha = 1;
+  text('src/components/features/settings/secrets-settings/secret-form.tsx', 150, 702, { font: MONO, size: 19, color: C.dim, alpha: kd });
+  text('-  <textarea name="secret-value" rows={valueRows} />', 150, 744, { font: MONO, size: 26, color: C.red, alpha: kd });
+  text('+  <input name="secret-value" type="password" autoComplete="new-password" />', 150, 784, { font: MONO, size: 26, color: C.green, alpha: kd });
+  caption(['Next: the same steps on the commit before the merge and on the merge itself, recorded by control-openhands.'], a * out(prog(t, 70.5, 1)), 900);
+}
+
+function clipPanels(t, win, crop, boxes, head, sub, notes) {
+  const a = window_(t, win, 0.5);
+  kicker(head, a, C.teal); heading(sub, a, 168);
+  const lab = [['BEFORE', 'main@4d1c4d1 · the commit before the merge', C.red], ['AFTER', 'main@04f6dd5 · PR #18870 merged', C.green]];
+  boxes.forEach(([x, y, w, h], i) => {
+    text(lab[i][0], x, y - 16, { font: MONO, size: 22, weight: 600, color: lab[i][2], alpha: a });
+    text(lab[i][1], x + width(lab[i][0], 22, MONO, 600) + 16, y - 16, { font: MONO, size: 19, color: C.muted, alpha: a });
+    g.globalAlpha = a; rrect(x - 3, y - 3, w + 6, h + 6, 12, '#1b1b1b', lab[i][2], 3); g.globalAlpha = 1;
+    text(notes[i], x, y + h + 46, { font: MONO, size: 22, color: lab[i][2], alpha: a });
+  });
+}
+function sceneSettings(t) {
+  clipPanels(t, T.settings, null, [[60, 236, 880, 466], [980, 236, 880, 466]],
+    'live · F14.value-reveal', 'Settings → Secrets → Add a Secret, same steps',
+    ['browser eval → TEXTAREA textarea', 'browser eval → INPUT password new-password']);
+  caption(['Both stacks ran from their own commit with control-openhands launch --new. The value is a dummy:',
+    'sk-demo-0000-not-a-real-key. Only the AFTER build masks it, and Show secret reveals only what was typed.'], window_(t, T.settings, 0.5), 860, 24);
+}
+function sceneCard(t) {
+  clipPanels(t, T.card, null, [[60, 222, 880, 521], [980, 222, 880, 521]],
+    'live · F14.agent-request', 'The agent asks for a secret (request_secret), same prompt',
+    ['card value field: TEXTAREA', 'card value field: INPUT password, eye button']);
+  caption(['This is the path from the original report: deepseek-flash calls request_secret, the card appears in the chat.'],
+    window_(t, T.card, 0.5), 860, 24);
+}
+
+function sceneCode(t) {
+  const a = window_(t, T.code);
+  kicker('the script behind it', a); heading('What the agent runs, in pseudocode', a);
+  rrect(120, 220, 1680, 700, 16, '#12151b', C.line, 1.5);
+  const start = 105.2, per = 0.42;
+  CODE.forEach(([s, kind, cmt], i) => {
+    const k = clamp((t - start - i * per) / per);
+    const shown = s.slice(0, Math.floor(s.length * k));
+    const col = kind === 'c' ? C.dim : kind === 'f' ? C.violet : kind === 'b' ? C.teal : C.ink;
+    text(shown, 160, 270 + i * 40, { font: MONO, size: 24, color: col, alpha: a });
+    if (cmt && k >= 1) text(cmt, 160 + width(s, 24, MONO), 270 + i * 40, { font: MONO, size: 24, color: C.dim, alpha: a });
+  });
+  caption(['Pseudocode: every line is a real control-openhands verb; the F14.value-reveal recipe is abridged.'], a * out(prog(t, 112, 1)), 975, 24);
+}
+
+function sceneEnd(t) {
+  const a = window_(t, T.end, 0.8);
+  g.save(); g.globalAlpha = 0.25 * a; g.translate(0, 470); drawGrid(t, { sweep: 1, daily: 1, labels: 0 }); g.restore();
+  text('Every day', W / 2, 320, { font: SERIF, size: 96, align: 'center', alpha: a });
+  text('baseline  →  map affected  →  drive  →  evidence  →  one PR', W / 2, 410, { font: MONO, size: 32, align: 'center', color: C.amber, alpha: a });
+  text('Bugs become xfail rows until they are fixed; fixes are proven twice before a row changes.', W / 2, 490, { size: 30, align: 'center', color: C.muted, alpha: a });
+  text('OpenHands/OpenHands #18869 · #18870 · #18904        enyst.github.io/verify/feature-map-daily.html', W / 2, 600, { font: MONO, size: 20, align: 'center', color: C.dim, alpha: a });
+}
+
+window.renderFrame = function (t) {
+  g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
+  const inside = ([a, b]) => t >= a - 0.01 && t <= b + 0.01;
+  if (inside(T.title)) sceneTitle(t);
+  if (inside(T.map)) sceneMap(t);
+  if (inside(T.daily)) sceneDaily(t);
+  if (inside(T.results)) sceneResults(t);
+  if (inside(T.zoom)) sceneZoom(t);
+  if (inside(T.story)) sceneStory(t);
+  if (inside(T.settings)) sceneSettings(t);
+  if (inside(T.card)) sceneCard(t);
+  if (inside(T.code)) sceneCode(t);
+  if (inside(T.end)) sceneEnd(t);
+};
+
+const faces = [
+  ['Instrument Serif', 'fonts/instrument-serif-latin-400-normal.woff2', {}],
+  ['DM Sans', 'fonts/dm-sans-latin-400-normal.woff2', { weight: '400' }],
+  ['DM Sans', 'fonts/dm-sans-latin-500-normal.woff2', { weight: '500' }],
+  ['DM Sans', 'fonts/dm-sans-latin-700-normal.woff2', { weight: '700' }],
+  ['JetBrains Mono', 'fonts/jetbrains-mono-latin-400-normal.woff2', { weight: '400' }],
+  ['JetBrains Mono', 'fonts/jetbrains-mono-latin-600-normal.woff2', { weight: '600' }],
+];
+window.ready = Promise.all(faces.map(([f, u, o]) => new FontFace(f, `url(${u})`, o).load().then(x => document.fonts.add(x))))
+  .then(() => {
+    const q = new URLSearchParams(location.search);
+    if (q.has('t')) renderFrame(+q.get('t'));
+    else if (q.has('play')) { const t0 = performance.now(); const loop = () => { renderFrame((performance.now() - t0) / 1000 % DURATION); requestAnimationFrame(loop); }; loop(); }
+    else renderFrame(2.5);
+  });
+</script>
+</body>
+</html>

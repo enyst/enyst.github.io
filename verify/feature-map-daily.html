@@ -1,0 +1,216 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-10-25","role":"author"}]} -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Feature Map Daily — Self-Healing Codebase Project</title>
+  <meta name="description" content="One daily pass of the OpenHands Agent Canvas feature map, and one change it verified end to end: PR #18870, which masks secret values. A short film, the map at scale, every result type, before/after recordings and the commands behind them." />
+  <meta property="og:title" content="Feature Map Daily" />
+  <meta property="og:description" content="798 behaviors, 8 families touched by 11 merged PRs, 84 checks, and one secret field that stopped showing its value." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/verify/feature-map-daily.html" />
+  <meta property="og:image" content="https://enyst.github.io/experiments/feature-map-daily/stills/film-3s.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://enyst.github.io/verify/feature-map-daily.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    .film { margin: 0 0 var(--space-md); }
+    .film video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; background: #111318; border: 1px solid var(--border); border-radius: var(--border-radius); }
+    .film figcaption, .shot figcaption { color: var(--muted); font-size: 0.88em; line-height: 1.5; margin-top: 10px; }
+    .film figcaption a, .meta a, .prose a, td a, .page-intro a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,0.3); }
+    .page-intro { color: var(--muted); font-size: var(--text-lg); margin-bottom: 28px; }
+    .three { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 8px 0 var(--space-md); }
+    .three div { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 16px 18px; line-height: 1.5; font-size: 0.92em; }
+    .three b { display: block; font-family: var(--mono); font-size: 0.78em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+    .numbers { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 4px 0 18px; }
+    .numbers div { font-size: 0.9em; color: var(--muted); }
+    .numbers span { display: block; font-family: var(--serif); font-size: 2.2em; color: var(--ink); line-height: 1.1; }
+    .results { display: grid; grid-template-columns: 80px 1fr; gap: 8px 14px; align-items: center; margin: 12px 0 8px; font-size: 0.9em; }
+    .results .k { font-family: var(--mono); font-weight: 600; text-align: right; }
+    .results .row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .results .bar { height: 14px; border-radius: 4px; flex: none; }
+    .results .n { font-family: var(--serif); font-size: 1.5em; color: var(--ink); flex: none; }
+    .results .d { color: var(--muted); line-height: 1.35; }
+    .grid-wrap { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 14px; margin: 10px 0 8px; overflow-x: auto; }
+    .fam-grid { display: grid; grid-template-columns: repeat(28, 1fr); gap: 4px; min-width: 560px; }
+    .fam { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .fam .id { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+    .fam .dots { display: grid; grid-template-columns: repeat(3, 5px); gap: 2px; }
+    .fam .dots i { width: 5px; height: 5px; border-radius: 50%; background: #2f4b45; display: block; }
+    .fam.hit .dots i { background: #e5a65a; }
+    .fam.hit .id { color: #e5a65a; }
+    .fam.focus { outline: 1px solid #e5a65a; outline-offset: 3px; border-radius: 4px; }
+    .fam.focus .dots i:nth-child(12) { background: #fff; box-shadow: 0 0 0 2px #e5a65a; }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.82em; color: var(--muted); margin-top: 8px; }
+    .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    ol.rows { list-style: none; padding: 0; margin: 8px 0 14px; font-family: var(--mono); font-size: 0.82em; columns: 2; column-gap: 24px; }
+    ol.rows li { padding: 3px 0; color: var(--muted); break-inside: avoid; }
+    ol.rows li.new { color: var(--ink); }
+    ol.rows li.new::after { content: "  ← new on 24 Oct"; color: var(--accent); font-family: var(--sans); }
+    .timeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 10px 0 var(--space-md); }
+    .timeline div { background: var(--card); border: 1px solid var(--border); border-top: 3px solid var(--border); border-radius: var(--border-radius); padding: 14px 16px; font-size: 0.88em; line-height: 1.5; }
+    .timeline .is { border-top-color: #e76a5e; } .timeline .pr { border-top-color: #7aa7e0; } .timeline .dp { border-top-color: #e5a65a; }
+    .timeline b { display: block; font-family: var(--mono); font-size: 0.8em; color: var(--muted); margin-bottom: 4px; }
+    .timeline strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.35em; color: var(--ink); margin-bottom: 4px; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 8px 0 18px; }
+    @media (max-width: 640px) { .pair { grid-template-columns: 1fr; } ol.rows { columns: 1; } }
+    .shot { margin: 0; }
+    .shot img { width: 100%; height: auto; display: block; border-radius: var(--border-radius); border: 2px solid var(--border); }
+    .shot.before img { border-color: #e76a5e; } .shot.after img { border-color: #7cc47f; }
+    .shot figcaption b { font-family: var(--mono); }
+    .shot.before b { color: #e76a5e; } .shot.after b { color: #7cc47f; }
+    pre.code { background: #12151b; border: 1px solid var(--border); border-radius: var(--border-radius); padding: 14px 16px; overflow-x: auto; font-size: 0.8em; line-height: 1.55; }
+    pre.code .c { color: #6c7380; } pre.code .f { color: #b39ddb; } pre.code .b { color: #6bbfab; }
+    pre.diff .del { color: #e76a5e; } pre.diff .add { color: #7cc47f; }
+    table.facts { width: 100%; border-collapse: collapse; font-size: 0.88em; margin: 8px 0 18px; }
+    table.facts td { border-top: 1px solid var(--border); padding: 7px 8px 7px 0; vertical-align: top; line-height: 1.45; }
+    table.facts td:first-child { color: var(--muted); white-space: nowrap; width: 9.5em; }
+    table.facts code, .prose code, .timeline code { word-break: break-word; }
+    @media (max-width: 640px) { table.facts, table.facts tbody, table.facts tr, table.facts td { display: block; width: auto; } table.facts td:first-child { border-top: 1px solid var(--border); padding-bottom: 0; } table.facts td + td { border-top: 0; } }
+    blockquote.row { margin: 8px 0 18px; padding: 12px 16px; border-left: 3px solid var(--accent); background: var(--card); font-size: 0.9em; line-height: 1.55; }
+  </style>
+</head>
+<body>
+  <div class="shell shell--wide">
+    <a class="back" href="index.html">← Self-Healing Codebase Project</a>
+    <h1 class="page">Feature Map Daily</h1>
+    <p class="page-intro">Every day an agent checks the OpenHands Agent Canvas against its feature map: everything that changed since yesterday, driven in a real browser, with evidence. This page follows one daily pass, the one of 24 October 2026, and one change it verified from end to end: <a href="https://github.com/OpenHands/OpenHands/pull/18870">PR #18870</a>, which stopped secret values from showing in plain text.</p>
+
+    <h2 id="film">The film</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/feature-map-daily/stills/film-3s.png">
+        <source src="../experiments/feature-map-daily/feature-map-daily.mp4" type="video/mp4" />
+        <a href="../experiments/feature-map-daily/feature-map-daily.mp4">Download the video (MP4, 2:05)</a>
+      </video>
+      <figcaption>2:05, with a quiet generated score; all words are on screen. The map at full scale, what a daily pass touches, what it recorded, then a zoom into one family and one behavior, and real before/after recordings of #18870 on the commit before the merge and on the merge itself. <a href="../experiments/feature-map-daily/feature-map-daily.mp4" download>Download (MP4, 7 MB)</a> · <a href="https://github.com/enyst/enyst.github.io/tree/main/experiments/feature-map-daily">frames, score and recordings</a></figcaption>
+    </figure>
+
+    <h2 id="scale">The map, and what a day covers</h2>
+    <div class="prose">
+      <p>The verify-openhands feature map lists every behavior a user can see in the OpenHands app (Agent Canvas): 28 families, 798 behaviors after the 24 October pass. Each behavior has a stable ID such as <code>F14.value-reveal</code> and a recipe of <code>control-openhands</code> commands that an agent runs against a fresh local stack in a real browser.</p>
+    </div>
+    <div class="three">
+      <div><b>Full pass · weekly</b>Every family, every behavior, driven live. Also before a release, because Agent Server and automation releases change behavior without touching this repository.</div>
+      <div><b>Daily pass · every day</b>The families whose code changed since the last accepted baseline, every map row whose linked issue closed, one smoke row in every other family, and four families in depth by rotation.</div>
+      <div><b>One PR · when needed</b>Map corrections, new rows and new known bugs go into one pull request with the evidence. Merging it accepts the next baseline. A clean day opens nothing.</div>
+    </div>
+    <div class="grid-wrap" aria-label="The 28 families as columns of dots; the 8 families the 24 October pass drove are highlighted, and F14 is outlined">
+      <div class="fam-grid" id="famgrid"></div>
+      <div class="legend"><span><i style="background:#2f4b45"></i>a behavior</span><span><i style="background:#e5a65a"></i>in a family the 24 Oct pass drove for changed code</span><span><i style="background:#fff;box-shadow:0 0 0 2px #e5a65a"></i>F14.value-reveal</span></div>
+    </div>
+    <p class="meta">On 24 October, 11 pull requests had merged since the baseline. <code>map affected</code> mapped their changed files to 8 families: F01, F03, F05, F06, F07, F14, F25 and F26 (#18870 is the one that touched F14).</p>
+
+    <h2 id="results">What the pass recorded</h2>
+    <div class="numbers">
+      <div><span>798</span>behaviors in the map</div>
+      <div><span>11</span>merged PRs since the baseline</div>
+      <div><span>8</span>families driven for changed code</div>
+      <div><span>84</span>checks on the TARGET runs</div>
+    </div>
+    <div class="results">
+      <div class="k" style="color:#7cc47f">pass</div><div class="row"><span class="bar" style="width:52%;background:#7cc47f"></span><span class="n">71</span></div>
+      <div></div><div class="d">The behavior matches the map.</div>
+      <div class="k" style="color:#e76a5e">fail</div><div class="row"><span class="bar" style="width:3%;background:#e76a5e"></span><span class="n">4</span><span class="d">Something new is wrong. Here: the consent prompt coming back (#16601, three checks) and a VS Code token readable in Docker (software-agent-sdk#6194), both filed or linked the same day.</span></div>
+      <div class="k" style="color:#b39ddb">xfail</div><div class="row"><span class="bar" style="width:3%;background:#b39ddb"></span><span class="n">4</span><span class="d">A known bug still reproduces, exactly as its map block predicts. Not a regression; the map already knows.</span></div>
+      <div class="k" style="color:#e8d36a">xpass</div><div class="row"><span class="bar" style="width:3px;background:#e8d36a"></span><span class="n">0</span><span class="d">A known bug stopped reproducing. That is a map review, not a pass: find what fixed it, prove it, then change the row.</span></div>
+      <div class="k" style="color:#9aa1ab">blocked</div><div class="row"><span class="bar" style="width:1%;background:#7e8794"></span><span class="n">1</span><span class="d">A prerequisite is missing (here: a real DigitalOcean team token), named in the report.</span></div>
+      <div class="k" style="color:#6c7380">not-run</div><div class="row"><span class="bar" style="width:3%;background:#5d6470"></span><span class="n">4</span><span class="d">Out of scope or refused by the session, and said so.</span></div>
+    </div>
+    <p class="meta">Totals across the TARGET ledgers of the 24 October pass, from <a href="https://github.com/OpenHands/OpenHands/pull/18904">OpenHands PR #18904</a>. A known bug lives in the map as a fenced <code>known-bug</code> block whose one <code># bug</code> line asserts the correct behavior and names the wrong one: <code>bug run</code> reports xfail while the bug is there and xpass when it is gone. A fix is accepted only when the commit before it gives xfail twice and the fix gives xpass twice (<code>bug proof</code>).</p>
+
+    <h2 id="zoom">Zoom in: F14, Secrets</h2>
+    <div class="prose">
+      <p>F14 is one of the smaller families: Settings → Secrets, and the card the agent shows when it asks for a secret. After the 24 October pass it has 13 behaviors. One of them was written that day, because of #18870.</p>
+    </div>
+    <ol class="rows">
+      <li>F14.list</li><li>F14.create</li><li>F14.create-validation</li><li>F14.edit</li><li>F14.delete</li><li>F14.agent-access</li><li>F14.phone</li>
+      <li>F14.form-back</li><li>F14.rename</li><li>F14.edit-value</li><li>F14.delete-escape</li><li class="new">F14.value-reveal</li><li>F14.agent-request</li>
+    </ol>
+    <blockquote class="row"><code>F14.value-reveal</code>: the value field in the Add and Edit forms and in the request card is a masked password input. Its eye button (<b>Show secret</b>, then <b>Hide secret</b>) shows and hides only what was typed, never a stored value; it does not submit or save, and the field is masked again when the form reopens or another secret is edited.</blockquote>
+
+    <h2 id="example">The example: #18869 → #18870 → the daily pass</h2>
+    <div class="timeline">
+      <div class="is"><b>23 Oct · issue #18869</b><strong>Reported</strong>"Agent-requested secret entry displays credentials in plain text." Opened by an agent for Graham Neubig (@neubig), labelled bug, priority:medium, ready-for-dev. Scope settled in the issue: mask the value everywhere the shared form is used.</div>
+      <div class="pr"><b>23 Oct, 12:15 → 12:50 · PR #18870</b><strong>Fixed</strong>By @neubig with an OpenHands agent. +127 −29 in 10 files. Approved by @VascoSch92 and @DevinVinson; merged as <code>04f6dd5</code>, closing #18869.</div>
+      <div class="dp"><b>24 Oct · daily pass, PR #18904</b><strong>Mapped and proven</strong><code>map affected</code> listed F14. The pass wrote the new row, drove it live at desktop and phone width, updated three older F14 sentences, and an independent agent re-ran it.</div>
+    </div>
+    <table class="facts">
+      <tr><td>Issue</td><td><a href="https://github.com/OpenHands/OpenHands/issues/18869">#18869</a>, opened and closed 23 Oct 2026. Reported in Agent Canvas 1.32.0; the request card rendered the shared <code>SecretForm</code>, whose value control was an unmasked <code>&lt;textarea&gt;</code>. Triage added ten acceptance criteria, among them: masked native password input on the card and in Settings, a show/hide control that starts hidden and never reveals a stored value, unchanged save, cancel and retry paths, and the value never leaving the browser.</td></tr>
+      <tr><td>Pull request</td><td><a href="https://github.com/OpenHands/OpenHands/pull/18870">#18870</a> "fix: mask secret values in request and Settings forms". HUMAN note: "I caught this while testing the software factory automation myself." No API or persistence change; Settings also became single-line.</td></tr>
+      <tr><td>Files</td><td><code>src/components/features/settings/secrets-settings/secret-form.tsx</code> (+42 −25), <code>src/components/features/conversation/secret-request-card.tsx</code> (−1), <code>src/i18n/translation.json</code> (+36, the Show/Hide secret labels), three test files (+49 −3), and four <code>.pr/</code> screenshots.</td></tr>
+      <tr><td>Merge</td><td><code>04f6dd5fcc42</code>; the commit before it on main is <code>4d1c4d1048b7</code>. Both were launched for the recordings below.</td></tr>
+      <tr><td>Daily pass</td><td><a href="https://github.com/OpenHands/OpenHands/pull/18904">#18904</a>, BASE <code>6eb91bb</code> → TARGET <code>084a410</code>: "F14.value-reveal is a new row: masked value with a Show/Hide secret toggle (#18870). The Gotcha, 'Replace the value' and 'Agent requests a secret' wording are updated to match." Merged 24 Oct; the next pass started from its baseline.</td></tr>
+    </table>
+    <pre class="code diff">src/components/features/settings/secrets-settings/secret-form.tsx
+<span class="del">- &lt;textarea name="secret-value" rows={valueRows} /&gt;</span>
+<span class="add">+ &lt;input name="secret-value" type="password" autoComplete="new-password" /&gt;</span></pre>
+
+    <h2 id="before-after">Before and after, recorded</h2>
+    <div class="prose">
+      <p>For this page, both commits were launched side by side as isolated stacks (<code>control-openhands launch --new</code> from a worktree at each commit; Agent Server 1.58.1, automation 1.25.1) and driven with the same commands. The value is a dummy, <code>sk-demo-0000-not-a-real-key</code>. <code>browser eval</code> reads the field from the DOM, so the result does not rest on a screenshot alone.</p>
+    </div>
+    <h3>Settings → Secrets → Add a Secret</h3>
+    <div class="pair">
+      <figure class="shot before"><img src="../experiments/feature-map-daily/stills/settings-before-crop.png" alt="Before: the Add a Secret form shows the typed value sk-demo-0000-not-a-real-key in a multi-line text box" loading="lazy" /><figcaption><b>Before · 4d1c4d1</b> · <code>browser eval</code> → <code>TEXTAREA textarea</code>. The value is readable.</figcaption></figure>
+      <figure class="shot after"><img src="../experiments/feature-map-daily/stills/settings-after-crop.png" alt="After: the same form shows the value as dots in a single-line field with an eye button" loading="lazy" /><figcaption><b>After · 04f6dd5</b> · <code>browser eval</code> → <code>INPUT password new-password</code>. Masked; the eye button shows it on request.</figcaption></figure>
+    </div>
+    <h3>The agent asks for a secret (<code>request_secret</code>)</h3>
+    <div class="pair">
+      <figure class="shot before"><img src="../experiments/feature-map-daily/stills/card-before-crop.png" alt="Before: the agent's 'The agent needs a secret' card in the chat shows the typed value in plain text" loading="lazy" /><figcaption><b>Before · 4d1c4d1</b> · the card's value field is a <code>TEXTAREA</code>. This is the path in the original report.</figcaption></figure>
+      <figure class="shot after"><img src="../experiments/feature-map-daily/stills/card-after-crop.png" alt="After: the same card shows the value as dots with an eye button" loading="lazy" /><figcaption><b>After · 04f6dd5</b> · <code>INPUT password</code> with the eye button. deepseek-flash made the same single <code>request_secret</code> call on both stacks.</figcaption></figure>
+    </div>
+
+    <h2 id="commands">The commands, as pseudocode</h2>
+    <div class="prose"><p>Every line is a real <code>control-openhands</code> verb. The outer loop is the daily pass; the inner block is the <code>F14.value-reveal</code> recipe, abridged.</p></div>
+<pre class="code"><span class="c"># a daily delta pass (verify-openhands)</span>
+BASE     = map baseline                     <span class="c"># "Maintenance baseline: main@&lt;sha&gt;" in the map index</span>
+TARGET   = git rev-parse origin/main
+families = map affected --base BASE --target TARGET   <span class="c"># → F01 F03 F05 F06 F07 F14 F25 F26</span>
+RUN      = launch --new ; doctor             <span class="c"># isolated stack: Agent Server, automation, UI, browser</span>
+llm preset deepseek ; onboard --skip
+
+<span class="f">for row in rows(families) + rows_linking_closed_issues:</span>
+<span class="b">    # F14.value-reveal, abridged
+    browser goto   /settings/secrets
+    browser click  testid=add-secret-button
+    browser eval   "input.tagName, input.type, input.autocomplete"   # INPUT password new-password
+    browser fill   'testid=add-secret-form >> testid=value-input'  qa-dummy-value-123
+    browser network --clear
+    browser click  'testid=add-secret-form >> role=button[name="Show secret"]'
+    browser eval   "input.type"                                       # text, button now "Hide secret"
+    browser network --filter /api/settings/secrets                    # no request: nothing saved
+    browser screenshot --feature F14.value-reveal --name revealed
+    evidence add --feature F14.value-reveal --result pass --artifact evidence/F14.value-reveal/revealed.png</span>
+
+<span class="f">for block in bug list:</span>
+<span class="b">    bug run block.id --attempts 2                                     # xfail: still broken · xpass: review the row</span>
+
+evidence report                              <span class="c"># pass / fail / blocked / not-run / xfail / xpass, fail rows first</span>
+map check ; map coverage ; map testids       <span class="c"># the map stays well-formed</span>
+map baseline --set TARGET                    <span class="c"># proposed in the one PR; merging accepts it</span>
+stop</pre>
+    <p class="meta">The before/after recordings used <code>browser record start --feature F14.value-reveal --name settings-before --fps 20</code> … <code>browser record stop</code> on each stack. The full recipe is in <a href="https://github.com/OpenHands/OpenHands/blob/main/.agents/skills/verify-openhands/references/feature-map/F14-secrets.md">F14-secrets.md</a>; the procedure is in <a href="https://github.com/OpenHands/OpenHands/blob/main/.agents/skills/verify-openhands/references/daily.md">daily.md</a>.</p>
+
+    <h2 id="sources">Sources</h2>
+    <p class="meta">Issue <a href="https://github.com/OpenHands/OpenHands/issues/18869">#18869</a>, fix <a href="https://github.com/OpenHands/OpenHands/pull/18870">#18870</a>, daily pass <a href="https://github.com/OpenHands/OpenHands/pull/18904">#18904</a>; the skill and the map in <a href="https://github.com/OpenHands/OpenHands/tree/main/.agents/skills/verify-openhands">.agents/skills/verify-openhands</a>. The film is drawn frame by frame from <a href="../experiments/feature-map-daily/video.html">video.html</a> with the two recorded stacks composited in; the score is synthesized with numpy. Related: <a href="../arch/verify-openhands.html">Give agents a way to prove it</a> and <a href="../openhands-features/scenarios.html">the map, one scenario at a time</a>.</p>
+  </div>
+  <script>
+    // The 28 families as dot columns (counts after the 24 Oct 2026 pass).
+    const fams = [['F01',22],['F02',28],['F03',45],['F04',41],['F05',26],['F06',37],['F07',25],['F08',34],['F09',26],['F10',34],['F11',21],['F12',25],['F13',25],['F14',13],
+      ['F15',24],['F16',21],['F17',33],['F18',22],['F19',25],['F20',24],['F21',35],['F22',31],['F23',42],['F24',26],['F25',33],['F26',35],['F27',30],['F28',15]];
+    const hit = new Set(['F01','F03','F05','F06','F07','F14','F25','F26']);
+    const grid = document.getElementById('famgrid');
+    for (const [id, n] of fams) {
+      const f = document.createElement('div');
+      f.className = 'fam' + (hit.has(id) ? ' hit' : '') + (id === 'F14' ? ' focus' : '');
+      f.title = `${id}: ${n} behaviors`;
+      f.innerHTML = `<span class="id">${id.slice(1)}</span><span class="dots">${'<i></i>'.repeat(n)}</span>`;
+      grid.appendChild(f);
+    }
+  </script>
+</body>
+</html>
