@@ -1294,3 +1294,26 @@ Main remains **508/0**; independent17+12 branch reductions and branch491/496
 counts are separate. All 97 originals and old source identities are retained;
 owned runs are stopped/private-purged and core ports independently closed.
 SDK5603 and budget18533 remain user-parked, with their records unchanged.
+
+
+## 25 October continuation · READY, initial bot reviews pending
+
+Asset B `11dd5ab4dd01504b1f0fd881377d9551539ff6c1` and media docs C
+`6a55643db7a6fcdf29fedc962c0f945fd52c00a2` are published. Eleven immutable
+raw files pass HTTP/full SHA; fifteen live Pages files pass HTTP/full SHA and
+expected MIME, including both own film anchors. Existing designated Chrome
+shows readable native profile Before at 0:18/0:48 and After at 0:25/0:48, plus
+Files After at 0:28/0:38, with visible Slack download links. Downloads were
+verified by HTTP/full SHA; no browser download click is claimed. These checks
+apply to media snapshot C, not the later READY-docs D deployment.
+
+Both #18933/#18934 are **ready/open at unchanged exact heads**, with fresh
+ready-event description validation successful and effective required CI
+**8 passed/6 skipped/0 failed/0 pending**. Initial all-hands-bot requests were
+verified pending after green; reviews are empty. HUMAN prefixes were byte
+preserved. Independent final readiness is PASS; no bot approval or merge is
+claimed. Cohort: **56: 52 merged/4 open non-draft/0 drafts**. All 42 complete
+players/84 MP4 anchors, source/capture identities and coverage limits are
+unchanged. Main stays 508/0; branch 491/496 and independent 17+12 remain separate.
+SDK #5603/budget #18533 remain user-parked with their old records unchanged. The
+user chooses merging; no merges, releases or watch actions are performed here.
