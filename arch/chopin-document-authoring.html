@@ -1,0 +1,187 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Codex","llm":null,"date":"2026-10-25","role":"author"},{"agent":"Codex","llm":null,"date":"2026-10-25","role":"editor"}]} -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chopin: the document as a shared workspace · Engel’s Notebook</title>
+  <meta name="description" content="A source-backed study of Chopin’s MDXEditor, Lexical and Yjs layers, careful agent edits, durable decisions, and a bounded authoring experiment for Liberty Labs.">
+  <meta name="author" content="Codex">
+  <meta name="keywords" content="Chopin, collaborative authoring, MDXEditor, Lexical, Yjs, Liberty Labs">
+  <meta property="article:published_time" content="2026-10-25">
+  <meta property="og:title" content="Chopin: the document as a shared workspace">
+  <meta property="og:description" content="How people and agents edit one durable document, and which parts are worth studying for Liberty Labs.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://enyst.github.io/arch/chopin-document-authoring.html">
+  <link rel="canonical" href="https://enyst.github.io/arch/chopin-document-authoring.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../arch.css">
+  <style>
+    html{color-scheme:dark;scroll-padding-top:24px}
+    .shell{max-width:1040px;padding-top:42px;font-size:18px}
+    header,.prose,footer{max-width:70ch;margin-inline:auto}
+    h1{font-size:clamp(2.6rem,5.7vw,4.2rem);line-height:1.08;margin:30px 0 24px;text-wrap:balance}
+    h2,h3{font-family:var(--sans);text-transform:none;letter-spacing:-.01em}
+    h2{font-size:1.5rem;margin-top:56px;scroll-margin-top:24px}
+    h3{font-size:1.05rem;color:var(--ink)}
+    .lead{font-size:1.16em;line-height:1.65}
+    .meta,.small,figcaption,.back{color:var(--muted);font-size:.84em}
+    .meta{margin:22px 0}
+    a{color:var(--teal);text-underline-offset:.2em;overflow-wrap:anywhere}
+    a:hover{color:var(--ink)}
+    a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+    ::selection{background:var(--accent);color:var(--bg)}
+    .contents{display:flex;flex-wrap:wrap;gap:8px 22px;padding:18px 0;border-block:1px solid var(--border);font-size:.88em}
+    .contents a{padding:4px 0}
+    .thesis{font-size:1.12em;padding:22px 0;margin:24px 0;border-block:1px solid var(--border)}
+    .flow{list-style:none;padding:0;margin:26px 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+    .flow li{margin:0;padding:16px 0;border-block:1px solid var(--border);min-width:0}
+    .flow strong{display:block;margin-bottom:8px;font-size:1.02em}
+    .flow span{display:block;font-size:.88em}
+    figure{margin:26px 0}figcaption{margin-top:12px;line-height:1.6}
+    details{border-bottom:1px solid var(--border);padding:18px 0}
+    summary{cursor:pointer;font-weight:600;padding:4px 0;color:var(--teal)}
+    details ol{margin-top:18px}details li{margin-bottom:12px}
+    .table-scroll{overflow-x:auto;scrollbar-color:var(--muted) var(--card);margin:24px 0}
+    table{min-width:540px;margin:0;font-size:.85em}
+    caption{text-align:left;color:var(--muted);padding-bottom:12px}
+    th{font:600 1em var(--sans);text-transform:none;letter-spacing:0;color:var(--ink)}
+    th,td{vertical-align:top;padding:12px}
+    code{overflow-wrap:anywhere}
+    .sources{padding-left:22px}.sources li{margin-bottom:14px}
+    footer{margin-top:56px;padding:24px 0;border-top:1px solid var(--border)}
+    @media(max-width:740px){.shell{padding:26px 20px 60px;font-size:17px}.flow{grid-template-columns:1fr;gap:0}.flow li{border-bottom:0;padding:15px 0}.flow li:last-child{border-bottom:1px solid var(--border)}h1{font-size:2.7rem}h2{margin-top:44px}.contents{gap:5px 18px}th,td{padding:10px}}
+    @media print{html{color-scheme:light}body{background:white;color:#111}h1,h2,h3,strong,a,th{color:#111}.meta,.small,caption,figcaption{color:#555}.back,.contents{display:none}.table-scroll{overflow:visible}table{min-width:0}code,th{background:#eee;color:#111}details{break-inside:avoid}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header>
+    <a class="back" href="../index.html">Back to Engel’s Notebook</a>
+    <h1>The document as a shared workspace</h1>
+    <p class="lead">Chopin puts people and an agent inside the same editable document. Its most useful ideas concern how that document changes, how decisions survive a rewrite, and how a reader can understand what the agent did.</p>
+    <p class="meta">Source study · <time datetime="2026-10-25">25 October 2026</time><br>Chopin at <a href="https://github.com/githubnext/chopin/tree/f84f153d8e969c66cd15e0585017d5ad0ebe55ec"><code>f84f153d</code></a>, committed 24 October. Implementation and documentation inspected; the application was not run for this study. The LL trial below is a proposal.</p>
+    <nav class="contents" aria-label="On this page">
+      <a href="#purpose">The goal</a><a href="#structure">The structure</a><a href="#editing">Two edit paths</a><a href="#decisions">Decisions and attribution</a><a href="#ll">An LL experiment</a><a href="#sources">Sources</a>
+    </nav>
+  </header>
+
+  <section class="prose" id="purpose">
+    <h2>A document people can keep shaping</h2>
+    <p>Chopin is a GitHub Next research prototype for people and repository-grounded agents to co-author durable documents. Implementation plans are its main workflow, but the model also covers specifications, RFCs, proposals and decision records. Its agent, currently called <strong>Planner</strong>, is still prompted and tooled primarily for planning.</p>
+    <p>The <a href="https://githubnext.com/projects/chopin/">project introduction</a> identifies four weaknesses in existing planning interfaces: limited interaction with the plan, isolated team members, unclear decision ownership, and too much explanation confined to prose. Chopin explores a shared editing surface with comments, visuals, research and an agent that participates in the work.</p>
+    <p class="thesis"><strong>The durable artifact is the document.</strong> Chat supplies discussion and instructions. Decision records retain what people chose and who chose it. Those pieces remain related without becoming interchangeable.</p>
+    <p>A <strong>channel</strong> contains one repository-connected document and its collaboration context. Published research can become a child document. The architecture and maintainer guide say children share their root’s Chat while owning their document and Decisions; the README still describes separate child Chat. This study follows the more specific architecture contract and records the discrepancy.</p>
+  </section>
+
+  <section class="prose" id="structure">
+    <h2>Four layers inside the editor</h2>
+    <figure>
+      <ol class="flow" aria-label="Document editing layers">
+        <li><strong>MDXEditor</strong><span>The rich editing interface and Markdown import/export machinery.</span></li>
+        <li><strong>Lexical</strong><span>The editable node tree: paragraphs, selections, formatting and commands.</span></li>
+        <li><strong>Yjs</strong><span>Shared document updates, collaborative undo and live presence.</span></li>
+        <li><strong>Server room</strong><span>Authoritative shared state, headless validation and durable commits.</span></li>
+      </ol>
+      <figcaption>These layers describe one document. PostgreSQL persists collaborative state and its related records; canonical MDX provides a readable projection. The server does not trust a browser to serialize the accepted document.</figcaption>
+    </figure>
+    <p>At the inspected revision, the workspace pins MDXEditor 4.1.0 and Lexical 0.48.0. Chopin adds substantial integration around them: a shared schema registry, custom collaboration and history handling, table nodes, comments, decision widgets and server-side conversion. Its MDXEditor patch restores a missing TypeScript declaration for a runtime export used by that registry.</p>
+    <div class="table-scroll" role="region" aria-label="Chopin package map" tabindex="0">
+      <table><caption>The main code boundaries. Scroll horizontally on a narrow screen.</caption>
+        <thead><tr><th scope="col">Area</th><th scope="col">Responsibility</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>apps/web</code></th><td>React workspace, repository picker, navigation and Chat.</td></tr>
+          <tr><th scope="row"><code>packages/editor</code></th><td>Rich editor, collaboration provider, cursors, comments and widgets.</td></tr>
+          <tr><th scope="row"><code>packages/dialect</code></th><td>Allowed MDX, parser, serializer and shared Lexical schema.</td></tr>
+          <tr><th scope="row"><code>packages/protocol</code></th><td>Messages used by browser and server.</td></tr>
+          <tr><th scope="row"><code>apps/server</code></th><td>Authentication, live rooms, storage, Planner, background jobs and MCP.</td></tr>
+          <tr><th scope="row"><code>apps/connector</code></th><td>Connects a person’s machine and ACP-compatible coding agent for local work.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Shared packages do not depend on either application. The runtime is a Bun server serving the built React client, HTTP API, MCP and WebSockets from one origin, backed by PostgreSQL. A renewable database writer lease permits one application process to write at a time.</p>
+    <p><a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/docs/architecture.md#collaborative-document">Document architecture</a> · <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/packages/editor/src/plan-editor.tsx">Editor composition</a> · <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/packages/dialect/src/registry.ts">Shared registry</a></p>
+  </section>
+
+  <section class="prose" id="editing">
+    <h2>A human types; an agent addresses blocks</h2>
+    <p>Both paths end in the same live document and durable storage, but they start with different editing operations. Open either trace to follow a change.</p>
+    <details open>
+      <summary>Follow a human edit</summary>
+      <ol>
+        <li>The browser edits its Lexical tree; the Lexical/Yjs binding produces a collaborative update.</li>
+        <li>The provider keeps the update until acknowledgement, allowing compatible updates to be replayed after reconnection.</li>
+        <li>The server groups incoming updates for 5 milliseconds, applies them to its document, and projects canonical MDX through headless Lexical.</li>
+        <li>After validation, the update and related state commit under the database writer fence. Only then does the server acknowledge and relay the accepted state.</li>
+      </ol>
+      <p>If an update produces an invalid document, Yjs cannot simply roll back that transaction. The room rebuilds its last known-good state under a new epoch, and clients reopen against that history.</p>
+    </details>
+    <details>
+      <summary>Follow an agent edit</summary>
+      <ol>
+        <li>Planner reads the current document revision and an outline of addressable top-level blocks.</li>
+        <li>It proposes operations such as insert, replace, move or delete against that revision. A stale revision is refused before applying the batch.</li>
+        <li>Operations stage against a parsed Markdown tree. The assembled result must pass dialect validation and a Lexical import/export round trip.</li>
+        <li>Reconciliation reuses untouched or moved nodes. A durable commit precedes broadcasting the update and its recent-change markers.</li>
+      </ol>
+      <p>Preserving node identity helps preserve unaffected selections, cursors and undo history. The ordinary operation vocabulary also includes whole-document replacement; careful block edits are a supported mechanism, not a promise that every agent change is small.</p>
+    </details>
+    <p>The <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/apps/server/src/plan/edit.ts">edit engine</a> is the most useful starting point for studying agent changes. Read it beside the <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/packages/editor/src/collaboration.tsx">browser binding</a> and the architecture’s <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/docs/architecture.md#human-edit-flow">human edit flow</a>.</p>
+    <h3>The document language is an explicit boundary</h3>
+    <p>Chopin’s MDX is parsed into approved structures and rendered through components the application owns. Imports, exports, expressions, raw HTML and unknown JSX are rejected. It does not compile arbitrary document text into executable React code. The same <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/packages/dialect/src/dialect.ts">dialect allowlist</a> and validation rules shape browser feedback and server acceptance.</p>
+  </section>
+
+  <section class="prose" id="decisions">
+    <h2>Keep decisions and authorship durable</h2>
+    <p>Questionnaire answers and accepted comment decisions live in records beside the document. Their visible components project those records. An ordinary browser edit cannot create, remove or alter a protected decision projection; domain operations update the record and its projection together.</p>
+    <p>This matters when an agent rewrites a plan. A recommendation, a casual agreement in Chat and a saved decision have different meanings. Saving an answer records its author. Reopening retains earlier answers while a new one develops. A rewrite of the prose does not acquire authority to change that history. See <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/docs/decisions.md">the decision lifecycle</a>.</p>
+    <p><strong>Recent agent change marks are a different feature.</strong> They help a person notice additions, moves and deletions while working. They are temporary browser decoration, not a durable ledger of agent and model contributions. LL’s machine-readable attribution still needs to survive saves, imports and exports independently of any visible highlight.</p>
+    <h3>Document authority and execution authority are separate</h3>
+    <p>The default Copilot-backed Planner has bounded repository-reading tools and document tools. The Atomic harness deliberately gives Planner shell and filesystem capabilities as the server process’s user. A remote Planner moves model execution to an attached client while server tools still enforce document authority. Those configurations have materially different execution boundaries.</p>
+    <p>Chopin uses GitHub identity and repository permissions: pull access can read channels, while push or administration access permits changes. Browser access also checks the GitHub App installation. External MCP uses its caller’s GitHub bearer directly. Public repository access does not make the channel anonymously readable. These rules fit repository collaboration; LL’s owner, invited-reader and public audiences need their own authorization. <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/docs/architecture.md#trust-boundaries">Trust boundaries</a>.</p>
+  </section>
+
+  <section class="prose" id="ll">
+    <h2>A small authoring experiment for Liberty Labs</h2>
+    <p><strong>Proposed first step:</strong> evaluate a visual Markdown editor for the owner’s writing room, using synthetic writing and the existing save contract. This is a local experiment to decide whether editing becomes better. Real-time multiplayer, a hosted Planner and a storage migration are separate choices.</p>
+    <p>LL currently uses CodeMirror for Markdown source editing. An MDXEditor integration could live in a bounded React mount in the owner editor while the application keeps its TypeScript request handler, server-rendered reading pages and authoritative D1 store. That is an implementation hypothesis to test; this study has not installed or integrated it.</p>
+    <ol>
+      <li><strong>Define the supported writing subset.</strong> Use synthetic headings, links, lists, quotations, fenced code, tables and images. Include comments and protected source fragments whose preservation matters. Unsupported content must remain intact or refuse the edit clearly.</li>
+      <li><strong>Prove round trips before choosing the editor.</strong> Import, edit, undo, export, save, reload and compare meaning and preserved source. Exercise keyboard selection, paste and phone editing. A successful mount is insufficient.</li>
+      <li><strong>Keep one save authority.</strong> Save to D1 through the existing owner checks and writing revision. Keep audience changes separate. Stale saves, disconnects and failed saves must not lose text or quietly replace newer writing.</li>
+      <li><strong>Retain source editing as a deliberate choice.</strong> Test moving between source and visual views without introducing a second independently saved copy. Imported standalone HTML documents keep their existing format; they do not become restricted MDX through a bulk conversion.</li>
+      <li><strong>Study agent edits separately.</strong> A later owner-authorized edit tool could accept revision-checked block operations. Record the contributor and verified model, preserve earlier attribution, and let LL choose its public presentation. Any persistent schema change needs its own reviewed migration.</li>
+    </ol>
+    <div class="table-scroll" role="region" aria-label="LL experiment acceptance criteria" tabindex="0">
+      <table><caption>Evidence needed to continue the experiment</caption>
+        <thead><tr><th scope="col">Question</th><th scope="col">Required result</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Does editing help?</th><td>Normal writing, keyboard use, undo and phone editing work in the real browser.</td></tr>
+          <tr><th scope="row">Does content survive?</th><td>Supported content round-trips; unsupported content and attribution are preserved or explicitly refused.</td></tr>
+          <tr><th scope="row">Does saving remain correct?</th><td>Reloads read the same D1 state; stale and failed saves preserve the author’s work.</td></tr>
+          <tr><th scope="row">Does access remain correct?</th><td>Only the owner edits. Invited readers remain readers. Ordinary saves retain the current audience.</td></tr>
+          <tr><th scope="row">Is adoption worthwhile?</th><td>Observed editing improvements justify bundle, integration and maintenance costs.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The most transferable Chopin patterns are shared validation, revision-aware edits and durable records for decisions and contributions. Its PostgreSQL writer lease, collaborative server and GitHub authorization model belong to a larger system choice.</p>
+  </section>
+
+  <section class="prose" id="sources">
+    <h2>Sources and evidence limits</h2>
+    <p>This is a dated reading of source and design contracts at one commit. It is not a fresh runtime test, security audit, editor benchmark or claim of production readiness. Chopin’s own documentation describes it as an experimental research prototype and lists implementation gaps.</p>
+    <ul class="sources">
+      <li><a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/README.md">README</a> and <a href="https://githubnext.com/projects/chopin/">GitHub Next introduction</a>: purpose and collaboration model. The child-Chat discrepancy is noted above.</li>
+      <li><a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/docs/architecture.md">Architecture</a> and <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/AGENTS.md">maintainer guide</a>: authority, persistence, collaboration and known gaps.</li>
+      <li><a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/package.json">Pinned dependencies</a>, <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/packages/editor/src/plan-editor.tsx">editor composition</a>, <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/packages/editor/src/collaboration.tsx">collaboration binding</a> and <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/packages/dialect/src/registry.ts">schema registry</a>: the actual MDXEditor/Lexical/Yjs integration.</li>
+      <li><a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/apps/server/src/plan/edit.ts">Agent edit engine</a> and <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/packages/dialect/src/validate.ts">validator</a>: revision checks, staging and accepted document structures.</li>
+      <li><a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/docs/decisions.md">Decisions</a> and <a href="https://github.com/githubnext/chopin/blob/f84f153d8e969c66cd15e0585017d5ad0ebe55ec/docs/storage.md">storage</a>: saved answers, related prose and durable state.</li>
+    </ul>
+    <p>The LL section is a proposed experiment based on the current authoring contract. No editor replacement, data migration or deployment follows from this note.</p>
+  </section>
+  <footer><a href="../index.html">Back to the Notebook</a></footer>
+</main>
+</body>
+</html>
