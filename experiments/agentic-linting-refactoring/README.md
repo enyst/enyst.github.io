@@ -1206,3 +1206,475 @@ All 40 film elements/80 MP4 anchors, corrected source/media bytes and stated
 coverage limits remain unchanged. Exact-main stays 603/0; independent 77+18
 proposal reductions remain separate. The user chooses merging; no merge,
 release or watch is performed here.
+
+
+## 25 October continuation · draft evidence checkpoint
+
+Prior #18917 merged at `2026-10-25T02:20:45Z` as
+`74323b544c151669b3cdd88fb950942a29beda55`; #18918 merged at
+`2026-10-25T02:21:19Z` as `b185939d3dec3b203b0651c675f175ee5b4ed43e`.
+These are 03:20 and 03:21 Stockholm after the DST change; original capture heads
+and all 40 whole film elements/80 MP4 anchors remain unchanged.
+
+Exact main `c5612599307c0bc44e21ed25c97e2a542e194b32` now has **508 warnings/0 errors**:
+439 arbitrary values, 51 inline styles and 18 palette findings. The
+[public audit](main-lint-audit-2026-10-25-c561259930.json) records exactly 95 removed and none
+added versus 1abbd4b415; SHA-256 `26aac3a5821323c5277f2f7789863827b6f3ab992b604e0ce856b4d74a822279`.
+Full lint, machine ESLint, typecheck and formatting pass using the committed
+lock and existing verified install; no dependency resolution/install ran.
+
+New **draft** [#18933](https://github.com/OpenHands/OpenHands/pull/18933) uses
+17 existing profile theme aliases across six files at `2c4e9e6bd9533d84245f92a66ab732a2a35b255b`.
+All 90 tests, app/library builds and five emitted full-class pairs pass;
+independent branch lint is491/0. Known Solarized keyless-note contrast #18546
+(2.58:1) and the public embedded AddModels body-portal gap remain inherited.
+New **draft** [#18934](https://github.com/OpenHands/OpenHands/pull/18934) gives
+twelve preview bindings two compiled owners at `e0eee4cc154875c759d6f346495afce69118a79e`.
+All 34 existing tests/full lint/builds pass, independent branch lint496/0;
+independent actual twelve-property cascade proof is still ongoing.
+These branch reductions remain separate from integrated main508/0.
+Matching evidence and current source CI are in progress; no frozen new movie,
+public HTTP, readiness or initial bot request is claimed. Own film anchors
+`profile-theme-aliases-film` and `file-preview-theme-film` must be published
+and verified before readiness and initial review. No arbitrary batch size/count cap.
+
+The cohort is **56: 52 merged/2 open non-draft/2 draft**. Current read-only
+#18520 evidence confirms open/non-draft, CLEAN/MERGEABLE, bot-approved at
+unchanged `aef5a5591d`, CI8 passed/6 skipped and no review requests. Its latest
+bot approval accepts candid fixture-backed appearance evidence: a real-account
+empty state plus forty focus measurements across five themes/two viewports.
+The earlier static-only record and original source identities remain history.
+Fixture proof does not establish DigitalOcean authentication, billing or
+resource lifecycle; issue18517 still requests authenticated affected states
+and is not ready-for-dev. No duplicate DO source work is needed.
+SDK5603 and budget18533 are explicitly **parked by the user**; their records,
+prerequisites and user text remain unchanged, with no new SDK status work.
+
+
+## 25 October continuation · frozen MEDIA/DRAFT checkpoint
+
+The [profile theme film](../../arch/agentic-linting-refactoring.html#profile-theme-aliases-film)
+and [Markdown preview film](../../arch/agentic-linting-refactoring.html#file-preview-theme-film)
+are complete locally. Both native players have posters/captions, visible Slack
+downloads, complete-original ZIPs and relative source/comparison links. All forty
+earlier whole players/eighty MP4 anchors retain their bytes; totals are
+**42 films/84 MP4 downloads**. No new GIF.
+
+Local-only asset B `11dd5ab4dd01504b1f0fd881377d9551539ff6c1` contains
+123 packet assets plus the exact-main audit. It is not yet published. Frozen
+profile packet: 48.64 seconds, 59 PNGs/four native clips, 72 ZIP members; film
+SHA `a2808a9dec0c43e0238fa9947214b7952f81026e978a277281d7b4092aeed277`.
+Frozen Files packet: 38.4 seconds, 32 PNGs/two native clips, 43 ZIP members; film
+SHA `a431e990bf5c7946adfb0e9760696991f67b6e20c354df617c8cb2a8eda971d1`.
+Both are H.264/yuv420p/AAC, 25 fps with fast start, and quiet original ambience
+averaging −52.5 dB. Independent code/live/frozen-asset gates and root visual
+review pass; no public HTTP or live-anchor verification is claimed yet.
+
+Source/builds are c561259930/dfd39a7c2f6aec0a before, profile
+2c4e9e6bd9/b38c7801a740f06a and Files e0eee4cc15/b5f49973c55d0d72 after.
+All 23 profile computed states and eleven desktop Files states match. Five
+themes and representative 390 px phone originals are included. Files phone
+uses native Hide file tree on both revisions; three matching Before stills
+come from a supplemental same-baseline/build run. Phone Rich/table visual
+smoke lacks paired baseline hidden-tree computed measurements. Host overrides,
+embedded hosts and absent sanitized caption/kbd/lead descendants retain
+compiled-contract coverage; Files actual twelve-property proof passes across
+32 scenarios. Genuine filesystem reads use the existing adapter, with zero
+agent prompts/model calls/turns. Solarized keyless-note issue #18546 (2.58:1),
+Cloud/older-backend/bound-provider and embedded AddModels limits remain. Four
+existing profile warnings remain outside the color-only batch; no claim that
+all four lack aliases. No pixel identity, contrast or phone-layout fix claimed.
+
+Both #18933/#18934 remain **draft/NoBot**. Actual 11:05 UTC source-CI receipt
+records **7 passed/1 media-description failure/6 skipped/0 pending** each.
+Root publishes B plus media docs C, verifies immutable raw and own live film
+anchors, attaches media and closes required checks before readiness/initial
+bot review. Cohort remains **56: 52 merged/2 open non-draft/2 drafts**.
+Main remains **508/0**; independent17+12 branch reductions and branch491/496
+counts are separate. All 97 originals and old source identities are retained;
+owned runs are stopped/private-purged and core ports independently closed.
+SDK5603 and budget18533 remain user-parked, with their records unchanged.
+
+
+## 25 October continuation · READY, initial bot reviews pending
+
+Asset B `11dd5ab4dd01504b1f0fd881377d9551539ff6c1` and media docs C
+`6a55643db7a6fcdf29fedc962c0f945fd52c00a2` are published. Eleven immutable
+raw files pass HTTP/full SHA; fifteen live Pages files pass HTTP/full SHA and
+expected MIME, including both own film anchors. Existing designated Chrome
+shows readable native profile Before at 0:18/0:48 and After at 0:25/0:48, plus
+Files After at 0:28/0:38, with visible Slack download links. Downloads were
+verified by HTTP/full SHA; no browser download click is claimed. These checks
+apply to media snapshot C, not the later READY-docs D deployment.
+
+Both #18933/#18934 are **ready/open at unchanged exact heads**, with fresh
+ready-event description validation successful and effective required CI
+**8 passed/6 skipped/0 failed/0 pending**. Initial all-hands-bot requests were
+verified pending after green; reviews are empty. HUMAN prefixes were byte
+preserved. Independent final readiness is PASS; no bot approval or merge is
+claimed. Cohort: **56: 52 merged/4 open non-draft/0 drafts**. All 42 complete
+players/84 MP4 anchors, source/capture identities and coverage limits are
+unchanged. Main stays 508/0; branch 491/496 and independent 17+12 remain separate.
+SDK #5603/budget #18533 remain user-parked with their old records unchanged. The
+user chooses merging; no merges, releases or watch actions are performed here.
+
+
+## 25 October evening continuation · draft checkpoint
+
+[#18933](https://github.com/OpenHands/OpenHands/pull/18933) merged
+`2026-10-25T19:53:58Z` as `ddbcd525d0f3259ffddf1ea5fff366ecdc4a171a`;
+[#18934](https://github.com/OpenHands/OpenHands/pull/18934) merged
+`2026-10-25T20:57:16Z` as `044ec59e12e5070406378ba24d568cfbb3a10bf0`.
+These are 20:53 and 21:57 Stockholm (ZoneInfo, UTC+1 after DST). Original
+capture heads 2c4e9e6bd9/e0eee4cc15 and all 42 whole players/84 MP4 download
+anchors retain their bytes. There are 88 total MP4 href anchors; download
+counts require the download attribute.
+
+Exact main `044ec59e12e5070406378ba24d568cfbb3a10bf0` passes **479 warnings/0 errors**:
+410 arbitrary values, 51 inline styles and 18 palette findings, 1,425 files
+linted/186 with diagnostics. The [public audit](main-lint-audit-2026-10-25-044ec59e12.json)
+records exactly 29 removed/0 added versus c561259930 (settings 17/Files 12);
+SHA-256 `65295d88364b60da49c5e8f2f7ae26bc79f7ed375b702a420a92c75f2d7af1a6`.
+Full lint, machine ESLint, typecheck and formatting pass; independent draft
+branch counts are not combined into this integrated-main total.
+
+Three new **drafts** have independent code/CSS PASS/LOW, with final live
+evidence, media and final-head CI still pending:
+
+- [Home #18946](https://github.com/OpenHands/OpenHands/pull/18946), issue #18943,
+  final `0cc2b720c16a1c498ed6ca387b66045a69470833` / product `988aab3510`: six
+  aliases/findings removed, branch 473/0. Original 25-test Home and targeted
+  37-test Home/theme runs overlap; do not add them. One new actual consumer
+  CSS case covers five themes; isolated-runtime notice/static test-mode pill
+  remain compiler/test-only pending genuine live proof.
+- [Automation #18947](https://github.com/OpenHands/OpenHands/pull/18947), issue #18944,
+  `4506f4ff98958f68283e7121f1763367f96a8ab1`: four substitutions remove only
+  two diagnosed warnings, branch 477/0; seven suites/40 tests. Draft map recipes
+  are outside the current class-site scanner; genuine DRAFT differs from
+  paused/inactive. Matching script/status evidence remains pending.
+- [Extensions #18948](https://github.com/OpenHands/OpenHands/pull/18948), issue #18945,
+  final `510f00ebc3c7b236e76e6ace4b541f62e8cb71b2` / product `50b5f7e6a8`: six
+  frames/twelve classes/findings, branch 467/0. Seven suites/101 tests plus two
+  additional build/viewport suites/16 tests pass. The scoped 90vw/85vh library
+  build contract retains the preexisting embedded body-portal limitation.
+
+Final Home/Extensions commits are test-only and preserve reviewed product
+bytes. Initial CI snapshots are superseded; final required checks/media
+description outcomes remain pending. No frozen new film paths, public HTTP,
+readiness or initial bot request is claimed. Future own anchors are
+`home-launcher-theme-film`, `automation-detail-theme-film` and
+`extension-dialog-viewport-film`; matching films must be published/live-verified
+before readiness and initial review. Coherent batches have no arbitrary
+count/size cap. Cohort: **59 = 54 merged/2 open non-draft/3 drafts**.
+Read-only reconciliation confirms #18520/#18533 remain open/non-draft at their
+unchanged heads (approved/review-required respectively). Their old objects
+and user text remain unchanged. SDK #5603/budget #18533 stay explicitly parked;
+no new SDK work, source/media edits, merges, release or watch is performed.
+
+
+## 25 October evening continuation · frozen MEDIA/DRAFT checkpoint
+
+Three own film sections are complete locally: [Home](../../arch/agentic-linting-refactoring.html#home-launcher-theme-film),
+[Automation detail](../../arch/agentic-linting-refactoring.html#automation-detail-theme-film), and
+[Extension dialogs](../../arch/agentic-linting-refactoring.html#extension-dialog-viewport-film).
+They use native same-origin controls, posters/captions, visible Slack downloads
+and complete-original ZIP/source/comparison links. All 42 older whole players
+and 84 download anchors retain their bytes; totals are **45 films/90 MP4
+download anchors** (94 total MP4 href anchors). No new GIF.
+
+Local-only asset B `bec344f8284745a92ce0c10c9a4e4a1a2779926a` contains 252 packet assets
+plus the main audit; it is not yet published. Independent frozen-asset gate
+passes 69 checks and root decoded visual review passes. Final movies:
+
+- Home 43.24 seconds, 80 PNGs/four native clips, 94 ZIP members; film SHA
+  `1b3b3f64f1bcb71f820cd68fd54b63dff1ea18e848e8db781f8f3d7590f599c6`.
+- Automation 31.88 seconds, 42 PNGs/six clips, 57 ZIP members; film SHA
+  `04c48deff3f6d74c25909c2491ab2bb552b5b5e336467446d71f328ba485731c`.
+- Extensions 77.88 seconds, 76 PNGs/four clips, 89 ZIP members; film SHA
+  `25fba58c5f22d8269f747754c507eaa7c0e6b4d47e6cb6c4627a96c1445c6745`.
+
+All are 25 fps H.264/yuv420p/AAC, fast-start, with original quiet ambience
+averaging −52.5 dB. The 212 selected originals are retained; all six owned runs
+are stopped/private-purged and all owned ports are conclusively closed.
+No model prompt, completion or agent turn was run.
+
+Home has 40 corrected matched mounted-branch samples across five themes, both
+Code/Automate modes, desktop/phone and normal/reduced motion, settled 750 ms.
+Earlier preference-only captures are excluded. Clock activation is one 700 ms
+animation, not continuous rotation. Isolated-runtime notice remains compiler/
+mocked-test-only. Automation has 20 matched genuine detail Draft/script states;
+compact Draft cards/rows remain compiler-only. One fixed credential-free printf
+Test per phase exited 0 in Bash; service remained RUNNING/Starting without its
+callback. Exact runs were cancelled and owned objects deleted; no completed
+Test lifecycle, expand/copy controls or enabled schedule is claimed. Extensions
+has 38 matched samples across six real frames, desktop/phone/short-phone, with
+five-theme stills on one representative dialog. Long API-discovered content
+exercises real scrolling/footer owners; nothing was installed or executed.
+Inherited embedded body-portal scope remains; no live embedded/Cloud/ACP
+coverage, global pixel identity, layout or performance improvement is claimed.
+
+Actual build/cache identities are distinct from final checkout heads: Before
+044ec59e12/build 8e365d1fa30953c3; Home checkout 0cc2b720c1/build cdf6895f5874b3f2
+reuses actual app/library source 988aab3510 by exact input equality. Automation
+4506f4ff98/build d75a8350ef7e384f is built from that source. Extensions checkout/
+app source 510f00ebc3/build 086cdbb325a81428 retains library source 50b5f7e6a8.
+No older bytes are relabelled as newly built source.
+
+Cohort remains **59: 54 merged/2 open non-draft/3 drafts**. All three new PRs
+remain **draft/NoBot**, with actual code CI 7 passed/1 expected media-description
+failure/6 skipped/0 pending. Raw HTTP, own live anchors, publication and final
+readiness gates await root B+C publication and media attachment. Exact-main
+stays 479/0; independent 473/477/467 branches and 6/2/12 reductions stay separate.
+SDK #5603/budget #18533 remain user-parked and unchanged.
+
+
+## 25 October evening continuation · READY, initial bot reviews pending
+
+Asset B `bec344f8284745a92ce0c10c9a4e4a1a2779926a` and media docs C
+`355eafa23e4a722d7b913c800dbfec6a7c265420` are published. Sixteen immutable raw files
+and twenty live Pages files pass HTTP/full SHA and expected MIME, including
+all three own film anchors. Designated Chrome verifies readable native
+playback and visible Slack download links. Downloads were verified by HTTP
+and full body SHA; no browser download click is claimed. Proof belongs to
+media C, not the later READY-docs D deployment.
+
+All three #18946/#18947/#18948 are **ready/open at unchanged heads**. Fresh
+ready-event description validation succeeds; required CI is **8 passed /
+6 skipped / 0 failed / 0 pending** each. Initial all-hands-bot requests are
+verified pending after green, with empty reviews and preserved HUMAN prefixes.
+Independent final readiness passes; no bot approval or merge is claimed.
+Cohort: **59 = 54 merged / 5 open non-draft / 0 drafts**. All 45 whole players
+and 90 MP4 download anchors, source/build/cache identities, originals and
+coverage limits remain unchanged. Main stays 479/0; branches 473/477/467 and
+reductions 6/2/12 remain separate. SDK #5603/budget #18533 remain user-parked
+with their records unchanged. The user chooses merging; no merge, release
+or watch action is performed here.
+
+
+## 26 October continuation · one combined setup draft
+
+Prior #18946/#18947/#18948 merged at 23:02:08/23:02:30/23:03:22 UTC on
+25 October: Stockholm 26 October 00:02/00:02/00:03. Merge commits are
+`9b43513590b6e3eaa90b0c363f7b75a9c2360fcd`,
+`f5f3e412d44e7ba90e535c5e345c5a176f1eaa3a`, and
+`7a41641c6d8bcf3e2e3c19c08b778781bcf954c2`. Original capture/build/cache
+identities remain unchanged, as do all 45 complete players/90 MP4 download
+anchors/94 total MP4 href anchors.
+
+Exact main `7a41641c6d8bcf3e2e3c19c08b778781bcf954c2` passes **459 warnings/0 errors**:
+390 arbitrary values, 51 inline styles, 18 palette findings; 1,425 linted files/
+179 diagnostic files. [Public audit](main-lint-audit-2026-10-26-7a41641c6d.json)
+SHA-256 `c57a3d0d1d4f5b2484df483f0c91d0b752ee4219517763c83f03985989e47afe` records 20 removed/0 added
+versus 044ec59e12. Full lint/typecheck/format and machine ESLint pass. Active
+Node 24.22.1/npm 11.12.1 differ from the repository Volta Node pin recorded
+separately in that audit; no matching-pin claim.
+
+One meaningful [combined Automation setup PR #18950](https://github.com/OpenHands/OpenHands/pull/18950),
+issue #18949, groups 42 findings: panel 17, prompt stack 17, new route 4 and
+ConversationMain dock 4. Final head `eef335c07dcb4f013c7722e107c49d720bb507d5`
+preserves product `ceb04025621644dc9d672af4d9b4c1796d029fc7`; branch 417/0
+removes 42 findings/0 added, independently of main 459/0. Typography/palette, APIs, state
+and dynamic layout logic remain untouched. 94 focused tests across six suites
+and 15 Vite/scope tests across two files overlap; do not claim 109 disjoint
+tests. Permanent actual library output covers 14 recipe roles/four width refs.
+An erased PostCSS annotation fix reproduced then resolved the full typecheck
+error; generated test JavaScript and all product files remain byte-identical.
+Independent source/CSS/acceptance/type-fix reviews pass.
+
+Captured After checkout/app source is `7569edff89e328d1bdfd0cbda6edd8df327c0bcb`,
+actual library source is `ceb04025621644dc9d672af4d9b4c1796d029fc7`; never
+relabel these pixels as final PR head eef335c07d. Private evidence has 42 named
+states, 84 PNGs/six native clips and 16,276 matching sampled computed properties.
+No-message/autotitle-off/tools-empty idle fixtures have zero model turns/events;
+inactive bundles have zero runs/dispatches. Owned runs are stopped/private-
+purged with actual errno 61 port-closure checks. Root Before review passes;
+final After/film/source packaging and public media gates remain pending. The
+unrelated Getting started counter differs with fixture order, outside the
+selected setup comparisons; no whole-page pixel/synchronized-video identity.
+
+#18950 remains **draft/NoBot**: actual CI 6 passed/1 pending Ubuntu/1 expected
+media-description failure/6 skipped. Cohort: **60 = 57 merged/2 old open
+non-draft/1 draft**. No new movie path, asset B, public HTTP verification,
+readiness or bot success is claimed. Own anchor `automation-setup-layout-film`
+is reserved; the matching film must be published/live-verified before readiness
+and initial bot review. User preference is one coherent combined owner batch,
+rather than tiny PRs. SDK #5603/budget #18533 and all older user records,
+history/audits/watch remain unchanged. No Git/source/assets/external actions.
+
+
+## 26 October · frozen MEDIA/DRAFT checkpoint
+
+The [combined Automation setup film](../../arch/agentic-linting-refactoring.html#automation-setup-layout-film)
+is complete locally: 82 seconds, 84 PNGs/six full native clips, 105 ZIP members,
+109 packet assets plus the audit. Local-only asset B
+`025d108708a9f26698afe3dee6330313ff09fdab` is not yet published. Independent frozen-asset
+review passes 28 checks; root Before/After source and decoded-film review pass.
+Film SHA `65785af3bf6430053e20bd185202fd18304da0b6f28a0ddd5ba57a5eafea6bb2`;
+ZIP SHA `ea40b853661ee3b18502af1a8fd6000950404ca990bb5cc200fe5398662d8475`.
+Native same-origin playback/poster/captions and Slack download are accompanied
+by immutable B MP4/ZIP/source/comparison/compiled-contract/source-binding links.
+No public availability or HTTP success is claimed. All 45 previous players/
+90 download anchors/94 MP4 href anchors retain their bytes; totals become
+**46 players/92 download anchors/96 MP4 href anchors**. No GIF.
+
+Captured/app After remains 7569edff89, library source ceb0402562 and final PR
+head eef335c07d; exact source equality and erased test syntax never relabel the
+original pixels. All 42 named states/16,276 sampled computed properties match.
+The sidebar Getting started counter 2→3 reflects fixture order, outside selected
+roles. Benign QA labels/UUIDs, relative clocks and existing narrow overflow
+remain. Standalone Local Neutral/Light+ is live evidence; embedded scope is
+compiled proof. No model/provider turn, Automation run/dispatch, appearance
+improvement or whole-page/synchronized-video identity claim. The inactive
+bundle and zero-message/events idle conversation remain execution-free.
+Local Node 24.22.1 differs from repository Volta Node 24.21.0; npm 11.12.1 is
+repository-pinned. Original ambience averages −52.5 dB, with 25 fps H.264/AAC,
+fast start and unaltered selected-original bytes/timing. Owned runs/fixtures
+are stopped/deleted and private state purged, with actual errno 61 port checks.
+
+#18950 remains **draft/NoBot**. Actual current final-head CI is **7 passed/
+1 expected missing-media-description failure/6 skipped/0 pending**, with Ubuntu
+and Windows green. Cohort remains **60 = 57 merged/2 old open non-draft/1 draft**.
+Root publishes B+C, verifies raw/live own anchors and attaches media before
+final required green CI, readiness and initial bot review. Main 459/0 and
+independent branch 417/0 remain separate. SDK #5603/budget #18533, older user
+records, audit/history/watch and source identities remain unchanged.
+
+
+## 26 October · READY, initial bot review pending
+
+Asset B `025d108708a9f26698afe3dee6330313ff09fdab` and media docs C
+`7ebad1d4289e78810fc3abc6eebb95e0b2453607` are published. Six immutable raw files
+and ten live Pages files pass HTTP/full body SHA; live MP4 is video/mp4.
+The own film anchor is verified. Existing designated Chrome shows native
+Before playback at 0:29, After at 0:48, paused at 0:52/1:22, with the visible
+same-origin Slack download link. No browser download/save was clicked or
+claimed. These checks belong to media C, not future READY docs D deployment.
+
+#18950 is **ready/open at unchanged eef335c07d**, with actual final ready-event
+CI **8 passed / 6 skipped / 0 pending / 0 failed**. Fresh description job
+[121334708278](https://github.com/OpenHands/OpenHands/actions/runs/40248376873/job/121334708278) succeeds.
+Initial all-hands-bot review was requested and verified pending after green;
+reviews were empty, HUMAN prefix preserved, no prior approval/re-review claim.
+Independent final closure is PASS/readyAllowed; no merge is authorized here.
+Cohort: **60 = 57 merged / 3 open non-draft / 0 drafts**. All 46 complete
+players, 92 download anchors and 96 MP4 href anchors, exact originals and
+source/build/cache/runtime limits remain unchanged. Captured/app 7569 and
+library ceb remain distinct from final eef; main 459 and branch 417 remain
+separate. SDK #5603/budget #18533 and older user/audit/history/watch records
+are unchanged. The user chooses merging; no merge, release or watch action.
+
+
+## 26 October continuation · command and backend draft checkpoint
+
+#18950 merged `2026-10-26T05:52:26Z` (06:52 Stockholm) as
+`ec0f70fe31b637e699ab3713ba477abe3c3d6b6f`. Captured/app 7569, library/product ceb,
+final source eef and immutable original media remain distinct and unchanged.
+All 46 whole players/92 MP4 download anchors/96 total MP4 href anchors retain
+their bytes; no synthetic or new player is inserted.
+
+Exact main `ec0f70fe31b637e699ab3713ba477abe3c3d6b6f` passes **417 warnings/0 errors**:
+348 arbitrary values, 51 inline styles, 18 palette findings; 1,425 linted files/
+176 diagnostic files. [Public audit](main-lint-audit-2026-10-26-ec0f70fe31.json)
+SHA-256 `3bba95c88ce62dba88068f2f531c97210541bd8a94142d8129992dc03536aad4` records 42 removed/0 added
+versus 7a41641c6d. Full lint/typecheck/format and machine audit pass.
+
+Two separate coherent presentation owners remain **draft/NoBot**:
+
+- [Command #18966](https://github.com/OpenHands/OpenHands/pull/18966), issue #18964,
+  head `b8c3ea7d503ae096212252e1a0fbcac97a1011d5`: branch 402/0, 15 removed/0 added,
+  44 focused tests across three files and app/library builds pass. Nine actual
+  output roles and 24 relevant Tailwind property registrations retain parity.
+  Typography, shadows/filter composition, keyboard/query/focus and lazy body
+  portal remain; no text-medium or palette decision.
+- [Backend #18967](https://github.com/OpenHands/OpenHands/pull/18967), issue #18965,
+  head `3dd7c0f4edfbd3a6907c3e953c79276d3fcdb243`: branch 406/0, 11 removed/0 added,
+  41 tests across three files and app/library builds pass. Eight renamed rules
+  per output and 12 isolated Chromium actual-CSS cases pass; these fixtures
+  are not live Canvas/backend evidence. 0fr/1fr timing/reduced motion, mounted/
+  inert content, 92vh Add/92dvh Edit caps, halo, measured-height and auth/save
+  owners are preserved.
+
+Counts 402/406 and reductions 15/11 are independent proposals; do not subtract 26
+from main 417 or sum test counts. Final genuine Before/After capture, frozen
+films, required remote CI and publication remain pending. Supplied early CI
+snapshots are not final green gates. Own anchors `command-menu-recipes-film`
+and `backend-chooser-recipes-film` are status placeholders without invented
+movie URLs; live matching films must be verified before readiness/initial bot
+reviews. Cohort: **62 = 58 merged/2 older open non-draft/2 new drafts**.
+Root minimal read-only lifecycle confirms #18520/#18533 remain open/non-draft
+at unchanged heads (approved/review-required). Their records, SDK #5603/
+budget #18533 user parking, audit/history/watch and user text remain unchanged.
+No Git, source, assets, verifier, browser, remote or parked-work actions.
+
+
+## 26 October continuation · frozen command/backend MEDIA/DRAFT
+
+Own native [command menu](../../arch/agentic-linting-refactoring.html#command-menu-recipes-film) and
+[backend chooser](../../arch/agentic-linting-refactoring.html#backend-chooser-recipes-film) films
+are complete locally, with posters/captions, immutable B MP4/ZIP/provenance
+links and same-origin Slack downloads. All 46 old whole players/92 downloads/
+96 MP4 href anchors retain their bytes; totals are **48 players/96 downloads/
+100 MP4 href anchors**. No new GIF. Local-only B
+`4ef2deeff4e51899eb455be5d5ad716816336c16` contains 120 packet assets plus the audit;
+root source/film and independent frozen-assets PASS 53 gates pass. It is not
+yet publicly pushed; HTTP/Chrome/final CI/readiness remain pending.
+
+Command is 48.92 seconds/1,223 frames, 30 PNGs/four clips, 49 ZIP members; SHA
+`d53827241ddd7e22f5c149ae3e46f739414742ca2b28add6dd5d5bc8886dd060`.
+Backend is 66.04 seconds/1,651 frames, 44 PNGs/four clips, 63 ZIP members; SHA
+`b05e18287c0afcceffa2e2ccde1ca047edb337fbbbe57320068b35786a8c6ad5`.
+Both use 25 fps H.264/yuv420p/AAC, fast start and original ambience averaging
+−52.5 dB. All 82 originals remain unchanged; three shared owned runs are
+stopped/purged and fifteen actual owned ports are conclusively closed.
+
+Common Before ec0f70fe31/build 2eb3fb8c7b4d1fca and exact command After/app/
+library/final b8c3ea7d50/build bf62017c750db5ca, backend 3dd7c0f4ed/build
+e5a7cff1007a54ec remain explicit. App built-this-run Boolean is absent/null;
+no fresh app build is inferred. Root rebuilt After libraries at exact heads.
+Command has 15 matching states/12,936 property pairs; backend 22/4,554.
+These differ from 15/11 warning reductions; per-owner 44/41 test counts share
+the Vite suite and are not added. Main 417 remains separate from 402/406.
+
+Live UI is standalone Local Neutral/Light+ through actual Settings/resolved
+CSS; legacy data-theme is null. Compiler/fixture host proof is separate from
+live embedded/Cloud/ACP/provider/auth coverage. No configured/invoked model,
+auth/connection submission, conversation creation or Automation execution.
+Benign loopbacks, secret-name-only Settings context and existing narrow menu
+truncation remain. Backend key is product-masked and .test host inert. Short
+modals open at normal phone size then resize/scroll; initial 420 px-short
+drawer entry/fix is not claimed. Remote canonical closed state uses natural
+Tab/settled animations; pre-settle captures excluded. No visual improvement,
+whole-page pixel or synchronized-frame identity claim.
+
+Both remain **draft/NoBot**, current CI **7 passed/1 expected missing-media
+description failure/6 skipped/0 pending**; cohort **62 = 58 merged/2 older
+open non-draft/2 new drafts**. Root publishes B+C, verifies public HTTP/Chrome
+and own live anchors, attaches media, then closes final required CI/readiness
+and initial bot requests. SDK #5603/budget #18533 and all older user/audit/
+history/watch records remain untouched.
+
+
+## 26 October continuation · READY, initial reviews pending
+
+Asset B `4ef2deeff4e51899eb455be5d5ad716816336c16` and media docs C
+`28a5dbac7e1a680a0776043c821edf572b3ad414` are published. Eleven raw files and
+fifteen live Pages files pass HTTP/full SHA and expected MIME, including both
+own film anchors. Native Chrome plays Before through After to natural ends
+48.92/66.04 seconds; both players are paused/ended and Slack links visible.
+Both Chrome downloads succeeded with files present and expected sizes. Exact
+HTTP source hashes are verified; local downloaded-file hashes are not claimed.
+These checks belong to media C, not future READY docs D deployment. A normal
+merge preserved the disjoint Mention Gazette update and immutable B identity.
+
+Both #18966/#18967 are **ready/open at unchanged exact heads**, with fresh
+ready-event effective CI **8 passed / 6 skipped / 0 failed / 0 pending**.
+The new successful description checks supersede earlier missing-media runs.
+Initial all-hands-bot requests are verified pending after green; reviews were
+empty, exact bodies and HUMAN prefixes retained. Final independent readiness
+is PASS/readyAllowed, without merge authorization or bot approval.
+Cohort: **62 = 58 merged / 4 open non-draft / 0 drafts**. All 48 whole players/
+96 download anchors/100 MP4 href anchors, source/build identities, originals
+and runtime/privacy limits are unchanged. Main 417 stays separate from
+independent 402/406; 44/41 test runs overlap Vite. SDK #5603/budget #18533
+and older user/audit/history/watch records stay unchanged. The user chooses
+merging; no merge, release or watch action is performed here.

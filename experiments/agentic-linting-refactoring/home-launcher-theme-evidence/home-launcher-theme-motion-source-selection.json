@@ -1,0 +1,25 @@
+{
+  "status": "retained-excluded-from-motion-branch-proof",
+  "sourcePhases": [
+    "before",
+    "home-after"
+  ],
+  "reason": "The initial recipe changed browser media after Home mounted. Pinned framer-motion useReducedMotion reads preference at mount, so browser matchMedia labels alone do not prove the component branch. Original images, clips and raw measurements remain unchanged. Corrected supplemental phases set media before full navigation and observe actual animated child/static fill.",
+  "initialRawComparisonSha256": "67b354b031e746fb767d51b04f49a926a508b4c0ce515dd3e43095e7e69e007e",
+  "rawCodeObservation": {
+    "colorSamplesExactlyEqual": 20,
+    "wholeSamplesExactlyEqual": 19,
+    "twentiethDifference": "Animated pill transform/bounding x differs by 0.0073px; static geometry and all Code colors match."
+  },
+  "automateObservations": "The clock has a 700ms activation animation; early clock-transform and near-endpoint color/alpha transition differences were sampled. No synchronized frame or pixel identity was established.",
+  "correctedPhases": [
+    "before-home-motion",
+    "home-after-motion"
+  ],
+  "notAProductRegressionClaim": true,
+  "privateInterpretationReceiptSha256": "50877a0a7c00052a368f9a56561172bcae083c70063dcd24305bfbc19fb3679f",
+  "finalSelectedSourceManifestSha256": {
+    "before": "7c8458bf190ef3ed8d313a55aaf781d047044cdf472d885183b056227e09e154",
+    "after": "8db7f4cdf784203702e6c09e6b33a5a59031da78c16f9581b65b5f5848b21bcd"
+  }
+}
