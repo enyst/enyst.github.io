@@ -1,0 +1,785 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SmolPaws Skills Inventory</title>
+<meta name="description" content="Complete inventory of all skills across three install locations — dupes, origins, licenses.">
+<meta property="og:title" content="SmolPaws Skills Inventory">
+<meta property="og:description" content="Complete inventory of all skills across three install locations.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://enyst.github.io/skills-inventory.html">
+<meta name="twitter:card" content="summary">
+<style>
+  :root{
+    --fg:#1a1a1a;--muted:#5a5a5a;--subtle:#8a8a82;
+    --bg:#fdfdfb;--card:#ffffff;--elevated:#f7f6f1;
+    --accent:#2b4eaa;--accent-soft:#e6ecfa;
+    --rule:#e2e2dc;--code-bg:#f3f1ec;--warn:#b25b0e;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans)}
+  body{line-height:1.65;font-size:16px}
+  .wrap{max-width:1100px;margin:0 auto;padding:32px 28px 96px}
+  header.title{border-bottom:1px solid var(--rule);padding-bottom:22px;margin-bottom:32px}
+  header.title .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  header.title h1{font-size:clamp(28px,4vw,44px);margin:8px 0 8px;letter-spacing:-.03em;line-height:1.05}
+  header.title .sub{color:var(--muted);max-width:780px;font-size:16px}
+  header.title .meta{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-top:14px}
+  .stats{display:flex;gap:20px;flex-wrap:wrap;margin:24px 0 32px}
+  .stat{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:16px 20px;min-width:120px}
+  .stat .num{font-size:32px;font-weight:700;color:var(--accent);line-height:1.1}
+  .stat .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+  .stat .loc{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+  .locations{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px}
+  .loc-card{flex:1;min-width:260px;background:var(--elevated);border-radius:8px;padding:16px 18px}
+  .loc-card h3{font-family:var(--mono);font-size:12px;color:var(--accent);margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em}
+  .loc-card .count{font-size:26px;font-weight:700}
+  .loc-card .detail{font-size:12px;color:var(--muted);margin-top:2px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-weight:600;background:var(--code-bg);font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);position:sticky;top:0;z-index:1}
+  td.name{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+  td.desc{max-width:400px}
+  .tag{display:inline-block;font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;margin-right:4px}
+  .tag-ok{background:#e6f4ea;color:#2f7a3a}
+  .tag-warn{background:#fbf1e6;color:#b25b0e}
+  .tag-info{background:var(--accent-soft);color:var(--accent)}
+  .tag-ext{background:#f0e6fa;color:#6b3fa0}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+  a:hover{border-bottom-color:var(--accent)}
+  .empty{color:var(--subtle);font-style:italic;font-size:12px}
+  .section-head{border-top:1px solid var(--rule);padding-top:28px;margin-top:28px}
+  .section-head h2{font-size:18px;margin:0 0 20px}
+  .summary{line-height:1.7;max-width:700px;margin-bottom:28px}
+  .back-link{display:inline-block;margin-top:40px;font-family:var(--mono);font-size:13px;color:var(--muted);text-decoration:none;border:none}
+  .back-link:hover{color:var(--accent)}
+</style></head><body>
+<div class="wrap">
+<header class="title">
+  <div class="eyebrow">Skills Inventory</div>
+  <h1>All SmolPaws skills — three locations, one view</h1>
+  <div class="sub">86 skills total: 7 flat files + 79 directories. 4 duplicates, 5 vendored with known origin, 6 include a LICENSE.</div>
+  <div class="meta">Generated 2026-10-26 · <a href="https://enyst.github.io/">Back to notebook</a></div>
+</header>
+
+<div class="locations">
+  <div class="loc-card"><h3>~/.openhands/skills</h3><div class="count">17</div><div class="detail">Personal skills · Engel-specific (blog-voice, human-review, local, etc.)</div></div>
+  <div class="loc-card"><h3>~/repos/.openhands/skills</h3><div class="count">31</div><div class="detail">Shared skills repo · Kakuna suite, vendored, general-purpose</div></div>
+  <div class="loc-card"><h3>smolpaws/.agents/skills</h3><div class="count">41</div><div class="detail">SmolPaws repo · agent tools, platforms, teaching/debugging</div></div>
+</div>
+
+<div class="section-head"><h2>Full Inventory</h2></div>
+<table>
+<thead><tr>
+  <th>Name</th><th>Skill ID</th><th>Description</th><th>Locations</th><th>Origin</th><th>License</th>
+</tr></thead>
+<tbody>
+<tr>
+  <td class="name">adapt-yourself</td>
+  <td class="name">adapt-yourself</td>
+  <td class="desc">Decide how to make OpenHands adapt/improve itself persistently (after restart) by choosing between repo/user skills, always-on instructions, hooks, plugins, MCP servers, or code changes in OpenHands-C…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">add-gmail</td>
+  <td class="name">add-gmail</td>
+  <td class="desc">Add Gmail integration to SmolPaws. Can be configured as a tool (agent reads/sends emails when triggered from WhatsApp) or as a full bridge (emails can trigger the agent, schedule tasks, and receive re…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">add-openhands-reviewer</td>
+  <td class="name">add-openhands-reviewer</td>
+  <td class="desc">Add OpenHands PR review automation to a GitHub repository by creating or updating the review workflow, wiring the openhands-reviewer trigger, and configuring GitHub App or PAT authentication. Use when…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">add-parallel</td>
+  <td class="name">add-parallel</td>
+  <td class="desc">Add Parallel AI MCP integration to SmolPaws for web research with quick search and deep task APIs.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">agent-sdk</td>
+  <td class="name">agent-sdk</td>
+  <td class="desc">Current TypeScript OpenHands SDK transpilation, profile/secret boundaries, and upstream maintenance rules.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">agent-sdk-server</td>
+  <td class="name">agent-sdk-server</td>
+  <td class="desc">Current upstream-shaped TypeScript OpenHands agent-server package and its boundary with the SmolPaws coordinator.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">analytical-design</td>
+  <td class="name">tufte-viz</td>
+  <td class="desc">|</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">antislop-codebase</td>
+  <td class="name">antislop-codebase</td>
+  <td class="desc">|</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">apple-instruments <span class="tag tag-warn">DUPE</span></td>
+  <td class="name">apple-instruments</td>
+  <td class="desc">Profile, debug, and inspect macOS apps and processes from the CLI using xctrace, leaks, sample, fs_usage, powermetrics, and xcodebuild. Use when diagnosing macOS performance, memory, hangs, file I/O, …</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills, ~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">attack-surface-reduction</td>
+  <td class="name">attack-surface-reduction</td>
+  <td class="desc">Map and reduce unnecessary code reachability in the current codebase. Use for attack-surface analysis, pre-authentication exposure, disabled-but-reachable features, or configuration combinations that …</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">babysit-pr</td>
+  <td class="name">babysit-pr</td>
+  <td class="desc">Babysit a GitHub pull request by continuously polling CI checks/workflow runs, new review comments, and mergeability state until the PR is ready to merge (or merged/closed). Diagnose failures, retry l…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">blog-voice</td>
+  <td class="name">blog-voice</td>
+  <td class="desc">Draft blog posts in Engel's writing voice for the &quot;Coffee with Opus&quot; blog. Use ONLY when intentionally writing or revising long-form blog prose on Engel's behalf (a post, a section, an intro, a rewrit…</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">brand-atomic-kit</td>
+  <td class="name">brand-atomic-kit</td>
+  <td class="desc">Generate an agent-readable brand system as a structured folder of files. Use when building a brand identity, creating AI-usable brand guidelines, generating landing pages or marketing materials, or pa…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">cat-secretary</td>
+  <td class="name">cat-secretary</td>
+  <td class="desc">Maintain SmolPaws secretary context and searchable Slack archives for the agent-canvas sprint. Use when asked about project status, Slack discussions, what someone said, heartbeat archive refreshes, o…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">cli-helpers</td>
+  <td class="name">cli-helpers</td>
+  <td class="desc">How smolpaws runs Codex CLI and Claude Code headless on Engel's MacBook as helper agents (second opinion, review, parallel worker). Use when a task wants a fresh pair of eyes, a different model family…</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">cloudflare-queues</td>
+  <td class="name">cloudflare-queues</td>
+  <td class="desc">Cloudflare Queues messaging on Workers, including producer/consumer bindings, queue handlers, batching, retries, and dead-letter queues. Use when building or configuring Cloudflare Queue workflows.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">codebase-design</td>
+  <td class="name">codebase-design</td>
+  <td class="desc">Shared vocabulary for designing deep modules. Use when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-n…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">codebase-maintainability-guardrails</td>
+  <td class="name">codebase-maintainability-guardrails</td>
+  <td class="desc">|</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">codereview-axes</td>
+  <td class="name">codereview-axes</td>
+  <td class="desc">Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match wha…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">codereview-roasted <span class="tag tag-warn">DUPE</span></td>
+  <td class="name">codereview-roasted</td>
+  <td class="desc">Brutally honest code review in the style of Linus Torvalds, focusing on data structures, simplicity, and pragmatism. Use when you want critical, no-nonsense feedback that prioritizes engineering funda…</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills, ~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><a href="https://github.com/OpenHands/extensions">OpenHands/extensions</a></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">conversation-recovery</td>
+  <td class="name">conversation-recovery</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">create-fork</td>
+  <td class="name">create-fork</td>
+  <td class="desc">How to create and maintain a long-running *personal* fork of a GitHub project — the kind that intentionally diverges from upstream `main` to carry personal preferences and gets rebased onto upstream p…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">create-verification-skill</td>
+  <td class="name">create-verification-skill</td>
+  <td class="desc">&quot;Generate a project-local verification skill that drives your app the way a user does — any language, framework, or platform. Use for /create-verification-skill, \&quot;make a control skill for this repo\&quot;…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">customize</td>
+  <td class="name">customize</td>
+  <td class="desc">Add new capabilities or modify SmolPaws behavior. Use when user wants to add bridges (Telegram, Slack, email input), change triggers, add integrations, modify the router, or make any other customizati…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">daytona</td>
+  <td class="name">daytona</td>
+  <td class="desc">Daytona sandbox infrastructure and SDK usage for running agent servers, executing commands, and previewing apps. Use when provisioning or managing Daytona sandboxes.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">debug</td>
+  <td class="name">debug</td>
+  <td class="desc">Debug container agent issues. Use when things aren't working, container fails, authentication problems, or to understand how the container system works. Covers logs, environment variables, mounts, and…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">diagnosing-bugs</td>
+  <td class="name">diagnosing-bugs</td>
+  <td class="desc">Diagnosis loop for hard bugs and performance regressions. Use when the user says &quot;diagnose&quot;/&quot;debug this&quot;, or reports something broken/throwing/failing/slow.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">domain-modeling</td>
+  <td class="name">domain-modeling</td>
+  <td class="desc">Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain t…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">executor-qa-demo</td>
+  <td class="name">executor-qa-demo</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">fastify</td>
+  <td class="name">fastify</td>
+  <td class="desc">Comprehensive best practices for Fastify development</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">fieldtheory</td>
+  <td class="name">fieldtheory</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">fly-sprites</td>
+  <td class="name">fly-sprites</td>
+  <td class="desc">Operate Fly.io and Sprites for Engel using Keychain credentials, read-only authentication checks, persistent agent VMs, checkpoints, services, and scoped network access. Use for Fly deployments, Sprit…</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">frontend-design</td>
+  <td class="name">frontend-design</td>
+  <td class="desc">Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples inclu…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">frontend-slides</td>
+  <td class="name">frontend-slides</td>
+  <td class="desc">Create stunning, animation-rich HTML presentations from scratch or by converting PowerPoint files. Use when the user wants to build a presentation, convert a PPT/PPTX to web, or create slides for a ta…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><a href="https://github.com/OpenHands/extensions">OpenHands/extensions</a></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">github-apps-webhooks</td>
+  <td class="name">github-apps-webhooks</td>
+  <td class="desc">Build and operate GitHub Apps with webhook validation, JWT auth, and installation tokens. Use when integrating GitHub webhooks or GitHub App authentication.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">github-forwarders</td>
+  <td class="name">github-forwarders</td>
+  <td class="desc"></td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">grilling</td>
+  <td class="name">grilling</td>
+  <td class="desc">Interview the user relentlessly about a plan or design. Use when the user wants to stress-test a plan before building, or uses any 'grill' trigger phrases.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">handoff</td>
+  <td class="name">handoff</td>
+  <td class="desc">Compact the current conversation into a handoff document for another agent to pick up.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">human-review</td>
+  <td class="name">human-review</td>
+  <td class="desc">Open an HTML file, Markdown file, or localhost page in the browser so Engel can edit text directly and leave comments on specific parts, then send all edits and comments back to you. Use after writing…</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><a href="https://github.com/user-attachments/assets">user-attachments/assets</a></td>
+  <td style="font-size:11px;font-family:var(--mono)">MIT License</td>
+</tr>
+<tr>
+  <td class="name">humanlayer-show-me</td>
+  <td class="name">humanlayer-show-me</td>
+  <td class="desc"></td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">impeccable</td>
+  <td class="name">impeccable</td>
+  <td class="desc">&quot;Use when the user wants to design, redesign, shape, critique, audit, polish, simplify, harden, animate, or otherwise improve a frontend interface: websites, landing pages, dashboards, product UI, com…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)">Apache License</td>
+</tr>
+<tr>
+  <td class="name">improve-codebase-architecture</td>
+  <td class="name">improve-codebase-architecture</td>
+  <td class="desc">Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">launch-video</td>
+  <td class="name">launch-video</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">learning-retirement</td>
+  <td class="name">learning-retirement</td>
+  <td class="desc">Record when a temporary engineering lesson stops applying, or check whether one is obsolete. Use while saving verified project learnings or when asked to refresh a specific learning. Does not sweep or…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><a href="https://github.com/EveryInc/compound-engineering-plugin">EveryInc/compound-engineering-plugin</a></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">llm-research</td>
+  <td class="name">llm-research</td>
+  <td class="desc">Research LLM and AI agent topics using local paper notes and external interpretability tools. Use when investigating ML papers, model behavior, interpretability, prompting techniques, agent architectu…</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">local</td>
+  <td class="name">local</td>
+  <td class="desc"></td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">local-bd</td>
+  <td class="name">local-bd</td>
+  <td class="desc"></td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">loop-library</td>
+  <td class="name">loop-library</td>
+  <td class="desc">Find, compare, adapt, and design repeatable AI-agent loops with explicit triggers, actions, verification, stopping conditions, guardrails, and handoffs. Use when a user asks for a loop, recurring agen…</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">macos-screen-record</td>
+  <td class="name">macos-screen-record</td>
+  <td class="desc">&quot;Record the macOS screen to a video file from the terminal. Uses ScreenCaptureKit's SCRecordingOutput API (macOS 15+) for direct-to-file recording. Handles TCC permission via an app bundle wrapper.&quot;</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">maintain-verification-skill</td>
+  <td class="name">maintain-verification-skill</td>
+  <td class="desc">&quot;Periodic pass that keeps a project's verification skill and feature map honest: parallel source readers per feature, one live session driving every feature, at most one PR of proven corrections. Use …</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">narrated-demo</td>
+  <td class="name">narrated-demo</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">ndrstnd</td>
+  <td class="name">ndrstnd</td>
+  <td class="desc">Use when a human wants to understand code changes (requests like &quot;help me understand these changes&quot;, &quot;explain this branch&quot;, or &quot;walk me through this diff&quot;) and after completing a coding task when a hu…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">newsletter <span class="tag tag-warn">DUPE</span></td>
+  <td class="name">newsletter</td>
+  <td class="desc">Generate a newspaper-style project status dispatch (&quot;The Foreman Dispatch&quot;) summarizing active work, agent status, CI/CD state, code reviews, merge queues, documentation health, and open items. Use wh…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills, ~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">no-ai-slop</td>
+  <td class="name">no-ai-slop</td>
+  <td class="desc">Edit drafts into sharper, more human writing while preserving the writer's personal voice, or detect AI-slop patterns without rewriting. Use when the user wants a draft clearer, more direct, more opin…</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">observability-hardening</td>
+  <td class="name">observability-hardening</td>
+  <td class="desc">Make a production application observable and debuggable with privacy-safe telemetry. Use when the user asks for structured logging, error classes, request IDs, traces, metrics, dashboards, alerts, pro…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">openhands-api-v1</td>
+  <td class="name">openhands-api-v1</td>
+  <td class="desc">Minimal reference skill for the OpenHands Cloud REST API (V1) (app server /api/v1 + sandbox agent-server). Use when you need to automate common OpenHands Cloud actions; don't use for general sandbox/d…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">openhands-conversation-export</td>
+  <td class="name">openhands-conversation-export</td>
+  <td class="desc">Export an OpenHands Cloud conversation to JSON and render a readable markdown transcript. Use when the user wants to export/share an OpenHands conversation, inspect conversation events, make a redacte…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">opensre</td>
+  <td class="name">opensre</td>
+  <td class="desc">Contributing to OpenSRE (Tracer-Cloud/opensre) — contribution rules, project context, and maintainer sponsorship path.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">pr-video</td>
+  <td class="name">pr-video</td>
+  <td class="desc"></td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">printing-press</td>
+  <td class="name">printing-press</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">productionize-app-with-services</td>
+  <td class="name">productionize-app-with-services</td>
+  <td class="desc">Transform a working demo/prototype codebase into a production-shaped product that is observable, auditable, secure, API-drivable, product-manageable, and easy for AI agents/bots to maintain. Use when …</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">prototype</td>
+  <td class="name">prototype</td>
+  <td class="desc">Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">release-readiness-hardening</td>
+  <td class="name">release-readiness-hardening</td>
+  <td class="desc">Prepare a repo for safe release and production deployment. Use when the user asks whether an app is ready to ship, needs deploy gates, environment validation, smoke tests, rollback planning, feature f…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">security-audit</td>
+  <td class="name">security-audit</td>
+  <td class="desc">Security guidance and vulnerability review for codebases, APIs, services, CLI tools, libraries, and daemons. Use for security questions, focused reviews, vulnerability research, security audits, or pe…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">security-hardening</td>
+  <td class="name">security-hardening</td>
+  <td class="desc">|</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">security-scan</td>
+  <td class="name">security-scan</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">setup</td>
+  <td class="name">setup</td>
+  <td class="desc">Run initial SmolPaws setup. Use when user wants to install dependencies, authenticate WhatsApp, register their main channel, or start the background services. Triggers on &quot;setup&quot;, &quot;install&quot;, &quot;configur…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">show-me</td>
+  <td class="name">show-me</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">skin-app</td>
+  <td class="name">skin-app</td>
+  <td class="desc">&gt;-</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">supabase</td>
+  <td class="name">supabase</td>
+  <td class="desc">Supabase platform — Postgres database, pgvector for embeddings, Auth, Storage, Edge Functions, and CLI. Use when building on or integrating with Supabase.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">swiftui-pro</td>
+  <td class="name">swiftui-pro</td>
+  <td class="desc">Comprehensively reviews SwiftUI code for best practices on modern APIs, maintainability, and performance. Use when reading, writing, or reviewing SwiftUI projects.</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)">MIT License</td>
+</tr>
+<tr>
+  <td class="name">tdd</td>
+  <td class="name">tdd</td>
+  <td class="desc">Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions &quot;red-green-refactor&quot;, or wants integration tests.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">teach-me</td>
+  <td class="name">teach-me</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">test-strategy-hardening</td>
+  <td class="name">test-strategy-hardening</td>
+  <td class="desc">Audit and harden a repository test suite so tests carry their weight. Use when the user asks whether tests are useful, flaky, duplicated, slow, under-covering critical behavior, missing contract/regre…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">typebox</td>
+  <td class="name">typebox</td>
+  <td class="desc">TypeBox JSON Schema builder and runtime validation for TypeScript. Use when defining schemas, inferring types, or validating data with TypeBox.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">typesafe-ai</td>
+  <td class="name">typesafe-ai</td>
+  <td class="desc">&gt;</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)">MIT License</td>
+</tr>
+<tr>
+  <td class="name">vercel-react-best-practices <span class="tag tag-warn">DUPE</span></td>
+  <td class="name">vercel-react-best-practices</td>
+  <td class="desc">React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patter…</td>
+  <td style="white-space:nowrap"><span class="tag tag-info">P</span> <span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/.openhands/skills, ~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">video-use</td>
+  <td class="name">video-use</td>
+  <td class="desc">Edit any video by conversation. Transcribe, cut, color grade, generate overlay animations, burn subtitles — for talking heads, montages, tutorials, travel, interviews. No presets, no menus. Ask questi…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><a href="https://github.com/heygen-com/hyperframes">heygen-com/hyperframes</a></td>
+  <td style="font-size:11px;font-family:var(--mono)">MIT License</td>
+</tr>
+<tr>
+  <td class="name">vscode-local-setup</td>
+  <td class="name">vscode-local-setup</td>
+  <td class="desc">Run, debug, and troubleshoot the OpenHands Tab VS Code extension in a local Extension Development Host. Use when setting up VS Code locally, rebuilding or reloading the extension, collecting webview o…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">vscode-remote-setup</td>
+  <td class="name">vscode-remote-setup</td>
+  <td class="desc">Set up and operate VS Code in a headless remote environment with Xvfb, Fluxbox, x11vnc, and noVNC. Use when testing the OpenHands Tab extension in remote sandboxes, starting or stopping noVNC services…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">wait-what</td>
+  <td class="name">wait-what</td>
+  <td class="desc">Stop — that last message did not land. Re-pitch it with context, plainly.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">wayfinder</td>
+  <td class="name">wayfinder</td>
+  <td class="desc">Plan a huge chunk of work (more than one agent session can hold) as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">weakest-hypothesis</td>
+  <td class="name">weakest-hypothesis</td>
+  <td class="desc">Use when inducing a rule, root cause, or lesson from few examples — reflection steps in self-improvement loops, encoding learnings into memory or prompts, diagnosing from a handful of failure reports,…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">wrangler</td>
+  <td class="name">wrangler</td>
+  <td class="desc">Cloudflare Workers CLI for deploying, developing, and managing Workers, KV, R2, D1, Vectorize, Hyperdrive, Workers AI, Containers, Queues, Workflows, Pipelines, and Secrets Store. Load before running …</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">writing-for-agents</td>
+  <td class="name">writing-for-agents</td>
+  <td class="desc">Writing documents an agent consumes. Use when creating or editing skills, or modifying AGENTS.md / CLAUDE.md.</td>
+  <td style="white-space:nowrap"><span class="tag tag-ok">S</span> <span style="font-size:10px;color:var(--muted)">~/repos/smolpaws/.agents/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)"><span class="empty">—</span></td>
+</tr>
+<tr>
+  <td class="name">wtf</td>
+  <td class="name">wtf</td>
+  <td class="desc">&quot;Explain the last message, or a supplied file, link, or passage, in plain language a person follows on the first read. Use when the user invokes wtf because they did not follow something. For a code i…</td>
+  <td style="white-space:nowrap"><span class="tag tag-ext">R</span> <span style="font-size:10px;color:var(--muted)">~/repos/.openhands/skills</span></td>
+  <td style="font-size:12px"><span class="empty">—</span></td>
+  <td style="font-size:11px;font-family:var(--mono)">MIT License</td>
+</tr>
+
+</tbody>
+</table>
+
+<div style="margin-top:32px;font-size:12px;color:var(--muted)">
+  <strong>Key:</strong>
+  <span class="tag tag-info">P</span> ~/.openhands/skills (personal)
+  <span class="tag tag-ext">R</span> ~/repos/.openhands/skills (shared)
+  <span class="tag tag-ok">S</span> smolpaws/.agents/skills
+  <span class="tag tag-warn">DUPE</span> present in 2+ locations
+</div>
+
+<div class="summary" style="margin-top:28px">
+  <p><strong>Vendored with known origin:</strong> codereview-roasted + frontend-slides (OpenHands/extensions), learning-retirement (EveryInc/compound-engineering-plugin), human-review (petergyang/human-review, MIT), video-use (heygen-com/hyperframes, MIT), security-audit (cloudflare/security-audit-skill).</p>
+  <p><strong>Kakuna suite</strong> (8 skills: antislop-codebase, codebase-maintainability-guardrails, observability-hardening, productionize-app-with-services, release-readiness-hardening, security-hardening, test-strategy-hardening, attack-surface-reduction) — vendor unknown, no README/LICENSE at the skill level.</p>
+  <p><strong>Licensed without origin:</strong> wtf (MIT), swiftui-pro (MIT), typesafe-ai (MIT), impeccable (Apache 2.0).</p>
+</div>
+
+<a href="https://enyst.github.io/" class="back-link">← Back to notebook</a>
+</div>
+<script>(()=>{try{var k="openhands-site-theme";var t=localStorage.getItem(k);var d=document.documentElement;d.dataset.theme=t==='light'?'light':'noir';d.style.colorScheme=t==='light'?'light':'dark';}catch(e){}})();</script>
+</body></html>
