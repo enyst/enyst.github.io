@@ -1678,3 +1678,12 @@ and runtime/privacy limits are unchanged. Main 417 stays separate from
 independent 402/406; 44/41 test runs overlap Vite. SDK #5603/budget #18533
 and older user/audit/history/watch records stay unchanged. The user chooses
 merging; no merge, release or watch action is performed here.
+
+
+### 26 October — conflict resolution and DigitalOcean follow-up
+
+Command-menu #18966 merged at13:05UTC as62849086007d49596ed2cd0733d3ee12f879969b after bot approval; its captured b8c3ea7 source and film are unchanged. Backend #18967 is green at 6a5d1d7 and awaiting required follow-up approval. Head6a5d1d78a92a29f3087dd397c0aa120b548e678f retains both recipe/test families and completes the missed DigitalOcean13.5rem minimum criterion.
+
+Exact-main machine ESLint audit402warnings/0errors; fixed branch390/0,12removed. Combined234tests/15files, full lint/typecheck, app/library builds and all8effective checks pass,6skip. Fresh bot review is requested; no auto-merge or approval bypass.
+
+The [15.72s Before/After supplement](../../arch/agentic-linting-refactoring.html#backend-chooser-digitalocean-followup-film), [source/provenance](https://raw.githubusercontent.com/enyst/enyst.github.io/2bc4e7841e835c7b4a82e1e64c5d4b950ea691f5/experiments/agentic-linting-refactoring/backend-chooser-digitalocean-followup-sources.json), [comparison](https://raw.githubusercontent.com/enyst/enyst.github.io/2bc4e7841e835c7b4a82e1e64c5d4b950ea691f5/experiments/agentic-linting-refactoring/backend-chooser-digitalocean-followup-comparison.json) and [six unchanged originals](https://raw.githubusercontent.com/enyst/enyst.github.io/2bc4e7841e835c7b4a82e1e64c5d4b950ea691f5/experiments/agentic-linting-refactoring/backend-chooser-digitalocean-followup-evidence.zip) use exact6284908600/6a5d1d7 captures. Desktop/phone sampled styles/rectangles match, including216px minimum at 16pxroot. No sign-in, credentials, resources, model or live embedded-host/ACP lifecycle is claimed. Both owned stacks stopped/private-purged,10 ports closed. Original48players/96downloads retain bytes; totals49/98.
