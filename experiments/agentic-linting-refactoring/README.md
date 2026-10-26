@@ -1449,3 +1449,92 @@ coverage limits remain unchanged. Main stays 479/0; branches 473/477/467 and
 reductions 6/2/12 remain separate. SDK #5603/budget #18533 remain user-parked
 with their records unchanged. The user chooses merging; no merge, release
 or watch action is performed here.
+
+
+## 26 October continuation · one combined setup draft
+
+Prior #18946/#18947/#18948 merged at 23:02:08/23:02:30/23:03:22 UTC on
+25 October: Stockholm 26 October 00:02/00:02/00:03. Merge commits are
+`9b43513590b6e3eaa90b0c363f7b75a9c2360fcd`,
+`f5f3e412d44e7ba90e535c5e345c5a176f1eaa3a`, and
+`7a41641c6d8bcf3e2e3c19c08b778781bcf954c2`. Original capture/build/cache
+identities remain unchanged, as do all 45 complete players/90 MP4 download
+anchors/94 total MP4 href anchors.
+
+Exact main `7a41641c6d8bcf3e2e3c19c08b778781bcf954c2` passes **459 warnings/0 errors**:
+390 arbitrary values, 51 inline styles, 18 palette findings; 1,425 linted files/
+179 diagnostic files. [Public audit](main-lint-audit-2026-10-26-7a41641c6d.json)
+SHA-256 `c57a3d0d1d4f5b2484df483f0c91d0b752ee4219517763c83f03985989e47afe` records 20 removed/0 added
+versus 044ec59e12. Full lint/typecheck/format and machine ESLint pass. Active
+Node 24.22.1/npm 11.12.1 differ from the repository Volta Node pin recorded
+separately in that audit; no matching-pin claim.
+
+One meaningful [combined Automation setup PR #18950](https://github.com/OpenHands/OpenHands/pull/18950),
+issue #18949, groups 42 findings: panel 17, prompt stack 17, new route 4 and
+ConversationMain dock 4. Final head `eef335c07dcb4f013c7722e107c49d720bb507d5`
+preserves product `ceb04025621644dc9d672af4d9b4c1796d029fc7`; branch 417/0
+removes 42 findings/0 added, independently of main 459/0. Typography/palette, APIs, state
+and dynamic layout logic remain untouched. 94 focused tests across six suites
+and 15 Vite/scope tests across two files overlap; do not claim 109 disjoint
+tests. Permanent actual library output covers 14 recipe roles/four width refs.
+An erased PostCSS annotation fix reproduced then resolved the full typecheck
+error; generated test JavaScript and all product files remain byte-identical.
+Independent source/CSS/acceptance/type-fix reviews pass.
+
+Captured After checkout/app source is `7569edff89e328d1bdfd0cbda6edd8df327c0bcb`,
+actual library source is `ceb04025621644dc9d672af4d9b4c1796d029fc7`; never
+relabel these pixels as final PR head eef335c07d. Private evidence has 42 named
+states, 84 PNGs/six native clips and 16,276 matching sampled computed properties.
+No-message/autotitle-off/tools-empty idle fixtures have zero model turns/events;
+inactive bundles have zero runs/dispatches. Owned runs are stopped/private-
+purged with actual errno 61 port-closure checks. Root Before review passes;
+final After/film/source packaging and public media gates remain pending. The
+unrelated Getting started counter differs with fixture order, outside the
+selected setup comparisons; no whole-page pixel/synchronized-video identity.
+
+#18950 remains **draft/NoBot**: actual CI 6 passed/1 pending Ubuntu/1 expected
+media-description failure/6 skipped. Cohort: **60 = 57 merged/2 old open
+non-draft/1 draft**. No new movie path, asset B, public HTTP verification,
+readiness or bot success is claimed. Own anchor `automation-setup-layout-film`
+is reserved; the matching film must be published/live-verified before readiness
+and initial bot review. User preference is one coherent combined owner batch,
+rather than tiny PRs. SDK #5603/budget #18533 and all older user records,
+history/audits/watch remain unchanged. No Git/source/assets/external actions.
+
+
+## 26 October · frozen MEDIA/DRAFT checkpoint
+
+The [combined Automation setup film](../../arch/agentic-linting-refactoring.html#automation-setup-layout-film)
+is complete locally: 82 seconds, 84 PNGs/six full native clips, 105 ZIP members,
+109 packet assets plus the audit. Local-only asset B
+`025d108708a9f26698afe3dee6330313ff09fdab` is not yet published. Independent frozen-asset
+review passes 28 checks; root Before/After source and decoded-film review pass.
+Film SHA `65785af3bf6430053e20bd185202fd18304da0b6f28a0ddd5ba57a5eafea6bb2`;
+ZIP SHA `ea40b853661ee3b18502af1a8fd6000950404ca990bb5cc200fe5398662d8475`.
+Native same-origin playback/poster/captions and Slack download are accompanied
+by immutable B MP4/ZIP/source/comparison/compiled-contract/source-binding links.
+No public availability or HTTP success is claimed. All 45 previous players/
+90 download anchors/94 MP4 href anchors retain their bytes; totals become
+**46 players/92 download anchors/96 MP4 href anchors**. No GIF.
+
+Captured/app After remains 7569edff89, library source ceb0402562 and final PR
+head eef335c07d; exact source equality and erased test syntax never relabel the
+original pixels. All 42 named states/16,276 sampled computed properties match.
+The sidebar Getting started counter 2→3 reflects fixture order, outside selected
+roles. Benign QA labels/UUIDs, relative clocks and existing narrow overflow
+remain. Standalone Local Neutral/Light+ is live evidence; embedded scope is
+compiled proof. No model/provider turn, Automation run/dispatch, appearance
+improvement or whole-page/synchronized-video identity claim. The inactive
+bundle and zero-message/events idle conversation remain execution-free.
+Local Node 24.22.1 differs from repository Volta Node 24.21.0; npm 11.12.1 is
+repository-pinned. Original ambience averages −52.5 dB, with 25 fps H.264/AAC,
+fast start and unaltered selected-original bytes/timing. Owned runs/fixtures
+are stopped/deleted and private state purged, with actual errno 61 port checks.
+
+#18950 remains **draft/NoBot**. Actual current final-head CI is **7 passed/
+1 expected missing-media-description failure/6 skipped/0 pending**, with Ubuntu
+and Windows green. Cohort remains **60 = 57 merged/2 old open non-draft/1 draft**.
+Root publishes B+C, verifies raw/live own anchors and attaches media before
+final required green CI, readiness and initial bot review. Main 459/0 and
+independent branch 417/0 remain separate. SDK #5603/budget #18533, older user
+records, audit/history/watch and source identities remain unchanged.
