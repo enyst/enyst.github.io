@@ -1562,3 +1562,93 @@ source/build/cache/runtime limits remain unchanged. Captured/app 7569 and
 library ceb remain distinct from final eef; main 459 and branch 417 remain
 separate. SDK #5603/budget #18533 and older user/audit/history/watch records
 are unchanged. The user chooses merging; no merge, release or watch action.
+
+
+## 26 October continuation · command and backend draft checkpoint
+
+#18950 merged `2026-10-26T05:52:26Z` (06:52 Stockholm) as
+`ec0f70fe31b637e699ab3713ba477abe3c3d6b6f`. Captured/app 7569, library/product ceb,
+final source eef and immutable original media remain distinct and unchanged.
+All 46 whole players/92 MP4 download anchors/96 total MP4 href anchors retain
+their bytes; no synthetic or new player is inserted.
+
+Exact main `ec0f70fe31b637e699ab3713ba477abe3c3d6b6f` passes **417 warnings/0 errors**:
+348 arbitrary values, 51 inline styles, 18 palette findings; 1,425 linted files/
+176 diagnostic files. [Public audit](main-lint-audit-2026-10-26-ec0f70fe31.json)
+SHA-256 `3bba95c88ce62dba88068f2f531c97210541bd8a94142d8129992dc03536aad4` records 42 removed/0 added
+versus 7a41641c6d. Full lint/typecheck/format and machine audit pass.
+
+Two separate coherent presentation owners remain **draft/NoBot**:
+
+- [Command #18966](https://github.com/OpenHands/OpenHands/pull/18966), issue #18964,
+  head `b8c3ea7d503ae096212252e1a0fbcac97a1011d5`: branch 402/0, 15 removed/0 added,
+  44 focused tests across three files and app/library builds pass. Nine actual
+  output roles and 24 relevant Tailwind property registrations retain parity.
+  Typography, shadows/filter composition, keyboard/query/focus and lazy body
+  portal remain; no text-medium or palette decision.
+- [Backend #18967](https://github.com/OpenHands/OpenHands/pull/18967), issue #18965,
+  head `3dd7c0f4edfbd3a6907c3e953c79276d3fcdb243`: branch 406/0, 11 removed/0 added,
+  41 tests across three files and app/library builds pass. Eight renamed rules
+  per output and 12 isolated Chromium actual-CSS cases pass; these fixtures
+  are not live Canvas/backend evidence. 0fr/1fr timing/reduced motion, mounted/
+  inert content, 92vh Add/92dvh Edit caps, halo, measured-height and auth/save
+  owners are preserved.
+
+Counts 402/406 and reductions 15/11 are independent proposals; do not subtract 26
+from main 417 or sum test counts. Final genuine Before/After capture, frozen
+films, required remote CI and publication remain pending. Supplied early CI
+snapshots are not final green gates. Own anchors `command-menu-recipes-film`
+and `backend-chooser-recipes-film` are status placeholders without invented
+movie URLs; live matching films must be verified before readiness/initial bot
+reviews. Cohort: **62 = 58 merged/2 older open non-draft/2 new drafts**.
+Root minimal read-only lifecycle confirms #18520/#18533 remain open/non-draft
+at unchanged heads (approved/review-required). Their records, SDK #5603/
+budget #18533 user parking, audit/history/watch and user text remain unchanged.
+No Git, source, assets, verifier, browser, remote or parked-work actions.
+
+
+## 26 October continuation · frozen command/backend MEDIA/DRAFT
+
+Own native [command menu](../../arch/agentic-linting-refactoring.html#command-menu-recipes-film) and
+[backend chooser](../../arch/agentic-linting-refactoring.html#backend-chooser-recipes-film) films
+are complete locally, with posters/captions, immutable B MP4/ZIP/provenance
+links and same-origin Slack downloads. All 46 old whole players/92 downloads/
+96 MP4 href anchors retain their bytes; totals are **48 players/96 downloads/
+100 MP4 href anchors**. No new GIF. Local-only B
+`4ef2deeff4e51899eb455be5d5ad716816336c16` contains 120 packet assets plus the audit;
+root source/film and independent frozen-assets PASS 53 gates pass. It is not
+yet publicly pushed; HTTP/Chrome/final CI/readiness remain pending.
+
+Command is 48.92 seconds/1,223 frames, 30 PNGs/four clips, 49 ZIP members; SHA
+`d53827241ddd7e22f5c149ae3e46f739414742ca2b28add6dd5d5bc8886dd060`.
+Backend is 66.04 seconds/1,651 frames, 44 PNGs/four clips, 63 ZIP members; SHA
+`b05e18287c0afcceffa2e2ccde1ca047edb337fbbbe57320068b35786a8c6ad5`.
+Both use 25 fps H.264/yuv420p/AAC, fast start and original ambience averaging
+−52.5 dB. All 82 originals remain unchanged; three shared owned runs are
+stopped/purged and fifteen actual owned ports are conclusively closed.
+
+Common Before ec0f70fe31/build 2eb3fb8c7b4d1fca and exact command After/app/
+library/final b8c3ea7d50/build bf62017c750db5ca, backend 3dd7c0f4ed/build
+e5a7cff1007a54ec remain explicit. App built-this-run Boolean is absent/null;
+no fresh app build is inferred. Root rebuilt After libraries at exact heads.
+Command has 15 matching states/12,936 property pairs; backend 22/4,554.
+These differ from 15/11 warning reductions; per-owner 44/41 test counts share
+the Vite suite and are not added. Main 417 remains separate from 402/406.
+
+Live UI is standalone Local Neutral/Light+ through actual Settings/resolved
+CSS; legacy data-theme is null. Compiler/fixture host proof is separate from
+live embedded/Cloud/ACP/provider/auth coverage. No configured/invoked model,
+auth/connection submission, conversation creation or Automation execution.
+Benign loopbacks, secret-name-only Settings context and existing narrow menu
+truncation remain. Backend key is product-masked and .test host inert. Short
+modals open at normal phone size then resize/scroll; initial 420 px-short
+drawer entry/fix is not claimed. Remote canonical closed state uses natural
+Tab/settled animations; pre-settle captures excluded. No visual improvement,
+whole-page pixel or synchronized-frame identity claim.
+
+Both remain **draft/NoBot**, current CI **7 passed/1 expected missing-media
+description failure/6 skipped/0 pending**; cohort **62 = 58 merged/2 older
+open non-draft/2 new drafts**. Root publishes B+C, verifies public HTTP/Chrome
+and own live anchors, attaches media, then closes final required CI/readiness
+and initial bot requests. SDK #5603/budget #18533 and all older user/audit/
+history/watch records remain untouched.
