@@ -1538,3 +1538,27 @@ Root publishes B+C, verifies raw/live own anchors and attaches media before
 final required green CI, readiness and initial bot review. Main 459/0 and
 independent branch 417/0 remain separate. SDK #5603/budget #18533, older user
 records, audit/history/watch and source identities remain unchanged.
+
+
+## 26 October · READY, initial bot review pending
+
+Asset B `025d108708a9f26698afe3dee6330313ff09fdab` and media docs C
+`7ebad1d4289e78810fc3abc6eebb95e0b2453607` are published. Six immutable raw files
+and ten live Pages files pass HTTP/full body SHA; live MP4 is video/mp4.
+The own film anchor is verified. Existing designated Chrome shows native
+Before playback at 0:29, After at 0:48, paused at 0:52/1:22, with the visible
+same-origin Slack download link. No browser download/save was clicked or
+claimed. These checks belong to media C, not future READY docs D deployment.
+
+#18950 is **ready/open at unchanged eef335c07d**, with actual final ready-event
+CI **8 passed / 6 skipped / 0 pending / 0 failed**. Fresh description job
+[121334708278](https://github.com/OpenHands/OpenHands/actions/runs/40248376873/job/121334708278) succeeds.
+Initial all-hands-bot review was requested and verified pending after green;
+reviews were empty, HUMAN prefix preserved, no prior approval/re-review claim.
+Independent final closure is PASS/readyAllowed; no merge is authorized here.
+Cohort: **60 = 57 merged / 3 open non-draft / 0 drafts**. All 46 complete
+players, 92 download anchors and 96 MP4 href anchors, exact originals and
+source/build/cache/runtime limits remain unchanged. Captured/app 7569 and
+library ceb remain distinct from final eef; main 459 and branch 417 remain
+separate. SDK #5603/budget #18533 and older user/audit/history/watch records
+are unchanged. The user chooses merging; no merge, release or watch action.
