@@ -1652,3 +1652,29 @@ open non-draft/2 new drafts**. Root publishes B+C, verifies public HTTP/Chrome
 and own live anchors, attaches media, then closes final required CI/readiness
 and initial bot requests. SDK #5603/budget #18533 and all older user/audit/
 history/watch records remain untouched.
+
+
+## 26 October continuation · READY, initial reviews pending
+
+Asset B `4ef2deeff4e51899eb455be5d5ad716816336c16` and media docs C
+`28a5dbac7e1a680a0776043c821edf572b3ad414` are published. Eleven raw files and
+fifteen live Pages files pass HTTP/full SHA and expected MIME, including both
+own film anchors. Native Chrome plays Before through After to natural ends
+48.92/66.04 seconds; both players are paused/ended and Slack links visible.
+Both Chrome downloads succeeded with files present and expected sizes. Exact
+HTTP source hashes are verified; local downloaded-file hashes are not claimed.
+These checks belong to media C, not future READY docs D deployment. A normal
+merge preserved the disjoint Mention Gazette update and immutable B identity.
+
+Both #18966/#18967 are **ready/open at unchanged exact heads**, with fresh
+ready-event effective CI **8 passed / 6 skipped / 0 failed / 0 pending**.
+The new successful description checks supersede earlier missing-media runs.
+Initial all-hands-bot requests are verified pending after green; reviews were
+empty, exact bodies and HUMAN prefixes retained. Final independent readiness
+is PASS/readyAllowed, without merge authorization or bot approval.
+Cohort: **62 = 58 merged / 4 open non-draft / 0 drafts**. All 48 whole players/
+96 download anchors/100 MP4 href anchors, source/build identities, originals
+and runtime/privacy limits are unchanged. Main 417 stays separate from
+independent 402/406; 44/41 test runs overlap Vite. SDK #5603/budget #18533
+and older user/audit/history/watch records stay unchanged. The user chooses
+merging; no merge, release or watch action is performed here.

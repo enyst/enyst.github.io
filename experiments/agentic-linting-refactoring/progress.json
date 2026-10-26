@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-26T10:12:54.172450+00:00",
+  "checkedAt": "2026-10-26T10:33:55.803997+00:00",
   "displayTimeZone": "Europe/Stockholm",
   "main": "ec0f70fe31b637e699ab3713ba477abe3c3d6b6f",
   "shadcnLintVersion": "0.2.1",
@@ -8467,11 +8467,13 @@
       "headRefOid": "b8c3ea7d503ae096212252e1a0fbcac97a1011d5",
       "headRefName": "astra/lint-command-menu-recipes",
       "baseRefOid": "ec0f70fe31b637e699ab3713ba477abe3c3d6b6f",
-      "draft": true,
-      "requestedReviewers": [],
-      "checkedAt": "2026-10-26T10:12:54.172450+00:00",
+      "draft": false,
+      "requestedReviewers": [
+        "all-hands-bot"
+      ],
+      "checkedAt": "2026-10-26T10:33:49.320937+00:00",
       "issue": 18964,
-      "reviewDecision": null,
+      "reviewDecision": "REVIEW_REQUIRED",
       "reviews": [],
       "verification": {
         "typecheckPassed": true,
@@ -8496,8 +8498,8 @@
         "focusedTestsPassed": 44,
         "focusedTestFilesPassed": 3,
         "liveAffectedStateVerified": true,
-        "readiness": "Draft with completed root source/film and frozen copied local assets. Public HTTP/Chrome, published-media description validation and final readiness/bot gates pending.",
-        "mediaStatus": "Frozen packet at local-only B passes root source/film and independent asset PASS53; no public availability/HTTP/Chrome/readiness claim.",
+        "readiness": "Ready/open at unchanged exact head with published matching media, verified own live anchor/native playback, effective required CI8pass/6skip/0fail/0pending and initial bot request pending. Reviews empty; no approval or merge claimed.",
+        "mediaStatus": "Immutable B and actual media C published/verified:11 raw full-SHA files,15 live Pages HTTP/fullSHA/MIME files, own anchors/native Before-to-After/natural ends and successful Chrome downloads verified. Local downloaded-file contents are not hash-certified; HTTP source bodies are. Future READY docs D deployment is separate.",
         "notebookFeatureUrl": "https://enyst.github.io/arch/agentic-linting-refactoring.html#command-menu-recipes-film",
         "ownershipNote": "Separate coherent presentation owner; no text-medium, palette, backend/API/state or typography decision.",
         "compiledCssProof": {
@@ -8735,28 +8737,64 @@
         },
         "mediaPublication": {
           "commit": "4ef2deeff4e51899eb455be5d5ad716816336c16",
-          "localOnly": true,
-          "published": false,
-          "status": "Local immutable B; public HTTP/live own anchors/Chrome pending",
+          "localOnly": false,
+          "published": true,
+          "status": "Published immutable B and verified actual media docs C",
           "rawHttpVerification": {
-            "status": "pending",
-            "allPassed": false
+            "allPassed": true,
+            "criticalFilesTotal": 11,
+            "receiptSha256": "fe35cb031c493469f32f5c67d6a49e28c51e97ccc27cd751466b6fc780acd912"
           },
-          "liveNotebookFeatureAnchorVerified": false,
+          "liveNotebookFeatureAnchorVerified": true,
           "immutableRawFilmUrl": "https://raw.githubusercontent.com/enyst/enyst.github.io/4ef2deeff4e51899eb455be5d5ad716816336c16/experiments/agentic-linting-refactoring/command-menu-recipes-before-after.mp4",
-          "immutableRawEvidenceZipUrl": "https://raw.githubusercontent.com/enyst/enyst.github.io/4ef2deeff4e51899eb455be5d5ad716816336c16/experiments/agentic-linting-refactoring/command-menu-recipes-evidence.zip"
+          "immutableRawEvidenceZipUrl": "https://raw.githubusercontent.com/enyst/enyst.github.io/4ef2deeff4e51899eb455be5d5ad716816336c16/experiments/agentic-linting-refactoring/command-menu-recipes-evidence.zip",
+          "verifiedMediaDocsCommit": "28a5dbac7e1a680a0776043c821edf572b3ad414",
+          "nativeChromePlaybackVerified": true,
+          "nativePlaybackReceiptSha256": "aeba0919ffe807dd27e71ec05531851e97adc03d38574d85f6ff3010322c0bf1",
+          "nativePlayback": {
+            "beforeAndAfterObserved": true,
+            "durationSeconds": 48.92,
+            "endedNaturally": true,
+            "paused": true,
+            "sameOriginVideo": true
+          },
+          "browserDownload": {
+            "fileExists": true,
+            "bytes": 3647845,
+            "sizeMatchesApprovedFilm": true,
+            "sourceHttpSha256": "d53827241ddd7e22f5c149ae3e46f739414742ca2b28add6dd5d5bc8886dd060",
+            "localDownloadedContentHashVerified": false
+          },
+          "downloadVerification": "Actual Chrome downloads succeeded; file existence/size checked. HTTP source hashes verified; no local file hash claim."
+        },
+        "independentReadinessClosure": {
+          "verdict": "PASS",
+          "readyAllowed": true,
+          "mergeAllowed": false,
+          "receiptSha256": "8e9ee9c1aaa66d7f2b5c3ae5e40883714f7615a1fabc2be4625ee43bbf19341d",
+          "scope": "Final independent source/evidence/body/publication/effective-CI closure plus actual fresh ready-event and initial-review-requested receipts. No bot approval/merge claim."
         }
       },
       "latestChecks": {
-        "pass": 7,
-        "failed": 1,
+        "pass": 8,
+        "failed": 0,
         "pending": 0,
         "skip": 6,
-        "snapshotComplete": true,
-        "receiptSha256": "7e88a350b63ba941b00619f62b982863d0e84be43f7c7898cfe4849d72435a26",
-        "note": "Actual pre-publication current set:7pass/1expected missing-media-description failure/6skip. No code failure or queue; draft/NoBot."
+        "checkedAt": "2026-10-26T10:33:49.320937+00:00",
+        "descriptionValidation": {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40308215209/job/121522532290",
+          "name": "Validate PR description",
+          "state": "SUCCESS"
+        },
+        "effectiveChecksSha256": "3749f13f306cde7b82146829ce843c9e0f2ecf56403d24266797c8c2ff5174b7",
+        "note": "Fresh ready-event successful description check supersedes older missing-media failures in historical rollups. Effective8pass/6skip; initial bot request verified pending, no approval/merge claimed."
       },
-      "initialBotReviewRequestedThisRun": false
+      "initialBotReviewRequestedThisRun": true,
+      "mergeable": "MERGEABLE",
+      "reviewRequestVerifiedAt": "2026-10-26T10:33:49.320937+00:00",
+      "readyBotReceiptSha256": "a1b2530e1693c7165d1a9ead9d29e81a5cd42e75d4010e1f635cbcffe623d7b6",
+      "humanPrefixBytePreserved": true
     },
     {
       "number": 18967,
@@ -8767,11 +8805,13 @@
       "headRefOid": "3dd7c0f4edfbd3a6907c3e953c79276d3fcdb243",
       "headRefName": "astra/lint-backend-chooser-recipes",
       "baseRefOid": "ec0f70fe31b637e699ab3713ba477abe3c3d6b6f",
-      "draft": true,
-      "requestedReviewers": [],
-      "checkedAt": "2026-10-26T10:12:54.172450+00:00",
+      "draft": false,
+      "requestedReviewers": [
+        "all-hands-bot"
+      ],
+      "checkedAt": "2026-10-26T10:33:55.803997+00:00",
       "issue": 18965,
-      "reviewDecision": null,
+      "reviewDecision": "REVIEW_REQUIRED",
       "reviews": [],
       "verification": {
         "typecheckPassed": true,
@@ -8795,8 +8835,8 @@
         "focusedTestsPassed": 41,
         "focusedTestFilesPassed": 3,
         "liveAffectedStateVerified": true,
-        "readiness": "Draft with completed root source/film and frozen copied local assets. Public HTTP/Chrome, published-media description validation and final readiness/bot gates pending.",
-        "mediaStatus": "Frozen packet at local-only B passes root source/film and independent asset PASS53; no public availability/HTTP/Chrome/readiness claim.",
+        "readiness": "Ready/open at unchanged exact head with published matching media, verified own live anchor/native playback, effective required CI8pass/6skip/0fail/0pending and initial bot request pending. Reviews empty; no approval or merge claimed.",
+        "mediaStatus": "Immutable B and actual media C published/verified:11 raw full-SHA files,15 live Pages HTTP/fullSHA/MIME files, own anchors/native Before-to-After/natural ends and successful Chrome downloads verified. Local downloaded-file contents are not hash-certified; HTTP source bodies are. Future READY docs D deployment is separate.",
         "notebookFeatureUrl": "https://enyst.github.io/arch/agentic-linting-refactoring.html#backend-chooser-recipes-film",
         "ownershipNote": "Separate coherent presentation owner; no text-medium, palette, backend/API/state or typography decision.",
         "compiledCssProof": {
@@ -9040,28 +9080,64 @@
         },
         "mediaPublication": {
           "commit": "4ef2deeff4e51899eb455be5d5ad716816336c16",
-          "localOnly": true,
-          "published": false,
-          "status": "Local immutable B; public HTTP/live own anchors/Chrome pending",
+          "localOnly": false,
+          "published": true,
+          "status": "Published immutable B and verified actual media docs C",
           "rawHttpVerification": {
-            "status": "pending",
-            "allPassed": false
+            "allPassed": true,
+            "criticalFilesTotal": 11,
+            "receiptSha256": "fe35cb031c493469f32f5c67d6a49e28c51e97ccc27cd751466b6fc780acd912"
           },
-          "liveNotebookFeatureAnchorVerified": false,
+          "liveNotebookFeatureAnchorVerified": true,
           "immutableRawFilmUrl": "https://raw.githubusercontent.com/enyst/enyst.github.io/4ef2deeff4e51899eb455be5d5ad716816336c16/experiments/agentic-linting-refactoring/backend-chooser-recipes-before-after.mp4",
-          "immutableRawEvidenceZipUrl": "https://raw.githubusercontent.com/enyst/enyst.github.io/4ef2deeff4e51899eb455be5d5ad716816336c16/experiments/agentic-linting-refactoring/backend-chooser-recipes-evidence.zip"
+          "immutableRawEvidenceZipUrl": "https://raw.githubusercontent.com/enyst/enyst.github.io/4ef2deeff4e51899eb455be5d5ad716816336c16/experiments/agentic-linting-refactoring/backend-chooser-recipes-evidence.zip",
+          "verifiedMediaDocsCommit": "28a5dbac7e1a680a0776043c821edf572b3ad414",
+          "nativeChromePlaybackVerified": true,
+          "nativePlaybackReceiptSha256": "aeba0919ffe807dd27e71ec05531851e97adc03d38574d85f6ff3010322c0bf1",
+          "nativePlayback": {
+            "beforeAndAfterObserved": true,
+            "durationSeconds": 66.04,
+            "endedNaturally": true,
+            "paused": true,
+            "sameOriginVideo": true
+          },
+          "browserDownload": {
+            "fileExists": true,
+            "bytes": 5075212,
+            "sizeMatchesApprovedFilm": true,
+            "sourceHttpSha256": "b05e18287c0afcceffa2e2ccde1ca047edb337fbbbe57320068b35786a8c6ad5",
+            "localDownloadedContentHashVerified": false
+          },
+          "downloadVerification": "Actual Chrome downloads succeeded; file existence/size checked. HTTP source hashes verified; no local file hash claim."
+        },
+        "independentReadinessClosure": {
+          "verdict": "PASS",
+          "readyAllowed": true,
+          "mergeAllowed": false,
+          "receiptSha256": "8e9ee9c1aaa66d7f2b5c3ae5e40883714f7615a1fabc2be4625ee43bbf19341d",
+          "scope": "Final independent source/evidence/body/publication/effective-CI closure plus actual fresh ready-event and initial-review-requested receipts. No bot approval/merge claim."
         }
       },
       "latestChecks": {
-        "pass": 7,
-        "failed": 1,
+        "pass": 8,
+        "failed": 0,
         "pending": 0,
         "skip": 6,
-        "snapshotComplete": true,
-        "receiptSha256": "a83f4a277baa003d6811bdb45361d34b56032b63bef10a9d0313c252686166d3",
-        "note": "Actual pre-publication current set:7pass/1expected missing-media-description failure/6skip. No code failure or queue; draft/NoBot."
+        "checkedAt": "2026-10-26T10:33:55.803997+00:00",
+        "descriptionValidation": {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/40308224132/job/121522561555",
+          "name": "Validate PR description",
+          "state": "SUCCESS"
+        },
+        "effectiveChecksSha256": "3900696ed54b6d3b6b6e9eb969d0dcfb85c3740d7737241e1c23f41d949691dc",
+        "note": "Fresh ready-event successful description check supersedes older missing-media failures in historical rollups. Effective8pass/6skip; initial bot request verified pending, no approval/merge claimed."
       },
-      "initialBotReviewRequestedThisRun": false
+      "initialBotReviewRequestedThisRun": true,
+      "mergeable": "MERGEABLE",
+      "reviewRequestVerifiedAt": "2026-10-26T10:33:55.803997+00:00",
+      "readyBotReceiptSha256": "98d6e36c4cbfcbc84a41201bfecf1dcbdd79ed34fb5fe35a2f0309072e537bee",
+      "humanPrefixBytePreserved": true
     }
   ],
   "lintAudit": {
@@ -11737,7 +11813,7 @@
     }
   },
   "statusSnapshotCoverage": {
-    "previousCohortCheckedAt": "2026-10-26T06:31:40.018263+00:00",
+    "previousCohortCheckedAt": "2026-10-26T10:12:54.172450+00:00",
     "previousCohortCount": 62,
     "freshPullRequests": [],
     "updatedPullRequests": [
@@ -11746,7 +11822,7 @@
     ],
     "mergedSincePreviousSnapshot": [],
     "existingOpenLifecycleVerified": [],
-    "note": "MEDIA/DRAFT from exact approved source/films and local B. Both7pass/1expected media-descriptionfail/6skip; public HTTP/Chrome/final readiness pending. All60 older PR objects and46 old whole players/92 downloads/96 href anchors, audits/history/watch/user records retained."
+    "note": "READY-only refresh from actual B/C HTTP/Chrome/download and fresh effective CI/initial-bot receipts. All60 older PR objects, audits/history/watch/user records and48 whole players/96 downloads/100 MP4 href anchors retained. Public proof is pinned to media C, not future READY docs D."
   },
   "approvalWatch": {
     "startedAt": "2026-10-19T02:49:08Z",
@@ -13009,14 +13085,60 @@
         "totalMp4DownloadLinks": 92
       },
       "note": "Prior DRAFT checkpoint before completed source/film gates, frozen local packets and asset B."
+    },
+    {
+      "checkedAt": "2026-10-26T10:12:54.172450+00:00",
+      "cohortCount": 62,
+      "cohortCounts": {
+        "total": 62,
+        "merged": 58,
+        "openNonDraft": 2,
+        "draft": 2,
+        "note": "18950 merged; command18966/backend18967 remain drafts. Root minimal lifecycle confirms18520/18533 stay open/non-draft at unchanged approved/review-required heads. Parked SDK/budget/user records untouched."
+      },
+      "proposalChecks": {
+        "18966": {
+          "pass": 7,
+          "failed": 1,
+          "pending": 0,
+          "skip": 6,
+          "snapshotComplete": true,
+          "receiptSha256": "7e88a350b63ba941b00619f62b982863d0e84be43f7c7898cfe4849d72435a26",
+          "note": "Actual pre-publication current set:7pass/1expected missing-media-description failure/6skip. No code failure or queue; draft/NoBot."
+        },
+        "18967": {
+          "pass": 7,
+          "failed": 1,
+          "pending": 0,
+          "skip": 6,
+          "snapshotComplete": true,
+          "receiptSha256": "a83f4a277baa003d6811bdb45361d34b56032b63bef10a9d0313c252686166d3",
+          "note": "Actual pre-publication current set:7pass/1expected missing-media-description failure/6skip. No code failure or queue; draft/NoBot."
+        }
+      },
+      "mediaSnapshot": {
+        "totalFilms": 48,
+        "totalMp4DownloadLinks": 96,
+        "newMediaAssetCommit": {
+          "commit": "4ef2deeff4e51899eb455be5d5ad716816336c16",
+          "localOnly": true,
+          "published": false,
+          "packetAssets": 120,
+          "auditAssets": 1,
+          "independentAssetGate": "PASS",
+          "publicVerification": "pending root B+C publication and raw/live own-anchor/Chrome checks"
+        }
+      },
+      "publicationCommit": "28a5dbac7e1a680a0776043c821edf572b3ad414",
+      "note": "Historical MEDIA/DRAFT checkpoint before publication:both7pass/1expected descriptionfail/6skip, no bot requests. Root then preserved unrelated Mention Gazette by normal merge and published B+C; actual public/ready-event/review-request receipts are current below."
     }
   ],
   "currentCohortCounts": {
     "total": 62,
     "merged": 58,
-    "openNonDraft": 2,
-    "draft": 2,
-    "note": "18950 merged; command18966/backend18967 remain drafts. Root minimal lifecycle confirms18520/18533 stay open/non-draft at unchanged approved/review-required heads. Parked SDK/budget/user records untouched."
+    "openNonDraft": 4,
+    "draft": 0,
+    "note": "Two current proposals ready/open with published verified proof, green effective ready-event CI and initial bot requests pending. Two older PRs remain open/non-draft; parked SDK5603/budget18533 records untouched. No new approval or merge claimed."
   },
   "currentMediaSnapshot": {
     "historicalFilmsRetained": 46,
@@ -13026,31 +13148,33 @@
     "totalFilms": 48,
     "totalMp4DownloadLinks": 96,
     "publishedBackendMediaCommit": "a877fcbbdcf4674ad4b36b01c138f234bb377f45",
-    "newProposalMediaStatus": "Two frozen root-approved packets at local-only B. Both drafts7pass/1expected descriptionfail/6skip, NoBot. Public HTTP/Chrome/final readiness pending.",
+    "newProposalMediaStatus": "Both owner packets published at B with verified media C/own live anchors, native Before-to-After/natural-end playback and actual Chrome downloads. Both ready, effective8pass/6skip/0fail/0pending; initial bot requests pending. No approval/merge claimed.",
     "note": "All46 old whole players and92 downloads/96 href anchors retain bytes; two new players add4 downloads:48 players/96 downloads/100 href anchors. Live15/22 states, warning reductions15/11 and overlapping44/41 tests remain separate.",
     "publishedFilesMediaCommit": "73d4225fa15ed071a5d06e8bf79a185d1f2bb0c2",
     "publishedDraftDocsCommit": "689a013069ff681b04810839cb67e6d33c29c251",
     "livePagesVerification": {
-      "status": "pending",
-      "commit": null,
-      "allPassed": false,
-      "ownFilmAnchorsVerified": false
+      "commit": "28a5dbac7e1a680a0776043c821edf572b3ad414",
+      "allPassed": true,
+      "ownFilmAnchorsVerified": true,
+      "publicFilesChecked": 15,
+      "receiptSha256": "399f46aec5845196c7bd032bfdddbf6f7420e108ff6002ac0421ba03e370244f",
+      "scope": "Actual media C verification only. Future READY docs D deployment remains a later root check."
     },
     "newSidebarStackingFilm": "sidebar-stacking-before-after.mp4",
     "newOverviewDrawerFilm": "overview-drawer-before-after.mp4",
     "newMediaAssetCommit": {
       "commit": "4ef2deeff4e51899eb455be5d5ad716816336c16",
-      "localOnly": true,
-      "published": false,
+      "localOnly": false,
+      "published": true,
       "packetAssets": 120,
       "auditAssets": 1,
       "independentAssetGate": "PASS",
-      "publicVerification": "pending root B+C publication and raw/live own-anchor/Chrome checks"
+      "publicVerification": "11 immutable raw full-SHA files and15 live media-C HTTP/fullSHA/MIME files passed; own anchors/native playback and actual Chrome download existence/size verified."
     },
-    "publishedMediaDocsCommit": null,
+    "publishedMediaDocsCommit": "28a5dbac7e1a680a0776043c821edf572b3ad414",
     "newAutomationThemeAliasesFilm": "automation-theme-aliases-before-after.mp4",
     "newDropdownHiddenControlsFilm": "dropdown-hidden-controls-before-after.mp4",
-    "priorWavePublicationNote": "Legacy published film/commit fields describe earlier merged waves. Current command/backend B and media-docs-C publication remains pending.",
+    "priorWavePublicationNote": "Legacy published film/commit fields describe earlier merged waves. Current command/backend B and media docs C are published and verified, pinned to actual C.",
     "priorWaveMediaPublication": {
       "assetCommit": {
         "commit": "025d108708a9f26698afe3dee6330313ff09fdab",
@@ -13139,20 +13263,27 @@
     "newExtensionDialogViewportFilm": "extension-dialog-viewport-before-after.mp4",
     "newAutomationSetupLayoutFilm": "automation-setup-layout-before-after.mp4",
     "newCommandMenuRecipesFilm": "command-menu-recipes-before-after.mp4",
-    "newBackendChooserRecipesFilm": "backend-chooser-recipes-before-after.mp4"
+    "newBackendChooserRecipesFilm": "backend-chooser-recipes-before-after.mp4",
+    "publicationIntegration": {
+      "publicationBase": "717565e7536e695e458c909e57bf97245e590f5f",
+      "immutableAssetCommitRetained": "4ef2deeff4e51899eb455be5d5ad716816336c16",
+      "disjointMentionGazettePreservedByNormalMerge": true,
+      "receiptSha256": "3c1c85b2cfe2b0531f82a56d15aa72c12d13239aa6941426b168578064a88a2e"
+    }
   },
   "nextSteps": [
     {
       "order": 1,
-      "scope": "Publish two completed owner films/docs and verify own anchors before final CI/readiness/review",
+      "scope": "Complete initial bot/maintainer review of two ready coherent owners; the user chooses merging",
       "pullRequests": [
         18966,
         18967
       ],
       "measuredMainWarnings": 417,
       "measuredMain": "ec0f70fe31b637e699ab3713ba477abe3c3d6b6f",
-      "localAssetCommit": "4ef2deeff4e51899eb455be5d5ad716816336c16",
-      "note": "Root source/film and frozen asset gates pass; both draft7pass/1expected descriptionfail/6skip. Publish B+C, verify public raw/live own anchors and Chrome, attach media, then final green CI/readiness/initial bot requests. Main417 and independent402/406 stay separate;44/41 tests overlap Vite."
+      "publishedAssetCommit": "4ef2deeff4e51899eb455be5d5ad716816336c16",
+      "verifiedMediaDocsCommit": "28a5dbac7e1a680a0776043c821edf572b3ad414",
+      "note": "Published own films/anchors, native playback/Chrome downloads and fresh effective8pass/6skip pass. Initial bot reviews requested/pending. Main417 and independent402/406 remain separate;44/41 test runs overlap Vite. No merge/release/watch action."
     },
     {
       "order": 2,
