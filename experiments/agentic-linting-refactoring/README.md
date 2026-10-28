@@ -1709,3 +1709,6 @@ Workspace evidence refresh: both exact source revisions were rebuilt after `npm 
 
 
 CI follow-up: first run passed9615tests and failed one existing class-string assertion in workspace-selection-form. Final head `c612caa172a5fe0fce6e5488e51b9990e7231de8` replaces it with a compiled CSS check against the actual rendered header/entries. Expanded focused run:100tests/sevenfiles pass. This changes no product source after capture535a4b0f3d; `workspace-picker-recipes-final-source-binding.json` records that identity. Current CI reruns; bot review waits for green.
+
+
+Final readiness checkpoint 2026-10-28T09:46:35.439669+00:00: #19052 at `ce4225a63a3b8d152968e5bddc8ecc5c37f86721` has **8 effective CI checks passed / 6 skipped**, and all-hands-bot review is requested and verified. The100-test/seven-file focused run and full local lint/typecheck pass. Current readiness supersedes the earlier rerun notes; captured535a4b0f3d and immutable refreshed asset8349628d1c remain unchanged.
