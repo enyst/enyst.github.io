@@ -1703,3 +1703,9 @@ Fresh exact main `0c547b494fb5d89200164b37b19fbc4cad0bee2b` has **390 warnings /
 [36.92-second Before/After film and Slack download](https://enyst.github.io/arch/agentic-linting-refactoring.html#workspace-picker-recipes-film) compare exact main with `535a4b0f3deaeb6a63b6d767228dea4dece999ce`: eight real Local desktop/phone states and330 selected fields match. Twenty unchanged originals and scoped source/CSS proof are published at `1bbfc1636206a816dd31ce9ee205e28cee52ab5f`. Both owned stacks are stopped/private-purged and all ten actual ports closed. No model call or live authenticated Cloud/ACP/embedding evidence is claimed. CI: 6 passed, 6 skipped, 2 pending; bot review will be requested when green.
 
 Cohort63 =60merged/3open-nondraft/0draft. Other62 proposal snapshots, historical audits,49 earlier video players and parked budget/SDK records are retained.
+
+
+Workspace evidence refresh: both exact source revisions were rebuilt after `npm ci` with the unchanged committed lock, including public-skills0.36.0. The refreshed36.84-second film and20new untouched originals are at immutable `8349628d1c8b58aad313c09b657eae3200095eac`; its five critical raw files pass full SHA-256. The earlier36.92-second packet at1bbfc16362 reused cached public-skills0.35.0 and remains historical. Fresh eight-state/330-field comparison and actual app/library contracts still match, and83focusedtests/full lint pass. Both fresh stacks stopped/private-purged; all ten ports closed.
+
+
+CI follow-up: first run passed9615tests and failed one existing class-string assertion in workspace-selection-form. Final head `c612caa172a5fe0fce6e5488e51b9990e7231de8` replaces it with a compiled CSS check against the actual rendered header/entries. Expanded focused run:100tests/sevenfiles pass. This changes no product source after capture535a4b0f3d; `workspace-picker-recipes-final-source-binding.json` records that identity. Current CI reruns; bot review waits for green.
