@@ -1694,3 +1694,12 @@ The [15.72s Before/After supplement](../../arch/agentic-linting-refactoring.html
 GitHub now confirms both #18966 and [#18967](https://github.com/OpenHands/OpenHands/pull/18967) are merged. The bot approved backend head `6a5d1d78a92a29f3087dd397c0aa120b548e678f` on 26 October at 14:03 UTC after confirming the DigitalOcean criterion, 234 focused tests (544 in its broader run), builds and green CI. The PR merged on 27 October at 23:00:42 UTC as `6354932e87f99e1583f482f2cea49d6d573443e0`.
 
 The tracked cohort is now **62 = 60 merged / 2 open non-draft / 0 drafts**; other proposal records retain their dated snapshots. The earlier approval-pending entries above are historical. All original films, capture revisions and the [DigitalOcean supplement](https://enyst.github.io/arch/agentic-linting-refactoring.html#backend-chooser-digitalocean-followup-film) remain unchanged. The 402-warning main audit belongs to `6284908600`; 390 is the reviewed backend branch measurement, not a fresh audit of today's main.
+
+
+## 28 October — workspace picker recipes (#19052)
+
+Fresh exact main `0c547b494fb5d89200164b37b19fbc4cad0bee2b` has **390 warnings / 0 errors** (321 arbitrary,51 inline,18 raw colors). [PR #19052](https://github.com/OpenHands/OpenHands/pull/19052), issue #19051, uses five named recipe roles plus built-in z-9999 for seven class-token substitutions; its branch has **383 / 0**. All83 tests/six files, full lint/typecheck, app and library/declarations builds pass. Six rule contracts match in each actual emitted output.
+
+[36.92-second Before/After film and Slack download](https://enyst.github.io/arch/agentic-linting-refactoring.html#workspace-picker-recipes-film) compare exact main with `535a4b0f3deaeb6a63b6d767228dea4dece999ce`: eight real Local desktop/phone states and330 selected fields match. Twenty unchanged originals and scoped source/CSS proof are published at `1bbfc1636206a816dd31ce9ee205e28cee52ab5f`. Both owned stacks are stopped/private-purged and all ten actual ports closed. No model call or live authenticated Cloud/ACP/embedding evidence is claimed. CI: 6 passed, 6 skipped, 2 pending; bot review will be requested when green.
+
+Cohort63 =60merged/3open-nondraft/0draft. Other62 proposal snapshots, historical audits,49 earlier video players and parked budget/SDK records are retained.
