@@ -1,0 +1,40 @@
+Readable title evaluation — 2026-10-30
+
+Source SDK revision:
+01bb167b04c00afc4d781f198fd8941a543eb266
+Source skill revision:
+cad9dfcc2a68473a64aa4537e76f49c13dcbbf66
+
+Environment used: Python 3.13, repository lock export, with only LiteLLM
+1.105.1 replaced by user-approved 1.105.6 in an isolated environment.
+Repository dependency manifests and the original environment were unchanged.
+
+Install the SDK at the source revision in a suitable isolated environment.
+Keep provider credentials in environment variables, never output files.
+Set LLM_MODEL to an available provider-prefixed alias, LLM_API_KEY to its key,
+and optionally LLM_BASE_URL to the service endpoint. Use synthetic inputs only.
+
+python evaluate.py --skill /path/to/skills/readable-text/SKILL.md \
+  --output new-run.json --repeats 2 \
+  --revision 01bb167b04c00afc4d781f198fd8941a543eb266
+
+The final harness explicitly disables the legacy Anthropic thinking budget.
+The recorded Gemini run preceded that explicit setting and retained 200000;
+Gemini does not use this Anthropic-only field. Requested temperature is zero,
+but SDK capability handling may omit sampling parameters for some models.
+API providers and model aliases can change; byte-identical replay is not promised.
+Do not overwrite published evidence with a new run.
+
+Scoring: shuffle generated titles, hide arm labels/model names/prompts, give
+an independent evaluator each original synthetic request and rubric.json.
+Score parse/frontload/fidelity per title; connotation only where applicable.
+Score consistency across auth/upgrade siblings, variation across auth/upgrade/
+feedback siblings, separately for each model, arm, and repeat. Save judgments
+before revealing mappings. Published judgments include the revealed mappings
+and reasons. This is an AI rubric, not a human usability measurement.
+
+python build_report.py
+
+Build-report reads the recorded haiku.json, gemini.json, judgments.json and
+rubric.json and writes ../../arch/readable-title-evaluation.html. It does not
+make API calls. Source data is also embedded in the HTML for offline inspection.

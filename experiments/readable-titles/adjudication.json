@@ -1,0 +1,75 @@
+{
+  "stage": "After blinded scoring, before publication; arm mappings visible to adjudicator",
+  "adjudicator": "SmolPaws AI agent",
+  "changes": [
+    {
+      "id": "a054",
+      "before": {
+        "fidelity": "pass",
+        "reason": "Praising offline exposes the topic immediately and preserves the positive train-practice feedback."
+      },
+      "after": {
+        "fidelity": "fail",
+        "reason": "Praising the lessons assigns the agent an evaluative act instead of summarizing customers’ praise."
+      },
+      "reason": "Apply wrong-requested-work fidelity gate to changed praise attribution, as to investigate→fix."
+    },
+    {
+      "id": "a058",
+      "before": {
+        "fidelity": "pass",
+        "reason": "Praising offline exposes the topic immediately and preserves the positive train-practice feedback."
+      },
+      "after": {
+        "fidelity": "fail",
+        "reason": "Praising the lessons assigns the agent an evaluative act instead of summarizing customers’ praise."
+      },
+      "reason": "Apply wrong-requested-work fidelity gate to changed praise attribution, as to investigate→fix."
+    },
+    {
+      "id": "b016",
+      "before": {
+        "parse": "partial",
+        "reason": "Investigating login identifies the topic immediately, but the displayed password r... leaves the trigger unfinished."
+      },
+      "after": {
+        "parse": "pass",
+        "reason": "Investigating login failures remains clear; the truncated password-reset modifier loses detail without obscuring the task."
+      },
+      "reason": "Align identical request/title with a053: incomplete modifier alone is not an unclear core task."
+    },
+    {
+      "id": "b-g02",
+      "before": {
+        "consistent": "partial",
+        "variation": "partial",
+        "reason": "The upgrade pattern and packages remain clear, but only Pydantic drops Regression from equivalent testing requests."
+      },
+      "after": {
+        "consistent": "pass",
+        "variation": "pass",
+        "reason": "All use Upgrade plus package and testing; Tests is a compatible shortening of Regression Tests under the same rule used for Haiku."
+      },
+      "reason": "Apply compatible abbreviation consistently across both model sessions."
+    },
+    {
+      "id": "b-g05",
+      "before": {
+        "consistent": "partial",
+        "variation": "partial",
+        "reason": "The shared upgrade structure is clear, but only Pydantic specifies Regression for otherwise equivalent testing requests."
+      },
+      "after": {
+        "consistent": "pass",
+        "variation": "pass",
+        "reason": "All use Upgrade plus package and testing; Tests is a compatible shortening of Regression Tests under the same rule used for Haiku."
+      },
+      "reason": "Apply compatible abbreviation consistently across both model sessions."
+    }
+  ],
+  "clarifications": [
+    "Parse partial means an obscured core task or an unfinished core clause; a clipped modifier alone is not automatically partial. This distinction was clarified after scoring, not preregistered.",
+    "Tests and Regression Tests are compatible abbreviations in these equivalent upgrade requests for both models.",
+    "Praising lessons instead of summarizing customers’ praise fails requested-work fidelity."
+  ]
+}

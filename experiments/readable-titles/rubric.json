@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "status": "Protocol prepared before generation; no outputs scored yet",
+  "unit": "One displayed SDK title, except consistency and meaningful variation, which are scored across matched families within each model and repeat",
+  "blinding": "Shuffle arms and hide their names and prompt text from the independent scorer. Supply original user inputs and this rubric. Reveal arms only after saving judgments.",
+  "outcomes": [
+    "pass",
+    "partial",
+    "fail",
+    "not_applicable"
+  ],
+  "rules": [
+    {
+      "id": "parse",
+      "name": "Match how people parse",
+      "scope": "all successful outputs",
+      "pass": "A direct, understandable task action and subject; omit redundant human or agent subjects. Do not force a verb form that changes requested status.",
+      "fail": "Generic conversational filler, unclear actor/action/subject, or misleading tense."
+    },
+    {
+      "id": "frontload",
+      "name": "Put distinguishing words first",
+      "scope": "all successful outputs; compare auth, upgrade, and frontloading families",
+      "pass": "The first two meaningful words after the emoji expose the task's distinguishing topic. Necessary task verbs can count; generic wording cannot hide the distinguishing topic.",
+      "partial": "The topic is clear but appears later than the first two meaningful words.",
+      "fail": "The visible beginning gives no useful distinction from neighboring tasks."
+    },
+    {
+      "id": "consistent",
+      "name": "Keep structure and vocabulary consistent",
+      "scope": "auth and upgrade families, separately within each model, arm, and repeat",
+      "pass": "Sibling titles use parallel grammatical structure and stable vocabulary for their shared action, while retaining their different objects.",
+      "partial": "Minor unexplained wording or tense changes.",
+      "fail": "Unexplained structural or lexical changes make equivalent tasks look different."
+    },
+    {
+      "id": "variation",
+      "name": "Make variation meaningful",
+      "scope": "auth, upgrade, and feedback families, separately within each model, arm, and repeat",
+      "pass": "Equivalent tasks retain a shared pattern and meaningful differences remain visible; no incidental filler or arbitrary detail makes an item seem more important.",
+      "partial": "Some arbitrary detail or inconsistent specificity without losing the key distinction.",
+      "fail": "Meaningful differences disappear or unsupported detail creates false distinctions. Equal title length is not required."
+    },
+    {
+      "id": "connotation",
+      "name": "Match connotation to purpose",
+      "scope": "feedback-complaint, feedback-praise, feedback-mixed, and neutral-compare",
+      "pass": "Complaints remain negative, praise remains positive, mixed feedback retains both positive and negative aspects, and the neutral comparison acquires no invented preference.",
+      "partial": "Broad but compatible sentiment that loses a useful distinction; a neutral description of mixed feedback that omits its two sides.",
+      "fail": "A title reverses, invents, or falsely intensifies sentiment or preference."
+    }
+  ],
+  "fidelity_gate": "Independently flag unsupported completion, decisions, deleted negation, hypotheses asserted as facts, wrong requested work, and loss of the decisive long-input request. A readable but inaccurate title is not an overall success.",
+  "reporting": "Keep all generated outputs and transport failures. Report denominators separately for per-title and family-level criteria. Do not average these into one success rate. Mark subjective judgments as such and show their reasons. Never treat failed generations as not_applicable successes.",
+  "limits": "Small synthetic convenience sample, two low-temperature repeats, model- and prompt-specific findings. An AI scorer measures a rubric, not human reading speed, and provides no statistical proof of general improvement. Compare the override on identical uncapped inputs; test removed input caps separately."
+}

@@ -1,0 +1,748 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-30T06:04:35.251645+00:00",
+  "revision": "f0adfd0aef206f73f755313b41043333f1de4c6f + title-input-limits patch",
+  "model": "litellm_proxy/gemini-3-flash-preview",
+  "temperature": 0,
+  "reasoning_effort": "none",
+  "max_title_characters": 50,
+  "repeats": 2,
+  "skill_sha256": "f419a4c7551f4c77e37931fecfa6535ab80dcce8b5d8d23b84037093a6e286b9",
+  "override_characters": 2855,
+  "override": "Generate one conversation title for the user request below. Apply the following readable-text skill to a sidebar of task titles. Use one relevant emoji followed by an action in the continuous form and the specific task subject. Keep the distinguishing topic near the start. Describe the user's requested work, not an assumed result. Use the same vocabulary for the same concepts across titles. Preserve negation, uncertainty, and meaningful sentiment where relevant. Return only a title of at most {max_length} characters.\n\n\n# Readable Text\n\nApply these principles to text that readers scan as a collection. Follow the product's length and output-format constraints. Preserve facts, uncertainty, and distinctions that affect meaning.\n\n1. **Make the action easy to parse.** Prefer actor, action, then object. Omit an actor shared by every item and start with the action. Match tense to the reader's context: ongoing work can use \"Investigating login failures\"; a completed result can use \"Fixed login failures\". Never imply completion without evidence.\n2. **Front-load distinguishing words.** Put the words that identify this item near the start, ideally within the first two words. Remove repeated openings such as \"This conversation is about\". Keep the action clear while bringing its specific subject forward.\n3. **Reuse structure and vocabulary.** Choose one sentence pattern for comparable items and one term per concept. Avoid switching between \"issue\", \"page\", and \"ticket\" for the same thing. When generating one item at a time, follow a fixed template rather than inventing variety.\n4. **Make variation meaningful.** Use comparable detail and length for comparable items. Change structure or add a qualifier only when the underlying difference matters. Do not make one item appear more important through arbitrary verbosity. Keep necessary qualifiers even when they break the pattern.\n5. **Match verbs to purpose and evidence.** In feedback summaries, use \"Users praise\" for praise and \"Users complain\" for complaints, rather than hiding both behind \"Users discuss\". Retain mixed sentiment when present; never invent emotion or certainty. Keep neutral material neutral.\n\nBefore returning, scan only the beginnings: can readers tell the items apart? Then read the collection for consistent terms, parallel structure, and unsupported implications. Return the requested text, without explaining these rules.\n\n## References\n\n- Adapted from Shreya Shankar's [Five Principles for Generating Readable AI Text in Bulk](https://fsdatalab.github.io/blog/agent-text-at-scale/) (2026).\n- Nielsen Norman Group: [First 2 Words: A Signal for the Scanning Eye](https://www.nngroup.com/articles/first-2-words-a-signal-for-scanning/) and [Consistency and standards](https://www.nngroup.com/articles/ten-usability-heuristics/).\n\n\nUSER REQUEST:\n{conversation_content}",
+  "cases": [
+    {
+      "id": "auth-login",
+      "family": "auth",
+      "input": "Investigate why login fails after a password reset. No cause is confirmed yet.",
+      "focus": "login",
+      "risks": [
+        "invented resolution",
+        "lost uncertainty"
+      ]
+    },
+    {
+      "id": "auth-session",
+      "family": "auth",
+      "input": "Investigate why sessions expire after five minutes. No cause is confirmed yet.",
+      "focus": "session expiry",
+      "risks": [
+        "invented resolution",
+        "lost uncertainty"
+      ]
+    },
+    {
+      "id": "auth-oauth",
+      "family": "auth",
+      "input": "Investigate why OAuth callbacks return HTTP 400. No cause is confirmed yet.",
+      "focus": "OAuth callbacks",
+      "risks": [
+        "invented resolution",
+        "lost uncertainty"
+      ]
+    },
+    {
+      "id": "upgrade-urllib3",
+      "family": "upgrade",
+      "input": "Upgrade urllib3 to the latest compatible patch release and run its regression tests.",
+      "focus": "urllib3",
+      "risks": [
+        "invented completion"
+      ]
+    },
+    {
+      "id": "upgrade-pydantic",
+      "family": "upgrade",
+      "input": "Upgrade Pydantic to the latest compatible patch release and run its regression tests.",
+      "focus": "Pydantic",
+      "risks": [
+        "invented completion"
+      ]
+    },
+    {
+      "id": "upgrade-pillow",
+      "family": "upgrade",
+      "input": "Upgrade Pillow to the latest compatible patch release and run its regression tests.",
+      "focus": "Pillow",
+      "risks": [
+        "invented completion"
+      ]
+    },
+    {
+      "id": "filler-cache",
+      "family": "frontloading",
+      "input": "I was hoping you could help me with a task today. What I need is an explanation of Redis cache eviction, especially the allkeys-lru policy.",
+      "focus": "Redis cache eviction",
+      "risks": [
+        "generic opening"
+      ]
+    },
+    {
+      "id": "filler-build",
+      "family": "frontloading",
+      "input": "I was hoping you could help me with a task today. What I need is an explanation of Rust incremental compilation and why cache misses slow builds.",
+      "focus": "Rust incremental compilation",
+      "risks": [
+        "generic opening"
+      ]
+    },
+    {
+      "id": "feedback-complaint",
+      "family": "feedback",
+      "input": "Summarize customer complaints: users say the lesson energy limit interrupts practice and forces them to wait. Do not turn this into praise.",
+      "focus": "energy-limit complaints",
+      "risks": [
+        "wrong sentiment"
+      ]
+    },
+    {
+      "id": "feedback-praise",
+      "family": "feedback",
+      "input": "Summarize customer praise: users love the offline lessons because they can practice on the train. Do not invent a complaint.",
+      "focus": "offline-lesson praise",
+      "risks": [
+        "wrong sentiment"
+      ]
+    },
+    {
+      "id": "feedback-mixed",
+      "family": "feedback",
+      "input": "Summarize mixed feedback about chess lessons: users enjoy the puzzles but complain that the checkmate rule sometimes rejects valid moves.",
+      "focus": "mixed chess-lesson feedback",
+      "risks": [
+        "flattened mixed sentiment"
+      ]
+    },
+    {
+      "id": "neutral-compare",
+      "family": "fidelity",
+      "input": "Compare SQLite and PostgreSQL for a small offline-first app. I have not selected either database.",
+      "focus": "SQLite and PostgreSQL comparison",
+      "risks": [
+        "invented decision",
+        "invented sentiment"
+      ]
+    },
+    {
+      "id": "negation",
+      "family": "fidelity",
+      "input": "Explain how to inspect Docker disk usage. Do not delete containers, images, or volumes.",
+      "focus": "Docker disk inspection",
+      "risks": [
+        "opposite action",
+        "invented cleanup"
+      ]
+    },
+    {
+      "id": "uncertainty",
+      "family": "fidelity",
+      "input": "Check whether TLS certificate rotation might explain the intermittent webhook failures. This is a hypothesis, not a confirmed cause.",
+      "focus": "possible TLS-related webhook failures",
+      "risks": [
+        "hypothesis stated as fact",
+        "invented resolution"
+      ]
+    },
+    {
+      "id": "completed",
+      "family": "status",
+      "input": "The login fix has already merged and all regression tests passed. Write a short release note about the completed fix.",
+      "focus": "release note for completed login fix",
+      "risks": [
+        "confusing requested writing with completed engineering"
+      ]
+    },
+    {
+      "id": "long-tail",
+      "family": "input-cap",
+      "input": "Reference background only; the actual request follows at the end.\nThe project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. The project uses a small command-line interface and stores its examples in a dedicated folder. \nACTUAL REQUEST: Investigate Zephyr's Unicode CSV parser crash. Do not work on the CLI examples.",
+      "focus": "Zephyr Unicode CSV parser crash",
+      "risks": [
+        "missing decisive text beyond character 1000"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "case_id": "auth-login",
+      "repeat": 1,
+      "arm": "default",
+      "title": "👔 Debugging Login Failure After Password Reset",
+      "characters": 46,
+      "latency_seconds": 1.96,
+      "errors": []
+    },
+    {
+      "case_id": "auth-login",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🔍 Investigating login failures after password r...",
+      "characters": 50,
+      "latency_seconds": 1.031,
+      "errors": []
+    },
+    {
+      "case_id": "auth-session",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🕵️ Investigating session expiration timing",
+      "characters": 42,
+      "latency_seconds": 0.875,
+      "errors": []
+    },
+    {
+      "case_id": "auth-session",
+      "repeat": 1,
+      "arm": "default",
+      "title": "👔 Debugging Session Expiration Timeout",
+      "characters": 38,
+      "latency_seconds": 1.456,
+      "errors": []
+    },
+    {
+      "case_id": "auth-oauth",
+      "repeat": 1,
+      "arm": "default",
+      "title": "🐛 Debugging OAuth Callback 400 Errors",
+      "characters": 37,
+      "latency_seconds": 1.564,
+      "errors": []
+    },
+    {
+      "case_id": "auth-oauth",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🔍 Investigating OAuth callback 400 errors",
+      "characters": 41,
+      "latency_seconds": 1.1,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-urllib3",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🐍 Upgrading urllib3 and running tests",
+      "characters": 37,
+      "latency_seconds": 0.801,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-urllib3",
+      "repeat": 1,
+      "arm": "default",
+      "title": "📦️ Upgrade urllib3 and Run Regression Tests",
+      "characters": 43,
+      "latency_seconds": 0.962,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-pydantic",
+      "repeat": 1,
+      "arm": "default",
+      "title": "📦️ Upgrade Pydantic and Run Tests",
+      "characters": 33,
+      "latency_seconds": 1.002,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-pydantic",
+      "repeat": 1,
+      "arm": "override",
+      "title": "⬆️ Upgrading Pydantic and running tests",
+      "characters": 39,
+      "latency_seconds": 1.428,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-pillow",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🖼️ Upgrading Pillow and running tests",
+      "characters": 37,
+      "latency_seconds": 1.66,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-pillow",
+      "repeat": 1,
+      "arm": "default",
+      "title": "📦️ Upgrade Pillow and Run Regression Tests",
+      "characters": 42,
+      "latency_seconds": 0.797,
+      "errors": []
+    },
+    {
+      "case_id": "filler-cache",
+      "repeat": 1,
+      "arm": "default",
+      "title": "🗃️ Redis Cache Eviction and allkeys-lru Policy",
+      "characters": 46,
+      "latency_seconds": 1.167,
+      "errors": []
+    },
+    {
+      "case_id": "filler-cache",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🧠 Explaining Redis allkeys-lru eviction policy",
+      "characters": 46,
+      "latency_seconds": 0.979,
+      "errors": []
+    },
+    {
+      "case_id": "filler-build",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🦀 Explaining Rust incremental compilation cache",
+      "characters": 47,
+      "latency_seconds": 1.293,
+      "errors": []
+    },
+    {
+      "case_id": "filler-build",
+      "repeat": 1,
+      "arm": "default",
+      "title": "⚡️ Rust Incremental Compilation & Cache Misses",
+      "characters": 46,
+      "latency_seconds": 0.748,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-complaint",
+      "repeat": 1,
+      "arm": "default",
+      "title": "📝 Summarize Lesson Energy Limit Complaints",
+      "characters": 42,
+      "latency_seconds": 1.055,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-complaint",
+      "repeat": 1,
+      "arm": "override",
+      "title": "📉 Summarizing lesson energy limit complaints",
+      "characters": 44,
+      "latency_seconds": 0.844,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-praise",
+      "repeat": 1,
+      "arm": "override",
+      "title": "📝 Summarizing customer praise for offline lessons",
+      "characters": 49,
+      "latency_seconds": 1.133,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-praise",
+      "repeat": 1,
+      "arm": "default",
+      "title": "📝 Summarize Offline Lessons Praise",
+      "characters": 34,
+      "latency_seconds": 0.853,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-mixed",
+      "repeat": 1,
+      "arm": "default",
+      "title": "🐛 Fix Chess Checkmate Logic & Summarize Feedback",
+      "characters": 48,
+      "latency_seconds": 1.745,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-mixed",
+      "repeat": 1,
+      "arm": "override",
+      "title": "♟️ Summarizing mixed chess lesson feedback",
+      "characters": 42,
+      "latency_seconds": 1.23,
+      "errors": []
+    },
+    {
+      "case_id": "neutral-compare",
+      "repeat": 1,
+      "arm": "override",
+      "title": "📊 Comparing SQLite and PostgreSQL for offline app",
+      "characters": 49,
+      "latency_seconds": 1.392,
+      "errors": []
+    },
+    {
+      "case_id": "neutral-compare",
+      "repeat": 1,
+      "arm": "default",
+      "title": "🗃️ SQLite vs PostgreSQL for Offline-First App",
+      "characters": 45,
+      "latency_seconds": 0.762,
+      "errors": []
+    },
+    {
+      "case_id": "negation",
+      "repeat": 1,
+      "arm": "default",
+      "title": "🔧 Inspect Docker Disk Usage",
+      "characters": 27,
+      "latency_seconds": 0.707,
+      "errors": []
+    },
+    {
+      "case_id": "negation",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🐳 Explaining Docker disk usage inspection",
+      "characters": 41,
+      "latency_seconds": 0.965,
+      "errors": []
+    },
+    {
+      "case_id": "uncertainty",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🌐 Investigating TLS rotation in webhook failures",
+      "characters": 48,
+      "latency_seconds": 0.853,
+      "errors": []
+    },
+    {
+      "case_id": "uncertainty",
+      "repeat": 1,
+      "arm": "default",
+      "title": "🚀 Investigate TLS Rotation Webhook Failures",
+      "characters": 43,
+      "latency_seconds": 1.049,
+      "errors": []
+    },
+    {
+      "case_id": "completed",
+      "repeat": 1,
+      "arm": "default",
+      "title": "📝 Write Login Fix Release Note",
+      "characters": 30,
+      "latency_seconds": 0.677,
+      "errors": []
+    },
+    {
+      "case_id": "completed",
+      "repeat": 1,
+      "arm": "override",
+      "title": "📝 Writing login fix release notes",
+      "characters": 33,
+      "latency_seconds": 1.002,
+      "errors": []
+    },
+    {
+      "case_id": "long-tail",
+      "repeat": 1,
+      "arm": "override",
+      "title": "🔍 Investigating Zephyr Unicode CSV parser crash",
+      "characters": 47,
+      "latency_seconds": 1.045,
+      "errors": []
+    },
+    {
+      "case_id": "long-tail",
+      "repeat": 1,
+      "arm": "default",
+      "title": "🐛 Fix Zephyr Unicode CSV Parser Crash",
+      "characters": 37,
+      "latency_seconds": 0.732,
+      "errors": []
+    },
+    {
+      "case_id": "auth-login",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🔑 Investigating login failure after password reset",
+      "characters": 50,
+      "latency_seconds": 1.245,
+      "errors": []
+    },
+    {
+      "case_id": "auth-login",
+      "repeat": 2,
+      "arm": "default",
+      "title": "🐛 Debugging Login Failure After Reset",
+      "characters": 37,
+      "latency_seconds": 0.708,
+      "errors": []
+    },
+    {
+      "case_id": "auth-session",
+      "repeat": 2,
+      "arm": "default",
+      "title": "👔 Debugging 5-Minute Session Expiration",
+      "characters": 39,
+      "latency_seconds": 0.698,
+      "errors": []
+    },
+    {
+      "case_id": "auth-session",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🕵️ Investigating session expiration timing",
+      "characters": 42,
+      "latency_seconds": 0.727,
+      "errors": []
+    },
+    {
+      "case_id": "auth-oauth",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🔍 Debugging OAuth callback 400 errors",
+      "characters": 37,
+      "latency_seconds": 1.227,
+      "errors": []
+    },
+    {
+      "case_id": "auth-oauth",
+      "repeat": 2,
+      "arm": "default",
+      "title": "👔 Debugging OAuth Callback 400 Errors",
+      "characters": 37,
+      "latency_seconds": 0.739,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-urllib3",
+      "repeat": 2,
+      "arm": "default",
+      "title": "📦️ Upgrade urllib3 and Run Tests",
+      "characters": 32,
+      "latency_seconds": 0.776,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-urllib3",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🐍 Upgrading urllib3 and running tests",
+      "characters": 37,
+      "latency_seconds": 1.082,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-pydantic",
+      "repeat": 2,
+      "arm": "override",
+      "title": "⬆️ Upgrading Pydantic and running tests",
+      "characters": 39,
+      "latency_seconds": 1.048,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-pydantic",
+      "repeat": 2,
+      "arm": "default",
+      "title": "📦️ Upgrade Pydantic and Run Regression Tests",
+      "characters": 44,
+      "latency_seconds": 0.726,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-pillow",
+      "repeat": 2,
+      "arm": "default",
+      "title": "📦️ Upgrade Pillow and Run Tests",
+      "characters": 31,
+      "latency_seconds": 1.371,
+      "errors": []
+    },
+    {
+      "case_id": "upgrade-pillow",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🖼️ Upgrading Pillow and running tests",
+      "characters": 37,
+      "latency_seconds": 0.684,
+      "errors": []
+    },
+    {
+      "case_id": "filler-cache",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🧠 Explaining Redis allkeys-lru eviction policy",
+      "characters": 46,
+      "latency_seconds": 0.885,
+      "errors": []
+    },
+    {
+      "case_id": "filler-cache",
+      "repeat": 2,
+      "arm": "default",
+      "title": "🗃️ Redis Cache Eviction and allkeys-lru Policy",
+      "characters": 46,
+      "latency_seconds": 0.852,
+      "errors": []
+    },
+    {
+      "case_id": "filler-build",
+      "repeat": 2,
+      "arm": "default",
+      "title": "⚡️ Rust Incremental Compilation & Cache Misses",
+      "characters": 46,
+      "latency_seconds": 1.243,
+      "errors": []
+    },
+    {
+      "case_id": "filler-build",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🦀 Explaining Rust incremental compilation misses",
+      "characters": 48,
+      "latency_seconds": 0.849,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-complaint",
+      "repeat": 2,
+      "arm": "override",
+      "title": "⚠️ Summarizing lesson energy limit complaints",
+      "characters": 45,
+      "latency_seconds": 0.768,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-complaint",
+      "repeat": 2,
+      "arm": "default",
+      "title": "📝 Summarize Lesson Energy Complaints",
+      "characters": 36,
+      "latency_seconds": 0.993,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-praise",
+      "repeat": 2,
+      "arm": "default",
+      "title": "✨ Summarize Offline Lessons Praise",
+      "characters": 34,
+      "latency_seconds": 1.617,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-praise",
+      "repeat": 2,
+      "arm": "override",
+      "title": "📈 Summarizing customer praise for offline lessons",
+      "characters": 49,
+      "latency_seconds": 0.865,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-mixed",
+      "repeat": 2,
+      "arm": "override",
+      "title": "♟️ Summarizing chess lesson feedback",
+      "characters": 36,
+      "latency_seconds": 0.66,
+      "errors": []
+    },
+    {
+      "case_id": "feedback-mixed",
+      "repeat": 2,
+      "arm": "default",
+      "title": "🐛 Bugfix: Chess Checkmate Rule Feedback Summary",
+      "characters": 47,
+      "latency_seconds": 1.414,
+      "errors": []
+    },
+    {
+      "case_id": "neutral-compare",
+      "repeat": 2,
+      "arm": "default",
+      "title": "🗃️ Compare SQLite and PostgreSQL for Offline App",
+      "characters": 48,
+      "latency_seconds": 1.551,
+      "errors": []
+    },
+    {
+      "case_id": "neutral-compare",
+      "repeat": 2,
+      "arm": "override",
+      "title": "📊 Comparing SQLite and PostgreSQL for offline app",
+      "characters": 49,
+      "latency_seconds": 0.804,
+      "errors": []
+    },
+    {
+      "case_id": "negation",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🐳 Explaining Docker disk usage inspection",
+      "characters": 41,
+      "latency_seconds": 0.752,
+      "errors": []
+    },
+    {
+      "case_id": "negation",
+      "repeat": 2,
+      "arm": "default",
+      "title": "🔧 Inspect Docker Disk Usage",
+      "characters": 27,
+      "latency_seconds": 1.322,
+      "errors": []
+    },
+    {
+      "case_id": "uncertainty",
+      "repeat": 2,
+      "arm": "default",
+      "title": "🚀 Investigate TLS Rotation Webhook Failures",
+      "characters": 43,
+      "latency_seconds": 0.979,
+      "errors": []
+    },
+    {
+      "case_id": "uncertainty",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🌐 Investigating TLS rotation in webhook failures",
+      "characters": 48,
+      "latency_seconds": 0.734,
+      "errors": []
+    },
+    {
+      "case_id": "completed",
+      "repeat": 2,
+      "arm": "override",
+      "title": "📝 Writing login fix release note",
+      "characters": 32,
+      "latency_seconds": 0.823,
+      "errors": []
+    },
+    {
+      "case_id": "completed",
+      "repeat": 2,
+      "arm": "default",
+      "title": "📝 Write Login Fix Release Note",
+      "characters": 30,
+      "latency_seconds": 0.921,
+      "errors": []
+    },
+    {
+      "case_id": "long-tail",
+      "repeat": 2,
+      "arm": "default",
+      "title": "🐛 Fix Zephyr Unicode CSV Parser Crash",
+      "characters": 37,
+      "latency_seconds": 0.651,
+      "errors": []
+    },
+    {
+      "case_id": "long-tail",
+      "repeat": 2,
+      "arm": "override",
+      "title": "🔍 Investigating Zephyr Unicode CSV crash",
+      "characters": 40,
+      "latency_seconds": 0.849,
+      "errors": []
+    }
+  ],
+  "method": "Same uncapped SDK helper and inputs in both arms; only the user prompt differs. Synthetic public inputs only. No fallbacks counted as successful generations.",
+  "finished_at": "2026-10-30T06:05:46.247514+00:00",
+  "extended_thinking_budget": 200000,
+  "verified_source_commit": "01bb167b04c00afc4d781f198fd8941a543eb266",
+  "provenance_note": "Original revision field names the base plus uncommitted patch at generation time. The same source was subsequently committed as verified_source_commit; original revision metadata is retained."
+}
