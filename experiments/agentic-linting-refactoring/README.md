@@ -1712,3 +1712,24 @@ CI follow-up: first run passed9615tests and failed one existing class-string ass
 
 
 Final readiness checkpoint 2026-10-28T09:46:35.439669+00:00: #19052 at `ce4225a63a3b8d152968e5bddc8ecc5c37f86721` has **8 effective CI checks passed / 6 skipped**, and all-hands-bot review is requested and verified. The100-test/seven-file focused run and full local lint/typecheck pass. Current readiness supersedes the earlier rerun notes; captured535a4b0f3d and immutable refreshed asset8349628d1c remain unchanged.
+
+## Area pages · 30 October 2026
+
+The original `arch/agentic-linting-refactoring.html` is now a short overview.
+Film players and proposal entries live in `arch/agentic-linting-{home,chat,files,settings,backends,automations,rules}.html`.
+`arch/agentic-linting-notes.html` retains shared recording context and historical batch notes.
+Each page has previous/next navigation and links to the other areas. All 50 original players, 100 MP4 download links and their immutable evidence are retained.
+
+Add future films and entries to their owning area page; link PRs directly to that page's film anchor.
+Preserve existing section and player IDs. Then run:
+
+```sh
+node scripts/build-agentic-linting-navigation.mjs
+node scripts/build-agentic-linting-navigation.mjs --check
+```
+
+The area HTML is the source of truth for the generated compatibility router.
+Old `agentic-linting-refactoring.html#...` PR links redirect to the same section in its new area.
+Without JavaScript, the overview provides direct links at the old fragment IDs.
+Media files remain in this directory; their content and provenance are unchanged by pagination.
+The root `progress.json` remains the dated machine-readable lifecycle record.
