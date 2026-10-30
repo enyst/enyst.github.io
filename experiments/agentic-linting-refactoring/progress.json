@@ -1,7 +1,7 @@
 {
-  "checkedAt": "2026-10-30T04:21:10.944591+00:00",
+  "checkedAt": "2026-10-30T13:56:41.838973+00:00",
   "displayTimeZone": "Europe/Stockholm",
-  "main": "5e8052347cc021b7657abc7f30828dead944a683",
+  "main": "940dc61587e31f2625d6a59e07d70340878031d2",
   "shadcnLintVersion": "0.2.1",
   "pullRequests": [
     {
@@ -9446,12 +9446,12 @@
     {
       "number": 19107,
       "title": "refactor: name floating menu layers and icon strokes",
-      "state": "OPEN",
+      "state": "MERGED",
       "draft": false,
       "url": "https://github.com/OpenHands/OpenHands/pull/19107",
       "headRefOid": "6a80e0263aea593a38be1eb6abeb5f92ea33ba2d",
       "baseRefOid": "5e8052347cc021b7657abc7f30828dead944a683",
-      "checkedAt": "2026-10-30T04:21:10.944591+00:00",
+      "checkedAt": "2026-10-30T13:56:41.838973+00:00",
       "issue": 19106,
       "latestChecks": [
         {
@@ -9539,10 +9539,8 @@
           "state": "SKIPPED"
         }
       ],
-      "reviewDecision": "REVIEW_REQUIRED",
-      "requestedReviewers": [
-        "all-hands-bot"
-      ],
+      "reviewDecision": "APPROVED",
+      "requestedReviewers": [],
       "verification": {
         "base": "5e8052347cc021b7657abc7f30828dead944a683",
         "head": "6a80e0263aea593a38be1eb6abeb5f92ea33ba2d",
@@ -9786,7 +9784,7 @@
           "stdout": "https://github.com/OpenHands/OpenHands/pull/19107\n",
           "stderr": ""
         },
-        "readiness": "Ready; eight checks pass/six skip; bot review requested after green CI.",
+        "readiness": "Merged30October2026 as940dc61587 after green CI and bot approval; original source/evidence retained.",
         "liveNotebook": {
           "contentCommit": "97858308c9489c06768f7dfa875879c520ef182e",
           "fullHashFilesVerified": 18,
@@ -9794,6 +9792,424 @@
           "downloadBytes": 3018023,
           "downloadMatchesOriginal": true,
           "phoneNavigationAndOldAnchorRedirect": true
+        }
+      },
+      "mergeCommit": {
+        "oid": "940dc61587e31f2625d6a59e07d70340878031d2"
+      },
+      "mergedAt": "2026-10-30T13:22:36Z",
+      "reviews": [
+        {
+          "id": "PRR_kwDOLfkiw88AAAABVDxPVw",
+          "author": {
+            "login": "all-hands-bot"
+          },
+          "authorAssociation": "MEMBER",
+          "body": "_This review was posted by an AI agent (OpenHands)._\n\nFresh review of head `6a80e0263aea593a38be1eb6abeb5f92ea33ba2d` (unchanged; no prior reviews existed). This is a Canvas UI change and belongs in this repository per the ownership table in `AGENTS.md`; linked issue #19106 is open with `enhancement`, `priority:low`, `ready-for-dev` and matches the PR's scope.\n\n**What the diff does:** nine one-line class substitutions (six z-index: `z-[200]`\u2192`z-200`, `z-[9999]`\u2192`z-9999` in the card context menu, tag-chips popover, Overview menu, tabs menu, Skills pill-row popover, and the shared tooltip; three Skills icon strokes `stroke-[1.75]`\u2192`context-menu-icon-stroke`), plus an append-only `@utility context-menu-icon-stroke` in `src/tailwind.css` and two focused contract tests. No dependency, API, or behavior changes.\n\n**Verification performed in the workspace:**\n- Both changed test suites pass at this head (15/15, including the new `keeps the Skills icon's unitless stroke in the rendered menu` and the extended scoped-library-stylesheet test asserting `z-index: 200`, `z-index: 9999`, and `stroke-width: 1.75px`).\n- `tailwind-merge@3.7.0` treats `z-200`/`z-9999` exactly like the old arbitrary values (`twMerge('z-9999','z-50') === twMerge('z-[9999]','z-50')` and same for `z-200`), so override behavior is preserved as claimed.\n- All three Skills-icon consumers (Tools menu, card context menu, name context menu) now use the named utility; the remaining `stroke-[2.5]` in `circle-plus-check-toggle.tsx` is a different icon and correctly untouched. All six z-index sites were located in the diff.\n- `tsc --noEmit` passes; ESLint on every changed source file reports 0 errors and no `stroke-[1.75]`/`z-[...]` warnings on the touched lines (remaining warnings in those files are pre-existing, out-of-scope values not among the nine findings).\n- The `prettier --check` complaint on `src/tailwind.css` reproduces identically at base `5e80523` and is unreachable by the repo lint script (which checks only `*.{ts,tsx}`), so it is pre-existing and not introduced here. Full `npm run lint` was re-run step-by-step because the combined pipeline OOMs in this 16 GB review container; each step (react-router typegen, tsc, ESLint, prettier on changed files) was verified independently instead. CI on this exact head shows test-and-build green on ubuntu and windows plus all workflow checks green or intentionally skipped.\n\n**Acceptance criteria checklist (issue #19106):**\n- Replace the six repeated z-index arbitrary values with standard `z-200`/`z-9999` utilities \u2014 met (verified via compiled-recipe assertions and tailwind-merge equality).\n- Give the unitless 1.75 menu-icon stroke one named CSS owner \u2014 met (`context-menu-icon-stroke` in `src/tailwind.css`; Tailwind does not emit `stroke-1.75` natively, so a utility is the right owner).\n- Preserve appearance and interactions \u2014 supported by the compiled-CSS equality assertions, the real rendered-icon computed-style test, and the PR's paired live-state evidence (16 states / 600 computed fields / 0 differences, video and screenshots linked, real Local Canvas stack, no mocks for the live pass).\n- Extend build/verification coverage \u2014 met (scoped library stylesheet test extended; rendered-consumer test added).\n\nThe change is minimal, append-only in CSS, contract-tested at both the compiled and rendered levels, and CI is green on the exact head. No material correctness, security, compatibility, or architecture findings.\n\n\u2705 APPROVED\n",
+          "submittedAt": "2026-10-30T04:50:11Z",
+          "includesCreatedEdit": false,
+          "reactionGroups": [],
+          "state": "APPROVED",
+          "commit": {
+            "oid": "6a80e0263aea593a38be1eb6abeb5f92ea33ba2d"
+          }
+        }
+      ]
+    },
+    {
+      "number": 19120,
+      "title": "refactor: name shared menu geometry and label recipes",
+      "state": "OPEN",
+      "draft": false,
+      "url": "https://github.com/OpenHands/OpenHands/pull/19120",
+      "headRefOid": "ded09edd7712c84dd6cf7a67625a30f8a21415f1",
+      "baseRefOid": "940dc61587e31f2625d6a59e07d70340878031d2",
+      "checkedAt": "2026-10-30T13:56:41.838973+00:00",
+      "issue": 19118,
+      "latestChecks": [
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067103783/job/124101339126",
+          "name": "pr-title / Apply conventional-type label",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pending",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102024/job/124101320119",
+          "name": "test-and-build (windows)",
+          "state": "IN_PROGRESS"
+        },
+        {
+          "bucket": "pending",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102024/job/124101320219",
+          "name": "test-and-build (ubuntu)",
+          "state": "IN_PROGRESS"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102320/job/124101326864",
+          "name": "Consolidate Build Information",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067103783/job/124101273366",
+          "name": "pr-title / Lint PR title (conventional)",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067101939/job/124101267026",
+          "name": "Validate PR description",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067101870/job/124101267249",
+          "name": "Verify skill isolation",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102019/job/124101267671",
+          "name": "check-pr-artifacts",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "pass",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102024/job/124101265487",
+          "name": "prepare-test-matrix",
+          "state": "SUCCESS"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102024/job/124101267815",
+          "name": "live-e2e",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102320/job/124101267994",
+          "name": "Merge Multi-Arch Manifests",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102019/job/124101269619",
+          "name": "cleanup-after-merge",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102320/job/124101269139",
+          "name": "Build & Push (${{ matrix.arch }})",
+          "state": "SKIPPED"
+        },
+        {
+          "bucket": "skipping",
+          "link": "https://github.com/OpenHands/OpenHands/actions/runs/41067102320/job/124101270566",
+          "name": "Update PR description with Docker image",
+          "state": "SKIPPED"
+        }
+      ],
+      "reviewDecision": "REVIEW_REQUIRED",
+      "requestedReviewers": [],
+      "verification": {
+        "base": "940dc61587e31f2625d6a59e07d70340878031d2",
+        "head": "ded09edd7712c84dd6cf7a67625a30f8a21415f1",
+        "captureTool": "Unmodified control-openhands; real standalone Local Canvas; installed Google Chrome",
+        "canvas": "1.34.0",
+        "agentServer": "1.59.0",
+        "automation": "1.26.1",
+        "node": "24.22.1",
+        "npm": "11.12.1",
+        "publicSkills": "0.36.0",
+        "dependencyInstall": "npm ci replays unchanged committed package-lock.json",
+        "model": "DeepSeek Flash profile configured from authorized Keychain credential; validation skipped; no message, ActionEvent or model invocation",
+        "viewports": {
+          "desktop": [
+            1440,
+            1000
+          ],
+          "phone": [
+            390,
+            844
+          ]
+        },
+        "coverage": [
+          "Home agent/LLM profile pickers, Tools and profile/Macros submenus",
+          "Local launch picker and layout/filter menu, empty desktop tag filter",
+          "Conversation card clamp, metadata and tag overflow grid",
+          "Actual installed public skill pill overflow",
+          "Conversation header Git-actions menu, without invoking actions",
+          "Automation Add menu and current match-trigger-width backend selector"
+        ],
+        "limits": [
+          "Selected menu, metadata and text computed fields only, not whole-page pixel identity.",
+          "Phone viewport uses Chrome mouse/pointer, not touch hardware.",
+          "Phone profile submenu already extends beyond the viewport; clipping is preserved, not fixed.",
+          "Phone agent-profile pill is intentionally hidden; its submenu remains reachable through Tools.",
+          "Cloud/provider-only branches, intrinsic-width public Dropdown cap, and some inactive menu details have compiler or unit coverage only.",
+          "Default OpenHands-Neutral theme only; authenticated Cloud, live ACP, embedded host and model execution are not claimed.",
+          "Source AST normalization covers all18 source files and32 class values;36 app/library CSS contracts preserve exact units/scope. Only explicit calc(1 * -1) arithmetic is normalized, and both actual measuring layers compute to -1.",
+          "31 reported arbitrary-value findings plus one unreported metadata-chip font declaration migrate to named owners and existing numeric z utilities. State, routing, portals, callbacks, colors, APIs and dependencies are unchanged.",
+          "Exploratory backend-selector click toggled its hover-open menu closed, and an outside phone click closed the drawer. Those recordings were discarded; canonical successful receipt paths select desktop and repeated phone captures.",
+          "Four complete native recordings and48 genuine screenshots retained byte-for-byte. Film holds real stills with editorial labels and quiet original chord ambience.",
+          "Browser recording is sampled native footage; controller time between commands is not wall-clock timing evidence.",
+          "Both owned stacks stopped/private-purged; all ten owned ports refuse connections; temporary credential copy removed."
+        ],
+        "builds": {
+          "before": {
+            "revision": "940dc61587e31f2625d6a59e07d70340878031d2",
+            "buildId": "ce086313610a238d",
+            "builtThisRun": true,
+            "pins": {
+              "agentServer": "1.59.0",
+              "agentCanvas": "1.34.0",
+              "automation": "1.26.1"
+            }
+          },
+          "after": {
+            "revision": "ded09edd7712c84dd6cf7a67625a30f8a21415f1",
+            "buildId": "5007432fc9a33962",
+            "builtThisRun": true,
+            "pins": {
+              "agentServer": "1.59.0",
+              "agentCanvas": "1.34.0",
+              "automation": "1.26.1"
+            }
+          }
+        },
+        "film": {
+          "durationSeconds": 159.44,
+          "sha256": "7e9b29a54b6162c29197260c68d1811117f966bf8732070d91c7b86bfb715fe5",
+          "audio": "Original quiet synthesized chord ambience",
+          "encoding": "H.264/yuv420p,25fps,AAC,fast start"
+        },
+        "originals": {
+          "menu-geometry-evidence/after/desktop-agent-profile.png": {
+            "bytes": 103428,
+            "sha256": "7812ddfc232a1e9ba521a5dd4dd12d64dcf7b640869931723ec736cf3d158d13"
+          },
+          "menu-geometry-evidence/after/desktop-automation-add.png": {
+            "bytes": 121394,
+            "sha256": "0ec3fc5db613c1ff72ba552a6eb58cf247ac656f84f66dd54ef8a4344b617e0b"
+          },
+          "menu-geometry-evidence/after/desktop-backend.png": {
+            "bytes": 88723,
+            "sha256": "9900628bc803161d8658e6f9cc2346f2c48bbbba21501a0821a88007f302385d"
+          },
+          "menu-geometry-evidence/after/desktop-card.png": {
+            "bytes": 81133,
+            "sha256": "610edb2cd96d3f2866c4ab802159f6ef48d8e3c632b49cbb354a0b442bc7262a"
+          },
+          "menu-geometry-evidence/after/desktop-flow.mp4": {
+            "bytes": 746488,
+            "sha256": "3d29bda0031567d03e6876b193e35ecbb72aae3aea8caa242390d7d496bfb20f"
+          },
+          "menu-geometry-evidence/after/desktop-git-actions.png": {
+            "bytes": 76836,
+            "sha256": "8a519fb99f052ae90fe09d229c86cee7d3fb3bdc716627b0d77eea8d65531042"
+          },
+          "menu-geometry-evidence/after/desktop-launch.png": {
+            "bytes": 70999,
+            "sha256": "e327fd8ba8e72c4f35c1d69760b0db1bc4abb668f1c8cfb921300f633e5692c6"
+          },
+          "menu-geometry-evidence/after/desktop-layouts.png": {
+            "bytes": 78306,
+            "sha256": "b35cec64f23f428254b2152a3064699304be6b3941cc702332716017a3543ec6"
+          },
+          "menu-geometry-evidence/after/desktop-llm-profile.png": {
+            "bytes": 107002,
+            "sha256": "f1970c5780bf5c14f13071aeff363de82c0472e8a9d54f056acc90272fdf22fb"
+          },
+          "menu-geometry-evidence/after/desktop-macros.png": {
+            "bytes": 110640,
+            "sha256": "17db443455caf12dd54c80407d15c57d964c9bc52bd06d50074dac39d784360d"
+          },
+          "menu-geometry-evidence/after/desktop-profile-submenu.png": {
+            "bytes": 107344,
+            "sha256": "f23c40b3676d2fe6a277dda08c65be60983d2dd886f9535cfff158ca2fad0881"
+          },
+          "menu-geometry-evidence/after/desktop-skills.png": {
+            "bytes": 169630,
+            "sha256": "8cad7bb30a767d08802890036ee564a021903da7ff31f539e97ae994ee359517"
+          },
+          "menu-geometry-evidence/after/desktop-tags.png": {
+            "bytes": 74346,
+            "sha256": "396fb2070163902a105b0766cb8f426d096cd43795faf9537090fa7bd4d3b91f"
+          },
+          "menu-geometry-evidence/after/desktop-tools.png": {
+            "bytes": 105386,
+            "sha256": "dd5c2d25bb59d719ab725fc8ca4cb4b5d4494401e8e2d374b9861ecd2bceae51"
+          },
+          "menu-geometry-evidence/after/phone-automation-add.png": {
+            "bytes": 51194,
+            "sha256": "77e00dc214b28bed04dc241972fefb0e2cd5d41c66c25ef932b74bd9206a6f7f"
+          },
+          "menu-geometry-evidence/after/phone-backend.png": {
+            "bytes": 27833,
+            "sha256": "721d32bde2177ce8aa3ce34ef66d5f82ac0633bc16bfdfdfef4e82a40076e2e8"
+          },
+          "menu-geometry-evidence/after/phone-card.png": {
+            "bytes": 49562,
+            "sha256": "5c6b8d4b6ff6a751628d7fee060f1e895850338691c9741f5dbbf99624f4df9c"
+          },
+          "menu-geometry-evidence/after/phone-flow.mp4": {
+            "bytes": 399765,
+            "sha256": "e9b4a522563a5fe8062401aa9f0606076a5b7b7bee8f4144365c91530a961839"
+          },
+          "menu-geometry-evidence/after/phone-git-actions.png": {
+            "bytes": 30823,
+            "sha256": "5567f71b9ab984956ce20ea9bc750801e5607fd2f609f4da2171ef34499cafc2"
+          },
+          "menu-geometry-evidence/after/phone-launch.png": {
+            "bytes": 40678,
+            "sha256": "2cede979aa3cba2140b8d062a94195b4a3d34561d9de64f5a23b58ee8fd2f9f8"
+          },
+          "menu-geometry-evidence/after/phone-layouts.png": {
+            "bytes": 40610,
+            "sha256": "d35e9ae04ada7230633239f5893c8b1f58afb8af0ac1740a3cc5b74fb2f9fa99"
+          },
+          "menu-geometry-evidence/after/phone-llm-profile.png": {
+            "bytes": 35630,
+            "sha256": "3012957e43a044712a48549a72d7ef3679bb5deef19e7efa8e6c4adf2cbde2f7"
+          },
+          "menu-geometry-evidence/after/phone-profile-submenu.png": {
+            "bytes": 37381,
+            "sha256": "383ce07724f6bc5564e7fff19bee24c9e440b5687efbfd52fd7e1fde836ef4a7"
+          },
+          "menu-geometry-evidence/after/phone-skills.png": {
+            "bytes": 53340,
+            "sha256": "2355a4a588a25fcc5d03e2de42627a795a236b79f3e4324c12c7245c3dfe52be"
+          },
+          "menu-geometry-evidence/after/phone-tags.png": {
+            "bytes": 43438,
+            "sha256": "75093bbecf065ef2d74d980bfdaf3220d601595be6d8ad10c1019175ea9a7ab8"
+          },
+          "menu-geometry-evidence/after/phone-tools.png": {
+            "bytes": 36005,
+            "sha256": "3f7e47ce720b81c2658ad09f632c928134a12ba292290d45273ce6794110c79d"
+          },
+          "menu-geometry-evidence/before/desktop-agent-profile.png": {
+            "bytes": 103441,
+            "sha256": "85c60f75480b86e8b27a99d7e84cbec9d46bf2f453138b3acae28045f4ae63c0"
+          },
+          "menu-geometry-evidence/before/desktop-automation-add.png": {
+            "bytes": 121404,
+            "sha256": "01ed01fde270d4674c01eb0df5f6704d0c87411f08376d4325aa3688a2899f60"
+          },
+          "menu-geometry-evidence/before/desktop-backend.png": {
+            "bytes": 88723,
+            "sha256": "9900628bc803161d8658e6f9cc2346f2c48bbbba21501a0821a88007f302385d"
+          },
+          "menu-geometry-evidence/before/desktop-card.png": {
+            "bytes": 80328,
+            "sha256": "2923e035d39d604604671d9c40a163a8e6b6c837090d44549c25f05424f8de70"
+          },
+          "menu-geometry-evidence/before/desktop-flow.mp4": {
+            "bytes": 485821,
+            "sha256": "a74b61f8ad58d1391ac73fb2a04cfed681078d80294e7df746de80cf350607a2"
+          },
+          "menu-geometry-evidence/before/desktop-git-actions.png": {
+            "bytes": 76685,
+            "sha256": "12b4ccf69d22cfa91998f2cd97e56cbd1c5aec6c3b3614bc2f6d57cc1a5edd20"
+          },
+          "menu-geometry-evidence/before/desktop-launch.png": {
+            "bytes": 70998,
+            "sha256": "4e8fad816732810220a60c0a4e5d9c3ade32cafe0ecf6f45ba3083a133af1b36"
+          },
+          "menu-geometry-evidence/before/desktop-layouts.png": {
+            "bytes": 78303,
+            "sha256": "ab958f208b8d07978ead907e65d261662a2282ea0c605f18c5870170be91725d"
+          },
+          "menu-geometry-evidence/before/desktop-llm-profile.png": {
+            "bytes": 107096,
+            "sha256": "accafe25361c2d29af223cfc5931b9290e3917f213cfc68f34dfeb5e97eacbcd"
+          },
+          "menu-geometry-evidence/before/desktop-macros.png": {
+            "bytes": 110643,
+            "sha256": "50246384a43bc42c29617b30e6a1d4972dafca3ffebe15d89d9df2837abd753d"
+          },
+          "menu-geometry-evidence/before/desktop-profile-submenu.png": {
+            "bytes": 107353,
+            "sha256": "bbff82ce07cf9df75c74564d2233af94e9bb29204c0573ab0a86211084d73662"
+          },
+          "menu-geometry-evidence/before/desktop-skills.png": {
+            "bytes": 169648,
+            "sha256": "07b37423bf6b57227d4aefbdec763d04fba7d147a4a8348aea8df1bd68f73a0d"
+          },
+          "menu-geometry-evidence/before/desktop-tags.png": {
+            "bytes": 74344,
+            "sha256": "411f4b790bd9d6d35bcb1d27de81ce5b69fe2769bcad91c5c0ecee06a479f6bd"
+          },
+          "menu-geometry-evidence/before/desktop-tools.png": {
+            "bytes": 105393,
+            "sha256": "801c300eef77199f182dc7ac66a882a27818f5b2a7dc7be59f7440d1383eca33"
+          },
+          "menu-geometry-evidence/before/phone-automation-add.png": {
+            "bytes": 51198,
+            "sha256": "183d659724675dc7af402e9d7c8e0a447f7da61dff00402b8dcf0e99d8498d78"
+          },
+          "menu-geometry-evidence/before/phone-backend.png": {
+            "bytes": 27609,
+            "sha256": "b54b7d1c67ce01a293cf9c7bf186260267f5fac0b626f4e10130008818d48779"
+          },
+          "menu-geometry-evidence/before/phone-card.png": {
+            "bytes": 49562,
+            "sha256": "5c6b8d4b6ff6a751628d7fee060f1e895850338691c9741f5dbbf99624f4df9c"
+          },
+          "menu-geometry-evidence/before/phone-flow.mp4": {
+            "bytes": 425659,
+            "sha256": "52af96ed683052c03f2c29f4be5d3f8248c28bdb5b5838fb899c2fad87bd6026"
+          },
+          "menu-geometry-evidence/before/phone-git-actions.png": {
+            "bytes": 30823,
+            "sha256": "5567f71b9ab984956ce20ea9bc750801e5607fd2f609f4da2171ef34499cafc2"
+          },
+          "menu-geometry-evidence/before/phone-launch.png": {
+            "bytes": 40565,
+            "sha256": "75378c39185fcb620ef793258c68e8c0aaea405b1b705e3032716e1c15b18cc1"
+          },
+          "menu-geometry-evidence/before/phone-layouts.png": {
+            "bytes": 40610,
+            "sha256": "d35e9ae04ada7230633239f5893c8b1f58afb8af0ac1740a3cc5b74fb2f9fa99"
+          },
+          "menu-geometry-evidence/before/phone-llm-profile.png": {
+            "bytes": 35630,
+            "sha256": "3012957e43a044712a48549a72d7ef3679bb5deef19e7efa8e6c4adf2cbde2f7"
+          },
+          "menu-geometry-evidence/before/phone-profile-submenu.png": {
+            "bytes": 37381,
+            "sha256": "383ce07724f6bc5564e7fff19bee24c9e440b5687efbfd52fd7e1fde836ef4a7"
+          },
+          "menu-geometry-evidence/before/phone-skills.png": {
+            "bytes": 53340,
+            "sha256": "2355a4a588a25fcc5d03e2de42627a795a236b79f3e4324c12c7245c3dfe52be"
+          },
+          "menu-geometry-evidence/before/phone-tags.png": {
+            "bytes": 43438,
+            "sha256": "75093bbecf065ef2d74d980bfdaf3220d601595be6d8ad10c1019175ea9a7ab8"
+          },
+          "menu-geometry-evidence/before/phone-tools.png": {
+            "bytes": 36005,
+            "sha256": "3f7e47ce720b81c2658ad09f632c928134a12ba292290d45273ce6794110c79d"
+          }
+        },
+        "validation": {
+          "focusedTests": 206,
+          "existingTodos": 6,
+          "files": 16,
+          "lintWarningsBefore": 375,
+          "lintWarningsAfter": 344,
+          "lintErrors": 0,
+          "typecheck": true,
+          "appBuild": true,
+          "libraryAndDeclarationsBuild": true,
+          "pairedLiveStates": 24,
+          "comparedLiveFields": 1963,
+          "observedDifferences": 0,
+          "browserErrors": 0
         }
       }
     }
@@ -12348,6 +12764,30 @@
       },
       "source": "main-lint-audit-2026-10-30-5e8052347c.json",
       "sourceSha256": "e9b3c2ecccec8d8d47f3d194dff0e3c4e2e1b117e3f0eb08eadf44b6680a556c"
+    },
+    {
+      "completedAt": "2026-10-30T13:52:28.031470+00:00",
+      "sourceCommit": "940dc61587e31f2625d6a59e07d70340878031d2",
+      "command": "npm exec -- eslint src --format json",
+      "warnings": 375,
+      "errors": 0,
+      "shadcnLintVersion": "0.2.1",
+      "rules": {
+        "shadcn/no-arbitrary-values": {
+          "warnings": 306,
+          "files": 153
+        },
+        "shadcn/no-inline-styles": {
+          "warnings": 51,
+          "files": 32
+        },
+        "shadcn/no-raw-colors": {
+          "warnings": 18,
+          "files": 4
+        }
+      },
+      "note": "Fresh merged-main audit. Menu geometry proposal at ded09edd77 separately measures344warnings/0errors; no combined main claim.",
+      "source": "main-lint-audit-2026-10-30-940dc61587.json"
     }
   ],
   "relatedWork": {
@@ -13909,21 +14349,21 @@
     }
   ],
   "currentCohortCounts": {
-    "total": 64,
-    "merged": 61,
+    "total": 65,
+    "merged": 62,
     "openNonDraft": 3,
     "draft": 0,
-    "note": "Floating menu19107 ready, green CI; bot review requested. Other63 proposal records retain their dates; budget/SDK remain parked."
+    "note": "19107 merged;19120 ready with CI running. Other63 records retain their dates; budget/SDK work remains parked."
   },
   "currentMediaSnapshot": {
     "historicalFilmsRetained": 46,
     "historicalMp4DownloadLinksRetained": 92,
     "newBackendPanelHeightFilm": "backend-panel-height-before-after.mp4",
     "newFilesTreeWidthFilm": "files-tree-width-before-after.mp4",
-    "totalFilms": 51,
-    "totalMp4DownloadLinks": 102,
+    "totalFilms": 52,
+    "totalMp4DownloadLinks": 104,
     "publishedBackendMediaCommit": "a877fcbbdcf4674ad4b36b01c138f234bb377f45",
-    "newProposalMediaStatus": "Floating menus19107 ready, green CI and bot review requested;51 films by area with previous/next and compatible old anchors.",
+    "newProposalMediaStatus": "Shared menu geometry19120 ready, CI running;52 films organized by area, all earlier players/downloads and legacy anchors retained.",
     "note": "All46 old whole players and92 downloads/96 href anchors retain bytes; two new players add4 downloads:48 players/96 downloads/100 href anchors. Live15/22 states, warning reductions15/11 and overlapping44/41 tests remain separate.",
     "publishedFilesMediaCommit": "73d4225fa15ed071a5d06e8bf79a185d1f2bb0c2",
     "publishedDraftDocsCommit": "689a013069ff681b04810839cb67e6d33c29c251",
@@ -14057,19 +14497,21 @@
     },
     "newWorkspacePickerFilm": "workspace-picker-recipes-locked-before-after.mp4",
     "workspacePickerAssetCommit": "8349628d1c8b58aad313c09b657eae3200095eac",
-    "floatingMenuMediaCommit": "51b6a5273f9dd560b140029157ba0032a063552a"
+    "floatingMenuMediaCommit": "51b6a5273f9dd560b140029157ba0032a063552a",
+    "menuGeometryMediaCommit": "9c9278a22f6ed122c4203f81fe8b93e79c9b6be9"
   },
   "nextSteps": [
     {
       "order": 1,
-      "scope": "Finish floating menu19107 CI/review, then select next coherent main-audit batch",
+      "scope": "Finish larger shared menu geometry19120 CI/review, then re-audit merged main for coherent batches",
       "completedPullRequests": [
-        19052
+        19052,
+        19107
       ],
-      "measuredMain": "5e8052347cc021b7657abc7f30828dead944a683",
-      "measuredMainWarnings": 384,
+      "measuredMain": "940dc61587e31f2625d6a59e07d70340878031d2",
+      "measuredMainWarnings": 375,
       "note": "Fresh main315arbitrary/51inline/18raw. Preserve dynamic portal/renderer owners; budget/SDK parked. One new Files radius finding is separate.",
-      "activePullRequest": 19107
+      "activePullRequest": 19120
     },
     {
       "order": 2,
@@ -14108,7 +14550,7 @@
     "directive": "Parked by user; preserve records/history, take no actions or fresh SDK status work."
   },
   "pageOrganization": {
-    "updatedAt": "2026-10-30T04:07:10.415879+00:00",
+    "updatedAt": "2026-10-30T13:56:41.838973+00:00",
     "overview": "arch/agentic-linting-refactoring.html",
     "areas": [
       {
@@ -14161,7 +14603,7 @@
       }
     ],
     "legacyAnchorsRetained": true,
-    "playerCount": 51,
+    "playerCount": 52,
     "note": "Area HTML owns content; rebuild compatibility router with node scripts/build-agentic-linting-navigation.mjs. All earlier film bytes and evidence remain unchanged."
   }
 }
