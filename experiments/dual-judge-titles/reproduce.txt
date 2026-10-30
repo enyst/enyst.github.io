@@ -1,0 +1,42 @@
+Four-rule dual-judge title experiment,2026-10-30
+Protocol/run.py frozen in commit4b23f61 before generation.
+SDK01bb167,Python3.13,isolated repo-lock export except approvedLiteLLM1.105.6.
+Both prior reports/evidence remain unchanged. All24requests are now previously
+observed diagnostic cases, not held-out validation. No human gold labels.
+
+Generation (configured SDK environment):
+python run.py --model haiku --output new-haiku.json
+python run.py --model gemini --output new-gemini.json
+python run.py --model luna --output new-luna.json
+
+Keep credentials private. Haiku/Gemini receive LLM_BASE_URL and LLM_API_KEY
+through environment. Luna uses SDK cached private ChatGPT OAuth credentials,
+not copied into the repository. Luna low reasoning via extra_body is verified
+in normalized SDK options. Subscription omits temperature/output-token limits.
+Do not overwrite published results; providers and aliases can change.
+
+Scoring preparation, after placing frozen model records in the expected paths:
+python score.py prepare
+This deduplicates exact(case_id,title),shuffles with seed1030202603,computes first
+two Unicode lexical words and48collection groups. Neither judge sees model/arm
+mapping or generation prompts. Both use protocol.json questions/criteria.
+
+Jev: set TYPESAFE_API_KEY in the process environment from your secret store.
+python score.py jev
+Uses pinnedjev-1.14.0Choice questions with per-item deterministic option shuffles,
+2workers,bounded retries and raw responses/errors. No credentials written.
+One synthetic Jev smoke request preceded this scoring run and is excluded.
+
+Codex: divide blinded title items round-robin into three batches,all48groups in
+one batch. Send each a rubric and its items only,not mapping,model files,Jev
+answers or generation instructions. Use gpt-6-astra medium reasoning read-only;
+exact instructions saved in codex-instructions.json. Validate complete item IDs
+and applicable criteria,then combine the unmodified labels in codex.json.
+No manual adjudication or normalization toward agreement in this study.
+
+python build_report.py
+Offline reconstruction of ../../arch/dual-judge-title-evaluation.html and
+summary.json/agreement.json. All evidence,including raw Jev probabilities,
+Codex labels/instructions,protocol and revealed mappings,is embedded in HTML.
+Jev confidence is a statistic of its probability distribution,not a measured
+probability that its answer is correct. Judge agreement is not accuracy.
