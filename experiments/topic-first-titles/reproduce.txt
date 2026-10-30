@@ -1,0 +1,41 @@
+Topic-first title experiment, 2026-10-30
+
+The protocol and run.py were committed at159f1b9 before generation.
+SDK checkout01bb167b04c00afc4d781f198fd8941a543eb266, isolated Python3.13
+environment with repository locked dependencies except approved LiteLLM1.105.6.
+No SDK source/dependency files changed during this experiment.
+
+Use a properly configured SDK environment. Set LLM_BASE_URL and LLM_API_KEY
+for the Haiku/Gemini eval-proxy route. Do not write credentials to result files.
+Luna uses the SDK's private cached ChatGPT subscription credentials through
+OpenAISubscriptionAuth; use the normal interactive login if not already signed in.
+Never copy those credential files into this repository or report directory.
+
+python run.py --model haiku --output new-haiku.json
+python run.py --model gemini --output new-gemini.json
+python run.py --model luna --output new-luna.json
+
+Do not overwrite the published evidence. Runs are not byte-reproducible: model
+aliases, provider deployments and stochastic responses can change.
+
+The subscription endpoint does not accept temperature or max-output-token caps.
+Luna low reasoning is explicitly passed through litellm_extra_body.reasoning and
+verified in the SDK's normalized Responses options. Server interpretation is not
+independently attested. Both other models request temperature0 and256 output
+tokens, with legacy Anthropic thinking disabled and reasoning effort none.
+All arms use the unchanged50-character SDK display cap.
+
+Before scoring, exact duplicate(case_id, displayed_title) pairs were deduplicated.
+Blinded scorer inputs include full request, displayed title, family and split;
+exclude model/arm identities and generation prompts. Unique outputs are shuffled
+with seed10302026 and divided round-robin into three batches. One separate batch
+judges all family groups. All use Codex/gpt-6-astra medium, read-only. Exact
+scoring instructions are published as scoring-titles.txt and scoring-groups.txt.
+The same unique grade maps back to all its occurrences. AI judgments are not
+measurements of human reading speed or statistical proof.
+
+python build_report.py
+
+This offline command reads protocol/model outputs/judgments and produces the
+new../../arch/topic-first-title-evaluation.html without touching study one.
+All evidence is also embedded in the self-contained HTML. No API calls in build.
