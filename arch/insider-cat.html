@@ -1,14 +1,16 @@
 <!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"codex","llm":null,"date":"2026-10-31","role":"editor"}]} -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Insider Cat — one OpenHands agent, text and Voice</title>
-  <meta name="description" content="Insider Cat's current Canvas interface, saved OpenHands identity, Voice handoff, and the tools it actually needs to coordinate conversations.">
-  <meta property="og:title" content="Insider Cat — one OpenHands agent, text and Voice">
-  <meta property="og:description" content="The Cat's current look, durable conversations, and the distinction between Voice transport and agent capabilities.">
+  <title>Insider Cat — your OpenHands companion</title>
+  <meta name="description" content="Meet Insider Cat: saved conversations, normal OpenHands tools and skills, and Voice that brings requests to the same agent.">
+  <meta property="og:title" content="Insider Cat — your OpenHands companion">
+  <meta property="og:description" content="Choose a Cat, talk or type, and keep the same conversation across Agent Canvas.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://enyst.github.io/arch/insider-cat.html">
+  <link rel="stylesheet" href="../brand.css">
   <link rel="stylesheet" href="../arch.css">
   <style>
     :root { --muted:#b0aaa0; }
@@ -21,13 +23,16 @@
     h1 { font-size:clamp(2.3rem,5vw,3.6rem); } h2 { scroll-margin-top:20px; }
     h3 { font-size:1rem; text-transform:none; letter-spacing:0; }
     main { min-width:0; } .meta,.source { font-size:14px; color:var(--muted); }
-    .eyebrow { color:var(--accent); font-family:var(--mono); font-size:14px; }
-    .status { display:inline-block; border:1px solid var(--accent); border-radius:4px; padding:4px 9px; color:var(--accent); }
+    .status { display:inline-block; border:1px solid var(--border); border-radius:4px; padding:4px 9px; color:var(--muted); }
+    .callout { border:1px solid var(--border); border-left:1px solid var(--border); border-radius:var(--border-radius); }
     .callout p { font-size:1rem; } .table-wrap { overflow-x:auto; margin:20px 0; }
     table { margin:0; font-size:14px; } th { font-size:14px; text-transform:none; letter-spacing:0; }
     td,th { vertical-align:top; } code { overflow-wrap:anywhere; }
-    .flow { display:grid; gap:12px; padding:22px; border:1px solid var(--border); border-left:3px solid var(--teal); background:var(--card); margin:24px 0; }
-    .flow p { margin:0; }
+    .flow { display:grid; gap:12px; padding:22px; border:1px solid var(--border); background:var(--card); margin:24px 0; }
+    .flow li { margin:0; }
+    .anchor { scroll-margin-top:20px; }
+    footer { font-size:14px; }
+    ::selection { background:#35584d; color:#fff8eb; }
     figure { margin:24px 0; } figcaption { font-size:14px; color:var(--muted); line-height:1.6; margin-top:12px; }
     .poses { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; padding:18px; border:1px solid #42443f; border-radius:22px; background:#20211f; }
     .pose { text-align:center; color:#efeee7; font-size:13px; }
@@ -98,30 +103,29 @@
     <ol>
       <li><a href="#what">The companion</a></li>
       <li><a href="#look">The current look</a></li>
-      <li><a href="#conversations">One saved identity</a></li>
+      <li><a href="#conversations">Saved conversations</a></li>
       <li><a href="#tools">What the Cat can do</a></li>
-      <li><a href="#voice">Voice → OpenHands</a></li>
+      <li><a href="#voice">How Voice works</a></li>
       <li><a href="#apps">Install and configure</a></li>
-      <li><a href="#usability">Usability priorities</a></li>
+      <li><a href="#usability">Everyday use</a></li>
       <li><a href="#sources">Evidence and limits</a></li>
     </ol>
     <p><a href="insider-cat-stories.html">User scenarios →</a></p>
   </nav>
   <main id="content">
     <header>
-      <p class="eyebrow">Agent Canvas · Apps · behavior and architecture</p>
       <h1>Insider Cat</h1>
-      <p>A sibling of SmolPaws inside Agent Canvas: one saved OpenHands agent, with a Cat-shaped place to talk, type, and find your work.</p>
-      <p class="meta">Updated <time datetime="2026-10-05">5 October 2026</time>. <span class="status">Development implementation · review pending</span></p>
+      <p>A sibling of SmolPaws inside Agent Canvas. Talk through your work with a Cat that has its own saved OpenHands conversation, tools, and skills.</p>
+      <p class="meta">Updated <time datetime="2026-10-31">31 October 2026</time> · <span class="status">Development build · not released</span></p>
     </header>
-    <div class="callout"><p><strong>Voice is a way to reach the Cat. OpenHands does the work.</strong> The selected Cat has a durable conversation, agent configuration, tools, and approval policy on Agent Server. The Voice connection carries requests and speaks saved results; it does not replace that agent or grant it access to every conversation in Canvas.</p></div>
+    <div class="callout"><p><strong>Choose a Cat. Talk or type. Pick up where you left off.</strong> Projects, the compact companion, and regular chat all lead to the same saved conversation. Voice brings requests to that OpenHands agent and speaks its results.</p></div>
 
-    <h2 id="what">A sibling with its own place</h2>
-    <p>The standalone <a href="https://github.com/enyst/insider">Insider App</a> contributes the <strong>Projects</strong> page and, on a compatible Canvas host, a travelling companion. The Cat has its own identity and history. The compatibility tag <code>smolpaws: insider</code> does not give it SmolPaws’ credentials, memories, channels, or permissions.</p>
-    <p>Canvas owns navigation and the visible controls. Agent Server owns the saved conversation and execution. The chosen OpenHands agent profile supplies the model and actual tools. Selecting an LLM profile or switching models alone does not add tools. The App adds its <a href="#skill">Insider instructions</a> when creating a Cat; instructions explain the role but cannot manufacture missing capabilities.</p>
+    <h2 id="what">A companion for your work</h2>
+    <p>The <a href="https://github.com/enyst/insider">Insider App</a> adds <strong>Projects</strong> to Canvas: your Cat beside a browser of the backend’s conversations. Use <strong>Discuss with Cat</strong> to bring a piece of work into a typed request, or ask the Cat to investigate using its normal OpenHands tools.</p>
+    <p>You can keep several Cats for different subjects. Each has its own history and workspace. The selected Cat stays with you when you open another Canvas view; it has its own identity, separate from SmolPaws and the other agents doing your work.</p>
 
-    <h2 id="look">The Cat comes first</h2>
-    <p>The September 19 interface puts a warm cream SVG Cat, its status, and <strong>Talk</strong> beside the conversation. The saved-Cat picker and <strong>New Cat</strong> sit with that conversation; <strong>Your work</strong> holds the conversation browser. On narrower screens the work list moves below the Cat. The page has one set of Voice controls.</p>
+    <h2 id="look">A quiet Cat, with clear controls</h2>
+    <p>The Cat rests beside its status and <strong>Talk</strong> control. The conversation picker and <strong>New Cat</strong> sit together. <strong>Your work</strong> moves below the Cat on smaller screens. Away from Projects, a compact companion keeps the same Cat and call available without covering the chat composer.</p>
     <figure>
       <div class="poses"><div class="pose"><div class="insider-cat-avatar" data-pose="sleeping"><svg viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
   <ellipse class="cat-avatar-rest" cx="81" cy="100" rx="64" ry="10"/>
@@ -329,106 +333,82 @@
 </svg></div><div>Working</div></div></div>
       <figcaption>Actual Cat artwork from the App, shown here as static state illustrations, not a browser screenshot. Adjacent text and controls carry the status; color and animation are supplementary.</figcaption>
     </figure>
-    <p>The Cat sleeps when idle, perks up while connecting, listens when the microphone is active, and stays awake while speaking or working. Pending agent work takes precedence over a listening pose. Mute removes the active-listening cue; it does not imply the agent stopped. Errors, unknown state, paused work, and approval requests stay visible instead of looking like a peaceful idle Cat. Reduced-motion preferences disable the decorative animation.</p>
-    <p>Before a Cat is selected, <strong>Talk</strong> is visible but disabled, with an explanation. Choose a saved Cat, or select New Cat and send the first typed message. Away from Projects, a compact companion keeps the same call and Cat available in the Canvas layout. It occupies space below the main content instead of covering the chat composer. Returning to Projects restores the main view without creating another connection.</p>
-    <p class="source">UI and artwork: <a href="https://github.com/enyst/insider/blob/7efa337366e411127ce9e65063fe67ef217cb927/src/cat-view.js">shared Cat view</a> and <a href="https://github.com/enyst/insider/blob/7efa337366e411127ce9e65063fe67ef217cb927/src/cat-avatar.js">pose mapping and SVG</a>.</p>
+    <p>The Cat wakes while connecting, perks up when listening, and stays awake while speaking or working. Working takes priority over listening; muting removes the listening cue. Errors, paused work, and approval requests get an attention state and text. Reduced-motion preferences disable animation.</p>
+    <p class="source">Illustrations from the App’s <a href="https://github.com/enyst/insider/blob/bf99051b0c8293c324091c47bac5df3b3d16d45b/src/cat-avatar.js">Cat artwork</a>; <a href="https://github.com/enyst/insider/blob/bf99051b0c8293c324091c47bac5df3b3d16d45b/src/cat-view.js">shared controls and status</a>.</p>
 
-    <h2 id="conversations">One saved Cat, across views and calls</h2>
+    <h2 id="conversations">The same conversation, wherever you open it</h2>
     <div class="table-wrap"><table>
-      <thead><tr><th>Action</th><th>What happens</th></tr></thead>
+      <thead><tr><th scope="col">Action</th><th scope="col">What happens</th></tr></thead>
       <tbody>
-        <tr><td>Choose a saved Cat</td><td>Reload that controller by its full ID on its owning backend. The App discovers controllers across list pages; multiple Cats require a deliberate choice unless a remembered choice is verified.</td></tr>
-        <tr><td>Open the full conversation</td><td>Continue the same ID in ordinary Canvas chat, including its tools and approval controls. Its Insider badge and return link distinguish it from a worker. Navigation preserves the active call.</td></tr>
-        <tr><td>New Cat or <code>/new</code></td><td>Prepare a fresh Cat. Its first typed send creates a different controller, using the then-active OpenHands profile and chosen workspace. This does not clear the old Cat or clone its whole history.</td></tr>
-        <tr><td><code>/condense</code></td><td>Condense the selected Cat without changing its ID or starting another agent turn. End its Voice session first; a new call loads the updated context. The saved event record remains inspectable.</td></tr>
-        <tr><td>Select a worker</td><td>Attach the full worker ID and current metadata to the next typed Cat request, while preserving the draft. Selection alone does not send the worker anything.</td></tr>
-        <tr><td>End call</td><td>Release the microphone and close Voice. Work already accepted by OpenHands continues; its result remains in the saved conversation.</td></tr>
+        <tr><td>Choose a saved Cat</td><td>Resume its history on the selected backend. The picker finds Cats across list pages and remembers your verified choice for that backend and organization, including compatible older Cats.</td></tr>
+        <tr><td>Open chat</td><td>Continue that exact conversation in regular Canvas chat, with tool activity and approval controls. Cat badges in chat and the conversation panel distinguish it from other work. An active call continues.</td></tr>
+        <tr><td>New Cat or <code>/new</code></td><td>Prepare a separate Cat. The first typed message creates it using the active Agent Profile and selected workspace. The previous Cat stays saved.</td></tr>
+        <tr><td><code>/condense</code></td><td>Shorten the active context while keeping the same Cat and saved event history. Canvas ends Voice before compaction; choose Talk afterward to use the refreshed context. Finish running work or resolve approvals first.</td></tr>
+        <tr><td>Discuss with Cat</td><td>Add the selected conversation’s identity and metadata to your next typed Cat request. Your draft stays intact. Selection alone does not send to or run that other conversation.</td></tr>
       </tbody>
     </table></div>
-    <p>Cat selection is scoped to the backend and organization, and revalidated after loading. Changing Cat or backend, disabling the App, or requesting condensation ends the old call. A regular conversation you open elsewhere in Canvas does not silently become the Voice target. Draft text survives navigation within the active App, but is not persisted across reloads or backend changes.</p>
-    <p>The App shows text from recent saved events and a link to the full conversation. Live captions are transient. Saved delegated requests and OpenHands answers are the task record; exact audio and every word spoken by the Voice model are not a second complete transcript.</p>
+    <p>Opening another regular conversation does not change who your call is with. Choosing a different Cat, starting New Cat, changing backend, or disabling the App ends the old call. Unsent text survives navigation within the active App, but not a reload or backend change.</p>
+    <p>Submitted requests and agent results live in the saved Cat. Live captions are temporary; the exact audio and every Voice utterance are not stored as a second complete transcript.</p>
 
-    <h2 id="tools">Use the normal OpenHands tools and skills</h2>
-    <p>The Cat can inspect and coordinate conversations through the existing Agent Server API using its normal terminal tool. The OpenHands API skill provides instructions; the runtime must identify the actual backend URL, authentication source, and relevant state or workspace. A dedicated conversation-listing tool is an optional convenience, not a prerequisite.</p>
-    <p>The Projects page’s JavaScript methods are not automatically model tools, but that does not prevent a normally configured OpenHands agent from making the same supported API requests through its terminal. Skills explain how to use existing capabilities; they do not independently grant network access, credentials, or permissions. Selecting an LLM profile also does not change the saved agent’s tool configuration.</p>
-    <p>A September 20 inspection found that the reported Cat was an earlier bare fixture: its configured tool list was empty and it had no client tools. The remaining reasoning and finish tools did not include terminal access. The reported parallel entry was not a registered native SDK tool in that configuration. This was an incomplete agent configuration, not evidence that OpenHands needs a new inventory-tool implementation.</p>
-    <p>The same Cat was repaired by adding the standard workspace tools without rewriting its history or changing its ID, model, or approvals. A <a href="insider-cat-codex-voice.html#current-verification">real Voice test executed a terminal calculation and spoke its saved result</a>. A subsequent check restored the default OpenHands skills and supplied accurate backend context: the same Cat loaded <code>openhands-api</code>, discovered the count endpoint from OpenAPI, and called it through the terminal. Its saved count matched an independent API check and returned through Voice. No bespoke inventory tool was added.</p>
+    <h2 id="tools">A real OpenHands agent does the work</h2>
+    <p>A new Cat inherits the active <strong>OpenHands Agent Profile</strong>’s tools and enabled skills, along with Canvas’s confirmation and security settings. The normal tool set includes the terminal, file editor, task tracker, and model switching; browser tools depend on runtime support. A restricted profile stays restricted. Choosing an LLM profile changes the model; it does not add these capabilities.</p>
+    <p>OpenHands skills explain how to use the backend API. The Cat also receives advertised backend connection information when available. For “How many conversations are here?”, it can query the owning Agent Server through its terminal and the API skill. Counting visible cards only counts the loaded work; it is not a complete backend inventory.</p>
+    <h3 id="skill">Insider instructions give the Cat its role</h3>
+    <p>The App embeds <a href="https://github.com/enyst/insider/blob/bf99051b0c8293c324091c47bac5df3b3d16d45b/skills/insider-cat/SKILL.md">its Insider skill</a> into new Cat launches, alongside the profile’s existing instructions. It explains conversation ownership, selected work, and reporting actions accurately. Default-enabled OpenHands skills provide the usual tool workflows. Instructions do not grant credentials or bypass approvals.</p>
+    <p>Already-saved Cats keep their actual configuration. If an older Cat reports only reasoning and finish tools, starting Voice or switching models will not repair it. Configure the normal Agent Profile and create a new Cat; inspect existing Cats in full chat before relying on their tools.</p>
+
+    <h2 id="voice">Speak to the same Cat</h2>
+    <p>Choose a saved Cat, or send the first typed message to create one. Then select <strong>Talk</strong> and allow microphone access. Talk is disabled until a Cat exists; installation and navigation never start the microphone. Typed chat remains available when Voice is unavailable.</p>
+    <ol class="flow" aria-label="Voice request flow">
+      <li>You speak during an active call.</li>
+      <li>The Voice provider hands the request to the selected, saved OpenHands Cat.</li>
+      <li>OpenHands runs it with that Cat’s tools and approval policy.</li>
+      <li>The bridge returns the new saved answer for speech. Longer results remain available in full chat.</li>
+    </ol>
+    <p>The experimental <strong>Codex transport</strong> sends provider handoffs directly through Agent Server to the saved Cat. It uses a dedicated ChatGPT-authenticated Codex app-server pinned to <code>0.154.0</code>. The separate <strong>OpenAI API transport</strong> uses an API key and the browser’s <code>send_to_insider</code> tool bridge. Both keep OpenHands in charge of execution. See <a href="insider-cat-codex-voice.html#direct-handoff">the Voice implementation</a> for setup and boundaries.</p>
+    <p>A Codex call starts with a bounded snapshot of the saved Cat’s context. It does not automatically receive the Projects board’s selected worker. Include the target in a saved typed message when it matters. The provider must emit a handoff for a spoken request to reach OpenHands; hearing a spoken acknowledgment alone does not prove the request was saved.</p>
     <div class="table-wrap"><table>
-      <thead><tr><th>Layer</th><th>Responsibility</th><th>Boundary</th></tr></thead>
+      <thead><tr><th scope="col">Control</th><th scope="col">Effect</th></tr></thead>
       <tbody>
-        <tr><td>Projects UI</td><td>List, filter, page through and open conversations; select a target; send to the Cat.</td><td>A loaded page is not the complete server inventory.</td></tr>
-        <tr><td>Saved OpenHands Cat</td><td>Use its configured tools, including terminal, under its approval and security policy.</td><td>Older saved Cats retain their actual configuration; a new model does not repair missing tools or context.</td></tr>
-        <tr><td>OpenHands skills and runtime context</td><td>Explain the APIs and identify the correct backend, authentication source, workspace, and state.</td><td>Instructions are not permissions. Use available authorized access without exposing credentials or guessing another backend.</td></tr>
-        <tr><td>Voice bridge</td><td>Bind a spoken request to that Cat and return its verified result.</td><td>The OpenHands agent remains the execution owner, whether it uses a terminal API request or another tool.</td></tr>
-        <tr><td>Optional focused tools</td><td>Wrap list/count/read/wait or create/send requests with typed inputs and convenient results.</td><td>They may improve ergonomics and validation; they are not required for API access through the terminal.</td></tr>
+        <tr><td>Mute / Unmute</td><td>Turn microphone input off or on. Accepted agent work continues.</td></tr>
+        <tr><td>Stop speaking / Resume audio</td><td>Pause and restore the call’s local audio output. On Codex this does not cancel provider generation or the OpenHands task.</td></tr>
+        <tr><td>End call</td><td>Close Voice and release the microphone. An accepted OpenHands task can finish and save its result.</td></tr>
       </tbody>
     </table></div>
-    <p><strong>For a conversation count, prefer <code>GET /api/conversations/count</code> on the owning Agent Server.</strong> It is the authoritative API count for that backend and query. For titles, statuses, or per-conversation detail, follow the relevant list/search pagination and state any filters or incomplete coverage. Count conversations, not messages, events, or files.</p>
-    <p>A filesystem check is useful only when the runtime confirms the current local backend’s persistence directory and the agent has access to it. Count distinct conversation records there, not every JSON file or an old checkout’s state. For a remote backend, local files are not its inventory. Use the live API when possible and explain any narrower fallback scope.</p>
-    <p>The <a href="https://github.com/OpenHands/extensions/blob/main/skills/openhands-api/SKILL.md">OpenHands API skill</a> already documents terminal-based local and Cloud workflows. It is default-enabled for new workspaces in the registry; existing saved skill selections still need to be checked. Confirm the actual URL and authentication source rather than copying example defaults. Keep credentials out of tool output, chat, and notes. For an uncertain write, inspect the saved conversation before retrying.</p>
-    <p>A name such as <code>ask_agent</code> can describe asking the real agent to investigate. It is not an implemented Codex tool in this path. The SDK’s existing <code>/ask_agent</code> endpoint answers a stateless, one-off question; it does not run the saved Cat with its tools. The current <code>send_message(run=True)</code> handoff preserves that saved execution owner.</p>
+    <p>If you correct a request while the Cat is busy, the new request is not queued or used to steer the running task. Voice reports that it was not sent; repeat it once the Cat finishes. The bridge suppresses a superseded pending spoken result, but cannot recall audio already delivered. Inspect full chat before retrying an uncertain action.</p>
 
-    <h2 id="voice">Two Voice transports, the same execution owner</h2>
-    <div class="flow" aria-label="Voice to the saved OpenHands agent">
-      <p><strong>1. The person speaks</strong> after explicitly choosing Talk and granting microphone access.</p>
-      <p><strong>2. The selected Voice transport hands off a request</strong> to one bound Cat conversation.</p>
-      <p><strong>3. OpenHands saves and runs it</strong> with that Cat’s own model, tools, workspace, and approval policy.</p>
-      <p><strong>4. The bridge waits for the whole run to settle</strong>, including stop hooks, and retrieves the new saved answer.</p>
-      <p><strong>5. Voice speaks that answer or a labelled excerpt.</strong> The full result stays in the same conversation.</p>
-    </div>
-    <h3>Codex: direct server handoff</h3>
-    <p>In the current experimental Codex path, Agent Server consumes <code>thread/realtime/itemAdded</code> items of type <code>handoff_request</code>. It validates the explicit <code>input_transcript</code>, admits each <code>handoff_id</code> at most once within that call, and sends it directly to the bound OpenHands conversation. The saved result returns through <code>thread/realtime/appendSpeech</code>.</p>
-    <p>The Codex background thread exposes <code>dynamicTools: []</code> with its other tool access restricted. The pinned app-server may still start a background turn, but that turn neither dispatches the request nor supplies the saved Cat’s answer. The browser does not also forward Codex transcripts. This replaces the older model-chosen <code>send_to_insider</code> relay, which could receive a handoff and finish without calling the Cat.</p>
-    <p>Live still has to emit a handoff. A sentence spoken directly by the Voice model is not evidence that OpenHands received or saved a request. A new Codex call starts from a bounded snapshot of the saved Cat; the Projects page’s selected worker is not included in that session. The <a href="insider-cat-codex-voice.html#direct-handoff">Codex implementation note</a> records protocol, configuration, history, and live evidence.</p>
-    <h3>OpenAI API: browser tool bridge</h3>
-    <p>The separate public Realtime API path uses <code>gpt-realtime-2.1</code> and a server-held OpenAI API key. Its Voice model calls <code>send_to_insider</code>; the App forwards that request through the Cat’s normal conversation API and waits for confirmed run completion. This tool belongs to the Voice bridge, not the Cat’s own toolbox. This transport retains fixture coverage; it needs its own live provider validation.</p>
-    <p>The server selects the transport. Codex uses its dedicated, tested sign-in/configuration path; an OpenAI API key belongs to the public API path. Neither substitutes the other’s credential automatically. No provider credential is sent to the browser.</p>
-    <h3>Controls and failures</h3>
-    <p>Both transports offer Mute and End call. The API transport also exposes Stop speaking; the Codex App hides that action because its inspected app-server protocol has no verified speech-only interruption operation. Ending speech is separate from stopping agent work.</p>
-    <p><code>request_not_sent</code> means the bridge rejected the request before admission. <code>relay_failed</code> means the saved outcome needs inspection, and must not encourage a blind retry. <code>connection_failed</code> reports a connection or protocol problem. A busy Cat can reject a new spoken request while an earlier accepted request continues.</p>
-
-    <h2 id="apps">Install the matching components</h2>
-    <p>The package is an ordinary Canvas App with a prepared, self-contained browser bundle. It replaces the historical Secretary skin server, iframe bridge, fixed browser ports, and page-owned credentials. The enhanced companion and Voice paths require matching Canvas and Agent Server changes; choosing an App ref alone cannot add missing host or backend capabilities.</p>
+    <h2 id="apps">Use the matching development components</h2>
+    <p>This version combines the Insider App with the Canvas and Agent Server changes linked below. Installing the App alone cannot add missing host or Voice capabilities. These changes are still in draft PRs; the default App branch does not contain the full behavior described here.</p>
     <ol>
-      <li>Use a local Agent Server connection with Apps, agent profiles and launch additions. The inspected Apps host does not support the cloud backend.</li>
-      <li>Open <strong>Customize → Apps</strong>. Use Source <code>github:enyst/insider</code> and a reviewed Ref; leave Repository path empty. For a local source, use the package directory on the server machine and leave both other fields empty.</li>
-      <li>Configure the active OpenHands agent profile in Canvas settings, enable the installed App, and open Projects. Choose a real workspace for a new Cat. Check that it has the normal tools, enabled OpenHands skills, and accurate backend connection context.</li>
-      <li>Configure the selected Voice transport on Agent Server. The availability check runs before requesting the microphone. Typed chat remains usable without Voice.</li>
+      <li>Connect Canvas to an Agent Server with Apps and Agent Profiles support. This Apps installation flow uses a local Agent Server connection, rather than the Cloud backend.</li>
+      <li>Open <strong>Customize → Apps</strong>. Choose <strong>Add app</strong>. Set <strong>App source</strong> to <code>github:enyst/insider</code> and <strong>Ref</strong> to the reviewed <code>gpt/insider-voice-discovery</code> branch or its pinned commit. Leave <strong>Path</strong> empty, then select <strong>Install</strong>.</li>
+      <li>Enable Insider Cat, choose the active Agent Profile and workspace, and open Projects. Send a typed message to create your Cat.</li>
+      <li>Configure Voice on Agent Server using the <a href="insider-cat-codex-voice.html#authentication">transport setup guide</a>. The availability check runs before microphone permission is requested.</li>
     </ol>
-    <p>The server copies <code>extension.js</code>; it does not build source. Rebuild and reinstall after source, translation, or skill changes. The <a href="https://github.com/enyst/insider#readme">App README</a> contains setup details; the <a href="insider-cat-codex-voice.html#direct-handoff">Codex note</a> distinguishes the current transport from earlier experiments.</p>
-    <h3 id="skill">An Insider skill explains the role</h3>
-    <p>The standalone package owns <code>skills/insider-cat/SKILL.md</code>. The build embeds its body and appends it through <code>agent_launch_additions.system_message_suffix_append</code> when creating a controller. This preserves the profile’s existing instructions and policies and works independently of the Cat’s working directory. It complements the normal OpenHands skills. It does not install tools or rewrite an already saved Cat’s configuration.</p>
-    <p>The skill distinguishes the Cat from selected workers, requires actual evidence for actions, and separates acceptance from completion. It grants no shared SmolPaws memory, scheduler, or automatic monitoring. The Odie-local skill and old skin remain part of the development history.</p>
-    <p>New Cat launches also read the owning backend’s advertised <code>runtime_services</code> and include validated agent-side URLs and authentication environment-variable names. Credential values are not included. The host must actually provide those references to the agent. The September 20 direct-Vite fix restores this metadata on that development path; missing metadata is omitted rather than replaced with a guessed backend.</p>
+    <p>The App ships a built browser bundle. Source or skill changes need a rebuild and reinstall; the server copies the bundle rather than building it.</p>
 
-    <h2 id="usability">Make capability and continuity easy to see</h2>
-    <ol>
-      <li><strong>Keep the Cat, status, and Talk together.</strong> An idle Cat rests; connecting, work, approvals, and errors remain legible in words. Avoid duplicate controls when the page and companion share a call.</li>
-      <li><strong>Show what this Cat can actually do.</strong> Check the agent’s normal tools, enabled skills, and actual backend context. Terminal API access is a valid way to inspect conversations; do not mistake the absence of a dedicated wrapper tool for inability.</li>
-      <li><strong>Keep one visible target.</strong> The controller, selected worker, and merely viewed conversation are separate identities. Confirm ambiguous names and use full IDs for actions.</li>
-      <li><strong>Make coverage explicit.</strong> Your work filters the loaded pages, and Load more expands them. Agent answers about all conversations require complete server data or an honest partial count.</li>
-      <li><strong>Keep receipts with results.</strong> Voice should speak saved outcomes; the full conversation shows tools and approvals. An acknowledgment is not completion, and silence is not evidence that work stopped.</li>
-    </ol>
-    <h3 id="next">Configure and verify the existing capability first</h3>
-    <p>Use the normal OpenHands toolset and enabled skills with accurate runtime context. Verify a read-only count or list on the intended backend, then read and follow up on an explicitly chosen worker under the existing permissions and approval policy. Focused conversation tools can be added later for convenience. Scheduled “keep me updated” work needs a durable Automation service and its normal API or skills; an open Voice connection is not a scheduler.</p>
-    <h3 id="puck">Design references</h3>
-    <p>The earlier exploration drew on Amp’s <a href="https://ampcode.com/docs/puck">Puck</a> for the distinction between a companion conversation and worker threads, and <a href="https://ampcode.com/news/talk-to-puck">Talk to Puck</a> for Voice handing work to a real agent. ElevenLabs remains an alternative to evaluate later. Neither is a dependency of the current App. Provider comparisons in the <a href="../voice-landscape.html">voice landscape</a> are dated research, not current installation guarantees.</p>
-
-    <h2 id="sources">Evidence, history, and limits</h2>
-    <h3 id="october-validation">5 October: integration maintenance</h3>
-    <p>The feature is split across three implementation PRs: Agent Server owns Voice and saved work, Canvas owns the companion surface, and the Insider App owns its controls and audio. <a href="https://github.com/OpenHands/software-agent-sdk/issues/5515">The integration issue</a> records acceptance criteria and current verification; <a href="https://github.com/OpenHands/OpenHands/issues/17557">the Canvas issue</a> tracks host behavior. The App and notebook repositories have issues disabled, so their PRs link back to those issues.</p>
-    <p>The failed Agent Server macOS job stopped while downloading a dependency from PyPI, before building or running tests. It was a connection timeout, not a demonstrated Voice failure. A fresh rerun and cross-repository checks are recorded on the linked issues and PRs; the September provider observations below remain historical evidence.</p>
-    <p id="implementation-status"><strong>September 19–20 direct-handoff checks:</strong> generated speech reached the real saved OpenHands Cat and returned its saved answer as audio. A fresh call then recalled the saved test word, saving its new question and answer in that same Cat. These checks used the real provider and existing Codex sign-in, with generated input rather than a physical microphone. They establish those observed requests, not universal delegation or account eligibility. On September 20, a further natural spoken request also verified skill-guided API use: the Cat independently discovered and queried the conversation-count endpoint, saved the correct result, and returned matching speech. The request did not supply an endpoint or command.</p>
-    <p>Physical iPad microphone, speaker, interruption, approval, and repeated-use behavior still needs device verification. The public API transport’s provider speech remains unverified. No fresh page screenshot is claimed here; the artwork is copied from the App source.</p>
+    <h2 id="usability">Keep work easy to follow</h2>
+    <span class="anchor" id="next"></span><span class="anchor" id="puck"></span>
     <ul>
-      <li><a href="https://github.com/enyst/insider/pull/2">App interface and Voice update</a>: current artwork, shared controls, conversation behavior, and translated failures.</li>
-      <li><a href="https://github.com/OpenHands/OpenHands/pull/17558">Canvas companion and Insider identity</a>: persistent dock, new/resume and condensation integration.</li>
-      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5180">Agent Server Voice implementation</a>: broker, scoped calls, direct Codex handoff, and safe run settlement.</li>
-      <li><a href="insider-cat-codex-voice.html">Codex Voice research and dated verification</a> · <a href="insider-cat-stories.html">User scenarios</a>.</li>
+      <li><strong>Keep a Cat for an ongoing subject.</strong> Resume it for continuity; use <code>/condense</code> to shorten context, or New Cat for a separate history.</li>
+      <li><strong>Name the work you want changed.</strong> Discuss with Cat adds a target to a typed request. A conversation you merely view elsewhere is not the call’s target.</li>
+      <li><strong>Open chat for approvals and receipts.</strong> Voice does not approve actions for you. The saved conversation shows what the agent actually did.</li>
+      <li><strong>Distinguish audio from work.</strong> Mute, Stop speaking, and End call affect the call. They do not cancel accepted agent tasks.</li>
     </ul>
-    <p id="behavior">The <a href="secretary-cat.html">Secretary proposal</a> documents the earlier skin. Its authentication, proxy, memory, and dispatch assumptions should not be read as the current App contract. The September 15 fixture and September 16 model-driven relay trials remain historical evidence in the Codex note.</p>
-    <p id="status" class="source">Reviewed against App <code>7efa337</code>, published SDK <code>02a51ae46</code> (the equivalent tested worktree change is <code>957c1c584</code>), and the Canvas draft. These pages describe development revisions, not a release announcement or live service-status monitor. Beads owns follow-up status.</p>
-    <footer>Engel’s Code Design Notebook · Insider Cat · September 2026</footer>
+    <p><a href="insider-cat-stories.html">Everyday examples: start, resume, correct, and condense →</a></p>
+
+    <h2 id="sources">Current source and verification</h2>
+    <span class="anchor" id="behavior"></span><span class="anchor" id="status"></span>
+    <p id="implementation-status">Source and PR status checked <strong>31 October 2026</strong>. The three draft heads match the <strong>26 October</strong> integrated verification record. This page describes that development build, not a deployed service or released feature.</p>
+    <ul>
+      <li><a href="https://github.com/enyst/insider/pull/2">Insider App #2</a> · <a href="https://github.com/enyst/insider/blob/bf99051b0c8293c324091c47bac5df3b3d16d45b/src/extension.js"><code>bf99051</code></a>: page, saved Cats, shared controls, and Voice playback.</li>
+      <li><a href="https://github.com/OpenHands/OpenHands/pull/17558">Canvas #17558</a> · <a href="https://github.com/enyst/playground/blob/b6ff25af6e37e99d65aa368225fe4fd4c7b46e36/src/hooks/use-compact-context-action.ts"><code>b6ff25a</code></a>: companion, Cat identity, navigation, and context compaction.</li>
+      <li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5180">Agent SDK #5180</a> · <a href="https://github.com/OpenHands/software-agent-sdk/blob/e17f4e09b10db0227660975409f8452c5b8d4fbc/openhands-agent-server/openhands/agent_server/voice_router.py"><code>e17f4e0</code></a>: Voice sessions and direct handoff to saved agent work.</li>
+    </ul>
+    <h3 id="october-validation">What has been exercised</h3>
+    <p>The <a href="https://github.com/enyst/insider/blob/bf99051b0c8293c324091c47bac5df3b3d16d45b/.pr/insider-verification-20261026.md">26 October verification report</a> records 42 passed checks out of 46 scoped UI checks, plus nine SDK API recipes. Real Codex Voice handed generated speech to a normal OpenHands Cat, which used tools, saved its answer, and returned response audio. The report also covers old-Cat resume, phone identity, context compaction, and correction handling.</p>
+    <p>Four checks remain: physical microphone and speaker use on iPad, the OpenAI API transport with a live provider, switching backend during a live call, and complete keyboard-only traversal. The 31 October update checks source and documentation; it does not claim another live audio run.</p>
+    <footer>Engel’s Code Design Notebook · Insider Cat · October 2026</footer>
   </main>
 </div>
 </body>

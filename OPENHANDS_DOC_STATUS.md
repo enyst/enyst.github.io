@@ -7,12 +7,20 @@ Beads owns task status; the site explains dated architecture, decisions and plan
 
 ## Insider Voice integration
 
-The 5 October 2026 maintenance pass follows SDK [#5180](https://github.com/OpenHands/software-agent-sdk/pull/5180),
-Canvas [#17558](https://github.com/OpenHands/OpenHands/pull/17558), and Insider [#2](https://github.com/enyst/insider/pull/2).
-[SDK issue #5515](https://github.com/OpenHands/software-agent-sdk/issues/5515) tracks the shared acceptance criteria;
-[Canvas issue #17557](https://github.com/OpenHands/OpenHands/issues/17557) tracks host behavior.
-[The Insider page](arch/insider-cat.html#october-validation) separates the fresh validation from September's provider observations.
-The linked issues and PRs own current CI/test status; physical-device audio remains a separate validation task.
+The 31 October 2026 source check follows SDK [#5180](https://github.com/OpenHands/software-agent-sdk/pull/5180)
+(`e17f4e09b`), Canvas [#17558](https://github.com/OpenHands/OpenHands/pull/17558)
+(`b6ff25af6`), and Insider [#2](https://github.com/enyst/insider/pull/2) (`bf99051b`).
+All three remain draft PRs; these heads match the 26 October integrated verification record.
+[The Insider presentation](arch/insider-cat.html), [user guide](arch/insider-cat-stories.html),
+and [Voice guide](arch/insider-cat-codex-voice.html) now describe that implementation,
+without the superseded prototypes or speculative interaction designs.
+
+The [26 October report](https://github.com/enyst/insider/blob/bf99051b0c8293c324091c47bac5df3b3d16d45b/.pr/insider-verification-20261026.md)
+records 42 passed checks out of 46 scoped UI checks, plus nine SDK API recipes.
+Real Codex handoff, saved OpenHands tool work, and returned audio were exercised
+with generated microphone input. Remaining checks: physical iPad microphone/speaker,
+live OpenAI API Voice, live backend switching, and complete keyboard-only traversal.
+The 31 October documentation pass is not another live runtime test.
 
 ## Current explanations
 
@@ -39,13 +47,13 @@ The linked issues and PRs own current CI/test status; physical-device audio rema
   automation is disabled. The [testing strategy](arch/openhands-sdk-architecture-testing.html)
   remains the broader plan. The [merged evaluation](https://github.com/enyst/automations/tree/ce3f5e362d73c22bf122bd6c02a9a0048e402027/evaluations/sdk-lifecycle-conformance/2026-10-09-cloud)
   owns the dated evidence; this page does not report live run status.
-- [Insider Cat](arch/insider-cat.html): September 20 App behavior, Cat interface,
-  conversation continuity, and normal OpenHands tools and skills. The
-  [Voice implementation note](arch/insider-cat-codex-voice.html) records a real
-  spoken request invoking the API skill and querying the owning backend through
-  the terminal, then returning the saved answer as speech. Dedicated inventory
-  tools are optional; this flow needs the normal skills and accurate runtime
-  context. Physical iPad audio and worker-mutation flows remain separate checks.
+- [Insider Cat](arch/insider-cat.html): 31 October 2026 presentation of the current
+  development App: several saved Cats, one continuing identity across Projects and
+  regular chat, normal Agent Profile tools and enabled skills, and direct Codex
+  handoff to the saved OpenHands agent. Covers legacy Cat resume, local audio
+  Stop/Resume, explicit busy-request rejection, and automatic call teardown before
+  `/condense`. The [Voice guide](arch/insider-cat-codex-voice.html) records transport
+  configuration, context and ownership boundaries, and the dated verification limits.
 - [How SmolPaws resets its context](arch/smolpaws-agent-reset.html): 5 October 2026 implementation guide covering voluntary reset, warnings, the separate emergency summarizer, configuration and durable events. It links checked source revisions; it does not assert a live deployment state. The [September proposal](arch/agent-triggered-condensation.html) is retained as design history.
 - [Reviewing the reviewer](arch/openhands-review-auditor.html): September 16 investigation,
   chosen actual Astra model and exasperated robot babysitter voice, event-driven implementation draft,
