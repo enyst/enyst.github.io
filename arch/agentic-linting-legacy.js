@@ -79,6 +79,7 @@ const destinations = {
   "profile-theme-aliases-proposal": "agentic-linting-settings.html#profile-theme-aliases-proposal",
   "catalog-feedback-film": "agentic-linting-settings.html#catalog-feedback-film",
   "catalog-feedback-video": "agentic-linting-settings.html#catalog-feedback-video",
+  "catalog-review-proof-nov07": "agentic-linting-settings.html#catalog-review-proof-nov07",
   "backend-chooser-recipes-film": "agentic-linting-backends.html#backend-chooser-recipes-film",
   "backend-chooser-recipes-video": "agentic-linting-backends.html#backend-chooser-recipes-video",
   "backend-chooser-digitalocean-followup-film": "agentic-linting-backends.html#backend-chooser-digitalocean-followup-film",
