@@ -180,6 +180,7 @@ const destinations = {
   "scroll-fade-tokens-film": "agentic-linting-rules.html#scroll-fade-tokens-film",
   "scroll-fade-tokens-video": "agentic-linting-rules.html#scroll-fade-tokens-video",
   "palette-completed-guards-nov08": "agentic-linting-rules.html#palette-completed-guards-nov08",
+  "palette-completed-guards-ci-status": "agentic-linting-rules.html#palette-completed-guards-ci-status",
   "budget-sdk-prerequisites-nov07": "agentic-linting-notes.html#budget-sdk-prerequisites-nov07",
   "oct26b-films": "agentic-linting-notes.html#oct26b-films",
   "oct25c-films": "agentic-linting-notes.html#oct25c-films",
