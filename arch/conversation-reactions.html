@@ -1,0 +1,79 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-11-09","role":"author"}]} -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conversation reactions · Engel's Notebook</title>
+  <meta name="description" content="Agents talk a lot. With reactions, an agent in OpenHands can answer a change of plan with a thumbs up and get on with the work. A short narrated film of a real run, and how to turn the experimental feature on." />
+  <meta property="og:title" content="Conversation reactions: react, then do the thing" />
+  <meta property="og:description" content="A real run in Agent Canvas: wait, actually, a thumbs up, a short answer, a heart, and reactions that survive a restart." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/conversation-reactions.html" />
+  <meta property="og:image" content="https://enyst.github.io/experiments/reactions-video/stills/poster.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="canonical" href="https://enyst.github.io/arch/conversation-reactions.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    .film { margin: 0 0 var(--space-md); }
+    .film video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; background: #111318; border: 1px solid var(--border); border-radius: var(--border-radius); }
+    .film figcaption { color: var(--muted); font-size: 0.88em; line-height: 1.5; margin-top: 10px; }
+    .film figcaption a, .prose a, .meta a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,0.3); }
+    .film figcaption a:hover, .prose a:hover, .meta a:hover { border-bottom-color: var(--teal); }
+    .page-intro { color: var(--muted); font-size: var(--text-lg); margin-bottom: 28px; }
+    .three { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 8px 0 var(--space-md); }
+    .three div { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 16px 18px; line-height: 1.5; font-size: 0.92em; }
+    .three b { display: block; font-family: var(--mono); font-size: 0.78em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+    .agents-md { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 14px 18px; font-family: var(--mono); font-size: 0.84em; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; margin: 8px 0 18px; }
+    .prose code { word-break: break-word; }
+  </style>
+</head>
+<body>
+  <div class="shell shell--wide">
+    <a class="back" href="../index.html">← Engel's Notebook</a>
+    <h1 class="page">Conversation reactions</h1>
+    <p class="page-intro">Agents talk a lot. Ask for one small change and the answer often starts by reading your own words back to you. With reactions, an agent in OpenHands can answer “wait, actually” with a thumbs up, and simply go do the thing.</p>
+
+    <h2 id="video">The film</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/reactions-video/stills/poster.png">
+        <source src="../experiments/reactions-video/reactions.mp4" type="video/mp4" />
+        <a href="../experiments/reactions-video/reactions.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>A real run in Agent Canvas, recorded with the verify-openhands skill against a live Agent Server, in the Paper theme, with DeepSeek Flash as the agent's model. Drawn with Manim; narrated by Kokoro-82M, an open-weight speech model; the score and the reaction sounds are generated with numpy. <a href="../experiments/reactions-video/reactions.mp4" download>Download (MP4, 1:27, 4.5 MB)</a> · <a href="https://github.com/enyst/enyst.github.io/tree/main/experiments/reactions-video">Scene script, narration, recordings and music</a></figcaption>
+    </figure>
+
+    <h2 id="idea">The idea</h2>
+    <div class="three">
+      <div><b>Fewer words</b>A wall of text is tiring to read. When the person changes course mid-task, a 👍 says “understood” without restating the request, and the agent keeps working.</div>
+      <div><b>Real tools</b>The agent gets <code>react</code> and <code>unreact</code> tools. A reaction is saved as an event in the conversation, so it stays after a reload or a server restart.</div>
+      <div><b>Both ways</b>You can react to the agent's messages too: a ❤️ on an answer you love. Your reactions are kept the same way, and they never start a run.</div>
+    </div>
+
+    <h2 id="run">What happens in the run</h2>
+    <div class="prose">
+      <ol>
+        <li><strong>Turn it on.</strong> Press <kbd>Ctrl</kbd>+<kbd>K</kbd>, open <em>Experimental</em>, and switch on <em>Conversation reactions</em>. It applies to conversations you start afterwards.</li>
+        <li><strong>Ask.</strong> “Can you write a little script that splits our team dinner bill evenly? It takes the total and a list of names. Put it in split_bill.py and show me an example run.”</li>
+        <li><strong>Change your mind.</strong> While the agent works: “Wait, actually: not everyone had drinks. Can it take what each person ordered, and split only the shared appetizers evenly?” The agent puts a 👍 on that message and carries on.</li>
+        <li><strong>A short answer.</strong> The new options, one example run, and a line about leftover pennies. You react with ❤️.</li>
+        <li><strong>Restart, reopen.</strong> After <code>control-openhands restart</code>, the conversation opens with the 👍 and the ❤️ where they were.</li>
+      </ol>
+    </div>
+
+    <h2 id="agents-md">One honest detail</h2>
+    <div class="prose">
+      <p>The demo repository has an <code>AGENTS.md</code> with a short note on how the person likes to work. In four earlier runs without it, DeepSeek Flash and DeepSeek Pro handled the change of plan correctly, but none of them reacted on their own: the tool's description suggests 👀 when starting on work and 👍 for a note that needs no reply, and the models did not read a mid-task correction as either. With the note, the agent reacted on the first try and again in the recorded run.</p>
+    </div>
+    <div class="agents-md">## Working with me
+- Keep answers short. I can read the code.
+- If I change my mind while you're working, don't restate what I said: react with a thumbs up (+1) on my message and carry on.</div>
+
+    <h2 id="sources">Sources</h2>
+    <p class="meta">Agent Server: experimental feature switches and the reactions API and tools in <a href="https://github.com/OpenHands/software-agent-sdk/pull/6609">software-agent-sdk #6609</a>. Canvas: Settings › Experimental, reaction chips and the picker in <a href="https://github.com/OpenHands/OpenHands/pull/19503">OpenHands #19503</a>. Both are open pull requests; the film was recorded from their branches on 9 November 2026 (SDK <code>c4beabb</code>, Canvas verify branch <code>1e9d355</code>). Everything here is open source, and anyone can rerun it.</p>
+  </div>
+</body>
+</html>
