@@ -1,0 +1,208 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-11-10","role":"author"}]} -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projects, end to end · Engel's Notebook</title>
+  <meta name="description" content="Every Projects user scenario run live in Agent Canvas and Agent Server, with real agents acting: three complete projects replayed from real history, sixteen building blocks, one narrated video per section, and what broke along the way." />
+  <meta property="og:title" content="Projects, end to end: three real projects, run live" />
+  <meta property="og:description" content="An SDK bug bash, a scoped-secrets feature and an Insider release, replayed as Projects with real agents. What works, with video, and what broke." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/projects-scenarios.html" />
+  <meta property="og:image" content="https://enyst.github.io/experiments/projects-scenarios-video/s2-poster.jpg" />
+  <link rel="canonical" href="https://enyst.github.io/arch/projects-scenarios.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    .page-intro { color: var(--muted); font-size: var(--text-lg); margin-bottom: 28px; }
+    .film { margin: 0 0 var(--space-md); }
+    .film video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; background: #111318; border: 1px solid var(--border); border-radius: var(--border-radius); }
+    .film figcaption { color: var(--muted); font-size: 0.88em; line-height: 1.5; margin-top: 10px; }
+    .film figcaption a, .prose a, .meta a, td a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,0.3); }
+    .film figcaption a:hover, .prose a:hover, .meta a:hover, td a:hover { border-bottom-color: var(--teal); }
+    .prose code { word-break: break-word; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 0 0 var(--space-md); }
+    .stats div { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 14px 16px; }
+    .stats b { display: block; font-family: var(--serif, 'Instrument Serif'), serif; font-size: 2em; font-weight: 400; color: var(--ink); line-height: 1.1; }
+    .stats span { color: var(--muted); font-size: 0.86em; }
+    .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--border-radius); margin: 8px 0 var(--space-md); }
+    table { border-collapse: collapse; width: 100%; min-width: 40rem; font-size: 0.88em; line-height: 1.5; }
+    th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: 0; }
+    th { font-family: var(--mono); font-size: 0.74em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--card); }
+    td code { font-family: var(--mono); font-size: 0.86em; }
+    .t { display: inline-block; font-family: var(--mono); font-size: 0.72em; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+    .ok { color: var(--green); border: 1px solid rgba(123,196,127,0.45); }
+    .fixed { color: var(--teal); border: 1px solid rgba(107,191,171,0.5); }
+    .open { color: var(--accent); border: 1px solid rgba(201,168,76,0.45); }
+    .note { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--border-radius); padding: 12px 16px; margin: 0 0 var(--space-md); line-height: 1.55; font-size: 0.94em; }
+    .meta { color: var(--muted); font-size: 0.86em; margin-top: var(--space-lg); border-top: 1px solid var(--border); padding-top: 14px; }
+  </style>
+</head>
+<body>
+  <div class="shell shell--wide">
+    <a class="back" href="../index.html">← Engel's Notebook</a>
+    <h1 class="page">Projects, end to end: three real projects, run live</h1>
+    <p class="page-intro">Projects lets a person work one level up: a coordinator they talk to, workers that do the work, and a board that says what needs them. This page proves it works by running it. Three projects replayed from real OpenHands and Insider history, plus every building block, all driven in Agent Canvas with real agents doing real work. Each section has a short narrated video. Where something broke, it says so, and says what happened next.</p>
+
+    <div class="stats">
+      <div><b>3</b><span>complete projects, replayed from real history</span></div>
+      <div><b>16</b><span>building blocks, 15 working, 1 partly</span></div>
+      <div><b>33/33</b><span>Agent Server checks (verify-agent-server, F36)</span></div>
+      <div><b>5</b><span>bugs found live, fixed the same day</span></div>
+    </div>
+
+    <h2 id="setup">How it was run</h2>
+    <div class="prose">
+      <p>The stack was the two Projects pull requests together: <a href="https://github.com/OpenHands/software-agent-sdk/pull/6602">SDK #6602</a> (Agent Server, up to <code>95dadd7</code>) and <a href="https://github.com/OpenHands/OpenHands/pull/19495">Canvas #19495</a>, with <a href="https://github.com/enyst/insider">Insider</a> main installed as a Canvas app. The coordinator and the workers ran the new <code>project_coordinator</code> and <code>project_worker</code> prompts and their predefined profiles (<a href="project-agent-profiles.html">the design</a>, landed in #6602 at <code>67c1038</code>). Agents ran on DeepSeek. Every UI step was driven with the <code>control-openhands</code> CLI in the Paper theme and recorded, and the server side was checked with <code>verify-agent-server</code>.</p>
+      <p>The projects are replays. Each one starts from a local copy of a real repository at the commit just before the real work happened, with no remote and the later history removed, so nothing reached the real repositories and the agents couldn't peek at the answer. That lets us compare each worker's fix with the one that actually merged.</p>
+    </div>
+
+    <h2 id="turn-on">1. Turn Projects on</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/projects-scenarios-video/s1-poster.jpg">
+        <source src="../experiments/projects-scenarios-video/s1.mp4" type="video/mp4" />
+        <a href="../experiments/projects-scenarios-video/s1.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>Settings › Experimental, the Projects entry in the sidebar, and the two profiles the first project creates. <a href="../experiments/projects-scenarios-video/s1.mp4" download>MP4, 0:28</a></figcaption>
+    </figure>
+    <div class="prose">
+      <p>Projects and conversation reactions are switched on from Settings › Experimental (mentions come with Projects). The first project seeds two profiles from the person's active one: <b>Project coordinator</b> (terminal, file editor, task tracker and the project tools, no browser) and <b>Project worker</b> (the person's tools, without the power to start more conversations). Neither is overwritten later. Whatever profile a coordinator or worker runs, the server gives it its role in the system prompt.</p>
+    </div>
+
+    <h2 id="p1">2. Project 1: an SDK bug bash</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/projects-scenarios-video/s2-poster.jpg">
+        <source src="../experiments/projects-scenarios-video/s2.mp4" type="video/mp4" />
+        <a href="../experiments/projects-scenarios-video/s2.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>Four bug reports in, four workers out, one summary back. Agent waits are sped up. <a href="../experiments/projects-scenarios-video/s2.mp4" download>MP4, 0:51</a></figcaption>
+    </figure>
+    <div class="prose">
+      <p>Four edge-case bugs from <a href="https://github.com/OpenHands/software-agent-sdk/issues/6348">SDK issue #6348</a>, on the SDK as it was before they were fixed: a search pattern read as a command-line flag (<a href="https://github.com/OpenHands/software-agent-sdk/pull/6537">#6537</a>), <code>file://</code> URLs sliced wrong (<a href="https://github.com/OpenHands/software-agent-sdk/pull/6482">#6482</a>), stale cached text after a binary write (<a href="https://github.com/OpenHands/software-agent-sdk/pull/6534">#6534</a>), and a lost first-line indent in commit diffs (<a href="https://github.com/OpenHands/software-agent-sdk/pull/6538">#6538</a>).</p>
+      <p>We gave the coordinator all four reports in one message. It started one worker per bug and ended its turn, as its prompt tells it to. Each worker found the cause, wrote a regression test that failed first, fixed it, and reported back. The coordinator reviewed every diff without touching the workers' worktrees and sent one summary with two decisions for us. All four fixes match what merged in substance. When we asked for one more test case, the coordinator sent it to the worker that owned that branch instead of doing it itself. Three cards resolved on their own (the judge was 85 to 92% sure); we resolved the fourth by hand and reopened one from its banner.</p>
+    </div>
+
+    <h2 id="p2">3. Project 2: scoped secrets</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/projects-scenarios-video/s3-poster.jpg">
+        <source src="../experiments/projects-scenarios-video/s3.mp4" type="video/mp4" />
+        <a href="../experiments/projects-scenarios-video/s3.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>An approval gate, a project file, a “wait, actually”, and a rule saved to memory. <a href="../experiments/projects-scenarios-video/s3.mp4" download>MP4, 0:45</a></figcaption>
+    </figure>
+    <div class="prose">
+      <p>A feature rather than fixes: scoped secrets, <a href="https://github.com/OpenHands/software-agent-sdk/issues/5672">issue #5672</a>, which merged as <a href="https://github.com/OpenHands/software-agent-sdk/pull/6276">#6276</a>. It touches the model, the system prompt and the agent. We asked to approve the exact prompt text first. The coordinator split the work, started only the parts that didn't depend on that text, and saved its proposal as a project file. The card waited under <b>Needs you</b> until we approved it with one change.</p>
+      <p>Then we dropped into a busy worker and said “wait, actually, also test the round trip”. The worker did it, but only after its running test command finished, a few minutes later, and it didn't react with a 👍. Both are listed under <a href="#open">what's still open</a>. At the end the coordinator merged the three branches locally to check that they fit together, and wrote our rule into project memory.</p>
+    </div>
+
+    <h2 id="p3">4. Project 3: Insider</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/projects-scenarios-video/s4-poster.jpg">
+        <source src="../experiments/projects-scenarios-video/s4.mp4" type="video/mp4" />
+        <a href="../experiments/projects-scenarios-video/s4.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>Insider installed from GitHub, its Cat running a project on the server. Sped up 5.5×. <a href="../experiments/projects-scenarios-video/s4.mp4" download>MP4, 0:29</a></figcaption>
+    </figure>
+    <div class="prose">
+      <p>The same server, seen through the Insider app. We installed Insider from GitHub in Customize › Apps and trusted it. Then we gave the Insider Cat three fixes the Projects review found in Insider itself (<a href="https://github.com/enyst/insider/pull/58">#58</a>, <a href="https://github.com/enyst/insider/pull/59">#59</a>, <a href="https://github.com/enyst/insider/pull/60">#60</a>, the review's I2 gap), on a local copy from before they landed. The Cat started a real project on the server, with coordinator tools, and three workers. Its board grouped them the way the server does. One worker asked whether to merge its branch with the others; we answered from the card and came back.</p>
+    </div>
+
+    <h2 id="files-memory">5. Project files and memory</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/projects-scenarios-video/s5-poster.jpg">
+        <source src="../experiments/projects-scenarios-video/s5.mp4" type="video/mp4" />
+        <a href="../experiments/projects-scenarios-video/s5.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>An uploaded checklist read by the coordinator; a memory rule reaching the next worker. <a href="../experiments/projects-scenarios-video/s5.mp4" download>MP4, 0:26</a></figcaption>
+    </figure>
+    <div class="prose">
+      <p>We uploaded a release checklist on the bug-bash project page and asked whether the four branches met it. The coordinator listed the project's files, read ours, checked every branch, and found the real gap: no commit named the issue it fixed. Memory works the same way in the other direction. The rule we gave the coordinator in the scoped-secrets project showed up in the next worker's <code>&lt;PROJECT&gt;</code> block, in its system prompt.</p>
+    </div>
+
+    <h2 id="restart">6. Agent Server restarts</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/projects-scenarios-video/s6-poster.jpg">
+        <source src="../experiments/projects-scenarios-video/s6.mp4" type="video/mp4" />
+        <a href="../experiments/projects-scenarios-video/s6.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>A restart in the middle of a worker's run, before and after the fix. <a href="../experiments/projects-scenarios-video/s6.mp4" download>MP4, 0:29</a></figcaption>
+    </figure>
+    <div class="prose">
+      <p>We restarted Agent Server while a worker was running. Projects, the board and every conversation came back, the interrupted worker showed under <b>Needs you</b>, the coordinator was told, and one sentence from us got the worker going again. Two things were wrong on the way. The first try reported the pause as ours (“Paused by the person”), fixed in <code>14b3f7c</code>. On the second, the worker was mid-command and came back worded like a crash, fixed in <code>95dadd7</code>. Run again live after the fix, the worker came back paused, and the coordinator said it was “paused by the server restart, not by you”.</p>
+    </div>
+
+    <h2 id="turn-off">7. Turn Projects off</h2>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/projects-scenarios-video/s7-poster.jpg">
+        <source src="../experiments/projects-scenarios-video/s7.mp4" type="video/mp4" />
+        <a href="../experiments/projects-scenarios-video/s7.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>Off hides, on brings everything back. <a href="../experiments/projects-scenarios-video/s7.mp4" download>MP4, 0:13</a></figcaption>
+    </figure>
+    <div class="prose">
+      <p>With the switch off, the sidebar entry goes and the Projects page says where to turn it back on. Nothing is deleted: on again, all three projects are still there, with their boards.</p>
+    </div>
+
+    <h2 id="blocks">Building blocks</h2>
+    <div class="prose"><p>Each block was seen working inside the projects above; the last column says where.</p></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th style="width:3.5rem">#</th><th>Scenario</th><th style="width:7rem">Result</th><th style="width:9rem">Seen in</th></tr></thead>
+        <tbody>
+          <tr><td>B1</td><td>Turn on Projects in Settings › Experimental; Projects appears in the sidebar</td><td><span class="t ok">works</span></td><td><a href="#turn-on">1</a></td></tr>
+          <tr><td>B2</td><td>A new project starts its coordinator from the Project coordinator profile</td><td><span class="t ok">works</span></td><td><a href="#turn-on">1</a>, <a href="#p1">2</a></td></tr>
+          <tr><td>B3</td><td>Project coordinator and Project worker profiles exist; workers run from the worker profile</td><td><span class="t ok">works</span></td><td><a href="#turn-on">1</a></td></tr>
+          <tr><td>B4</td><td>The coordinator routes work: starts workers, names them as mentions, ends its turn instead of polling</td><td><span class="t fixed">fixed, works</span></td><td><a href="#p1">2</a>, <a href="#p2">3</a></td></tr>
+          <tr><td>B5</td><td>Board: Working, Needs you, Done, Resolved, live as workers move</td><td><span class="t ok">works</span></td><td><a href="#p1">2</a>, <a href="#p3">4</a></td></tr>
+          <tr><td>B6</td><td>Needs you: a worker's real question shows as the card's ask; the person answers in the worker</td><td><span class="t fixed">fixed, works</span></td><td><a href="#p2">3</a>, <a href="#p3">4</a></td></tr>
+          <tr><td>B7</td><td>The coordinator hears back from the workers it started: finished, paused, waiting</td><td><span class="t ok">works</span></td><td><a href="#p1">2</a>, <a href="#restart">6</a></td></tr>
+          <tr><td>B8</td><td>“Also do X” to the coordinator reaches the worker that owns the branch</td><td><span class="t ok">works</span></td><td><a href="#p1">2</a></td></tr>
+          <tr><td>B9</td><td>Auto-resolve with “N% sure”; manual Resolve; Reopen from the banner</td><td><span class="t fixed">fixed, works</span></td><td><a href="#p1">2</a></td></tr>
+          <tr><td>B10</td><td>Click a mention to open a worker; Back returns</td><td><span class="t ok">works</span></td><td><a href="#p1">2</a></td></tr>
+          <tr><td>B11</td><td>“Wait, actually” gets a 👍 while the agent keeps working</td><td><span class="t open">partly</span></td><td><a href="#p2">3</a></td></tr>
+          <tr><td>B12</td><td>Project files: the coordinator saves one, the person uploads one and an agent reads it</td><td><span class="t ok">works</span></td><td><a href="#p2">3</a>, <a href="#files-memory">5</a></td></tr>
+          <tr><td>B13</td><td>Project memory written by the coordinator reaches a new worker's system prompt</td><td><span class="t ok">works</span></td><td><a href="#files-memory">5</a></td></tr>
+          <tr><td>B14</td><td>A worker waiting for approval is not run past it by the coordinator</td><td><span class="t ok">works</span></td><td><a href="#p2">3</a></td></tr>
+          <tr><td>B15</td><td>Agent Server restart keeps projects, the board and the update loop</td><td><span class="t fixed">fixed, works</span></td><td><a href="#restart">6</a></td></tr>
+          <tr><td>B16</td><td>Flag off hides Projects; data kept; on again restores it</td><td><span class="t ok">works</span></td><td><a href="#turn-off">7</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="prose">
+      <p>On the server side, the <code>verify-agent-server</code> map for Projects (F36) runs every route and tool against a live server. It went from 25 of 33 on <code>67c1038</code> (one real bug, a turn shown with no outcome while the judge was deciding, fixed in <code>f290d9b</code>; the rest was the map lagging behind the new prompts) to 33 of 33.</p>
+    </div>
+
+    <h2 id="fixed">What broke, and was fixed today</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Found live</th><th style="width:9rem">Fix in #6602</th></tr></thead>
+        <tbody>
+          <tr><td>Rehearsal on the old prompts: workers used <code>git stash</code> to prove a test fails first, and since worktrees share one stash, edits moved between workers. The coordinator also polled with <code>sleep</code> and ran tests inside workers' worktrees.</td><td><code>67c1038</code> (the new prompts)</td></tr>
+          <tr><td>The judge put a hand-off we had already waived under Needs you; filed a worker's question meant for the coordinator as ours; used the last sentence (“Closing out here.”) as the ask.</td><td><code>3c01774</code></td></tr>
+          <tr><td>A pause from a server restart was shown as “Paused by the person”.</td><td><code>14b3f7c</code></td></tr>
+          <tr><td>A turn showed no outcome while the judge was still deciding.</td><td><code>f290d9b</code></td></tr>
+          <tr><td>A restart in the middle of a command came back worded like a crash.</td><td><code>95dadd7</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="open">What's still open</h2>
+    <div class="note"><b>A message to a busy worker waits for its running command.</b> “Wait, actually” is delivered only when the current tool call ends, which can be minutes for a test run. The cause is the SDK's step lock; it's going to Engel as its own question rather than a quiet fix.</div>
+    <div class="prose">
+      <ul>
+        <li>Agents don't react 👍 to a “wait, actually” unless AGENTS.md nudges them, the same finding as the <a href="conversation-reactions.html">reactions film</a>. They do act on the content.</li>
+        <li>The board doesn't show the coordinator's own state, and the projects list doesn't show which project needs you.</li>
+        <li>A resolved card keeps showing its old ask text.</li>
+        <li>The Canvas profile editor shows “OpenHands default” as the system prompt for the two project profiles, though the server gives them their role.</li>
+        <li>Insider: the project is named after the whole first message; the Cat runs the person's active profile, so it has a browser; updates are labelled “Another conversation”; the page needs a reload after the app is enabled.</li>
+      </ul>
+    </div>
+
+    <p class="meta">Recorded 10 November 2026 with the <code>verify-openhands</code>, <code>verify-agent-server</code>, <code>control-openhands</code> and <code>control-agent-server</code> skills. Narration by Kokoro-82M, an open-weight speech model (voice af_heart); the score is generated with numpy and mixed low. <a href="https://github.com/enyst/enyst.github.io/tree/main/experiments/projects-scenarios-video">Narration, composition and score scripts</a> · <a href="project-agent-profiles.html">Coordinator and worker prompts</a> · <a href="conversation-reactions.html">Conversation reactions</a></p>
+  </div>
+</body>
+</html>
