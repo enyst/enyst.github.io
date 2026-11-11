@@ -1,12 +1,13 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":null,"date":"2026-11-11","role":"editor"}]} -->
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Routing GitHub mentions to Codex and Claude — Engel Nyst</title>
-  <meta name="description" content="A plan for a personal Cloudflare Worker that routes trusted GitHub comments to hosted Codex and Claude agents without installing apps on the target repository." />
+  <meta name="description" content="A plan for routing trusted @smolpaws codex and @smolpaws claude requests on GitHub to hosted Codex and Claude agents, from SmolPaws's existing GitHub Worker." />
   <meta property="og:title" content="Routing GitHub mentions to Codex and Claude" />
-  <meta property="og:description" content="Extend SmolPaws's GitHub Worker with an isolated module, Cron and D1 around the OpenAI Agents API and Claude Managed Agents." />
+  <meta property="og:description" content="Grow SmolPaws's GitHub Worker with one D1 ledger and cron loop around Claude Managed Agents and the OpenAI Agents API." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://enyst.github.io/arch/github-mention-router.html" />
   <meta name="twitter:card" content="summary" />
@@ -40,172 +41,188 @@
 <main class="shell">
   <a class="back" href="../index.html">&larr; Home</a>
   <h1>Routing GitHub mentions to Codex and Claude <span class="tag tag-draft">draft plan</span></h1>
-  <p class="meta">12 October 2026 · Revised 14 October 2026 · Proposed implementation: <code>smolpaws/apps/github</code></p>
+  <p class="meta">12 October 2026 · Revised 14 October and 11 November 2026 · Proposed implementation: <code>smolpaws/apps/github</code></p>
 
   <div class="callout">
-    <p><strong>Extend the existing GitHub Worker with a separate managed-agent module.</strong> Its minute cron and D1 follow requests to the OpenAI Agents API for <code>@codex</code> and Claude Managed Agents for <code>@claude</code>. Both providers host execution. SmolPaws posts attributed replies; enyst's write access belongs to later code publication and maintainer operations.</p>
+    <p><strong>Grow the existing GitHub Worker; don't build a second one.</strong> enyst writes <code>@smolpaws codex …</code> or <code>@smolpaws claude …</code>. GitHub delivers that to SmolPaws as a notification, which the Worker already polls. One D1 ledger and the existing minute cron carry each request to a delivered reply posted as SmolPaws. Claude runs on Claude Managed Agents and Codex on the OpenAI Agents API: two API-key agents the Worker controls, neither visible in the providers' web apps.</p>
   </div>
-  <p>Requests from enyst or SmolPaws reach the same durable ledger, through GitHub comments or an authenticated direct call. A first version returns findings and proposed patches as comments. The hosted routes use their own authorization and lifecycle code inside the GitHub app, independently of SmolPaws's local agent runner.</p>
+  <p>The SmolPaws agent asks through a direct tool that writes the same ledger row, not through a GitHub comment. A first version returns findings as comments. Code proposals come later as branches on enyst's fork.</p>
   <p class="status">Revised proposal. The managed routes have not been implemented or activated.</p>
 
   <nav aria-label="On this page">
     <ul class="toc">
+      <li><a href="#changes">What changed</a></li>
       <li><a href="#separation">Code organization</a></li>
-      <li><a href="#access">GitHub access</a></li>
-      <li><a href="#cloudflare">Cloudflare services</a></li>
-      <li><a href="#providers">Provider APIs</a></li>
-      <li><a href="#intake">Comment intake</a></li>
+      <li><a href="#trigger">Trigger and identity</a></li>
+      <li><a href="#cloudflare">Cron and D1</a></li>
+      <li><a href="#providers">Backends</a></li>
+      <li><a href="#intake">Intake</a></li>
       <li><a href="#delivery">Reliable delivery</a></li>
+      <li><a href="#logs">Run logs</a></li>
       <li><a href="#rollout">Rollout</a></li>
     </ul>
   </nav>
 
+  <h2 id="changes">What changed in this revision</h2>
+  <p>A review on 11 November kept the correctness core and questioned the shape. These changes follow from it.</p>
+  <ul>
+    <li><strong>Trigger.</strong> <code>@codex</code> and <code>@claude</code> become <code>@smolpaws codex</code> and <code>@smolpaws claude</code>. Bare handles collide with OpenAI's and Anthropic's own GitHub integrations and forced repository-wide comment polling.</li>
+    <li><strong>Intake.</strong> SmolPaws's notifications find requests. Repository-wide feeds, scan cursors, overlap windows and per-surface baselines are gone.</li>
+    <li><strong>Requesters.</strong> On GitHub, only enyst can ask. SmolPaws asks through its direct tool, so every SmolPaws-authored comment can be ignored on intake.</li>
+    <li><strong>Backends.</strong> Claude stays on Managed Agents and Codex on the OpenAI Agents API. The plan now says plainly that neither run appears in claude.ai/code or Codex web, and why a web-visible Claude Code scheduled task was considered and set aside.</li>
+    <li><strong>Run logs.</strong> Since neither run opens in a web app, the Worker copies each session's full log to R2 and serves a private run viewer linked from every reply.</li>
+    <li><strong>Operator states.</strong> <em>Dispatch unknown</em> and <em>delivery unknown</em> now notify enyst through SmolPaws, not only a D1 column.</li>
+  </ul>
+
   <h2 id="separation">Keep hosted routing inside the GitHub app</h2>
-  <p><code>smolpaws/apps/github</code> already contains a Cloudflare Worker, a minute cron, notification intake, a queue and GitHub replies. Ordinary SmolPaws requests go through <code>agentServerClient.ts</code> to the local runner. The hosted routes should be selected before that dispatch and handled by their own module. <a href="https://github.com/smolpaws/smolpaws/blob/dd3d18f23f547f770cb3898b5b7c7e0179d0ff8e/apps/github/src/index.ts">GitHub Worker source</a>, <a href="https://github.com/smolpaws/smolpaws/blob/dd3d18f23f547f770cb3898b5b7c7e0179d0ff8e/apps/github/wrangler.toml">Worker configuration</a>, and <a href="https://github.com/smolpaws/smolpaws/blob/dd3d18f23f547f770cb3898b5b7c7e0179d0ff8e/apps/github/src/agentServerClient.ts">local runner adapter</a>.</p>
+  <p><code>smolpaws/apps/github</code> already contains a Cloudflare Worker, a minute cron, an <code>ALLOWED_ACTORS</code> allowlist, notification polling with SmolPaws's user token, a queue and GitHub replies. Ordinary SmolPaws requests go through <code>agentServerClient.ts</code> to the local runner. The hosted routes are selected before that dispatch and handled by their own module. <a href="https://github.com/smolpaws/smolpaws/blob/dd3d18f23f547f770cb3898b5b7c7e0179d0ff8e/apps/github/src/index.ts">GitHub Worker source</a>, <a href="https://github.com/smolpaws/smolpaws/blob/dd3d18f23f547f770cb3898b5b7c7e0179d0ff8e/apps/github/wrangler.toml">Worker configuration</a>, and <a href="https://github.com/smolpaws/smolpaws/blob/dd3d18f23f547f770cb3898b5b7c7e0179d0ff8e/apps/github/src/agentServerClient.ts">local runner adapter</a>.</p>
   <pre class="code">apps/github/
   src/index.ts                  Worker wiring and route selection
   src/managedAgents/
     index.ts                    accept(request), tick(), status(runId)
+    intake.ts                   Notification thread scan and mention parsing
     lifecycle.ts                Dispatch, observation and publication
     ledger.ts                   D1 requests, leases and reply outbox
-    providers/openai.ts         OpenAI managed sessions
-    providers/claude.ts         Claude managed sessions
+    transcripts.ts              Session logs to R2 and the run viewer
+    providers/claudeManaged.ts  Claude Managed Agents sessions
+    providers/openaiAgents.ts   OpenAI Agents API sessions
   migrations/                   Shared durable intake and routing schema</pre>
-  <p>This is a proposed layout. Keep the module free of imports from the agent server, coordinator, personal memory and local runner protocol. Pass its storage, clock, HTTP access and comment writer in explicitly. Provider-specific session formats stay inside the two adapters. The direct SmolPaws tools are clients of this module's authenticated Worker interface.</p>
-  <p>A recognized managed command is consumed even if it is rejected; it must not also reach the local runner. Keep the hosted author allowlist separate from the ordinary SmolPaws allowlist. Supply each route only the credentials it needs.</p>
-  <p>Use one D1 database for durable intake receipts and managed requests. Ordinary SmolPaws requests retain their queue and runner path; hosted jobs progress from D1 on each cron tick. Replace Cache API admission checks with durable receipts, including a migration baseline so old mentions do not run again. Cloudflare describes its cache as ephemeral and local to a data center. <a href="https://developers.cloudflare.com/workers/reference/how-the-cache-works/">Cache API storage properties</a>.</p>
-  <p>Require two integration checks: hosted requests work with the local runner unavailable, and disabling hosted routes preserves ordinary SmolPaws requests. The shared Worker remains one deployment, so releases affect both paths. If independent deployments become useful, the small module interface provides a place to extract a separate Worker. The local <code>github-mention-router</code> draft holds the contract and backlog until implementation moves into the GitHub app.</p>
+  <p>This is a proposed layout. Keep the module free of imports from the agent server, coordinator, personal memory and local runner protocol. Pass its storage, clock, HTTP access and comment writer in explicitly. Provider-specific formats stay inside the two adapters. The SmolPaws <code>ask_codex</code> and <code>ask_claude</code> tools call <code>accept(request)</code> through the Worker's authenticated interface.</p>
+  <p>A recognized <code>@smolpaws codex</code> or <code>@smolpaws claude</code> command is consumed even if it is rejected; it must not also reach the local runner. A plain <code>@smolpaws</code> mention keeps going to SmolPaws itself.</p>
+  <p><strong>Build the ledger once and let both paths use it.</strong> The Worker's current dedupe, <code>wasGithubMentionEnqueued</code> and <code>wasNotificationEnqueued</code>, lives in the Cloudflare Cache API, which is local to a data center and can be evicted at any time. Replace it with D1 receipts for ordinary SmolPaws mentions too, with a migration baseline so old mentions do not run again. <a href="https://developers.cloudflare.com/workers/reference/how-the-cache-works/">Cache API storage properties</a>.</p>
+  <p>Require two integration checks: hosted requests work with the local runner unavailable, and disabling hosted routes preserves ordinary SmolPaws requests. The shared Worker remains one deployment, so a release affects both paths.</p>
 
-  <h2 id="access">GitHub access determines the trigger</h2>
-  <p>The target supplied as <code>OpenHands/agent-sdk</code> currently resolves to <a href="https://github.com/OpenHands/software-agent-sdk">OpenHands/software-agent-sdk</a>, repository ID <code>1043426082</code>. Store the ID as the boundary and resolve the current name during preflight. A rename should change API paths, not silently change which repository may receive work.</p>
-  <p>Push access is enough to propose code through a writable branch. It does not establish authority to configure a repository webhook. GitHub requires repository ownership or admin access to create one. Polling its public comment API avoids that dependency. If an administrator later adds a webhook, it can feed the same request ledger while polling remains a reconciliation path. <a href="https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks">GitHub webhook requirements</a>.</p>
-  <p><code>smolpaws</code> can leave requests and publish the agents' replies through its own comment access. It has no labeling or maintainer permissions. The router checks request author IDs and chooses the writing identity by action: <code>smolpaws</code> for ordinary comments, and <code>enyst</code> for later authorized code publication. Labeling and other maintainer tasks require their own authorized path. The model providers do not become repository members through this arrangement.</p>
+  <h2 id="trigger">The trigger is addressed to SmolPaws</h2>
+  <p><strong>Use <code>@smolpaws codex …</code> and <code>@smolpaws claude …</code>.</strong> The provider word is an argument to a mention of an account enyst controls.</p>
+  <pre class="code">@smolpaws codex review this change for cancellation and cleanup bugs
+@smolpaws claude explain whether the proposed API preserves replay behavior</pre>
+  <p>Bare <code>@codex</code> and <code>@claude</code> fail in three ways. <code>@codex</code> triggers OpenAI's Codex GitHub integration and <code>@claude</code> triggers Anthropic's Claude GitHub app and Action. If anyone connects either one to the target repository, a single comment would start the real product and the router, billing and posting twice. Each mention also pings whoever owns the handle. And because the mention is not addressed to an account enyst controls, finding it requires polling every comment in the repository.</p>
+  <p>A mention of <code>@smolpaws</code> creates a notification for SmolPaws on any repository where enyst can comment. The Worker already polls those notifications. The repository allowlist stays, starting with <a href="https://github.com/OpenHands/software-agent-sdk">OpenHands/software-agent-sdk</a> (repository ID <code>1043426082</code>), but it is a policy check, not the intake mechanism. Store IDs, not names, so a rename cannot silently change which repository may receive work.</p>
 
-  <div class="table-scroll" role="region" aria-label="Ownership of trigger and publication permissions" tabindex="0">
+  <h3>Who acts as whom</h3>
+  <p>Only enyst's immutable GitHub author ID may request work through a comment. SmolPaws asks through its direct tool. Replies are posted as <code>smolpaws</code>, which makes the attribution obvious and lets loop prevention be a single rule: ignore comments whose author ID is SmolPaws's.</p>
+  <div class="table-scroll" role="region" aria-label="Who performs each action" tabindex="0">
     <table>
       <thead><tr><th>Action</th><th>Who performs it</th><th>Required access</th></tr></thead>
       <tbody>
-        <tr><td>Read public comments and source</td><td>Router and hosted sandbox</td><td>Public read access; authenticated API reads give a larger rate allowance.</td></tr>
-        <tr><td>Request Codex or Claude</td><td><code>enyst</code> or <code>smolpaws</code></td><td>Ability to comment, plus the router author allowlist.</td></tr>
-        <tr><td>Publish a result comment</td><td>Router as <code>smolpaws</code></td><td>SmolPaws's existing comment access.</td></tr>
-        <tr><td>Publish a branch and draft PR</td><td>Router as <code>enyst</code>, in the later code phase</td><td>Contents and pull request write access to that destination.</td></tr>
-        <tr><td>Label or perform maintainer tasks</td><td><code>enyst</code>, through a separately authorized path</td><td>The permission required by that operation; outside the comment route.</td></tr>
-        <tr><td>Install a repository webhook</td><td>A repository administrator</td><td>Separate administrative authority.</td></tr>
+        <tr><td>Request Codex or Claude on GitHub</td><td><code>enyst</code></td><td>Ability to comment on an allowed repository. The author ID check is the authorization.</td></tr>
+        <tr><td>Request Codex or Claude from SmolPaws</td><td>SmolPaws agent</td><td>The direct tool's service credential. No GitHub comment.</td></tr>
+        <tr><td>Publish a result or status comment</td><td>Router as <code>smolpaws</code></td><td>SmolPaws's existing comment access.</td></tr>
+        <tr><td>Push a proposal branch, later</td><td>Router as <code>enyst</code></td><td>Contents write access to enyst's fork only.</td></tr>
+        <tr><td>Open a draft PR, later</td><td><code>enyst</code>, by hand at first</td><td>Ordinary PR access from the fork.</td></tr>
+        <tr><td>Label, approve, merge</td><td>Outside this plan</td><td>Not part of the comment route.</td></tr>
       </tbody>
     </table>
   </div>
 
-  <h2 id="cloudflare">A small controller on Cloudflare</h2>
-  <p><strong>Use the existing Worker cron plus D1.</strong> D1 owns accepted requests, scan progress, provider session IDs, next observation times and the reply outbox. Each minute, the scheduled handler claims due work with expiring leases, performs bounded HTTP operations, saves progress and exits. The next tick resumes the same rows. <a href="https://developers.cloudflare.com/workers/configuration/cron-triggers/">Cron Triggers</a> and <a href="https://developers.cloudflare.com/d1/">D1</a>.</p>
-  <p>The hosted provider runs the agent's tools while the controller is idle between ticks. A twenty-minute job watchdog spans multiple invocations; the Worker never waits inside one invocation for the whole job. Cloudflare limits cron invocations to fifteen minutes of elapsed time. Set a much smaller tick budget and persist pagination continuations when it is reached. <a href="https://developers.cloudflare.com/workers/platform/limits/#wall-time-limits-by-invocation-type">Worker invocation limits</a>.</p>
-  <p>V1 polls provider state and events once per minute. Workflows and provider webhooks can follow if measured latency or volume justifies them. The existing queue serves ordinary SmolPaws runner traffic; hosted jobs use the D1 lifecycle directly.</p>
+  <h2 id="cloudflare">One durability owner: cron and D1</h2>
+  <p><strong>The D1 row drives a small state machine from the existing minute cron.</strong> No Workflows, no sweeper, no provider webhooks in V1. One mechanism owns the property that matters: every accepted request ends delivered or visibly failed. It is easy to inspect, to test locally and to reason about. <a href="https://developers.cloudflare.com/workers/configuration/cron-triggers/">Cron Triggers</a> and <a href="https://developers.cloudflare.com/d1/">D1</a>.</p>
+  <p>Each tick claims due rows with expiring leases, performs bounded HTTP operations, saves progress and exits. The provider runs the agent while the controller is idle. A twenty-minute watchdog spans many ticks; the Worker never waits for a whole job inside one invocation. Cloudflare limits cron invocations to fifteen minutes; set a much smaller tick budget. <a href="https://developers.cloudflare.com/workers/platform/limits/#wall-time-limits-by-invocation-type">Worker invocation limits</a>.</p>
+  <p>Polling status once a minute for a twenty-minute job is a few dozen calls. That replaces public webhook endpoints, signature verification, event persistence and handling of duplicate, reordered or lost events. Webhooks can be added later if measured latency justifies them.</p>
 
   <figure class="route-flow" aria-labelledby="flow-caption">
     <ol>
-      <li><strong>A GitHub comment or direct SmolPaws request</strong><small>Verified identity, explicit provider and allowed repository.</small></li>
-      <li><strong>The GitHub Worker accepts the request</strong><small>Comment intake and authenticated tools use the same managed-agent module.</small></li>
-      <li><strong>D1 records a unique request</strong><small>The existing minute cron advances its durable lifecycle.</small></li>
-      <li><strong>The selected hosted agent works</strong>
+      <li><strong><code>@smolpaws codex|claude</code> from enyst, or a direct SmolPaws tool call</strong><small>Verified author ID, explicit provider, allowed repository.</small></li>
+      <li><strong>The GitHub Worker accepts the request</strong><small>Notification intake and the direct tool both call <code>accept(request)</code>.</small></li>
+      <li><strong>D1 records a unique request</strong><small>The existing minute cron advances it.</small></li>
+      <li><strong>The selected backend works</strong>
         <div class="providers">
-          <div class="provider"><strong><code>@codex</code></strong><small>OpenAI Agents API<br />Managed Codex harness</small></div>
-          <div class="provider"><strong><code>@claude</code></strong><small>Claude Managed Agents<br />Managed Claude harness</small></div>
+          <div class="provider"><strong><code>claude</code></strong><small>Claude Managed Agents<br />Managed Claude harness</small></div>
+          <div class="provider"><strong><code>codex</code></strong><small>OpenAI Agents API<br />Managed Codex harness</small></div>
         </div>
       </li>
-      <li><strong>Router collects and publishes the result</strong><small>Attributed GitHub reply, assessed commit, test evidence, and a durable receipt.</small></li>
+      <li><strong>SmolPaws publishes the result</strong><small>Provider, model, assessed commit, findings, a link to the run log and a durable receipt.</small></li>
     </ol>
-    <figcaption id="flow-caption" class="source-note">Proposed request path. Provider state is polled between cron ticks; the local SmolPaws runner is needed only for ordinary SmolPaws conversations.</figcaption>
+    <figcaption id="flow-caption" class="source-note">Proposed request path. The local SmolPaws runner is needed only for ordinary SmolPaws conversations.</figcaption>
   </figure>
 
-  <h2 id="providers">The hosted APIs fit this job</h2>
-  <h3>Codex through the OpenAI Agents API</h3>
-  <p>OpenAI's Agents API runs a managed Codex harness with durable sessions and optional hosted sandboxes. It handles the agent loop, context compaction, and recovery. Start with <code>POST /v1/agents/sessions</code> and an <code>openai_hosted</code> environment. Select and pin a model available to the deployment account. <a href="https://developers.openai.com/api/docs/guides/agents-api/overview">Official OpenAI documentation</a>.</p>
-  <p>The documented beta header is <code>OpenAI-Beta: agents=v1</code>. The application key needs <code>api.agents.read</code>, <code>api.agents.write</code>, and <code>api.responses.write</code>. Keep it in the controller. Follow the quickstart with a controlled task before using the target repository. <a href="https://developers.openai.com/api/docs/guides/agents-api/quickstart">Agents API prerequisites</a>.</p>
+  <h2 id="providers">Backends: two managed agent APIs</h2>
+  <p>Both providers host the agent loop and sandbox, and the Worker drives both the same way: create a session, poll its state, read the answer. Keys stay in the Worker, budgets are set per session, and nothing acts on GitHub except the router. The cost is that neither run appears in claude.ai/code or chatgpt.com/codex, so a result cannot be opened and continued in a web app. The plan accepts that trade and makes up for it with its own <a href="#logs">run logs</a>.</p>
 
   <h3>Claude through Claude Managed Agents</h3>
-  <p>Anthropic's managed service also supplies a harness and cloud sandbox. Configure an agent and environment, then create a session and send a user event; <code>initial_events</code> can combine creation and the first request. Its endpoints use <code>anthropic-beta: managed-agents-2026-04-01</code> with the API's normal version header. The documentation says Managed Agents is enabled by default for API accounts; the deployment still needs a working API key and its own smoke test. <a href="https://platform.claude.com/docs/en/managed-agents/overview">Managed Agents overview</a> and <a href="https://platform.claude.com/docs/en/managed-agents/sessions">Starting a session</a>.</p>
+  <p>Configure an agent and environment once, then create a session per request and send the request as a user event; <code>initial_events</code> can combine the two. Endpoints use <code>anthropic-beta: managed-agents-2026-04-01</code> with the API's normal version header. Managed Agents is enabled by default for API accounts; the deployment still needs its own smoke test. <a href="https://platform.claude.com/docs/en/managed-agents/overview">Managed Agents overview</a> and <a href="https://platform.claude.com/docs/en/managed-agents/sessions">Starting a session</a>.</p>
 
-  <p>These routes create configured agent sessions. Supply the skills and instructions they need explicitly. Existing personal chats, desktop tasks, and their memory are not inputs in this design.</p>
+  <h3>Codex through the OpenAI Agents API</h3>
+  <p>Start with <code>POST /v1/agents/sessions</code>, an <code>openai_hosted</code> environment and a pinned model. The beta header is <code>OpenAI-Beta: agents=v1</code>; the key needs <code>api.agents.read</code>, <code>api.agents.write</code> and <code>api.responses.write</code> and stays in the Worker. <a href="https://developers.openai.com/api/docs/guides/agents-api/overview">OpenAI Agents API overview</a> and <a href="https://developers.openai.com/api/docs/guides/agents-api/quickstart">quickstart</a>.</p>
+  <p>The two betas differ in session model, event names and budget fields. Keep those differences inside the two adapters, and give <code>lifecycle.ts</code> one shape: created, running, waiting, answered, failed.</p>
 
-  <h2 id="intake">Define exactly which comments count</h2>
-  <p>Keep the original <code>@codex</code> and <code>@claude</code> commands in V1. The existing SmolPaws notification poller can suggest threads to inspect, but it does not supply a complete stream of individual requests. GitHub notifications describe threads, and a thread's <code>mention</code> reason can persist through later activity. Several requests between ticks must all be enumerated. Review summaries and PR descriptions also remain distinct source types. <a href="https://docs.github.com/en/rest/activity/notifications">GitHub notification semantics</a>.</p>
-  <p>GitHub separates PR conversation comments, inline review comments, and review summary bodies. The first two have repository-wide feeds, so they make a clear first-version boundary. <a href="https://docs.github.com/en/rest/issues/comments#list-issue-comments-for-a-repository">Issue comment API</a> and <a href="https://docs.github.com/en/rest/pulls/comments#list-review-comments-in-a-repository">Review comment API</a>.</p>
-  <div class="table-scroll" role="region" aria-label="Comment surfaces included in the first version" tabindex="0">
-    <table>
-      <thead><tr><th>Surface</th><th>Intake</th><th>Scope</th></tr></thead>
-      <tbody>
-        <tr><td>Issue comments and PR conversation comments</td><td><code>GET /repos/{owner}/{repo}/issues/comments</code></td><td>V1</td></tr>
-        <tr><td>Inline PR review comments and replies</td><td><code>GET /repos/{owner}/{repo}/pulls/comments</code></td><td>V1</td></tr>
-        <tr><td>A submitted review's summary body</td><td><a href="https://docs.github.com/en/rest/pulls/reviews#list-reviews-for-a-pull-request">Per-PR review enumeration</a> or a <code>pull_request_review</code> webhook</td><td>Later; a separate intake path is required.</td></tr>
-        <tr><td>Issue/PR descriptions, commit comments, Discussions</td><td>Separate APIs and event types</td><td>Outside the first comment watcher.</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p>For either V1 feed, use <code>since</code>, sort by update time ascending, request up to 100 items per page, and follow every <code>Link</code> page. The API's <code>since</code> filter is based on last update, so edits will appear in scans too.</p>
-  <p>Capture the scan's start time. Read from the last completed scan minus a five-minute overlap, persist discovered requests, and advance that surface's cursor only after all pages succeed. Keep a lease to prevent overlapping scans and retain a wider reconciliation scan for delayed observations. A failed page must leave the completed cursor unchanged. When the tick budget is reached, save the next-page continuation and resume later. Polling cannot recover a comment deleted before it is ever observed.</p>
-  <p><strong>At activation, establish a baseline.</strong> Accept new comments created after it; do not replay old requests. Freeze the first qualifying observed body. Editing an accepted comment must not start another paid job. Ask again in a new comment for a new request. The initial observed snapshot can already include an edit made between scans.</p>
+  <h3>Why not the web-visible routes</h3>
+  <p><strong>Claude Code scheduled task.</strong> A scheduled task (formerly a routine) with an API trigger turns each request into a claude.ai/code session that enyst could open and continue. Checked against its documentation on 11 November, it is the wrong fit for this router. Anything it does through connected GitHub access appears as enyst, who has push access to the target. The <code>/fire</code> call returns a session URL but not the answer, so results need a callback endpoint. A run cannot be stopped by the router, and the feature is a research preview under <code>experimental-cc-routine-2026-04-01</code>, limited to 30 fires per hour per task. <a href="https://code.claude.com/docs/en/routines">Scheduled tasks</a> and <a href="https://platform.claude.com/docs/en/api/claude-code/routines-fire">Trigger a routine through the API</a>.</p>
+  <p><strong>Codex web.</strong> <code>codex cloud exec</code> creates a Codex web task but depends on ChatGPT login. That is the same dependency that stopped the OpenHands Cloud Codex ACP canary on 12 October, when it required ChatGPT reauthentication.</p>
+  <p>Neither backend reads personal chats, desktop tasks or their memory. Supply the skills and instructions each needs explicitly.</p>
+
+  <h2 id="intake">Intake from notifications</h2>
+  <p>GitHub notifications describe threads, not individual comments. A thread's <code>mention</code> reason can persist through later activity, and the Worker today reads only <code>latest_comment_url</code>, so two requests in one thread between ticks would lose one. <a href="https://docs.github.com/en/rest/activity/notifications">GitHub notification semantics</a>.</p>
+  <p><strong>Treat a notification as a pointer to a thread, then scan that thread.</strong> For each <code>mention</code> notification on an allowed repository, list that issue's or PR's comments, review comments and review summaries since the thread's last scan, kept per thread in D1 with a short overlap. Parse each item for <code>@smolpaws codex</code> and <code>@smolpaws claude</code>, and mark the notification read only after the rows are written. The scan stays bounded to threads that mention SmolPaws, so repository-wide cursors, overlap windows across feeds, leases on scans and activation baselines per surface are no longer needed.</p>
+  <p>Review summaries and PR or issue descriptions that mention SmolPaws also produce notifications. They come with the same scan instead of a separate later intake path. At activation, ignore items created before the activation time so old requests do not run.</p>
 
   <h3>Authorization and mention parsing</h3>
-  <p>Allow immutable GitHub author IDs for <code>enyst</code> and <code>smolpaws</code>. Read them from GitHub metadata. A copied name, a quoted request, and <code>author_association</code> do not authorize work.</p>
-  <p>Parse actual mention tokens in authored Markdown text, ignoring code, blockquotes, and URL destinations. Match case-insensitively with handle boundaries: <code>@codex-example</code> must not launch Codex. Both actual mentions in one comment create one request per provider. Router-generated replies must be excluded even though their GitHub author is allowlisted.</p>
-  <pre class="code">@codex review this change for cancellation and cleanup bugs
-@claude explain whether the proposed API preserves replay behavior</pre>
-  <p>Before dispatch, fetch the source again. Deletion or removal of that provider's mention cancels work that has not started. Other edits leave the frozen prompt unchanged. Put the approved request ahead of the surrounding thread, label each context comment with its author and source, and cap context at twenty comments and 32 KiB. Reject approved requests over 16 KiB instead of silently changing them. Show when context was truncated.</p>
+  <p>Authorize by enyst's immutable GitHub author ID, read from the API. A copied name, a quoted request and <code>author_association</code> do not authorize work. Ignore every comment authored by SmolPaws.</p>
+  <p>Parse actual mention tokens in authored Markdown, ignoring code, blockquotes and URL destinations. Match <code>@smolpaws</code> case-insensitively with handle boundaries, followed by <code>codex</code> or <code>claude</code> as the next word. <code>@smolpaws-example</code> is not a match. Two commands in one comment create one request per provider.</p>
 
-  <h3>Let SmolPaws submit directly</h3>
-  <p>Add <code>ask_codex</code> and <code>ask_claude</code> tools that submit to an authenticated Worker endpoint, plus a tool to read request status. A dedicated service credential identifies SmolPaws; the caller cannot select another principal through its payload. Require a stable client request ID, an allowed repository and an explicit issue/PR destination. A retry returns the same durable request.</p>
-  <p>Direct requests use the same provider adapters, budgets and reply outbox as GitHub comments. SmolPaws can still request through a GitHub comment when a public request is useful. Keep generated reply IDs and output markers in the exclusion set rather than excluding every SmolPaws-authored comment. These controls also protect recovery when a GitHub post succeeds but its response is lost.</p>
+  <h3>Freeze the request, label the context</h3>
+  <p>Freeze the first qualifying observed body. Before dispatch, fetch the source again: deletion, or removal of that provider's command, cancels work that has not started. Any other edit is ignored, and the frozen request runs. Editing an accepted comment never starts another paid job; ask again in a new comment.</p>
+  <p>Put the frozen request first. Follow it with a thread snapshot in which each comment is labeled with its author and source, marked as untrusted, and capped at twenty comments and 32 KiB, with a per-comment cap so one long comment cannot crowd out the rest. Say when context was truncated. Reject requests over 16 KiB rather than silently shortening them. Other authors' text can inform the analysis but cannot change the destination, the permissions or the provider.</p>
+
+  <h3>Let SmolPaws ask directly</h3>
+  <p>Give the SmolPaws agent <code>ask_codex</code> and <code>ask_claude</code> tools, plus a status tool. They call the Worker's authenticated endpoint with a dedicated service credential; the caller cannot pick another principal through its payload. Require a stable client request ID, an allowed repository and an explicit issue or PR destination. A retry returns the same durable request. Direct requests use the same ledger, adapters, budgets and reply outbox. There is no GitHub round trip and no reason for SmolPaws to comment a request for the poller to find a minute later.</p>
 
   <h2 id="delivery">A durable request and a durable reply</h2>
-  <p>For GitHub intake, the request key is <code>repository ID + surface + comment ID + provider</code>. For direct intake, use the authenticated principal, client request ID and provider; a repeated ID with different content is a conflict. Put uniqueness constraints on both. Store the frozen request, policy version, target commit, session ID, event cursor, next attempt time, lease version and publication receipt.</p>
-  <p>D1 is the lifecycle authority. Admit the request and reserve its budget atomically, then let cron claim and advance due rows. A repeated scan or direct call returns the existing run. Use conditional state updates with a lease owner and version so an expired worker cannot overwrite newer progress. D1 batches support transactional statements, but a provider call or GitHub post remains a separate remote mutation. <a href="https://developers.cloudflare.com/d1/worker-api/d1-database/#batch">D1 batch transactions</a>.</p>
+  <p>For GitHub intake, the request key is <code>repository ID + surface + comment ID + provider</code>. For direct intake, it is the authenticated principal, client request ID and provider; a repeated ID with different content is a conflict. Put uniqueness constraints on both. Store the frozen request, policy version, target commit, provider session ID, log key and cursor, next attempt time, lease version and publication receipt.</p>
+  <p>Admit the request and reserve its daily budget atomically, then let cron claim and advance due rows. Use conditional updates with a lease owner and version so an expired tick cannot overwrite newer progress. D1 batches are transactional, but a provider call or GitHub post remains a separate remote mutation. <a href="https://developers.cloudflare.com/d1/worker-api/d1-database/#batch">D1 batch transactions</a>.</p>
   <pre class="code">accepted → dispatching → running → result ready → publishing → delivered
 
 Other outcomes: awaiting action · budget paused · failed · canceled
 Ambiguous responses: dispatch unknown · delivery unknown</pre>
-  <p><strong>A timeout after session creation is not proof that creation failed.</strong> If the provider accepted work but the controller lost the response, a blind retry can start another paid session. Verify the endpoint's supported idempotency and reconciliation mechanisms during implementation. When recovery cannot establish the outcome, park the request for an operator. Apply the same rule to sending input events and GitHub publication.</p>
+  <p><strong>A timeout after creation is not proof that creation failed.</strong> If the provider accepted work but the response was lost, a blind retry starts another paid run. Put the request ID in session metadata where the API allows it, and check each provider's idempotency and listing support during preflight. When recovery cannot establish the outcome, park the request as <em>dispatch unknown</em>. Apply the same rule to GitHub publication.</p>
+  <p><strong>Unknown states must reach enyst.</strong> <em>Dispatch unknown</em>, <em>delivery unknown</em>, budget pauses and watchdog expiries send a SmolPaws message to enyst with the request, thread link and session link. Known failures also get an attributed status comment on the thread. A <em>delivery unknown</em> row gets no further comment until its receipt is resolved.</p>
 
-  <h3>Completion must be checked against the request</h3>
-  <p>Fetch session state and new events on each due observation. Idle can mean waiting for permission or input; an unfinished provider run may also remain open. Require the current request's answer and a compatible completion reason. Persist the event cursor and bounded result before marking it ready for publication. <a href="https://developers.openai.com/api/docs/guides/agents-api/sessions">OpenAI session lifecycle</a> and <a href="https://platform.claude.com/docs/en/managed-agents/session-operations">Claude session operations</a>.</p>
-  <p>Recover after a missed tick by selecting overdue rows from D1. Back off transient read failures. Permission waits, budget pauses and known failures should produce an attributed status reply. Ambiguous dispatch or publication outcomes require reconciliation and an action-required status in the authenticated status tool. A lost publication response must not cause another status post before its receipt is resolved.</p>
-  <p>Use one session per request in V1 and include a bounded, current thread snapshot. Serialize work for the same thread and provider. Reusing one durable session per thread is a later enhancement: it needs per-request event ranges, head-change handling, and a policy for pending requests while the agent is running.</p>
+  <h3>Completion is checked against the request</h3>
+  <p>Fetch session state and new events on each due tick. Idle can mean waiting for permission or input, and an unfinished run may stay open. Require the current request's answer and a compatible completion reason, and persist the event cursor and bounded result before marking it ready. A session that asks a question instead of answering is published as a question with an <em>awaiting action</em> status. <a href="https://developers.openai.com/api/docs/guides/agents-api/sessions">OpenAI session lifecycle</a> and <a href="https://platform.claude.com/docs/en/managed-agents/session-operations">Claude session operations</a>.</p>
+  <p>Use one session per request in V1, and serialize work for the same thread and provider. Reusing one session per thread is a later enhancement: it needs per-request event ranges, head-change handling, and a policy for requests that arrive while the agent is running.</p>
 
   <h3>Publish through an outbox</h3>
-  <p>Prepare the reply in D1 before calling GitHub. Its header should identify the provider, configured model and assessed commit SHA. Follow with the source request, findings and actual test evidence. Write a stable hidden run marker into the comment and record its GitHub ID after success. After a lost acknowledgement, reconcile the fully paginated destination thread for that marker under SmolPaws's writer ID before another attempt.</p>
-  <p>Replies posted as <code>smolpaws</code> should identify whether Codex or Claude produced them. Record generated comment IDs and filter them before routing; also avoid copied mention tokens that ping or re-trigger agents. This closes the feedback loop where an agent quotes its original request in its own answer.</p>
+  <p>Prepare the reply in D1 before calling GitHub. Its header names the provider, the configured model and the assessed commit SHA, and links the private run log. Follow with the source request, findings and actual test evidence. Write a stable hidden run marker into the comment and record its GitHub ID on success. After a lost acknowledgement, look for that marker among SmolPaws-authored comments in the fully paginated thread before another attempt. The marker exists for idempotent publication, not for loop filtering. Don't copy command tokens into replies.</p>
+  <p>Before publishing, recheck the target head. If the PR moved, say so beside the assessed SHA, or assess the new head.</p>
 
-  <h2 id="credentials">Keep writing credentials in the controller</h2>
-  <p>The comment route needs SmolPaws's GitHub credential and provider API credentials. Provision them into Worker secrets during deployment. Keep enyst's separate write credential for the later code publication path; a failed comment post must not escalate to it. Keep credentials out of prompts, D1 payloads, logs, and agent-visible files or environment variables. Public source can enter a sandbox as a commit-pinned archive or through a public clone; neither requires a writing credential.</p>
-  <p>OpenAI's hosted sandbox accepts input files and setup commands and offers restricted network access. Configure the network explicitly and supply the dependencies required by the SDK's real tests. Anthropic supports GitHub repository mounts with an authorization token; that is an optional integration, not a prerequisite for this public-repository plan. <a href="https://developers.openai.com/api/docs/guides/agents-api/environments/openai-hosted">OpenAI hosted sandbox configuration</a> and <a href="https://platform.claude.com/docs/en/managed-agents/github">Claude GitHub access</a>.</p>
-  <p>The agent can produce findings and patch artifacts while deterministic router code controls publication. Repository instructions and other authors' text can guide analysis, but cannot grant the agent secrets, a new repository destination, or extra write permissions.</p>
+  <h2 id="logs">Keep every run's log</h2>
+  <p>Neither provider shows these runs in its web app, so the router keeps its own record of what each agent did. Without one, a reply is a claim nobody can check: which files the agent read, which commands and tests it ran, and what they printed.</p>
+  <p><strong>Copy the whole session log, not just the answer.</strong> Both APIs expose saved history. Claude Managed Agents lists a session's full event history, including <code>agent.tool_use</code> and <code>agent.tool_result</code> events, and keeps it until the session is deleted. The OpenAI Agents API lists a session's saved items, messages and tool calls, at <code>/v1/agents/sessions/{id}/items</code>. <a href="https://platform.claude.com/docs/en/managed-agents/events-and-streaming">Claude session events</a> and <a href="https://developers.openai.com/api/docs/guides/agents-api/sessions">OpenAI session items</a>.</p>
+  <ul>
+    <li><strong>Capture as the run goes.</strong> The tick already reads new events to judge completion. Append each page to the run's log in R2 as JSON Lines, keyed by request ID, and advance the stored cursor after the write. A last full read at the terminal state fills any gaps. R2 holds the logs; D1 keeps only the key, size and cursor, since a long run can outgrow a D1 row. <a href="https://developers.cloudflare.com/r2/">R2</a>.</li>
+    <li><strong>Save artifacts before they expire.</strong> Claude's sandbox state lasts thirty days from creation. Copy patches and other output files to R2 when the run finishes.</li>
+    <li><strong>Keep the raw record and a readable view.</strong> Store provider events unchanged, so nothing is lost to one adapter's interpretation. A Worker route, <code>/runs/{requestId}</code>, renders them as one timeline across both providers: the request and context, each tool call with its input and output, the final answer, usage and timing.</li>
+    <li><strong>Keep the viewer private.</strong> Put the route behind Cloudflare Access for enyst. Every reply links to it; others reading the thread see only the findings. Publishing a particular run can be a later per-request choice.</li>
+    <li><strong>Scrub before storing.</strong> No credentials enter the sandbox, but a tool's output can still echo a token-shaped string from the repository or environment. Apply a secret-pattern scrub before writing to R2, and keep logs for a fixed period, starting at ninety days.</li>
+  </ul>
+  <p>Keep the provider session too, rather than deleting it when the run ends. Its ID is stored on the request row, which leaves room for a later <code>@smolpaws claude continue …</code> that sends a follow-up into the same session.</p>
 
-  <h2 id="code-changes">Add code changes through branches and draft PRs</h2>
-  <p>After the comment path is proven, explicit requests such as <code>@codex implement …</code> or <code>@claude implement …</code> can produce a patch against a pinned commit. The router should verify that it applies to the allowed repository, reject paths outside its publication policy, and publish to a deterministic proposal branch followed by a draft PR.</p>
-  <p>Before publishing a review or patch, recheck the target head. If the PR changed, assess the new head or clearly retain the result as a report on the earlier commit. Base-repository write access does not grant access to a contributor's fork branch: use a writable fork or propose a new branch in the allowed repository.</p>
-  <p>For the initial rollout, use ordinary comments for reviews. Formal approval and requests-for-changes affect repository gates and should be a separate policy choice. Direct pushes to the target's default branch and automatic merging stay outside this plan.</p>
+  <h2 id="credentials">Keep credentials out of the sandbox</h2>
+  <p>The Worker holds SmolPaws's GitHub token and both provider keys as Worker secrets. None of them enter prompts, D1 payloads, logs or agent-visible files. Public source enters each sandbox as a commit-pinned archive or a public clone, with network access configured explicitly and the dependencies the SDK's real tests need. Anthropic supports GitHub repository mounts with a token; this public-repository plan does not need one. <a href="https://developers.openai.com/api/docs/guides/agents-api/environments/openai-hosted">OpenAI hosted sandbox configuration</a> and <a href="https://platform.claude.com/docs/en/managed-agents/github">Claude GitHub access</a>.</p>
+  <p>The agents produce findings and patch artifacts; deterministic router code controls publication. Repository instructions and other authors' text can guide analysis but cannot grant secrets, a new destination or extra write permissions.</p>
+
+  <h2 id="code-changes">Code changes through the fork</h2>
+  <p>After the comment path is proven, <code>@smolpaws codex implement …</code> or <code>@smolpaws claude implement …</code> can return a patch against a pinned commit. The router checks that it applies, rejects paths outside its publication policy, and pushes a deterministic proposal branch to enyst's fork with a credential limited to that fork. enyst opens the PR by hand at first; automated draft PRs can follow. This avoids contributor-fork permissions in V1.</p>
+  <p>Use ordinary comments for reviews. Formal approvals and requests for changes affect repository gates and stay a separate decision. No pushes to the target's default branch and no merges.</p>
 
   <h2 id="cost">Bound jobs and measure cost</h2>
-  <p>Two single-page comment feeds at one-minute intervals make <strong>120 base GitHub reads per hour</strong>, before pagination, context fetches, and reconciliation. Read the response rate headers and back off on primary or secondary limits; the allowance is shared with other use of the same credential.</p>
-  <p>Reusing the Worker avoids another deployment, while D1 operations and provider usage still add cost. Measure actual API reads, model usage, tools and hosted execution on the fixture before setting the operating budget. <a href="https://developers.cloudflare.com/workers/platform/pricing/">Cloudflare pricing</a> and <a href="https://developers.openai.com/api/docs/guides/agents-api/overview">OpenAI Agents API billing</a>.</p>
-  <p>Proposed starting limits are two concurrent jobs, one per thread/provider, twenty requests per day, and a twenty-minute watchdog. Reserve a daily admission budget atomically before launch. Treat the watchdog and controller budget as limits on new work, with in-flight usage still possible.</p>
-  <p>Claude supports a session budget set at creation. It stops issuing new model requests at its list-cost cap, but an in-flight request can take the final amount beyond that cap. Keep that margin and publish a paused status when it is reached. Verify current OpenAI controls independently instead of copying Claude's budget fields. <a href="https://platform.claude.com/docs/en/managed-agents/budgets">Claude session budgets</a>.</p>
+  <p>Intake adds little to GitHub reads. The Worker already polls notifications every minute, and the thread scan runs only for mention notifications. Read the rate headers and back off on primary or secondary limits; SmolPaws's allowance is shared with its ordinary work.</p>
+  <p>Proposed starting limits are two concurrent jobs, one per thread and provider, twenty requests per day, and a twenty-minute watchdog. Reserve the daily admission budget atomically before launch. Claude sessions accept a budget at creation; they stop issuing model requests at the cap, though an in-flight request can go past it. Publish a paused status when it is reached. Verify OpenAI's controls separately instead of copying Claude's fields. <a href="https://platform.claude.com/docs/en/managed-agents/budgets">Claude session budgets</a>. Measure real usage on the fixture before settling the budget. <a href="https://developers.cloudflare.com/workers/platform/pricing/">Cloudflare pricing</a>.</p>
 
-  <h2 id="rollout">Roll out in stages with evidence</h2>
+  <h2 id="rollout">Roll out in three stages</h2>
   <ol>
-    <li><strong>Wire the module in shadow mode.</strong> Move the contract and implementation tasks into the GitHub app and its Beads tracker when implementation begins. Add durable intake and bounded cron progression. Prove author filtering, parsing, pagination, missed-tick recovery, direct-call authorization, migration baselines and separation from the local runner. Make no managed provider calls or new router posts.</li>
-    <li><strong>Prove both routes on a controlled fixture.</strong> Check account access, sandbox dependencies, current endpoint behavior and actual cost. Exercise restarts, response-loss recovery, stale heads, permission waits, budget pauses and output loops. Require one attributed current result per successful request and visible failure status.</li>
-    <li><strong>Enable bounded target replies.</strong> Set the activation baseline and enable comments on the allowed repository. Keep managed intake, each provider and publication independently switchable. Verify ordinary SmolPaws requests still work.</li>
+    <li><strong>Ledger and intake in shadow mode.</strong> Move SmolPaws's Cache API dedupe to D1. Add notification thread scanning, parsing, the direct tool and cron progression. Prove author filtering, multiple requests per thread, missed-tick recovery, direct-call authorization and separation from the local runner. No provider calls and no new posts.</li>
+    <li><strong>Both backends on a controlled fixture.</strong> Check account access, sandbox dependencies, current endpoint behavior and cost for both APIs. Exercise restarts, lost responses, stale heads, questions instead of answers, budget pauses and the operator messages. Check that each run's log in R2 matches the provider's own history and renders in the viewer. Require one attributed current result per successful request and a visible status for every failure.</li>
+    <li><strong>Enable the allowed repository.</strong> Set the activation time and turn on replies. Keep intake, each provider and publication independently switchable. Check that ordinary SmolPaws requests still work.</li>
   </ol>
-  <p>Branches and draft PRs follow as a separate code publication phase using enyst's credential. Review summaries and persistent session continuation also remain later work.</p>
-  <p>Review summaries need their own later intake work: enumerate reviews for candidate PRs and verify whether review activity advances the candidate timestamp. Include reconciliation for closed PRs. If webhook administration becomes available, a <code>pull_request_review</code> event is a cleaner trigger for that surface. Do not claim the two V1 feeds cover every GitHub comment type.</p>
+  <p>Proposal branches on the fork and session continuation per thread follow as separate work.</p>
 
   <h2 id="decisions">Decisions to make at implementation time</h2>
   <ul>
-    <li>Choose provider accounts, models, sandbox setup, and per-request spending limits after a real preflight.</li>
-    <li>Confirm the publication policy: comments first, then which implementation requests may create draft PRs.</li>
-    <li>Choose a dedicated SmolPaws credential for replies with the minimum access available under the organization policy. Provision enyst's separate credential only when the code publication phase is authorized.</li>
-    <li>Decide whether review summary bodies need priority before target activation, and whether follow-up comments should eventually reuse sessions.</li>
+    <li>Choose models, sandbox setup and per-session limits for both providers after a real preflight.</li>
+    <li>Choose where operator messages land: SmolPaws's usual channel to enyst, or a pinned GitHub issue.</li>
   </ul>
-  <p class="source-note">Original draft: 12 October 2026. Worker source, reply identity, cron lifecycle and module placement revised on 14 October 2026. API lifecycle and platform behavior checked against the linked official sources. The module layout, limits and rollout are proposed design choices.</p>
+  <p class="source-note">Original draft: 12 October 2026. Worker source, reply identity, cron lifecycle and module placement revised on 14 October 2026. Trigger syntax, notification intake, direct SmolPaws requests and operator states revised on 11 November 2026 after review, with run logs added the same day; Claude Managed Agents kept over a Claude Code scheduled task after checking the scheduled task documentation that day. Provider API details are as linked and not re-verified in this revision. The module layout, limits and rollout are proposed design choices.</p>
   <nav class="foot-nav" aria-label="Related pages"><a href="../index.html">&larr; Notebook</a> · <a href="../smolpaws-github.html">SmolPaws GitHub entry point</a> · <a href="openhands-automations.html">OpenHands Automations</a></nav>
 </main>
 </body>
