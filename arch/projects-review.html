@@ -1,0 +1,675 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-fable-5-2","date":"2026-11-10","role":"author"},{"agent":"Claude Code","llm":"claude-fable-5-2","date":"2026-11-11","role":"editor"}]} -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenHands Projects, reviewed · Engel's Notebook</title>
+  <meta name="description" content="An independent review of the OpenHands Projects work across Agent Server, Canvas and Insider: findings by severity, an assessment of each key decision, a prioritized plan, and the status of every plan item a day later, with two recordings of the fixes." />
+  <meta property="og:title" content="OpenHands Projects, reviewed: where it stands and what to do next" />
+  <meta property="og:description" content="An independent review of the OpenHands Projects work across Agent Server, Canvas and Insider: findings by severity, an assessment of each key decision, a prioritized plan, and the status of every plan item a day later, with two recordings of the fixes." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/projects-review.html" />
+  <meta property="og:image" content="https://enyst.github.io/experiments/projects-review-video/new-project-poster.jpg" />
+  <link rel="canonical" href="https://enyst.github.io/arch/projects-review.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+  <style>*, *::before, *::after { box-sizing: border-box; } body { margin: 0; }</style>
+<style>
+/* Layout: one reading column (max 46rem) for prose; findings are rows with a severity label in a left rail that folds above the text on phones. */
+:root {
+  --bg: #f6f7f8;
+  --surface: #ffffff;
+  --ink: #18212b;
+  --muted: #5a6673;
+  --rule: #d9dee3;
+  --accent: #0f6e73;
+  --accent-soft: #e2f1f1;
+  --high: #a8321f;
+  --high-soft: #fbe9e5;
+  --med: #8a5a00;
+  --med-soft: #fbf0d8;
+  --low: #47586b;
+  --low-soft: #e8edf2;
+  --ok: #24693d;
+  --ok-soft: #e3f2e7;
+  --code-bg: #eef1f4;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-head: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171c; --surface: #1a2128; --ink: #e6ebf0; --muted: #9aa7b4; --rule: #2e3944;
+    --accent: #5cc4c8; --accent-soft: #15353a;
+    --high: #f0907e; --high-soft: #3d1f1a; --med: #e6b95c; --med-soft: #3a2c10;
+    --low: #a9b8c8; --low-soft: #242e39; --ok: #7fcf98; --ok-soft: #17301f; --code-bg: #222b34;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171c; --surface: #1a2128; --ink: #e6ebf0; --muted: #9aa7b4; --rule: #2e3944;
+  --accent: #5cc4c8; --accent-soft: #15353a;
+  --high: #f0907e; --high-soft: #3d1f1a; --med: #e6b95c; --med-soft: #3a2c10;
+  --low: #a9b8c8; --low-soft: #242e39; --ok: #7fcf98; --ok-soft: #17301f; --code-bg: #222b34;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.page { max-width: 54rem; margin: 0 auto; padding-block: 2.5rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 2.75rem; }
+header.top { display: flex; flex-direction: column; gap: .75rem; }
+.eyebrow { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+h1 { font-family: var(--font-head); font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.15; margin: 0; font-weight: 600; text-wrap: balance; }
+h2 { font-family: var(--font-head); font-size: 1.45rem; line-height: 1.25; margin: 0; font-weight: 600; text-wrap: balance; }
+h3 { font-family: var(--font-head); font-size: 1.08rem; margin: 0; font-weight: 600; text-wrap: balance; }
+p { margin: 0; max-width: 46rem; }
+section { display: flex; flex-direction: column; gap: 1.1rem; min-width: 0; }
+.sub { color: var(--muted); max-width: 46rem; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+code, .ref { font-family: var(--font-mono); font-size: .84em; background: var(--code-bg); padding: .08em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+nav.toc { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; font-size: .92rem; }
+.verdict { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1.4rem 1.5rem; display: flex; flex-direction: column; gap: .9rem; }
+.verdict p { max-width: none; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .9rem 1.5rem; margin: 0; }
+.facts div { min-width: 0; }
+.facts dt { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.facts dd { margin: .15rem 0 0; font-size: .94rem; }
+.findings { display: flex; flex-direction: column; border-top: 1px solid var(--rule); }
+.finding { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: .4rem 1.25rem; padding: 1.15rem 0; border-bottom: 1px solid var(--rule); }
+.finding > div { display: flex; flex-direction: column; gap: .55rem; min-width: 0; }
+.finding p { max-width: 44rem; }
+.sev { font-size: .74rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: .2rem .55rem; border-radius: 999px; justify-self: start; align-self: start; white-space: nowrap; }
+.sev.high { color: var(--high); background: var(--high-soft); }
+.sev.med { color: var(--med); background: var(--med-soft); }
+.sev.low { color: var(--low); background: var(--low-soft); }
+.id { font-family: var(--font-mono); font-size: .8rem; color: var(--muted); margin-right: .45rem; font-weight: 500; }
+.basis { font-size: .88rem; color: var(--muted); }
+.basis b { color: var(--ink); font-weight: 600; }
+.fix { font-size: .95rem; }
+.fix b { color: var(--accent); font-weight: 600; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 40rem; font-size: .93rem; }
+th, td { text-align: left; vertical-align: top; padding: .7rem .9rem; border-bottom: 1px solid var(--rule); }
+tr:last-child td { border-bottom: 0; }
+th { font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.tag { font-size: .74rem; font-weight: 600; padding: .15rem .5rem; border-radius: 999px; white-space: nowrap; }
+.tag.ok { color: var(--ok); background: var(--ok-soft); }
+.tag.part { color: var(--med); background: var(--med-soft); }
+.tag.no { color: var(--high); background: var(--high-soft); }
+ul, ol { margin: 0; padding-left: 1.25rem; max-width: 46rem; display: flex; flex-direction: column; gap: .45rem; }
+.plan { display: flex; flex-direction: column; gap: 1.6rem; }
+.phase { display: flex; flex-direction: column; gap: .8rem; }
+.phase h3 { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+.phase h3 span { font-family: var(--font-body); font-size: .85rem; color: var(--muted); font-weight: 400; }
+.items { display: flex; flex-direction: column; border-top: 1px solid var(--rule); }
+.item { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr); gap: .3rem 1rem; padding: .85rem 0; border-bottom: 1px solid var(--rule); }
+.item .n { font-family: var(--font-mono); font-size: .82rem; color: var(--accent); font-weight: 500; padding-top: .15rem; }
+.item > div { min-width: 0; }
+.item strong { font-weight: 600; }
+.item .meta { font-size: .86rem; color: var(--muted); display: block; margin-top: .3rem; }
+.status { font-size: .88rem; color: var(--muted); display: block; margin-top: .4rem; }
+.status b { color: var(--ink); font-weight: 600; }
+.status .tag { margin-right: .4rem; }
+.tag.idle { color: var(--low); background: var(--low-soft); }
+footer { font-size: .86rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 1.2rem; }
+@media (max-width: 560px) {
+  .finding { grid-template-columns: minmax(0, 1fr); }
+  .item { grid-template-columns: minmax(0, 1fr); }
+  .verdict { padding: 1.1rem; }
+}
+
+.back { font-size: .9rem; color: var(--muted); text-decoration: none; }
+.back:hover { color: var(--accent); }
+.films { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.25rem; }
+.film { margin: 0; min-width: 0; }
+.film video { display: block; width: 100%; aspect-ratio: 1440 / 1000; height: auto; background: #111318; border: 1px solid var(--rule); border-radius: 10px; }
+.film figcaption { color: var(--muted); font-size: .88rem; line-height: 1.5; margin-top: .6rem; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="top">
+  <a class="back" href="../index.html">← Engel's Notebook</a>
+  <div class="eyebrow">Independent review · 10 November 2026 · plan status updated 11 November</div>
+  <h1>OpenHands Projects: where it stands and what to do next</h1>
+  <p class="sub">For Engel. Covers Agent Server PR #6602 at <code>9fb9184</code>, Canvas PR #19495 at <code>53124e9</code>, and Insider <code>main</code> at <code>0025493</code>. I read the code at those commits and checked the notes against it. Each finding says whether I verified it in code or am inferring it.</p>
+  <nav class="toc" aria-label="Sections">
+    <a href="#verdict">Verdict</a>
+    <a href="#server">Agent Server</a>
+    <a href="#canvas">Canvas</a>
+    <a href="#insider">Insider</a>
+    <a href="#cross">Cross-cutting</a>
+    <a href="#decisions">Decisions</a>
+    <a href="#gaps">Verification gaps</a>
+    <a href="#merge">Path to merge</a>
+    <a href="#status">Status</a>
+    <a href="#plan">Plan</a>
+  </nav>
+</header>
+
+<section id="verdict">
+  <h2>Verdict</h2>
+  <div class="verdict">
+    <p><strong>The server design is sound and the careful parts are careful.</strong> A Project record plus tag membership, a coordinator with typed tools, and workers as normal conversations is the right shape, and it belongs in the Agent Server. The run-lock confirmation guard, the artifact path handling, the revisioned memory and the corrupted-file handling are well made and well tested. The 170 tests in the six focused suites pass on the PR head here.</p>
+    <p><strong>It is not ready to merge, and the reasons are mostly about the loop and the packaging, not the idea.</strong> The coordinator only hears about workers that finish cleanly, so the conversation the person relies on is blind to exactly the workers that need them. The wake-up path keeps its state in memory and drops failures. The confirmation guard covers one state, and a coordinator message still resumes work the person paused. On the Canvas side, the head commit that contains the Projects view has not been through the test workflow, and the PR carries four features under an Insider title.</p>
+    <p><strong>The largest risk to "doing this to the end" is the one-big-PR rule.</strong> It served testing well. As a merge vehicle it means a 10,700-line server PR and a 6,900-line Canvas PR, each approved only by the review bot and each changed substantially since that approval. I recommend keeping the big branches for integration and merging through five or six smaller PRs in a fixed order, which the plan at the end lays out.</p>
+    <dl class="facts">
+      <div><dt>Agent Server #6602</dt><dd>Open, not draft. 67 files, +10,752. <code>tools-tests</code> red on head; everything else green. Bot approval is 3 feature commits old.</dd></div>
+      <div><dt>Canvas #19495</dt><dd>Draft, conflicts with main (33 commits behind). Only title, description and isolation checks ran on head. Bot approval predates all Projects code.</dd></div>
+      <div><dt>Split-outs</dt><dd>#6704, #6706, #6709 merged. #6609 and #19503 (flags and reactions) still open. #19574 (lost message) draft.</dd></div>
+      <div><dt>Human review</dt><dd>None yet from an OpenHands maintainer on either big PR. No open review threads.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="server">
+  <h2>Agent Server</h2>
+  <p class="sub">Paths are relative to <code>openhands-agent-server/openhands/agent_server/</code> unless they start with another package name.</p>
+  <div class="findings">
+
+    <div class="finding">
+      <span class="sev high">High</span>
+      <div>
+        <h3><span class="id">S1</span>The coordinator is only told about runs that finish</h3>
+        <p>The outcome subscriber acts on one transition: execution status becoming <code>finished</code> (<span class="ref">project_board.py:149-158</span>, <span class="ref">:244</span>). A worker that ends in error, gets stuck, pauses, or stops for the person's confirmation produces no update at all. The board puts those in Needs you, but the coordinator learns nothing until it happens to call <code>list_project_conversations</code>.</p>
+        <p>This matters more than its size suggests. The promise of Projects is that the person talks to one conversation and it surfaces what needs them. Today that conversation knows about the workers that are fine and not about the ones that are blocked.</p>
+        <p class="fix"><b>Suggested fix.</b> For a turn the coordinator started, deliver an update on every terminal transition, with a header that names the state ("stopped for your approval of …", "failed with …"). Add a test per state and an F36 recipe for a worker that stops on a confirmation.</p>
+        <p class="basis"><b>Verified in code.</b> No test or F36 recipe covers a non-finished ending.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev high">High</span>
+      <div>
+        <h3><span class="id">S2</span>Wake-ups depend on in-memory state and are dropped on failure</h3>
+        <p>Who started the current turn, whether the agent asked a question, and the last agent text all live on the subscriber object (<span class="ref">project_board.py:176-192</span>). Deliveries are unsupervised asyncio tasks; an exception is logged and the update is gone (<span class="ref">:329-344</span>). When no run slot is free, the update is saved in the coordinator but nothing ever runs it (<span class="ref">project_wake.py:136-139</span>).</p>
+        <p>After a server restart the subscriber starts empty, so a worker that resumes and finishes a coordinator-started turn has <code>_turn_sender = None</code>, is treated as a turn the person started, and is copied to the coordinator without waking it. A long-lived project will hit a restart.</p>
+        <p class="fix"><b>Suggested fix.</b> At finish time, read the turn's starter from the event log (the last user <code>MessageEvent</code> on the active branch already records <code>sender</code>) instead of from memory. Make delivery retryable: on startup and on run-slot release, reconcile "members that finished after the coordinator's last update from them".</p>
+        <p class="basis"><b>Verified by reading.</b> I did not reproduce the restart case. <code>F36.persist-restart</code> checks that records survive, not that the loop does.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev high">High</span>
+      <div>
+        <h3><span class="id">S3</span>The confirmation guard covers one state; a coordinator message resumes paused work</h3>
+        <p><code>refuse_pending_confirmation</code> refuses only when the status is exactly <code>waiting_for_confirmation</code> (<span class="ref">event_service.py:1653-1660</span>). A paused, errored or stuck conversation is run. The F36 notes say so plainly: "A <code>paused</code> conversation is resumed." And the agent's step begins by executing any unmatched actions, which the code itself calls implicit confirmation (<span class="ref">openhands-sdk/…/agent/agent.py:757-766</span>).</p>
+        <p>So a worker the person stopped is restarted by the coordinator's next follow-up, and any actions left over from an interrupted batch run first. The same applies in the other direction: a worker's update wakes a coordinator the person paused (<span class="ref">project_wake.py:125-132</span>). The board calls all of these states "needs you"; the message path treats them as "go ahead". The Voice work reached a stricter rule for the same hazard (<code>send_message_if_idle</code> in #5180 refuses paused-with-pending-actions and goal loops), so there are now two guards with different answers.</p>
+        <p class="fix"><b>Suggested fix.</b> One shared admission check for every sender that is not the person: run only from idle or finished; for anything the board would call needs you, save or refuse and tell the caller why. Use it for the tool, the wake-up and Voice.</p>
+        <p class="basis"><b>Verified in code and in the F36 gotchas.</b> I did not build a paused-with-unmatched-actions reproduction; the worst case (leftover actions executing) is inferred from the two code paths.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">S4</span>The guard and project scoping are conventions, not boundaries</h3>
+        <p>The tools authenticate with the server's own session key read from the environment (<span class="ref">openhands-tools/…/child_conversation/impl.py:33-66</span>). <code>sender_conversation_id</code> is whatever the caller says it is (<span class="ref">event_router.py:280-292</span>), and a sender that is in no project may message into any project (<span class="ref">project_wake.py:82-89</span>). An agent with a terminal can post to <code>/events</code> with <code>run: true</code> and neither flag; Insider's skill tells the Cat to use the API from its terminal.</p>
+        <p>For a single-user local server this is acceptable. It should be described that way. The PR text and the bot reviews call it "project isolation", and an upstream reviewer will reasonably read that as a security property.</p>
+        <p class="fix"><b>Suggested fix.</b> State in the PR and the route docs that these are guard rails for well-behaved tools. If real scoping is wanted later, it needs per-conversation credentials, which is a separate design.</p>
+        <p class="basis"><b>Partly inferred.</b> I did not confirm that a worker's terminal inherits the session key variable.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">S5</span>The Cat persona ships in the upstream tool prompt</h3>
+        <p><code>COORDINATOR_PROMPT_GUIDANCE</code> opens with "the cat who presides over a herd of worker conversations" and gives it "a dry, good-natured cat" voice (<span class="ref">openhands-tools/…/project/definition.py:76-80</span>). Every coordinator gets this, including the plain one Canvas starts. Issue #19575 asks for a coordinator "with no persona", and the decision is that the Cat is an optional layer.</p>
+        <p>The same block describes UI that may not exist ("a resolved conversation shows a banner", memory "shows in the project view"; Canvas has no memory view).</p>
+        <p class="fix"><b>Suggested fix.</b> Keep routing, what-you-hear and safety in the tool guidance, in neutral words. Move the voice into Insider's <code>&lt;INSIDER_CONTROLLER&gt;</code> launch addition, which already exists.</p>
+        <p class="basis"><b>Verified in code.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">S6</span>Board state lives in user-visible tags that clients replace wholesale</h3>
+        <p><code>project</code>, <code>turn</code>, <code>ask</code> and <code>resolved</code> are ordinary tags with generic names (<span class="ref">openhands-sdk/…/conversation/types.py:24-45</span>). The server serializes its own single-tag writes, and its docstring admits the limit: "a concurrent PATCH of the full set still replaces it" (<span class="ref">conversation_service.py:2117-2120</span>). Both UIs resolve a card by reading all tags in the browser and writing all of them back (Canvas <span class="ref">project-board.tsx:52-66</span>; Insider <span class="ref">src/attention.js:24-29</span>). A resolve that overlaps a worker finishing can erase <code>turn</code> and <code>ask</code>, or restore stale ones.</p>
+        <p>The tags also leak into the product: the Canvas screenshots show "Ask: Question: for…" and "Turn: answered" as tag chips in the conversation list, and a 200-character sentence is being stored as a tag value. A person who already uses a <code>project</code> tag of their own will collide with membership.</p>
+        <p class="fix"><b>Suggested fix.</b> Add single-purpose routes (<code>POST …/conversations/{id}/resolve</code> and <code>/reopen</code>) backed by <code>set_conversation_tag</code>, and have both UIs use them. Reserve the four keys so the generic tag PATCH and the tag editors cannot change or show them. Membership by tag is fine for now; <code>ask</code> in particular would sit better in a small server-owned record.</p>
+        <p class="basis"><b>Verified in code and screenshots.</b> The race is by inspection, not reproduced.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">S7</span>Every message and reply in every worker is appended to the coordinator's history</h3>
+        <p>The person's messages in a worker, and the worker's final reply to each, are saved into the coordinator as user-role messages of up to 4,000 characters (<span class="ref">project_wake.py:142-222</span>, <span class="ref">project_prompts.py:147</span>). In a project where the person works directly with three workers, most of the coordinator's context becomes copies it is told to ignore. That brings condensation sooner, and the known post-condensation confusion (person's words versus another conversation's) applies to the coordinator too, because these are user-role messages distinguished only by a bracketed first line.</p>
+        <p class="fix"><b>Suggested fix.</b> Keep the person's words, drop or shorten the reply copies (a one-line "replied; N characters, ended with a question" plus <code>read_project_conversation</code> is enough). Longer term, store awareness notes as a non-LLM event and render one digest into the coordinator's next turn.</p>
+        <p class="basis"><b>Verified in code.</b> The cost is an inference; nobody has measured coordinator context growth over a long project.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">S8</span>With the flag off, project tools are kept but every call fails</h3>
+        <p>All <code>/api/projects</code> routes answer 404 the moment the flag is off (<span class="ref">projects_router.py:89-103</span>), and all six project tools go through those routes (<span class="ref">openhands-tools/…/project/impl.py:116</span>, <span class="ref">:212</span>, <span class="ref">:313</span>, <span class="ref">:428</span>). So an existing coordinator keeps its tools and its <code>&lt;PROJECT_COORDINATOR&gt;</code> prompt, and each call returns "Projects are turned off". For reactions the decision holds as stated, because the agent's tool writes the event directly.</p>
+        <p>Also, there is no mentions flag: the registry has two keys (<span class="ref">experimental_features.py:35</span>) and mention links are emitted whenever Projects is on.</p>
+        <p class="fix"><b>Suggested fix.</b> Decide which is meant. Either the flag gates creation and new conversations only (let member-facing routes keep working for existing projects), or off means off and the decision text and PR description say so. I would pick the first; it matches the reactions rule.</p>
+        <p class="basis"><b>Verified in code.</b> <code>test_projects_feature_flag.py</code> tests the 404 and the withheld tools, not an existing coordinator after the switch.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">S9</span>A worker's own child is told the wrong thing and nobody hears back from it</h3>
+        <p>Any project member's child gets <code>worker_guidance</code> naming its parent as "the project's coordinator, the conversation that started you" and promising "the coordinator relays" its final message (<span class="ref">conversation_service.py:2385-2395</span>, <span class="ref">:2566-2570</span>; <span class="ref">project_prompts.py:71-101</span>). But updates are delivered only for turns the real coordinator started (<span class="ref">project_wake.py:170-171</span>). A grandchild's report reaches no one.</p>
+        <p class="fix"><b>Suggested fix.</b> Wake the conversation that started the turn, whoever it is, and word the guidance as "the conversation that started you". Or withhold <code>start_child_conversation</code> from workers until this is designed.</p>
+        <p class="basis"><b>Verified in code.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev low">Low</span>
+      <div>
+        <h3><span class="id">S10</span>The "asks" heuristic picks the last question mark</h3>
+        <p><code>extract_ask</code> takes the last sentence ending in "?" in the last paragraph (<span class="ref">project_board.py:101-131</span>). The PR's own screenshot shows the result: a card reading "Asks: Or keep the constraint and accept the two working invocations above?", the second half of an either/or. A closing "Want me to also add tests?" marks a finished task as needing input.</p>
+        <p class="fix"><b>Suggested fix.</b> Give workers an explicit way to ask (a field on <code>finish</code>, or a small <code>ask_person</code> tool) and keep the heuristic as the fallback. This also resolves the clash with Stop hooks noted in project memory.</p>
+        <p class="basis"><b>Verified in code and in <code>.pr/projects-default-ui/09-board-needs-you.png</code>.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev low">Low</span>
+      <div>
+        <h3><span class="id">S11</span>Prompt changes that affect every conversation ride along</h3>
+        <p>The condenser's system prompt gains a sentence about bracketed headers for all conversations (<span class="ref">openhands-sdk/…/condenser/prompts/summarizing_system.j2:8</span>). The PR also adds tool descriptions and a system-prompt suffix. The bot review pointed out that the repo's checklist asks for the <code>integration-test</code> label on such changes; it is not set.</p>
+        <p class="fix"><b>Suggested fix.</b> Put the condenser line in its own small PR with the eval label. It is the piece most likely to draw a maintainer's objection, and it is separable.</p>
+        <p class="basis"><b>Verified in the diff and PR labels.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev low">Low</span>
+      <div>
+        <h3><span class="id">S12</span>Smaller items</h3>
+        <ul>
+          <li>Projects work only for conversations that live in the host server. Worker profiles require a <code>LocalWorkspace</code> parent (<span class="ref">conversation_service.py:2322</span>), and a Docker runtime's server has its own empty <code>projects.json</code>. Worth one sentence in the PR. (Partly inferred.)</li>
+          <li><code>MEMORY.md</code> can be 64 KiB and is pasted whole into every new worker's first message (<span class="ref">project_memory.py:38</span>, <span class="ref">conversation_service.py:616-630</span>). Cap what is injected.</li>
+          <li>Each open board polls every 5 s, and each poll reconciles and refreshes the status of every conversation on the server (<span class="ref">conversation_service.py:2091-2103</span>). Fine today; note it.</li>
+          <li>UIs recognize update kinds by matching English prose at the start of the message (<code>[Sent by </code>, <code>[Update from </code>…). The sender is structured; the kind is not. A small structured field would remove a three-repo string contract.</li>
+          <li><code>tools-tests</code> is red on the head commit. The six focused suites pass locally (170 tests), so it may be a flake, but I could not see the failing test in the job log and nobody has commented on it.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="canvas">
+  <h2>Canvas</h2>
+  <div class="findings">
+
+    <div class="finding">
+      <span class="sev high">High</span>
+      <div>
+        <h3><span class="id">C1</span>The commit with the Projects view has not been tested by CI or reviewed</h3>
+        <p>#19495 is a draft with merge conflicts against main, and only ten light checks ran on head <code>53124e9</code>: title, description, verify-skill isolation and PR artifacts. No lint, type-check, unit tests or build. The type-check could not pass anyway, because the pinned client (1.60.1) has no <code>listExperimentalFeatures</code>, <code>react</code> or <code>ReactionEvent</code>. The single bot approval is at <code>ada67c7</code>, 41 commits earlier, before the Projects view, reactions, mentions and the socket fix existed in the branch.</p>
+        <p class="fix"><b>Suggested fix.</b> Resolve the conflicts so workflows run, and treat the earlier approval as void. See C2 for what to put in front of reviewers.</p>
+        <p class="basis"><b>Verified from the PR's check runs and review list.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev high">High</span>
+      <div>
+        <h3><span class="id">C2</span>One PR, four features, the wrong title</h3>
+        <p>The PR is titled "preserve Insider Cat context across Canvas views" and most of its description is October and November evidence for the Insider companion. It now also contains the default Projects view (closing #19575), a copy of flags and reactions (#19503), mention rendering, and a copy of the lost-message fix (#19574): 123 files, +6,942, of which 1,152 lines are translations. A maintainer opening it cannot tell what they are being asked to approve.</p>
+        <p class="fix"><b>Suggested fix.</b> Keep this branch as the integration branch. Open a new PR for the default Projects view alone (routes, board, files, badge, compact headers, mentions) that closes #19575, and leave #19495 to close #17557 with the extension-host changes it was opened for.</p>
+        <p class="basis"><b>Verified from the PR and diff.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">C3</span>The Projects API is called untyped, with wire shapes declared locally</h3>
+        <p><code>ProjectsService</code> uses the client's low-level <code>request()</code> with string paths and hand-written interfaces for every payload (<span class="ref">src/api/projects-service/projects-service.api.ts:13-91</span>, <span class="ref">:93</span>). The repo's review guide asks for the opposite order: SDK model, typed client, published release, then Canvas, and it flags "Canvas-local wire redeclarations". The SDK PR lists typed project methods as out of scope.</p>
+        <p>So the client dependency is larger than the known one. The view is not only hidden until a release with <code>listExperimentalFeatures</code>; to pass review it needs a <code>ProjectsClient</code> in <code>clients/typescript</code> as well.</p>
+        <p class="fix"><b>Suggested fix.</b> Add the typed client methods in the SDK repo right after #6602 merges, so one client release unblocks both flags and Projects.</p>
+        <p class="basis"><b>Verified in code and <code>.agents/skills/custom-codereview-guide.md</code>.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">C4</span>Gaps against issue #19575 and against "one level up"</h3>
+        <ul>
+          <li>The acceptance criterion "starting a conversation from the project page creates it tagged into the project" is not built. The page can only add an existing conversation (<span class="ref">src/routes/project.tsx:33-98</span>).</li>
+          <li>No rename or delete. <code>updateProject</code> and <code>deleteProject</code> exist in the service and nothing calls them.</li>
+          <li>No memory view, though the coordinator tells the person memory shows in the project view.</li>
+          <li>The Coordinator card shows no state (<span class="ref">project.tsx:147-176</span>). If the coordinator itself is waiting for approval, the project page does not say so.</li>
+          <li>The Projects list shows names and goals only (<span class="ref">src/routes/projects.tsx:52-72</span>). With three projects, nothing tells you which one needs you. That count is the point of the list.</li>
+        </ul>
+        <p class="basis"><b>Verified in code.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">C5</span>Thin tests and no verification map for the view</h3>
+        <p>The view has four unit tests in <code>__tests__/routes/project.test.tsx</code>. There are no mock handlers for <code>/api/projects</code>, so <code>dev:mock</code> cannot show it, and the verify-openhands map in #19496 has no family for <code>/projects</code> (F30 covers the Insider page; F31 for reactions sits on another branch). The evidence is one live run with screenshots at <code>73513fd</code>.</p>
+        <p class="fix"><b>Suggested fix.</b> Add mock handlers and a feature-map family with recipes for create, board states, resolve and reopen, files, and flag off.</p>
+        <p class="basis"><b>Verified in both branches.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev low">Low</span>
+      <div>
+        <h3><span class="id">C6</span>Board details</h3>
+        <ul>
+          <li>Cards print the raw status string, such as <code>waiting_for_confirmation</code> (<span class="ref">project-board.tsx:139</span>). It is untranslated and reads as internal.</li>
+          <li>Needs you merges "approve an action" and "answer a question". These call for different moves; a short label on the card would help.</li>
+          <li>Remove sits next to Resolve with the same weight and no confirmation.</li>
+          <li>Resolve and Reopen use the read-then-replace tag write described in S6.</li>
+        </ul>
+        <p class="basis"><b>Verified in code and screenshots 09, 11, 14.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev low">Low</span>
+      <div>
+        <h3><span class="id">C7</span>The lost-message fix has no "after" that exercises it</h3>
+        <p>#19574 adds an HTTP fallback while an open socket has not yet delivered a frame. The notes in <code>canvas-socket-fix/README.md</code> say the "after" run went over an already-served socket, so it "does NOT exercise the new POST fallback". The server half (#6709) is merged, which may be why the symptom is gone. The fix is small and reasonable; it is just not shown working.</p>
+        <p class="basis"><b>Verified from the notes and the diff.</b></p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="insider">
+  <h2>Insider</h2>
+  <div class="findings">
+
+    <div class="finding">
+      <span class="sev high">High</span>
+      <div>
+        <h3><span class="id">I1</span>Following the setup guide probably gives a Cat without coordinator tools</h3>
+        <p>Insider creates the Cat from the person's active agent profile and then registers it with <code>coordinator_conversation_id</code> (<span class="ref">src/extension.js:1694-1720</span>, <span class="ref">:1937-1940</span>). The server adds the coordinator tools only on its own creation path, <code>start_project_coordinator</code> (<span class="ref">conversation_service.py:2472-2481</span>); making an existing conversation the coordinator only tags it. The project tools are marked not user-selectable (<span class="ref">project/definition.py:136</span>), so a profile made in the UI cannot include them.</p>
+        <p>The demos worked because Coordinator and Worker profiles were created by hand through the API. <code>docs/try-projects-locally.md</code> has no such step. Without it the Cat falls back to its skill and the API from a terminal, and workers started that way are not children, so they get no <code>project</code> tag, no worker profile, no memory, and send no updates. The first live run, where the Cat did all three tasks itself, looks like this.</p>
+        <p class="fix"><b>Suggested fix.</b> One creation path. Let <code>POST /api/projects</code> with <code>coordinator: {…}</code> accept launch additions, and have Insider use it, passing its <code>&lt;INSIDER_CONTROLLER&gt;</code> block. Then the Cat gets the tools from the server, and the two-step "create Cat, then create project" flow with its failure cases goes away.</p>
+        <p class="basis"><b>Inferred from three code paths.</b> I did not run the guide. This is the first thing to confirm by running it on a clean machine.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">I2</span>Insider computes its own board, with different rules</h3>
+        <p>Insider pages through every conversation on the server (<span class="ref">src/extension.js:1046-1064</span>) and groups them itself (<span class="ref">src/attention.js:53-66</span>). Its rule puts any non-running conversation with <code>turn=asked</code> in Needs you; the server only does so for a finished one (<span class="ref">projects_router.py:403-417</span>). Canvas uses the server's <code>attention</code>. So the same project can show different groups in the two UIs, and there are three places to change when the rules change.</p>
+        <p class="fix"><b>Suggested fix.</b> When the Cat has a project, read <code>GET /api/projects/{id}/conversations</code> and use its <code>attention</code>. Keep the tag path only for servers without Projects, or drop it.</p>
+        <p class="basis"><b>Verified in code.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">I3</span>Demo output became the product</h3>
+        <p>The demo runs used Insider itself as the target repo, and the Cat and its workers merged their own PRs (#17 and #18 "via raw GitHub API", then #28 to #31). That includes translating every string into 15 languages (a 2,300-line <code>translation.json</code>), accessibility changes to the board, the README, and the 0.2.0-beta.1 changelog. None of it has had the fresh-context review the project's own rule asks for before merge.</p>
+        <p class="fix"><b>Suggested fix.</b> One review pass over what the demo workers merged, with a native-speaker spot check on two or three locales. Use a scratch repo for future takes.</p>
+        <p class="basis"><b>Verified from project notes, the changelog and repo contents.</b> I did not review the translations.</p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev low">Low</span>
+      <div>
+        <h3><span class="id">I4</span>Smaller items</h3>
+        <ul>
+          <li><code>src/extension.js</code> is one 2,019-line file of hand-managed DOM and generation counters. It has good tests (2,261 lines), so this is a note for when the board logic moves to the server's list, which should shrink it.</li>
+          <li>The setup guide copies a locally built client over <code>node_modules</code>. Fine as a stopgap; add a line saying when it stops being needed.</li>
+          <li>The guide mentions two flags; project memory elsewhere mentions a third for mentions, which does not exist. Keep the guide as it is and fix the notes.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="cross">
+  <h2>Cross-cutting</h2>
+  <div class="findings">
+
+    <div class="finding">
+      <span class="sev high">High</span>
+      <div>
+        <h3><span class="id">X1</span>Approvals are from the bot only, and they are stale</h3>
+        <p>#6602 has three approvals, all from <code>all-hands-bot</code>, the latest at <code>de797f7</code>. Since then the branch gained server-started coordinators, the post-summary fix and agent-visible reactions (about 450 changed source lines). On Canvas the one approval predates everything in scope here. The bot reviews are thorough about what they looked at, but they did not raise S1, S3 or S5, and no OpenHands maintainer has reviewed either PR.</p>
+        <p class="basis"><b>Verified from review lists and git history.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">X2</span>Evidence is dated per piece, and mostly from one model</h3>
+        <p>The PR text is honest about this, but it adds up: F36 31/31 is claimed on "the current branch" as of the mentions change; F37 passed "on an earlier commit"; the full-stack run was "built from an earlier revision"; the Canvas live check is at <code>73513fd</code>. All live runs used DeepSeek. In those runs the stronger model ignored the reaction nudge, and in the first run the coordinator did not delegate at all. Nothing shows how a different model family behaves as coordinator.</p>
+        <p class="basis"><b>Verified from PR descriptions and project notes.</b></p>
+      </div>
+    </div>
+
+    <div class="finding">
+      <span class="sev med">Medium</span>
+      <div>
+        <h3><span class="id">X3</span>The message-origin problem needs a structural answer</h3>
+        <p>The known issue (after condensation a worker can mistake the coordinator's note for the person's words) is handled today by three pieces of prose: the header line, a paragraph in worker guidance, and a sentence in the condenser prompt. All coordinator and relay messages are stored as user-role messages whose first content block is the header. The structured fact, <code>MessageEvent.sender</code>, is not used when the event is turned into a prompt.</p>
+        <p class="fix"><b>Suggested fix.</b> Generate the origin line from <code>sender</code> at prompt-building time, so it cannot be separated from the message, and have the condenser receive each message's origin as data. Then the stored content is just the text, UIs stop parsing prose, and S7's digest becomes easy.</p>
+        <p class="basis"><b>Design opinion, based on the code as read.</b></p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="decisions">
+  <h2>The key decisions</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th style="width:27%">Decision</th><th style="width:13%">Holds up?</th><th style="width:15%">Implemented?</th><th>Comment</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Projects native in Agent Server; Canvas default view; Insider optional; one Cat per project</td>
+          <td><span class="tag ok">Yes</span></td>
+          <td><span class="tag part">Partly</span></td>
+          <td>Right split, and the issue's reasoning for it is good. Two leaks: the Cat persona is in the server's tool prompt (S5), and Insider does not use the server's board or creation path (I1, I2). One coordinator per project is enforced on write (<span class="ref">projects_router.py:334-345</span>).</td>
+        </tr>
+        <tr>
+          <td>Experimental flags, off by default, for Projects, reactions and mentions</td>
+          <td><span class="tag ok">Yes</span></td>
+          <td><span class="tag part">Two of three</span></td>
+          <td>The registry is small and clean. There is no mentions flag; mentions ride with Projects. Either add it or change the wording of the decision.</td>
+        </tr>
+        <tr>
+          <td>Flag off: conversations started while on keep their tools</td>
+          <td><span class="tag ok">Yes</span></td>
+          <td><span class="tag part">Reactions only</span></td>
+          <td>For Projects the tools remain and every call returns 404 (S8). I would make the flag gate creation and leave existing projects working.</td>
+        </tr>
+        <tr>
+          <td>Workers are normal conversations from an agent profile</td>
+          <td><span class="tag ok">Yes</span></td>
+          <td><span class="tag ok">Yes</span></td>
+          <td>The best decision in the set. It keeps workers inspectable and steerable by the person and avoids a second kind of agent. Two edges: a non-local parent silently falls back to copying its agent, and a worker's own children are mis-told (S9).</td>
+        </tr>
+        <tr>
+          <td>Every user message in a worker reaches the Cat at once, as context</td>
+          <td><span class="tag part">Intent yes</span></td>
+          <td><span class="tag ok">Yes</span></td>
+          <td>The Cat should know. Doing it by appending full user-role messages, plus every reply, is the costly way (S7). "At once" means saved at once; the Cat reads it on its next turn, which is the right behavior.</td>
+        </tr>
+        <tr>
+          <td>No stacked PRs; one big PR per repo carrying copies of split-outs</td>
+          <td><span class="tag no">For merging, no</span></td>
+          <td><span class="tag ok">Yes</span></td>
+          <td>Good for testing everything together. As the thing upstream reviews, it has already cost review quality (C1, C2, X1). Unstacked does not have to mean single: the pieces below are sequential, each based on main after the previous one merges.</td>
+        </tr>
+        <tr>
+          <td>Known issue: workers cannot message each other</td>
+          <td><span class="tag ok">Fine to defer</span></td>
+          <td>—</td>
+          <td>Relaying through the Cat is a reasonable v1 and keeps the wake rules simple. Fix S9 first; it is the same question one level down.</td>
+        </tr>
+        <tr>
+          <td>Known issue: origin confusion after condensation</td>
+          <td><span class="tag part">Needs more</span></td>
+          <td><span class="tag part">Prose only</span></td>
+          <td>See X3. Also applies to the coordinator, not only to workers.</td>
+        </tr>
+        <tr>
+          <td>Known issue: Canvas view hidden until a client release</td>
+          <td><span class="tag part">Understated</span></td>
+          <td>—</td>
+          <td>The release also needs typed Projects methods before the Canvas PR can pass its own repo's review rules (C3).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="gaps">
+  <h2>Verification gaps</h2>
+  <p class="sub">What is claimed or implied but not shown, and what the verify skills do not reach.</p>
+  <ul>
+    <li><strong>Blocked workers.</strong> No test or recipe for a coordinator-started worker that ends in error, stuck, paused or waiting for confirmation (S1).</li>
+    <li><strong>Restart during a project.</strong> Only record survival is checked, not that a worker finishing after a restart wakes the coordinator (S2).</li>
+    <li><strong>Paused targets.</strong> The behavior is documented as a gotcha, not tested as a safety property (S3).</li>
+    <li><strong>Flag off with a live project.</strong> Tests cover the 404 and withheld tools on new conversations, not an existing coordinator after the switch (S8).</li>
+    <li><strong>Server-started coordinator and worker profiles.</strong> Unit tests exist; I found no F36 recipe for <code>coordinator: {…}</code> or <code>worker_agent_profile_id</code>, the two paths the Canvas view depends on.</li>
+    <li><strong>Long projects.</strong> Nothing exercises a coordinator through condensation with awareness copies in its history (S7, X3).</li>
+    <li><strong>Canvas view.</strong> One live run; four unit tests; no mock mode; no verify-openhands family; never built by CI (C1, C5).</li>
+    <li><strong>The setup guide.</strong> No record of anyone following <code>docs/try-projects-locally.md</code> from a clean machine with default profiles (I1).</li>
+    <li><strong>Lost-message fix.</strong> The fallback path was not hit in the "after" run (C7).</li>
+    <li><strong>Second model.</strong> All live evidence is DeepSeek (X2).</li>
+    <li><strong>Docker runtime and Cloud.</strong> Out of scope by construction, but not stated in the server PR.</li>
+  </ul>
+  <p>What I could not verify myself: the cause of the red <code>tools-tests</code> job (the log tail available to me held only cleanup lines), whether a worker's terminal can read the session key (S4), and anything that needs a running stack. I ran only the six focused server suites.</p>
+</section>
+
+<section id="merge">
+  <h2>Path to merge</h2>
+  <p>Nothing here needs stacked PRs. Each item is opened against main after the one before it lands, and the two big branches keep existing as the place where everything is tested together.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th style="width:5%">#</th><th style="width:16%">Repo</th><th style="width:34%">PR</th><th>Why this position</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Agent Server</td><td>#6609, flags and reactions</td><td>Already separate and approved on an older head. Re-request review on the current head and merge. Everything else waits on it.</td></tr>
+        <tr><td>2</td><td>Agent Server</td><td>New, small: send-route guard and sender (<code>refuse_pending_confirmation</code> with the shared admission rule from S3, <code>sender_conversation_id</code>, run outcome, fresh tags on read, <code>goal_loop</code> sender)</td><td>About 400 lines, useful on its own, and Voice wants the same guard. It lets a maintainer review the safety property without the rest.</td></tr>
+        <tr><td>3</td><td>Agent Server</td><td>#6602 rebased: Projects core (record, membership, board, coordinator tools, wake-ups, worker profiles), with S1, S2, S5, S8 and S9 fixed</td><td>The main review. Without flags, reactions and the guard it is roughly half its current size.</td></tr>
+        <tr><td>4</td><td>Agent Server</td><td>New: artifacts and memory (routes, stores, three tools), optionally as two PRs</td><td>Self-contained, already well tested, and the easiest to approve. Can go before item 3 if a maintainer prefers, since the stores do not depend on the wake-up logic.</td></tr>
+        <tr><td>5</td><td>Agent Server</td><td>New: typed Projects methods in <code>clients/typescript</code>, then a client release</td><td>One release unblocks both Canvas PRs.</td></tr>
+        <tr><td>6</td><td>Canvas</td><td>#19574 lost-message fix, with a real "after"</td><td>Independent of everything. Can go any time.</td></tr>
+        <tr><td>7</td><td>Canvas</td><td>#19503, flags and reactions, with the client pin bumped</td><td>Needs item 5's release (or an earlier one that includes #6609).</td></tr>
+        <tr><td>8</td><td>Canvas</td><td>New: default Projects view, closing #19575</td><td>Typed client, resolve routes from S6, tests and a verify family.</td></tr>
+        <tr><td>9</td><td>Canvas</td><td>#19495, back to its original scope (companion host API, closing #17557), then #19496</td><td>Smallest once the rest is out of it.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Before item 3 goes to a maintainer, ask for a human reviewer by name. The bot's approval will not be enough for a change of this size, and an early human read of the design (S3, S5 and S6 especially) is cheaper than a late one.</p>
+</section>
+
+<section id="status">
+  <h2>Status of the plan</h2>
+  <p class="sub">Checked on 11 November 2026, 14:30 UTC, against Agent Server #6602 at <code>01f2bf1</code>, Canvas #19495 at <code>5df7ee2</code> and Insider <code>main</code> at <code>4e66b45</code>. The findings above describe the code as it was reviewed on 10 November; each plan item below carries its current status.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th style="width:24%">Status</th><th style="width:28%">Items</th><th>Note</th></tr></thead>
+      <tbody><tr><td>Done or fixed on the branch</td><td>F1, F2, F3, F4, N1, N2, N7, N8, D4, D5</td><td>All three High server findings are closed on #6602, the Cat is out of the server prompt, and Insider reads the server's board.</td></tr><tr><td>Waiting on a release or a reviewer</td><td>F5, F6, N5</td><td>#6609 needs a maintainer. A typescript-client release that carries it turns Canvas CI green.</td></tr><tr><td>Not started</td><td>N3, N4, N6, L1 to L6</td><td>N3 and N6 are the split into reviewable PRs. Neither can start before the merge decision.</td></tr><tr><td>Engel's decisions</td><td>D1, D2, D3, and the two choices in N4</td><td>The merge strategy and a named human reviewer are now what most of the remaining plan waits on.</td></tr></tbody>
+    </table>
+  </div>
+  <h3>The follow-up, recorded</h3>
+  <p>Two of the fixes were recorded live in Agent Canvas with the Insider app.</p>
+  <div class="films">
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/projects-review-video/new-project-poster.jpg">
+        <source src="../experiments/projects-review-video/new-project.mp4" type="video/mp4" />
+        <a href="../experiments/projects-review-video/new-project.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>The setup guide, run from scratch (F4, finding I1). A new project's Cat now has its coordinator tools: it starts a worker, the worker does the task, and its question lands under Needs you. <a href="../experiments/projects-review-video/new-project.mp4" download>MP4, 1:30</a></figcaption>
+    </figure>
+    <figure class="film">
+      <video controls preload="metadata" playsinline poster="../experiments/projects-review-video/resolve-poster.jpg">
+        <source src="../experiments/projects-review-video/resolve.mp4" type="video/mp4" />
+        <a href="../experiments/projects-review-video/resolve.mp4">Download the video (MP4)</a>
+      </video>
+      <figcaption>Resolve on Insider's board, which now reads the server's list and goes through the project's routes (N2, N7). <a href="../experiments/projects-review-video/resolve.mp4" download>MP4, 0:04</a></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="plan">
+  <h2>Prioritized plan</h2>
+  <p class="sub">Each item is sized for one work thread. Finding ids in brackets point back to the detail above.</p>
+  <div class="plan">
+
+    <div class="phase">
+      <h3>First <span>makes the loop trustworthy and unblocks review</span></h3>
+      <div class="items">
+        <div class="item"><span class="n">F1</span><div><strong>Tell the coordinator about blocked workers.</strong> Deliver an update when a coordinator-started turn ends in error, stuck, paused or waiting for confirmation, with a header naming the state. Unit test per state and one F36 recipe. <span class="meta">Agent Server · <code>project_board.py</code>, <code>project_wake.py</code>, <code>project_prompts.py</code> · [S1]</span><span class="status"><span class="tag ok">Fixed on #6602</span> <code>eb0daaa</code> and <code>8e7b6eb</code>: a worker that stops for an approval, on an error or stuck wakes the coordinator with what it waits on, and a run that never started is reported too. The F36 map passed 33 of 33 on <code>002caac</code>.</span></div></div>
+        <div class="item"><span class="n">F2</span><div><strong>One admission rule for non-person senders.</strong> Run only from idle or finished; otherwise save or refuse with a reason. Apply to the send route flag, the tool and the wake-up, and line it up with Voice's <code>send_message_if_idle</code>. Open as its own PR (merge item 2). <span class="meta">Agent Server · <code>event_service.py</code>, <code>event_router.py</code> · [S3, S4]</span><span class="status"><span class="tag ok">Fixed on #6602</span> <code>6daa336</code> and <code>8e7b6eb</code>: one admission rule for every sender that is not the person, on the route, the tool and the wake-up. Not yet its own PR, which waits on the merge decision (D1). I did not compare it with Voice's guard in #5180.</span></div></div>
+        <div class="item"><span class="n">F3</span><div><strong>Make wake-ups survive a restart.</strong> Read the turn's starter from the event log at finish time; add a reconcile step for undelivered updates; stop swallowing delivery failures silently. Test with a restart between task and finish. <span class="meta">Agent Server · <code>project_board.py</code>, <code>conversation_service.py</code> · [S2]</span><span class="status"><span class="tag ok">Fixed on #6602</span> <code>761b346</code> delivers coordinator updates a restart left undelivered, the turn's starter is read from the event log (tested), and <code>14b3f7c</code> and <code>95dadd7</code> stop a restart from looking like the person's pause or a crash.</span></div></div>
+        <div class="item"><span class="n">F4</span><div><strong>Run the setup guide on a clean machine and fix what it shows.</strong> Confirm or refute I1. If confirmed, add launch additions to <code>coordinator: {…}</code> on the server and switch Insider's New project to that path. <span class="meta">Insider + Agent Server · <code>src/extension.js</code>, <code>projects_router.py</code> · [I1]</span><span class="status"><span class="tag ok">Done</span> The guide was run from scratch and recorded. Insider #55 starts the Cat as its project's coordinator, and #57 brought <code>main</code> level with the working branch.</span></div></div>
+        <div class="item"><span class="n">F5</span><div><strong>Land #6609.</strong> Re-request review on the current head, find out why <code>tools-tests</code> is red on #6602 and whether it affects #6609, and merge. <span class="meta">Agent Server · [X1]</span><span class="status"><span class="tag part">Waiting on a human</span> #6609 is still open. Its only review is the bot's approval of 7 November on an older head. SDK v1.62.0 was released without it.</span></div></div>
+        <div class="item"><span class="n">F6</span><div><strong>Get the Canvas branch green.</strong> Merge main, resolve conflicts, build against a locally packed client so lint, type-check and tests actually run, and fix what fails. This is for the integration branch; it does not need to be reviewable yet. <span class="meta">Canvas · [C1]</span><span class="status"><span class="tag part">Waiting on a release</span> #19495 is at <code>5df7ee2</code>, 16 commits behind main. Its type-check fails only on flag and reaction types that the published typescript-client (1.61.0) lacks; it needs a client release that carries #6609.</span></div></div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <h3>Next <span>shapes the PRs upstream will read</span></h3>
+      <div class="items">
+        <div class="item"><span class="n">N1</span><div><strong>Take the Cat out of the server prompt.</strong> Neutral coordinator guidance in <code>openhands-tools</code>; voice and UI description in Insider's launch addition. Re-run F36.mention and the delegation recipes afterwards, since wording changes behavior. <span class="meta">Agent Server + Insider · [S5]</span><span class="status"><span class="tag ok">Done</span> <code>67c1038</code>: coordinator and worker are prompt presets with predefined profiles, and no cat voice is left in <code>openhands-tools</code>. Insider #62 has the server introduce the Cat in a worker's brief.</span></div></div>
+        <div class="item"><span class="n">N2</span><div><strong>Resolve and reopen as server routes; reserve the board tags.</strong> Add the two routes, block the four keys in the generic tag PATCH, hide them in Canvas tag chips and the tag editor, and move both UIs to the routes. <span class="meta">All three repos · [S6, C6]</span><span class="status"><span class="tag ok">Done</span> <code>325b694</code> and <code>ec45c7b</code> add the resolve and reopen routes and reserve the board tags on the server. Canvas (<code>5df7ee2</code>) and Insider (#60, #61) resolve only through the routes. I did not re-check the Canvas tag chips.</span></div></div>
+        <div class="item"><span class="n">N3</span><div><strong>Split #6602 for review.</strong> Rebase after #6609 and F2; carve artifacts and memory into their own PR; rewrite the description for the smaller scope, including the limits (host-local only, guard rails not isolation). Ask for a named human reviewer. <span class="meta">Agent Server · [X1, S12]</span><span class="status"><span class="tag no">Not started</span> Waits on the merge decision (D1). #6602 is now 92 files, +16,419 lines.</span></div></div>
+        <div class="item"><span class="n">N4</span><div><strong>Settle flag-off semantics and the worker's-child case.</strong> Two small decisions for Engel, then code and tests: does the flag gate creation only, and does a worker's child wake its parent or is the tool withheld. <span class="meta">Agent Server · [S8, S9]</span><span class="status"><span class="tag no">Not started</span> Still needs two decisions from Engel: does the flag gate creation only, and does a worker's child wake its parent or lose the tool.</span></div></div>
+        <div class="item"><span class="n">N5</span><div><strong>Typed Projects client.</strong> <code>ProjectsClient</code> in <code>clients/typescript</code> with tests and the endpoint-audit entries, ready to merge right after Projects core so one release covers everything. <span class="meta">Agent Server · [C3]</span><span class="status"><span class="tag part">Written, not released</span> <code>ProjectsClient</code> is on #6602 (<code>65b7333</code>, <code>22f5eb9</code>). The client only ships with an SDK release, so Canvas still calls the routes untyped until one carries it.</span></div></div>
+        <div class="item"><span class="n">N6</span><div><strong>New Canvas PR for the default Projects view.</strong> Cut from the integration branch; typed client; mock handlers; a verify-openhands family; the missing "new conversation in this project" action; coordinator status on the page; needs-you count on the list. <span class="meta">Canvas · [C2, C4, C5]</span><span class="status"><span class="tag no">Not started</span> Waits on D1. On head the view has three test files, no mock handlers and no verify-openhands family.</span></div></div>
+        <div class="item"><span class="n">N7</span><div><strong>Insider reads the server's board.</strong> Use <code>GET /api/projects/{id}/conversations</code> and its <code>attention</code> when a project exists; delete the duplicate grouping for that case. <span class="meta">Insider · <code>src/extension.js</code>, <code>src/attention.js</code> · [I2]</span><span class="status"><span class="tag ok">Done</span> Insider #59 groups a project's board from the server's list.</span></div></div>
+        <div class="item"><span class="n">N8</span><div><strong>Review what the demo workers merged into Insider.</strong> Fresh-context review of #17, #18 and #28 to #31, plus a spot check of two or three locales. <span class="meta">Insider · [I3]</span><span class="status"><span class="tag ok">Done</span> The demo workers' PRs were reviewed; Insider #58 fixed what turned up (an English-only label, concatenated screen-reader labels, an overclaim in the changelog) and added a test that checks all 15 locales.</span></div></div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <h3>Later <span>worth doing, not blocking the first merge</span></h3>
+      <div class="items">
+        <div class="item"><span class="n">L1</span><div><strong>Message origin as data.</strong> Build the origin line from <code>sender</code> when the prompt is assembled, pass origins to the condenser, add a structured kind for UIs, and remove the prose-matching regexes in Canvas and Insider. <span class="meta">Agent Server first · [X3, S12]</span><span class="status"><span class="tag no">Not started</span> A worker's brief now carries a sender header, which helps. The origin is still prose that UIs match by regex.</span></div></div>
+        <div class="item"><span class="n">L2</span><div><strong>Lighter awareness.</strong> Shorten or drop reply copies; measure coordinator context over a long project before and after. <span class="meta">Agent Server · [S7]</span><span class="status"><span class="tag no">Not started</span> </span></div></div>
+        <div class="item"><span class="n">L3</span><div><strong>An explicit ask.</strong> A field on <code>finish</code> or an <code>ask_person</code> tool, with the heuristic as fallback. <span class="meta">Agent Server · [S10]</span><span class="status"><span class="tag no">Not started</span> The new resolution judge (<code>c3eb959</code>) now decides whether a turn needs the person, which replaces the last-question-mark heuristic. The agent still has no explicit way to ask.</span></div></div>
+        <div class="item"><span class="n">L4</span><div><strong>A second model as coordinator.</strong> Run the F36 tool recipes and one full project with a different model family, and record where delegation and reactions differ. <span class="meta">Verification · [X2]</span><span class="status"><span class="tag no">Not started</span> The end-to-end scenario runs of 10 November all used DeepSeek.</span></div></div>
+        <div class="item"><span class="n">L5</span><div><strong>Canvas project management.</strong> Rename, delete, memory view, clearer card states. <span class="meta">Canvas · [C4, C6]</span><span class="status"><span class="tag no">Not started</span> </span></div></div>
+        <div class="item"><span class="n">L6</span><div><strong>Worker-to-worker messages and a standalone mentions flag.</strong> Both are designed for; neither is needed to ship v1. <span class="meta">Agent Server + Canvas</span><span class="status"><span class="tag no">Not started</span> The flag registry still has two keys, <code>conversation_reactions</code> and <code>projects</code>.</span></div></div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <h3>Stop or drop</h3>
+      <div class="items">
+        <div class="item"><span class="n">D1</span><div><strong>Stop treating the big PRs as the merge vehicles.</strong> Keep them as integration branches. Stop adding new scope to them until the first pieces have landed.<span class="status"><span class="tag idle">Engel's decision</span> Open. #6602 went from +12,854 to +16,419 lines in a day: auto-resolve, the profiles, the typed client and the fixes above all landed on it.</span></div></div>
+        <div class="item"><span class="n">D2</span><div><strong>Stop counting the bot's approval as review.</strong> It is a useful first pass. Each has gone stale within hours on these branches, and none raised the top findings here.<span class="status"><span class="tag idle">Engel's decision</span> Open. No human reviewer is named on #6602, #6609 or #19495.</span></div></div>
+        <div class="item"><span class="n">D3</span><div><strong>Stop using Insider as the demo target, and pause new demo films.</strong> Five takes exist. The next one is worth making after F1 to F4, when the loop it shows is the loop that will ship.<span class="status"><span class="tag idle">Engel's decision</span> Seven scenario videos were recorded on 10 November, on Canvas and a replayed SDK history, as verification.</span></div></div>
+        <div class="item"><span class="n">D4</span><div><strong>Drop the cat voice from <code>openhands-tools</code></strong> (N1), and drop the condenser prompt line from #6602 in favor of its own evaluated PR. <span class="meta">[S5, S11]</span><span class="status"><span class="tag ok">Done</span> The cat voice is gone (<code>67c1038</code>) and the condenser line was dropped from #6602 (<code>ccbf36d</code>).</span></div></div>
+        <div class="item"><span class="n">D5</span><div><strong>Drop Insider's tag-only board path</strong> once it reads the server's list, unless supporting servers without Projects is a real goal. <span class="meta">[I2]</span><span class="status"><span class="tag ok">Done</span> I found no tag-based board grouping left in Insider's <code>src/extension.js</code> on <code>main</code>.</span></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <p>Method: read all project notes and shared documents; fetched both PR heads and diffed against their merge bases (<code>79844ce</code> for the SDK, <code>82196a4</code> for Canvas); read the server modules, tools, Canvas routes and services, and the Insider extension in full or in the relevant parts; read PR descriptions, reviews, check runs and issue #19575 through the GitHub API; ran <code>tests/tools/project</code>, <code>tests/tools/reaction</code> and four <code>tests/agent_server</code> project suites on the SDK head (170 passed). No code, PR, issue or project memory was changed.</p>
+</footer>
+
+</div>
+</body>
+</html>
