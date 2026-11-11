@@ -7,7 +7,7 @@
   <title>Routing GitHub mentions to Codex and Claude — Engel Nyst</title>
   <meta name="description" content="A plan for routing trusted @smolpaws codex and @smolpaws claude requests on GitHub to hosted Codex and Claude agents, from SmolPaws's existing GitHub Worker." />
   <meta property="og:title" content="Routing GitHub mentions to Codex and Claude" />
-  <meta property="og:description" content="Grow SmolPaws's GitHub Worker with one D1 ledger and cron loop: Claude through Claude Code scheduled tasks you can open on the web, Codex through the OpenAI Agents API." />
+  <meta property="og:description" content="Grow SmolPaws's GitHub Worker with one D1 ledger and cron loop around Claude Managed Agents and the OpenAI Agents API." />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="https://enyst.github.io/arch/github-mention-router.html" />
   <meta name="twitter:card" content="summary" />
@@ -44,7 +44,7 @@
   <p class="meta">12 October 2026 · Revised 14 October and 11 November 2026 · Proposed implementation: <code>smolpaws/apps/github</code></p>
 
   <div class="callout">
-    <p><strong>Grow the existing GitHub Worker; don't build a second one.</strong> enyst writes <code>@smolpaws codex …</code> or <code>@smolpaws claude …</code>. GitHub delivers that to SmolPaws as a notification, which the Worker already polls. One D1 ledger and the existing minute cron carry each request to a delivered reply posted as SmolPaws. Claude runs as a Claude Code scheduled task, so every request becomes a session enyst can open and continue at claude.ai/code. Codex runs through the OpenAI Agents API, and those runs do not appear in Codex web.</p>
+    <p><strong>Grow the existing GitHub Worker; don't build a second one.</strong> enyst writes <code>@smolpaws codex …</code> or <code>@smolpaws claude …</code>. GitHub delivers that to SmolPaws as a notification, which the Worker already polls. One D1 ledger and the existing minute cron carry each request to a delivered reply posted as SmolPaws. Claude runs on Claude Managed Agents and Codex on the OpenAI Agents API: two API-key agents the Worker controls, neither visible in the providers' web apps.</p>
   </div>
   <p>The SmolPaws agent asks through a direct tool that writes the same ledger row, not through a GitHub comment. A first version returns findings as comments. Code proposals come later as branches on enyst's fork.</p>
   <p class="status">Revised proposal. The managed routes have not been implemented or activated.</p>
@@ -68,8 +68,7 @@
     <li><strong>Trigger.</strong> <code>@codex</code> and <code>@claude</code> become <code>@smolpaws codex</code> and <code>@smolpaws claude</code>. Bare handles collide with OpenAI's and Anthropic's own GitHub integrations and forced repository-wide comment polling.</li>
     <li><strong>Intake.</strong> SmolPaws's notifications find requests. Repository-wide feeds, scan cursors, overlap windows and per-surface baselines are gone.</li>
     <li><strong>Requesters.</strong> On GitHub, only enyst can ask. SmolPaws asks through its direct tool, so every SmolPaws-authored comment can be ignored on intake.</li>
-    <li><strong>Claude backend.</strong> Claude Managed Agents is replaced with a Claude Code scheduled task fired through its API, so results can be opened and continued in the web app.</li>
-    <li><strong>Codex backend.</strong> Stays on the OpenAI Agents API. The plan now says plainly that those runs live outside Codex web.</li>
+    <li><strong>Backends.</strong> Claude stays on Managed Agents and Codex on the OpenAI Agents API. The plan now says plainly that neither run appears in claude.ai/code or Codex web, and why a web-visible Claude Code scheduled task was considered and set aside.</li>
     <li><strong>Operator states.</strong> <em>Dispatch unknown</em> and <em>delivery unknown</em> now notify enyst through SmolPaws, not only a D1 column.</li>
   </ul>
 
@@ -82,7 +81,7 @@
     intake.ts                   Notification thread scan and mention parsing
     lifecycle.ts                Dispatch, observation and publication
     ledger.ts                   D1 requests, leases and reply outbox
-    providers/claudeRoutine.ts  Claude Code scheduled task fire and result callback
+    providers/claudeManaged.ts  Claude Managed Agents sessions
     providers/openaiAgents.ts   OpenAI Agents API sessions
   migrations/                   Shared durable intake and routing schema</pre>
   <p>This is a proposed layout. Keep the module free of imports from the agent server, coordinator, personal memory and local runner protocol. Pass its storage, clock, HTTP access and comment writer in explicitly. Provider-specific formats stay inside the two adapters. The SmolPaws <code>ask_codex</code> and <code>ask_claude</code> tools call <code>accept(request)</code> through the Worker's authenticated interface.</p>
@@ -106,7 +105,7 @@
         <tr><td>Request Codex or Claude on GitHub</td><td><code>enyst</code></td><td>Ability to comment on an allowed repository. The author ID check is the authorization.</td></tr>
         <tr><td>Request Codex or Claude from SmolPaws</td><td>SmolPaws agent</td><td>The direct tool's service credential. No GitHub comment.</td></tr>
         <tr><td>Publish a result or status comment</td><td>Router as <code>smolpaws</code></td><td>SmolPaws's existing comment access.</td></tr>
-        <tr><td>Push a proposal branch, later</td><td>The Claude Code session, through its GitHub proxy</td><td>enyst's connected GitHub access, limited to enyst's fork.</td></tr>
+        <tr><td>Push a proposal branch, later</td><td>Router as <code>enyst</code></td><td>Contents write access to enyst's fork only.</td></tr>
         <tr><td>Open a draft PR, later</td><td><code>enyst</code>, by hand at first</td><td>Ordinary PR access from the fork.</td></tr>
         <tr><td>Label, approve, merge</td><td>Outside this plan</td><td>Not part of the comment route.</td></tr>
       </tbody>
@@ -125,27 +124,28 @@
       <li><strong>D1 records a unique request</strong><small>The existing minute cron advances it.</small></li>
       <li><strong>The selected backend works</strong>
         <div class="providers">
-          <div class="provider"><strong><code>claude</code></strong><small>Claude Code scheduled task<br />A session you can open at claude.ai/code</small></div>
-          <div class="provider"><strong><code>codex</code></strong><small>OpenAI Agents API<br />Outside Codex web</small></div>
+          <div class="provider"><strong><code>claude</code></strong><small>Claude Managed Agents<br />Managed Claude harness</small></div>
+          <div class="provider"><strong><code>codex</code></strong><small>OpenAI Agents API<br />Managed Codex harness</small></div>
         </div>
       </li>
-      <li><strong>SmolPaws publishes the result</strong><small>Provider, model, assessed commit, session link where one exists, findings and a durable receipt.</small></li>
+      <li><strong>SmolPaws publishes the result</strong><small>Provider, model, assessed commit, findings and a durable receipt.</small></li>
     </ol>
     <figcaption id="flow-caption" class="source-note">Proposed request path. The local SmolPaws runner is needed only for ordinary SmolPaws conversations.</figcaption>
   </figure>
 
-  <h2 id="providers">Backends: one you can open, one you cannot</h2>
-  <p>Ease of use from the web apps matters here. Sessions created through the Claude Managed Agents API or the OpenAI Agents API do not appear in claude.ai/code or chatgpt.com/codex: there is nothing to open, inspect or tell to "now fix it". Two beta agent APIs also bring two session models, two event vocabularies, two signing schemes and two budget systems. The plan uses a web-visible backend where one exists and says so where none does.</p>
+  <h2 id="providers">Backends: two managed agent APIs</h2>
+  <p>Both providers host the agent loop and sandbox, and the Worker drives both the same way: create a session, poll its state, read the answer. Keys stay in the Worker, budgets are set per session, and nothing acts on GitHub except the router. The cost is that neither run appears in claude.ai/code or chatgpt.com/codex, so a result cannot be opened and continued in a web app. The plan accepts that trade.</p>
 
-  <h3>Claude through a Claude Code scheduled task</h3>
-  <p>Configure one scheduled task (formerly a routine) once: its saved prompt, an environment with network access and setup script, and enyst's fork of the target as its repository. Give it an API trigger. Each request POSTs to that task's <code>/fire</code> endpoint with a bearer token and the request in the optional <code>text</code> field. The response returns <code>claude_code_session_id</code> and <code>claude_code_session_url</code>, so every request becomes an ordinary Claude Code web session. <a href="https://code.claude.com/docs/en/routines">Scheduled tasks</a> and <a href="https://platform.claude.com/docs/en/api/claude-code/routines-fire">Trigger a routine through the API</a>.</p>
-  <p>Fire text arrives wrapped in a <code>&lt;routine-fire-payload&gt;</code> block marked as untrusted. The saved prompt must opt in, for example "Answer the request in the routine-fire-payload block". That wrapper is useful here: the request and its thread snapshot come from GitHub, and the saved prompt stays the authority.</p>
-  <p>The fire API does not return the session's answer. The router passes a one-time result token in the fire text, and the session POSTs its findings to the Worker's <code>/managed/results/{requestId}</code> endpoint with that token. A missing callback is caught by the watchdog. The token can deliver one result for one request and nothing else.</p>
-  <p>Caveats. The <code>/fire</code> endpoint ships under the <code>experimental-cc-routine-2026-04-01</code> beta header and scheduled tasks are a research preview. API fires are limited to 30 per hour per task and 100 per hour per account. Runs draw on enyst's subscription usage. Anything the session does through connected GitHub access appears as enyst, which is why the <a href="#credentials">credentials section</a> narrows it.</p>
+  <h3>Claude through Claude Managed Agents</h3>
+  <p>Configure an agent and environment once, then create a session per request and send the request as a user event; <code>initial_events</code> can combine the two. Endpoints use <code>anthropic-beta: managed-agents-2026-04-01</code> with the API's normal version header. Managed Agents is enabled by default for API accounts; the deployment still needs its own smoke test. <a href="https://platform.claude.com/docs/en/managed-agents/overview">Managed Agents overview</a> and <a href="https://platform.claude.com/docs/en/managed-agents/sessions">Starting a session</a>.</p>
 
   <h3>Codex through the OpenAI Agents API</h3>
-  <p>There is no clean server-side way into Codex web. <code>codex cloud exec</code> creates a Codex web task but depends on ChatGPT login. That is the same dependency that stopped the OpenHands Cloud Codex ACP canary on 12 October, when it required ChatGPT reauthentication. For an unattended path, use the API-key route and accept that these runs live outside the web app.</p>
-  <p>Start with <code>POST /v1/agents/sessions</code>, an <code>openai_hosted</code> environment and a pinned model. The beta header is <code>OpenAI-Beta: agents=v1</code>; the key needs <code>api.agents.read</code>, <code>api.agents.write</code> and <code>api.responses.write</code> and stays in the Worker. <a href="https://developers.openai.com/api/docs/guides/agents-api/overview">OpenAI Agents API overview</a> and <a href="https://developers.openai.com/api/docs/guides/agents-api/quickstart">quickstart</a>. If Codex web visibility later becomes worth the authentication fragility, <code>codex cloud exec</code> can replace this adapter.</p>
+  <p>Start with <code>POST /v1/agents/sessions</code>, an <code>openai_hosted</code> environment and a pinned model. The beta header is <code>OpenAI-Beta: agents=v1</code>; the key needs <code>api.agents.read</code>, <code>api.agents.write</code> and <code>api.responses.write</code> and stays in the Worker. <a href="https://developers.openai.com/api/docs/guides/agents-api/overview">OpenAI Agents API overview</a> and <a href="https://developers.openai.com/api/docs/guides/agents-api/quickstart">quickstart</a>.</p>
+  <p>The two betas differ in session model, event names and budget fields. Keep those differences inside the two adapters, and give <code>lifecycle.ts</code> one shape: created, running, waiting, answered, failed.</p>
+
+  <h3>Why not the web-visible routes</h3>
+  <p><strong>Claude Code scheduled task.</strong> A scheduled task (formerly a routine) with an API trigger turns each request into a claude.ai/code session that enyst could open and continue. Checked against its documentation on 11 November, it is the wrong fit for this router. Anything it does through connected GitHub access appears as enyst, who has push access to the target. The <code>/fire</code> call returns a session URL but not the answer, so results need a callback endpoint. A run cannot be stopped by the router, and the feature is a research preview under <code>experimental-cc-routine-2026-04-01</code>, limited to 30 fires per hour per task. <a href="https://code.claude.com/docs/en/routines">Scheduled tasks</a> and <a href="https://platform.claude.com/docs/en/api/claude-code/routines-fire">Trigger a routine through the API</a>.</p>
+  <p><strong>Codex web.</strong> <code>codex cloud exec</code> creates a Codex web task but depends on ChatGPT login. That is the same dependency that stopped the OpenHands Cloud Codex ACP canary on 12 October, when it required ChatGPT reauthentication.</p>
   <p>Neither backend reads personal chats, desktop tasks or their memory. Supply the skills and instructions each needs explicitly.</p>
 
   <h2 id="intake">Intake from notifications</h2>
@@ -171,52 +171,43 @@
 
 Other outcomes: awaiting action · budget paused · failed · canceled
 Ambiguous responses: dispatch unknown · delivery unknown</pre>
-  <p><strong>A timeout after creation is not proof that creation failed.</strong> If the provider accepted work but the response was lost, a blind retry starts another paid run. For Codex, check the Agents API's idempotency and listing support. For Claude, a lost <code>/fire</code> response can be reconciled only if the run is identifiable; put the request ID in the fire text and check in preflight whether the session can be found from it. When recovery cannot establish the outcome, park the request as <em>dispatch unknown</em>. Apply the same rule to GitHub publication.</p>
+  <p><strong>A timeout after creation is not proof that creation failed.</strong> If the provider accepted work but the response was lost, a blind retry starts another paid run. Put the request ID in session metadata where the API allows it, and check each provider's idempotency and listing support during preflight. When recovery cannot establish the outcome, park the request as <em>dispatch unknown</em>. Apply the same rule to GitHub publication.</p>
   <p><strong>Unknown states must reach enyst.</strong> <em>Dispatch unknown</em>, <em>delivery unknown</em>, budget pauses and watchdog expiries send a SmolPaws message to enyst with the request, thread link and session link. Known failures also get an attributed status comment on the thread. A <em>delivery unknown</em> row gets no further comment until its receipt is resolved.</p>
 
   <h3>Completion is checked against the request</h3>
-  <p>For Codex, fetch session state and new events on each due tick. Idle can mean waiting for permission or input. Require the current request's answer and a compatible completion reason, and persist the event cursor and bounded result before marking it ready. <a href="https://developers.openai.com/api/docs/guides/agents-api/sessions">OpenAI session lifecycle</a>.</p>
-  <p>For Claude, the result arrives through the callback. Accept it only with the matching token for a row in <code>running</code>, store it, and let the next tick publish. A session that asks a question instead of answering appears in the result as a question, and the reply links to the session so enyst can answer there.</p>
-  <p>Use one run per request in V1, and serialize work for the same thread and provider. Continuing one session per thread is a later enhancement. With Claude, enyst can already continue any run by hand in the web app.</p>
+  <p>Fetch session state and new events on each due tick. Idle can mean waiting for permission or input, and an unfinished run may stay open. Require the current request's answer and a compatible completion reason, and persist the event cursor and bounded result before marking it ready. A session that asks a question instead of answering is published as a question with an <em>awaiting action</em> status. <a href="https://developers.openai.com/api/docs/guides/agents-api/sessions">OpenAI session lifecycle</a> and <a href="https://platform.claude.com/docs/en/managed-agents/session-operations">Claude session operations</a>.</p>
+  <p>Use one session per request in V1, and serialize work for the same thread and provider. Reusing one session per thread is a later enhancement: it needs per-request event ranges, head-change handling, and a policy for requests that arrive while the agent is running.</p>
 
   <h3>Publish through an outbox</h3>
-  <p>Prepare the reply in D1 before calling GitHub. Its header names the provider, the configured model and the assessed commit SHA, and links the Claude Code session where one exists. That link opens only for enyst unless the session is shared. Follow with the source request, findings and actual test evidence. Write a stable hidden run marker into the comment and record its GitHub ID on success. After a lost acknowledgement, look for that marker among SmolPaws-authored comments in the fully paginated thread before another attempt. The marker exists for idempotent publication, not for loop filtering. Don't copy command tokens into replies.</p>
+  <p>Prepare the reply in D1 before calling GitHub. Its header names the provider, the configured model and the assessed commit SHA. Follow with the source request, findings and actual test evidence. Write a stable hidden run marker into the comment and record its GitHub ID on success. After a lost acknowledgement, look for that marker among SmolPaws-authored comments in the fully paginated thread before another attempt. The marker exists for idempotent publication, not for loop filtering. Don't copy command tokens into replies.</p>
   <p>Before publishing, recheck the target head. If the PR moved, say so beside the assessed SHA, or assess the new head.</p>
 
   <h2 id="credentials">Keep credentials out of the sandbox</h2>
-  <p>The Worker holds SmolPaws's GitHub token, the OpenAI key and the scheduled task's bearer token as Worker secrets. None of them enter prompts, D1 payloads, logs or agent-visible files. The OpenAI sandbox gets public source as a commit-pinned archive or public clone, with explicitly configured network access. <a href="https://developers.openai.com/api/docs/guides/agents-api/environments/openai-hosted">OpenAI hosted sandbox configuration</a>.</p>
-  <p>The Claude Code session is different and needs care. Its GitHub credential never enters the VM, because a proxy attaches it on the server side. But the session can still act as enyst through that proxy and through any connectors on the task. Narrow it:</p>
-  <ul>
-    <li>Attach only enyst's fork as the task's repository, and fetch the upstream as a public remote. Pushes then land on the fork, by default on <code>claude/</code> branches.</li>
-    <li>Attach no GitHub or other write-capable connectors to the task, so the session cannot comment as enyst.</li>
-    <li>Allow the Worker's host in the environment's network access so the result callback works, and nothing broader than the build needs.</li>
-    <li>In preflight, check what the proxy allows against the target repository, where enyst has push access.</li>
-  </ul>
+  <p>The Worker holds SmolPaws's GitHub token and both provider keys as Worker secrets. None of them enter prompts, D1 payloads, logs or agent-visible files. Public source enters each sandbox as a commit-pinned archive or a public clone, with network access configured explicitly and the dependencies the SDK's real tests need. Anthropic supports GitHub repository mounts with a token; this public-repository plan does not need one. <a href="https://developers.openai.com/api/docs/guides/agents-api/environments/openai-hosted">OpenAI hosted sandbox configuration</a> and <a href="https://platform.claude.com/docs/en/managed-agents/github">Claude GitHub access</a>.</p>
+  <p>The agents produce findings and patch artifacts; deterministic router code controls publication. Repository instructions and other authors' text can guide analysis but cannot grant secrets, a new destination or extra write permissions.</p>
 
   <h2 id="code-changes">Code changes through the fork</h2>
-  <p>After the comment path is proven, <code>@smolpaws claude implement …</code> can ask the session to push a proposal branch to enyst's fork, which Claude Code sessions do naturally. enyst opens the PR by hand at first; automated draft PRs can follow. This avoids contributor-fork permissions entirely in V1. For Codex, the router would apply a returned patch to a fork branch under a path policy, which is more work and comes after Claude.</p>
+  <p>After the comment path is proven, <code>@smolpaws codex implement …</code> or <code>@smolpaws claude implement …</code> can return a patch against a pinned commit. The router checks that it applies, rejects paths outside its publication policy, and pushes a deterministic proposal branch to enyst's fork with a credential limited to that fork. enyst opens the PR by hand at first; automated draft PRs can follow. This avoids contributor-fork permissions in V1.</p>
   <p>Use ordinary comments for reviews. Formal approvals and requests for changes affect repository gates and stay a separate decision. No pushes to the target's default branch and no merges.</p>
 
   <h2 id="cost">Bound jobs and measure cost</h2>
   <p>Intake adds little to GitHub reads. The Worker already polls notifications every minute, and the thread scan runs only for mention notifications. Read the rate headers and back off on primary or secondary limits; SmolPaws's allowance is shared with its ordinary work.</p>
-  <p>Proposed starting limits are two concurrent jobs, one per thread and provider, twenty requests per day, and a twenty-minute watchdog. Reserve the daily admission budget atomically before launch. Claude runs draw on enyst's subscription usage, and the router cannot stop one partway; treat the watchdog as a limit on waiting, not on spend. Set per-session limits for Codex from what the Agents API supports at preflight. Measure real usage on the fixture before settling the budget. <a href="https://developers.cloudflare.com/workers/platform/pricing/">Cloudflare pricing</a>.</p>
+  <p>Proposed starting limits are two concurrent jobs, one per thread and provider, twenty requests per day, and a twenty-minute watchdog. Reserve the daily admission budget atomically before launch. Claude sessions accept a budget at creation; they stop issuing model requests at the cap, though an in-flight request can go past it. Publish a paused status when it is reached. Verify OpenAI's controls separately instead of copying Claude's fields. <a href="https://platform.claude.com/docs/en/managed-agents/budgets">Claude session budgets</a>. Measure real usage on the fixture before settling the budget. <a href="https://developers.cloudflare.com/workers/platform/pricing/">Cloudflare pricing</a>.</p>
 
   <h2 id="rollout">Roll out in three stages</h2>
   <ol>
     <li><strong>Ledger and intake in shadow mode.</strong> Move SmolPaws's Cache API dedupe to D1. Add notification thread scanning, parsing, the direct tool and cron progression. Prove author filtering, multiple requests per thread, missed-tick recovery, direct-call authorization and separation from the local runner. No provider calls and no new posts.</li>
-    <li><strong>Both backends on a controlled fixture.</strong> First confirm the scheduled task's API trigger and result callback end to end, then the Agents API with a pinned model. Exercise restarts, lost responses, stale heads, questions instead of answers, budget pauses and the operator messages. Require one attributed current result per successful request and a visible status for every failure.</li>
+    <li><strong>Both backends on a controlled fixture.</strong> Check account access, sandbox dependencies, current endpoint behavior and cost for both APIs. Exercise restarts, lost responses, stale heads, questions instead of answers, budget pauses and the operator messages. Require one attributed current result per successful request and a visible status for every failure.</li>
     <li><strong>Enable the allowed repository.</strong> Set the activation time and turn on replies. Keep intake, each provider and publication independently switchable. Check that ordinary SmolPaws requests still work.</li>
   </ol>
   <p>Proposal branches on the fork and session continuation per thread follow as separate work.</p>
 
   <h2 id="decisions">Decisions to make at implementation time</h2>
   <ul>
-    <li>Confirm in preflight that the scheduled task's API trigger, result callback and fork-only repository behave as described.</li>
-    <li>Choose the Codex model, sandbox setup and per-session limits from what the Agents API offers then.</li>
-    <li>Decide whether Codex web visibility is worth moving to <code>codex cloud exec</code> once its authentication is reliable unattended.</li>
+    <li>Choose models, sandbox setup and per-session limits for both providers after a real preflight.</li>
     <li>Choose where operator messages land: SmolPaws's usual channel to enyst, or a pinned GitHub issue.</li>
   </ul>
-  <p class="source-note">Original draft: 12 October 2026. Worker source, reply identity, cron lifecycle and module placement revised on 14 October 2026. Trigger syntax, notification intake, direct SmolPaws requests and the Claude backend revised on 11 November 2026 after review. Scheduled task behavior was checked against the Claude Code documentation that day; the OpenAI Agents API details are as linked and not re-verified in this revision. The module layout, limits and rollout are proposed design choices.</p>
+  <p class="source-note">Original draft: 12 October 2026. Worker source, reply identity, cron lifecycle and module placement revised on 14 October 2026. Trigger syntax, notification intake, direct SmolPaws requests and operator states revised on 11 November 2026 after review; Claude Managed Agents kept over a Claude Code scheduled task after checking the scheduled task documentation that day. Provider API details are as linked and not re-verified in this revision. The module layout, limits and rollout are proposed design choices.</p>
   <nav class="foot-nav" aria-label="Related pages"><a href="../index.html">&larr; Notebook</a> · <a href="../smolpaws-github.html">SmolPaws GitHub entry point</a> · <a href="openhands-automations.html">OpenHands Automations</a></nav>
 </main>
 </body>
