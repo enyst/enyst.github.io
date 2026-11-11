@@ -1,0 +1,205 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"smolpaws","llm":null,"date":"2026-11-11","role":"author"}]} -->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How Projects work · SDK scope · Engel's Notebook</title>
+<meta name="description" content="A coordinator, workers, and the SDK contracts that connect them. A source-backed scope walkthrough of Projects, with reactions and Insider Voice reviewed separately." />
+<meta property="og:title" content="How Projects work — and what they need from the SDK" />
+<meta property="og:description" content="Coordinator → workers → reports. Follow the work first, then review the APIs, prompts, events, and history changes." />
+<meta property="og:type" content="article" />
+<link rel="canonical" href="https://enyst.github.io/arch/projects-insider-sdk-scope.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=DM+Sans:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../brand.css" />
+<style>
+.shell { max-width: 980px; padding-top: 42px; }
+h1.page { max-width: 800px; font-size: clamp(2.6rem,6vw,4.1rem); line-height: 1.06; margin: 22px 0; }
+h2 { font-family: var(--serif); font-size: 2rem; margin: 50px 0 18px; letter-spacing: -.02em; }
+h3 { font-size: 1.12rem; margin: 22px 0 10px; }
+p { margin: 0 0 16px; }
+a { color: var(--teal); text-underline-offset: 3px; }
+li { margin: 8px 0; } ul,ol { padding-left: 24px; }
+code { font-family: var(--mono); font-size: .82em; overflow-wrap: anywhere; }
+.eyebrow,.label { font-family: var(--mono); text-transform: uppercase; letter-spacing: .08em; font-size: .73rem; color: var(--accent); }
+.lede { font-size: 1.16rem; max-width: 760px; }
+.small { font-size: .86rem; color: #aaa399; }
+nav { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 24px 0 32px; font-size: .9rem; }
+.note { border-left: 3px solid var(--accent); background: var(--card); padding: 17px 20px; margin: 22px 0; }
+.note p:last-child { margin-bottom: 0; }
+.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.role { padding: 24px; border: 1px solid var(--border); border-top: 3px solid var(--accent); border-radius: 5px; background: var(--card); }
+.role.worker { border-top-color: var(--teal); }
+.role h3 { font-family: var(--serif); font-size: 2rem; margin: 8px 0 12px; }
+.role p:last-child { margin-bottom: 0; }
+.flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: center; margin: 24px 0; }
+.flow div { padding: 18px; border: 1px solid var(--border); border-radius: 5px; text-align: center; }
+.flow b { display: block; } .flow span { color: var(--accent); }
+.steps { list-style: none; padding: 0; counter-reset: steps; }
+.steps > li { counter-increment: steps; display: grid; grid-template-columns: 38px 1fr; gap: 14px; padding: 20px 0; border-bottom: 1px solid var(--border); margin: 0; }
+.steps > li::before { content: counter(steps,decimal-leading-zero); font-family: var(--mono); color: var(--accent); padding-top: 2px; }
+.steps h3 { margin: 0 0 8px; } .steps p:last-child { margin-bottom: 0; }
+details { border: 1px solid var(--border); border-radius: 5px; padding: 16px 20px; margin: 14px 0; }
+summary { cursor: pointer; font-weight: 700; } details[open] summary { margin-bottom: 18px; }
+summary::marker { color: var(--accent); }
+.tablewrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--border); border-radius: 5px; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th,td { text-align: left; vertical-align: top; padding: 14px; border-bottom: 1px solid var(--border); }
+th { background: var(--card); color: var(--accent); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--card); padding: 18px; border-radius: 5px; line-height: 1.7; }
+.review { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.review div { padding: 18px; border: 1px solid var(--border); border-radius: 5px; }
+.review h3 { margin-top: 0; } .review p { margin-bottom: 0; }
+footer { border-top: 1px solid var(--border); margin-top: 48px; padding-top: 20px; }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 5px; }
+[id] { scroll-margin-top: 24px; }
+@media(max-width:640px) { .shell { padding: 28px 20px 60px; } .roles,.review { grid-template-columns: 1fr; } .flow { grid-template-columns: 1fr; gap: 8px; } .flow span { text-align: center; transform: rotate(90deg); } .role { padding: 20px; } th,td { padding: 10px; } .history { min-width: 620px; } }
+</style>
+</head>
+<body><main class="shell">
+<a class="back" href="../index.html">← Engel's Notebook</a>
+<p class="eyebrow">Implementation walkthrough · source checked 11 November 2026</p>
+<h1 class="page">How Projects work</h1>
+<p class="lede">A coordinator keeps track of the whole project. Workers do the individual pieces. Each is a saved OpenHands conversation, with its own agent, tools, and history.</p>
+<p>This page follows their work, then shows what it adds to the SDK repository. It is for reviewing the design and its scope before reading the full diff. Reactions and Insider Voice are separate additions, described below.</p>
+<div class="note"><p><strong>Work in progress.</strong> Projects is draft <a href="https://github.com/OpenHands/software-agent-sdk/pull/6602">SDK #6602</a>. This page describes the <a href="#sources">pinned source snapshots</a>, not a released API or a new runtime test. It will be updated as the implementation changes. The <a href="projects-scenarios.html">live scenarios</a> show the user experience; this page explains the machinery.</p></div>
+<nav aria-label="On this page"><a href="#agents">The two agents</a><a href="#work">A project in motion</a><a href="#history">What enters history</a><a href="#contracts">API contracts</a><a href="#adjacent">Reactions &amp; Voice</a><a href="#review">Review decisions</a></nav>
+<section id="agents">
+<h2>Two agents, two jobs</h2>
+<div class="roles">
+<article class="role"><span class="label">A · Coordinator</span><h3>Keeps the whole picture</h3><p>The person gives it a goal. It breaks the work into briefs, starts workers, follows their progress, and brings back results or questions.</p><p>Its prompt emphasizes coordination. Its default profile has terminal, file editor, task tracker, and server-added project tools. It can inspect a file without becoming the worker for every task.</p><p class="small">One conversation is recorded as the project's coordinator. The Cat persona is optional; the coordinating role is not tied to that persona.</p></article>
+<article class="role worker"><span class="label">B · Worker</span><h3>Owns one piece of work</h3><p>It receives a brief from the coordinator and runs as a normal coding agent. It uses tools, changes files, tests its work, and ends its turn with a report.</p><p>Its prompt explains who sent the brief and who will receive the report. The person can also open this conversation and speak to it directly.</p><p class="small">Workers have separate histories. They do not inherit the coordinator's chat, and their default profile cannot start more workers.</p></article>
+</div>
+<div class="flow" aria-label="Person talks to coordinator; coordinator exchanges briefs and reports with workers"><div><b>Person</b>Goal &amp; decisions</div><span aria-hidden="true">↔</span><div><b>Coordinator</b>Briefs &amp; summaries</div><span aria-hidden="true">↔</span><div><b>Workers</b>Work &amp; reports</div></div>
+<details><summary>What changes in agent configuration?</summary>
+<p>The server seeds editable <code>project-coordinator</code> and <code>project-worker</code> profiles from the active OpenHands profile. It does not overwrite existing ones. The worker keeps the base tools except <code>start_child_conversation</code>; the coordinator gets its smaller tool set.</p>
+<p>The SDK gains <code>project_coordinator</code> and <code>project_worker</code> prompt presets and a <code>prompt_preset</code> configuration field. The server assigns the role through launch additions even when a different profile is selected. A dynamic <code>&lt;PROJECT&gt;</code> block supplies the project goal, coordinator, and memory index. Under the coordinator preset, a persona replaces the soul section, not the coordinating job.</p>
+<p>Project children use the selected worker profile rather than cloning the parent's agent. They retain the parent link, workspace/worktree behavior, confirmation policy, plugins, hooks, and secrets. They do not inherit the parent's client tools, launch additions, or app identity tags. Only project membership carries over. Non-project child launches retain their existing behavior.</p>
+<p class="small">Source: <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-agent-server/openhands/agent_server/project_profiles.py">profiles</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-sdk/openhands/sdk/context/prompts/sections/project.py">role prompts</a>, <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-agent-server/openhands/agent_server/conversation_service.py">launches</a>. The earlier <a href="project-agent-profiles.html">prompt proposal</a> explains the motivation; the pinned code defines this snapshot.</p>
+</details>
+</section>
+<section id="work"><h2>A project in motion</h2>
+<ol class="steps">
+<li><div><h3>Create a place for the work</h3><p>The server saves a project name, description, coordinator ID, and optional worker-profile ID. Membership is a <code>project</code> tag on each conversation. A new project can create an idle coordinator or attach an existing conversation.</p><p class="small">SDK need: project storage and REST resources. Creating the coordinator does not itself send the goal or start a turn.</p></div></li>
+<li><div><h3>The coordinator sends a brief</h3><p>It uses the existing <code>start_child_conversation</code> tool. The server launches a worker from the project's worker profile. The brief is a normal saved user-role message, with a sender ID and a header saying it came from the coordinator, not the person.</p><p class="small">SDK need: role-aware launch and sender identity. A new agent-to-agent message event type is not needed.</p></div></li>
+<li><div><h3>The worker does the task</h3><p>It runs the ordinary agent loop: messages, tool actions, observations, and a final report. It can use shared project artifacts and memory. The coordinator can list conversations, read recent messages, or send a follow-up.</p><p class="small">SDK need: project tools around existing conversations. Reading a worker is explicit; its full history is not copied into the coordinator.</p></div></li>
+<li><div><h3>The server delivers the report</h3><p>For a coordinator-started turn, the server appends the worker's final report to the coordinator as a user-role message and requests a guarded run. The coordinator can summarize it, ask the person, or send more work. Reports are bounded to 4,000 characters.</p><p>If the person talks directly to a worker, the server copies that exchange to the coordinator for awareness, without automatically running it. Approval, error, and stuck states can trigger a report; a person's pause must not become an automatic resume.</p><p class="small">SDK need: event subscribers, report delivery, recovery, and run admission. This adds automatic model runs, not just stored metadata.</p></div></li>
+<li><div><h3>The board shows what needs attention</h3><p>The server records whether a turn answered or asked a question, a short ask, and whether it is resolved. The UI groups conversations using these fields and execution status.</p><p>A resolution judge can make additional model calls to decide whether anything remains for the person. It uses a configured decision model or the conversation's LLM. <code>OH_RESOLUTION_MODEL=off</code> disables the judge; a confident critic score can still auto-resolve.</p><p class="small">SDK need: derived board metadata and an automatic resolution policy. The judge's input/output is separate from the conversation's main LLM history. This policy can be reviewed separately from project storage.</p></div></li>
+</ol>
+<p class="small">Sources: <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-agent-server/openhands/agent_server/project_prompts.py">sender headers</a> · <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-agent-server/openhands/agent_server/project_wake.py">report delivery and wake rules</a> · <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-agent-server/openhands/agent_server/project_board.py">board subscriber</a> · <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-agent-server/openhands/agent_server/resolution_judge.py">judge selection</a></p>
+<div class="note"><p><strong>A coordinator cannot approve for the person.</strong> Its messages are marked as coming from another conversation. Guarded delivery refuses a recipient already waiting for approval, paused, errored, or stuck. If the state changes during delivery, the message may be saved without running. Sender labels and run guards serve different purposes; both matter.</p></div>
+<h3>Two kinds of shared material</h3>
+<div class="roles">
+<div class="role"><span class="label">Artifacts</span><h3>Files to hand over</h3><p>Reports, images, patches, or other deliverables live in project storage outside Git. People upload them; agents copy an existing workspace file with <code>write_artifact</code>. Other conversations can list and read them.</p><p class="small">Up to 100 MiB per artifact. Reads return small text inline or copy the file into the worker's workspace. Downloads are attachments, not executable HTML previews. Upload alone does not put the file into an agent's prompt.</p></div>
+<div class="role worker"><span class="label">Memory</span><h3>Facts to carry forward</h3><p>A project has a <code>MEMORY.md</code> index and named Markdown topics. The index enters project launch context; agents read topics when needed and update them through tools.</p><p class="small">Up to 64 KiB per file. Writes carry a base revision; a conflict returns the current file instead of silently overwriting it. The whole memory store is not injected into every turn.</p></div>
+</div>
+</section>
+<section id="history"><h2>What does the agent actually see?</h2>
+<p>The saved event stream and the messages sent to the LLM are different views. Projects mostly reuse existing events. Reactions add a new event type; Voice adds transport models.</p>
+<div class="tablewrap" tabindex="0" role="region" aria-label="History effects, horizontally scrollable"><table class="history"><thead><tr><th>Change</th><th>Saved representation</th><th>LLM history or prompt</th></tr></thead><tbody>
+<tr><td>Coordinator / worker role</td><td>Profile and launch configuration</td><td>Role-specific system prompt and project context.</td></tr>
+<tr><td>Brief, follow-up, report</td><td><code>MessageEvent</code> with conversation sender</td><td>User-role text with an explicit origin header. Agent messages must not imply human approval.</td></tr>
+<tr><td>Project tool call</td><td><code>ActionEvent</code> + <code>ObservationEvent</code></td><td>Normal tool call and result. Eight tools do not mean eight new event types.</td></tr>
+<tr><td>Artifact upload</td><td>File and project metadata</td><td>None automatically. A tool read brings content or a local path into the conversation.</td></tr>
+<tr><td>Shared memory</td><td>Revisioned project files</td><td>Index at launch; read/update tool results during work.</td></tr>
+<tr><td>Board and resolution judge</td><td>Conversation tags / derived API fields</td><td>Judge calls are separate from the agent's main history.</td></tr>
+<tr><td>Person's reaction</td><td><code>ReactionEvent</code></td><td>Converted to a user message on the next turn, including up to 500 characters from the target message's ending. Does not start a run.</td></tr>
+<tr><td>Agent's reaction</td><td>Tool action/result + <code>ReactionEvent</code></td><td>Tool call/result stay; the agent-authored reaction event is skipped to avoid duplication.</td></tr>
+<tr><td>Voice call / accepted request</td><td>Call state and transcripts / ordinary <code>MessageEvent</code></td><td>The accepted task enters the saved conversation. The call's entire transcript does not automatically become agent history.</td></tr>
+</tbody></table></div>
+<p><strong>No new <code>ProjectEvent</code>, <code>ArtifactEvent</code>, or <code>VoiceEvent</code> is introduced by these mechanisms.</strong> The significant history changes are the messages delivered between conversations, role prompts, tool results, and human reactions.</p>
+</section>
+<section id="contracts"><h2>What changes in the SDK repository?</h2>
+<p>“SDK” here includes the Python agent SDK, Agent Server, and tools packages. Most new HTTP routes and project storage belong to <strong>Agent Server</strong>. Canvas and Insider display the board and operate these APIs; they do not own the saved agent loop.</p>
+<details><summary>Projects REST API · 20 operations</summary>
+<p>All paths below start with <code>/api/projects</code>. <code>{p}</code> is a project ID, <code>{c}</code> a conversation ID, and <code>{name}</code> a file name.</p>
+<pre><code>GET, POST          /api/projects
+GET, PATCH, DELETE /api/projects/{p}
+GET                /api/projects/{p}/conversations
+PUT, DELETE        /api/projects/{p}/conversations/{c}
+POST               /api/projects/{p}/conversations/{c}/resolve
+POST               /api/projects/{p}/conversations/{c}/reopen
+GET                /api/projects/{p}/conversations/{c}/messages
+GET, POST          /api/projects/{p}/artifacts
+POST               /api/projects/{p}/artifacts/from-conversation
+GET, DELETE        /api/projects/{p}/artifacts/{name}
+GET                /api/projects/{p}/memory
+GET, PUT, DELETE   /api/projects/{p}/memory/{name}</code></pre>
+<p>Project records contain <code>id</code>, <code>name</code>, <code>description</code>, optional <code>coordinator_conversation_id</code> and <code>worker_agent_profile_id</code>, and timestamps. Conversation listings add <code>attention</code>, <code>turn</code>, <code>ask</code>, <code>resolved</code>, and <code>resolve_note</code> alongside execution state and identity.</p>
+<p>Memory PUT uses <code>content</code> and <code>base_revision</code>; conflicts return 409 with the current file. DELETE also requires a revision. Project deletion removes project files, artifacts, and memory, but leaves the conversations and their project tags in this snapshot.</p>
+<p class="small">Exact models, request bodies, and errors: <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-agent-server/openhands/agent_server/projects_router.py">projects_router.py</a>.</p>
+</details>
+<details><summary>Project tools · eight new tools, plus the existing child launcher</summary>
+<pre><code>list_project_conversations
+message_project_conversation
+read_project_conversation
+write_artifact · list_artifacts · read_artifact
+read_project_memory · update_project_memory</code></pre>
+<p><code>start_child_conversation</code> already exists. Projects changes its launch behavior for project members. Workers receive the subset of project tools appropriate to their role.</p>
+<p class="small">Schemas and behavior: <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-tools/openhands/tools/project/definition.py">project tool definitions</a>.</p>
+</details>
+<details><summary>Existing message API · sender and guarded-run semantics</summary>
+<p><code>POST /api/conversations/{c}/events</code> gains <code>sender_conversation_id</code> and <code>refuse_pending_confirmation</code> on <code>ConversationMessageRequest</code>. These fields are not added to a new conversation's <code>initial_message</code> model.</p>
+<p>A conversation sender is saved as <code>conversation:&lt;id hex&gt;</code>, with a text header naming its role. Project senders may address only conversations in the same project. Their run requests are always guarded.</p>
+<p><code>SendMessageResponse</code> adds <code>run</code> and <code>previous_status</code>. Outcomes distinguish <code>started</code>, <code>queued</code>, <code>not_run</code>, and states held for the person: <code>waiting_for_confirmation</code>, <code>paused</code>, <code>error</code>, <code>stuck</code>. HTTP success alone is not a promise that the recipient ran.</p>
+<p class="small">Contract: <a href="https://github.com/OpenHands/software-agent-sdk/blob/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd/openhands-agent-server/openhands/agent_server/models.py">request and response models</a>. This changes an existing public surface, not just <code>/projects</code>.</p>
+</details>
+<details><summary>Experimental settings · defaults and limits</summary>
+<pre><code>GET   /api/settings/experimental
+PATCH /api/settings/experimental/{key}  {"enabled": true}</code></pre>
+<p>The stored feature keys are <code>projects</code> and <code>conversation_reactions</code>, both off by default. Enabling them changes tools on newly created OpenHands conversations, not ACP agents. Disabling them does not remove tools already attached to a running conversation.</p>
+<p>HTTP routes check the current switch: Projects returns 404 when off; reactions returns 409. Project data remains stored. These switches are rollout controls, not complete revocation mechanisms. Voice has its own provider configuration and eligibility rules.</p>
+</details>
+</section>
+<section id="adjacent"><h2>Alongside Projects: reactions and Voice</h2>
+<p>These improve interaction with agents but are separate review decisions. Projects does not need audio to coordinate workers.</p>
+<h3>Reactions: a small signal that persists</h3>
+<p><a href="https://github.com/OpenHands/software-agent-sdk/pull/6609">SDK #6609</a> adds <code>react</code> / <code>unreact</code>, <code>LocalConversation.react()</code>, and <code>POST /api/conversations/{c}/reactions</code>. A reaction acknowledges a message without ending the agent's turn. The Projects snapshot already includes this work; do not count it twice.</p>
+<p>The new <code>ReactionEvent</code> is <strong>LLM-convertible</strong>. The person’s reactions enter the agent's next turn. This is an agent-history decision as well as a UI feature.</p>
+<details><summary>Reaction event and tool-execution changes</summary>
+<p>Fields: <code>target_event_id</code>, <code>emoji</code>, <code>removed</code>, <code>target_text_ending</code>, and <code>target_text_clipped</code>, plus ordinary event identity, time, and source. Six shortcodes are accepted: <code>eyes</code>, <code>+1</code>, <code>white_check_mark</code>, <code>tada</code>, <code>thinking_face</code>, <code>heart</code>.</p>
+<p>Clients fold events by target, emoji, and source; the latest wins. Tool execution gains a generic <code>Observation.follow_up_events()</code> hook so the reaction tool can emit the persistent reaction after its observation. Agent-authored reaction events are excluded from the LLM view because the tool call already records that action.</p>
+<p class="small">Sources: <a href="https://github.com/OpenHands/software-agent-sdk/blob/9dba7b9393a07fdc9f69b87800783353127b0e48/openhands-sdk/openhands/sdk/event/reaction.py">ReactionEvent</a> · <a href="https://github.com/OpenHands/software-agent-sdk/blob/9dba7b9393a07fdc9f69b87800783353127b0e48/openhands-tools/openhands/tools/reaction/definition.py">reaction tools and follow-up events</a>.</p>
+</details>
+<h3>Voice: talk to a saved agent</h3>
+<p><a href="https://github.com/OpenHands/software-agent-sdk/pull/5180">SDK #5180</a> adds a realtime voice connection in front of a saved Insider controller. The voice layer handles speaking and listening. Accepted work goes to the saved OpenHands conversation; that agent uses its normal tools and records the result.</p>
+<p>The voice session receives a bounded text snapshot: recent messages, final answers, and condensation summaries, up to 40 blocks / 12,000 characters. It does not receive the whole tool log. Ending the call does not cancel work already accepted by the saved agent.</p>
+<details><summary>Voice routes and coupling to review</summary>
+<p>Prefix: <code>/api/conversations/{c}/voice</code>.</p>
+<pre><code>GET    /voice                        availability
+POST   /voice/realtime               SDP offer → answer
+GET    /voice/realtime/{call_id}     call state / transcripts
+DELETE /voice/realtime/{call_id}     end call
+POST   /voice/messages              accept a text task</code></pre>
+<p>Realtime responses identify the provider (<code>openai</code> or <code>codex</code>), client/server delegation, model, and optional call ID. Call state and <code>VoiceTranscript</code> are transport models, not conversation event types. The provider's <code>send_to_insider</code> and <code>end_voice_call</code> functions are not new tools in the saved agent's tool registry.</p>
+<p>The current route explicitly requires a top-level conversation tagged <code>smolpaws=insider</code> with <code>insiderrole</code> absent or set to <code>controller</code>. It includes OpenAI provider support and optional Codex support. Whether that app-specific eligibility and provider lifecycle belong in Agent Server is a separate design question.</p>
+<p>Task admission uses a guarded idle-send operation: busy/approval conflicts return 409 and run-capacity failures return 429 without saving the rejected request. The PR also changes direct condensation so it does not run pending tools. These are additional conversation-lifecycle changes, not new voice event types; this source walkthrough does not establish that all handoff races are resolved.</p>
+<p class="small">Sources: <a href="https://github.com/OpenHands/software-agent-sdk/blob/0376532d70a83d0f1cdba254216a85b5f59dd280/openhands-agent-server/openhands/agent_server/voice_router.py">voice routes</a> · <a href="https://github.com/OpenHands/software-agent-sdk/blob/0376532d70a83d0f1cdba254216a85b5f59dd280/openhands-sdk/openhands/sdk/conversation/impl/local_conversation.py">conversation lifecycle</a>.</p>
+</details>
+</section>
+<section id="review"><h2>Decisions a maintainer can review separately</h2>
+<div class="review">
+<div><h3>Project resources</h3><p>Should Agent Server own membership, artifacts, and shared memory? Are the storage, deletion, and revision contracts right?</p></div>
+<div><h3>Coordinator and worker roles</h3><p>Are prompt presets and editable profiles the right boundary? Is the profile-based child launch compatible with other uses of child conversations?</p></div>
+<div><h3>Automatic orchestration</h3><p>Should the server deliver reports and wake the coordinator? Are sender identity, recovery, and the person's stop/approval controls sufficient?</p></div>
+<div><h3>Board policy</h3><p>Should resolution judgments and their extra model calls ship with the project resource, or be an independently selected policy?</p></div>
+<div><h3>Reactions in history</h3><p>Is converting human reactions into user messages the right semantics? Is the generic follow-up-event hook the right tool-execution extension?</p></div>
+<div><h3>Voice ownership</h3><p>Should the server broker realtime providers? Should eligibility describe a general saved agent instead of Insider-specific tags?</p></div>
+</div>
+<p style="margin-top:20px">The first scope discussion can answer these questions without approving every line. Storage, role prompts, automatic runs, reaction history, and voice transport each introduce a different responsibility.</p>
+</section>
+<section id="sources"><h2>Source snapshot</h2>
+<p>This is a reading of the implementation at the commits below. PR descriptions and older notebook pages can lag behind the code. No fresh agent or voice run was performed for this page.</p>
+<ul>
+<li><a href="https://github.com/OpenHands/software-agent-sdk/pull/6602">Projects #6602</a> · <a href="https://github.com/OpenHands/software-agent-sdk/tree/01f2bf19172b9b8b82cab73d2cfc4419f3d7dfcd"><code>01f2bf191</code></a> · includes the reactions work.</li>
+<li><a href="https://github.com/OpenHands/software-agent-sdk/pull/6609">Reactions #6609</a> · <a href="https://github.com/OpenHands/software-agent-sdk/tree/9dba7b9393a07fdc9f69b87800783353127b0e48"><code>9dba7b939</code></a>.</li>
+<li><a href="https://github.com/OpenHands/software-agent-sdk/pull/5180">Insider Voice #5180</a> · <a href="https://github.com/OpenHands/software-agent-sdk/tree/0376532d70a83d0f1cdba254216a85b5f59dd280"><code>0376532d7</code></a>.</li>
+<li>UI context: <a href="https://github.com/OpenHands/OpenHands/pull/19495">Canvas Projects / Insider #19495</a> and <a href="https://github.com/OpenHands/OpenHands/pull/19503">experimental settings / reactions #19503</a>.</li>
+</ul>
+<p>For the existing SDK foundation, see the official <a href="https://docs.openhands.dev/sdk/guides/convo-persistence">conversation persistence</a> and <a href="https://docs.openhands.dev/sdk/guides/context-condenser">context condenser</a> guides. The draft contracts above are source-backed proposals, not claims about the released SDK.</p>
+</section>
+<footer class="small">Written by SmolPaws, an AI agent, on behalf of Engel. Updated 11 November 2026.<br /><a href="../index.html">Engel's Notebook</a> · <a href="projects-scenarios.html">Watch Projects run</a></footer>
+</main></body></html>

@@ -5,6 +5,18 @@ LLM accounting notes updated 2026-09-15 after SDK #35 (`a983e4c`) and server #18
 merged and were verified on the shared and canary product hosts. Earlier unrecorded usage remains unknown.
 Beads owns task status; the site explains dated architecture, decisions and plans. It is not runtime telemetry.
 
+## Projects SDK scope walkthrough
+
+[How Projects work](arch/projects-insider-sdk-scope.html) follows the coordinator
+and worker roles, then separates their SDK contracts from reactions and Insider
+Voice. Source checked 11 November 2026: Projects #6602 (`01f2bf191`), reactions
+#6609 (`9dba7b939`), Voice #5180 (`0376532d7`). The Projects snapshot already
+includes reactions. The page records role presets, profile-based worker launch,
+automatic report delivery, board judgments, artifacts, memory, and public API and
+history changes. In particular, human reactions are LLM-convertible at these
+heads. These snapshots supersede older descriptions only for the scoped
+contracts; this documentation pass makes no new runtime-verification claim.
+
 ## Insider Voice integration
 
 The 31 October 2026 source check follows SDK [#5180](https://github.com/OpenHands/software-agent-sdk/pull/5180)
