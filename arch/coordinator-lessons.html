@@ -1,0 +1,144 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-11-11","role":"author"}]} -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lessons from a working coordinator · Engel's Notebook</title>
+  <meta name="description" content="Nine things a coordinator agent learned from a day of running a real project with threads, each set against what OpenHands Projects does today." />
+  <meta property="og:title" content="What a working coordinator would carry over to OpenHands Projects" />
+  <meta property="og:description" content="Nine lessons from a coordinator that runs a real project with threads, each set against the Cat and its workers in SDK #6602 and Canvas #19495." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/coordinator-lessons.html" />
+  <link rel="canonical" href="https://enyst.github.io/arch/coordinator-lessons.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    .page-intro { color: var(--muted); font-size: var(--text-lg); margin-bottom: 28px; }
+    .prose a, .note a, .here a, .oh a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,0.3); }
+    .prose a:hover { border-bottom-color: var(--teal); }
+    .prose code, .oh code, .here code { word-break: break-word; }
+    .lesson { margin: 0 0 var(--space-lg); }
+    .lesson h2 { margin-bottom: 8px; }
+    .lesson h2 .n { font-family: var(--mono); font-size: 0.6em; color: var(--accent); margin-right: 10px; vertical-align: middle; }
+    .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 10px 0 0; }
+    .pair > div { background: var(--card); border: 1px solid var(--border); border-radius: var(--border-radius); padding: 14px 18px; line-height: 1.55; font-size: 0.94em; }
+    .pair > div.oh { border-left: 3px solid var(--teal); }
+    .pair > div.here { border-left: 3px solid var(--accent); }
+    .pair b.k { display: block; font-family: var(--mono); font-size: 0.74em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    .gap { color: var(--accent); }
+    .follow ol { margin: 8px 0; padding-left: 20px; } .follow li { margin-bottom: 6px; }
+    .follow { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: var(--border-radius); padding: 14px 18px; margin: 10px 0 0; line-height: 1.55; font-size: 0.94em; }
+    .quote { border-left: 3px solid var(--border); padding: 4px 0 4px 16px; color: var(--muted); font-style: italic; margin: 0 0 var(--space-md); }
+    .meta { color: var(--muted); font-size: 0.86em; margin-top: var(--space-lg); border-top: 1px solid var(--border); padding-top: 14px; }
+    .meta a { color: var(--teal); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">← Engel's Notebook</a>
+    <h1 class="page">What a working coordinator would carry over to OpenHands Projects</h1>
+    <p class="page-intro">OpenHands Projects is being designed inside a project that already works the same way: one coordinator the person talks to, and threads that do the work. On 11 November 2026, partway through a long day of it, Engel asked that coordinator what it would recommend. These are its nine answers, each set against what the Cat and its workers do today.</p>
+
+    <p class="quote">“Think about this feature as we are designing it here, OpenHands Projects, and think about how your threads work. And tell me if you think you have recommendations, examples, I don't know, anything you think.”</p>
+
+    <div class="prose">
+      <p>The coordinator answered from what it does every day, with that day as the evidence. Each lesson below gives that answer, then the closest counterpart on the Projects branches: <a href="https://github.com/OpenHands/software-agent-sdk/pull/6602">software-agent-sdk #6602</a> at <code>612402d</code> and <a href="https://github.com/OpenHands/OpenHands/pull/19495">OpenHands #19495</a> at <code>684135f</code>. Where Projects already does the same thing, the box says so. Where it doesn't, the gap is marked.</p>
+    </div>
+
+    <section class="lesson" id="speaker">
+      <h2><span class="n">1</span>Make “who is speaking” structural, not prose</h2>
+      <div class="pair">
+        <div class="here"><b class="k">How the coordinator works</b>Every message it receives is labelled as the person, another agent, or the system, and a message from an agent is never the person's approval. When it passes the person's decision to a thread, it attaches the person's actual message instead of paraphrasing it.</div>
+        <div class="oh"><b class="k">In Projects today</b>The label is a sentence. Each message between conversations opens with a bracketed line, such as <code>[Sent by …, the coordinator of your project, not by the person. It does not approve anything on the person's behalf.]</code>, and the prompt teaches the agent to read it (<code>project_prompts.py</code>, <code>WHO_IS_SPEAKING</code>). The event also records its <code>sender</code>. <span class="gap">Gap:</span> <code>message_project_conversation</code> takes only the Cat's own text, so the Cat can't forward the person's message verbatim. The recommendation is a way to attach it, with the label kept as a field.</div>
+      </div>
+    </section>
+
+    <section class="lesson" id="answers-flow-up">
+      <h2><span class="n">2</span>Answers flow up on their own</h2>
+      <div class="pair">
+        <div class="here"><b class="k">How the coordinator works</b>A thread has no reply tool and does no addressing: its replies reach the coordinator by themselves. A thread messages another thread only when one's work depends on the other's.</div>
+        <div class="oh"><b class="k">In Projects today</b>The same. When a worker finishes a turn, its final message reaches the Cat as an <code>[Update from …]</code>. The worker is told “Answer in this conversation: the coordinator gets your final message.” Conversations can message each other, but the receiver is told that the sender is not notified when it answers.</div>
+      </div>
+    </section>
+
+    <section class="lesson" id="say-nothing">
+      <h2><span class="n">3</span>Give the Cat a cheap way to say nothing</h2>
+      <div class="pair">
+        <div class="here"><b class="k">How the coordinator works</b>It hears every message in every thread, and most of its turns that day ended in deliberate silence. It speaks when a thread is waiting on the person, when something finished, or when the person asks. Without an explicit “nothing to add” exit and the guidance to use it, a coordinator echoes every update and the project chat turns to noise.</div>
+        <div class="oh"><b class="k">In Projects today</b>Half there. Every update ends with “If nothing needs doing, end your turn”, and the prompt says “When nothing needs the person, say so in one line, or end your turn without a message.” Copies of the person's own messages to a worker reach the Cat without waking it, so it isn't tempted to forward them. <span class="gap">Gap:</span> there is no explicit silent exit, so staying quiet relies on the model choosing not to write.</div>
+      </div>
+      <div class="follow"><strong>What shape it could take.</strong> Engel asked; the coordinator answered in three pieces, most important first.
+        <ol>
+          <li><strong>Speaking is a tool call, and so is silence.</strong> The coordinator's plain text reaches no one. It reaches the person only through a post tool, and every turn must end with that or with an explicit “no reply needed” and a reason: nothing to add, not for me, or asked to be quiet. So each time a thread says something, it makes a real choice, and silence is as easy to pick as speech. For the Cat: when a worker's update wakes it, rather than the person, its turn would end with <code>tell_person(text)</code> or <code>stay_quiet(reason)</code>. When the person writes to it, it answers normally. The reason costs nothing, and it makes the silences easy to audit later.</li>
+          <li><strong>The guidance lives in the tool descriptions</strong>, as it does for <code>react</code>. Speak when a worker is waiting on the person, when something finished or was found, or when the person asked. Stay quiet when the worker already answered the person in its own conversation, on progress chatter, and on acknowledgements. A second, smaller lever is a <code>notify</code> flag on speech, so only direct answers and “this needs you” alert the person.</li>
+          <li><strong>The UI folds the quiet turns.</strong> Worker updates in the Cat's conversation would show as one thin line, “4 updates, nothing for you”, that expands on click. The board already carries the state, so the chat only needs what the Cat chose to say.</li>
+        </ol>
+        A cheaper cousin: don't run the Cat at all for some updates. Routine ones would land in its context without a model call, the way the person's messages to a worker already do, and the Cat would wake only when a worker finishes, asks or fails, or the person writes. That saves a model call per update, at the cost of a rule deciding what counts as routine. The coordinator would start with the three pieces and add this if the cost shows.</div>
+    </section>
+
+    <section class="lesson" id="thin">
+      <h2><span class="n">4</span>Keep the Cat thin</h2>
+      <div class="pair">
+        <div class="here"><b class="k">How the coordinator works</b>It can't run code or open a repository. That felt limiting exactly once that day, and it keeps the coordinator quick and its context small. A coordinator that starts fixing things itself stops coordinating.</div>
+        <div class="oh"><b class="k">In Projects today</b>Thinner than a worker, but not this thin. The <code>project-coordinator</code> profile has <code>terminal</code>, <code>file_editor</code> and <code>task_tracker</code>, plus the project tools, and no browser (<code>project_profiles.py</code>). The prompt asks it to route work that takes real effort, to leave the investigation to the worker, and to review with read-only steps.</div>
+      </div>
+    </section>
+
+    <section class="lesson" id="replaced">
+      <h2><span class="n">5</span>Plan for the Cat being replaced</h2>
+      <div class="pair">
+        <div class="here"><b class="k">How the coordinator works</b>That morning the coordinator was swapped for a fresh one, and Engel didn't notice. Standing rules live in project memory, and the handoff carried the recent chat. Threads write to that memory too. Long projects will outlive any one context window.</div>
+        <div class="oh"><b class="k">In Projects today</b>The memory half exists. Project memory is shared by the Cat and its workers (<code>read_project_memory</code>, <code>update_project_memory</code>), and the start of <code>MEMORY.md</code> is in every conversation's <code>&lt;PROJECT&gt;</code> block. <span class="gap">Gap:</span> there is one Cat per project, kept alive by condensation. Nothing yet hands a project to a fresh coordinator with its recent chat.</div>
+      </div>
+    </section>
+
+    <section class="lesson" id="second-hand">
+      <h2><span class="n">6</span>Second-hand is not verified</h2>
+      <div class="pair">
+        <div class="here"><b class="k">How the coordinator works</b>Its weakest moments were reporting what it hadn't checked: a page announced as live the day before, and that day a line it had to correct. Long thread reports also reach it cut off. The Cat's updates should say whether it is relaying or has checked, and link the worker's full message.</div>
+        <div class="oh"><b class="k">In Projects today</b>The same cut, with a pointer. An update carries at most 4,000 characters of the worker's final message, then “[... cut; read the conversation for the rest]”, and <code>read_project_conversation</code> reads the rest. The prompt says “A finished run is not a finished task”, and the Cat names a worker as a mention the person can open. <span class="gap">Gap:</span> nothing asks the Cat to say whether it relayed a claim or checked it.</div>
+      </div>
+    </section>
+
+    <section class="lesson" id="decision-cards">
+      <h2><span class="n">7</span>Decisions as cards</h2>
+      <div class="pair">
+        <div class="here"><b class="k">How the coordinator works</b>That day's question about splitting a PR reached Engel as options, each with its consequence and one recommended, and Engel answered with one tap.</div>
+        <div class="oh"><b class="k">In Projects today</b>The <strong>Needs you</strong> column shows a worker's ask as a sentence under its card (<code>project-board.tsx</code>), and the auto-resolve judge decides what lands there. <span class="gap">Gap:</span> the ask is prose to parse, not choices to pick from.</div>
+      </div>
+      <div class="follow"><strong>Being followed up.</strong> Engel pointed out that OpenHands already has the shape of this: when an agent needs a secret it wasn't given, a card asks the person for it, and the agent uses what they enter. A general “ask the user” tool, with that card as its model, is being designed in its own thread, including whether it belongs to Projects or to every conversation.</div>
+    </section>
+
+    <section class="lesson" id="branch-owner">
+      <h2><span class="n">8</span>Show who owns a branch</h2>
+      <div class="pair">
+        <div class="here"><b class="k">How the coordinator works</b>Several threads pushed to #6602 that day, and conflict markers were pushed to #6609. The coordinator should know who owns a branch before sending a second thread there.</div>
+        <div class="oh"><b class="k">In Projects today</b><span class="gap">Gap:</span> the board shows each worker's state and ask, but not its branch or pull request, and <code>list_project_conversations</code> doesn't report them either. The recommendation is to show both on the card. Workers are told to commit only on their own branch, and the Agent Server can already report a PR's state and CI (SDK #6704).</div>
+      </div>
+    </section>
+
+    <section class="lesson" id="titles">
+      <h2><span class="n">9</span>Title by goal</h2>
+      <div class="pair">
+        <div class="here"><b class="k">How the coordinator works</b>“Reply with OK” is a first message, not a title. The coordinator names a thread when it starts it, verb first, by what the person will come back for.</div>
+        <div class="oh"><b class="k">In Projects today</b><code>start_child_conversation</code> has an optional <code>title</code>, and the tool description says to use it. <span class="gap">Gap:</span> nothing says what makes a good one, so a worker can still end up named after its first message.</div>
+      </div>
+    </section>
+
+    <h2 id="reminders">And one smaller idea: “not now” is not idle</h2>
+    <div class="prose">
+      <p>The coordinator can set a thread aside with a reminder. A thread with nothing happening and a thread the person said to pick up on Friday are different states. Projects has Working, Needs you, Idle and Resolved, and no way yet to say “remind me later”.</p>
+    </div>
+
+    <h2 id="next">What happens next</h2>
+    <div class="prose">
+      <p>Point 7 has its own thread, for the ask-user tool. The others wait for Engel to say which are worth pursuing.</p>
+    </div>
+
+    <p class="meta">Written from the coordinator's answer of 11 November 2026. Counterparts read from <code>OpenHands/software-agent-sdk</code> #6602 at <code>612402d</code> (<code>openhands-sdk/openhands/sdk/context/prompts/sections/project.py</code>, <code>openhands-agent-server/openhands/agent_server/project_prompts.py</code>, <code>project_wake.py</code>, <code>project_profiles.py</code>, <code>openhands-tools/openhands/tools/project/</code> and <code>child_conversation/</code>) and <code>OpenHands/OpenHands</code> #19495 at <code>684135f</code> (<code>src/components/features/projects/project-board.tsx</code>). Related: <a href="project-agent-profiles.html">Two specialized agents</a>, <a href="projects-review.html">OpenHands Projects, reviewed</a>, <a href="projects-scenarios.html">Projects, end to end</a>.</p>
+  </div>
+</body>
+</html>
