@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-11-11","role":"author"}]} -->
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-11-11","role":"author"},{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-11-12","role":"editor"}]} -->
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -131,6 +131,20 @@
     <h2 id="reminders">And one smaller idea: “not now” is not idle</h2>
     <div class="prose">
       <p>The coordinator can set a thread aside with a reminder. A thread with nothing happening and a thread the person said to pick up on Friday are different states. Projects has Working, Needs you, Idle and Resolved, and no way yet to say “remind me later”.</p>
+    </div>
+
+    <h2 id="reactions">A day later: what reached the coordinator, and what didn't</h2>
+    <div class="prose">
+      <p>On 12 November 2026 Engel tested how reactions and replies reach the coordinator. Observed that day:</p>
+      <ol>
+        <li><strong>A bare reaction doesn't wake it.</strong> Engel put a 👍 on the coordinator's nine-lessons message, and no event arrived. Asked “did you see where my thumb up was?”, it honestly hadn't.</li>
+        <li><strong>Reactions live beside the message, not in it.</strong> The history view shows them, but only when the coordinator reads the right thread. It first looked in the wrong place, the last few project chat messages. Then it found both a 👍 and a later ⚠️ once the question led it there. The gap is not the view. Nothing prompts the agent to look.</li>
+        <li><strong>A reply under an old message does arrive.</strong> It comes as an event naming the message it sits under, and saying no one else is listening there, so the answer belongs in place, not in the main chat.</li>
+        <li><strong>“Did you see this?” is plain text.</strong> The agent has to fetch context to work out what “this” is. An event that names its target spares it the search.</li>
+        <li><strong>For Projects: a reaction is its own event, naming the message.</strong> An agent can't be expected to rescan history. The SDK reactions merged in #6609 already work this way: the agent reads <code>[The user reacted 👍 to …]</code> with the message's text, and a reaction that arrives while tool calls are open is held until the last result is saved. The history view should show reactions too, for when the agent does look. It is the same principle as the earlier “5/5” catch: a reaction the agent never sees is not a working reaction.</li>
+        <li><strong>Two smaller ones.</strong> PR ownership works better as a table the coordinator keeps than as a rule, so Engel dropped “the opener keeps the PR” and the coordinator routes to whichever thread fits. And wording an agent reads should say “user”, as the codebase does, not “the person”.</li>
+        <li><strong>To think about: say it, but don't interrupt.</strong> Each time the coordinator posts, it chooses whether the post alerts the user's phone or just sits in the chat. It alerts only for a direct answer to what the user just asked, and for a thread waiting on the user. That is a third level between speaking and silence. For the Cat it would be one boolean, <code>tell_user(text, notify)</code>, with those two rules in its description. Canvas would use it to choose between a notification or badge and simply adding the message to the chat. The chat keeps a full record without every line costing attention. Today OpenHands has only a sound and an emoji in the tab title. Three desktop-notification PRs are open, and <a href="https://github.com/OpenHands/OpenHands/pull/16175">#16175</a> is the most mature.</li>
+      </ol>
     </div>
 
     <h2 id="next">What happens next</h2>
