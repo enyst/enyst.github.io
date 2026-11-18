@@ -1,0 +1,184 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-11-18","role":"author"}]} -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How Projects is built · Engel's Notebook</title>
+  <meta name="description" content="The architecture and code design decisions behind OpenHands Projects in SDK #6602, what was chosen over what, a recommendation on each, and everything that is not behind the projects flag." />
+  <meta property="og:title" content="How OpenHands Projects is built: the design decisions in SDK #6602" />
+  <meta property="og:description" content="Thirteen design decisions, a recommendation on each, and the list of changes that reach every Agent Server user whether or not Projects is on." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/projects-design-decisions.html" />
+  <link rel="canonical" href="https://enyst.github.io/arch/projects-design-decisions.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    .page-intro { color: var(--muted); font-size: var(--text-lg); margin-bottom: 28px; }
+    .prose a, .dec a, .meta a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,0.3); }
+    .prose a:hover, .dec a:hover { border-bottom-color: var(--teal); }
+    code { word-break: break-word; }
+    video { width: 100%; border-radius: var(--border-radius); border: 1px solid var(--border); background: #000; margin: 4px 0 6px; }
+    .cap { color: var(--muted); font-size: 0.86em; margin: 0 0 var(--space-lg); }
+    .map { width: 100%; border-collapse: collapse; font-size: 0.9em; margin: 10px 0 var(--space-md); }
+    .map td { border-bottom: 1px solid var(--border); padding: 7px 8px; vertical-align: top; line-height: 1.45; }
+    .map td:first-child { font-family: var(--mono); font-size: 0.86em; color: var(--ink); white-space: nowrap; }
+    .map td.n { font-family: var(--mono); font-size: 0.82em; color: var(--muted); text-align: right; white-space: nowrap; }
+    .dec { margin: 0 0 var(--space-lg); }
+    .dec h3 { margin-bottom: 8px; }
+    .dec h3 .n { font-family: var(--mono); font-size: 0.62em; color: var(--accent); margin-right: 10px; vertical-align: middle; }
+    .dec p { line-height: 1.6; margin: 0 0 8px; }
+    .rec { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: var(--border-radius); padding: 12px 16px; line-height: 1.55; font-size: 0.94em; }
+    .rec b.k, .open b.k { display: block; font-family: var(--mono); font-size: 0.72em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+    .rec.open { border-left-color: var(--accent); }
+    .flagless li { margin-bottom: 10px; line-height: 1.55; }
+    .flagless b { color: var(--ink); }
+    .top ol { padding-left: 20px; } .top li { margin-bottom: 8px; line-height: 1.55; }
+    .meta { color: var(--muted); font-size: 0.86em; margin-top: var(--space-lg); border-top: 1px solid var(--border); padding-top: 14px; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">← Engel's Notebook</a>
+    <h1 class="page">How Projects is built</h1>
+    <p class="page-intro">The design decisions behind OpenHands Projects in <a href="https://github.com/OpenHands/software-agent-sdk/pull/6602">SDK #6602</a>: what the agent chose, what it chose it over, and what it would recommend now. The last sections list every change that reaches Agent Server users whether or not the <code>projects</code> flag is on.</p>
+
+    <video controls preload="metadata" playsinline poster="../experiments/projects-design-decisions-video/poster.png">
+      <source src="../experiments/projects-design-decisions-video/projects-design-decisions.mp4" type="video/mp4" />
+      <a href="../experiments/projects-design-decisions-video/projects-design-decisions.mp4">Download the video (MP4)</a>
+    </video>
+    <p class="cap">The same overview as a narrated film. Written at head <code>ba97ceedd</code>, 18 November 2026.</p>
+
+    <div class="prose">
+      <h2>The shape of it</h2>
+      <p>A project is a coordinator conversation, the Cat, and the worker conversations it starts. They are ordinary Agent Server conversations. What makes them a project is a <code>project</code> tag, a board that watches their turns, and a set of tools that only project members get. The PR touches 45 source files (+8,361 / −192) and 26 test files (+7,153).</p>
+      <table class="map">
+        <tr><td>projects_router.py</td><td>HTTP surface: create, board, resolve, artifacts, memory. 404 when the flag is off.</td><td class="n">1,340</td></tr>
+        <tr><td>project_service.py</td><td><code>ProjectService</code>: starts members, owns the server tags and their lock, resolve, restart catch-up, attaching the board.</td><td class="n">727</td></tr>
+        <tr><td>project_wake.py</td><td>Wakes the Cat with a header that says who spoke and what changed; passes answers on.</td><td class="n">686</td></tr>
+        <tr><td>project_turns.py</td><td><code>TurnTracker</code>: pure. Events in, signals out.</td><td class="n">462</td></tr>
+        <tr><td>project_board.py</td><td>Acts on the tracker's signals: writes the board, runs the judge, notifies.</td><td class="n">365</td></tr>
+        <tr><td>sdk …/resolution.py</td><td>The auto-resolve judge's questions and the code that decides from the answers.</td><td class="n">399</td></tr>
+        <tr><td>project_artifacts.py, project_memory.py</td><td>Shared files with a <code>base_revision</code> so writers can't overwrite each other blind.</td><td class="n">440</td></tr>
+        <tr><td>project_prompts.py, project_profiles.py</td><td>Role prompts and the predefined Cat and worker profiles.</td><td class="n">350</td></tr>
+        <tr><td>tools/project</td><td>The agents' project tools; they call the server over HTTP.</td><td class="n">1,672</td></tr>
+        <tr><td>conversation_service.py</td><td>Net +284. Four new public methods the project code uses, nothing private.</td><td class="n">3,345</td></tr>
+      </table>
+
+      <h2>The decisions</h2>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D1</span>Projects live inside Agent Server</h3>
+      <p>Projects could have been a client feature in Canvas or a separate service next to the server. The agent put them in the server, because the board has to see every turn, including turns that happen while no client is open, and a restart has to pick up where it left off. To keep that from spreading through the conversation code, <code>ProjectService</code> (reached as <code>ConversationService.projects</code>) only calls public methods: <code>create_conversation</code>, <code>start_copied_child</code>, <code>get_event_service</code>, <code>update_conversation</code>, <code>ensure_active</code>.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it. The public-methods-only rule is the boundary worth defending in review; any new reach into private conversation state is the moment to stop and add a method instead.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D2</span>Membership and board state are tags</h3>
+      <p>A conversation belongs to a project because it carries <code>project=&lt;id&gt;</code>. Its board state lives in tags too: <code>turn</code>, <code>ask</code>, <code>resolved</code>, <code>resolvenote</code>. Tags already persist, already come back on every conversation read, and already filter in search, so no new store or migration was needed. The cost is that tags are strings with no schema, so the server reserves those keys, guards them with a lock, and rejects clients that try to set them.</p>
+      <div class="rec open"><b class="k">Recommendation, still open</b>Keep <code>project</code> as a tag; it is a real label. Move the board state into a small typed record stored next to the conversation's meta, written by <code>ProjectService</code> only. The reserved-key list and the tag lock then disappear, and the board stops being visible to (and editable by) generic tag code. You have this one marked as undecided.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D3</span>Only the coordinator starts members</h3>
+      <p>Earlier, a client could start a conversation with a project tag or add an existing one. Now <code>start_child</code> refuses with 409 unless the parent is the coordinator, start and fork with a server-owned tag are 422, and the add-existing route is gone. An existing conversation joins a project only by becoming its coordinator. This makes "who is in the project" a fact the server decides, not one any caller can assert.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it. If adopting an existing conversation as a worker ever comes back, it should be a coordinator tool call that goes through the same start path, not a client route.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D4</span>Roles are prompt presets and predefined profiles</h3>
+      <p>The Cat and its workers are not new agent classes. They are the normal <code>Agent</code> with a <code>prompt_preset</code> (<code>PROJECT_COORDINATOR</code>, <code>PROJECT_WORKER</code>), an <code>AgentContext.project_context</code> section, and predefined SDK profiles. Project tools are added at launch and withheld while the flag is off. A worker without a profile copies its parent's agent.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it. Prompt role slots (letting a user swap the Cat's prompt) stay parked until after the first experiments, as you said.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D5</span>A pure turn tracker, and effects on the side</h3>
+      <p>Reading turns used to be mixed with writing the board. Now <code>TurnTracker</code> reads events in order and returns signals such as <code>TurnStarted</code>, <code>UserWrote</code>, <code>CardAnswered</code>; it does no I/O and is tested as a function. <code>project_board.py</code> only acts on those signals. The board is attached to project members only, through <code>subscribe_internal</code>, which does not keep an idle conversation from being evicted.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it. This is the split that makes the rest reviewable.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D6</span>Who is speaking is recorded, not guessed</h3>
+      <p>A message into a conversation can come from the user, the Cat, another member, or the goal loop. <code>POST /events</code> takes a <code>sender_conversation_id</code>; the server records the sender and adds a short header the receiving agent can read. Project senders are limited to their own project. Who started a turn decides what happens at its end: a user-started turn wakes the Cat, a Cat-started turn reports back to it. When the user types in a worker, the Cat sees it as context without being woken.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it. The sender field is the one piece here that other multi-agent features will want too.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D7</span>Nobody approves for the user</h3>
+      <p>When a worker waits on a tool confirmation, a message from the Cat must not slip through as if it were the user's go-ahead. An admission guard, checked under the run lock, refuses such messages (<code>refuse_pending_confirmation</code>, a typed <code>HeldForUser</code>). Tool approvals stay in the worker; the Cat only says who is waiting.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it, and keep it under the run lock. It is the safety property most likely to be broken by a later refactor, so it has its own test.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D8</span>A question for the user reaches the user</h3>
+      <p>When a worker asks something only the user can answer, the turn becomes <code>asked</code>, even if the Cat started it. It stays asked through any number of Cat messages, until the user writes in the worker or answers the Cat's card for that worker. While it is open the judge is skipped and <code>resolve_conversation</code> returns 409. This came from a live run where a worker resolved itself after the Cat told it "you're finished"; it was the worker's own model, not the judge.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it. The known cost is a stale "Needs you" when the Cat answers the question itself; a Cat tool to withdraw a question on the user's behalf would fix that later, without loosening the rule.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D9</span>A judge decides when work is done, narrowly</h3>
+      <p>At the end of a turn, a small judge model answers typed yes/no questions (did the task finish, is the agent asking the user something) and code makes the call from those answers. It runs on the <code>DecisionModel</code>, falls back to the conversation's own model, is skipped when a worker resolves itself, and never overrides the user's own resolve. Its model is configured by environment variables (<code>OH_RESOLUTION_MODEL</code>, <code>OH_RESOLUTION_API_KEY</code>, <code>OH_RESOLUTION_BASE_URL</code>).</p>
+      <div class="rec open"><b class="k">Recommendation, still open</b>Keep the narrow-judgments design. Move the configuration into settings, next to the other LLM profiles, instead of environment variables, and drop the regex heuristics that run before the judge once the judge has been watched on real projects for a while.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D10</span>Project tools call the server over HTTP</h3>
+      <p>The project tools run inside the agent and reach the server through its own HTTP API on loopback, with the session key. That keeps one code path for every caller (the Cat's tools, Canvas, the TypeScript client) and works the same when the agent runs in a separate sandbox. The cost is a network hop and an extra failure mode inside a tool call.</p>
+      <div class="rec open"><b class="k">Recommendation, still open</b>Keep HTTP. Put the client behind a small interface so tests can pass an in-process transport (it already accepts an <code>httpx</code> transport) and a future in-process agent could skip the hop.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D11</span>Artifacts and memory are files with revisions</h3>
+      <p>Project artifacts and project memory are plain files in the project's folder, written through the server with a <code>base_revision</code>. A write against an old revision is refused, so two workers can't overwrite each other without noticing. Tools: <code>write_artifact</code>, <code>read_artifact</code>, <code>list_artifacts</code>.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it. Files are easy to inspect, back up and open in Canvas.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D12</span>One experimental flag gates the feature</h3>
+      <p>The <code>projects</code> flag hides the router (404), withholds the project tools, and is checked again by the board on each action and by restart catch-up. Conversations started with the flag on keep their tools if it is turned off later. Reading the flag goes through a cache of the settings file, also proposed on its own as SDK #6936.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it, and read the next section: the flag covers the feature, not everything the feature needed.</div>
+    </div>
+
+    <div class="dec">
+      <h3><span class="n">D13</span>Nothing reads a whole event log</h3>
+      <p>An event log can hold 60,000 events. Every project lookup goes through the conversation's View, an id lookup, or a bounded walk back from the end (for example <code>find_pending_ask_back</code>). Restart catch-up reads from the last event the board saw.</p>
+      <div class="rec"><b class="k">Recommendation</b>Keep it, as a rule for the whole server, not just Projects.</div>
+    </div>
+
+    <div class="prose flagless">
+      <h2>Not behind the projects flag</h2>
+      <p>These changes ship to every Agent Server and SDK user once #6602 merges, with the flag off.</p>
+      <ul>
+        <li><b>Shutdown pauses running conversations.</b> A conversation running when the server shuts down gets a <code>.paused_by_shutdown</code> marker and comes back as PAUSED, not ERROR, with a different tool-interrupted message.</li>
+        <li><b>Reserved tags for every client.</b> <code>project</code>, <code>turn</code>, <code>ask</code>, <code>resolved</code> and <code>resolvenote</code> are server-owned: start and fork with them return 422, PATCH keeps them (a client may only set <code>resolved</code> to <code>user</code> or remove it), and writes go through a tag lock.</li>
+        <li><b>Tags read from stored meta.</b> <code>ConversationInfo.tags</code> now comes from the stored meta, and copied children drop the project and board tags.</li>
+        <li><b><code>POST /events</code> changed.</b> New <code>sender_conversation_id</code> (header plus a recorded <code>sender</code>; project senders limited to their project) and <code>refuse_pending_confirmation</code>. The response is now <code>SendMessageResponse</code> (<code>run</code>, <code>previous_status</code>) instead of a plain success. The admission guard and <code>HeldForUser</code> apply to every caller.</li>
+        <li><b>Typed refusals.</b> <code>ConversationAlreadyRunning</code>, <code>GoalAlreadyRunning</code> and <code>HeldForUser</code> replace untyped errors; the messages are the same. A new <code>TooLarge</code> maps to 413.</li>
+        <li><b>SDK schema additions.</b> <code>prompt_preset</code> on <code>Agent</code>, <code>AgentSettings</code> and <code>AgentProfile</code> (with resolver and seed); <code>AgentContext.project_context</code>; <code>AgentLaunchAdditions.prompt_preset</code> and <code>project_context</code>; <code>withheld_tools</code> at finalize; the two project prompt presets.</li>
+        <li><b>ask_user for another conversation.</b> <code>for_conversation</code> and <code>AskUserForConversationAction</code> exist on the ask_user tool for everyone, though only the Cat has a reason to use them.</li>
+        <li><b>Routes and tools are present but closed.</b> The projects router is mounted and answers 404; the project tools are registered and withheld.</li>
+        <li><b>Plumbing.</b> The settings-file flag cache (copy of #6936), a <code>GOAL_LOOP_SENDER</code> constant, and four new public <code>ConversationService</code> methods: <code>create_conversation</code>, <code>start_copied_child</code>, <code>list_tagged_conversations</code>, <code>ensure_active</code>.</li>
+      </ul>
+      <p>The ones a reviewer should look at first are the shutdown pause, the reserved tags and the <code>POST /events</code> response change: those alter behavior an existing client can see.</p>
+    </div>
+
+    <div class="prose top">
+      <h2>If you only take three</h2>
+      <ol>
+        <li>Move the board state out of tags into a typed record owned by <code>ProjectService</code> (D2).</li>
+        <li>Configure the judge through settings, not environment variables (D9).</li>
+        <li>Decide, before merge, whether the shutdown pause and the reserved tags should be gated or announced, since they reach every user (previous section).</li>
+      </ol>
+
+      <h2>How it was checked</h2>
+      <p>The unit and integration tests run with the PR. On top of that, the 34 recipes of the F36 Projects family in the Agent Server verification skill ran live, end to end, with real agents acting, at <code>ba97cee</code>: 34 of 34 passed. A later live run on the DeepSeek proxy confirmed the question rule from D8: the worker asked, its own resolve was refused with 409, and the question was still open after the Cat wrote to it.</p>
+      <p>Related pages: <a href="projects-review.html">the Projects review</a>, <a href="coordinator-lessons.html">lessons from a working coordinator</a>, <a href="projects-scenarios.html">Projects scenarios</a>.</p>
+    </div>
+
+    <p class="meta">Written by Claude Code from the PR at head <code>ba97ceedd</code>, 18 November 2026.</p>
+  </div>
+</body>
+</html>
