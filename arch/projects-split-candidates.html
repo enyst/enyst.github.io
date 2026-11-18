@@ -1,0 +1,139 @@
+<!doctype html>
+<!-- notebook-attribution: {"version":1,"contributions":[{"agent":"Claude Code","llm":"claude-opus-5-5","date":"2026-11-18","role":"author"}]} -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>What could split out of the Projects PR · Engel's Notebook</title>
+  <meta name="description" content="A fresh read of software-agent-sdk #6602 for pieces that would stand on main without Projects: three to split, one to check first, and what should stay." />
+  <meta property="og:title" content="What could split out of the Projects PR" />
+  <meta property="og:description" content="Three pieces of SDK #6602 that are worth something on main without Projects, one to check first, and the plumbing that should stay." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://enyst.github.io/arch/projects-split-candidates.html" />
+  <link rel="canonical" href="https://enyst.github.io/arch/projects-split-candidates.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../brand.css" />
+  <style>
+    .page-intro { color: var(--muted); font-size: var(--text-lg); margin-bottom: 28px; }
+    .prose a, .cand a, .meta a { color: var(--teal); text-decoration: none; border-bottom: 1px solid rgba(107,191,171,0.3); }
+    .prose a:hover, .cand a:hover { border-bottom-color: var(--teal); }
+    code { word-break: break-word; }
+    video { width: 100%; border-radius: var(--border-radius); border: 1px solid var(--border); margin: 6px 0 var(--space-lg); background: #000; }
+    .cand { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: var(--border-radius); padding: 16px 20px; margin: 0 0 var(--space-md); line-height: 1.58; }
+    .cand.check { border-left-color: var(--accent); }
+    .cand.keep { border-left-color: var(--border); }
+    .cand h3 { margin: 0 0 6px; }
+    .cand h3 .n { font-family: var(--mono); font-size: 0.7em; color: var(--accent); margin-right: 8px; }
+    .verdict { font-family: var(--mono); font-size: 0.76em; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .cand dl { display: grid; grid-template-columns: 9.5em 1fr; gap: 6px 14px; margin: 10px 0 0; font-size: 0.94em; }
+    .cand dt { color: var(--muted); font-weight: 500; }
+    .cand dd { margin: 0; }
+    @media (max-width: 640px) { .cand dl { grid-template-columns: 1fr; } .cand dt { margin-top: 6px; } }
+    table.keep-table { width: 100%; border-collapse: collapse; font-size: 0.92em; margin: 8px 0 var(--space-lg); }
+    table.keep-table th, table.keep-table td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    table.keep-table th { color: var(--muted); font-weight: 500; }
+    .quote { border-left: 3px solid var(--border); padding: 4px 0 4px 16px; color: var(--muted); font-style: italic; margin: 0 0 var(--space-md); }
+    .meta { color: var(--muted); font-size: 0.86em; margin-top: var(--space-lg); border-top: 1px solid var(--border); padding-top: 14px; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <a class="back" href="../index.html">← Engel's Notebook</a>
+    <h1 class="page">What could split out of the Projects PR</h1>
+    <p class="page-intro">A fresh read of <a href="https://github.com/OpenHands/software-agent-sdk/pull/6602">software-agent-sdk #6602</a>, looking for pieces that would earn their place on <code>main</code> without Projects. Three do. One more might, and should be checked first. The rest is plumbing that only Projects calls, and it should stay where it is.</p>
+
+    <p class="quote">“maybe separately (separately, you could make a new thread even just so it thinks anew) suggestions if theres anything we could separate out”</p>
+
+    <video controls preload="metadata" poster="../experiments/projects-split-video/poster.jpg" src="../experiments/projects-split-video/projects-split.mp4"></video>
+
+    <div class="prose">
+      <p>Read at #6602 head <code>ba97cee</code> against <code>main</code> <code>f1eedd7</code>. The PR is 82 files and about 16,800 added lines: roughly 8,400 of code, 7,200 of tests, 760 of docs and prompt snapshots, and 540 of TypeScript client. Already split out and not repeated here: flags #6759, reactions #6609, ask_user #6852, mentions #6851, exceptions #6910 and #6912, the flag cache #6936, and #6922. The auto-resolve judge was considered before and stays out for the same reason as then: nothing on <code>main</code> would call it.</p>
+      <p>The test for each piece was the same. Does <code>main</code> get something from it today, with Projects off? Can it be reviewed on its own? And can it be cut from <code>main</code> without dragging project code along? Each split-out PR would be opened from <code>main</code>, with #6602 keeping its copy until it merges, as with the others.</p>
+    </div>
+
+    <h2>Split these</h2>
+
+    <section class="cand" id="guarded-messages">
+      <h3><span class="n">1</span>Messages from someone other than the user</h3>
+      <div class="verdict">Recommend · the biggest one · after #6912</div>
+      <p>When anything but the user posts a message and asks for a run, it should never approve the user's pending actions or resume work the user paused. #6602 adds that rule for every sender, plus a way to say who sent the message.</p>
+      <dl>
+        <dt>What it holds</dt>
+        <dd><code>admission_refusal</code> and the typed refusals <code>ConversationAlreadyRunning</code>, <code>GoalAlreadyRunning</code> and <code>HeldForUser</code> (<code>event_service.py</code>). On <code>POST /api/conversations/{id}/events</code>: <code>refuse_pending_confirmation</code>, <code>sender_conversation_id</code> with its header line, and a <code>SendMessageResponse</code> that says whether the message ran (<code>started</code>, <code>queued</code>, a held status, or <code>not_run</code>). The sender constants in <code>conversation/types.py</code>: <code>conversation_sender</code>, <code>CONVERSATION_SENDER_PREFIX</code>, <code>GOAL_LOOP_SENDER</code>, <code>HELD_FOR_USER_STATUSES</code>. A child's first message recorded as sent by its parent. The matching TypeScript types.</dd>
+        <dt>Why on its own</dt>
+        <dd>Today a run asked for on a conversation waiting for confirmation approves its pending action. Any client that talks to a conversation for someone else hits that: automations, Voice, and the Insider Cat, whose prompt already tells it to send <code>refuse_pending_confirmation</code> and <code>sender_conversation_id</code> (<code>enyst/insider</code> <code>extension.js:421</code>). Those fields exist only in #6602. A released server's <code>SendMessageRequest</code> silently ignores fields it does not know, so the Cat's careful message runs unguarded there. <code>start_child_conversation</code> is on <code>main</code> too, and its task message would finally record who sent it.</dd>
+        <dt>What stays in #6602</dt>
+        <dd>The project rule in <code>sender_message_header</code> (a project's conversations reach only their own project, and the coordinator gets its own wording). On <code>main</code> the header names “another conversation”. Also <code>run_saved_message_when_free</code> and <code>keep_goal_loop</code>, which only project wake-ups use.</dd>
+        <dt>Depends on</dt>
+        <dd>#6912, because the three exception classes belong in its new <code>exceptions.py</code>. Open it once #6912 merges, not on top of it.</dd>
+        <dt>Size</dt>
+        <dd>My estimate: about 350 lines of code and a similar amount of tests, much of it already written in #6602 (commit <code>d31af0b</code> for the typed refusals). If that feels large, the typed refusals alone are a clean refactor in the spirit of #6910 and could go first, and the guard after it merges.</dd>
+        <dt>Flag</dt>
+        <dd>Opt-in request fields, so nothing changes for clients that don't send them. The one visible change is the child's task showing its parent as sender.</dd>
+      </dl>
+    </section>
+
+    <section class="cand" id="pending-ask">
+      <h3><span class="n">2</span>Find the open question without reading the whole log</h3>
+      <div class="verdict">Recommend · small · and it fixes more on main than #6602 does</div>
+      <p>Your rule is that nothing reads a whole event log. <code>main</code> still does it to answer one small question: is there an unanswered <code>ask_user</code>?</p>
+      <dl>
+        <dt>What it holds</dt>
+        <dd><code>find_pending_ask_back</code> in <code>sdk/event/ask_user.py</code>: one pass, newest first, stopping at the question or the user's latest message, so it can take <code>state.walk_back()</code> lazily.</dd>
+        <dt>Why on its own</dt>
+        <dd>On <code>main</code>, <code>find_pending_ask</code> is fed the whole active branch in <code>local_conversation.py</code> (three places), <code>event_service.py</code> (the goal loop check), and the whole log in <code>goal/runner.py:54</code> (<code>conversation.state.events</code>). #6602 only fixed the agent server's call. A PR from <code>main</code> would fix all five, with ask_user (#6852) already released.</dd>
+        <dt>What stays in #6602</dt>
+        <dd>The coordinator parts of the same function: <code>for_conversation</code>, and treating a coordinator-delivered answer as closing the question.</dd>
+        <dt>Depends on</dt>
+        <dd>Nothing. <code>walk_back</code> is on <code>main</code>.</dd>
+        <dt>Size</dt>
+        <dd>About 40 lines in <code>ask_user.py</code>, six call sites, and tests.</dd>
+      </dl>
+    </section>
+
+    <section class="cand" id="tags-on-read">
+      <h3><span class="n">3</span>Show new tags as soon as they are saved</h3>
+      <div class="verdict">Recommend · a bug fix, so its own PR by the standing rule</div>
+      <dl>
+        <dt>What it holds</dt>
+        <dd>Commit <code>81147dd</code>: <code>GET /api/conversations/{id}</code> reads tags from <code>meta.json</code> instead of <code>base_state.json</code> (<code>conversation_service.py:443</code>).</dd>
+        <dt>Why on its own</dt>
+        <dd>A tag <code>PATCH</code> writes <code>meta.json</code> at once, but a running conversation saves <code>base_state.json</code> only when its run lets go of the state lock. Until then the PATCH looks lost. That happens on <code>main</code> for anyone who tags a running conversation, Insider's tags included.</dd>
+        <dt>Depends on</dt>
+        <dd>Nothing.</dd>
+        <dt>Size</dt>
+        <dd>Eight lines and an 18-line test, which today lives in <code>test_projects_router.py</code> and would move to the conversation tests.</dd>
+      </dl>
+    </section>
+
+    <h2>Check first</h2>
+
+    <section class="cand check" id="shutdown-pause">
+      <h3><span class="n">4</span>A shutdown pause is not a crash</h3>
+      <div class="verdict">Maybe · only if it reproduces on main</div>
+      <p><code>close()</code> leaves a <code>.paused_by_shutdown</code> mark when it pauses a running run, and on load a conversation still marked <code>RUNNING</code> comes back <code>PAUSED</code> with an honest message, instead of <code>ERROR</code> and “this may indicate a fatal memory error”. Its main consumer is Projects: the coordinator's catch-up after a restart names the restart instead of blaming the user (commit <code>14b3f7c</code>). On <code>main</code>, <code>close()</code> already pauses before it cancels, so a graceful shutdown may already end <code>PAUSED</code>. I did not reproduce it. If a stop of the server on <code>main</code> does leave conversations in <code>ERROR</code> with the crash message, the load-time half is a bug fix worth its own small PR. If not, it stays.</p>
+    </section>
+
+    <h2>Keep in #6602</h2>
+    <div class="prose"><p>These look general, and some are well made, but on <code>main</code> nothing would call them. Splitting them would add code with no user, the same reason the judge stayed.</p></div>
+    <table class="keep-table">
+      <tr><th>Piece</th><th>Why it stays</th></tr>
+      <tr><td><code>EventService.scan_events</code>, <code>subscribe_internal</code>; <code>ConversationService.list_tagged_conversations</code>, public <code>create_conversation</code>, <code>start_copied_child</code></td><td>Good primitives, called only from <code>project_wake.py</code>, <code>project_service.py</code> and <code>projects_router.py</code>. They belong to the review of their callers.</td></tr>
+      <tr><td><code>prompt_preset</code> on <code>Agent</code>, profiles and settings; <code>project_context</code>; <code>withheld_tools</code> in <code>finalize</code></td><td>Launch plumbing whose only values are the project roles. A profile could pick <code>planning</code> with it, but nobody has asked for that, and it would be a new feature.</td></tr>
+      <tr><td>Project prompt sections and snapshots</td><td>A prompt PR would be easy to read, but nothing on <code>main</code> builds these presets.</td></tr>
+      <tr><td><code>AskUserForConversationAction</code></td><td>Coordinator-only.</td></tr>
+      <tr><td><code>TooLarge</code> domain error</td><td>Two lines, used by project artifacts and memory.</td></tr>
+      <tr><td>Auto-resolve judge</td><td>As decided before: auto-resolve without Projects would be a new feature.</td></tr>
+    </table>
+
+    <div class="prose">
+      <h2>What it would leave</h2>
+      <p>With the three split out, #6602 sheds its only changes to the shared send path and to the ask lookup, which are the parts a reviewer outside Projects would worry about most. What remains is Projects itself: the store and routes, the service, turn tracker and board, wake-ups, the tools, the prompts and the client. Behind the flag, and reviewable as one feature. The order I would suggest: 3 and 2 now, since they depend on nothing; 1 once #6912 merges.</p>
+    </div>
+
+    <p class="meta">Suggestions only: no PRs opened, no code changed. Read from the diff at #6602 <code>ba97cee</code> and <code>main</code> <code>f1eedd7</code>, 18 November 2026. Line counts for candidate 1 are my estimate. Narration voiced by <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro-82M</a> (open weights, Apache-2.0), voice af_heart. Related: <a href="projects-review.html">the Projects review</a> and <a href="projects-insider-sdk-scope.html">how Projects work</a>.</p>
+  </div>
+</body>
+</html>
